@@ -1,0 +1,3 @@
+#Grafkit2 is ...
+Completely refraced and rewritten version of GK 0.5
+By Caiwan/IR
