@@ -1,35 +1,35 @@
-# Projektszervezés
+# ProjektszervezÃ©s
 
 ## File szinten
 
-- `src/` könyvtárba megy minden source
-	- `src/api` köynvtár az api könyvtára
-	- `src/idogep` könyvtár a szerkesztõé
-	- **TODO** ide kell még valahova minden egyéb apróság kódja, python szkriptek, html/js toolok, minden ilyen
-		- Textúra generátor
-		- A BMFont-ból kialakított textúra generátor library
+- `src/` kÃ¶nyvtÃ¡rba megy minden source
+	- `src/api` kÃ¶ynvtÃ¡r az api kÃ¶nyvtÃ¡ra
+	- `src/idogep` kÃ¶nyvtÃ¡r a szerkesztÅ‘Ã©
+	- **TODO** ide kell mÃ©g valahova minden egyÃ©b aprÃ³sÃ¡g kÃ³dja, python szkriptek, html/js toolok, minden ilyen
+		- TextÃºra generÃ¡tor
+		- A BMFont-bÃ³l kialakÃ­tott textÃºra generÃ¡tor library
 - `test/`
-	- unitesztek - valószínûleg gteszt lesz
-	- funkcionális tesztek - API egyes részeit teszteli le, valószínûleg robot framework-kel
-	- engine teszt - az apiban levõ player funcionális tesztjei
-	- **TODO** - ezeket el kell választani valahogy egymástól
+	- unitesztek - valÃ³szÃ­nÅ±leg gteszt lesz
+	- funkcionÃ¡lis tesztek - API egyes rÃ©szeit teszteli le, valÃ³szÃ­nÅ±leg robot framework-kel
+	- engine teszt - az apiban levÅ‘ player funcionÃ¡lis tesztjei
+	- **TODO** - ezeket el kell vÃ¡lasztani valahogy egymÃ¡stÃ³l
 	
 - `build/` 
-	- ide szemetel a fordító
+	- ide szemetel a fordÃ­tÃ³
 	
 - `demos/`
-	- az api-val készült demók, releasek
+	- az api-val kÃ©szÃ¼lt demÃ³k, releasek
 	
 - `tools`
-	- *subrepository* minden 3rd party cucc ide jön + a fordításukhoz szükséges MSVC projektek, illetve szkriptek
+	- *subrepository* minden 3rd party cucc ide jÃ¶n + a fordÃ­tÃ¡sukhoz szÃ¼ksÃ©ges MSVC projektek, illetve szkriptek
 	
-**TODO** - a shader effekteknek is kell valahova valamilyen könyvtár, amiben ellennének, ne az assetsben legyen külön. 
+**TODO** - a shader effekteknek is kell valahova valamilyen kÃ¶nyvtÃ¡r, amiben ellennÃ©nek, ne az assetsben legyen kÃ¼lÃ¶n. 
 
 
 
 ## API szinten
 
-### Névterek
+### NÃ©vterek
 
 #### `FWcore`
 
