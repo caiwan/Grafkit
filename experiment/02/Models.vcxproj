@@ -41,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="color.hlsl" />
-    <None Include="color.vs" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9793CC2B-FAC0-4DB9-899B-C7CFB5974126}</ProjectGuid>

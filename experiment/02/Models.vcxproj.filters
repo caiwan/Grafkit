@@ -70,9 +70,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.vs">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="color.hlsl">
       <Filter>Resource Files</Filter>
     </None>
