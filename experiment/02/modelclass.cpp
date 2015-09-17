@@ -21,7 +21,7 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D11Device* device)
+bool ModelClass::Initialize(ID3D11Device* device, WCHAR* textureFilename)
 {
 	bool result;
 
@@ -29,6 +29,13 @@ bool ModelClass::Initialize(ID3D11Device* device)
 	// Initialize the vertex and index buffers.
 	result = InitializeBuffers(device);
 	if(!result)
+	{
+		return false;
+	}
+
+	// Load the texture for this model.
+	result = LoadTexture(device, textureFilename);
+	if (!result)
 	{
 		return false;
 	}
@@ -41,6 +48,7 @@ void ModelClass::Shutdown()
 {
 	// Shutdown the vertex and index buffers.
 	ShutdownBuffers();
+	ReleaseTexture();
 
 	return;
 }
@@ -58,6 +66,39 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 int ModelClass::GetIndexCount()
 {
 	return m_indexCount;
+}
+
+bool ModelClass::LoadTexture(ID3D11Device *device, WCHAR *filename)
+{
+	bool result;
+
+
+	// Create the texture object.
+	m_texture = new TextureClass;
+	if (!m_texture)
+	{
+		return false;
+	}
+
+	// Initialize the texture object.
+	result = m_texture->Initialize(device, filename);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true; 
+}
+
+void ModelClass::ReleaseTexture()
+{
+	if(this->m_texture){
+		this->m_texture->Shutdown();
+		delete m_texture;
+		m_texture = 0;
+	}
+	
+	//this->m_texture->Shutdown();
 }
 
 
@@ -91,14 +132,14 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	}
 
 	// Load the vertex array with data.
-	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
-	vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[0].position = float3(-1.0f, -1.0f, 0.0f);  // Bottom left.
+	vertices[0].texture  = float2(0.0f, 0.0f);
 
-	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);  // Top middle.
-	vertices[1].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[1].position = float3(0.0f, 1.0f, 0.0f);  // Top middle.
+	vertices[1].texture  = float2(0.5f, 1.0f);
 
-	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f);  // Bottom right.
-	vertices[2].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[2].position = float3(1.0f, -1.0f, 0.0f);  // Bottom right.
+	vertices[2].texture  = float2(1.0f, 0.0f);
 
 	// Load the index array with data.
 	indices[0] = 0;  // Bottom left.
