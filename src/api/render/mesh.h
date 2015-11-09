@@ -55,14 +55,25 @@ namespace FWrender
 
 	typedef Ref<Mesh> MeshRef;
 
+	/**
+	Simple mesh generator. Automatically creates the vertex buffers from vectors 
+	*/
 	class SimpleMeshGenerator {
-	public: 
-		static MeshRef fromRaw(
-			ID3D11Device* device,
-			int vertexCount, const float3* position, const float2* uv,
+		public: 
+			SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
+
+		MeshRef& operator() (
+			int vertexCount, const float3* position,
 			int indexCount, const int* indices
 		);
 
+		MeshRef& operator() (
+			int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
+			int indexCount, const int* indices
+		);
+
+	private:
+		ID3D11Device* m_device;
 	};
 }
 
