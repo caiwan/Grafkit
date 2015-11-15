@@ -5,14 +5,30 @@
 #include "../core/exceptions.h"
 
 namespace FWrender {
+
+	class ParameterManager {
+		// + parameter manager
+	};
+
+	/// @todo: ez a shader csak vagy VS vagy FS shadert tartalmazzon 
 	class Shader {
 	public:
+
+		/// @todo ezt innen el kell pakoni - egyik felet a node-ba, a masikat a kameraba
 		struct MatrixBufferType
 		{
 			matrix world;
 			matrix view;
 			matrix projection;
 		};
+
+		enum ShaderType_e {
+			ST_NONE = 0,
+			ST_Vertex,
+			ST_Fragment,
+			ST_COUNT
+		};
+
 	public:
 		Shader();
 		virtual ~Shader();

@@ -94,6 +94,9 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 		throw new EX(FSCrerateException);
 	}
 
+
+	// --- ezek mennenek a meshbe, vagy a mesh factoryba 
+
 	// Create the vertex input layout description.
 	// This setup needs to match the VertexType stucture in the Model and in the shader.
 	polygonLayout[0].SemanticName = "POSITION";
@@ -122,12 +125,16 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 		throw new EX(InputLayoutCreateException);
 	}
 
+	// --- egeszen eddig ---
+
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
 	vertexShaderBuffer->Release();
 	vertexShaderBuffer = 0;
 
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = 0;
+
+	// --- ezek mennenek a parameter managerbe ---
 
 	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -143,6 +150,8 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	{
 		throw new EX(ConstantBufferCreateException); //Exception(1001, L"Could not create constant buffer", EX_WHERE);
 	}
+
+	// --- egeszen eddig 
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
