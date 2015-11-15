@@ -8,6 +8,7 @@
 #include "dxtypes.h"
 
 #include "../core/reference.h"
+#include "../core/exceptions.h"
 
 #include <vector>
 
@@ -54,7 +55,7 @@ namespace FWrender
 
 		protected:
 			struct BufferStateDescriptor {
-				ID3D11Buffer * buffer;
+				ID3D11Buffer *buffer;
 				UINT stride, offset;
 
 				BufferStateDescriptor() {
@@ -75,22 +76,27 @@ namespace FWrender
 	Simple mesh generator. Automatically creates the vertex buffers from vectors 
 	*/
 	class SimpleMeshGenerator {
-		public: 
-			SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
+	public: 
+		SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
 
-		MeshRef& operator() (
-			int vertexCount, const float3* position,
-			int indexCount, const int* indices
-		);
+	MeshRef operator() (
+		int vertexCount, const float3* position,
+		int indexCount, const int* indices
+	);
 
-		MeshRef& operator() (
-			int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
-			int indexCount, const int* indices
-		);
+	MeshRef operator() (
+		int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
+		int indexCount, const int* indices
+	);
 
 	private:
-		ID3D11Device* m_device;
+		void createIndexBuffer(MeshRef mesh, int indexCount, const int* indices);
+		ID3D11Device *m_device;
 	};
 }
+
+// --- excpetions 
+DEFINE_EXCEPTION(CreateVertexBufferException, 1301, "Could not create vertex buffer")
+DEFINE_EXCEPTION(CreateIndevBufferException, 1302, "Could not create index buffer")
 
 #endif
