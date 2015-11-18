@@ -26,7 +26,7 @@ namespace FWrender {
 
 	protected:
 		ShaderRef m_shader;
-		const Actor* parent;
+		const Actor* m_parent;
 
 		/// @todo + transformation
 		/// @todo + bounding box, ha kell 
