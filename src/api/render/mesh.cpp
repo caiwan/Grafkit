@@ -83,7 +83,7 @@ void FWrender::Mesh::ShutdownBuffers()
 
 
 // ========================================================================
-MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 * pPosition, int indexCount, const int * pIndices)
+MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 * pPosition, int indexCount, const int * pIndices, MeshRef input_mesh)
 {
 	Mesh* mesh = NULL;
 	HRESULT result = 0;
@@ -95,8 +95,12 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 
 	
 	ID3D11Buffer *vertexBuffer = NULL;
 
-	mesh = new Mesh();
-	this->createIndexBuffer(mesh, indexCount, pIndices);
+	if (input_mesh.Invalid()) {
+		mesh = new Mesh();
+	}
+	else {
+		mesh = input_mesh;
+	}	this->createIndexBuffer(mesh, indexCount, pIndices);
 
 	// --- 
 	_vertex_t* vertices = NULL;
@@ -141,7 +145,7 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 
 	return mesh;
 }
 
-MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 *pPosition, const float3 *pNormal, const float2 *pUv, const float3 *pTangent, int indexCount, const int *pIndices)
+MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 *pPosition, const float3 *pNormal, const float2 *pUv, const float3 *pTangent, int indexCount, const int *pIndices, MeshRef input_mesh)
 {
 	Mesh* mesh = NULL;
 	HRESULT result = 0;
@@ -153,7 +157,12 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 
 
 	ID3D11Buffer *vertexBuffer = NULL;
 
-	mesh = new Mesh();
+	if (input_mesh.Invalid()) {
+		mesh = new Mesh();
+	}
+	else {
+		mesh = input_mesh;
+	}
 	this->createIndexBuffer(mesh, indexCount, pIndices);
 
 	// --- 

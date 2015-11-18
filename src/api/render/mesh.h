@@ -76,22 +76,24 @@ namespace FWrender
 	Simple mesh generator. Automatically creates the vertex buffers from vectors 
 	*/
 	class SimpleMeshGenerator {
-	public: 
-		SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
+		public: 
+			SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
 
-	MeshRef operator() (
-		int vertexCount, const float3* position,
-		int indexCount, const int* indices
-	);
+			MeshRef operator() (
+				int vertexCount, const float3* position,
+				int indexCount, const int* indices,
+				MeshRef input
+			);
 
-	MeshRef operator() (
-		int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
-		int indexCount, const int* indices
-	);
+			MeshRef operator() (
+				int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
+				int indexCount, const int* indices,
+				MeshRef input
+			);
 
-	private:
-		void createIndexBuffer(MeshRef mesh, int indexCount, const int* indices);
-		ID3D11Device *m_device;
+		private:
+			void createIndexBuffer(MeshRef mesh, int indexCount, const int* indices);
+			ID3D11Device *m_device;
 	};
 }
 
