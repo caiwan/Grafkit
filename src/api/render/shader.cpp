@@ -148,11 +148,12 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
 	if (FAILED(result))
 	{
-		throw new EX(ConstantBufferCreateException); //Exception(1001, L"Could not create constant buffer", EX_WHERE);
+		throw new EX(ConstantBufferCreateException);
 	}
 
 	// --- egeszen eddig 
 
+	// sampler statet hogyan? 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
