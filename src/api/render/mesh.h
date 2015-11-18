@@ -82,13 +82,13 @@ namespace FWrender
 			MeshRef operator() (
 				int vertexCount, const float3* position,
 				int indexCount, const int* indices,
-				MeshRef input
+				MeshRef input = NULL
 			);
 
 			MeshRef operator() (
 				int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
 				int indexCount, const int* indices,
-				MeshRef input
+				MeshRef input = NULL
 			);
 
 		private:
