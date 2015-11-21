@@ -1,39 +1,124 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="FWrender::Camera" Collapsed="true">
-    <Position X="4.25" Y="0.5" Width="1.5" />
+  <Class Name="FWrender::Camera">
+    <Position X="8.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACCQAAAACCAAAIoQAAGAQSAYCIAQghAABAAAAUAAAA=</HashCode>
       <FileName>render\camera.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FWrender::Mesh" Collapsed="true">
+  <Class Name="FWrender::Mesh">
     <Position X="0.5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="FWrender::Mesh::VertexType_pos" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\mesh.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="FWrender::Mesh::VertexType_pos_tex" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\mesh.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="FWrender::Mesh::BufferStateDescriptor" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\mesh.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>ACAAAAAQAAEAAEAQAAAQARAAAAABAAAAARAAAAAAEAA=</HashCode>
-      <FileName>render\model.h</FileName>
+      <HashCode>ACAAAAUQAAEAAEAQAAAQARAAAAAAAAAAARAAAAEACAA=</HashCode>
+      <FileName>render\mesh.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FWrender::Renderer" Collapsed="true">
-    <Position X="2.5" Y="0.5" Width="1.5" />
+  <Class Name="FWrender::Renderer">
+    <Position X="14.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>CACghAAAEAQIAUBAQAEAAQIBAAACAAhABACAGAAABAA=</HashCode>
       <FileName>render\renderer.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FWrender::Shader" Collapsed="true">
-    <Position X="7.75" Y="0.5" Width="1.5" />
+  <Class Name="FWrender::Shader">
+    <Position X="10.5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="FWrender::Shader::MatrixBufferType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\shader.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Enum Name="FWrender::Shader::ShaderType_e" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\renderer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>QAAIAAAAAAQAABAAAAACAUAAACCAAAAABBAEAAAAEAA=</HashCode>
       <FileName>render\shader.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FWrender::Texture" Collapsed="true">
-    <Position X="6" Y="0.5" Width="1.5" />
+  <Class Name="FWrender::Texture">
+    <Position X="12.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAQAAACAAAAgwAAAAAAAQAAAAAAAAIAAAIAAAAAAAA=</HashCode>
       <FileName>render\texture.h</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="FWrender::Model">
+    <Position X="0.5" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>render\renderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::ParameterManager">
+    <Position X="10.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>render\shader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::SimpleMeshGenerator">
+    <Position X="10.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAEAAAAAgAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>render\mesh.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Typedef Name="FWrender::CameraRef" Collapsed="true">
+    <Position X="8.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>render\renderer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="FWrender::ModelRef" Collapsed="true">
+    <Position X="2.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>render\renderer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="FWrender::ShaderRef" Collapsed="true">
+    <Position X="10.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>render\renderer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="FWrender::TextureRef" Collapsed="true">
+    <Position X="12.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>render\renderer.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="FWrender::MeshRef" Collapsed="true">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>render\mesh.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
   <Font Name="Tahoma" Size="8.25" />
 </ClassDiagram>
