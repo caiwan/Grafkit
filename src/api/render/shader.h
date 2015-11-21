@@ -1,6 +1,7 @@
 
 #pragma once 
 
+#include "../core/reference.h"
 #include "dxtypes.h"
 #include "../core/exceptions.h"
 
@@ -11,7 +12,7 @@ namespace FWrender {
 	};
 
 	/// @todo: ez a shader csak vagy VS vagy FS shadert tartalmazzon 
-	class Shader {
+	class Shader : virtual public Referencable{
 	public:
 
 		/// @todo ezt innen el kell pakoni - egyik felet a node-ba, a masikat a kameraba
