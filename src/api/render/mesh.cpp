@@ -90,7 +90,7 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 
 	typedef struct Mesh::VertexType_pos _vertex_t;
 	
 	// check inputs
-	if (!vertexCount || !pPosition || !indexCount || pIndices)
+	if (!vertexCount || !pPosition || !indexCount || !pIndices)
 		throw EX(NullPointerException);
 	
 	ID3D11Buffer *vertexBuffer = NULL;
@@ -152,7 +152,7 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 
 	typedef struct Mesh::VertexType_pos_tex _vertex_t;	/// @todo ezt bele lehetne rangatni egy templatebe, nem?
 
 	// check inputs
-	if (!vertexCount || !pPosition || !indexCount || pIndices || pNormal || pTangent || pUv)
+	if (!vertexCount || !pPosition || !indexCount || !pIndices || !pNormal || !pTangent || !pUv)
 		throw EX(NullPointerException);
 
 	ID3D11Buffer *vertexBuffer = NULL;
