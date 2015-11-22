@@ -14,7 +14,10 @@ using FWmath::Matrix;
 
 // =============================================================================================================================
 
-Shader::Shader()
+Shader::Shader() : 
+	m_sampleState(NULL),
+	m_pShader(NULL),
+	m_vShader(NULL)
 {
 }
 
@@ -23,12 +26,14 @@ FWrender::Shader::~Shader()
 	this->Shutdown();
 }
 
-void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCSTR fsEntry, LPCWCHAR vsFile, LPCWCHAR fsFile)
+//void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCSTR fsEntry, LPCWCHAR vsFile, LPCWCHAR fsFile)
+void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
-	ID3D10Blob* vertexShaderBuffer;
-	ID3D10Blob* pixelShaderBuffer;
+
+	ID3D10Blob* shaderBuffer;
+
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDesc;
@@ -36,24 +41,23 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	D3D11_SAMPLER_DESC samplerDesc;
 
 	// input checking
-	if (!vsEntry) throw new EX(NullPointerException);
-	if (!fsEntry) throw new EX(NullPointerException);
-	if (!vsFile) throw new EX(NullPointerException);
+	if (!entry) throw new EX(NullPointerException);
+	if (!file) throw new EX(NullPointerException);
+
 
 	// Initialize the pointers this function will use to null.
 	errorMessage = 0;
-	vertexShaderBuffer = 0;
-	pixelShaderBuffer = 0;
+	shaderBuffer = 0;
 
 	// Compile the vertex shader code.
-	result = D3DCompileFromFile(vsFile, NULL, NULL, vsEntry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertexShaderBuffer, &errorMessage);
+	result = D3DCompileFromFile(file, NULL, NULL, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 
 	if (FAILED(result))
 	{
 		// If the shader failed to compile it should have writen something to the error message.
 		if (errorMessage)
 		{
-			DispatchShaderErrorMessage(errorMessage, vsFile, vsEntry);
+			DispatchShaderErrorMessage(errorMessage, file, entry);
 		}
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
@@ -63,40 +67,48 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	}
 
 	// Compile the pixel shader code.
-	LPCWCHAR _fsFile = fsFile ? fsFile : vsFile;
-	result = D3DCompileFromFile(_fsFile, NULL, NULL, fsEntry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixelShaderBuffer, &errorMessage);
 
-	if (FAILED(result))
-	{
-		// If the shader failed to compile it should have writen something to the error message.
-		if (errorMessage)
+	//LPCWCHAR _fsFile = fsFile ? fsFile : vsFile;
+	//result = D3DCompileFromFile(_fsFile, NULL, NULL, fsEntry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixelShaderBuffer, &errorMessage);
+
+	//if (FAILED(result))
+	//{
+	//	// If the shader failed to compile it should have writen something to the error message.
+	//	if (errorMessage)
+	//	{
+	//		DispatchShaderErrorMessage(errorMessage, _fsFile, fsEntry);
+	//	}
+	//	// If there was nothing in the error message then it simply could not find the shader file itself.
+	//	else
+	//	{
+	//		throw new EX(MissingShaderExcepotion);
+	//	}
+	//}
+
+
+	if (type == ST_Vertex) {
+		// Create the vertex shader from the buffer.
+		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_vShader);
+		if (FAILED(result))
 		{
-			DispatchShaderErrorMessage(errorMessage, _fsFile, fsEntry);
+			throw new EX(VSCrerateException);
 		}
-		// If there was nothing in the error message then it simply could not find the shader file itself.
-		else
+	}
+	else if (type == ST_Pixel){
+		// Create the pixel shader from the buffer.
+		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_pShader);
+		if (FAILED(result))
 		{
-			throw new EX(MissingShaderExcepotion);
+			throw new EX(FSCrerateException);
 		}
 	}
 
-	// Create the vertex shader from the buffer.
-	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
-	if (FAILED(result))
-	{
-		throw new EX(VSCrerateException);
-	}
-
-	// Create the pixel shader from the buffer.
-	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
-	if (FAILED(result))
-	{
-		throw new EX(FSCrerateException);
-	}
-
+	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
+	shaderBuffer->Release();
+	shaderBuffer = NULL;
 
 	// --- ezek mennenek a meshbe, vagy a mesh factoryba 
-
+#if 0
 	// Create the vertex input layout description.
 	// This setup needs to match the VertexType stucture in the Model and in the shader.
 	polygonLayout[0].SemanticName = "POSITION";
@@ -124,18 +136,11 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	{
 		throw new EX(InputLayoutCreateException);
 	}
-
+#endif
 	// --- egeszen eddig ---
 
-	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
-	vertexShaderBuffer->Release();
-	vertexShaderBuffer = 0;
-
-	pixelShaderBuffer->Release();
-	pixelShaderBuffer = 0;
-
 	// --- ezek mennenek a parameter managerbe ---
-
+#if 0
 	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
@@ -150,10 +155,11 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	{
 		throw new EX(ConstantBufferCreateException);
 	}
-
+#endif
 	// --- egeszen eddig 
 
-	// sampler statet hogyan? 
+	// ezt ki kell deriteni, hogy mit csinal
+#if 0
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -175,12 +181,13 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	{
 		throw new EX(SamplerStateCreateException);
 	}
+#endif
 
 }
 
 void FWrender::Shader::Shutdown()
 {
-	// why is empty 
+	// why is this empty 
 }
 
 void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
@@ -191,6 +198,7 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 
 void FWrender::Shader::SetCameraMatrices(ID3D11DeviceContext * deviceContext, FWmath::Matrix & mat_projection, FWmath::Matrix & mat_world, FWmath::Matrix & mat_view)
 {
+# if 0
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* mMatrix;
@@ -217,6 +225,8 @@ void FWrender::Shader::SetCameraMatrices(ID3D11DeviceContext * deviceContext, FW
 	deviceContext->Unmap(m_matrixBuffer, 0);
 	bufferNumber = 0;
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+
+#endif
 }
 
 void FWrender::Shader::SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView * texture)

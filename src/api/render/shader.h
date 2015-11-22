@@ -3,15 +3,26 @@
 
 #include "../core/reference.h"
 #include "dxtypes.h"
+#include "../render/renderer.h"
 #include "../core/exceptions.h"
 
 namespace FWrender {
 
+	class Shader;
+
 	class ParameterManager {
+		friend class Shader;
+	public:
 		// + parameter manager
 	};
 
-	/// @todo: ez a shader csak vagy VS vagy FS shadert tartalmazzon 
+	enum ShaderType_e {
+		ST_NONE = 0,
+		ST_Vertex,
+		ST_Pixel,
+		ST_COUNT
+	};
+
 	class Shader : virtual public Referencable{
 	public:
 
@@ -23,25 +34,17 @@ namespace FWrender {
 			matrix projection;
 		};
 
-		enum ShaderType_e {
-			ST_NONE = 0,
-			ST_Vertex,
-			ST_Fragment,
-			ST_COUNT
-		};
-
 	public:
 		Shader();
 		virtual ~Shader();
 
 		/**
 			@param device device context
-			@param vsEntry entry point of vertex shader
-			@param fsEntry entry point of fragment/pixel shader
-			@param vsFile source file of vertex shader
-			@param fsFile source file of fragment/pixel shader. NULL if shared with vertex shader
+			@param entry entry point of vertex shader
+			@param file source file of vertex shader
+			@param type type of shader @see FWrender::ShaderType_e
 		*/
-		void LoadFromFile(ID3D11Device* device, LPCSTR vsEntry, LPCSTR fsEntry, LPCWCHAR vsFile, LPCWCHAR fsFile = NULL);
+		void LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
 		
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
@@ -53,13 +56,19 @@ namespace FWrender {
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
 
 	private:
-		ID3D11VertexShader* m_vertexShader;
-		ID3D11PixelShader* m_pixelShader;
-		ID3D11InputLayout* m_layout;
-		ID3D11Buffer* m_matrixBuffer;
+		ID3D11VertexShader* m_vShader;
+		ID3D11PixelShader* m_pShader;
+
+//		ID3D11InputLayout* m_layout;
+//		ID3D11Buffer* m_matrixBuffer;
 
 		ID3D11SamplerState* m_sampleState;
 	};
+
+	struct shader_pair {
+		ShaderRef vs, fs;
+	};
+
 }
 
 // Definition of exceptions
@@ -77,3 +86,4 @@ DEFINE_EXCEPTION(ConstantBufferLocateException, 1106, "Could not locate constant
 
 ///@Todo ennek teljesen sajat exceptiont kell definialni
 DEFINE_EXCEPTION(ShaderException, 1200, "Could not compile shader")
+
