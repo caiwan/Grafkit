@@ -49,8 +49,8 @@ namespace FWrender {
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
 
-		void SetCameraMatrices(ID3D11DeviceContext* deviceContext, FWmath::Matrix& projection, FWmath::Matrix& world, FWmath::Matrix& view);
-		void SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* texture);
+		//void SetCameraMatrices(ID3D11DeviceContext* deviceContext, FWmath::Matrix& projection, FWmath::Matrix& world, FWmath::Matrix& view);
+		//void SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* texture);
 
 	protected:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);

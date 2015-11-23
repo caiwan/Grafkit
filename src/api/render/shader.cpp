@@ -196,42 +196,42 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 
 // =============================================================================================================================
 
-void FWrender::Shader::SetCameraMatrices(ID3D11DeviceContext * deviceContext, FWmath::Matrix & mat_projection, FWmath::Matrix & mat_world, FWmath::Matrix & mat_view)
-{
-# if 0
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType* mMatrix;
-	unsigned int bufferNumber;
+//void FWrender::Shader::SetCameraMatrices(ID3D11DeviceContext * deviceContext, FWmath::Matrix & mat_projection, FWmath::Matrix & mat_world, FWmath::Matrix & mat_view)
+//{
+//# if 0
+//	HRESULT result;
+//	D3D11_MAPPED_SUBRESOURCE mappedResource;
+//	MatrixBufferType* mMatrix;
+//	unsigned int bufferNumber;
+//
+//	// Transpose the matrices to prepare them for the shader.
+//	mat_projection.Transpose();
+//	mat_world.Transpose();
+//	mat_view.Transpose();
+//
+//	// Lock the constant buffer so it can be written to.
+//	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+//	if (FAILED(result))
+//	{
+//		throw new EX(ConstantBufferLocateException);
+//	}
+//
+//	mMatrix = (MatrixBufferType*)mappedResource.pData;
+//
+//	mMatrix->world = mat_world;
+//	mMatrix->view = mat_view;
+//	mMatrix->projection = mat_projection;
+//
+//	deviceContext->Unmap(m_matrixBuffer, 0);
+//	bufferNumber = 0;
+//	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+//
+//#endif
+//}
 
-	// Transpose the matrices to prepare them for the shader.
-	mat_projection.Transpose();
-	mat_world.Transpose();
-	mat_view.Transpose();
-
-	// Lock the constant buffer so it can be written to.
-	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-	{
-		throw new EX(ConstantBufferLocateException);
-	}
-
-	mMatrix = (MatrixBufferType*)mappedResource.pData;
-
-	mMatrix->world = mat_world;
-	mMatrix->view = mat_view;
-	mMatrix->projection = mat_projection;
-
-	deviceContext->Unmap(m_matrixBuffer, 0);
-	bufferNumber = 0;
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
-
-#endif
-}
-
-void FWrender::Shader::SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView * texture)
-{
-}
+//void FWrender::Shader::SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView * texture)
+//{
+//}
 
 // =============================================================================================================================
 
