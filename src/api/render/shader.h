@@ -13,6 +13,7 @@ namespace FWrender {
 	class ParameterManager {
 		friend class Shader;
 	public:
+		// --- d3d reflection goez here --- 
 		// + parameter manager
 	};
 
@@ -27,12 +28,12 @@ namespace FWrender {
 	public:
 
 		/// @todo ezt innen el kell pakoni - egyik felet a node-ba, a masikat a kameraba
-		struct MatrixBufferType
+		/*struct MatrixBufferType
 		{
 			matrix world;
 			matrix view;
 			matrix projection;
-		};
+		};*/
 
 	public:
 		Shader();
