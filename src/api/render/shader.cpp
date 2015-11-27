@@ -106,7 +106,7 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 		/// @todo throw exception
 	}
 
-	this->BuildReflection();
+	this->BuildReflection(device);
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
 	shaderBuffer->Release();
@@ -221,9 +221,11 @@ FWrender::Shader::ShaderVariable FWrender::Shader::operator[](const char * name)
 	HRESULT result = 0;
 	ID3D11ShaderReflectionConstantBuffer * pConstBuffer = this->m_pReflector->GetConstantBufferByName(name);
 	D3D11_SHADER_BUFFER_DESC pDesc;
-	if (pConstBuffer->GetDesc(&pDesc) != S_OK)
-		return;
-
+	// --- fuckings bele 
+	//if (pConstBuffer->GetDesc(&pDesc) != S_OK)
+	//	return FWrender::Shader::ShaderVariable(NULL);
+	
+	pConstBuffer->GetDesc(&pDesc);
 	return FWrender::Shader::ShaderVariable(pDesc);
 }
 
@@ -251,7 +253,7 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	throw new EX(ShaderException);
 }
 
-void FWrender::Shader::BuildReflection()
+void FWrender::Shader::BuildReflection(ID3D11Device* device)
 {
 	HRESULT result = 0;
 	D3D11_SHADER_DESC desc;
@@ -298,8 +300,25 @@ void FWrender::Shader::BuildReflection()
 			pType->GetDesc(&type_desc);
 			cbLayout.Types.push_back(type_desc);
 
-			// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476501(v=vs.85).aspx
+			// create constant buffer for each variable
+			ID3D11Buffer* buffer = NULL;
+			D3D11_BUFFER_DESC bufferDesc;
+			bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+			bufferDesc.ByteWidth = var_desc.Size;
+			bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			bufferDesc.MiscFlags = 0;
+			bufferDesc.StructureByteStride = 0;
+
+			result = device->CreateBuffer(&bufferDesc, NULL, &buffer);
+			if (FAILED(result)) {
+				throw EX(ConstantBufferCreateException);
+			}
+
+			cbLayout.Buffers.push_back(buffer);
+
 		}
+
 		this->m_constantBuffers.push_back(cbLayout);
 	}
 	

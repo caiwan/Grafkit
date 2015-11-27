@@ -8,6 +8,9 @@
 #include "../render/renderer.h"
 #include "../core/exceptions.h"
 
+// #pragma lib(dxguid.lib.)
+#include <d3d11shader.h>
+
 
 namespace FWrender {
 
@@ -57,15 +60,21 @@ namespace FWrender {
 		class ShaderVariable {
 			friend class Shader;
 		private:
-			ShaderVariable(D3D11_SHADER_BUFFER_DESC descriptor);
+			// itt valamilyen mas rekordot adjon vissza, ha lehet
+			ShaderVariable(D3D11_SHADER_BUFFER_DESC descriptor){ /**@todo implement*/}
+			
+			// invalid shader, vagy nincs location 
+			ShaderVariable() {/**@todo implement*/ }
 
 			D3D11_SHADER_BUFFER_DESC descriptor;
 		public:
 			void operator= (float v);
-			void operator= (float2 v);
-			void operator= (float3 v);
-			void operator= (float4 v);
-			void operator= (FWmath::Matrix v);
+
+			//void operator= (float2 v);
+			//void operator= (float3 v);
+			//void operator= (float4 v);
+			// 16-os alignmentet meg kell szerelni
+			// void operator= (FWmath::Matrix v);
 
 			void set(float v1, float v2);
 			void set(float v1, float v2, float v3);
@@ -81,12 +90,13 @@ namespace FWrender {
 
 	protected:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
-		void BuildReflection();
+		void BuildReflection(ID3D11Device* device);
 
 		struct ConstantBufferLayout {
 			D3D11_SHADER_BUFFER_DESC Description;
 			std::vector<D3D11_SHADER_VARIABLE_DESC> Variables;
 			std::vector<D3D11_SHADER_TYPE_DESC> Types;
+			std::vector<ID3D11Buffer*> Buffers;
 		};
 
 	private:
@@ -96,6 +106,16 @@ namespace FWrender {
 
 		std::vector<struct ConstantBufferLayout>  m_constantBuffers;
 	};
+
+	/*
+	class ShaderRef : public Ref<Shader> {
+		/// enhance Reference with operator [] to acces the shader's indides, without dereferencing
+		// ... 
+		///@todo a = operator nem toltodik at -> tagfuggveny elrejtes? 
+	};
+	*/
+
+	typedef Ref<Shader> ShaderRef;
 
 	struct shader_pair {
 		ShaderRef vs, fs;
