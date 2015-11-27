@@ -1,21 +1,24 @@
 
 #pragma once 
 
+#include <vector>
+
 #include "../core/reference.h"
 #include "dxtypes.h"
 #include "../render/renderer.h"
 #include "../core/exceptions.h"
 
+
 namespace FWrender {
 
 	class Shader;
 
-	class ParameterManager {
-		friend class Shader;
-	public:
-		// --- d3d reflection goez here --- 
-		// + parameter manager
-	};
+	//class ParameterManager {
+	//	friend class Shader;
+	//public:
+	//	// --- d3d reflection goez here --- 
+	//	// + parameter manager
+	//};
 
 	enum ShaderType_e {
 		ST_NONE = 0,
@@ -24,7 +27,7 @@ namespace FWrender {
 		ST_COUNT
 	};
 
-	class Shader : virtual public Referencable{
+	class Shader : virtual public Referencable {
 	public:
 
 		/// @todo ezt innen el kell pakoni - egyik felet a node-ba, a masikat a kameraba
@@ -46,22 +49,52 @@ namespace FWrender {
 			@param type type of shader @see FWrender::ShaderType_e
 		*/
 		void LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
-		
+
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
 
-		//void SetCameraMatrices(ID3D11DeviceContext* deviceContext, FWmath::Matrix& projection, FWmath::Matrix& world, FWmath::Matrix& view);
-		//void SetTexture(ID3D11DeviceContext* deviceContext, ID3D11ShaderResourceView* texture);
+	public:
+		class ShaderVariable {
+			friend class Shader;
+		private:
+			ShaderVariable(D3D11_SHADER_BUFFER_DESC descriptor);
+
+			D3D11_SHADER_BUFFER_DESC descriptor;
+		public:
+			void operator= (float v);
+			void operator= (float2 v);
+			void operator= (float3 v);
+			void operator= (float4 v);
+			void operator= (FWmath::Matrix v);
+
+			void set(float v1, float v2);
+			void set(float v1, float v2, float v3);
+			void set(float v1, float v2, float v3, float v4);
+
+			void set(void*); 
+		};
+
+		ShaderVariable operator[] (const char*); 
+
+		// set input layout
+		// set out sampler 
 
 	protected:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
+		void BuildReflection();
+
+		struct ConstantBufferLayout {
+			D3D11_SHADER_BUFFER_DESC Description;
+			std::vector<D3D11_SHADER_VARIABLE_DESC> Variables;
+			std::vector<D3D11_SHADER_TYPE_DESC> Types;
+		};
 
 	private:
 		ID3D11VertexShader* m_vShader;
 		ID3D11PixelShader* m_pShader;
+		ID3D11ShaderReflection *m_pReflector;
 
-//		ID3D11InputLayout* m_layout;
-//		ID3D11Buffer* m_matrixBuffer;
+		std::vector<struct ConstantBufferLayout>  m_constantBuffers;
 	};
 
 	struct shader_pair {

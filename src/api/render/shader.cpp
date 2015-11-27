@@ -100,6 +100,14 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 		}
 	}
 
+	// create reflection interface 
+	result = D3DReflect(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&m_pReflector);
+	if (FAILED(result)) {
+		/// @todo throw exception
+	}
+
+	this->BuildReflection();
+
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
 	shaderBuffer->Release();
 	shaderBuffer = NULL;
@@ -206,6 +214,19 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 
 // =============================================================================================================================
 
+FWrender::Shader::ShaderVariable FWrender::Shader::operator[](const char * name)
+{
+	// fuckings 
+
+	HRESULT result = 0;
+	ID3D11ShaderReflectionConstantBuffer * pConstBuffer = this->m_pReflector->GetConstantBufferByName(name);
+	D3D11_SHADER_BUFFER_DESC pDesc;
+	if (pConstBuffer->GetDesc(&pDesc) != S_OK)
+		return;
+
+	return FWrender::Shader::ShaderVariable(pDesc);
+}
+
 void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
 {
 	char* compileErrors;
@@ -230,3 +251,63 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	throw new EX(ShaderException);
 }
 
+void FWrender::Shader::BuildReflection()
+{
+	HRESULT result = 0;
+	D3D11_SHADER_DESC desc;
+	this->m_pReflector->GetDesc(&desc);
+
+	// fetch input descriptors
+	// input layouts? 
+	for (size_t i = 0; i < desc.InputParameters; i++)
+	{
+		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
+		this->m_pReflector->GetInputParameterDesc(i, &input_desc);
+
+		// ... 
+	}
+
+	// fetch output desctiptor
+	/// @todo tudumm 
+	for (size_t i = 0; i < desc.OutputParameters; i++)
+	{
+		D3D11_SIGNATURE_PARAMETER_DESC out_desc;
+		this->m_pReflector->GetOutputParameterDesc(i, &out_desc);
+
+		// ... 
+	}
+
+	// fetch constant buffers
+	for (size_t i = 0; i < desc.ConstantBuffers; i++)
+	{
+		struct ConstantBufferLayout cbLayout;
+		ID3D11ShaderReflectionConstantBuffer * pConstBuffer = this->m_pReflector->GetConstantBufferByIndex(i);
+		result = pConstBuffer->GetDesc(&cbLayout.Description);
+
+		for (size_t j = 0; j < cbLayout.Description.Variables; j++) 
+		{
+			// Get the variable description and store it
+			ID3D11ShaderReflectionVariable* pVariable = pConstBuffer->GetVariableByIndex(j);
+			D3D11_SHADER_VARIABLE_DESC var_desc;
+			pVariable->GetDesc(&var_desc);
+			cbLayout.Variables.push_back(var_desc);
+			
+			// Get the variable type description and store it
+			ID3D11ShaderReflectionType* pType = pVariable->GetType();
+			D3D11_SHADER_TYPE_DESC type_desc;
+			pType->GetDesc(&type_desc);
+			cbLayout.Types.push_back(type_desc);
+
+			// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476501(v=vs.85).aspx
+		}
+		this->m_constantBuffers.push_back(cbLayout);
+	}
+	
+}
+
+// =============================================================================================================================
+
+void FWrender::Shader::ShaderVariable::operator=(float v)
+{
+	// ((float*)(((unsigned char*)&pFullscreenQuadConstants) + pDesc.StartOffset))[0] = v;
+}
