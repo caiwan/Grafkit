@@ -1,5 +1,5 @@
 
-#include <fstream>
+#include <cstdio>
 
 #include "shader.h"
 
@@ -47,7 +47,12 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 	shaderBuffer = 0;
 
 	// Compile the vertex shader code.
-	result = D3DCompileFromFile(file, NULL, NULL, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	if (type == ST_Vertex) {
+		result = D3DCompileFromFile(file, NULL, NULL, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	}
+	else if (type == ST_Pixel) {
+		result = D3DCompileFromFile(file, NULL, NULL, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	}
 
 	if (FAILED(result))
 	{
@@ -233,23 +238,20 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 {
 	char* compileErrors;
 	unsigned long bufferSize, i;
-	ofstream fout;
+	//ofstream fout;
+	FILE* fp = NULL;
 
 	std::wstring error_string();
 
 	compileErrors = (char*)(errorMessage->GetBufferPointer());
 	bufferSize = errorMessage->GetBufferSize();
-	fout.open("shader-error.txt");
 
-	for (i = 0; i<bufferSize; i++)
-	{
-		if (compileErrors[i])
-			// fuckings ebbe bele most keresztbe
-			fout << compileErrors[i];
-			// error_string += compileErrors[i];
-	}
+	fopen_s(&fp, "shader-error.txt", "w");
 
-	fout.close();
+	fputs(compileErrors, fp); fputs("\r\n", fp);
+
+	fflush(fp);
+	fclose(fp);
 
 	errorMessage->Release();
 	errorMessage = 0;
