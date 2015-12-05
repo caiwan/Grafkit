@@ -2,6 +2,7 @@
 #pragma once 
 
 #include <vector>
+#include <map>
 
 #include "../core/reference.h"
 #include "dxtypes.h"
@@ -56,19 +57,23 @@ namespace FWrender {
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
 
-	public:
-		class ShaderVariable {
-			friend class Shader;
-		private:
-			// itt valamilyen mas rekordot adjon vissza, ha lehet
-			ShaderVariable(D3D11_SHADER_BUFFER_DESC descriptor){ /**@todo implement*/}
-			
-			// invalid shader, vagy nincs location 
-			ShaderVariable() {/**@todo implement*/ }
+		enum ShaderType_e getShaderType() { return this->m_type; }
 
-			D3D11_SHADER_BUFFER_DESC descriptor;
+	public:
+		/**
+		A class that holds the reflection record for a certain constant buffer
+		and aids to set variables into it
+		*/
+		class ConstantBufferRecord {
+			friend class Shader;
+		
+		protected:
+			ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
+
+			void setDC(ID3D11DeviceContext* pd3dic) { this->m_pDC = pd3dic; }
+		
 		public:
-			void operator= (float v);
+			// void operator= (float v);
 
 			//void operator= (float2 v);
 			//void operator= (float3 v);
@@ -76,14 +81,20 @@ namespace FWrender {
 			// 16-os alignmentet meg kell szerelni
 			// void operator= (FWmath::Matrix v);
 
-			void set(float v1, float v2);
-			void set(float v1, float v2, float v3);
-			void set(float v1, float v2, float v3, float v4);
+			// void set(float v1, float v2);
+			// void set(float v1, float v2, float v3);
+			// void set(float v1, float v2, float v3, float v4);
 
 			void set(void*); 
+
+		private:
+			ID3D11DeviceContext* m_pDC;
+			Shader *m_parent;
+			D3D11_SHADER_BUFFER_DESC m_description;
+			ID3D11Buffer *m_buffer;
 		};
 
-		ShaderVariable operator[] (const char*); 
+		ConstantBufferRecord operator[] (const char*);
 
 		// set input layout
 		// set out sampler 
@@ -92,19 +103,13 @@ namespace FWrender {
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
 		void BuildReflection(ID3D11Device* device);
 
-		struct ConstantBufferLayout {
-			D3D11_SHADER_BUFFER_DESC Description;
-			std::vector<D3D11_SHADER_VARIABLE_DESC> Variables;
-			std::vector<D3D11_SHADER_TYPE_DESC> Types;
-			std::vector<ID3D11Buffer*> Buffers;
-		};
-
 	private:
+		ShaderType_e m_type;
 		ID3D11VertexShader* m_vShader;
 		ID3D11PixelShader* m_pShader;
 		ID3D11ShaderReflection *m_pReflector;
 
-		std::vector<struct ConstantBufferLayout>  m_constantBuffers;
+		std::map<const char*, ConstantBufferRecord> m_mapBuffers;
 	};
 
 	/*

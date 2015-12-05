@@ -219,19 +219,9 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 
 // =============================================================================================================================
 
-FWrender::Shader::ShaderVariable FWrender::Shader::operator[](const char * name)
+FWrender::Shader::ConstantBufferRecord FWrender::Shader::operator[](const char * name)
 {
-	// fuckings 
-
-	HRESULT result = 0;
-	ID3D11ShaderReflectionConstantBuffer * pConstBuffer = this->m_pReflector->GetConstantBufferByName(name);
-	D3D11_SHADER_BUFFER_DESC pDesc;
-	// --- fuckings bele 
-	//if (pConstBuffer->GetDesc(&pDesc) != S_OK)
-	//	return FWrender::Shader::ShaderVariable(NULL);
-	
-	pConstBuffer->GetDesc(&pDesc);
-	return FWrender::Shader::ShaderVariable(pDesc);
+	// kurd ki a zsirt 
 }
 
 void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
@@ -274,6 +264,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device)
 		this->m_pReflector->GetInputParameterDesc(i, &input_desc);
 
 		// ... 
+		///@todo fetch through shit 
 	}
 
 	// fetch output desctiptor
@@ -284,56 +275,74 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device)
 		this->m_pReflector->GetOutputParameterDesc(i, &out_desc);
 
 		// ... 
+		///@todo fetch through shit 
 	}
 
 	// fetch constant buffers
 	for (size_t i = 0; i < desc.ConstantBuffers; i++)
 	{
-		struct ConstantBufferLayout cbLayout;
-		ID3D11ShaderReflectionConstantBuffer * pConstBuffer = this->m_pReflector->GetConstantBufferByIndex(i);
-		result = pConstBuffer->GetDesc(&cbLayout.Description);
-
-		for (size_t j = 0; j < cbLayout.Description.Variables; j++) 
-		{
-			// Get the variable description and store it
-			ID3D11ShaderReflectionVariable* pVariable = pConstBuffer->GetVariableByIndex(j);
-			D3D11_SHADER_VARIABLE_DESC var_desc;
-			pVariable->GetDesc(&var_desc);
-			cbLayout.Variables.push_back(var_desc);
-			
-			// Get the variable type description and store it
-			ID3D11ShaderReflectionType* pType = pVariable->GetType();
-			D3D11_SHADER_TYPE_DESC type_desc;
-			pType->GetDesc(&type_desc);
-			cbLayout.Types.push_back(type_desc);
-
-			// create constant buffer for each variable
-			ID3D11Buffer* buffer = NULL;
-			D3D11_BUFFER_DESC bufferDesc;
-			bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-			bufferDesc.ByteWidth = var_desc.Size;
-			bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			bufferDesc.MiscFlags = 0;
-			bufferDesc.StructureByteStride = 0;
-
-			result = device->CreateBuffer(&bufferDesc, NULL, &buffer);
-			if (FAILED(result)) {
-				throw EX(ConstantBufferCreateException);
-			}
-
-			cbLayout.Buffers.push_back(buffer);
-
-		}
-
-		this->m_constantBuffers.push_back(cbLayout);
+		// struct ConstantBufferLayout cbLayout;
+		ConstantBufferRecord cbRecord(device, this->m_pReflector->GetConstantBufferByIndex(i));
+		this->m_mapBuffers[cbRecord.m_description.Name] = cbRecord;
 	}
 	
 }
 
 // =============================================================================================================================
 
-void FWrender::Shader::ShaderVariable::operator=(float v)
+FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
+	m_pDC(NULL),
+	m_parent(NULL),
+	m_buffer(NULL),
+	m_description()
 {
-	// ((float*)(((unsigned char*)&pFullscreenQuadConstants) + pDesc.StartOffset))[0] = v;
+	HRESULT result = 0; 
+	result = pConstBuffer->GetDesc(&this->m_description);
+
+	if (FAILED(result)) {
+		throw EX_DETAILS(ConstantBufferLocateException, L"Could not obtain description");
+	}
+
+	ID3D11Buffer* buffer = NULL;
+	D3D11_BUFFER_DESC bufferDesc;
+	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	bufferDesc.ByteWidth = this->m_description.Size;
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bufferDesc.MiscFlags = 0;
+	bufferDesc.StructureByteStride = 0;
+
+	result = device->CreateBuffer(&bufferDesc, NULL, &this->m_buffer);
+	if (FAILED(result)) {
+		throw EX(ConstantBufferCreateException);
+	}
+
+	// --- 
+	/// @todo fetch through even more shit 
+}
+
+void FWrender::Shader::ConstantBufferRecord::set(void * data)
+{
+	HRESULT result = 0;
+	D3D11_MAPPED_SUBRESOURCE MappedResource;
+
+	result = this->m_pDC->Map(this->m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
+	if (FAILED(result)) {
+		throw EX_DETAILS(ConstantBufferLocateException, L"Cannot map resource");
+	}
+
+	memcpy(MappedResource.pData, data, this->m_description.Size);
+
+	this->m_pDC->Unmap(this->m_buffer, 0);
+
+	// honnan tudom, hogy hova lett eppen bindelve??? 
+	if (this->m_parent->getShaderType() == ST_Vertex)
+	{
+		this->m_pDC->PSSetConstantBuffers();
+	}
+	else if (this->m_parent->getShaderType() == ST_Pixel)
+	{
+		this->m_pDC->VSSetConstantBuffers();
+	}
+	
 }
