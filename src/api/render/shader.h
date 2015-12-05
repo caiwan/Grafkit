@@ -60,9 +60,8 @@ namespace FWrender {
 		*/
 		void LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
 
-		void Bind(ID3D11DeviceContext* deviceContext);
-
 		void Shutdown();
+
 		void Render(ID3D11DeviceContext* deviceContext);
 
 		enum ShaderType_e getShaderType() { return this->m_type; }
@@ -103,6 +102,10 @@ namespace FWrender {
 			// Shader *m_parent;
 			D3D11_SHADER_BUFFER_DESC m_description;
 			ID3D11Buffer *m_buffer;
+
+		private:
+			ConstantBufferRecord(ConstantBufferRecord&) {}
+			ConstantBufferRecord& operator= (ConstantBufferRecord&) {}
 		};
 
 		ConstantBufferRecord& operator[] (const char* name);
