@@ -13,16 +13,22 @@
 #include <d3d11shader.h>
 
 
+// DHM - Dirty Hack of Mine
+// http://stackoverflow.com/questions/4157687/using-char-as-a-key-in-stdmap
+
+/// @todo move the fuck away
+struct cmp_str
+{
+	bool operator()(char const *a, char const *b)
+	{
+		return std::strcmp(a, b) < 0;
+	}
+};
+
+
 namespace FWrender {
 
 	class Shader;
-
-	//class ParameterManager {
-	//	friend class Shader;
-	//public:
-	//	// --- d3d reflection goez here --- 
-	//	// + parameter manager
-	//};
 
 	enum ShaderType_e {
 		ST_NONE = 0,
@@ -54,23 +60,28 @@ namespace FWrender {
 		*/
 		void LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
 
+		void Bind(ID3D11DeviceContext* deviceContext);
+
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
 
 		enum ShaderType_e getShaderType() { return this->m_type; }
 
 	public:
+		
 		/**
-		A class that holds the reflection record for a certain constant buffer
-		and aids to set variables into it
+		A class that holds the reflection record for a certain constant buffer and aids to set variables into it
 		*/
 		class ConstantBufferRecord {
 			friend class Shader;
 		
+		public:
+			// This class has to have a public accessable default constructor due to std::map
+			ConstantBufferRecord() : ConstantBufferRecord(NULL, NULL) {/*fucings bele*/ }
 		protected:
 			ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
 
-			void setDC(ID3D11DeviceContext* pd3dic) { this->m_pDC = pd3dic; }
+			// void setDC(ID3D11DeviceContext* pd3dic) { this->m_pDC = pd3dic; }
 		
 		public:
 			// void operator= (float v);
@@ -89,12 +100,12 @@ namespace FWrender {
 
 		private:
 			ID3D11DeviceContext* m_pDC;
-			Shader *m_parent;
+			// Shader *m_parent;
 			D3D11_SHADER_BUFFER_DESC m_description;
 			ID3D11Buffer *m_buffer;
 		};
 
-		ConstantBufferRecord operator[] (const char*);
+		ConstantBufferRecord& operator[] (const char* name);
 
 		// set input layout
 		// set out sampler 
@@ -109,7 +120,11 @@ namespace FWrender {
 		ID3D11PixelShader* m_pShader;
 		ID3D11ShaderReflection *m_pReflector;
 
-		std::map<const char*, ConstantBufferRecord> m_mapBuffers;
+		typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;
+		bufferMap_t m_mapBuffers;
+
+
+		// ID3D11DeviceContext* m_pDeviceContext;
 	};
 
 	/*
