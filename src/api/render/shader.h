@@ -101,6 +101,17 @@ namespace FWrender {
 			ConstantBufferRecord& operator= (ConstantBufferRecord&) { return *this; }
 		};
 
+		/**
+		A struct that extends the input layout descriptor
+		*/
+		struct InputElementRecord{
+			D3D11_INPUT_ELEMENT_DESC desc;
+			UINT width;
+			UINT offset;
+
+			InputElementRecord() {}
+		};
+
 		ConstantBufferRecord& operator[] (const char* name);
 
 		// set input layout
@@ -123,7 +134,7 @@ namespace FWrender {
 
 		ID3D11ShaderReflection *m_pReflector;
 
-		typedef std::map<const char*, D3D11_INPUT_ELEMENT_DESC, cmp_str> inputElementMap_t;
+		typedef std::map<const char*, InputElementRecord, cmp_str> inputElementMap_t;
 		inputElementMap_t m_mapInputElems;
 
 		typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;

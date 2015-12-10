@@ -197,6 +197,8 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		// --- 
 		https://takinginitiative.wordpress.com/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
 
+		InputElementRecord elem;
+
 		// fill out input element desc
 		D3D11_INPUT_ELEMENT_DESC elementDesc;
 		std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
@@ -207,33 +209,72 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;	
 		elementDesc.InstanceDataStepRate = 0;
 
+		elem.desc = elementDesc;
+
 		// determine DXGI format
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/ff728727(v=vs.85).aspx
+
+		//  D3D11Helper.GetFormat
+		// http://sharpdx.org/forum/5-api-usage/2136-basic-shader-reflection-automatic-input-layout-creation
 		if (input_desc.Mask == 1)
 		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32_UINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32_SINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32_FLOAT;
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) { 
+				elementDesc.Format = DXGI_FORMAT_R32_UINT; 
+				elem.width = 4;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32){ 
+				elementDesc.Format = DXGI_FORMAT_R32_SINT;
+				elem.width = 4;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+				elementDesc.Format = DXGI_FORMAT_R32_FLOAT;
+				elem.width = 4;
+			}
 		}
 		else if (input_desc.Mask <= 3)
 		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32G32_UINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32G32_SINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32_UINT;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32_SINT;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
+			}
 		}
 		else if (input_desc.Mask <= 7)
 		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32_UINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32_SINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32B32_UINT;
+				elem.width = 8;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32B32_SINT;
+				elem.width = 8;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+				elem.width = 8;
+			}
 		}
 		else if (input_desc.Mask <= 15)
 		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32A32_UINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32A32_SINT;
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32B32A32_UINT;
+				elem.width = 16;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32B32A32_SINT;
+				elem.width = 16;
+			}
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
+				elementDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+				elem.width = 16;
+			}
 		}
 		elements.push_back(elementDesc);
-		this->m_mapInputElems[input_desc.SemanticName] = elementDesc;
+		this->m_mapInputElems[input_desc.SemanticName] = elem;
 
 		if (this->m_type == ST_Vertex) {
 			result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
