@@ -123,6 +123,7 @@ namespace FWrender {
 
 	protected:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
+		void getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT byteWidth);
 		void BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer);
 
 	private:

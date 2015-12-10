@@ -27,7 +27,6 @@ FWrender::Shader::~Shader()
 	this->Shutdown();
 }
 
-//void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCSTR fsEntry, LPCWCHAR vsFile, LPCWCHAR fsFile)
 void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
 {
 	HRESULT result = 0;
@@ -174,6 +173,88 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	throw new EX_DETAILS(ShaderException, L"See shader-error.txt");
 }
 
+void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT byteWidth) {
+	BYTE mask = pd.Mask;
+	int varCount = 0;
+	while (mask)
+	{
+		if (mask & 0x01) varCount++;
+		mask = mask >> 1;
+	}
+
+	res = DXGI_FORMAT_UNKNOWN;
+	byteWidth = 0;
+
+	// I should took this mess into a LUT
+	switch (pd.ComponentType) {
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			switch (varCount) {
+			case 1:
+				res = DXGI_FORMAT_R32G32B32A32_FLOAT;
+				byteWidth = 4*4;
+				return;
+			case 2:
+				res = DXGI_FORMAT_R32G32B32_FLOAT;
+				byteWidth = 4*3;
+				return;
+			case 3:
+				res = DXGI_FORMAT_R32G32_FLOAT;
+				byteWidth = 4*2;
+				return;
+			case 4:
+				res = DXGI_FORMAT_R32_FLOAT;
+				byteWidth = 4*1;
+				return;
+			}
+			break;
+		}
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			switch (varCount) {
+			case 1:
+				res = DXGI_FORMAT_R32G32B32A32_SINT;
+				byteWidth = 4 * 4;
+				return;
+			case 2:
+				res = DXGI_FORMAT_R32G32B32_SINT;
+				byteWidth = 4 * 3;
+				return;
+			case 3:
+				res = DXGI_FORMAT_R32G32_SINT;
+				byteWidth = 4 * 2;
+				return;
+			case 4:
+				res = DXGI_FORMAT_R32_SINT;
+				byteWidth = 4 * 1;
+				return;
+			}
+		}
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			switch (varCount) {
+			case 1:
+				res = DXGI_FORMAT_R32G32B32A32_UINT;
+				byteWidth = 4 * 4;
+				return;
+			case 2:
+				res = DXGI_FORMAT_R32G32B32_UINT;
+				byteWidth = 4 * 3;
+				return;
+			case 3:
+				res = DXGI_FORMAT_R32G32_UINT;
+				byteWidth = 4 * 2;
+				return;
+			case 4:
+				res = DXGI_FORMAT_R32_UINT;
+				byteWidth = 4 * 1;
+				return;
+			}
+		}
+	}
+}
+
+
 void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 {
 	HRESULT result = 0;
@@ -195,7 +276,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		this->m_pReflector->GetInputParameterDesc(i, &input_desc);
 		
 		// --- 
-		https://takinginitiative.wordpress.com/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
+		// https://takinginitiative.wordpress.com/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
 
 		InputElementRecord elem;
 
@@ -211,68 +292,11 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 
 		elem.desc = elementDesc;
 
-		// determine DXGI format
-		// https://msdn.microsoft.com/en-us/library/windows/desktop/ff728727(v=vs.85).aspx
+		// -- determine DXGI format
+		this->getDXGIFormat(input_desc, elementDesc.Format, elem.width);
 
-		//  D3D11Helper.GetFormat
-		// http://sharpdx.org/forum/5-api-usage/2136-basic-shader-reflection-automatic-input-layout-creation
-		if (input_desc.Mask == 1)
-		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) { 
-				elementDesc.Format = DXGI_FORMAT_R32_UINT; 
-				elem.width = 4;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32){ 
-				elementDesc.Format = DXGI_FORMAT_R32_SINT;
-				elem.width = 4;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
-				elementDesc.Format = DXGI_FORMAT_R32_FLOAT;
-				elem.width = 4;
-			}
-		}
-		else if (input_desc.Mask <= 3)
-		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32_UINT;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32_SINT;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
-			}
-		}
-		else if (input_desc.Mask <= 7)
-		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32B32_UINT;
-				elem.width = 8;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32B32_SINT;
-				elem.width = 8;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-				elem.width = 8;
-			}
-		}
-		else if (input_desc.Mask <= 15)
-		{
-			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32B32A32_UINT;
-				elem.width = 16;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32B32A32_SINT;
-				elem.width = 16;
-			}
-			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) {
-				elementDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-				elem.width = 16;
-			}
-		}
+		// --- 
+
 		elements.push_back(elementDesc);
 		this->m_mapInputElems[input_desc.SemanticName] = elem;
 
