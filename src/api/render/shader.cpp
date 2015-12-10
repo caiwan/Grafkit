@@ -16,7 +16,9 @@ using FWmath::Matrix;
 
 Shader::Shader() : 
 	m_pShader(NULL),
-	m_vShader(NULL)
+	m_vShader(NULL),
+	m_pReflector(NULL),
+	m_layout(NULL)
 {
 }
 
@@ -28,23 +30,19 @@ FWrender::Shader::~Shader()
 //void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCSTR fsEntry, LPCWCHAR vsFile, LPCWCHAR fsFile)
 void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
 {
-	HRESULT result;
-	ID3D10Blob* errorMessage;
+	HRESULT result = 0;
+	ID3D10Blob* errorMessage = NULL;
 
-	ID3D10Blob* shaderBuffer;
+	ID3D10Blob* shaderBuffer = NULL;
 
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
-	unsigned int numElements;
-	D3D11_BUFFER_DESC matrixBufferDesc;
+	unsigned int numElements = 0;
+	
+	// D3D11_BUFFER_DESC matrixBufferDesc;
 
 	// input checking
 	if (!entry) throw new EX(NullPointerException);
 	if (!file) throw new EX(NullPointerException);
-
-
-	// Initialize the pointers this function will use to null.
-	errorMessage = 0;
-	shaderBuffer = 0;
 
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
@@ -85,13 +83,7 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 		}
 	}
 
-	// create reflection interface 
-	result = D3DReflect(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&m_pReflector);
-	if (FAILED(result)) {
-		/// @todo throw exception
-	}
-
-	this->BuildReflection(device);
+	this->BuildReflection(device, shaderBuffer);
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
 	shaderBuffer->Release();
@@ -125,12 +117,12 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 			}
 		}
 	}
-	// fuck off the layout
-
 	// fuck through the resources
 
 	// go the fuck off 
 	if (this->m_type == ST_Vertex) {
+		// fuck off the layout
+		deviceContext->IASetInputLayout(m_layout);
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
 	}
 	else if (this->m_type == ST_Pixel) {
@@ -182,9 +174,16 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	throw new EX_DETAILS(ShaderException, L"See shader-error.txt");
 }
 
-void FWrender::Shader::BuildReflection(ID3D11Device* device)
+void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 {
 	HRESULT result = 0;
+
+	// create reflection interface 
+	result = D3DReflect(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&m_pReflector);
+	if (FAILED(result)) {
+		/// @todo throw exception
+	}
+
 	D3D11_SHADER_DESC desc;
 	this->m_pReflector->GetDesc(&desc);
 
@@ -194,9 +193,57 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
 		this->m_pReflector->GetInputParameterDesc(i, &input_desc);
+		
+		// --- 
+		https://takinginitiative.wordpress.com/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
 
-		// ... 
-		///@todo fetch through shit 
+		// fill out input element desc
+		D3D11_INPUT_ELEMENT_DESC elementDesc;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
+		elementDesc.SemanticName = input_desc.SemanticName;
+		elementDesc.SemanticIndex = input_desc.SemanticIndex;
+		elementDesc.InputSlot = 0;
+		elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;	
+		elementDesc.InstanceDataStepRate = 0;
+
+		// determine DXGI format
+		if (input_desc.Mask == 1)
+		{
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32_UINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32_SINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32_FLOAT;
+		}
+		else if (input_desc.Mask <= 3)
+		{
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32G32_UINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32G32_SINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32G32_FLOAT;
+		}
+		else if (input_desc.Mask <= 7)
+		{
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32_UINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32_SINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		}
+		else if (input_desc.Mask <= 15)
+		{
+			if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_UINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32A32_UINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_SINT32) elementDesc.Format = DXGI_FORMAT_R32G32B32A32_SINT;
+			else if (input_desc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32) elementDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		}
+		elements.push_back(elementDesc);
+		this->m_mapInputElems[input_desc.SemanticName] = elementDesc;
+
+		if (this->m_type == ST_Vertex) {
+			result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
+
+			if (FAILED(result)) {
+				/// @todo throw exceptions 
+			}
+
+		}
+
 	}
 
 	// fetch output desctiptor
@@ -218,6 +265,8 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device)
 		this->m_mapBuffers[cbRecord.m_description.Name] = cbRecord;
 	}
 	
+	this->m_pReflector->Release();
+	this->m_pReflector = NULL;
 }
 
 // =============================================================================================================================

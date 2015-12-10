@@ -13,8 +13,9 @@
 #include <d3d11shader.h>
 
 
-// DHM - Dirty Hack of Mine
+// DHoM - Dirty Hack of Mine
 // http://stackoverflow.com/questions/4157687/using-char-as-a-key-in-stdmap
+// http://stackoverflow.com/questions/12136071/c-mapstdstring-vs-mapchar-performance-i-know-again
 
 /// @todo move the fuck away
 struct cmp_str
@@ -40,15 +41,6 @@ namespace FWrender {
 
 	class Shader : virtual public Referencable {
 		friend class ShaderRef;
-	public:
-
-		/// @todo ezt innen el kell pakoni - egyik felet a node-ba, a masikat a kameraba
-		/*struct MatrixBufferType
-		{
-			matrix world;
-			matrix view;
-			matrix projection;
-		};*/
 
 	public:
 		Shader();
@@ -63,9 +55,8 @@ namespace FWrender {
 		void LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
 
 		void Shutdown();
-
 		void Render(ID3D11DeviceContext* deviceContext);
-
+		
 		enum ShaderType_e getShaderType() { return this->m_type; }
 
 	public:
@@ -113,23 +104,30 @@ namespace FWrender {
 		ConstantBufferRecord& operator[] (const char* name);
 
 		// set input layout
+		void setInputLayout(ID3D11InputLayout* pLayout) { this->m_layout = pLayout; }
+		
+		// set shader resource
+
 		// set out sampler 
 
 	protected:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
-		void BuildReflection(ID3D11Device* device);
+		void BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer);
 
 	private:
 		ShaderType_e m_type;
 		ID3D11VertexShader* m_vShader;
 		ID3D11PixelShader* m_pShader;
+
+		ID3D11InputLayout* m_layout;
+
 		ID3D11ShaderReflection *m_pReflector;
+
+		typedef std::map<const char*, D3D11_INPUT_ELEMENT_DESC, cmp_str> inputElementMap_t;
+		inputElementMap_t m_mapInputElems;
 
 		typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;
 		bufferMap_t m_mapBuffers;
-
-
-		// ID3D11DeviceContext* m_pDeviceContext;
 	};
 
 	/// enhance Reference with operator [] to acces the shader's indides, without dereferencing
@@ -138,7 +136,7 @@ namespace FWrender {
 
 	public:
 		Shader::ConstantBufferRecord& operator[](const char *name){
-			this->ptr->operator[](name);
+			return this->ptr->operator[](name);
 		}
 
 
