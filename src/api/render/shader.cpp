@@ -91,10 +91,17 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 
 void FWrender::Shader::Shutdown()
 {
-	// why is this empty 
 	// fuck the constant buffers around
 
+	// ... 
+
+	// fuck this off 
 	this->m_pReflector->Release();
+
+	if (this->m_pShader) this->m_pShader->Release();
+	if (this->m_vShader) this->m_vShader->Release();
+
+	this->m_inputNames.clear();
 }
 
 void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
@@ -139,28 +146,13 @@ FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char 
 		return ConstantBufferRecord();
 	}
 
-	// todo: mindenkeppen kell egy nev->id feloldas
-
-	// m_pReflector->get
-
-	D3D11_SHADER_BUFFER_DESC cb_desc;
-	ID3D11ShaderReflectionConstantBuffer *cb = this->m_pReflector->GetConstantBufferByName(name);
-	// cb->GetDesc(&cb_desc);
-	// cb->
-
-	// cb_desc.
-
-	/*
 	bufferMap_t::iterator it = this->m_mapBuffers.find(name);
 	if (it == this->m_mapBuffers.end()) {
 		// no item found, moving on
 		return ConstantBufferRecord();
 	}
-	*/
 
-	// todo: find it 
-
-	//return it->second;
+	return it->second;
 }
 
 void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
@@ -168,7 +160,7 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	char* compileErrors;
 	unsigned long bufferSize, i;
 	
-	// ezt itt ki kell kurni ugy ahogy van
+	// fuck this shit
 	FILE* fp = NULL;
 
 	std::wstring error_string();
@@ -289,14 +281,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	// fetch input descriptors
 	this->m_mapInputElems.clear(); // push_back(elem);
 	// this->m_mapInputElems.insert
-#if 0
-	InputElementRecord elem;
-	ZeroMemory(&elem, sizeof(elem));
-	for (size_t i = 0; i < desc.InputParameters; i++){
-		this->m_mapInputElems.push_back(elem);
-	}
-# define IE_PREALLOC
-#endif 
+
 	for (size_t i = 0; i < desc.InputParameters; i++)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
@@ -324,9 +309,14 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 
 		// --- 
 
-		// ++ copy fucking name
 		elements.push_back(elementDesc);
-		this->m_mapInputElems.push_back(elem);
+		
+		// ++ copy fucking name
+		// this->m_inputNames.push_back(elementDesc.SemanticName);
+		// const char* name = this->m_inputNames.back().c_str();
+		const char *name = elementDesc.SemanticName;
+		
+		this->m_mapInputElems[name] = elem;
 
 		if (this->m_type == ST_Vertex) {
 			result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
@@ -341,7 +331,6 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	}
 
 	// fetch output desctiptor
-	/// @todo tudumm 
 	for (size_t i = 0; i < desc.OutputParameters; i++)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC out_desc;
@@ -356,21 +345,15 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	{
 		// struct ConstantBufferLayout cbLayout;
 		ConstantBufferRecord cbRecord(device, this->m_pReflector->GetConstantBufferByIndex(i));
-		// copy fucking name
-		// ehhez talan nem kell
+		// itt meg kell nezni, hogy le kell-e 
 		this->m_mapBuffers[cbRecord.m_description.Name] = cbRecord;
-		//this->m_mapBuffers.push_back(cbRecord); // [cbRecord.m_description.Name] = cbRecord;
 	}
-	
-	// this->m_pReflector->Release();
-	// this->m_pReflector = NULL;
 }
 
 // =============================================================================================================================
 
 FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
-	// m_pDC(NULL),
-	// m_parent(NULL),
+	m_pDC(NULL),
 	m_buffer(NULL),
 	m_description()
 {
