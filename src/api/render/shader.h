@@ -95,6 +95,7 @@ namespace FWrender {
 			// Shader *m_parent;
 			D3D11_SHADER_BUFFER_DESC m_description;
 			ID3D11Buffer *m_buffer;
+			UINT m_slot;
 
 		private:
 			ConstantBufferRecord(ConstantBufferRecord&) {}
@@ -136,10 +137,15 @@ namespace FWrender {
 		ID3D11ShaderReflection *m_pReflector;
 
 		typedef std::map<const char*, InputElementRecord, cmp_str> inputElementMap_t;
+		//typedef std::vector<InputElementRecord> inputElementMap_t;
 		inputElementMap_t m_mapInputElems;
 
 		typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;
+		//typedef std::vector<ConstantBufferRecord> bufferMap_t;
 		bufferMap_t m_mapBuffers;
+
+		std::vector<char*> m_bufferNames;
+		std::vector<char*> m_inputNames;
 	};
 
 	/// enhance Reference with operator [] to acces the shader's indides, without dereferencing

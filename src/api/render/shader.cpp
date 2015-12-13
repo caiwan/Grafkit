@@ -93,6 +93,8 @@ void FWrender::Shader::Shutdown()
 {
 	// why is this empty 
 	// fuck the constant buffers around
+
+	this->m_pReflector->Release();
 }
 
 void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
@@ -104,14 +106,14 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 		for (it = this->m_mapBuffers.begin(); it != this->m_mapBuffers.end(); it++) {
 			if (it->second.m_buffer) {
 				ID3D11Buffer* buffer = it->second.m_buffer;
-				UINT slot = 1;
+//				UINT slot = 1;
 
 				if (this->m_type == ST_Vertex) {
-					deviceContext->VSGetConstantBuffers(slot, 1, &buffer);
+					deviceContext->VSGetConstantBuffers(it->second.m_slot, 1, &buffer);
 
 				}
 				else if (this->m_type == ST_Pixel) {
-					deviceContext->PSGetConstantBuffers(slot, 1, &buffer);
+					deviceContext->PSGetConstantBuffers(it->second.m_slot, 1, &buffer);
 				}
 			}
 		}
@@ -137,13 +139,28 @@ FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char 
 		return ConstantBufferRecord();
 	}
 
+	// todo: mindenkeppen kell egy nev->id feloldas
+
+	// m_pReflector->get
+
+	D3D11_SHADER_BUFFER_DESC cb_desc;
+	ID3D11ShaderReflectionConstantBuffer *cb = this->m_pReflector->GetConstantBufferByName(name);
+	// cb->GetDesc(&cb_desc);
+	// cb->
+
+	// cb_desc.
+
+	/*
 	bufferMap_t::iterator it = this->m_mapBuffers.find(name);
 	if (it == this->m_mapBuffers.end()) {
 		// no item found, moving on
 		return ConstantBufferRecord();
 	}
+	*/
 
-	return it->second;
+	// todo: find it 
+
+	//return it->second;
 }
 
 void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
@@ -263,13 +280,23 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	result = D3DReflect(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&m_pReflector);
 	if (FAILED(result)) {
 		/// @todo throw exception
+		DebugBreak();
 	}
 
 	D3D11_SHADER_DESC desc;
 	this->m_pReflector->GetDesc(&desc);
 
 	// fetch input descriptors
-	// input layouts? 
+	this->m_mapInputElems.clear(); // push_back(elem);
+	// this->m_mapInputElems.insert
+#if 0
+	InputElementRecord elem;
+	ZeroMemory(&elem, sizeof(elem));
+	for (size_t i = 0; i < desc.InputParameters; i++){
+		this->m_mapInputElems.push_back(elem);
+	}
+# define IE_PREALLOC
+#endif 
 	for (size_t i = 0; i < desc.InputParameters; i++)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
@@ -297,14 +324,16 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 
 		// --- 
 
+		// ++ copy fucking name
 		elements.push_back(elementDesc);
-		this->m_mapInputElems[input_desc.SemanticName] = elem;
+		this->m_mapInputElems.push_back(elem);
 
 		if (this->m_type == ST_Vertex) {
 			result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
 
 			if (FAILED(result)) {
 				/// @todo throw exceptions 
+				DebugBreak();
 			}
 
 		}
@@ -327,11 +356,14 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	{
 		// struct ConstantBufferLayout cbLayout;
 		ConstantBufferRecord cbRecord(device, this->m_pReflector->GetConstantBufferByIndex(i));
+		// copy fucking name
+		// ehhez talan nem kell
 		this->m_mapBuffers[cbRecord.m_description.Name] = cbRecord;
+		//this->m_mapBuffers.push_back(cbRecord); // [cbRecord.m_description.Name] = cbRecord;
 	}
 	
-	this->m_pReflector->Release();
-	this->m_pReflector = NULL;
+	// this->m_pReflector->Release();
+	// this->m_pReflector = NULL;
 }
 
 // =============================================================================================================================
