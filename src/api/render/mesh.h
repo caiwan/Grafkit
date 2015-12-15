@@ -4,7 +4,8 @@
 #ifndef _Mesh_H_
 #define _Mesh_H_
 
-
+#include <vector>
+#include <map>
 
 #include "renderer.h"
 #include "dxtypes.h"
@@ -12,7 +13,8 @@
 #include "../core/reference.h"
 #include "../core/exceptions.h"
 
-#include <vector>
+#include "shader.h"
+
 
 namespace FWrender 
 {
@@ -81,12 +83,38 @@ namespace FWrender
 
 
 	class SimpleMeshGenerator {
+		friend class MeshAttribSetter;
 	public:
-		SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
+		SimpleMeshGenerator(ID3D11Device* device, ShaderRef shader);
 
-		// void setPtr
+		void setPtr(const char* name, void* ptr) { this->m_mapPtr[name] = ptr; }
+
+	public:
+		/// param setter class
+		class MeshAttribSetter {
+		protected:
+			MeshAttribSetter(const char*& name, SimpleMeshGenerator& parent) : m_parent(parent), m_name(name) {}
+		public:
+			void operator =(void* ptr) { this->m_parent.setPtr(m_name, ptr); }
+
+		private:
+			SimpleMeshGenerator& m_parent;
+			const char *&m_name;
+
+			MeshAttribSetter(MeshAttribSetter& other) : m_parent(other.m_parent), m_name(other.m_name) {}
+			void operator = (MeshAttribSetter&) {}
+		};
+
+		MeshAttribSetter operator[](const char*) {}
+
+		void operator() (size_t vertexCount, size_t indexCount, const int* indices);
+
 	private:
 		ID3D11Device *m_device;
+		ShaderRef m_shader;
+
+		typedef std::map<const char*, void*, cmp_str> mapPtr_t;
+		mapPtr_t m_mapPtr;
 	};
 
 # if 0		

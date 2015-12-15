@@ -265,3 +265,38 @@ void FWrender::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCou
 	mesh->addIndices(indexBuffer, indexCount);
 }
 #endif 
+
+FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * device, ShaderRef shader)
+	: m_device(device), m_shader(shader)
+{
+}
+
+void FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* indices)
+{
+	if (this->m_shader.Invalid()) {
+		throw EX(NullPointerException);
+	}
+	size_t elem_count = this->m_shader->getILayoutElemCount();
+
+	std::vector<void*> ptrs;
+	std::vector<size_t> widths;
+
+	for (size_t i = 0; i < elem_count; ++i) {
+		Shader::InputElementRecord &record = this->m_shader->getILayoutElem(i);
+		mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
+		if (it == this->m_mapPtr.end()) {
+			ptrs.push_back(NULL);
+		}
+		else {
+			ptrs.push_back(it->second);
+		}
+
+		widths.push_back(record.width);
+	}
+
+	// create constant buffer
+
+	// fetch trough vertices
+
+	// return mesh
+}
