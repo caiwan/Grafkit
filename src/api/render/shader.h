@@ -4,28 +4,15 @@
 #include <vector>
 #include <map>
 
+// #pragma lib(dxguid.lib.)
+#include <d3d11shader.h>
+
 #include "../core/reference.h"
 #include "dxtypes.h"
 #include "../render/renderer.h"
 #include "../core/exceptions.h"
 
-// #pragma lib(dxguid.lib.)
-#include <d3d11shader.h>
-
-
-// DHoM - Dirty Hack of Mine
-// http://stackoverflow.com/questions/4157687/using-char-as-a-key-in-stdmap
-// http://stackoverflow.com/questions/12136071/c-mapstdstring-vs-mapchar-performance-i-know-again
-
-/// @todo move the fuck away
-struct cmp_str
-{
-	bool operator()(char const *a, char const *b)
-	{
-		return std::strcmp(a, b) < 0;
-	}
-};
-
+#include "../utils/stringutils.h"
 
 namespace FWrender {
 
@@ -99,7 +86,7 @@ namespace FWrender {
 
 		private:
 			ConstantBufferRecord(ConstantBufferRecord&) {}
-			ConstantBufferRecord& operator= (ConstantBufferRecord&) { return *this; }
+			void operator= (ConstantBufferRecord&) {}
 		};
 
 		/**
@@ -113,7 +100,10 @@ namespace FWrender {
 			InputElementRecord() {}
 		};
 
-		ConstantBufferRecord& operator[] (const char* name);
+		ConstantBufferRecord operator[] (const char* name);
+
+		size_t getILayoutElemCount() { return this->m_mapInputElems.size(); }
+		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
 
 		// set input layout
 		void setInputLayout(ID3D11InputLayout* pLayout) { this->m_layout = pLayout; }
@@ -136,7 +126,8 @@ namespace FWrender {
 
 		ID3D11ShaderReflection *m_pReflector;
 
-		typedef std::map<const char*, InputElementRecord, cmp_str> inputElementMap_t;
+		//typedef std::map<const char*, InputElementRecord, cmp_str> inputElementMap_t;
+		typedef std::vector<InputElementRecord> inputElementMap_t;
 		inputElementMap_t m_mapInputElems;
 
 		typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;
@@ -145,7 +136,7 @@ namespace FWrender {
 		std::vector<std::string> m_inputNames;
 	};
 
-	/// enhance Reference with operator [] to acces the shader's indides, without dereferencing
+	/// enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
 	class ShaderRef : public Ref<Shader> {
 		friend class ShaderRef;
 

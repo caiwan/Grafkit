@@ -139,7 +139,7 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 
 }
 
-FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char * name)
+FWrender::Shader::ConstantBufferRecord FWrender::Shader::operator[](const char * name)
 {
 	if (this->m_mapBuffers.empty()) {
 		// no recorded items, keep moving on
@@ -157,13 +157,13 @@ FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char 
 
 void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
 {
-	char* compileErrors;
-	unsigned long bufferSize, i;
+	char* compileErrors = NULL;
+	unsigned long bufferSize = 0;
 	
 	// fuck this shit
 	FILE* fp = NULL;
 
-	std::wstring error_string();
+	std::wstring error_string;
 
 	compileErrors = (char*)(errorMessage->GetBufferPointer());
 	bufferSize = errorMessage->GetBufferSize();
@@ -316,7 +316,8 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		// const char* name = this->m_inputNames.back().c_str();
 		const char *name = elementDesc.SemanticName;
 		
-		this->m_mapInputElems[name] = elem;
+		//this->m_mapInputElems[name] = elem;
+		this->m_mapInputElems.push_back(elem);
 
 		if (this->m_type == ST_Vertex) {
 			result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
