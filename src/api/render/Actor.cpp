@@ -33,11 +33,6 @@ void FWrender::Entity3D::setFragmentShader(ShaderRef shader)
 	}
 }
 
-const Actor * FWrender::Entity3D::getParent()
-{
-	return this->m_parent;
-}
-
 // =================================================================
 
 FWrender::Actor::Actor()
