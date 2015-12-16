@@ -66,47 +66,47 @@ namespace FWrender
 	*/
 	class SimpleMeshGenerator {
 		friend class MeshAttribSetter;
-	public:
-		SimpleMeshGenerator(ID3D11Device* device, ShaderRef shader);
-
-		void setPtr(std::string name, void* ptr) { this->m_mapPtr[name] = ptr; }
-
-	// --- 
-	public:
-		/// param setter class
-		class MeshAttribSetter {
-			friend class SimpleMeshGenerator;
-		protected:
-			MeshAttribSetter(const char*& name, SimpleMeshGenerator& parent) : m_parent(parent), m_name(name) {}
 		public:
-			void operator =(void* ptr) { this->m_parent.setPtr(m_name, ptr); }
+			SimpleMeshGenerator(ID3D11Device* device, ShaderRef shader);
+
+			void setPtr(std::string name, void* ptr) { this->m_mapPtr[name] = ptr; }
+
+		// --- 
+		public:
+			// --- 
+			/// param setter class
+			class MeshAttribSetter {
+				friend class SimpleMeshGenerator;
+				protected:
+					MeshAttribSetter(const char*& name, SimpleMeshGenerator& parent) : m_parent(parent), m_name(name) {}
+				public:
+					void operator =(void* ptr) { this->m_parent.setPtr(m_name, ptr); }
+
+				private:
+					SimpleMeshGenerator& m_parent;
+					// const char *&m_name;
+					std::string m_name;
+
+					MeshAttribSetter(MeshAttribSetter& other) : m_parent(other.m_parent), m_name(other.m_name) {}
+					void operator = (MeshAttribSetter&) {}
+			};
+
+			MeshAttribSetter operator[](const char*name) { return MeshAttribSetter(name, *this); }
+
+			/**
+			Layout assembler
+			*/
+			MeshRef operator() (size_t vertexCount, size_t indexCount, const int* indices, MeshRef input = NULL);
 
 		private:
-			SimpleMeshGenerator& m_parent;
-			// const char *&m_name;
-			std::string m_name;
+			void createIndexBuffer(MeshRef in_mesh, int indexCount, const int* indices);
 
-			MeshAttribSetter(MeshAttribSetter& other) : m_parent(other.m_parent), m_name(other.m_name) {}
-			void operator = (MeshAttribSetter&) {}
-		};
+		private:
+			ID3D11Device *m_device;
+			ShaderRef m_shader;
 
-		MeshAttribSetter operator[](const char*name) { return MeshAttribSetter(name, *this); }
-
-		/**
-		Layout assembler
-		*/
-		MeshRef operator() (size_t vertexCount, size_t indexCount, const int* indices, MeshRef input = NULL);
-
-	private:
-		void createIndexBuffer(MeshRef in_mesh, int indexCount, const int* indices);
-
-	private:
-		ID3D11Device *m_device;
-		ShaderRef m_shader;
-
-		// typedef std::map<const char*, void*, cmp_str> mapPtr_t;
-		typedef std::map<std::string, void*> mapPtr_t;
-		mapPtr_t m_mapPtr;
+			typedef std::map<std::string, void*> mapPtr_t;
+			mapPtr_t m_mapPtr;
 	};
 }
 
