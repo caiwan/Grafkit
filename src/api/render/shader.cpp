@@ -94,11 +94,11 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 
 void FWrender::Shader::Shutdown()
 {
-	// fuck the constant buffers around
+	// duck the constant buffers around
 
 	// ... 
 
-	// fuck this off 
+	// duck this off 
 	this->m_pReflector->Release();
 
 	if (this->m_pShader) this->m_pShader->Release();
@@ -110,9 +110,9 @@ void FWrender::Shader::Shutdown()
 void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 {
 
-	// go the fuck off 
+	// go the duck off 
 	if (this->m_type == ST_Vertex) {
-		// fuck off the layout
+		// duck off the layout
 		deviceContext->IASetInputLayout(m_layout);
 		deviceContext->VSSetShader(m_vShader, NULL, 0);
 	}
@@ -120,7 +120,7 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 		deviceContext->PSSetShader(m_pShader, NULL, 0);
 	}
 
-	// fuck the constant buffers around
+	// duck the constant buffers around
 	if (!this->m_mapBuffers.empty()) {
 		bufferMap_t::iterator it;
 		for (it = this->m_mapBuffers.begin(); it != this->m_mapBuffers.end(); it++) {
@@ -138,7 +138,7 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 			}
 		}
 	}
-	// fuck through the resources
+	// duck through the resources
 
 }
 
@@ -163,7 +163,7 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	char* compileErrors = NULL;
 	unsigned long bufferSize = 0;
 	
-	// fuck this shit
+	// duck this rainbow
 	FILE* fp = NULL;
 
 	std::wstring error_string;
@@ -341,7 +341,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		this->m_pReflector->GetOutputParameterDesc(i, &out_desc);
 
 		// ... 
-		///@todo fetch through shit 
+		///@todo fetch through rainbow 
 	}
 
 	// fetch constant buffers
@@ -389,7 +389,7 @@ FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* devic
 
 	device->GetImmediateContext(&this->m_pDC);
 
-	/// @todo fetch through even more shit 
+	/// @todo fetch through even more rainbow 
 }
 
 void FWrender::Shader::ConstantBufferRecord::set(void * data)
