@@ -285,6 +285,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	this->m_mapInputElems.clear(); // push_back(elem);
 	// this->m_mapInputElems.insert
 
+	std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
 	for (size_t i = 0; i < desc.InputParameters; i++)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
@@ -297,7 +298,6 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 
 		// fill out input element desc
 		D3D11_INPUT_ELEMENT_DESC elementDesc;
-		std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
 		elementDesc.SemanticName = input_desc.SemanticName;
 		elementDesc.SemanticIndex = input_desc.SemanticIndex;
 		elementDesc.InputSlot = 0;
@@ -322,14 +322,14 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		//this->m_mapInputElems[name] = elem;
 		this->m_mapInputElems.push_back(elem);
 
-		if (this->m_type == ST_Vertex) {
-			result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
+	}
 
-			if (FAILED(result)) {
-				/// @todo throw exceptions 
-				DebugBreak();
-			}
+	if (this->m_type == ST_Vertex) {
+		result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
 
+		if (FAILED(result)) {
+			/// @todo throw exceptions 
+			DebugBreak();
 		}
 
 	}
