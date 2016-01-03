@@ -72,9 +72,11 @@ namespace FWrender
 
 			void setPtr(std::string name, void* ptr) { this->m_mapPtr[name] = ptr; }
 
+		
 		// --- 
 		public:
 			// --- 
+			/// @todo ezt elrendezni kicsit
 			/// param setter class
 			class MeshAttribSetter {
 				friend class SimpleMeshGenerator;

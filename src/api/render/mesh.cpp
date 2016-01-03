@@ -3,6 +3,8 @@
 
 #include "exceptions.h"
 
+#include "struct_pack.h"
+
 using namespace FWrender;
 using namespace FWdebugExceptions;
 
@@ -46,7 +48,7 @@ void FWrender::Mesh::Shutdown()
 	//	this->m_buffers[i].buffer->Release();
 	//}
 
-	if (this->m_buffer.buffer) 
+	if (this->m_buffer.buffer)
 		this->m_buffer.buffer->Release();
 
 	return;
@@ -82,11 +84,6 @@ void FWrender::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
 //	return;
 //}
 
-//void FWrender::Mesh::ShutdownBuffers()
-//{
-//
-//}
-
 
 // ========================================================================
 FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * device, ShaderRef shader)
@@ -96,73 +93,35 @@ FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * device, Shader
 
 MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* indices, MeshRef mesh_input)
 {
-	if (this->m_shader.Invalid()) {
+	if (this->m_shader.Invalid())
 		throw EX(NullPointerException);
-	}
-	
+
 	HRESULT result = 0;
 
 	// obtain input layout elements, and collect pointers that were set before
 	size_t elem_count = this->m_shader->getILayoutElemCount();
 
-	std::vector<BYTE*> src_ptrs;
-	std::vector<size_t> src_widths;
+	FWutils::StructPack packer;
+	packer.setFieldPadding(16);
+	//input_packer.setRecordPadding(16);
 
-	size_t struct_width = 0;
 
-	for (size_t i = 0; i < elem_count; ++i) {
+	for (size_t i = 0; i < elem_count; ++i)
+	{
 		Shader::InputElementRecord &record = this->m_shader->getILayoutElem(i);
-		mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
-		if (it == this->m_mapPtr.end()) {
-			src_ptrs.push_back(NULL);
-		}
-		else {
-			src_ptrs.push_back((BYTE*)it->second);
-		}
+		int field_id = packer.addField(record.width);
 
-		src_widths.push_back(record.width);
-		//struct_width += record.width;
-		// using fix 16 byte alignemnts
-		struct_width += 16;
+		mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
+		if (it != this->m_mapPtr.end())
+		{
+			packer.addPointer(field_id, it->second, 0, record.width);
+		}
 	}
 
 	MeshRef mesh;
-	if (mesh_input.Valid()) {
-		mesh = mesh_input;
-	}
-	else {
-		mesh = new Mesh();
-	}
-	// fetch trough vertices
-	size_t vd_size = struct_width * vertexCount;
-	BYTE* vertex_data = new BYTE[vd_size];
-	ZeroMemory(vertex_data, vd_size);
+	if (mesh_input.Valid()) mesh = mesh_input; else mesh = new Mesh();
 
-	// start address of the current structure
-	BYTE* dst_struct = (BYTE*)vertex_data;
-
-	for (size_t j = 0; j < elem_count; j++) {
-		size_t src_width = src_widths[j];
-		BYTE* src_ptr = src_ptrs[j];
-		size_t i = vertexCount;
-		if (src_ptr) {
-			BYTE* dst_ptr = dst_struct + 16 * j;
-			while (i--) {
-				/// @todo ezzel kell kezdeni valamit surgosen 
-				//size_t k = src_width;
-				//while (k--) {
-				//	dst_ptr[k] = i; // src_ptr[k];
-				//}
-				//dst_ptr[0] = i;
-				//dst_ptr[4] = j;
-
-				memcpy(dst_ptr, src_ptr, src_width);
-
-				dst_ptr += struct_width;
-				src_ptr += src_width;
-			}
-		}
-	}
+	void *vertex_buffer_data = packer(vertexCount);
 
 	// create buffer + index
 	ID3D11Buffer *vertexBuffer = NULL;
@@ -174,14 +133,14 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t ind
 	ZeroMemory(&vertexData, sizeof(vertexData));
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = vd_size;
+	vertexBufferDesc.ByteWidth = packer.getBufferSize();
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
 	vertexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the vertex data.
-	vertexData.pSysMem = vertex_data;
+	vertexData.pSysMem = vertex_buffer_data;
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
@@ -191,10 +150,11 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t ind
 		throw EX(CreateIndevBufferException);
 	}
 
-	delete[] vertex_data; //vertex_data = 0;
+	// delete[] vertex_data; //vertex_data = 0;
+	/// @todo delete vertex_buffer_data 
 
 	this->createIndexBuffer(mesh, indexCount, indices);
-	mesh->addElement(vertexBuffer, struct_width, 0);
+	mesh->addElement(vertexBuffer, packer.getRecordWidth(), 0);
 
 	return mesh;
 }
