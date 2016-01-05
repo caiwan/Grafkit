@@ -102,8 +102,8 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t ind
 	size_t elem_count = this->m_shader->getILayoutElemCount();
 
 	FWutils::StructPack packer;
-	packer.setFieldPadding(16);
-	//input_packer.setRecordPadding(16);
+	//packer.setFieldPadding(16);
+	//packer.setRecordPadding(16);
 
 
 	for (size_t i = 0; i < elem_count; ++i)

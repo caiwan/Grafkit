@@ -57,7 +57,7 @@ namespace FWrender {
 		
 		public:
 			// This class has to have a public accessable default constructor due to std::map
-			ConstantBufferRecord() : ConstantBufferRecord(NULL, NULL) {/*fucings bele*/ }
+			ConstantBufferRecord() : ConstantBufferRecord(NULL, NULL) {}
 		protected:
 			ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
 

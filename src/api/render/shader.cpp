@@ -197,8 +197,6 @@ void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 	res = DXGI_FORMAT_UNKNOWN;
 	byteWidth = 0;
 
-	// ezzel szopi van itt e s
-
 	// I should took this mess into a LUT
 	switch (pd.ComponentType) {
 		case D3D_REGISTER_COMPONENT_FLOAT32:
@@ -228,19 +226,19 @@ void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 			switch (varCount) {
 			case 4:
 				res = DXGI_FORMAT_R32G32B32A32_SINT;
-				byteWidth = 4 * 4;
+				byteWidth = 2 * 4;
 				return;
 			case 3:
 				res = DXGI_FORMAT_R32G32B32_SINT;
-				byteWidth = 4 * 3;
+				byteWidth = 2 * 3;
 				return;
 			case 2:
 				res = DXGI_FORMAT_R32G32_SINT;
-				byteWidth = 4 * 2;
+				byteWidth = 2 * 2;
 				return;
 			case 1:
 				res = DXGI_FORMAT_R32_SINT;
-				byteWidth = 4 * 1;
+				byteWidth = 2 * 1;
 				return;
 			}
 		}
@@ -304,7 +302,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		elementDesc.SemanticName = input_desc.SemanticName;
 		elementDesc.SemanticIndex = input_desc.SemanticIndex;
 		elementDesc.InputSlot = 0;
-		elementDesc.AlignedByteOffset = 16;		// 16 bytes alignment
+		elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;		// 16 bytes alignment
 		elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;	
 		elementDesc.InstanceDataStepRate = 0;
 
