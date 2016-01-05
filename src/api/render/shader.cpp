@@ -191,30 +191,32 @@ void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 	while (mask)
 	{
 		if (mask & 0x01) varCount++;
-		mask = mask >> 1;
+		mask >>= 1; 
 	}
 
 	res = DXGI_FORMAT_UNKNOWN;
 	byteWidth = 0;
+
+	// ezzel szopi van itt e s
 
 	// I should took this mess into a LUT
 	switch (pd.ComponentType) {
 		case D3D_REGISTER_COMPONENT_FLOAT32:
 		{
 			switch (varCount) {
-			case 1:
+			case 4:
 				res = DXGI_FORMAT_R32G32B32A32_FLOAT;
 				byteWidth = 4*4;
 				return;
-			case 2:
+			case 3:
 				res = DXGI_FORMAT_R32G32B32_FLOAT;
 				byteWidth = 4*3;
 				return;
-			case 3:
+			case 2:
 				res = DXGI_FORMAT_R32G32_FLOAT;
 				byteWidth = 4*2;
 				return;
-			case 4:
+			case 1:
 				res = DXGI_FORMAT_R32_FLOAT;
 				byteWidth = 4*1;
 				return;
@@ -224,19 +226,19 @@ void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 		case D3D_REGISTER_COMPONENT_SINT32:
 		{
 			switch (varCount) {
-			case 1:
+			case 4:
 				res = DXGI_FORMAT_R32G32B32A32_SINT;
 				byteWidth = 4 * 4;
 				return;
-			case 2:
+			case 3:
 				res = DXGI_FORMAT_R32G32B32_SINT;
 				byteWidth = 4 * 3;
 				return;
-			case 3:
+			case 2:
 				res = DXGI_FORMAT_R32G32_SINT;
 				byteWidth = 4 * 2;
 				return;
-			case 4:
+			case 1:
 				res = DXGI_FORMAT_R32_SINT;
 				byteWidth = 4 * 1;
 				return;
@@ -245,19 +247,19 @@ void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 		case D3D_REGISTER_COMPONENT_UINT32:
 		{
 			switch (varCount) {
-			case 1:
+			case 4:
 				res = DXGI_FORMAT_R32G32B32A32_UINT;
 				byteWidth = 4 * 4;
 				return;
-			case 2:
+			case 3:
 				res = DXGI_FORMAT_R32G32B32_UINT;
 				byteWidth = 4 * 3;
 				return;
-			case 3:
+			case 2:
 				res = DXGI_FORMAT_R32G32_UINT;
 				byteWidth = 4 * 2;
 				return;
-			case 4:
+			case 1:
 				res = DXGI_FORMAT_R32_UINT;
 				byteWidth = 4 * 1;
 				return;
@@ -295,6 +297,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		// https://takinginitiative.wordpress.com/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
 
 		InputElementRecord elem;
+		ZeroMemory(&elem, sizeof(elem));
 
 		// fill out input element desc
 		D3D11_INPUT_ELEMENT_DESC elementDesc;
