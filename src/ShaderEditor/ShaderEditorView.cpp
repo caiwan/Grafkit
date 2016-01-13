@@ -24,11 +24,14 @@ IMPLEMENT_DYNCREATE(CShaderEditorView, CView)
 BEGIN_MESSAGE_MAP(CShaderEditorView, CView)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+	ON_WM_SIZE()
+	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
 
 // CShaderEditorView construction/destruction
 
-CShaderEditorView::CShaderEditorView()
+CShaderEditorView::CShaderEditorView() :
+	m_xd3d_view()
 {
 	// TODO: add construction code here
 
@@ -48,14 +51,17 @@ BOOL CShaderEditorView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CShaderEditorView drawing
 
-void CShaderEditorView::OnDraw(CDC* /*pDC*/)
+void CShaderEditorView::OnDraw(CDC* pDC)
 {
 	CShaderEditorDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
 
+	this->m_xd3d_view.OnDraw(pDC);
+
 	// TODO: add draw code for native data here
+	// ... 
 }
 
 void CShaderEditorView::OnRButtonUp(UINT /* nFlags */, CPoint point)
@@ -94,3 +100,59 @@ CShaderEditorDoc* CShaderEditorView::GetDocument() const // non-debug version is
 
 
 // CShaderEditorView message handlers
+
+
+void CShaderEditorView::OnInitialUpdate()
+{
+	CView::OnInitialUpdate();
+
+	CRect rect; GetClientRect(rect);
+	m_xd3d_view.CXCreate(rect, this);
+
+	// should work at this point
+	// further init stuff goez here 
+}
+
+
+void CShaderEditorView::OnSize(UINT nType, int cx, int cy)
+{
+	CView::OnSize(nType, cx, cy);
+
+	/*
+	switch (nType)
+	{
+		case SIZE_RESTORED:
+		{
+			if (m_xd3d_view.m_bIsMaximized)
+			{
+				m_xd3d_view.m_bIsMaximized = false;
+			}
+
+			break;
+		}
+
+		case SIZE_MAXIMIZED:
+		{
+			m_xd3d_view.m_bIsMaximized = true;
+
+			break;
+		}
+	}
+	*/
+
+	m_xd3d_view.OnSize(nType, cx, cy);
+}
+
+
+BOOL CShaderEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+	//if ( 1 )
+	{
+		//::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_WAIT));
+		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW)); //https://msdn.microsoft.com/en-us/library/0a4f8y8f.aspx
+		return TRUE;
+	} // ... 
+
+	return CView::OnSetCursor(pWnd, nHitTest, message);
+
+}

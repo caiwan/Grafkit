@@ -59,15 +59,31 @@ CXDrawingDevice::CXDrawingDevice() : CWnd(),
 	m_unpTimer(0),
 	m_is_inited(0),
 	m_nPixelFormat(0),
-	m_hWnd(nullptr),
-	m_hdc(nullptr),
-	m_hrc(nullptr)
+	m_hWnd()
+//	m_hdc(nullptr),
+//	m_hrc(nullptr)
 {
 	// ... nothing exactly to do here
 }
 
 CXDrawingDevice::~CXDrawingDevice()
 {
+}
+
+
+void CXDrawingDevice::CXCreate(CRect rect, CWnd *parent) 
+{	
+	// if (m_is_inited) 
+		//  return;
+
+	// Set initial variables' values
+	m_oldWindow = rect;
+	m_originalRect = rect;
+
+	CString className = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_OWNDC, nullptr, (HBRUSH)GetStockObject(GRAY_BRUSH), nullptr);
+	CreateEx(0, className, _T("DrawingSurface"), WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, rect, parent, 0);
+
+	// m_is_inited = 1;
 }
 
 
@@ -83,29 +99,20 @@ END_MESSAGE_MAP()
 
 void CXDrawingDevice::OnDraw(CDC * pDC)
 {
-
-	this->BeginScene();
-	if (this->m_actualScene)
-	{
-		this->m_actualScene->DrawScene();
-	}
-	else
-	{
-		this->DrawEmptyScene();
-	}
-
-	this->EndScene();
+	this->CXRender();
 }
 
 void CXDrawingDevice::OnPaint()
 {
-	ValidateRect(NULL);
+	ValidateRect(nullptr);
 }
 
 
 void CXDrawingDevice::OnSize(UINT nType, int cx, int cy)
 {
-	if (!m_hWnd) return; // Q&D hotfix
+	if (!m_is_inited) 
+		return; // Q&D hotfix
+	
 	CWnd::OnSize(nType, cx, cy);
 
 	if (0 >= cx || 0 >= cy || nType == SIZE_MINIMIZED) return;
@@ -117,29 +124,29 @@ void CXDrawingDevice::OnSize(UINT nType, int cx, int cy)
 	switch (nType)
 	{
 		// If window resize token is "maximize"
-	case SIZE_MAXIMIZED:
-	{
-		GetWindowRect(m_rect);
-		m_oldWindow = m_rect;
-
-		break;
-	}
-
-	// If window resize token is "restore"
-	case SIZE_RESTORED:
-	{
-		// If the window is currently maximized
-		if (m_bIsMaximized)
+		case SIZE_MAXIMIZED:
 		{
 			GetWindowRect(m_rect);
 			m_oldWindow = m_rect;
+
+			break;
 		}
 
-		break;
-	}
+		// If window resize token is "restore"
+		case SIZE_RESTORED:
+		{
+			// If the window is currently maximized
+			if (m_is_maximized)
+			{
+				GetWindowRect(m_rect);
+				m_oldWindow = m_rect;
+			}
+
+			break;
+		}
 	}
 
-	this->CXApplyViewport(cx, cy);
+	//this->CXApplyViewport(cx, cy);
 
 	if (this->m_actualScene)
 		this->m_actualScene->OnResize(cx, cy);
@@ -150,7 +157,7 @@ void CXDrawingDevice::OnSize(UINT nType, int cx, int cy)
 void CXDrawingDevice::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == this->m_unpTimer) {
-		this->OnDraw(NULL);
+		this->OnDraw(nullptr);
 	}
 
 	CWnd::OnTimer(nIDEvent);
@@ -188,7 +195,8 @@ void CXDrawingDevice::OnMouseMove(UINT nHitTest, CPoint point)
 		}
 
 	}
-	OnDraw(NULL);
+
+	OnDraw(nullptr);
 
 	CWnd::OnMouseMove(nHitTest, point);
 }
@@ -196,9 +204,22 @@ void CXDrawingDevice::OnMouseMove(UINT nHitTest, CPoint point)
 
 int CXDrawingDevice::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CWnd::OnCreate(lpCreateStruct) == -1) return -1;
-	CXInit();
-	this->m_unpTimer = this->SetTimer(1, 1, 0);
+	if (CWnd::OnCreate(lpCreateStruct) == -1) 
+		return -1;
+	
+	m_hWnd = GetSafeHwnd(); // (HWND)(*this);
+
+	try {
+		this->CXInit();
+	}
+	catch (FWdebug::Exception &e) {
+		MessageBoxA(m_hWnd, e.what(), "Fuck off bitch", 0);
+		return -1;
+	}
+	
+	//this->m_unpTimer = this->SetTimer(1, 1, 0);
+
+	this->m_is_inited = 1;
 	return 0;
 }
 
