@@ -53,7 +53,9 @@
     <ClInclude Include="XDraw.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="XD3D.h" />
+    <ClInclude Include="XD3D.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShaderEditor.cpp">
