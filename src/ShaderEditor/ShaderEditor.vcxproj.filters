@@ -56,6 +56,15 @@
     <ClInclude Include="XD3D.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderSrcDoc.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shadersrceditor.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScintillaCtrl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShaderEditor.cpp">
@@ -92,6 +101,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="XD3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderSrcDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderSrcEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScintillaCtrl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

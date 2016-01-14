@@ -213,7 +213,7 @@ int CXDrawingDevice::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		this->CXInit();
 	}
 	catch (FWdebug::Exception &e) {
-		MessageBoxA(m_hWnd, e.what(), "Fuck off bitch", 0);
+		this->MessageBoxA(e.what(), "Fuck off bitch", 0);
 		return -1;
 	}
 	

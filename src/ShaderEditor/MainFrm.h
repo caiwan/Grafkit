@@ -8,6 +8,8 @@
 #include "OutputWnd.h"
 #include "PropertiesWnd.h"
 
+#include "shadersrceditor.h"
+
 class CMainFrame : public CFrameWndEx
 {
 	
@@ -43,6 +45,8 @@ protected:  // control bar embedded members
 	CClassView        m_wndClassView;
 	COutputWnd        m_wndOutput;
 	CPropertiesWnd    m_wndProperties;
+
+	CShaderEditorSingle m_wndShaderEditor;
 
 // Generated message map functions
 protected:

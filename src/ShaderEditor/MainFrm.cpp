@@ -114,12 +114,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	m_wndFileView.EnableDocking(CBRS_ALIGN_ANY);
+	
 	m_wndClassView.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndFileView);
 	CDockablePane* pTabbedBar = NULL;
 	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar);
+
 	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndOutput);
+
+	m_wndShaderEditor.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&m_wndShaderEditor);
+
 	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndProperties);
 
@@ -201,6 +207,17 @@ BOOL CMainFrame::CreateDockingWindows()
 	if (!m_wndFileView.Create(strFileView, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_FILEVIEW, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT| CBRS_FLOAT_MULTI))
 	{
 		TRACE0("Failed to create File View window\n");
+		return FALSE; // failed to create
+	}
+
+	// Create shader editor
+	CString strShaderEditor = "" ;
+	/// @todo
+	bNameValid = strFileView.LoadString(IDS_SHADER_EDITOR);
+	 ASSERT(bNameValid);
+	if (!m_wndShaderEditor.Create(strShaderEditor, this, CRect(0, 0, 200, 200), TRUE, ID_SHADER_EDITOR, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI))
+	{
+		TRACE0("Failed to create Shader Editor window\n");
 		return FALSE; // failed to create
 	}
 
