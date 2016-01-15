@@ -131,7 +131,8 @@ namespace FWrender {
 		typedef std::vector<InputElementRecord> inputElementMap_t;
 		inputElementMap_t m_mapInputElems;
 
-		typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;
+		//typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;
+		typedef std::map<std::string, ConstantBufferRecord> bufferMap_t;
 		bufferMap_t m_mapBuffers;
 
 		std::vector<std::string> m_inputNames;
