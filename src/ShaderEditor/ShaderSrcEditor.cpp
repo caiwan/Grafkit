@@ -180,8 +180,8 @@ void CShaderEditor::SetupStyle(){
 		sFaceName = "Courier New";		//rCtrl.StyleSetFont(0, "Courier New");	
 		nFaceSize = 8;					//rCtrl.StyleSetSize(0, 8);
 	}else{
-		sFaceName = "Lucida Console";	//rCtrl.StyleSetFont(0, "Lucida Console");	
-		nFaceSize = 8;					//rCtrl.StyleSetSize(0, 8);
+		sFaceName = "Consolas";	//rCtrl.StyleSetFont(0, "Lucida Console");	
+		nFaceSize = 10;					//rCtrl.StyleSetSize(0, 8);
 	}
 
 	rCtrl.SetBufferedDraw(false, false);
@@ -322,16 +322,17 @@ void CShaderEditor::AdjustLayout()
 	this->m_sh
 	delete[] b;*/
 
-void CShaderEditor::docFromEditor(std::string &dst){
+void CShaderEditor::docFromEditor(CString &dst){
 	int m = this->GetCtrl().GetTextLength();
 	TCHAR *b = new  TCHAR [m+1];
 	this->GetCtrl().GetText(m, b);
-	dst.assign(b);
+	//dst.assign(b);
+	dst = b;
 	delete[] b;
 }
 
-void CShaderEditor::docToEditor(std::string &src){
-	this->GetCtrl().SetText(src.c_str());
+void CShaderEditor::docToEditor(CString &src){
+	this->GetCtrl().SetText(src);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -455,6 +456,8 @@ void CShaderEditorSingle::docToEditor(){
 	if (!m_pDocument)
 		// throw new NullPointerException();
 		return;
+
+	this->m_wndEditor.docToEditor(m_pDocument->GetShaderSource());
 }
 
 // messages

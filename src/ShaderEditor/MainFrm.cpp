@@ -435,13 +435,16 @@ BOOL CMainFrame::OnCmdMsg(UINT id,int code , void *pExtra,AFX_CMDHANDLERINFO* pH
 {
   //route cmd first to registered dockable pane
   POSITION pos = m_regCmdMsg.GetHeadPosition();
+  
   while (pos)
   {
 	CBasePane* pane = m_regCmdMsg.GetAt(pos);
-	if(pane->IsVisible() &&
-	pane->OnCmdMsg(id,code,pExtra,pHandler))
-							return TRUE;
+	if(pane->GetSafeHwnd() && pane->IsVisible() && pane->OnCmdMsg(id,code,pExtra,pHandler)) 
+		return TRUE;
+
 	m_regCmdMsg.GetNext(pos);
+
   }
+
   return CFrameWndEx::OnCmdMsg(id,code,pExtra,pHandler);
 }

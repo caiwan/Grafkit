@@ -4,7 +4,10 @@
 
 #pragma once
 
+//#include "CEditorDoc.h"
 #include "XD3D.h"
+
+class CEditorDoc;
 
 class CEditorView : public CView
 {
@@ -14,7 +17,7 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	CEditorDoc* GetDocument() const;
+	CEditorDoc* GetDocument();
 
 // Operations
 public:

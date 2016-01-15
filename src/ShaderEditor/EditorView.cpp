@@ -91,7 +91,7 @@ void CEditorView::Dump(CDumpContext& dc) const
 	CView::Dump(dc);
 }
 
-CEditorDoc* CEditorView::GetDocument() const // non-debug version is inline
+CEditorDoc* CEditorView::GetDocument()// non-debug version is inline
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CEditorDoc)));
 	return (CEditorDoc*)m_pDocument;
@@ -109,8 +109,13 @@ void CEditorView::OnInitialUpdate()
 	CRect rect; GetClientRect(rect);
 	m_xd3d_view.CXCreate(rect, this);
 
-	// should work at this point
-	// further init stuff goez here 
+	CMainFrame*mainFrm = theApp.getMainFrame();
+	CShaderEditorSingle &shaderEditor = mainFrm->getEditor();
+
+	CShaderSrcDoc &shaderDoc = this->GetDocument()->m_shader_src;
+
+	shaderEditor.setDocument(&shaderDoc);
+	shaderEditor.docToEditor();
 }
 
 

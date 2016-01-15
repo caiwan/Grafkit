@@ -2,12 +2,17 @@
 // ShaderEditorDoc.h : interface of the CEditorDoc class
 //
 
-
 #pragma once
 
+// #include "EditorView.h"
+#include "ShaderSrcDoc.h"
+
+class CEditorView;
 
 class CEditorDoc : public CDocument
 {
+	friend class CEditorView;
+
 protected: // create from serialization only
 	CEditorDoc();
 	DECLARE_DYNCREATE(CEditorDoc)
@@ -36,6 +41,8 @@ public:
 #endif
 
 protected:
+
+	CShaderSrcDoc  m_shader_src;
 
 // Generated message map functions
 protected:

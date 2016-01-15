@@ -17,6 +17,12 @@
 #define new DEBUG_NEW
 #endif
 
+
+namespace {
+#include "defaultShader.cpp.inc"
+}
+
+
 // CEditorDoc
 
 IMPLEMENT_DYNCREATE(CEditorDoc, CDocument)
@@ -42,13 +48,10 @@ BOOL CEditorDoc::OnNewDocument()
 	if (!CDocument::OnNewDocument())
 		return FALSE;
 
-	// TODO: add reinitialization code here
-	// (SDI documents will reuse this document)
+	m_shader_src.SetShaderSource(::defaultShader);
 
 	return TRUE;
 }
-
-
 
 
 // CEditorDoc serialization

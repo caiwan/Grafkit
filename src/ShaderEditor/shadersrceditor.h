@@ -42,8 +42,8 @@ class CShaderEditor : public CWnd
 
 		inline Scintilla::CScintillaCtrl& GetCtrl(){return this->m_wndTextEditor;}
 
-		void docFromEditor(std::string &dst);
-		void docToEditor(std::string &src);
+		void docFromEditor(CString &dst);
+		void docToEditor(CString &src);
 
 	protected:
 		CWnd *hWnd;
