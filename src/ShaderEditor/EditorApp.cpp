@@ -3,15 +3,20 @@
 */
 
 #include "stdafx.h"
+
+#include "EditorDoc.h"
+#include "EditorView.h"
+
+#include "EditorApp.h"
+#include "MainFrm.h"
+
 #include "afxwinappex.h"
 #include "afxdialogex.h"
-#include "shadereditor.h"
-#include "MainFrm.h"
+
 
 //#include "Logger.h"
 
-#include "ShaderEditorDoc.h"
-#include "ShaderEditorView.h"
+
 
 #include <Scintilla.h>
 
@@ -22,19 +27,19 @@
 //using namespace FWcore;
 //using FWutils::PackageFile;
 
-// CTextureGeneratorApp
+// CEditorApp
 
-BEGIN_MESSAGE_MAP(CTextureGeneratorApp, CWinAppEx)
-	ON_COMMAND(ID_APP_ABOUT, &CTextureGeneratorApp::OnAppAbout)
+BEGIN_MESSAGE_MAP(CEditorApp, CWinAppEx)
+	ON_COMMAND(ID_APP_ABOUT, &CEditorApp::OnAppAbout)
 	// Standard file based document commands
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
 END_MESSAGE_MAP()
 
 
-// CTextureGeneratorApp construction
+// CEditorApp construction
 
-CTextureGeneratorApp::CTextureGeneratorApp() 
+CEditorApp::CEditorApp() 
 	//Framework(),
 	//BaseApplication(),
 	//
@@ -46,12 +51,12 @@ CTextureGeneratorApp::CTextureGeneratorApp()
 	SetAppID(_T("GrafKit.Idogep.TextureGenerator.AppID.NoVersion01")); //@todo nevet es verziot generalni
 }
 
-CTextureGeneratorApp::~CTextureGeneratorApp()
+CEditorApp::~CEditorApp()
 {
 }
 
-// The one and only CTextureGeneratorApp object
-CTextureGeneratorApp theApp;
+// The one and only CEditorApp object
+CEditorApp theApp;
 
 #define SCINTILLA_STATIC_LINK
 
@@ -84,9 +89,9 @@ HMODULE CScintillaDemoApp::LoadLibraryFromApplicationDirectory(LPCTSTR lpFileNam
 #endif
 
 
-// CTextureGeneratorApp initialization
+// CEditorApp initialization
 
-BOOL CTextureGeneratorApp::InitInstance()
+BOOL CEditorApp::InitInstance()
 {
 
 #ifndef SCINTILLA_STATIC_LINK
@@ -126,9 +131,9 @@ BOOL CTextureGeneratorApp::InitInstance()
 	CSingleDocTemplate* pDocTemplate;
 	pDocTemplate = new CSingleDocTemplate(
 		IDR_MAINFRAME,
-		RUNTIME_CLASS(CShaderEditorDoc),
+		RUNTIME_CLASS(CEditorDoc),
 		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-		RUNTIME_CLASS(CShaderEditorView));
+		RUNTIME_CLASS(CEditorView));
 	if (!pDocTemplate)
 		return FALSE;
 	AddDocTemplate(pDocTemplate);
@@ -158,7 +163,7 @@ BOOL CTextureGeneratorApp::InitInstance()
 	return TRUE;
 }
 
-// CTextureGeneratorApp message handlers
+// CEditorApp message handlers
 
 
 // CAboutDlg dialog used for App About
@@ -192,15 +197,15 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 // App command to run the dialog
-void CTextureGeneratorApp::OnAppAbout()
+void CEditorApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
 
-// CTextureGeneratorApp customization load/save methods
+// CEditorApp customization load/save methods
 
-void CTextureGeneratorApp::PreLoadState()
+void CEditorApp::PreLoadState()
 {
 	BOOL bNameValid;
 	CString strName;
@@ -212,47 +217,47 @@ void CTextureGeneratorApp::PreLoadState()
 	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EXPLORER);
 }
 
-void CTextureGeneratorApp::LoadCustomState()
+void CEditorApp::LoadCustomState()
 {
 }
 
-void CTextureGeneratorApp::SaveCustomState()
+void CEditorApp::SaveCustomState()
 {
 }
 
-// CTextureGeneratorApp message handlers
+// CEditorApp message handlers
 
 
 //// ---------------------------------------------------
 //// frmework + logger + assetman' overrides
 //// ---------------------------------------------------
-//int CTextureGeneratorApp::execute(){
+//int CEditorApp::execute(){
 //	return -1;
 //}
 //
-//void CTextureGeneratorApp::terminate(int errorcode){
+//void CEditorApp::terminate(int errorcode){
 //	///@todo megbaszni fasszal szarazon
 //}
 //
-//Logger& CTextureGeneratorApp::log(){
+//Logger& CEditorApp::log(){
 //	return this->m_logger;
 //}
 //
-//ASSETManager& CTextureGeneratorApp::ASSETManager(){
+//ASSETManager& CEditorApp::ASSETManager(){
 //	return this->m_pkg_file;
 //}
 //
-//int CTextureGeneratorApp::peekMessage(){
+//int CEditorApp::peekMessage(){
 //	return -1;
 //}
 //
-//void CTextureGeneratorApp::swapBuffers(){
+//void CEditorApp::swapBuffers(){
 //}
 //
 //// ---------------------------------------------------
 //// Base app overrides
 //// ---------------------------------------------------
-//#define APPHAXX_BASE_CLASS CTextureGeneratorApp
+//#define APPHAXX_BASE_CLASS CEditorApp
 //
 //#include "..\GrafKitEdit\common\application_hax.cpp.inc"
 

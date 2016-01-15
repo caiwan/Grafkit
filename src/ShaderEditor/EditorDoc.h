@@ -1,16 +1,16 @@
 
-// ShaderEditorDoc.h : interface of the CShaderEditorDoc class
+// ShaderEditorDoc.h : interface of the CEditorDoc class
 //
 
 
 #pragma once
 
 
-class CShaderEditorDoc : public CDocument
+class CEditorDoc : public CDocument
 {
 protected: // create from serialization only
-	CShaderEditorDoc();
-	DECLARE_DYNCREATE(CShaderEditorDoc)
+	CEditorDoc();
+	DECLARE_DYNCREATE(CEditorDoc)
 
 // Attributes
 public:
@@ -29,7 +29,7 @@ public:
 
 // Implementation
 public:
-	virtual ~CShaderEditorDoc();
+	virtual ~CEditorDoc();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

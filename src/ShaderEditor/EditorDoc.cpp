@@ -1,15 +1,15 @@
 
-// ShaderEditorDoc.cpp : implementation of the CShaderEditorDoc class
+// ShaderEditorDoc.cpp : implementation of the CEditorDoc class
 //
 
 #include "stdafx.h"
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
 // and search filter handlers and allows sharing of document code with that project.
 #ifndef SHARED_HANDLERS
-#include "ShaderEditor.h"
+#include "EditorApp.h"
 #endif
 
-#include "ShaderEditorDoc.h"
+#include "EditorDoc.h"
 
 #include <propkey.h>
 
@@ -17,27 +17,27 @@
 #define new DEBUG_NEW
 #endif
 
-// CShaderEditorDoc
+// CEditorDoc
 
-IMPLEMENT_DYNCREATE(CShaderEditorDoc, CDocument)
+IMPLEMENT_DYNCREATE(CEditorDoc, CDocument)
 
-BEGIN_MESSAGE_MAP(CShaderEditorDoc, CDocument)
+BEGIN_MESSAGE_MAP(CEditorDoc, CDocument)
 END_MESSAGE_MAP()
 
 
-// CShaderEditorDoc construction/destruction
+// CEditorDoc construction/destruction
 
-CShaderEditorDoc::CShaderEditorDoc()
+CEditorDoc::CEditorDoc()
 {
 	// TODO: add one-time construction code here
 
 }
 
-CShaderEditorDoc::~CShaderEditorDoc()
+CEditorDoc::~CEditorDoc()
 {
 }
 
-BOOL CShaderEditorDoc::OnNewDocument()
+BOOL CEditorDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument())
 		return FALSE;
@@ -51,9 +51,9 @@ BOOL CShaderEditorDoc::OnNewDocument()
 
 
 
-// CShaderEditorDoc serialization
+// CEditorDoc serialization
 
-void CShaderEditorDoc::Serialize(CArchive& ar)
+void CEditorDoc::Serialize(CArchive& ar)
 {
 	if (ar.IsStoring())
 	{
@@ -119,19 +119,19 @@ void CShaderEditorDoc::SetSearchContent(const CString& value)
 
 #endif // SHARED_HANDLERS
 
-// CShaderEditorDoc diagnostics
+// CEditorDoc diagnostics
 
 #ifdef _DEBUG
-void CShaderEditorDoc::AssertValid() const
+void CEditorDoc::AssertValid() const
 {
 	CDocument::AssertValid();
 }
 
-void CShaderEditorDoc::Dump(CDumpContext& dc) const
+void CEditorDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
 }
 #endif //_DEBUG
 
 
-// CShaderEditorDoc commands
+// CEditorDoc commands

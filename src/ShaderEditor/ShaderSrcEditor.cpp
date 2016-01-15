@@ -1,17 +1,7 @@
-
-//@todo azzal kell kezdeni velalamit, hogy mindket projectben egyforman mukodo legyen ez az egesz
-//#include "../stdafx.h"
-#include "stdafx.h"	// ne sirjon a pici szad
+#include "stdafx.h"
 
 #include "shadersrceditor.h"
-
-//#include "../MainFrm.h"
-//#include "../Resource.h"
-//
-////#include "../TextureGenerator.h"
-//#include "application.h"
-
-#include "ShaderEditor.h"
+#include "EditorApp.h"
 
 #include <SciLexer.h>
 #include <Scintilla.h>
@@ -21,6 +11,10 @@ using namespace Scintilla;
 // keywordok
 namespace {
 	#include "ShaderEditorKeywords.cpp.inc"
+}
+
+namespace ShaderSource {
+	#include "defaultShader.cpp.inc"
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -454,18 +448,6 @@ void CShaderEditorSingle::docFromEditor(){
 	if (!m_pDocument)
 		//throw new NullPointerException();
 		return;
-
-	
-//#ifdef USE_SINGLE_EDITOR_FOR_NOW
-//	
-//	this->m_wndEditor.docFromEditor(this->m_pDocument->getFSS());
-//
-//#else //USE_SINGLE_EDITOR_FOR_NOW
-//	// ide jon az, amikor egyszerre van VSS es FSS is
-//	if(m_pDocument->isFSSOnly()){
-//	} else {
-//	}
-//#endif //USE_SINGLE_EDITOR_FOR_NOW
 }
 
 void CShaderEditorSingle::docToEditor(){
@@ -473,19 +455,6 @@ void CShaderEditorSingle::docToEditor(){
 	if (!m_pDocument)
 		// throw new NullPointerException();
 		return;
-
-//#ifdef USE_SINGLE_EDITOR_FOR_NOW
-//
-//	this->m_wndEditor.docToEditor(this->m_pDocument->getFSS());
-//
-//#else //USE_SINGLE_EDITOR_FOR_NOW
-//
-//	// ide jon az, amikor egyszerre van VSS es FSS is
-//	if(m_pDocument->isFSSOnly()){
-//	} else {
-//	}
-//
-//#endif //USE_SINGLE_EDITOR_FOR_NOW
 }
 
 // messages
@@ -583,33 +552,3 @@ void CShaderEditorSingle::OnUpdateEditUndo(CCmdUI* pCmdUI){
 void CShaderEditorSingle::OnUpdateEditRedo(CCmdUI* pCmdUI){
 	ASSERT_VALID(this); pCmdUI->Enable(GetActiveCtrl().CanRedo());
 }
-
-
-
-
-/*
-CShaderEditorMulti
-
-void CShaderEditorSingle::OnEditCopy(){
-	GetActiveCtrl().Copy();
-}
-void CShaderEditorSingle::OnEditPaste(){
-	GetActiveCtrl().Paste();
-}
-void CShaderEditorSingle::OnEditCut(){
-	GetActiveCtrl().Cut();
-}
-void CShaderEditorSingle::OnEditUndo(){
-	GetActiveCtrl().Undo();
-}
-void CShaderEditorSingle::OnEditRedo(){
-	GetActiveCtrl().Redo();
-}
-void CShaderEditorSingle::OnEditSelectAll(){
-	GetActiveCtrl().SelectAll();
-}
-
-void CShaderEditorSingleOnUpdateNeedSelect(CCmdUI* pCmdUI){
-
-}
-*/

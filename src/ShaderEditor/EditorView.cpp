@@ -1,47 +1,47 @@
 
-// ShaderEditorView.cpp : implementation of the CShaderEditorView class
+// ShaderEditorView.cpp : implementation of the CEditorView class
 //
 
 #include "stdafx.h"
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
 // and search filter handlers and allows sharing of document code with that project.
 #ifndef SHARED_HANDLERS
-#include "ShaderEditor.h"
+#include "EditorApp.h"
 #endif
 
-#include "ShaderEditorDoc.h"
-#include "ShaderEditorView.h"
+#include "EditorDoc.h"
+#include "EditorView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CShaderEditorView
+// CEditorView
 
-IMPLEMENT_DYNCREATE(CShaderEditorView, CView)
+IMPLEMENT_DYNCREATE(CEditorView, CView)
 
-BEGIN_MESSAGE_MAP(CShaderEditorView, CView)
+BEGIN_MESSAGE_MAP(CEditorView, CView)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
 	ON_WM_SIZE()
 	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
 
-// CShaderEditorView construction/destruction
+// CEditorView construction/destruction
 
-CShaderEditorView::CShaderEditorView() :
+CEditorView::CEditorView() :
 	m_xd3d_view()
 {
 	// TODO: add construction code here
 
 }
 
-CShaderEditorView::~CShaderEditorView()
+CEditorView::~CEditorView()
 {
 }
 
-BOOL CShaderEditorView::PreCreateWindow(CREATESTRUCT& cs)
+BOOL CEditorView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
@@ -49,11 +49,11 @@ BOOL CShaderEditorView::PreCreateWindow(CREATESTRUCT& cs)
 	return CView::PreCreateWindow(cs);
 }
 
-// CShaderEditorView drawing
+// CEditorView drawing
 
-void CShaderEditorView::OnDraw(CDC* pDC)
+void CEditorView::OnDraw(CDC* pDC)
 {
-	CShaderEditorDoc* pDoc = GetDocument();
+	CEditorDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
@@ -64,13 +64,13 @@ void CShaderEditorView::OnDraw(CDC* pDC)
 	// ... 
 }
 
-void CShaderEditorView::OnRButtonUp(UINT /* nFlags */, CPoint point)
+void CEditorView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
 	ClientToScreen(&point);
 	OnContextMenu(this, point);
 }
 
-void CShaderEditorView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
+void CEditorView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 {
 #ifndef SHARED_HANDLERS
 	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
@@ -78,31 +78,31 @@ void CShaderEditorView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 }
 
 
-// CShaderEditorView diagnostics
+// CEditorView diagnostics
 
 #ifdef _DEBUG
-void CShaderEditorView::AssertValid() const
+void CEditorView::AssertValid() const
 {
 	CView::AssertValid();
 }
 
-void CShaderEditorView::Dump(CDumpContext& dc) const
+void CEditorView::Dump(CDumpContext& dc) const
 {
 	CView::Dump(dc);
 }
 
-CShaderEditorDoc* CShaderEditorView::GetDocument() const // non-debug version is inline
+CEditorDoc* CEditorView::GetDocument() const // non-debug version is inline
 {
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CShaderEditorDoc)));
-	return (CShaderEditorDoc*)m_pDocument;
+	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CEditorDoc)));
+	return (CEditorDoc*)m_pDocument;
 }
 #endif //_DEBUG
 
 
-// CShaderEditorView message handlers
+// CEditorView message handlers
 
 
-void CShaderEditorView::OnInitialUpdate()
+void CEditorView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
@@ -114,7 +114,7 @@ void CShaderEditorView::OnInitialUpdate()
 }
 
 
-void CShaderEditorView::OnSize(UINT nType, int cx, int cy)
+void CEditorView::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
 
@@ -144,7 +144,7 @@ void CShaderEditorView::OnSize(UINT nType, int cx, int cy)
 }
 
 
-BOOL CShaderEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+BOOL CEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	//if ( 1 )
 	{

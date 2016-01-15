@@ -1,20 +1,20 @@
 
-// ShaderEditorView.h : interface of the CShaderEditorView class
+// ShaderEditorView.h : interface of the CEditorView class
 //
 
 #pragma once
 
 #include "XD3D.h"
 
-class CShaderEditorView : public CView
+class CEditorView : public CView
 {
 protected: // create from serialization only
-	CShaderEditorView();
-	DECLARE_DYNCREATE(CShaderEditorView)
+	CEditorView();
+	DECLARE_DYNCREATE(CEditorView)
 
 // Attributes
 public:
-	CShaderEditorDoc* GetDocument() const;
+	CEditorDoc* GetDocument() const;
 
 // Operations
 public:
@@ -27,7 +27,7 @@ protected:
 
 // Implementation
 public:
-	virtual ~CShaderEditorView();
+	virtual ~CEditorView();
 
 #ifdef _DEBUG
 	virtual void AssertValid() const;
@@ -51,7 +51,7 @@ public:
 };
 
 #ifndef _DEBUG  // debug version in ShaderEditorView.cpp
-inline CShaderEditorDoc* CShaderEditorView::GetDocument() const
+inline CShaderEditorDoc* CEditorView::GetDocument() const
    { return reinterpret_cast<CShaderEditorDoc*>(m_pDocument); }
 #endif
 

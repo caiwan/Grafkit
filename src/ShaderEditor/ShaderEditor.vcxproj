@@ -211,7 +211,7 @@
   <ItemGroup>
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="ScintillaCtrl.h" />
-    <ClInclude Include="shadersrceditor.h" />
+    <ClInclude Include="ShaderSrcEditor.h" />
     <ClInclude Include="ShaderSrcDoc.h" />
     <ClInclude Include="XD3D.h" />
     <ClInclude Include="XDraw.h" />
@@ -219,9 +219,9 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="PropertiesWnd.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="ShaderEditor.h" />
-    <ClInclude Include="ShaderEditorDoc.h" />
-    <ClInclude Include="ShaderEditorView.h" />
+    <ClInclude Include="EditorApp.h" />
+    <ClInclude Include="EditorDoc.h" />
+    <ClInclude Include="EditorView.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ViewTree.h" />
@@ -236,9 +236,9 @@
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
-    <ClCompile Include="ShaderEditor.cpp" />
-    <ClCompile Include="ShaderEditorDoc.cpp" />
-    <ClCompile Include="ShaderEditorView.cpp" />
+    <ClCompile Include="EditorApp.cpp" />
+    <ClCompile Include="EditorDoc.cpp" />
+    <ClCompile Include="EditorView.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

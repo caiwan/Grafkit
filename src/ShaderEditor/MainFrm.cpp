@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "ShaderEditor.h"
+#include "EditorApp.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

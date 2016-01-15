@@ -1,8 +1,6 @@
 // #include "../stdafx.h"
 #include "stdafx.h"
 
-// #include "utilites/platform/stringutils.h"
-
 #include "ShaderSrcDoc.h"
 
 #include "render/shader.h"
@@ -19,14 +17,14 @@ using namespace FWdebugExceptions;
 // Shader dokumentum
 //////////////////////////////////////////////////////////////////////
 /*
-CShaderEditorDoc::CShaderEditorDoc(){
+CShaderSrcDoc::CShaderSrcDoc(){
 	m_shader = NULL;
 	m_is_FSS_Only = 0;
 	m_is_has_errors = 0;
 }
 */
 
-CShaderEditorDoc::CShaderEditorDoc(const char* _shader_source){
+CShaderSrcDoc::CShaderSrcDoc(const char* _shader_source){
 	//
 	//if (!_vss || !_fss) throw new NullPointerException();
 	//m_vss=_vss;
@@ -38,11 +36,11 @@ CShaderEditorDoc::CShaderEditorDoc(const char* _shader_source){
 
 }
 
-CShaderEditorDoc::~CShaderEditorDoc(){
+CShaderSrcDoc::~CShaderSrcDoc(){
 	//delete m_shader;
 }
 
-int CShaderEditorDoc::compileShader(){
+int CShaderSrcDoc::compileShader(){
 // shader objektum cserevel dolgozik
 	//FWrender::Shader *newshader = NULL;
 	//try{
@@ -76,7 +74,7 @@ int CShaderEditorDoc::compileShader(){
 	return 0;	// fail
 }
 
-void CShaderEditorDoc::flushErrors(){
+void CShaderSrcDoc::flushErrors(){
 	//this->m_errors.rewind();	
 }
 
@@ -84,7 +82,7 @@ void CShaderEditorDoc::flushErrors(){
 // Shader hibakezeles
 //////////////////////////////////////////////////////////////////////
 
-void CShaderEditorDoc::fillErrors(ShaderException& ex){
+void CShaderSrcDoc::fillErrors(ShaderException& ex){
 	//if (!ex) return;
 	//
 	//const char* err_str = ex->getCompilerError(); 

@@ -4,7 +4,7 @@
 #include "PropertiesWnd.h"
 #include "Resource.h"
 #include "MainFrm.h"
-#include "ShaderEditor.h"
+#include "EditorApp.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE

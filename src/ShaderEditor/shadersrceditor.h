@@ -3,7 +3,8 @@
 #include <string>
 
 #include "ScintillaCtrl.h"
-#include "ShaderEditorDoc.h"
+#include "ShaderSrcDoc.h"
+#include "EditorDoc.h"
 
 // ===================================================================================================================
 
@@ -73,7 +74,6 @@ class CShaderEditor : public CWnd
 		afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 		afx_msg void OnPaint();
 		afx_msg void OnSetFocus(CWnd* pOldWnd);
-		afx_msg LRESULT OnChangeActiveTab(WPARAM, LPARAM);
 };
 
 
@@ -86,25 +86,18 @@ class CShaderEditorSingle : public CDockablePane{
 		CShaderEditorSingle();
 		virtual ~CShaderEditorSingle();
 
-		inline void setDocument(CShaderEditorDoc *pdoc) {ASSERT(pdoc); this->m_pDocument = pdoc;}
-		inline CShaderEditorDoc *&getDocument() {ASSERT(m_pDocument); return this->m_pDocument;}
+		inline void setDocument(CShaderSrcDoc *pdoc) {ASSERT(pdoc); this->m_pDocument = pdoc;}
+		inline CShaderSrcDoc *&getDocument() {ASSERT(m_pDocument); return this->m_pDocument;}
 
 		void docFromEditor();
 		void docToEditor();	
 
-		/** atmenetileg helyben kifejtett lesz, kesobb megbonyolitom, ami az aktiv tabrol adja vissza a controlt*/
 		inline Scintilla::CScintillaCtrl& GetActiveCtrl(){return this->m_wndEditor.GetCtrl();}
 
 	protected:
 
-#if 1
-#define USE_SINGLE_EDITOR_FOR_NOW
-		CShaderEditor	m_wndEditor;						///@todo kell kulon editor a VSS es FSS szamara, ha a docban van
-#else 
-		CShaderEditor	m_wndEditor_VSS, m_wndEditor_FSS;
-#endif
-
-		CShaderEditorDoc *m_pDocument;
+		CShaderEditor	m_wndEditor;
+		CShaderSrcDoc *m_pDocument;
 
 	private:
 		HACCEL m_accelerators;
@@ -131,12 +124,4 @@ class CShaderEditorSingle : public CDockablePane{
 
 		void OnUpdateEditUndo(CCmdUI* pCmdUI);
 		void OnUpdateEditRedo(CCmdUI* pCmdUI);
-};
-
-/**
-	etc 
-*/
-
-class CShaderEditorMulti : public CShaderEditorSingle{
-	// +++ 
 };

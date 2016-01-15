@@ -3,7 +3,7 @@
 #include "MainFrm.h"
 #include "ClassView.h"
 #include "Resource.h"
-#include "ShaderEditor.h"
+#include "EditorApp.h"
 
 class CClassViewMenuButton : public CMFCToolBarMenuButton
 {

@@ -21,14 +21,14 @@
 #include "MainFrm.h"
 
 /**
-	CTextureGeneratorApp:
+	CEditorApp:
 	@See TextureGenerator.cpp for the implementation of this class
 */
-class CTextureGeneratorApp : public CWinAppEx // public FWcore::Framework, public BaseApplication
+class CEditorApp : public CWinAppEx // public FWcore::Framework, public BaseApplication
 {
 	public:
-		CTextureGeneratorApp();
-		~CTextureGeneratorApp();
+		CEditorApp();
+		~CEditorApp();
 
 		// --- framework overides
 
@@ -67,4 +67,4 @@ class CTextureGeneratorApp : public CWinAppEx // public FWcore::Framework, publi
 		DECLARE_MESSAGE_MAP()
 };
 
-extern CTextureGeneratorApp theApp;
+extern CEditorApp theApp;
