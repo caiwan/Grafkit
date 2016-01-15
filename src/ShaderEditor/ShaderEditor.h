@@ -1,6 +1,7 @@
+/**
+	@file TextureGenerator.h : main header file for the TextureGenerator application
 
-// ShaderEditor.h : main header file for the ShaderEditor application
-//
+*/
 #pragma once
 
 #ifndef __AFXWIN_H__
@@ -8,31 +9,62 @@
 #endif
 
 #include "resource.h"       // main symbols
+//#include "framework.h"
+//#include "framework_win32.h"
+//#include "utilites/io/package.h"
 
+//#include "..\GrafKitEdit\common\application.h"
 
-// CShaderEditorApp:
-// See ShaderEditor.cpp for the implementation of this class
-//
+//#include "Logger.h"
 
-class CShaderEditorApp : public CWinAppEx
+//class CMainFrame;
+#include "MainFrm.h"
+
+/**
+	CTextureGeneratorApp:
+	@See TextureGenerator.cpp for the implementation of this class
+*/
+class CTextureGeneratorApp : public CWinAppEx // public FWcore::Framework, public BaseApplication
 {
-public:
-	CShaderEditorApp();
+	public:
+		CTextureGeneratorApp();
+		~CTextureGeneratorApp();
 
+		// --- framework overides
 
-// Overrides
-public:
-	virtual BOOL InitInstance();
+	public:
+		//FWutils::PackageFile m_pkg_file;
+		//CLogger m_logger;
 
-// Implementation
-	BOOL  m_bHiColorIcons;
+		CMainFrame* getMainFrame(){ASSERT(m_pMainWnd); return (CMainFrame*)(GetMainWnd());}
 
-	virtual void PreLoadState();
-	virtual void LoadCustomState();
-	virtual void SaveCustomState();
+	private:
+		//virtual int execute();
+		//virtual void terminate(int errorcode);
+	public:
+		//virtual FWcore::Logger& log();
+		//virtual FWcore::ASSETManager& ASSETManager();
+			
+	private:
+		//virtual int peekMessage();
+		//virtual void swapBuffers();
 
-	afx_msg void OnAppAbout();
-	DECLARE_MESSAGE_MAP()
+	// Overrides
+	public:
+		virtual BOOL InitInstance();
+
+		//#include "..\GrafKitEdit\common\application_hax.h.inc"
+
+	// Implementation
+		UINT  m_nAppLook;
+		BOOL  m_bHiColorIcons;
+
+		virtual void PreLoadState();
+		virtual void LoadCustomState();
+		virtual void SaveCustomState();
+
+		afx_msg void OnAppAbout();
+		DECLARE_MESSAGE_MAP()
 };
 
-extern CShaderEditorApp theApp;
+extern CTextureGeneratorApp theApp;

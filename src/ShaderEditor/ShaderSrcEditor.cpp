@@ -116,7 +116,7 @@ BOOL CShaderEditor::Create(int n, CWnd* pParentWnd, const RECT& rect, UINT nID, 
 	// CString nname; nname.Format(SHADER_EDITOR_CLASNAME"_%d",n);	//remelem jau'1
 	CString className = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_OWNDC, nullptr, (HBRUSH)(GetStockObject(GRAY_BRUSH)), nullptr);
 
-	if (!CWnd::Create(SHADER_EDITOR_CLASNAME, className, dwStyle, rect, pParentWnd, nID))
+	if (!CWnd::Create(className, SHADER_EDITOR_CLASNAME, dwStyle, rect, pParentWnd, nID))
 		return false;
 
 	this->hWnd = pParentWnd;

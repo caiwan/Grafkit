@@ -1,72 +1,115 @@
-
-// ShaderEditor.cpp : Defines the class behaviors for the application.
-//
+/** 
+	@file TextureGenerator.cpp : Defines the class behaviors for the application.
+*/
 
 #include "stdafx.h"
 #include "afxwinappex.h"
 #include "afxdialogex.h"
-#include "ShaderEditor.h"
+#include "shadereditor.h"
 #include "MainFrm.h"
+
+//#include "Logger.h"
 
 #include "ShaderEditorDoc.h"
 #include "ShaderEditorView.h"
+
+#include <Scintilla.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+//using namespace FWcore;
+//using FWutils::PackageFile;
 
-// CShaderEditorApp
+// CTextureGeneratorApp
 
-BEGIN_MESSAGE_MAP(CShaderEditorApp, CWinAppEx)
-	ON_COMMAND(ID_APP_ABOUT, &CShaderEditorApp::OnAppAbout)
+BEGIN_MESSAGE_MAP(CTextureGeneratorApp, CWinAppEx)
+	ON_COMMAND(ID_APP_ABOUT, &CTextureGeneratorApp::OnAppAbout)
 	// Standard file based document commands
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
 END_MESSAGE_MAP()
 
 
-// CShaderEditorApp construction
+// CTextureGeneratorApp construction
 
-CShaderEditorApp::CShaderEditorApp()
+CTextureGeneratorApp::CTextureGeneratorApp() 
+	//Framework(),
+	//BaseApplication(),
+	//
+	//m_logger(),
+	//m_pkg_file("./")
 {
 	m_bHiColorIcons = TRUE;
 
-	// TODO: replace application ID string below with unique ID string; recommended
-	// format for string is CompanyName.ProductName.SubProduct.VersionInformation
-	SetAppID(_T("ShaderEditor.AppID.NoVersion"));
-
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
+	SetAppID(_T("GrafKit.Idogep.TextureGenerator.AppID.NoVersion01")); //@todo nevet es verziot generalni
 }
 
-// The one and only CShaderEditorApp object
-
-CShaderEditorApp theApp;
-
-
-// CShaderEditorApp initialization
-
-BOOL CShaderEditorApp::InitInstance()
+CTextureGeneratorApp::~CTextureGeneratorApp()
 {
+}
+
+// The one and only CTextureGeneratorApp object
+CTextureGeneratorApp theApp;
+
+#define SCINTILLA_STATIC_LINK
+
+#ifndef SCINTILLA_STATIC_LINK
+HMODULE CScintillaDemoApp::LoadLibraryFromApplicationDirectory(LPCTSTR lpFileName)
+{
+  //Get the Application diretory
+  TCHAR szFullPath[_MAX_PATH];
+  szFullPath[0] = _T('\0');
+  if (GetModuleFileName(NULL, szFullPath, _countof(szFullPath)) == 0)
+	return NULL;
+
+  //Form the new path
+  TCHAR szDrive[_MAX_DRIVE];
+  szDrive[0] = _T('\0');
+  TCHAR szDir[_MAX_DIR];
+  szDir[0] = _T('\0');
+  _tsplitpath_s(szFullPath, szDrive, sizeof(szDrive)/sizeof(TCHAR), szDir, sizeof(szDir)/sizeof(TCHAR), NULL, 0, NULL, 0);
+   TCHAR szFname[_MAX_FNAME];
+   szFname[0] = _T('\0');
+   TCHAR szExt[_MAX_EXT];
+   szExt[0] = _T('\0');
+  _tsplitpath_s(lpFileName, NULL, 0, NULL, 0, szFname, sizeof(szFname)/sizeof(TCHAR), szExt, sizeof(szExt)/sizeof(TCHAR));
+  _tmakepath_s(szFullPath, sizeof(szFullPath)/sizeof(TCHAR), szDrive, szDir, szFname, szExt);
+
+  //Delegate to LoadLibrary    
+  return LoadLibrary(szFullPath);
+}
+#else
+#endif
+
+
+// CTextureGeneratorApp initialization
+
+BOOL CTextureGeneratorApp::InitInstance()
+{
+
+#ifndef SCINTILLA_STATIC_LINK
+  m_hSciDLL = LoadLibraryFromApplicationDirectory(_T("SciLexer.dll"));
+  if (m_hSciDLL == NULL)
+  { 
+	AfxMessageBox(_T("Scintilla DLL is not installed, Please download the SciTE editor and copy the SciLexer.dll into this application's directory"));
+	return FALSE;
+  }
+#else
+#ifdef SCI_LEXER
+	// Scintilla_LinkLexers();
+#endif
+	Scintilla_RegisterClasses(this->m_hInstance);
+#endif
+
+
 	CWinAppEx::InitInstance();
-
-
+	
 	EnableTaskbarInteraction(FALSE);
 
-	// AfxInitRichEdit2() is required to use RichEdit control	
-	// AfxInitRichEdit2();
-
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	// of your final executable, you should remove from the following
-	// the specific initialization routines you do not need
-	// Change the registry key under which our settings are stored
-	// TODO: You should modify this string to be something appropriate
-	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 	LoadStdProfileSettings(4);  // Load standard INI file options (including MRU)
-
 
 	InitContextMenuManager();
 
@@ -106,7 +149,7 @@ BOOL CShaderEditorApp::InitInstance()
 		return FALSE;
 
 	// The one and only window has been initialized, so show and update it
-	m_pMainWnd->ShowWindow(SW_SHOWMAXIMIZED);
+	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
 	// call DragAcceptFiles only if there's a suffix
 	//  In an SDI app, this should occur after ProcessShellCommand
@@ -115,7 +158,7 @@ BOOL CShaderEditorApp::InitInstance()
 	return TRUE;
 }
 
-// CShaderEditorApp message handlers
+// CTextureGeneratorApp message handlers
 
 
 // CAboutDlg dialog used for App About
@@ -126,9 +169,7 @@ public:
 	CAboutDlg();
 
 // Dialog Data
-#ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
-#endif
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -138,7 +179,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
+CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
 {
 }
 
@@ -151,15 +192,15 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 // App command to run the dialog
-void CShaderEditorApp::OnAppAbout()
+void CTextureGeneratorApp::OnAppAbout()
 {
 	CAboutDlg aboutDlg;
 	aboutDlg.DoModal();
 }
 
-// CShaderEditorApp customization load/save methods
+// CTextureGeneratorApp customization load/save methods
 
-void CShaderEditorApp::PreLoadState()
+void CTextureGeneratorApp::PreLoadState()
 {
 	BOOL bNameValid;
 	CString strName;
@@ -171,15 +212,48 @@ void CShaderEditorApp::PreLoadState()
 	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EXPLORER);
 }
 
-void CShaderEditorApp::LoadCustomState()
+void CTextureGeneratorApp::LoadCustomState()
 {
 }
 
-void CShaderEditorApp::SaveCustomState()
+void CTextureGeneratorApp::SaveCustomState()
 {
 }
 
-// CShaderEditorApp message handlers
+// CTextureGeneratorApp message handlers
 
+
+//// ---------------------------------------------------
+//// frmework + logger + assetman' overrides
+//// ---------------------------------------------------
+//int CTextureGeneratorApp::execute(){
+//	return -1;
+//}
+//
+//void CTextureGeneratorApp::terminate(int errorcode){
+//	///@todo megbaszni fasszal szarazon
+//}
+//
+//Logger& CTextureGeneratorApp::log(){
+//	return this->m_logger;
+//}
+//
+//ASSETManager& CTextureGeneratorApp::ASSETManager(){
+//	return this->m_pkg_file;
+//}
+//
+//int CTextureGeneratorApp::peekMessage(){
+//	return -1;
+//}
+//
+//void CTextureGeneratorApp::swapBuffers(){
+//}
+//
+//// ---------------------------------------------------
+//// Base app overrides
+//// ---------------------------------------------------
+//#define APPHAXX_BASE_CLASS CTextureGeneratorApp
+//
+//#include "..\GrafKitEdit\common\application_hax.cpp.inc"
 
 

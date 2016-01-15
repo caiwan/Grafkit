@@ -23,9 +23,6 @@
     <ClInclude Include="MainFrm.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="OutputWnd.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="PropertiesWnd.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -91,9 +88,6 @@
     <ClCompile Include="ViewTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OutputWnd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PropertiesWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,14 +109,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderEditor.reg" />
-    <None Include="res\ShaderEditor.rc2">
+    <None Include="res\TextureGenerator.rc2">
       <Filter>Resource Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="ShaderEditor.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\file_view.ico">
@@ -200,5 +189,10 @@
     <Image Include="res\Toolbar256.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TextureGenerator.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

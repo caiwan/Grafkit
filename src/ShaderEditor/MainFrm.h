@@ -3,12 +3,12 @@
 //
 
 #pragma once
-#include "FileView.h"
 #include "ClassView.h"
-#include "OutputWnd.h"
-#include "PropertiesWnd.h"
+//#include "Logger.h"
 
 #include "shadersrceditor.h"
+
+#include "PropertiesWnd.h"
 
 class CMainFrame : public CFrameWndEx
 {
@@ -22,11 +22,14 @@ public:
 
 // Operations
 public:
+	CShaderEditorSingle &getEditor(){return this->m_shaderEditor;}
 
 // Overrides
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, CWnd* pParentWnd = NULL, CCreateContext* pContext = NULL);
+
+	
 
 // Implementation
 public:
@@ -39,25 +42,41 @@ public:
 protected:  // control bar embedded members
 	CMFCMenuBar       m_wndMenuBar;
 	CMFCToolBar       m_wndToolBar;
+
 	CMFCStatusBar     m_wndStatusBar;
 	CMFCToolBarImages m_UserImages;
-	CFileView         m_wndFileView;
+	
 	CClassView        m_wndClassView;
-	COutputWnd        m_wndOutput;
+	//CLoggerView       m_wndLogger;
 	CPropertiesWnd    m_wndProperties;
 
-	CShaderEditorSingle m_wndShaderEditor;
+	CShaderEditorSingle m_shaderEditor;
 
-// Generated message map functions
+	private:
+		CList<CBasePane*> m_regCmdMsg;
+
+		void RegCmdMsg(CBasePane* pane);
+		void UnregCmdMsg(CBasePane* pane);
+
+	private:
+		BOOL CreateDockingWindows();
+		void SetDockingWindowIcons(BOOL bHiColorIcons);
+
+		// Generated message map functions
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	
 	afx_msg void OnViewCustomize();
 	afx_msg LRESULT OnToolbarCreateNew(WPARAM wp, LPARAM lp);
+	afx_msg void OnApplicationLook(UINT id);
+	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
 	afx_msg void OnSettingChange(UINT uFlags, LPCTSTR lpszSection);
-	DECLARE_MESSAGE_MAP()
+	afx_msg void OnDestroy();
 
-	BOOL CreateDockingWindows();
-	void SetDockingWindowIcons(BOOL bHiColorIcons);
+	DECLARE_MESSAGE_MAP()
+	
+public:
+	virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo);
 };
 
 
