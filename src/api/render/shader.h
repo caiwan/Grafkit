@@ -41,11 +41,15 @@ namespace FWrender {
 			@param type type of shader @see FWrender::ShaderType_e
 		*/
 		void LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
+		void LoadFromMemory(ID3D11Device* device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
 
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
 		
 		enum ShaderType_e getShaderType() { return this->m_type; }
+
+	private:
+		void CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer);
 
 	public:
 		

@@ -19,7 +19,9 @@
 
 
 namespace {
+#define INCLUDE_DEFAULT_FSHADER
 #include "defaultShader.cpp.inc"
+#undef INCLUDE_DEFAULT_FSHADER
 }
 
 

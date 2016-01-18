@@ -37,7 +37,6 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = NULL;
-
 	ID3D10Blob* shaderBuffer = NULL;
 
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
@@ -50,11 +49,6 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 	if (!file) throw new EX(NullPointerException);
 
 	this->m_type = type;
-
-	std::ifstream t(file);
-	std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
-
-	std::cout << str << std::endl;
 
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
@@ -78,28 +72,55 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 		}
 	}
 
-	if (type == ST_Vertex) {
-		// Create the vertex shader from the buffer.
-		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_vShader);
-		if (FAILED(result))
-		{
-			throw new EX(VSCrerateException);
-		}
-	}
-	else if (type == ST_Pixel){
-		// Create the pixel shader from the buffer.
-		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_pShader);
-		if (FAILED(result))
-		{
-			throw new EX(FSCrerateException);
-		}
-	}
-
-	this->BuildReflection(device, shaderBuffer);
+	this->CompileShader(device, shaderBuffer);
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
 	shaderBuffer->Release();
-	shaderBuffer = NULL;
+}
+
+void FWrender::Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
+{
+	HRESULT result = 0;
+	ID3D10Blob* errorMessage = NULL;
+	ID3D10Blob* shaderBuffer = NULL;
+
+	// D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
+	unsigned int numElements = 0;
+
+	// D3D11_BUFFER_DESC matrixBufferDesc;
+
+	// input checking
+	if (!entry) throw new EX(NullPointerException);
+	if (!source) throw new EX(NullPointerException);
+
+	this->m_type = type;
+
+	// Compile the vertex shader code.
+	if (type == ST_Vertex) {
+		result = D3DCompile(source, size, NULL, NULL, NULL, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	}
+	else if (type == ST_Pixel) {
+		result = D3DCompile(source, size, NULL, NULL, NULL, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	}
+
+	if (FAILED(result))
+	{
+		// If the shader failed to compile it should have writen something to the error message.
+		if (errorMessage)
+		{
+			DispatchShaderErrorMessage(errorMessage, nullptr, entry);
+		}
+		// If there was nothing in the error message then it simply could not find the shader file itself.
+		else
+		{
+			throw new EX(MissingShaderExcepotion);
+		}
+	}
+
+	this->CompileShader(device, shaderBuffer);
+
+	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
+	shaderBuffer->Release();
 }
 
 void FWrender::Shader::Shutdown()
@@ -150,6 +171,29 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 	}
 	// duck through the resources
 
+}
+
+void FWrender::Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer)
+{
+	HRESULT result = 0;
+	if (this->m_type == ST_Vertex) {
+		// Create the vertex shader from the buffer.
+		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_vShader);
+		if (FAILED(result))
+		{
+			throw new EX(VSCrerateException);
+		}
+	}
+	else if (this->m_type == ST_Pixel) {
+		// Create the pixel shader from the buffer.
+		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_pShader);
+		if (FAILED(result))
+		{
+			throw new EX(FSCrerateException);
+		}
+	}
+
+	this->BuildReflection(device, shaderBuffer);
 }
 
 FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char * name)
