@@ -9,7 +9,7 @@
 
 class CEditorDoc;
 
-class CEditorView : public CView
+class CEditorView : public CView, public CXScene
 {
 protected: // create from serialization only
 	CEditorView();
@@ -32,6 +32,9 @@ protected:
 public:
 	virtual ~CEditorView();
 
+	virtual void InitScene(CXDrawingDevice* parent);
+	virtual void DrawScene(CXDrawingDevice* parent);
+
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -40,6 +43,9 @@ public:
 protected:
 
 	// fields
+	FWrender::ShaderRef m_shader_vertex;
+	FWrender::ModelRef m_fullscreen_quad;
+
 	CXD3D m_xd3d_view;
 
 // Generated message map functions

@@ -12,9 +12,18 @@
 #include "EditorDoc.h"
 #include "EditorView.h"
 
+#include "render/renderer.h"
+#include "render/model.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+namespace {
+#define INCLUDE_DEFAULT_VSHADER
+#include "defaultShader.cpp.inc"
+#undef INCLUDE_DEFAULT_VSHADER
+}
 
 
 // CEditorView
@@ -39,6 +48,36 @@ CEditorView::CEditorView() :
 
 CEditorView::~CEditorView()
 {
+}
+
+void CEditorView::InitScene(CXDrawingDevice * parent)
+{
+	if (!dynamic_cast<CXD3D*>(parent))
+		return;
+
+	FWrender::Renderer &render = *(dynamic_cast<CXD3D*>(parent));
+	this->m_fullscreen_quad = new FWrender::Model();
+
+	this->m_shader_vertex = new FWrender::Shader();
+	this->m_shader_vertex->LoadFromMemory(render, "main", defaultVertexShader, 65536, FWrender::ST_Vertex);
+
+	// build model
+	FWrender::SimpleMeshGenerator generator(render, m_shader_vertex);
+}
+
+void CEditorView::DrawScene(CXDrawingDevice * parent)
+{
+	CEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	FWrender::ShaderRef pxshader = pDoc->m_shader_src.GetShader();
+	if (pxshader.Invalid())
+		return;
+
+	// ... 
+
 }
 
 BOOL CEditorView::PreCreateWindow(CREATESTRUCT& cs)
