@@ -11,42 +11,48 @@ using namespace FWdebugExceptions;
 
 CXScene::CXScene()
 {
-	throw EX(NotImplementedMethodException);
+	ZeroMemory(&m_fvPos, sizeof(m_fvPos));
+	ZeroMemory(&m_fvRot, sizeof(m_fvRot));
+	ZeroMemory(&m_fZoom, sizeof(m_fZoom));
 }
 
 CXScene::~CXScene()
 {
-	throw EX(NotImplementedMethodException);
 }
 
-void CXScene::OnResize(int w, int h)
-{
-	throw EX(NotImplementedMethodException);
+void CXScene::OnResize(int w, int h) {
+	// empty
 }
 
-void CXScene::OnPanY(float d)
-{
-	throw EX(NotImplementedMethodException);
+// --- pan XY
+void CXScene::OnPanX(float d) {
+	m_fvPos.x += d;
 }
 
-void CXScene::OnRotateX(float d)
-{
-	throw EX(NotImplementedMethodException);
+void CXScene::OnPanY(float d) {
+	m_fvPos.y += d;
 }
 
-void CXScene::OnRotateY(float d)
-{
-	throw EX(NotImplementedMethodException);
+// --- rotate XY
+void CXScene::OnRotateX(float d) {
+	m_fvRot.x += d;
+	if ((m_fvRot.x > 360.0f) || (m_fvRot.x < -360.0f))
+	{
+		m_fvRot.x = 0.0f;
+	}
 }
 
-void CXScene::OnZoom(float d)
-{
-	throw EX(NotImplementedMethodException);
+void CXScene::OnRotateY(float d) {
+	m_fvRot.y += d;
+	if ((m_fvRot.y > 360.0f) || (m_fvRot.y < -360.0f))
+	{
+		m_fvRot.y = 0.0f;
+	}
 }
 
-void CXScene::OnPanX(float d)
-{
-	throw EX(NotImplementedMethodException);
+// --- zoom XY
+void CXScene::OnZoom(float d) {
+	m_fZoom += d;
 }
 
 
@@ -216,8 +222,8 @@ int CXDrawingDevice::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		this->MessageBoxA(e.what(), "Fuck off bitch", 0);
 		return -1;
 	}
-	
-	//this->m_unpTimer = this->SetTimer(1, 1, 0);
+
+	this->m_unpTimer = this->SetTimer(1, 1, 0);
 
 	this->m_is_inited = 1;
 	return 0;

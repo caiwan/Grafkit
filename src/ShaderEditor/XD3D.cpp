@@ -14,10 +14,14 @@ CXD3D::~CXD3D()
 
 void CXD3D::CXInit()
 {
-	this->Initialize(
-		this->m_originalRect.Width(), this->m_originalRect.Height(),
-		false, this->m_hWnd, false
-	);
+	if (!m_swapChain)
+		this->Initialize(
+			this->m_originalRect.Width(), this->m_originalRect.Height(),
+			false, this->m_hWnd, false
+		);
+
+	if (m_actualScene)
+		m_actualScene->InitScene(this);
 }
 
 void CXD3D::CXRender()

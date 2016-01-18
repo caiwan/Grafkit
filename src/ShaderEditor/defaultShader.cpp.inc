@@ -57,11 +57,4 @@ char defaultVertexShader[65536] =
 	"  return Out;\n"
 	"}\n";
 
-static float pQuad[] = {
-	-1.0, -1.0,  0.5,    0.0, 0.0,
-	-1.0,  1.0,  0.5,    0.0, 1.0,
-	1.0, -1.0,   0.5,    0.0, 0.0,
-	1.0,  1.0,   0.5,    1.0, 1.0,
-};
-
 #endif //INCLUDE_DEFAULT_VSHADER

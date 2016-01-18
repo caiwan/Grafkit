@@ -15,8 +15,10 @@ public:
 	virtual void CXRender();
 	virtual void CXDestroy();
 
-private:
+protected:
+	
 
+private:
 	virtual void CXResizeRenderSurface(int cx, int cy);
 	//virtual void CXApplyViewport(int cx, int cy);
 

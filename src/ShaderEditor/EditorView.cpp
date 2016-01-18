@@ -25,6 +25,8 @@ namespace {
 #undef INCLUDE_DEFAULT_VSHADER
 }
 
+#include "builtin_data/cube.h"
+
 
 // CEditorView
 
@@ -39,16 +41,18 @@ END_MESSAGE_MAP()
 
 // CEditorView construction/destruction
 
-CEditorView::CEditorView() :
+CEditorView::CEditorView() : CXScene(),
 	m_xd3d_view()
 {
-	// TODO: add construction code here
+	m_xd3d_view.SetScene(this);
 
 }
 
 CEditorView::~CEditorView()
 {
+
 }
+
 
 void CEditorView::InitScene(CXDrawingDevice * parent)
 {
@@ -56,13 +60,22 @@ void CEditorView::InitScene(CXDrawingDevice * parent)
 		return;
 
 	FWrender::Renderer &render = *(dynamic_cast<CXD3D*>(parent));
+
 	this->m_fullscreen_quad = new FWrender::Model();
 
 	this->m_shader_vertex = new FWrender::Shader();
 	this->m_shader_vertex->LoadFromMemory(render, "main", defaultVertexShader, 65536, FWrender::ST_Vertex);
 
+	// +++ compile PSHader
+
 	// build model
 	FWrender::SimpleMeshGenerator generator(render, m_shader_vertex);
+	generator["POSITION"] = FWBuiltInData::quad;
+	generator["TEXCOORD"] = FWBuiltInData::quad_texcoord;
+
+	generator(4, FWBuiltInData::quadIndicesLen, FWBuiltInData::cubeIndices, this->m_fullscreen_quad);
+
+	// ... 
 }
 
 void CEditorView::DrawScene(CXDrawingDevice * parent)
@@ -72,11 +85,19 @@ void CEditorView::DrawScene(CXDrawingDevice * parent)
 	if (!pDoc)
 		return;
 
+	if (!dynamic_cast<CXD3D*>(parent))
+		return;
+
+	FWrender::Renderer &render = *(dynamic_cast<CXD3D*>(parent));
+
 	FWrender::ShaderRef pxshader = pDoc->m_shader_src.GetShader();
 	if (pxshader.Invalid())
 		return;
 
-	// ... 
+	this->m_shader_vertex->Render(render);
+	pxshader->Render(render);
+
+	 // .. foyltkov 
 
 }
 
@@ -145,9 +166,6 @@ void CEditorView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
-	CRect rect; GetClientRect(rect);
-	m_xd3d_view.CXCreate(rect, this);
-
 	CMainFrame*mainFrm = theApp.getMainFrame();
 	CShaderEditorSingle &shaderEditor = mainFrm->getEditor();
 
@@ -155,6 +173,9 @@ void CEditorView::OnInitialUpdate()
 
 	shaderEditor.setDocument(&shaderDoc);
 	shaderEditor.docToEditor();
+
+	CRect rect; GetClientRect(rect);
+	m_xd3d_view.CXCreate(rect, this);
 }
 
 
