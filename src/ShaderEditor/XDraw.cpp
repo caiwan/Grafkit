@@ -79,8 +79,8 @@ CXDrawingDevice::~CXDrawingDevice()
 
 void CXDrawingDevice::CXCreate(CRect rect, CWnd *parent) 
 {	
-	// if (m_is_inited) 
-		//  return;
+	if (m_is_inited) 
+		return;
 
 	// Set initial variables' values
 	m_oldWindow = rect;
@@ -210,6 +210,9 @@ void CXDrawingDevice::OnMouseMove(UINT nHitTest, CPoint point)
 
 int CXDrawingDevice::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+	if (this->m_is_inited)
+		return 0;
+
 	if (CWnd::OnCreate(lpCreateStruct) == -1) 
 		return -1;
 	
@@ -219,7 +222,7 @@ int CXDrawingDevice::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		this->CXInit();
 	}
 	catch (FWdebug::Exception &e) {
-		this->MessageBoxA(e.what(), "Fuck off bitch", 0);
+		this->MessageBoxA(e.what(), "Duck off glitch", 0);
 		return -1;
 	}
 

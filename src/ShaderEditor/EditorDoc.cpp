@@ -62,11 +62,14 @@ void CEditorDoc::Serialize(CArchive& ar)
 {
 	if (ar.IsStoring())
 	{
-		// TODO: add storing code here
+		ar << this->m_shader_src.GetShaderSource();
 	}
 	else
 	{
-		// TODO: add loading code here
+		CString &str = this->m_shader_src.GetShaderSource();
+		ar >> str;
+
+		/// @todo refresh goez here
 	}
 }
 
