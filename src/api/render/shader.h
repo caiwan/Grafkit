@@ -24,6 +24,7 @@ namespace FWrender {
 		ST_NONE = 0,
 		ST_Vertex,
 		ST_Pixel,
+		ST_Compute,
 		ST_COUNT
 	};
 
@@ -45,29 +46,64 @@ namespace FWrender {
 
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
-		
+
 		enum ShaderType_e getShaderType() { return this->m_type; }
 
 	private:
 		void CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer);
 
 	public:
-		
+
+		// ==========================================================================================
 		/**
-		A class that holds the reflection record for a certain constant buffer and aids to set variables into it
+		A class that contains and manages one entire constant buffer with its elements from
+		the reflection record for a certain constant buffer and aids to set variables into it
 		*/
-		class ConstantBufferRecord {
+		class ConstantBufferElement;
+
+		class ConstantBufferRecord
+		{
 			friend class Shader;
-		
+
 		public:
 			// This class has to have a public accessable default constructor due to std::map
-			ConstantBufferRecord(); /* : ConstantBufferRecord(NULL, NULL) {}*/
+			ConstantBufferRecord();
 		protected:
 			ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
 
-			// void setDC(ID3D11DeviceContext* pd3dic) { this->m_pDC = pd3dic; }
-		
 		public:
+			void Set(void* pData);
+			void Set(void* pData, size_t offset, size_t width);
+
+		private:
+			void Map();
+			void Unmap();
+			void *GetMappedPtr();
+
+			ID3D11DeviceContext* m_pDC;
+			D3D11_MAPPED_SUBRESOURCE m_mappedResource;
+			D3D11_SHADER_BUFFER_DESC m_description;
+			ID3D11Buffer *m_buffer;
+			UINT m_slot;
+
+		protected:
+			typedef std::map<std::string, ConstantBufferElement> cb_variableMap_t;
+			cb_variableMap_t m_mapConstantVariables;
+
+		};
+
+		/**
+		Helps to bind one element from the constant buffer
+		*/
+		class ConstantBufferElement 
+		{
+			friend class ConstantBufferRecord;
+		public:
+			ConstantBufferElement(Shader::ConstantBufferRecord* parent_record = nullptr);
+
+		protected:
+			ConstantBufferElement(Shader::ConstantBufferRecord* parent_record, ID3D11ShaderReflectionVariable* shader_variable);
+
 			// void operator= (float v);
 
 			//void operator= (float2 v);
@@ -80,19 +116,17 @@ namespace FWrender {
 			// void set(float v1, float v2, float v3);
 			// void set(float v1, float v2, float v3, float v4);
 
-			void set(void*); 
+		protected:
+			Shader::ConstantBufferRecord* m_pBufferRecord;
+			size_t m_offset;
+			size_t m_width;
 
-		private:
-			ID3D11DeviceContext* m_pDC;
-			// Shader *m_parent;
-			D3D11_SHADER_BUFFER_DESC m_description;
-			ID3D11Buffer *m_buffer;
-			UINT m_slot;
-
-		private:
-			// ConstantBufferRecord(ConstantBufferRecord& other) {}
-			// void operator= (ConstantBufferRecord&) {}
+			D3D11_SHADER_VARIABLE_DESC m_var_desc;
+			D3D11_SHADER_TYPE_DESC m_type_desc;
 		};
+	
+
+		// ==========================================================================================
 
 		/**
 		A struct that extends the input layout descriptor
@@ -215,6 +249,7 @@ DEFINE_EXCEPTION(FSCrerateException, 1102, "Could not create framgent shader")
 DEFINE_EXCEPTION(InputLayoutCreateException, 1103, "Could not create input layout")
 DEFINE_EXCEPTION(ConstantBufferCreateException, 1104, "Could not create constant buffer")
 DEFINE_EXCEPTION(ConstantBufferLocateException, 1106, "Could not locate constant buffer")
+DEFINE_EXCEPTION(ConstantBufferMapException, 1108, "Could not map constant buffer")
 
 ///@Todo ennek teljesen sajat exceptiont kell definialni
 

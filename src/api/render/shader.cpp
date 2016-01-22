@@ -5,6 +5,8 @@
 
 #include "../math/matrix.h"
 
+#include "easyloggingpp.h"
+
 using namespace std;
 using namespace FWrender;
 
@@ -402,7 +404,6 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	{
 		// struct ConstantBufferLayout cbLayout;
 		ConstantBufferRecord cbRecord(device, this->m_pReflector->GetConstantBufferByIndex(i));
-		// itt meg kell nezni, hogy le kell-e 
 		this->m_mapBuffers[cbRecord.m_description.Name] = cbRecord;
 	}
 }
@@ -426,6 +427,8 @@ FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* devic
 		return;
 
 	HRESULT result = 0; 
+	
+	ZeroMemory(&m_description, sizeof(m_description));
 	result = pConstBuffer->GetDesc(&this->m_description);
 
 	if (FAILED(result)) {
@@ -448,23 +451,92 @@ FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* devic
 
 	device->GetImmediateContext(&this->m_pDC);
 
-	/// @todo fetch through even more rainbow 
+	LOG(TRACE) << "Constant buffer record" << m_description.Name << m_description.Size << m_description.Type;
+
+	// build up cbuffer variables
+	for (size_t i = 0; i < m_description.Variables; i++) {
+		ID3D11ShaderReflectionVariable* shader_variable = pConstBuffer->GetVariableByIndex(i);
+		ConstantBufferElement variable_elem(this, shader_variable);
+		m_mapConstantVariables[variable_elem.m_var_desc.Name] = variable_elem;
+	}
 }
 
-void FWrender::Shader::ConstantBufferRecord::set(void * data)
+void FWrender::Shader::ConstantBufferRecord::Map()
 {
-	if (!data || !m_buffer)
-		return;
-
 	HRESULT result = 0;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-	result = this->m_pDC->Map(this->m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	result = this->m_pDC->Map(this->m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &m_mappedResource);
 	if (FAILED(result)) {
-		throw EX_DETAILS(ConstantBufferLocateException, "Cannot map resource");
+		throw EX_DETAILS(ConstantBufferMapException, "Cannot map buffer to a resource");
 	}
 
-	memcpy(mappedResource.pData, data, this->m_description.Size);
+}
 
+inline void FWrender::Shader::ConstantBufferRecord::Unmap()
+{
 	this->m_pDC->Unmap(this->m_buffer, 0);
 }
+
+inline void * FWrender::Shader::ConstantBufferRecord::GetMappedPtr()
+{
+	return m_mappedResource.pData;
+}
+
+void FWrender::Shader::ConstantBufferRecord::Set(void * data)
+{
+	this->Map();
+	memcpy(this->GetMappedPtr(), data, this->m_description.Size);
+	this->Unmap();
+}
+
+void FWrender::Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width)
+{
+	if (!m_buffer) {
+		LOG(TRACE) << "No buffer was created";
+		return;
+	}
+
+	this->Map();
+	memcpy(((unsigned char*)this->GetMappedPtr()) + offset, pData, width);
+	this->Unmap();
+}
+
+// ============================================================================================================
+// CBelem
+
+FWrender::Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecord * parent_record):
+	m_pBufferRecord(parent_record)
+{
+	// do nothing here. 
+}
+
+FWrender::Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecord * parent_record, ID3D11ShaderReflectionVariable * shader_variable) : ConstantBufferElement()
+{
+	if (!parent_record && !shader_variable)
+		throw EX(NullPointerException);
+
+	HRESULT res = 0;
+
+	
+	ZeroMemory(&m_var_desc, sizeof(m_var_desc));
+	res = shader_variable->GetDesc(&m_var_desc);
+
+	if (FAILED(res)) {
+		throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain description for a cb variable");
+	}
+
+	ID3D11ShaderReflectionType* sr_type = shader_variable->GetType();
+	
+	ZeroMemory(&m_type_desc, sizeof(m_type_desc));
+	res = sr_type->GetDesc(&m_type_desc);
+
+	if (FAILED(res)) {
+		throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain shader reflection type description");
+	}
+
+	LOG(TRACE) << "Shader vairable created " << parent_record->m_description.Name << m_var_desc.Name << m_type_desc.Name;
+
+}
+
+// ... 
+
