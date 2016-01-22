@@ -34,9 +34,6 @@ INITIALIZE_EASYLOGGINGPP
 #define new DEBUG_NEW
 #endif
 
-//using namespace FWcore;
-//using FWutils::PackageFile;
-
 // CEditorApp
 
 BEGIN_MESSAGE_MAP(CEditorApp, CWinAppEx)
@@ -65,11 +62,10 @@ CEditorApp::CEditorApp()
 	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
 #endif // _DEBUG
 
-	
 	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
-	//el::Loggers::addFlag();
-
 	el::Loggers::reconfigureLogger("default", defaultConf);
+
+	// LOG(TRACE) << SOMETHING;
 }
 
 CEditorApp::~CEditorApp()
@@ -245,41 +241,3 @@ void CEditorApp::LoadCustomState()
 void CEditorApp::SaveCustomState()
 {
 }
-
-// CEditorApp message handlers
-
-
-//// ---------------------------------------------------
-//// frmework + logger + assetman' overrides
-//// ---------------------------------------------------
-//int CEditorApp::execute(){
-//	return -1;
-//}
-//
-//void CEditorApp::terminate(int errorcode){
-//	///@todo megbaszni fasszal szarazon
-//}
-//
-//Logger& CEditorApp::log(){
-//	return this->m_logger;
-//}
-//
-//ASSETManager& CEditorApp::ASSETManager(){
-//	return this->m_pkg_file;
-//}
-//
-//int CEditorApp::peekMessage(){
-//	return -1;
-//}
-//
-//void CEditorApp::swapBuffers(){
-//}
-//
-//// ---------------------------------------------------
-//// Base app overrides
-//// ---------------------------------------------------
-//#define APPHAXX_BASE_CLASS CEditorApp
-//
-//#include "..\GrafKitEdit\common\application_hax.cpp.inc"
-
-

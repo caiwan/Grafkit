@@ -9,22 +9,13 @@
 #endif
 
 #include "resource.h"       // main symbols
-//#include "framework.h"
-//#include "framework_win32.h"
-//#include "utilites/io/package.h"
-
-//#include "..\GrafKitEdit\common\application.h"
-
-//#include "Logger.h"
-
-//class CMainFrame;
 #include "MainFrm.h"
 
 /**
 	CEditorApp:
 	@See TextureGenerator.cpp for the implementation of this class
 */
-class CEditorApp : public CWinAppEx // public FWcore::Framework, public BaseApplication
+class CEditorApp : public CWinAppEx 
 {
 	public:
 		CEditorApp();
@@ -33,27 +24,11 @@ class CEditorApp : public CWinAppEx // public FWcore::Framework, public BaseAppl
 		// --- framework overides
 
 	public:
-		//FWutils::PackageFile m_pkg_file;
-		//CLogger m_logger;
-
 		CMainFrame* getMainFrame(){ASSERT(m_pMainWnd); return (CMainFrame*)(GetMainWnd());}
-
-	private:
-		//virtual int execute();
-		//virtual void terminate(int errorcode);
-	public:
-		//virtual FWcore::Logger& log();
-		//virtual FWcore::ASSETManager& ASSETManager();
-			
-	private:
-		//virtual int peekMessage();
-		//virtual void swapBuffers();
 
 	// Overrides
 	public:
 		virtual BOOL InitInstance();
-
-		//#include "..\GrafKitEdit\common\application_hax.h.inc"
 
 	// Implementation
 		UINT  m_nAppLook;
