@@ -4,7 +4,7 @@
 
 #pragma once
 
-//#include "CEditorDoc.h"
+#include "EditorDoc.h"
 #include "XD3D.h"
 
 class CEditorDoc;
@@ -61,7 +61,7 @@ public:
 };
 
 #ifndef _DEBUG  // debug version in ShaderEditorView.cpp
-inline CShaderEditorDoc* CEditorView::GetDocument() const
-   { return reinterpret_cast<CShaderEditorDoc*>(m_pDocument); }
+inline CEditorDoc* CEditorView::GetDocument()
+   { return reinterpret_cast<CEditorDoc*>(m_pDocument); }
 #endif
 

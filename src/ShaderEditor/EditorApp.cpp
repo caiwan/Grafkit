@@ -14,8 +14,18 @@
 #include "afxdialogex.h"
 
 
-//#include "Logger.h"
+#define ELPP_THREAD_SAFE
 
+#ifndef _DEBUG
+#define ELPP_DISABLE_DEBUG_LOGS
+#define ELPP_DISABLE_INFO_LOGS
+#define ELPP_DISABLE_VERBOSE_LOGS
+#define ELPP_DISABLE_TRACE_LOGS
+#endif // _DEBUG
+
+#include "easyloggingpp.h"
+
+INITIALIZE_EASYLOGGINGPP
 
 
 #include <Scintilla.h>
@@ -40,15 +50,33 @@ END_MESSAGE_MAP()
 // CEditorApp construction
 
 CEditorApp::CEditorApp() 
-	//Framework(),
-	//BaseApplication(),
-	//
-	//m_logger(),
-	//m_pkg_file("./")
 {
 	m_bHiColorIcons = TRUE;
 
 	SetAppID(_T("GrafKit.Idogep.TextureGenerator.AppID.NoVersion01")); //@todo nevet es verziot generalni
+
+	/// --- 
+	el::Configurations defaultConf;
+	defaultConf.setToDefault();
+
+#ifdef _DEBUG
+	defaultConf.setGlobally(el::ConfigurationType::Format, "%logger [%levshort]: %msg - at %fbase function %func line %line tid=%thread");
+#else 
+	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
+#endif // _DEBUG
+
+	
+	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
+	//el::Loggers::addFlag();
+
+	el::Loggers::reconfigureLogger("default", defaultConf);
+
+	LOG(DEBUG) << "App init OK";
+	LOG(TRACE) << "App init OK";
+	LOG(INFO) << "App init OK";
+	LOG(WARNING) << "App init OK";
+	LOG(ERROR) << "App init OK";
+
 }
 
 CEditorApp::~CEditorApp()
