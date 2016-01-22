@@ -70,13 +70,6 @@ CEditorApp::CEditorApp()
 	//el::Loggers::addFlag();
 
 	el::Loggers::reconfigureLogger("default", defaultConf);
-
-	LOG(DEBUG) << "App init OK";
-	LOG(TRACE) << "App init OK";
-	LOG(INFO) << "App init OK";
-	LOG(WARNING) << "App init OK";
-	LOG(ERROR) << "App init OK";
-
 }
 
 CEditorApp::~CEditorApp()
