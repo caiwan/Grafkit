@@ -10,6 +10,8 @@
 using namespace std;
 using namespace FWrender;
 
+using FWrender::Shader;
+
 using namespace FWdebugExceptions;
 
 using FWmath::Matrix;
@@ -17,15 +19,15 @@ using FWmath::Matrix;
 // =============================================================================================================================
 
 Shader::Shader() : 
-	m_pShader(NULL),
-	m_vShader(NULL),
+	m_pxShader(NULL),
+	m_vxShader(NULL),
 	m_pReflector(NULL),
 	m_layout(NULL),
 	m_type(ST_NONE)
 {
 }
 
-FWrender::Shader::~Shader()
+Shader::~Shader()
 {
 	this->Shutdown();
 }
@@ -80,7 +82,7 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 	shaderBuffer->Release();
 }
 
-void FWrender::Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
+void Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = NULL;
@@ -125,58 +127,58 @@ void FWrender::Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCST
 	shaderBuffer->Release();
 }
 
-void FWrender::Shader::Shutdown()
+void Shader::Shutdown()
 {
 	if (this->m_pReflector)
 		this->m_pReflector->Release();
 
-	if (this->m_pShader) this->m_pShader->Release();
-	if (this->m_vShader) this->m_vShader->Release();
+	if (this->m_pxShader) this->m_pxShader->Release();
+	if (this->m_vxShader) this->m_vxShader->Release();
 
 	this->m_inputNames.clear();
 }
 
-void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
+void Shader::Render(ID3D11DeviceContext * deviceContext)
 {
 
 	// go the duck off 
 	if (this->m_type == ST_Vertex) {
 		// duck off the layout
 		deviceContext->IASetInputLayout(m_layout);
-		deviceContext->VSSetShader(m_vShader, NULL, 0);
+		deviceContext->VSSetShader(m_vxShader, NULL, 0);
 	}
 	else if (this->m_type == ST_Pixel) {
-		deviceContext->PSSetShader(m_pShader, NULL, 0);
+		deviceContext->PSSetShader(m_pxShader, NULL, 0);
 	}
 
 	// duck the constant buffers around
-	if (!this->m_mapBuffers.empty()) {
-		bufferMap_t::iterator it;
-		for (it = this->m_mapBuffers.begin(); it != this->m_mapBuffers.end(); it++) {
-			if (it->second.m_buffer) {
-				ID3D11Buffer* buffer = it->second.m_buffer;
-//				UINT slot = 1;
+	if (!this->m_vBuffers.empty()) {
 
-				if (this->m_type == ST_Vertex) {
-					deviceContext->VSSetConstantBuffers(it->second.m_slot, 1, &buffer);
+		for (size_t i = 0; i < this->m_vBuffers.size(); i++){
+			ID3D11Buffer* buffer = this->m_vBuffers[i].m_buffer;
+			UINT slot = this->m_vBuffers[i].m_slot;
 
-				}
-				else if (this->m_type == ST_Pixel) {
-					deviceContext->PSSetConstantBuffers(it->second.m_slot, 1, &buffer);
-				}
+			if (this->m_type == ST_Vertex) {
+				deviceContext->VSSetConstantBuffers(slot, 1, &buffer);
+
+			}
+			else if (this->m_type == ST_Pixel) {
+				deviceContext->PSSetConstantBuffers(slot, 1, &buffer);
 			}
 		}
+
 	}
+
 	// duck through the resources
 
 }
 
-void FWrender::Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer)
+void Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 {
 	HRESULT result = 0;
 	if (this->m_type == ST_Vertex) {
 		// Create the vertex shader from the buffer.
-		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_vShader);
+		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_vxShader);
 		if (FAILED(result))
 		{
 			throw new EX(VSCrerateException);
@@ -184,7 +186,7 @@ void FWrender::Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuf
 	}
 	else if (this->m_type == ST_Pixel) {
 		// Create the pixel shader from the buffer.
-		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_pShader);
+		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_pxShader);
 		if (FAILED(result))
 		{
 			throw new EX(FSCrerateException);
@@ -194,7 +196,7 @@ void FWrender::Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuf
 	this->BuildReflection(device, shaderBuffer);
 }
 
-FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char * name)
+Shader::ConstantBufferRecord& Shader::operator[](const char * name)
 {
 	static ConstantBufferRecord null_object;
 
@@ -209,10 +211,21 @@ FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char 
 		return null_object;
 	}
 
-	return it->second;
+	return this->operator[](it->second);
 }
 
-void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
+Shader::ConstantBufferRecord & FWrender::Shader::operator[](size_t id)
+{
+	static ConstantBufferRecord null_object;
+
+	if (id >= this->m_vBuffers.size()) {
+		return null_object;
+	}
+
+	return this->m_vBuffers[id];
+}
+
+void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
 {
 	char* compileErrors = NULL;
 	unsigned long bufferSize = 0;
@@ -321,7 +334,7 @@ void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 }
 
 
-void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
+void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 {
 	HRESULT result = 0;
 
@@ -404,13 +417,15 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 	{
 		// struct ConstantBufferLayout cbLayout;
 		ConstantBufferRecord cbRecord(device, this->m_pReflector->GetConstantBufferByIndex(i));
-		this->m_mapBuffers[cbRecord.m_description.Name] = cbRecord;
+		this->m_vBuffers.push_back(cbRecord);
+		size_t id = this->m_vBuffers.size() - 1;
+		this->m_mapBuffers[cbRecord.m_description.Name] = id;
 	}
 }
 
 // =============================================================================================================================
 
-FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord() : 
+Shader::ConstantBufferRecord::ConstantBufferRecord() : 
 	m_pDC(NULL),
 	m_buffer(NULL),
 	m_description(),
@@ -419,7 +434,7 @@ FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord() :
 	// DebugBreak();
 }
 
-FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
+Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
 	ConstantBufferRecord()
 {
 	// create a dummy object w/o parsing
@@ -457,11 +472,13 @@ FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* devic
 	for (size_t i = 0; i < m_description.Variables; i++) {
 		ID3D11ShaderReflectionVariable* shader_variable = pConstBuffer->GetVariableByIndex(i);
 		ConstantBufferElement variable_elem(this, shader_variable);
-		m_mapConstantVariables[variable_elem.m_var_desc.Name] = variable_elem;
+		m_vConstVars.push_back(variable_elem);
+		size_t id = m_vConstVars.size() - 1;
+		m_mapConstVars[variable_elem.m_var_desc.Name] = id;
 	}
 }
 
-void FWrender::Shader::ConstantBufferRecord::Map()
+void Shader::ConstantBufferRecord::Map()
 {
 	HRESULT result = 0;
 
@@ -472,24 +489,24 @@ void FWrender::Shader::ConstantBufferRecord::Map()
 
 }
 
-inline void FWrender::Shader::ConstantBufferRecord::Unmap()
+inline void Shader::ConstantBufferRecord::Unmap()
 {
 	this->m_pDC->Unmap(this->m_buffer, 0);
 }
 
-inline void * FWrender::Shader::ConstantBufferRecord::GetMappedPtr()
+inline void * Shader::ConstantBufferRecord::GetMappedPtr()
 {
 	return m_mappedResource.pData;
 }
 
-void FWrender::Shader::ConstantBufferRecord::Set(void * data)
+void Shader::ConstantBufferRecord::Set(void * data)
 {
 	this->Map();
 	memcpy(this->GetMappedPtr(), data, this->m_description.Size);
 	this->Unmap();
 }
 
-void FWrender::Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width)
+void Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width)
 {
 	if (!m_buffer) {
 		LOG(TRACE) << "No buffer was created";
@@ -501,22 +518,47 @@ void FWrender::Shader::ConstantBufferRecord::Set(void * pData, size_t offset, si
 	this->Unmap();
 }
 
+Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator[](const char * name)
+{
+	static ConstantBufferElement null_object;
+
+	cb_variableMap_t::iterator it = this->m_mapConstVars.find(name);
+	if (it == this->m_mapConstVars.end())
+		return null_object;
+
+	return this->operator[](it->second);
+
+}
+
+Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator[](size_t id)
+{
+	static ConstantBufferElement null_object;
+
+	if (id >= m_vConstVars.size())
+		throw EX(OutOfBoundsException);
+
+	return this->m_vConstVars[id];
+}
+
+
+
 // ============================================================================================================
 // CBelem
 
-FWrender::Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecord * parent_record):
-	m_pBufferRecord(parent_record)
+Shader::ConstantBufferElement::ConstantBufferElement():
+	m_pBufferRecord(nullptr)
 {
 	// do nothing here. 
 }
 
-FWrender::Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecord * parent_record, ID3D11ShaderReflectionVariable * shader_variable) : ConstantBufferElement()
+Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecord * parent_record, ID3D11ShaderReflectionVariable * shader_variable) : ConstantBufferElement()
 {
 	if (!parent_record && !shader_variable)
 		throw EX(NullPointerException);
 
-	HRESULT res = 0;
+	this->m_pBufferRecord = parent_record;
 
+	HRESULT res = 0;
 	
 	ZeroMemory(&m_var_desc, sizeof(m_var_desc));
 	res = shader_variable->GetDesc(&m_var_desc);
@@ -538,5 +580,20 @@ FWrender::Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantB
 
 }
 
-// ... 
+D3D11_SHADER_VARIABLE_DESC & const FWrender::Shader::ConstantBufferElement::GetVarDesc()
+{
+	static D3D11_SHADER_VARIABLE_DESC null_obj;
+	if (!this->m_pBufferRecord)
+		return null_obj;
 
+	return this->m_var_desc;
+}
+
+D3D11_SHADER_TYPE_DESC & const FWrender::Shader::ConstantBufferElement::GetTypeDesc()
+{
+	static D3D11_SHADER_TYPE_DESC null_obj;
+	if (!this->m_pBufferRecord)
+		return null_obj;
+
+	return this->m_type_desc;
+}

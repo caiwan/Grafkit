@@ -75,6 +75,13 @@ namespace FWrender {
 			void Set(void* pData);
 			void Set(void* pData, size_t offset, size_t width);
 
+			size_t GetElementCount() { return this->m_vConstVars.size(); }
+			ConstantBufferElement& operator[](const char* name);
+			ConstantBufferElement& operator[](size_t id);
+
+			D3D11_SHADER_BUFFER_DESC& const GetBufferDesc() { return this->m_description; }
+
+
 		private:
 			void Map();
 			void Unmap();
@@ -87,8 +94,11 @@ namespace FWrender {
 			UINT m_slot;
 
 		protected:
-			typedef std::map<std::string, ConstantBufferElement> cb_variableMap_t;
-			cb_variableMap_t m_mapConstantVariables;
+			typedef std::map<std::string, size_t> cb_variableMap_t;
+			cb_variableMap_t m_mapConstVars;
+			
+			// a getterek miatt kell
+			std::vector<ConstantBufferElement> m_vConstVars;
 
 		};
 
@@ -99,27 +109,32 @@ namespace FWrender {
 		{
 			friend class ConstantBufferRecord;
 		public:
-			ConstantBufferElement(Shader::ConstantBufferRecord* parent_record = nullptr);
+			ConstantBufferElement();
 
 		protected:
 			ConstantBufferElement(Shader::ConstantBufferRecord* parent_record, ID3D11ShaderReflectionVariable* shader_variable);
 
-			// void operator= (float v);
+		public:
+			/// @todo implement 
+			void operator= (float v);
 
-			//void operator= (float2 v);
-			//void operator= (float3 v);
-			//void operator= (float4 v);
-			// 16-os alignmentet meg kell szerelni
-			// void operator= (FWmath::Matrix v);
+			void operator= (float3 v);
+			void operator= (float2 v);
+			void operator= (float4 v);
+			
+			/// @todo 16-os alignmentet meg kell szerelni
+			//void operator= (FWmath::Matrix v);
 
-			// void set(float v1, float v2);
-			// void set(float v1, float v2, float v3);
-			// void set(float v1, float v2, float v3, float v4);
+			void set(float v1);
+			void set(float v1, float v2);
+			void set(float v1, float v2, float v3);
+			void set(float v1, float v2, float v3, float v4);
+
+			D3D11_SHADER_VARIABLE_DESC & const GetVarDesc();
+			D3D11_SHADER_TYPE_DESC & const GetTypeDesc();
 
 		protected:
 			Shader::ConstantBufferRecord* m_pBufferRecord;
-			size_t m_offset;
-			size_t m_width;
 
 			D3D11_SHADER_VARIABLE_DESC m_var_desc;
 			D3D11_SHADER_TYPE_DESC m_type_desc;
@@ -140,6 +155,8 @@ namespace FWrender {
 		};
 
 		ConstantBufferRecord &operator[] (const char* name);
+		ConstantBufferRecord &operator[] (size_t id);
+		size_t GetConstantBufferCount() { return this->m_vBuffers.size(); }
 
 		size_t getILayoutElemCount() { return this->m_mapInputElems.size(); }
 		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
@@ -158,8 +175,8 @@ namespace FWrender {
 
 	private:
 		ShaderType_e m_type;
-		ID3D11VertexShader* m_vShader;
-		ID3D11PixelShader* m_pShader;
+		ID3D11VertexShader* m_vxShader;
+		ID3D11PixelShader* m_pxShader;
 
 		ID3D11InputLayout* m_layout;
 
@@ -169,9 +186,9 @@ namespace FWrender {
 		typedef std::vector<InputElementRecord> inputElementMap_t;
 		inputElementMap_t m_mapInputElems;
 
-		//typedef std::map<const char*, ConstantBufferRecord, cmp_str> bufferMap_t;
-		typedef std::map<std::string, ConstantBufferRecord> bufferMap_t;
+		typedef std::map<std::string, size_t> bufferMap_t;
 		bufferMap_t m_mapBuffers;
+		std::vector<ConstantBufferRecord> m_vBuffers;
 
 		std::vector<std::string> m_inputNames;
 	};
@@ -185,6 +202,9 @@ namespace FWrender {
 			return this->ptr->operator[](name);
 		}
 
+		Shader::ConstantBufferRecord& operator[](size_t id) {
+			return this->ptr->operator[](id);
+		}
 
 		// --- compatibility with Ref<T>
 		ShaderRef & operator=(Shader* pointer)
