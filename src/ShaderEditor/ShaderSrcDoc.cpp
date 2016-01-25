@@ -7,11 +7,10 @@
 #include "exceptions.h"
 
 using FWdebug::Exception;
-
 using namespace FWdebugExceptions;
+using FWrender::Shader;
 
-// using FWdebug::ShaderException;
-// using FWrender::Shader;
+#include "compareOperators.h"
 
 //////////////////////////////////////////////////////////////////////
 // Shader dokumentum
@@ -40,17 +39,28 @@ int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
 	
 		m_shader = newshader;
 
+		size_t buffer_count = this->m_shader->GetConstantBufferCount();
+		// make every existing cbuffer as invalid
+		// ... 
+		
+		// fill up cbuffers
+
+		
+		for (size_t i = 0; i < buffer_count; i++)
+		{
+			size_t var_count = m_shader[i].GetElementCount();
+			for (size_t j = 0; j < var_count; j++) {
+				m_shader[i][j];
+			}
+		}
+
 		this->m_is_has_errors = 0;
 	
 	} 
 	catch(ShaderException &e){
 		this->fillErrors(e);
 
-	//	FWcore::writeLog(true, FWcore::MSG_error, "Shader Exception:\n %s", e->what());
 		MessageBox(NULL, e.what(), "ShEX", MB_ICONEXCLAMATION);
-	//	
-	//	delete newshader;
-	//	delete e;
 
 		///@ todo add logger
 
