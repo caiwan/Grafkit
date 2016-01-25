@@ -1,6 +1,8 @@
 
 #pragma once
 
+class CShaderSrcDoc;
+
 class CPropertiesToolBar : public CMFCToolBar
 {
 public:
@@ -38,6 +40,8 @@ protected:
 public:
 	virtual ~CPropertiesWnd();
 
+	void UpdatePropList(CShaderSrcDoc *shaderDoc);
+
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -55,6 +59,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	void InitPropList();
+	
 	void SetPropListFont();
 
 	int m_nComboHeight;

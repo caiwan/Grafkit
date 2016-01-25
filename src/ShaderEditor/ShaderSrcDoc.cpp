@@ -10,7 +10,12 @@ using FWdebug::Exception;
 using namespace FWdebugExceptions;
 using FWrender::Shader;
 
-#include "compareOperators.h"
+// aliases for nested classes 
+using BufferRecord = CShaderSrcDoc::BufferRecord;
+using VariableElement = CShaderSrcDoc::BufferRecord::VariableElement;
+using VariableElementRef = CShaderSrcDoc::BufferRecord::VariableElementRef;
+
+//#include "compareOperators.h"
 
 //////////////////////////////////////////////////////////////////////
 // Shader dokumentum
@@ -39,26 +44,81 @@ int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
 	
 		m_shader = newshader;
 
-		size_t buffer_count = this->m_shader->GetConstantBufferCount();
-		// make every existing cbuffer as invalid
-		// ... 
-		
-		// fill up cbuffers
+		// mark every existing cbuffer as invalid
+#ifndef USE_STD_VECTOR
+		BufferRecordRef record;
+		POSITION pos_rec = this->m_lBuffers.GetHeadPosition();
 
-		
-		for (size_t i = 0; i < buffer_count; i++)
+		while(pos_rec)
 		{
-			size_t var_count = m_shader[i].GetElementCount();
-			for (size_t j = 0; j < var_count; j++) {
-				m_shader[i][j];
+			if (record.Valid())
+			{
+				record->m_is_valid = 0;
+				//record->m_id = 0;
+
+				VariableElementRef variable;
+				POSITION pos_var = record->m_lVariables.GetHeadPosition();
+
+				while (pos_var)
+				{
+					if (variable.Valid())
+					{
+						variable->m_is_valid = 0;
+						//variable->m_id = 0;
+					}
+				}
 			}
+			record = m_lBuffers.GetNext(pos_rec);
+		}
+#else
+		for (size_t i = 0; i < this->m_lBuffers.size(); i++) {
+			BufferRecordRef &record = this->m_lBuffers[i];
+			record->m_is_valid = 0;
+			for (size_t j = 0; j < record->m_lVariables.size(); j++) {
+				VariableElementRef &variable = record->m_lVariables[j];
+				variable->m_is_valid = 0;
+			}
+		}
+#endif // USE_STD_VECTOR
+		
+		// reflect buffers, and validate exisitng ones
+		size_t buffer_count = this->m_shader->GetConstantBufferCount();
+		for (size_t i = 0; i < buffer_count; i++){
+			BufferRecord *record = new BufferRecord();
+			size_t var_count = m_shader[i].GetElementCount();
+			
+			record->m_id = i;
+			record->m_desc = m_shader[i].GetBufferDesc();
+			record->m_name = m_shader[i].GetBufferDesc().Name;
+			record->m_is_valid = 1;
+
+			for (size_t j = 0; j < var_count; j++) {
+				VariableElement *variable = new VariableElement();
+				variable->m_id = j;
+				variable->m_varDesc = m_shader[i][j].GetVarDesc();
+				variable->m_typeDesc = m_shader[i][j].GetTypeDesc();
+				variable->m_name = variable->m_varDesc.Name;
+				variable->m_is_valid = 1;
+
+#ifndef USE_STD_VECTOR
+				record->m_lVariables.AddTail(variable);
+#else //USE_STD_VECTOR
+				record->m_lVariables.push_back(variable);
+#endif //USE_STD_VECTOR
+
+			}
+#ifndef USE_STD_VECTOR
+			this->m_lBuffers.AddTail(record);
+#else //USE_STD_VECTOR
+			this->m_lBuffers.push_back(record);
+#endif //USE_STD_VECTOR
 		}
 
 		this->m_is_has_errors = 0;
 	
 	} 
 	catch(ShaderException &e){
-		this->fillErrors(e);
+		this->FillErrors(e);
 
 		MessageBox(NULL, e.what(), "ShEX", MB_ICONEXCLAMATION);
 
@@ -81,7 +141,7 @@ void CShaderSrcDoc::FlushErrors(){
 // Shader hibakezeles
 //////////////////////////////////////////////////////////////////////
 
-void CShaderSrcDoc::fillErrors(ShaderException& ex){
+void CShaderSrcDoc::FillErrors(ShaderException& ex){
 	//if (!ex) return;
 	//
 	//const char* err_str = ex->getCompilerError(); 
@@ -132,3 +192,27 @@ ShaderError::ShaderError(){
 }
 */
 
+// ===================================================================================================
+
+CShaderSrcDoc::BufferRecord::BufferRecord():
+	m_is_valid(0),
+	m_id(0),
+	m_lVariables(),
+	m_name(),
+	m_desc()
+{
+}
+
+CShaderSrcDoc::BufferRecord::~BufferRecord()
+{
+}
+
+// ===================================================================================================
+CShaderSrcDoc::BufferRecord::VariableElement::VariableElement() :
+	m_is_valid(0),
+	m_id(0),
+	m_name(),
+	m_varDesc(),
+	m_typeDesc()
+{
+}

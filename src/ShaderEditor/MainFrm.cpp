@@ -140,10 +140,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndProperties);
 
-	m_shaderEditor.EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_shaderEditor);
+	m_wndShaderEditor.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&m_wndShaderEditor);
 
-	this->RegCmdMsg(&m_shaderEditor);
+	this->RegCmdMsg(&m_wndShaderEditor);
 
 	// Enable toolbar and docking window menu replacement
 	EnablePaneMenu(TRUE, ID_VIEW_CUSTOMIZE, strCustomize, ID_VIEW_TOOLBAR);
@@ -246,7 +246,7 @@ BOOL CMainFrame::CreateDockingWindows()
 #define ID_VIEW_SHADER_EDITOR 0
 #endif
 
-	if (!m_shaderEditor.Create(strShaderEditor, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_SHADER_EDITORWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI))
+	if (!m_wndShaderEditor.Create(strShaderEditor, this, CRect(0, 0, 200, 200), TRUE, ID_VIEW_SHADER_EDITORWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI))
 	{
 		TRACE0("Failed to create Properties window\n");
 		return FALSE; // failed to create

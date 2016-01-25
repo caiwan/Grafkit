@@ -22,7 +22,8 @@ public:
 
 // Operations
 public:
-	CShaderEditorSingle &getEditor(){return this->m_shaderEditor;}
+	CShaderEditorSingle &GetShaderEditorWnd(){return this->m_wndShaderEditor;}
+	CPropertiesWnd &GetPropWnd() { return this->m_wndProperties; }
 
 // Overrides
 public:
@@ -50,7 +51,7 @@ protected:  // control bar embedded members
 	//CLoggerView       m_wndLogger;
 	CPropertiesWnd    m_wndProperties;
 
-	CShaderEditorSingle m_shaderEditor;
+	CShaderEditorSingle m_wndShaderEditor;
 
 	private:
 		CList<CBasePane*> m_regCmdMsg;

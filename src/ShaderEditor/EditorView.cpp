@@ -167,8 +167,8 @@ void CEditorView::OnInitialUpdate()
 {
 	CView::OnInitialUpdate();
 
-	CMainFrame*mainFrm = theApp.getMainFrame();
-	CShaderEditorSingle &shaderEditor = mainFrm->getEditor();
+	CMainFrame*mainFrm = theApp.GetMainFrame();
+	CShaderEditorSingle &shaderEditor = mainFrm->GetShaderEditorWnd();
 
 	CShaderSrcDoc &shaderDoc = this->GetDocument()->m_shader_src;
 
@@ -233,7 +233,10 @@ void CEditorView::OnShaderCompile()
 
 	FWrender::Renderer &render = m_xd3d_view;
 
-	theApp.getMainFrame()->getEditor().docFromEditor();
+	theApp.GetMainFrame()->GetShaderEditorWnd().docFromEditor();
 	pDoc->m_shader_src.CompileShader(render);
-	theApp.getMainFrame()->getEditor().SetFocus();
+	theApp.GetMainFrame()->GetShaderEditorWnd().SetFocus();
+
+	// fuckup
+	theApp.GetMainFrame()->GetPropWnd().UpdatePropList(&pDoc->m_shader_src);
 }

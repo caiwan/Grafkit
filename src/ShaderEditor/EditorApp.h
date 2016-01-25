@@ -24,7 +24,7 @@ class CEditorApp : public CWinAppEx
 		// --- framework overides
 
 	public:
-		CMainFrame* getMainFrame(){ASSERT(m_pMainWnd); return (CMainFrame*)(GetMainWnd());}
+		CMainFrame* GetMainFrame(){ASSERT(m_pMainWnd); return (CMainFrame*)(GetMainWnd());}
 
 	// Overrides
 	public:
