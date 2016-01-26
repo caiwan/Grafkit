@@ -171,6 +171,7 @@ void CPropertiesWnd::InitPropList()
 
 }
 
+#if 0
 void CPropertiesWnd::UpdatePropList(CShaderSrcDoc *shaderDoc)
 {
 	this->InitPropList();
@@ -188,38 +189,6 @@ void CPropertiesWnd::UpdatePropList(CShaderSrcDoc *shaderDoc)
 
 	// --- 
 	// gen stuff for buffer records
-
-#ifdef USE_STD_VECTOR
-	CShaderSrcDoc::listBufferRecord_t &records = shaderDoc->GetBuffers();
-	for (size_t i = 0; i < records.size(); i++)
-	{
-		CShaderSrcDoc::BufferRecordRef &record = records[i];
-		CMFCPropertyGridProperty* recPropGrp = new CMFCPropertyGridProperty(record->m_name);
-		
-		CShaderSrcDoc::BufferRecord::listVariables_t &variables = record->GetVariables();
-
-		for (size_t j = 0; j < variables.size(); j++)
-		{
-			CShaderSrcDoc::BufferRecord::VariableElementRef &variable = variables[j];
-
-			CMFCPropertyGridProperty* varPropGrp = new CMFCPropertyGridProperty(variable->m_name);
-
-			// ... 
-
-			recPropGrp->AddSubItem(varPropGrp);
-		}
-		
-		// ... 
-
-		m_wndPropList.AddProperty(recPropGrp);
-	}
-	
-
-#else
-	throw EX_DETAILS(InvalidOperationException, "CList-re meg nincs implementalva a tortenet :(");
-#endif
-	
-	
 
 	//pGroup1->AddSubItem(pProp);
 	//pGroup1->AddSubItem(new CMFCPropertyGridProperty(_T("Caption"), (_variant_t) _T("About"), _T("Specifies the text that will be displayed in the window's title bar")));
@@ -283,6 +252,7 @@ void CPropertiesWnd::UpdatePropList(CShaderSrcDoc *shaderDoc)
 	//pGroup4->Expand(FALSE);
 	//m_wndPropList.AddProperty(pGroup4);
 }
+#endif 
 
 void CPropertiesWnd::OnSetFocus(CWnd* pOldWnd)
 {

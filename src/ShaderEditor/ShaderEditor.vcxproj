@@ -210,12 +210,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassView.h" />
+    <ClInclude Include="PropertyView.h" />
     <ClInclude Include="ScintillaCtrl.h" />
     <ClInclude Include="ShaderSrcEditor.h" />
     <ClInclude Include="ShaderSrcDoc.h" />
     <ClInclude Include="XD3D.h" />
     <ClInclude Include="XDraw.h" />
-    <ClInclude Include="FileView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="PropertiesWnd.h" />
     <ClInclude Include="Resource.h" />
@@ -224,16 +224,16 @@
     <ClInclude Include="EditorView.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="ViewTree.h" />
+    <ClInclude Include="TreeView.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="PropertyView.cpp" />
     <ClCompile Include="ScintillaCtrl.cpp" />
     <ClCompile Include="ShaderSrcEditor.cpp" />
     <ClCompile Include="ShaderSrcDoc.cpp" />
     <ClCompile Include="XD3D.cpp" />
     <ClCompile Include="XDraw.cpp" />
-    <ClCompile Include="FileView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
     <ClCompile Include="EditorApp.cpp" />
@@ -245,7 +245,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ViewTree.cpp" />
+    <ClCompile Include="TreeView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\TextureGenerator.rc2" />

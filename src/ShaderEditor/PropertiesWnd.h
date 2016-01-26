@@ -1,7 +1,6 @@
-
 #pragma once
 
-class CShaderSrcDoc;
+#include "PropertyView.h"
 
 class CPropertiesToolBar : public CMFCToolBar
 {
@@ -34,14 +33,14 @@ protected:
 	CFont m_fntPropList;
 	CComboBox m_wndObjectCombo;
 	CPropertiesToolBar m_wndToolBar;
-	CMFCPropertyGridCtrl m_wndPropList;
+
+public:
+	// ennek majd privatenak kell lennie
+	CPropertyView m_wndPropList;
 
 // Implementation
 public:
 	virtual ~CPropertiesWnd();
-
-	void UpdatePropList(CShaderSrcDoc *shaderDoc);
-
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -59,7 +58,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	void InitPropList();
-	
 	void SetPropListFont();
 
 	int m_nComboHeight;
