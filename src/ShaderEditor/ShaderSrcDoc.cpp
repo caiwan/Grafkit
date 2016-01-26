@@ -39,47 +39,23 @@ int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
 		this->m_is_has_errors = 1;
 
 		newshader = new FWrender::Shader();
-		//newshader->createFromMemory(this->m_vss.c_str(), this->m_fss.c_str());
 		newshader->LoadFromMemory(render, "main", m_shader_source, m_shader_source.GetLength(), FWrender::ST_Pixel);
 	
 		m_shader = newshader;
 
 		// mark every existing cbuffer as invalid
-#ifndef USE_STD_VECTOR
-		BufferRecordRef record;
-		POSITION pos_rec = this->m_lBuffers.GetHeadPosition();
-
-		while(pos_rec)
+		for (mapBufferRecord_t::iterator record_it = m_lBuffers.begin(); record_it != m_lBuffers.end(); record_it++) 
 		{
-			if (record.Valid())
-			{
-				record->m_is_valid = 0;
-				//record->m_id = 0;
-
-				VariableElementRef variable;
-				POSITION pos_var = record->m_lVariables.GetHeadPosition();
-
-				while (pos_var)
-				{
-					if (variable.Valid())
-					{
-						variable->m_is_valid = 0;
-						//variable->m_id = 0;
-					}
-				}
-			}
-			record = m_lBuffers.GetNext(pos_rec);
-		}
-#else
-		for (size_t i = 0; i < this->m_lBuffers.size(); i++) {
-			BufferRecordRef &record = this->m_lBuffers[i];
+			BufferRecordRef &record = record_it->second;
 			record->m_is_valid = 0;
-			for (size_t j = 0; j < record->m_lVariables.size(); j++) {
-				VariableElementRef &variable = record->m_lVariables[j];
+				
+			for(BufferRecord::mapVariables_t::iterator var_it = record->m_lVariables.begin(); var_it != record->m_lVariables.end(); var_it++) 
+			{
+				VariableElementRef &variable = var_it->second;
 				variable->m_is_valid = 0;
 			}
 		}
-#endif // USE_STD_VECTOR
+		
 		
 		// reflect buffers, and validate exisitng ones
 		size_t buffer_count = this->m_shader->GetConstantBufferCount();
@@ -100,18 +76,10 @@ int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
 				variable->m_name = variable->m_varDesc.Name;
 				variable->m_is_valid = 1;
 
-#ifndef USE_STD_VECTOR
-				record->m_lVariables.AddTail(variable);
-#else //USE_STD_VECTOR
-				record->m_lVariables.push_back(variable);
-#endif //USE_STD_VECTOR
+				record->m_lVariables[variable->m_name] = (variable);
 
 			}
-#ifndef USE_STD_VECTOR
-			this->m_lBuffers.AddTail(record);
-#else //USE_STD_VECTOR
-			this->m_lBuffers.push_back(record);
-#endif //USE_STD_VECTOR
+			this->m_lBuffers[record->m_name] = (record);
 		}
 
 		this->m_is_has_errors = 0;
@@ -143,20 +111,15 @@ void CShaderSrcDoc::operator() (CPropertyView & wndPropList)
 	wndPropList.SetHandler(this);
 	wndPropList.RemoveAll();
 
-#ifdef USE_STD_VECTOR
-	CShaderSrcDoc::listBufferRecord_t &records = this->GetBuffers();
-	for (size_t i = 0; i < records.size(); i++)
+	for (mapBufferRecord_t::iterator record_it = m_lBuffers.begin(); record_it != m_lBuffers.end(); record_it++)
 	{
-		CShaderSrcDoc::BufferRecordRef &record = records[i];
-		CMFCPropertyGridProperty* recPropGrp = new CMFCPropertyGridProperty(record->m_name);
+		CShaderSrcDoc::BufferRecordRef &record = record_it->second; //records[i];
+		CMFCPropertyGridProperty* recPropGrp = new CMFCPropertyGridProperty(record->m_name.c_str());
 
-		CShaderSrcDoc::BufferRecord::listVariables_t &variables = record->GetVariables();
-
-		for (size_t j = 0; j < variables.size(); j++)
+		for (BufferRecord::mapVariables_t::iterator var_it = record->m_lVariables.begin(); var_it != record->m_lVariables.end(); var_it++)
 		{
-			CShaderSrcDoc::BufferRecord::VariableElementRef &variable = variables[j];
-
-			CMFCPropertyGridProperty* varPropGrp = new CMFCPropertyGridProperty(variable->m_name);
+			CShaderSrcDoc::BufferRecord::VariableElementRef &variable = var_it->second; // variables[j];
+			CMFCPropertyGridProperty* varPropGrp = new CMFCPropertyGridProperty(variable->m_name.c_str());
 
 			// ... 
 
@@ -167,10 +130,6 @@ void CShaderSrcDoc::operator() (CPropertyView & wndPropList)
 
 		wndPropList.AddProperty(recPropGrp);
 	}
-
-#else
-	throw EX_DETAILS(InvalidOperationException, "CList-re meg nincs implementalva a tortenet :(");
-#endif
 }
 
 void CShaderSrcDoc::PropertyChangedEvent(NodeIterator * item)

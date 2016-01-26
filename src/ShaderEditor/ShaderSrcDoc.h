@@ -2,8 +2,11 @@
 A shader docot tartalmazza + ujraforditja + shader hibakat kezeli
 */
 
-
 #pragma once
+
+#include <vector>
+#include <map>
+#include <string>
 
 #include "render/renderer.h"
 #include "render/shader.h"
@@ -11,12 +14,7 @@ A shader docot tartalmazza + ujraforditja + shader hibakat kezeli
 
 #include "PropertyView.h"
 
-#define USE_STD_VECTOR
 
-
-#ifdef USE_STD_VECTOR
-#include <vector>
-#endif //USE_STD_VECTOR
 
 class CShaderSrcDoc : public CPropertyView::IBuilder, public CPropertyView::IProperyItemHandler
 {
@@ -27,12 +25,8 @@ public :
 	class BufferRecord;
 
 	typedef Ref<BufferRecord> BufferRecordRef;
-
-#ifndef USE_STD_VECTOR
-	typedef CList<BufferRecordRef, BufferRecordRef> listBufferRecord_t;
-#else //USE_STD_VECTOR
-	typedef std::vector<BufferRecordRef> listBufferRecord_t;
-#endif USE_STD_VECTOR
+	//typedef std::vector<BufferRecordRef> listBufferRecord_t;
+	typedef std::map<std::string, BufferRecordRef> mapBufferRecord_t;
 
 public:
 	CShaderSrcDoc();
@@ -48,7 +42,7 @@ public:
 	void SetShaderSource(TCHAR *in_src) {this->m_shader_source = in_src; }
 	CString &GetShaderSource() { return this->m_shader_source;}
 
-	listBufferRecord_t& GetBuffers() { return m_lBuffers; }
+	//mapBufferRecord_t& GetBuffers() { return m_lBuffers; }
 
 	// --- 
 public:
@@ -62,7 +56,7 @@ protected:
 	FWrender::ShaderRef m_shader;	///< Shader objektum, amit frissiteni kell.
 	int m_is_has_errors;
 
-	listBufferRecord_t m_lBuffers;
+	mapBufferRecord_t m_lBuffers;
 
 private:
 	void FillErrors(FWdebugExceptions::ShaderException& ex);	///< exception szovegebol feltolti a hibalistat
@@ -80,11 +74,7 @@ public:
 
 		typedef Ref<VariableElement> VariableElementRef;
 
-#ifndef USE_STD_VECTOR
-		typedef CList<VariableElementRef, VariableElementRef> listVariables_t;
-#else //USE_STD_VECTOR
-		typedef std::vector<VariableElementRef> listVariables_t;
-#endif // USE_STD_VECTOR
+		typedef std::map<std::string, VariableElementRef> mapVariables_t;
 
 		friend class CShaderSrcDoc;
 		friend class CShaderSrcDoc::BufferRecord::VariableElement;
@@ -93,14 +83,14 @@ public:
 		BufferRecord();
 		~BufferRecord();
 
-		listVariables_t& GetVariables() { return m_lVariables; }
+		// mapVariables_t& GetVariables() { return m_lVariables; }
 
 		// ezeknek majd idovel privatenak kellene lennie
 	public:
 		int m_is_valid;
 		size_t m_id; 
-		listVariables_t m_lVariables;
-		CString m_name;
+		mapVariables_t m_lVariables;
+		std::string m_name;
 
 		D3D11_SHADER_BUFFER_DESC m_desc;
 
@@ -122,7 +112,7 @@ public:
 		public:
 			int m_is_valid;
 			size_t m_id;
-			CString m_name;
+			std::string m_name;
 
 			D3D11_SHADER_VARIABLE_DESC m_varDesc;
 			D3D11_SHADER_TYPE_DESC m_typeDesc;
