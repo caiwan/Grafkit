@@ -4,16 +4,14 @@
 #include <vector>
 #include <map>
 
-// #pragma lib(dxguid.lib.)
 #include <d3d11shader.h>
 
 #include "dxtypes.h"
-#include "../render/renderer.h"
+#include "renderer.h"
 
 #include "reference.h"
 #include "exceptions.h"
 
-#include "../utils/stringutils.h"
 
 namespace FWrender {
 
