@@ -238,5 +238,6 @@ void CEditorView::OnShaderCompile()
 	theApp.GetMainFrame()->GetShaderEditorWnd().SetFocus();
 
 	// fuckup
-	theApp.GetMainFrame()->GetPropWnd().UpdatePropList(&pDoc->m_shader_src);
+//	theApp.GetMainFrame()->GetPropWnd().UpdatePropList(&pDoc->m_shader_src);
+	pDoc->m_shader_src(theApp.GetMainFrame()->GetPropWnd().m_wndPropList);
 }

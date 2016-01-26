@@ -22,7 +22,7 @@ using VariableElementRef = CShaderSrcDoc::BufferRecord::VariableElementRef;
 //////////////////////////////////////////////////////////////////////
 
 CShaderSrcDoc::CShaderSrcDoc() : 
-	m_shader_source(""),
+	m_shader_source(),
 	m_shader(),
 	m_is_has_errors(0)
 {
@@ -136,6 +136,49 @@ int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
 void CShaderSrcDoc::FlushErrors(){
 	//this->m_errors.rewind();	
 }
+
+
+void CShaderSrcDoc::operator() (CPropertyView & wndPropList)
+{
+	wndPropList.SetHandler(this);
+	wndPropList.RemoveAll();
+
+#ifdef USE_STD_VECTOR
+	CShaderSrcDoc::listBufferRecord_t &records = this->GetBuffers();
+	for (size_t i = 0; i < records.size(); i++)
+	{
+		CShaderSrcDoc::BufferRecordRef &record = records[i];
+		CMFCPropertyGridProperty* recPropGrp = new CMFCPropertyGridProperty(record->m_name);
+
+		CShaderSrcDoc::BufferRecord::listVariables_t &variables = record->GetVariables();
+
+		for (size_t j = 0; j < variables.size(); j++)
+		{
+			CShaderSrcDoc::BufferRecord::VariableElementRef &variable = variables[j];
+
+			CMFCPropertyGridProperty* varPropGrp = new CMFCPropertyGridProperty(variable->m_name);
+
+			// ... 
+
+			recPropGrp->AddSubItem(varPropGrp);
+		}
+
+		// ... 
+
+		wndPropList.AddProperty(recPropGrp);
+	}
+
+#else
+	throw EX_DETAILS(InvalidOperationException, "CList-re meg nincs implementalva a tortenet :(");
+#endif
+}
+
+void CShaderSrcDoc::PropertyChangedEvent(NodeIterator * item)
+{
+	// hello
+	throw EX(NotImplementedMethodException);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Shader hibakezeles

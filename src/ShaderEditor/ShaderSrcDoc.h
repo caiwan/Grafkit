@@ -1,20 +1,25 @@
+/**
+A shader docot tartalmazza + ujraforditja + shader hibakat kezeli
+*/
+
+
 #pragma once
 
 #include "render/renderer.h"
 #include "render/shader.h"
 #include "reference.h"
 
-/**
-	A shader docot tartalmazza + ujraforditja + shader hibakat kezeli 
-*/
+#include "PropertyView.h"
 
 #define USE_STD_VECTOR
+
 
 #ifdef USE_STD_VECTOR
 #include <vector>
 #endif //USE_STD_VECTOR
 
-class CShaderSrcDoc{
+class CShaderSrcDoc : public CPropertyView::IBuilder, public CPropertyView::IProperyItemHandler
+{
 	/**
 	A szerkeszto oldalon kezeli a shader forrast + ujraforditja + reflektalja a shader parameterket a szerkeszto fele 
 	*/
@@ -44,6 +49,12 @@ public:
 	CString &GetShaderSource() { return this->m_shader_source;}
 
 	listBufferRecord_t& GetBuffers() { return m_lBuffers; }
+
+	// --- 
+public:
+	virtual void operator() (CPropertyView &props);
+protected:
+	virtual void PropertyChangedEvent(NodeIterator* item);
 
 protected:
 	CString m_shader_source;
