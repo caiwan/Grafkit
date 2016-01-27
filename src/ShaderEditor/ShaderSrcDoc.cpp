@@ -12,8 +12,10 @@ using FWrender::Shader;
 
 // aliases for nested classes 
 using BufferRecord = CShaderSrcDoc::BufferRecord;
-using VariableElement = CShaderSrcDoc::BufferRecord::VariableElement;
-using VariableElementRef = CShaderSrcDoc::BufferRecord::VariableElementRef;
+//using VariableElement = CShaderSrcDoc::BufferRecord::VariableElement;
+using VariableElement = CShaderSrcDoc::VariableElement;
+//using VariableElementRef = CShaderSrcDoc::BufferRecord::VariableElementRef;
+using VariableElementRef = CShaderSrcDoc::VariableElementRef;
 
 //#include "compareOperators.h"
 
@@ -74,6 +76,7 @@ int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
 				variable->m_varDesc = m_shader[i][j].GetVarDesc();
 				variable->m_typeDesc = m_shader[i][j].GetTypeDesc();
 				variable->m_name = variable->m_varDesc.Name;
+				variable->parent = record;
 				variable->m_is_valid = 1;
 
 				record->m_lVariables[variable->m_name] = (variable);
@@ -113,23 +116,89 @@ void CShaderSrcDoc::operator() (CPropertyView & wndPropList)
 
 	for (mapBufferRecord_t::iterator record_it = m_lBuffers.begin(); record_it != m_lBuffers.end(); record_it++)
 	{
-		CShaderSrcDoc::BufferRecordRef &record = record_it->second; //records[i];
+		CShaderSrcDoc::BufferRecordRef &record = record_it->second;
 		CMFCPropertyGridProperty* recPropGrp = new CMFCPropertyGridProperty(record->m_name.c_str());
 
 		for (BufferRecord::mapVariables_t::iterator var_it = record->m_lVariables.begin(); var_it != record->m_lVariables.end(); var_it++)
 		{
-			CShaderSrcDoc::BufferRecord::VariableElementRef &variable = var_it->second; // variables[j];
+			VariableElementRef &variable = var_it->second;
 			CMFCPropertyGridProperty* varPropGrp = new CMFCPropertyGridProperty(variable->m_name.c_str());
 
-			// ... 
+			ParseVars(variable, varPropGrp);
 
 			recPropGrp->AddSubItem(varPropGrp);
 		}
 
-		// ... 
+		// ...
+		// ha egy adott elem epen nem erheto el, akkor (...) 
 
 		wndPropList.AddProperty(recPropGrp);
 	}
+}
+
+void CShaderSrcDoc::ParseVars(VariableElementRef & variable, CMFCPropertyGridProperty * parentProperty)
+{
+	variable->m_propGroup = parentProperty;
+
+	switch (variable->m_typeDesc.Class) {
+		case D3D_SVC_SCALAR:
+		{
+			CMFCPropertyGridProperty* pProp = new CMFCPropertyGridProperty(_T("Value"), (_variant_t)0l, _T(""));
+			pProp->EnableSpinControl(TRUE, 0, 0);
+			parentProperty->AddSubItem(pProp);
+
+			variable->m_lProps.push_back(pProp);
+		}
+			break;
+
+		case D3D_SVC_VECTOR:
+		{
+			variable->m_propType = new CMFCPropertyGridProperty(_T("Type"), _T("Vector"), _T(""));
+			variable->m_propType->AddOption(_T("Vector"));
+			variable->m_propType->AddOption(_T("Color"));
+			variable->m_propType->AllowEdit(FALSE);
+
+			parentProperty->AddSubItem(variable->m_propType);
+
+			const char *fields_names = "XYZW";
+			for (size_t i= 0;  i<variable->m_typeDesc.Columns; ++i) {
+				CMFCPropertyGridProperty* pProp = new CMFCPropertyGridProperty(CString(fields_names[i]), (_variant_t)0l, _T(""));
+				pProp->EnableSpinControl(TRUE, 0, 0);
+				parentProperty->AddSubItem(pProp);
+
+				variable->m_lProps.push_back(pProp);
+			}
+		}
+			break;
+		case D3D_SVC_MATRIX_ROWS:
+		case D3D_SVC_MATRIX_COLUMNS:
+			break;
+
+		case D3D_SVC_OBJECT:
+		case D3D_SVC_STRUCT:
+
+			break;
+	}
+
+	switch (variable->m_typeDesc.Class) {
+		case D3D_SVT_INT:
+		case D3D_SVT_FLOAT:
+		case D3D_SVT_UINT:
+		case D3D_SVT_UINT8:
+		case D3D_SVT_DOUBLE:
+			break;
+		case D3D_SVT_TEXTURE2D:
+		case D3D_SVT_SAMPLER2D:
+			break;
+	}
+
+
+	variable->m_propSource = new CMFCPropertyGridProperty(_T("Source"), _T("Manual"), _T(""));
+	variable->m_propSource->AddOption(_T("Manual"));
+	variable->m_propSource->AddOption(_T("Scenegraph"));
+	variable->m_propSource->AllowEdit(FALSE);
+
+	parentProperty->AddSubItem(variable->m_propSource);
 }
 
 void CShaderSrcDoc::PropertyChangedEvent(NodeIterator * item)
@@ -196,7 +265,7 @@ ShaderError::ShaderError(){
 
 // ===================================================================================================
 
-CShaderSrcDoc::BufferRecord::BufferRecord():
+BufferRecord::BufferRecord():
 	m_is_valid(0),
 	m_id(0),
 	m_lVariables(),
@@ -205,12 +274,12 @@ CShaderSrcDoc::BufferRecord::BufferRecord():
 {
 }
 
-CShaderSrcDoc::BufferRecord::~BufferRecord()
+BufferRecord::~BufferRecord()
 {
 }
 
 // ===================================================================================================
-CShaderSrcDoc::BufferRecord::VariableElement::VariableElement() :
+VariableElement::VariableElement() :
 	m_is_valid(0),
 	m_id(0),
 	m_name(),

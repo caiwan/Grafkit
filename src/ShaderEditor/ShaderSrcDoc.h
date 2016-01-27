@@ -4,7 +4,8 @@ A shader docot tartalmazza + ujraforditja + shader hibakat kezeli
 
 #pragma once
 
-#include <vector>
+//#include <vector>
+#include <list>
 #include <map>
 #include <string>
 
@@ -26,8 +27,11 @@ public :
 	class BufferRecord;
 
 	typedef Ref<BufferRecord> BufferRecordRef;
-	//typedef std::vector<BufferRecordRef> listBufferRecord_t;
 	typedef std::map<std::string, BufferRecordRef> mapBufferRecord_t;
+
+	class VariableElement;
+
+	typedef Ref<VariableElement> VariableElementRef;
 
 public:
 	CShaderSrcDoc();
@@ -48,7 +52,9 @@ public:
 	// --- 
 public:
 	virtual void operator() (CPropertyView &props);
+
 protected:
+	void ParseVars(VariableElementRef& variable, CMFCPropertyGridProperty *parentProperty);
 	virtual void PropertyChangedEvent(NodeIterator* item);
 
 protected:
@@ -65,7 +71,7 @@ private:
 
 	// ---- 
 public:
-	class BufferRecord : virtual public Referencable, 
+	class BufferRecord : virtual public Referencable, virtual public NodeIterator 
 	{
 		/**
 		A constant/texture buffereket reflektalja at a shaderbol a szerkeszto oldalra
@@ -73,8 +79,6 @@ public:
 		*/
 	public:
 		class VariableElement;
-
-		typedef Ref<VariableElement> VariableElementRef;
 
 		typedef std::map<std::string, VariableElementRef> mapVariables_t;
 
@@ -85,8 +89,6 @@ public:
 		BufferRecord();
 		~BufferRecord();
 
-		// mapVariables_t& GetVariables() { return m_lVariables; }
-
 		// ezeknek majd idovel privatenak kellene lennie
 	public:
 		int m_is_valid;
@@ -96,29 +98,32 @@ public:
 
 		D3D11_SHADER_BUFFER_DESC m_desc;
 
-		// ---- 
+	};
+
+	class VariableElement : virtual public Referencable, virtual public NodeIterator {
+		/**
+		A constant/texture buffer mezoit reflektalja at a shaderbol a szerkeszto oldalra
+		illetve kezeli az MFC elemeket, amiket a szerkeszto fog rajzolgani kifele a property viewban
+		*/
+
+		friend class CShaderSrcDoc;
+		friend class CShaderSrcDoc::BufferRecord;
 	public:
-		class VariableElement : public Referencable{
-			/**
-			A constant/texture buffer mezoit reflektalja at a shaderbol a szerkeszto oldalra
-			illetve kezeli az MFC elemeket, amiket a szerkeszto fog rajzolgani kifele a property viewban
-			*/
+		VariableElement();
 
-			friend class CShaderSrcDoc;
-			friend class CShaderSrcDoc::BufferRecord;
-		public:
-			VariableElement();
-			
+		// ezeknek majd idovel privatenak kellene lennie
+	public:
+		int m_is_valid;
+		size_t m_id;
+		std::string m_name;
 
-			// ezeknek majd idovel privatenak kellene lennie
-		public:
-			int m_is_valid;
-			size_t m_id;
-			std::string m_name;
+		D3D11_SHADER_VARIABLE_DESC m_varDesc;
+		D3D11_SHADER_TYPE_DESC m_typeDesc;
 
-			D3D11_SHADER_VARIABLE_DESC m_varDesc;
-			D3D11_SHADER_TYPE_DESC m_typeDesc;
-		};
+		CMFCPropertyGridProperty* m_propGroup;
+		CMFCPropertyGridProperty* m_propSource;
+		CMFCPropertyGridProperty* m_propType;
+		std::list<CMFCPropertyGridProperty*> m_lProps;
 	};
 };
 
