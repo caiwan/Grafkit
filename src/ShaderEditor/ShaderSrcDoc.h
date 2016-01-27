@@ -11,6 +11,7 @@ A shader docot tartalmazza + ujraforditja + shader hibakat kezeli
 #include "render/renderer.h"
 #include "render/shader.h"
 #include "reference.h"
+#include "tree.h"
 
 #include "PropertyView.h"
 
@@ -64,7 +65,8 @@ private:
 
 	// ---- 
 public:
-	class BufferRecord : public Referencable{
+	class BufferRecord : virtual public Referencable, 
+	{
 		/**
 		A constant/texture buffereket reflektalja at a shaderbol a szerkeszto oldalra
 		illetve kezeli az MFC elemeket, amiket a szerkeszto fog rajzolgani kifele a property viewban
