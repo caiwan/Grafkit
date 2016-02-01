@@ -29,6 +29,9 @@ CTreeView::CTreeView(ITreeItemHandler* hndlr) :
 
 CTreeView::~CTreeView()
 {
+	for (size_t i = 0; i < this->m_Items.size(); i++) {
+		delete this->m_Items[i];
+	}
 }
 
 BEGIN_MESSAGE_MAP(CTreeView, CTreeCtrl)
@@ -56,7 +59,7 @@ BOOL CTreeView::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 	return bRes;
 }
 
-NodeIterator* CTreeView::GetSelectedNode()
+TreeNode* CTreeView::GetSelectedNode()
 {
 	int indx = (int)GetItemData(GetSelectedItem());
 	if (indx)
@@ -70,7 +73,7 @@ NodeIterator* CTreeView::GetSelectedNode()
 	}
 }
 
-NodeIterator* CTreeView::GetSelectedNode(CPoint &point)
+TreeNode* CTreeView::GetSelectedNode(CPoint &point)
 {
 	UINT unFlags = 0 ;
 	HTREEITEM hItem = HitTest(point, &unFlags) ;
@@ -90,7 +93,7 @@ void CTreeView::OnTvnSelchanged(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
 	
-	NodeIterator *node = this->GetSelectedNode();
+	TreeNode *node = this->GetSelectedNode();
 	if(node && _pCallbackHndlr) _pCallbackHndlr->NodeSelectedEvent(node);
 
 	*pResult = 0;
@@ -104,7 +107,7 @@ void CTreeView::OnNmClick(NMHDR *pNMHDR, LRESULT *pResult){
 	pt2 = pt;
 	ScreenToClient(&pt2);
 
-	NodeIterator *node = this->GetSelectedNode(pt2);
+	TreeNode *node = this->GetSelectedNode(pt2);
 
 	if (_pCallbackHndlr){
 		if(node)
@@ -124,7 +127,7 @@ void CTreeView::OnNmRightClick(NMHDR *pNMHDR, LRESULT *pResult){
 	pt2 = pt;
 	ScreenToClient(&pt2);
 
-	NodeIterator *node = this->GetSelectedNode(pt2);
+	TreeNode *node = this->GetSelectedNode(pt2);
 
 	if (_pCallbackHndlr){
 		if(node)
@@ -144,7 +147,7 @@ void CTreeView::OnNmDoubleClick(NMHDR *pNMHDR, LRESULT *pResult){
 	pt2 = pt;
 	ScreenToClient(&pt2);
 
-	NodeIterator *node = this->GetSelectedNode(pt2);
+	TreeNode *node = this->GetSelectedNode(pt2);
 
 	if (_pCallbackHndlr){
 		if(node)
@@ -164,8 +167,8 @@ void CTreeView::FillTreeView(TreeBuilder &builder){
 	builder.parse(this);
 }
 
-void CTreeView::InsertItem(TreeItemRef item){
-	if (item.Invalid())
+void CTreeView::InsertItem(TreeItem* item){
+	if (item== nullptr)
 		throw EX(NullPointerException);
 
 	if (item->m_parent)
@@ -184,7 +187,7 @@ void CTreeView::InsertItem(TreeItemRef item){
 /********************************************************************************/
 // TreeItem
 
-TreeItem::TreeItem(NodeIterator* node, TreeItemRef parent) :
+TreeItem::TreeItem(TreeNode* node, TreeItem* parent) :
 	//m_rBuilder(treeBuilder),
 	m_pNode(node),
 	m_idIcon(0),
@@ -200,7 +203,7 @@ TreeItem::TreeItem(NodeIterator* node, TreeItemRef parent) :
 /********************************************************************************/
 // TreeBuilder
 
-TreeBuilder::TreeBuilder(TreeItemBuilder &itemBuilder, NodeIterator* root) :
+TreeBuilder::TreeBuilder(TreeItemBuilder &itemBuilder, TreeNode* root) :
 	m_pwndClassView(NULL),
 	m_rItemBuilder(itemBuilder),
 	m_pRoot(root), m_isSkipRoot(0)
@@ -211,21 +214,21 @@ TreeBuilder::~TreeBuilder(){
 }
 
 
-TreeItemRef TreeBuilder::InsertItem(NodeIterator* node, TreeItemRef &parent){
+TreeItem* TreeBuilder::InsertItem(TreeNode* node, TreeItem* &parent){
 	if (!this->m_pwndClassView)
 		throw EX(NullPointerException);
 
-	TreeItemRef item = m_rItemBuilder.newTreeItem(node, parent);
+	TreeItem* item = m_rItemBuilder.newTreeItem(node, parent);
 	this->m_pwndClassView->InsertItem(item);
 	return item;
 }
 
-void TreeBuilder::parseNode(NodeIterator* node, TreeItemRef parent, int _maxdepth){
+void TreeBuilder::parseNode(TreeNode* node, TreeItem* parent, int _maxdepth){
 //----- <common part>
 	if (_maxdepth <= 0) return; // overload
 	if (!node) return;	//kaphat nullptr-t
 
-	TreeItemRef treenode;
+	TreeItem* treenode;
 
 	if (m_isSkipRoot && node == m_pRoot){
 		
@@ -251,7 +254,7 @@ void TreeBuilder::parse(CTreeView *container)
 }
 
 
-void TreeBuilder::parse(CTreeView *container, TreeItemRef &parent)
+void TreeBuilder::parse(CTreeView *container, TreeItem* &parent)
 {
 	this->m_pwndClassView = container;
 	parseNode(m_pRoot, parent);
@@ -265,7 +268,7 @@ TreeBuilderBinary::TreeBuilderBinary(TreeItemBuilder &itemBuilder, BinaryTree* r
 {
 }
 
-void TreeBuilderBinary::parseChildren(NodeIterator* _node, TreeItemRef &parent, int _maxdepth){
+void TreeBuilderBinary::parseChildren(TreeNode* _node, TreeItem* &parent, int _maxdepth){
 	if (_maxdepth <= 0) return; // overload
 	BinaryTree *node = dynamic_cast<BinaryTree*>(_node);
 
@@ -282,7 +285,7 @@ TreeBuilderChain::TreeBuilderChain(TreeItemBuilder &itemBuilder, ChainTree *root
 {
 }
 
-void TreeBuilderChain::parseChildren(NodeIterator* _node, TreeItemRef &parent, int _maxdepth){
+void TreeBuilderChain::parseChildren(TreeNode* _node, TreeItem* &parent, int _maxdepth){
 	if (_maxdepth <= 0) return; // overload
 	ChainTree *node = dynamic_cast<ChainTree*>(_node);
 
@@ -302,7 +305,7 @@ TreeBuilderList::TreeBuilderList(TreeItemBuilder &itemBuilder, ListTree *root) :
 {
 }
 
-void TreeBuilderList::parseChildren(NodeIterator* _node, TreeItemRef &parent, int _maxdepth){
+void TreeBuilderList::parseChildren(TreeNode* _node, TreeItem* &parent, int _maxdepth){
 	ListTree *node = dynamic_cast<ListTree*>(_node);
 
 	if(node->hasChild()){

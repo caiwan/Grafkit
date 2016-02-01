@@ -13,23 +13,22 @@ class TreeItemBuilder;
 
 class TreeItem;
 
-typedef Ref<TreeItem> TreeItemRef;
 
 /********************************************************************************/
 // CTreeView window
 
 class ITreeItemHandler{
 public:
-	virtual void NodeSelectedEvent(NodeIterator* node) = 0;	///< akkor hivodik meg, ha a treeben megvaltozott a kijelolt elem
+	virtual void NodeSelectedEvent(TreeNode* node) = 0;	///< akkor hivodik meg, ha a treeben megvaltozott a kijelolt elem
 	
 	virtual void NodeClickEvent(CPoint &point){}
-	virtual void NodeClickOnItemEvent(CPoint &point, NodeIterator* node){}
+	virtual void NodeClickOnItemEvent(CPoint &point, TreeNode* node){}
 		
 	virtual void NodeDoubleClickEvent(CPoint &point){}		///< akkor hivodik meg, amikor duplakattintas tortent, de a kattintas helye nem egy elemre esik
-	virtual void NodeDoubleClickOnItemEvent(CPoint &point, NodeIterator* node){}	///< akkor hivodik meg, amikor egy duplakattintas egy elemre esett
+	virtual void NodeDoubleClickOnItemEvent(CPoint &point, TreeNode* node){}	///< akkor hivodik meg, amikor egy duplakattintas egy elemre esett
 
 	virtual void NodeRightClickEvent(CPoint &point){}
-	virtual void NodeRightClickOnItemEvent(CPoint &point, NodeIterator* node){}
+	virtual void NodeRightClickOnItemEvent(CPoint &point, TreeNode* node){}
 
 	///@todo ide jonnek a tovabbi Evt. handler fuggvenyek
 };
@@ -46,10 +45,10 @@ class CTreeView : public CTreeCtrl
 		inline void SetEventHandler(ITreeItemHandler* hndlr){this->_pCallbackHndlr = hndlr;}
 
 		void FillTreeView(TreeBuilder &builder);
-		void InsertItem(TreeItemRef m_parent);
+		void InsertItem(TreeItem* m_parent);
 
-		NodeIterator* GetSelectedNode();
-		NodeIterator* GetSelectedNode(CPoint &point);
+		TreeNode* GetSelectedNode();
+		TreeNode* GetSelectedNode(CPoint &point);
 
 	// Overrides
 	protected:
@@ -64,11 +63,13 @@ class CTreeView : public CTreeCtrl
 		DECLARE_MESSAGE_MAP()
 
 	private:
-		std::vector<TreeItemRef> m_Items;
+		std::vector<TreeItem*> m_Items;
 		ITreeItemHandler *_pCallbackHndlr;
 
 };
 
+
+///@todo inteherit these classes 
 
 /********************************************************************************/
 // TreeItem object
@@ -81,11 +82,11 @@ class TreeItem : virtual public Referencable{
 	friend class CTreeView;
 
 	public:
-		TreeItem(NodeIterator* node, TreeItemRef parent);
+		TreeItem(TreeNode* node, TreeItem* parent);
 		virtual ~TreeItem(){}
 
-		inline void setNode(NodeIterator* node){m_pNode = node;}
-		inline NodeIterator* getNode(void){return m_pNode;}
+		inline void setNode(TreeNode* node){m_pNode = node;}
+		inline TreeNode* getNode(void){return m_pNode;}
 
 	public:
 		int m_idIcon;
@@ -93,9 +94,9 @@ class TreeItem : virtual public Referencable{
 		CString m_name;
 
 	protected:
-		NodeIterator* m_pNode;
+		TreeNode* m_pNode;
 
-		TreeItemRef m_parent;
+		TreeItem* m_parent;
 		HTREEITEM m_hItem;
 
 };
@@ -108,32 +109,32 @@ class TreeItem : virtual public Referencable{
 class TreeItemBuilder{
 	friend class TreeBuilder;
 	protected:
-		virtual TreeItemRef newTreeItem(NodeIterator* node, TreeItemRef &parent) = 0;
+		virtual TreeItem* newTreeItem(TreeNode* node, TreeItem* &parent) = 0;
 };
 
 class TreeBuilder{
 	public:
-		TreeBuilder(TreeItemBuilder &itemBuilder, NodeIterator* root);
+		TreeBuilder(TreeItemBuilder &itemBuilder, TreeNode* root);
 		virtual ~TreeBuilder();
 
 		void parse(CTreeView *container);
-		void parse(CTreeView *container ,TreeItemRef &parent);
+		void parse(CTreeView *container ,TreeItem* &parent);
 
 		inline void switchForceSkipRoot(int isForce=1){m_isSkipRoot = isForce;}
 		// +++ images 
 		// +++ things 
 
 	protected:
-		virtual void parseNode(NodeIterator* node, TreeItemRef parent = TreeItemRef(), int _maxdepth = TREE_MAXDEPTH);
-		virtual void parseChildren(NodeIterator* node, TreeItemRef &parent, int _maxdepth = TREE_MAXDEPTH) = 0;
+		virtual void parseNode(TreeNode* node, TreeItem* parent = nullptr, int _maxdepth = TREE_MAXDEPTH);
+		virtual void parseChildren(TreeNode* node, TreeItem* &parent, int _maxdepth = TREE_MAXDEPTH) = 0;
 
-		TreeItemRef InsertItem(NodeIterator* node, TreeItemRef &m_parent);
+		TreeItem* InsertItem(TreeNode* node, TreeItem* &m_parent);
 
-		std::vector<TreeItemRef> m_Items;
+		std::vector<TreeItem*> m_Items;
 
 		// --- 
 		TreeItemBuilder &m_rItemBuilder;
-		NodeIterator *m_pRoot;
+		TreeNode *m_pRoot;
 	
 		CTreeView *m_pwndClassView;
 		//CImageList m_ClassViewImages;
@@ -156,7 +157,7 @@ class TreeBuilderBinary : public TreeBuilder{
 		TreeBuilderBinary(TreeItemBuilder &itemBuilder, BinaryTree* root);
 
 	protected:
-		virtual void parseChildren(NodeIterator* node, TreeItemRef &parent, int _maxdepth = TREE_MAXDEPTH);
+		virtual void parseChildren(TreeNode* node, TreeItem* &parent, int _maxdepth = TREE_MAXDEPTH);
 };
 
 // TreeBuilderChain
@@ -165,7 +166,7 @@ class TreeBuilderChain : public TreeBuilder{
 		TreeBuilderChain(TreeItemBuilder &itemBuilder, ChainTree *root);
 
 	protected:
-		virtual void parseChildren(NodeIterator* node, TreeItemRef &parent, int _maxdepth = TREE_MAXDEPTH);
+		virtual void parseChildren(TreeNode* node, TreeItem* &parent, int _maxdepth = TREE_MAXDEPTH);
 };
 
 // TreeBuilderList
@@ -174,7 +175,7 @@ class TreeBuilderList : public TreeBuilder{
 		TreeBuilderList(TreeItemBuilder &itemBuilder, ListTree *root);
 
 	protected:
-		virtual void parseChildren(NodeIterator* node, TreeItemRef &parent, int _maxdepth = TREE_MAXDEPTH);
+		virtual void parseChildren(TreeNode* node, TreeItem* &parent, int _maxdepth = TREE_MAXDEPTH);
 };
 
 
