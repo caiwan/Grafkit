@@ -76,7 +76,7 @@ int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
 				variable->m_varDesc = m_shader[i][j].GetVarDesc();
 				variable->m_typeDesc = m_shader[i][j].GetTypeDesc();
 				variable->m_name = variable->m_varDesc.Name;
-				variable->parent = record;
+				//variable->parent = record;
 				variable->m_is_valid = 1;
 
 				record->m_lVariables[variable->m_name] = (variable);
@@ -130,7 +130,7 @@ void CShaderSrcDoc::operator() (CPropertyView & wndPropList)
 		}
 
 		// ...
-		// ha egy adott elem epen nem erheto el, akkor (...) 
+		// ha egy adott elem eppen nem erheto el, akkor (...) 
 
 		wndPropList.AddProperty(recPropGrp);
 	}
@@ -201,7 +201,7 @@ void CShaderSrcDoc::ParseVars(VariableElementRef & variable, CMFCPropertyGridPro
 	parentProperty->AddSubItem(variable->m_propSource);
 }
 
-void CShaderSrcDoc::PropertyChangedEvent(NodeIterator * item)
+void CShaderSrcDoc::PropertyChangedEvent(TreeNode * item)
 {
 	// hello
 	throw EX(NotImplementedMethodException);

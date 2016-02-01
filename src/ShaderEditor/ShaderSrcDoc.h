@@ -55,7 +55,7 @@ public:
 
 protected:
 	void ParseVars(VariableElementRef& variable, CMFCPropertyGridProperty *parentProperty);
-	virtual void PropertyChangedEvent(NodeIterator* item);
+	virtual void PropertyChangedEvent(TreeNode* item);
 
 protected:
 	CString m_shader_source;
@@ -69,9 +69,9 @@ private:
 	void FillErrors(FWdebugExceptions::ShaderException& ex);	///< exception szovegebol feltolti a hibalistat
 
 
-	// ---- 
+	// ================================================================================================================
 public:
-	class BufferRecord : virtual public Referencable, virtual public NodeIterator 
+	class BufferRecord : virtual public Referencable //, virtual public NodeIterator 
 	{
 		/**
 		A constant/texture buffereket reflektalja at a shaderbol a szerkeszto oldalra
@@ -100,7 +100,8 @@ public:
 
 	};
 
-	class VariableElement : virtual public Referencable, virtual public NodeIterator {
+	class VariableElement : virtual public Referencable //, virtual public TreeNode
+	{
 		/**
 		A constant/texture buffer mezoit reflektalja at a shaderbol a szerkeszto oldalra
 		illetve kezeli az MFC elemeket, amiket a szerkeszto fog rajzolgani kifele a property viewban
