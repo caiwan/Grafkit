@@ -12,15 +12,14 @@ class CPropertyView : public CMFCPropertyGridCtrl
 
 public:
 	class IProperyItemHandler;
-	class IPropertyNode;
-	typedef Ref<IPropertyNode> IPropertyNodeRef;
+	class PropertyNode;
 
 public:
 	CPropertyView();
 	virtual ~CPropertyView();
 
 	void SetHandler(IProperyItemHandler * pHandler) { m_pHandler = pHandler; }
-	void AddItem(IPropertyNode* pNode);
+	void AddItem(PropertyNode* pNode);
 
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -28,7 +27,7 @@ public:
 	virtual void OnPropertyChanged(CMFCPropertyGridProperty* pProp) const;
 
 private:
-	std::vector<IPropertyNodeRef> m_vNodes;
+	std::vector<PropertyNode*> m_vNodes;
 	IProperyItemHandler* m_pHandler;
 
 
@@ -38,28 +37,34 @@ private:
 
 public:
 	// ================================================================
-	class IProperyItemHandler {
+	class IProperyItemHandler 
+	{
 		/**Property event handler interface*/
-	public:
-		virtual void PropertyChangedEvent(NodeIterator* item) = 0;
+		public:
+			virtual void PropertyChangedEvent(TreeNode* item) = 0;
 	};
 
 	// ================================================================ 
-	class IPropertyNode : public Referencable{
+	class PropertyNode
+	{
 		friend class CPropertyView;
-	public:
-		// ... 
+		public:
+			PropertyNode() {}
+			virtual ~PropertyNode() {}
 
-	private:
-		IPropertyNode *m_pParent;
-		NodeIterator* m_pNode;
-		CMFCPropertyGridProperty* m_pProperty;
-		IProperyItemHandler *m_pHandler;
+		protected:
+			CString m_name;
+
+			PropertyNode *m_pParent;
+			CMFCPropertyGridProperty* m_pProperty;
+			IProperyItemHandler *m_pHandler;
+
+			TreeNode* m_pNode;
 	};
 
 	class IBuilder {
-	public:
-		IBuilder() {}
-		virtual void operator() (CPropertyView &props) = 0;
+		public:
+			IBuilder() {}
+			virtual void operator() (CPropertyView &props) = 0;
 	};
 };

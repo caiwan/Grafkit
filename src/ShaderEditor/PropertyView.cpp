@@ -18,13 +18,15 @@ CPropertyView::CPropertyView()
 
 CPropertyView::~CPropertyView()
 {
+	/// @todo kell-e torolni a nodeokat
+}
+
+void CPropertyView::AddItem(PropertyNode * pNode)
+{
+	this->m_vNodes.push_back(pNode);
 }
 
 // ---------------
-
-void CPropertyView::AddItem(IPropertyNode * pNode)
-{
-}
 
 
 // ---------------
