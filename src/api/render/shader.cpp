@@ -478,10 +478,16 @@ void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 			throw EX(BoundResourceLocateException);
 		}
 
-		size_t id = m_vBResources.size();
-		m_vBResources.push_back(BoundResourceRecord(brDesc));
-		m_mapBResources[brDesc.Name] = id;
-
+		switch (brDesc.Type) {
+			case D3D_SIT_TEXTURE: {
+				size_t id = m_vBResources.size();
+				m_vBResources.push_back(BoundResourceRecord(brDesc));
+				m_mapBResources[brDesc.Name] = id;
+			} break;
+			case D3D_SIT_SAMPLER: {
+				///@ todo something 
+			} break;
+		}
 		// sampler state ??? 
 	}
 }
@@ -683,4 +689,6 @@ FWrender::Shader::BoundResourceRecord::BoundResourceRecord()
 FWrender::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc)
 	: m_desc(desc)
 {
+	LOG(TRACE) << "BoundResource:" << desc.Name << "type: " << desc.Type << desc.BindPoint 
+		<< desc.BindCount << desc.Dimension << desc.NumSamples << desc.ReturnType << desc.uFlags;
 }
