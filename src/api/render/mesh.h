@@ -70,7 +70,7 @@ namespace FWrender
 		public:
 			SimpleMeshGenerator(ID3D11Device* device, ShaderRef shader);
 
-			void setPtr(std::string name, const void* const ptr) { this->m_mapPtr[name] = ptr; }
+			void SetPtr(std::string name, const void* const ptr) { this->m_mapPtr[name] = ptr; }
 
 		
 		// --- 
@@ -83,7 +83,7 @@ namespace FWrender
 				protected:
 					MeshAttribSetter(const char*& name, SimpleMeshGenerator& parent) : m_parent(parent), m_name(name) {}
 				public:
-					void operator =(const void* const ptr) { this->m_parent.setPtr(m_name, ptr); }
+					void operator =(const void* const ptr) { this->m_parent.SetPtr(m_name, ptr); }
 
 				private:
 					SimpleMeshGenerator& m_parent;
