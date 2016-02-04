@@ -3,12 +3,11 @@
 FWrender::Scenegraph::Scenegraph():
 	m_pRoot(nullptr)
 {
-	// folytkov .
-
-	//m_pRoot = new ListTree();
-	//m_pRoot->
+	m_pRoot = new ListTree();
+	m_pRoot->setObject(this);
 }
 
 FWrender::Scenegraph::~Scenegraph()
 {
+	delete m_pRoot;
 }
