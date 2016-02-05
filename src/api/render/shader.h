@@ -9,6 +9,8 @@
 #include "dxtypes.h"
 #include "renderer.h"
 
+#include "renderassets.h"
+
 #include "reference.h"
 #include "exceptions.h"
 
@@ -27,7 +29,15 @@ namespace FWrender {
 		ST_COUNT
 	};
 
-	class Shader : virtual public Referencable {
+	class Shader;
+
+	class ShaderLoader : public FWrender::IRenderAssetGenerator
+	{
+		// implement tis 'ting
+	};
+
+	class Shader : virtual public Referencable, virtual public FWrender::IRenderAsset
+	{
 		friend class ShaderRef;
 
 		public:

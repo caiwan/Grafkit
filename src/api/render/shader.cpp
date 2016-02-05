@@ -20,7 +20,7 @@ using FWmath::Matrix;
 
 // =============================================================================================================================
 
-Shader::Shader() : 
+Shader::Shader() : IRenderAsset(nullptr),
 	m_pxShader(NULL),
 	m_vxShader(NULL),
 	m_pReflector(NULL),
