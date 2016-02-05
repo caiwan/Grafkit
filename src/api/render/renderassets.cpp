@@ -52,7 +52,7 @@ Guid FWrender::IRenderAsset::GenerateGUID()
 	return this->m_guid;
 }
 
-// ================================================================== 
+// ==================================================================================================================================== 
 FWrender::IRenderAssetManager::IRenderAssetManager()
 {
 	// ...
@@ -90,11 +90,13 @@ void FWrender::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
 void FWrender::IRenderAssetManager::ChangeName(IRenderAsset * obj, std::string oldname)
 {
 	// foyltkov
+	throw EX(NotImplementedMethodException);
 }
 
 void FWrender::IRenderAssetManager::ChangeUUID(IRenderAsset * obj, Guid olduuid)
 {
 	// foyltkov
+	throw EX(NotImplementedMethodException);
 }
 
 IRenderAsset * FWrender::IRenderAssetManager::GetObjectByUUID(Guid uuid)
@@ -118,3 +120,7 @@ inline FWrender::IRenderAssetManager::id_map_t::iterator FWrender::IRenderAssetM
 {
 	return this->m_mapID.find(uuid);
 }
+
+// ==================================================================================================================================== 
+
+// bazd az anyad tetejebe 

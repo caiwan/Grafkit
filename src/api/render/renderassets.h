@@ -55,7 +55,7 @@ namespace FWrender {
 		IRenderAssetManager();
 		virtual ~IRenderAssetManager();
 
-		// ... file access goez here 
+		// ... file access bullshit goez here 
 
 	protected:
 		void AddObject(IRenderAsset* obj);
