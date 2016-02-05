@@ -68,7 +68,7 @@ void FWrender::IRenderAssetManager::AddObject(IRenderAsset * obj)
 	this->m_mapID[obj->GetUUID()] = obj;
 	this->m_mapNames[obj->GetName()] = obj;
 
-	LOG(TRACE) << "Object added to assman" << obj->GetName << obj->GetUUID().toString_c_str();
+	LOG(TRACE) << "Object added to assman" << obj->GetName() << obj->GetUUID().toString_c_str();
 }
 
 void FWrender::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
@@ -80,10 +80,10 @@ void FWrender::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
 	{
 		m_mapID.erase(it_id);
 		m_mapNames.erase(it_name);
-		LOG(TRACE) << "Object removed from assman" << obj->GetName << obj->GetUUID().toString_c_str();
+		LOG(TRACE) << "Object removed from assman" << obj->GetName() << obj->GetUUID().toString_c_str();
 	}
 	else {
-		LOG(WARNING) << "No object to remove from assman" << obj->GetName << obj->GetUUID().toString_c_str();
+		LOG(WARNING) << "No object to remove from assman" << obj->GetName() << obj->GetUUID().toString_c_str();
 	}
 }
 
@@ -102,13 +102,13 @@ void FWrender::IRenderAssetManager::ChangeUUID(IRenderAsset * obj, Guid olduuid)
 IRenderAsset * FWrender::IRenderAssetManager::GetObjectByUUID(Guid uuid)
 {
 	IRenderAssetManager::id_map_t::iterator it = GetIDIterator(uuid);
-	return it == m_mapID.end?nullptr:it->second;
+	return it == m_mapID.end()?nullptr:it->second;
 }
 
 IRenderAsset * FWrender::IRenderAssetManager::GetObjectByName(std::string name)
 {
 	IRenderAssetManager::name_map_t::iterator it = GetNameItertator(name);
-	return it == m_mapID.end ? nullptr : it->second;
+	return it == m_mapNames.end()? nullptr : it->second;
 }
 
 inline FWrender::IRenderAssetManager::name_map_t::iterator FWrender::IRenderAssetManager::GetNameItertator(std::string name)
