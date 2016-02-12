@@ -25,4 +25,4 @@ namespace FWmodel {
 }
 
 // exceptions
-DEFINE_EXCEPTION(AssimpParseException, 4000, "Error while parsing file via ASSIMP")
+DEFINE_EXCEPTION(AssimpParseException, 4000, "Error while parsing file via ASSIMP");
