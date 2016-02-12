@@ -41,8 +41,6 @@ namespace FWassets{
 
 	protected:
 		/// Sets asset manager 
-		void SetAssmanPtr(IRenderAssetManager * assman = nullptr);
-
 		std::string m_name;
 		Guid m_guid;
 
@@ -65,10 +63,10 @@ namespace FWassets{
 
 		virtual FWassets::IResourceFactory* GetResourceFactory() = 0;
 
-	protected:
+	public:
 		void AddObject(IRenderAsset* obj);
 		void RemoveObject(IRenderAsset* obj);
-		void ChangeName(IRenderAsset* obj, std::string oldname);
+		void ChangeName(IRenderAsset* obj, std::string oldname);	///@todo ezt forditva kellene: *obj, amiben a regi uuid6nev van, es az uj nevet adna at.
 		void ChangeUUID(IRenderAsset *obj, Guid olduuid);
 
 		IRenderAsset* GetObjectByUUID(Guid uuid);

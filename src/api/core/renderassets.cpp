@@ -46,21 +46,6 @@ Guid FWassets::IRenderAsset::GenerateGUID()
 	return this->m_guid;
 }
 
-void FWassets::IRenderAsset::SetAssmanPtr(IRenderAssetManager * assman)
-{
-	if (m_assman != nullptr)
-	{
-		m_assman->RemoveObject(this);
-	}
-
-	m_assman = assman;
-	
-	if (m_assman != nullptr)
-	{
-		m_assman->AddObject(this);
-	}
-}
-
 // ==================================================================================================================================== 
 FWassets::IRenderAssetManager::IRenderAssetManager()
 {
@@ -74,6 +59,7 @@ FWassets::IRenderAssetManager::~IRenderAssetManager()
 
 void FWassets::IRenderAssetManager::AddObject(IRenderAsset * obj)
 {
+	if (obj->m_assman == nullptr) obj->m_assman = this;
 	this->m_mapID[obj->GetUUID()] = obj;
 	this->m_mapNames[obj->GetName()] = obj;
 
@@ -94,6 +80,8 @@ void FWassets::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
 	else {
 		LOG(WARNING) << "No object to remove from assman" << obj->GetName() << obj->GetUUID().toString_c_str();
 	}
+
+	if (obj->m_assman == this) obj->m_assman = nullptr;
 }
 
 void FWassets::IRenderAssetManager::ChangeName(IRenderAsset * obj, std::string oldname)
