@@ -66,7 +66,7 @@ namespace FWassets{
 	public:
 		void AddObject(IRenderAsset* obj);
 		void RemoveObject(IRenderAsset* obj);
-		void ChangeName(IRenderAsset* obj, std::string oldname);	///@todo ezt forditva kellene: *obj, amiben a regi uuid6nev van, es az uj nevet adna at.
+		void ChangeName(IRenderAsset* obj, std::string oldname);	///@todo ezt forditva kellene: *obj, amiben a regi uuid/nev van, es az uj nevet adna at.
 		void ChangeUUID(IRenderAsset *obj, Guid olduuid);
 
 		IRenderAsset* GetObjectByUUID(Guid uuid);

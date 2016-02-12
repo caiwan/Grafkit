@@ -21,7 +21,8 @@ namespace FWrender
 	/**
 	Stores basic data for a piece of mesh
 	*/
-	class Mesh : public virtual Referencable{
+	class Mesh : public virtual Referencable
+	{
 		public:
 			Mesh();
 			Mesh(const Mesh& mesh);
@@ -38,8 +39,6 @@ namespace FWrender
 			int GetIndexCount() { return m_indexCount; }
 
 		protected:
-			// void RenderBuffers(ID3D11DeviceContext* deviceContext);
-			// void ShutdownBuffers();
 			void Shutdown();
 
 		protected:
@@ -62,17 +61,18 @@ namespace FWrender
 
 	typedef Ref<Mesh> MeshRef;
 
+
 	/**
 	Simple mesh generator. Automatically creates the vertex buffers from vectors 
 	*/
-	class SimpleMeshGenerator {
+	class SimpleMeshGenerator 
+	{
 		friend class MeshAttribSetter;
 		public:
 			SimpleMeshGenerator(ID3D11Device *const& device, ShaderRef &shader);
 
 			void SetPtr(std::string name, const void* const ptr) { this->m_mapPtr[name] = ptr; }
 
-		
 		// --- 
 		public:
 			// --- 
