@@ -176,9 +176,51 @@ void FWmodel::AssimpLoader::operator()()
 	
 
 	// scene loading
-	// -- meshes
-	// -- faces
-	// -- luukup materials
+	if (scene->HasMeshes()) {
+		for (i = 0; i<scene->mNumMeshes; i++) {
+			// -- meshes
+			
+			Model *model = new Model();
+			aiMesh* curr_mesh = scene->mMeshes[i];
+
+			aiString name;
+			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
+			///@todo model->SetName(mesh_name);
+
+			///@todo 
+			//model->pushVert(reinterpret_cast<vec3float*>(curr_mesh->mVertices), curr_mesh->mNumVertices);
+			//model->pushTextureUV(reinterpret_cast<vec3float*>(curr_mesh->mTextureCoords[0]), curr_mesh->mNumVertices);	///@todo tobbfele texuv is lehet
+			//model->pushNormals(reinterpret_cast<vec3float*>(curr_mesh->mNormals), curr_mesh->mNumVertices);
+			//model->pushTangents(reinterpret_cast<vec3float*>(curr_mesh->mTangents), curr_mesh->mNumVertices);	//ha ilyen is van, akkor eljunk vele
+
+			// -- faces
+			j = curr_mesh->mNumFaces;
+
+			while (j--) {
+				aiFace *curr_face = &curr_mesh->mFaces[j];
+				///*offset = */ model->pushMesh(curr_face->mIndices, curr_face->mNumIndices /*, offset */);
+			}
+
+			// -- luukup materials
+			int mat_index = curr_mesh->mMaterialIndex;
+			if (materials.size()>mat_index)
+			{
+				//Material *mat = materials[mat_index];
+				model->setMaterial(material_table[mat_index].material);
+				if (material_table[mat_index].textures) {
+					k = material_table[mat_index].textures->size();
+					while (k--) {
+						model->SetTexture(k, (*material_table[mat_index].textures)[k]);
+					}
+					delete material_table[mat_index].textures;
+					material_table[mat_index].textures = NULL;
+				}
+			}
+
+			//FWmath::Matrix modelview = model->getModelviewMatrix();
+			//this->models.push(model);
+		}
+	}
 
 	// load cameras
 
