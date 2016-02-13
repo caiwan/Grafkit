@@ -47,11 +47,33 @@ FWmath::Matrix ai4x4MatrixToFWMatrix(void* _m)
 		);
 }
 
-//TextureRef assimpTexture(enum aiTextureType what, aiMaterial* material, int subnode, enum texture_type_e targetType) 
-TextureRef assimpTexture(enum aiTextureType what, aiMaterial* material, int subnode, int targetType)
+namespace {
+	// AI texture -- internal texture type mapping 
+	const struct {
+		enum aiTextureType ai;
+		enum texture_type_e tt;
+	}
+	texture_load_map[] = {
+		aiTextureType_NONE,		TMT_aux0,
+		aiTextureType_DIFFUSE,  TMT_map0,
+		aiTextureType_SPECULAR, TMT_specular,
+		aiTextureType_AMBIENT,  TMT_aux01,
+		aiTextureType_EMISSIVE, TMT_aux02,
+		aiTextureType_HEIGHT,   TMT_aux03,
+		aiTextureType_NORMALS,   TMT_normal,
+		aiTextureType_SHININESS, TMT_shiniess,
+		aiTextureType_OPACITY,   TMT_alpha,
+		aiTextureType_DISPLACEMENT, TMT_bump,
+		aiTextureType_LIGHTMAP,		TMT_aux04,
+		aiTextureType_REFLECTION,	TMT_reflect,
+		aiTextureType_UNKNOWN,		TMT_aux05,
+	};
+}
+
+TextureRef assimpTexture(enum aiTextureType what, aiMaterial* material, int subnode)
 {
 	aiString path;
-	TextureRef texture = NULL;
+	TextureRef texture;
 	aiReturn result = material->GetTexture(what, subnode, &path);
 
 	if (result == AI_SUCCESS && path.data[0]) {
@@ -61,7 +83,6 @@ TextureRef assimpTexture(enum aiTextureType what, aiMaterial* material, int subn
 		// texture lookup
 
 		// ide jon a textura generator, vagy lookup, attol fuggoen, hogy mink van eppen
-		// ++ a textura slotot is erdemes lenne berakni a helyere (targetType)
 
 		/*
 		texture->setMinFilter(FWrender::TF_LINEAR_MIPMAP_LINEAR);
@@ -108,20 +129,15 @@ void FWmodel::AssimpLoader::operator()()
 	int i = 0, j = 0, k = 0, l = 0;
 
 	// build texture -- material LUT
-	struct matrerial_texture_t {
-		MaterialRef material;
-		std::vector<TextureRef> textures;
-	};
-	std::vector< struct matrerial_texture_t> matrerial_texture_table;
+	std::vector<MaterialRef> materials;
 
 	// -- load materials
 	if (scene->HasMaterials()) {
 		for (i = 0; i<scene->mNumMaterials; i++) {
-			matrerial_texture_t mtable_elem;
-
 			aiString path, name;
 
-			MaterialRef material = new MaterialWrapper();
+			/// @todo milyen material kell 
+			MaterialRef material = new MaterialBase();
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
 			this->m_assman->AddObject(material.Get());
@@ -131,36 +147,40 @@ void FWmodel::AssimpLoader::operator()()
 			j = 0;
 			aiReturn texFound = AI_FAILURE;
 
-			mtable_elem.material = material;
-			std::vector<TextureRef> &texture_table = mtable_elem.textures;
-
 			// -- -- load textures
 			// textura-> material 
-			do
+
+			/*do
 			{
 				/// @todo ezt egy for ciklussal is meg lehetne oldani majd, sot. 
-				TextureRef diffuse = assimpTexture(aiTextureType_DIFFUSE, scene->mMaterials[i], j,   0 /*TextureMapType_map0    */);	///@todo ezeket a slotok miatt hagytam meg
-				TextureRef normal = assimpTexture(aiTextureType_NORMALS, scene->mMaterials[i], j,    0 /*TextureMapType_normal  */);
-				TextureRef specular = assimpTexture(aiTextureType_SPECULAR, scene->mMaterials[i], j, 0 /*TextureMapType_specular*/);
+				TextureRef diffuse = assimpTexture(aiTextureType_DIFFUSE, scene->mMaterials[i], j);
+				TextureRef normal = assimpTexture(aiTextureType_NORMALS, scene->mMaterials[i], j);
+				TextureRef specular = assimpTexture(aiTextureType_SPECULAR, scene->mMaterials[i], j);
 
 				texFound = AI_FAILURE;
 
 				if (diffuse) {
-					texture_table.push_back(diffuse);
+					material->SetTexture(diffuse, 0);	///@todo textura slotok
 					texFound = AI_SUCCESS;
 				}
 
 				if (specular) {
-					texture_table.push_back(specular);
+					material->SetTexture(specular, 1);
 					texFound = AI_SUCCESS;
 				}
 
 				if (normal) {
-					texture_table.push_back(normal);
+					material->SetTexture(normal, 2);
 					texFound = AI_SUCCESS;
 				}
 				j++;
-			} while (texFound == AI_SUCCESS);
+			} while (texFound == AI_SUCCESS);*/
+
+			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
+				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
+					/// itt minden map tipushoz N darab textura terozhat. -> ezt a materialban is meg kell szerkeszteni
+				}
+			}
 
 			assimpMaterialKey_2_float4(curr_mat, AI_MATKEY_COLOR_DIFFUSE, material->GetDiffuse());
 			assimpMaterialKey_2_float4(curr_mat, AI_MATKEY_COLOR_AMBIENT, material->GetAmbient());
@@ -169,15 +189,16 @@ void FWmodel::AssimpLoader::operator()()
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS, material->GetShininess());
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
-			matrerial_texture_table.push_back(mtable_elem);
-			
+			materials.push_back(material);
 		}
 	}
 	
 
 	// scene loading
-	if (scene->HasMeshes()) {
-		for (i = 0; i<scene->mNumMeshes; i++) {
+	if (scene->HasMeshes()) 
+	{
+		for (i = 0; i<scene->mNumMeshes; i++) 
+		{
 			// -- meshes
 			
 			Model *model = new Model();
@@ -202,20 +223,20 @@ void FWmodel::AssimpLoader::operator()()
 			}
 
 			// -- luukup materials
-			int mat_index = curr_mesh->mMaterialIndex;
-			if (materials.size()>mat_index)
-			{
-				//Material *mat = materials[mat_index];
-				model->setMaterial(material_table[mat_index].material);
-				if (material_table[mat_index].textures) {
-					k = material_table[mat_index].textures->size();
-					while (k--) {
-						model->SetTexture(k, (*material_table[mat_index].textures)[k]);
-					}
-					delete material_table[mat_index].textures;
-					material_table[mat_index].textures = NULL;
-				}
-			}
+			//int mat_index = curr_mesh->mMaterialIndex;
+			//if (materials.size()>mat_index)
+			//{
+			//	//Material *mat = materials[mat_index];
+			//	model->setMaterial(material_table[mat_index].material);
+			//	if (material_table[mat_index].textures) {
+			//		k = material_table[mat_index].textures->size();
+			//		while (k--) {
+			//			model->SetTexture(k, (*material_table[mat_index].textures)[k]);
+			//		}
+			//		delete material_table[mat_index].textures;
+			//		material_table[mat_index].textures = NULL;
+			//	}
+			//}
 
 			//FWmath::Matrix modelview = model->getModelviewMatrix();
 			//this->models.push(model);
