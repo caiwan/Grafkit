@@ -680,14 +680,15 @@ D3D11_SHADER_TYPE_DESC & const FWrender::Shader::ConstantBufferElement::GetTypeD
 // ============================================================================================================
 // Bindable/Bindig Resource record
 
-FWrender::Shader::BoundResourceRecord::BoundResourceRecord()
+FWrender::Shader::BoundResourceRecord::BoundResourceRecord() : 
+	m_is_valid(0)
 {
 	ZeroMemory(&m_desc, sizeof(m_desc));
 }
 
 
 FWrender::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc)
-	: m_desc(desc)
+	: m_desc(desc), m_is_valid(1)
 {
 	LOG(TRACE) << "BoundResource:" << desc.Name << "type: " << desc.Type << desc.BindPoint 
 		<< desc.BindCount << desc.Dimension << desc.NumSamples << desc.ReturnType << desc.uFlags;

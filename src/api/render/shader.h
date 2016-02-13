@@ -61,7 +61,7 @@ namespace FWrender {
 			void Shutdown();
 			void Render(ID3D11DeviceContext* deviceContext);
 
-			enum ShaderType_e getShaderType() { return this->m_type; }
+			enum ShaderType_e GetShaderType() { return this->m_type; }
 
 		private:
 			void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
@@ -223,10 +223,13 @@ namespace FWrender {
 					D3D11_SHADER_INPUT_BIND_DESC & GetDesc() { return m_desc; }
 					void SetTexture(TextureRef texture = nullptr) { m_rBoundTexture = texture; }
 
+					int IsValid() { return m_is_valid; }
+
 				protected:
 					TextureRef m_rBoundTexture;
-
 					D3D11_SHADER_INPUT_BIND_DESC m_desc;
+
+					int m_is_valid;
 			};
 
 		};
