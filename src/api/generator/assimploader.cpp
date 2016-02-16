@@ -106,7 +106,10 @@ FWmodel::AssimpLoader::~AssimpLoader()
 void FWmodel::AssimpLoader::operator()()
 {
 	Assimp::Importer importer;
-	const aiScene *scene = (importer.ReadFileFromMemory(this->m_resource->GetData(), this->m_resource->GetSize(), aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_GenNormals));
+	/// @todo genNormals szar. Miert?
+	const aiScene *scene = importer.ReadFileFromMemory(this->m_resource->GetData(), this->m_resource->GetSize(), 
+		aiProcessPreset_TargetRealtime_Quality | /*aiProcess_GenNormals |*/ 0
+	);
 
 	if (!scene) {
 		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
