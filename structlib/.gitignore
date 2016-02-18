@@ -1,0 +1,15 @@
+Debug/
+Release/
+build/
+*.sdf
+*.opensdf
+*.opendb
+*.lib
+*.obj
+*.exe
+*.log
+output*
+result*
+.vs/
+*.bin
+*.bin_
