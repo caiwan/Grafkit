@@ -70,7 +70,7 @@ void Shader::LoadFromFile(ID3D11Device * const & device, LPCSTR entry, LPCWCHAR 
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			throw new EX(MissingShaderExcepotion);
+			throw new EX(MissingShaderException);
 		}
 	}
 
@@ -93,8 +93,8 @@ void Shader::LoadFromMemory(ID3D11Device * const & device, LPCSTR entry, LPCSTR 
 	// D3D11_BUFFER_DESC matrixBufferDesc;
 
 	// input checking
-	if (!entry) throw new EX(NullPointerException);
-	if (!source) throw new EX(NullPointerException);
+	if (!entry) throw EX(NullPointerException);
+	if (!source) throw EX(NullPointerException);
 
 	this->m_type = type;
 
@@ -116,7 +116,7 @@ void Shader::LoadFromMemory(ID3D11Device * const & device, LPCSTR entry, LPCSTR 
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			throw new EX(MissingShaderExcepotion);
+			throw EX(MissingShaderException);
 		}
 	}
 
@@ -200,7 +200,7 @@ void Shader::CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuff
 		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_vxShader);
 		if (FAILED(result))
 		{
-			throw new EX(VSCrerateException);
+			throw EX(VSCrerateException);
 		}
 	}
 	else if (this->m_type == ST_Pixel) {
@@ -208,7 +208,7 @@ void Shader::CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuff
 		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_pxShader);
 		if (FAILED(result))
 		{
-			throw new EX(FSCrerateException);
+			throw EX(FSCrerateException);
 		}
 	}
 

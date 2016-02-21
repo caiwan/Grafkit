@@ -303,7 +303,7 @@ namespace FWrender {
 
 // Definition of exceptions
 
-DEFINE_EXCEPTION(MissingShaderExcepotion, 1100, "Missing shader file")
+DEFINE_EXCEPTION(MissingShaderException, 1100, "Missing shader file")
 
 ///@todo ezeket at kell pakolni a shader exceptionbe majd
 DEFINE_EXCEPTION(VSCrerateException, 1101, "Could not create vertex shader")
