@@ -10,15 +10,16 @@ using namespace FWdebugExceptions;
 
 // ====================================================================================
 
-FWassets::ResourceFilterExtension::ResourceFilterExtension(const char ** const & extensions, size_t count)
-	: IResourceFilter()
+FWassets::ResourceFilter::ResourceFilter(const char ** const & extensions, size_t count)
 {
 	for (size_t i = 0; i < count; i++) {
-		this->m_filterExtensions.insert(extensions[i]);
+		if(extensions[i] || extensions[i][0]) 
+			this->m_filterExtensions.insert(extensions[i]);
 	}
 }
 
-int FWassets::ResourceFilterExtension::isFileInfilter(std::string path)
+
+int FWassets::ResourceFilter::isFileInfilter(std::string path)
 {	
 	// miezittkerem
 	char * in_str = new char[path.length()+1];
@@ -53,13 +54,14 @@ int FWassets::ResourceFilterExtension::isFileInfilter(std::string path)
 	return found;
 }
 
+
 // implementation of file managers
 
 #include "dirent.h"
 
-typedef FWassets::FileResourceManager::fileleist_t _filelist_t;
+//typedef FWassets::FileResourceManager::fileleist_t _filelist_t;
 
-_filelist_t listdir(std::string root, _filelist_t &dirlist) {
+filelist_t listdir(std::string root, filelist_t &dirlist) {
 	DIR *dir;
 	struct dirent *ent;
 	if ((dir = opendir(root.c_str())) != NULL) {
@@ -93,9 +95,11 @@ FWassets::FileResourceManager::FileResourceManager(std::string root) :
 	listdir(root, m_dirlist);
 }
 
+
 FWassets::FileResourceManager::~FileResourceManager()
 {
 }
+
 
 // ====================================================================================
 
@@ -122,20 +126,23 @@ IResourceRef FWassets::FileResourceManager::GetResourceByName(std::string name)
 	return new FileResource(data, size);
 }
 
+
 IResourceRef FWassets::FileResourceManager::GetResourceByUUID(Guid uuid)
 {
 	// throw EX_DETAILS(NotImplementedMethodException, "Loading file from uuid is not implemented. Not even close.");
 	return IResourceRef();
 }
 
+
 std::list<std::string> FWassets::FileResourceManager::GetResourceList()
 {
 	return this->m_dirlist;
 }
 
-std::list<std::string> FWassets::FileResourceManager::GetResourceList(IResourceFilter * filter)
+
+std::list<std::string> FWassets::FileResourceManager::GetResourceList(ResourceFilter * filter)
 {
-	_filelist_t filelist;
+	filelist_t filelist;
 	for (fileleist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); it++)
 	{
 		if (filter->isFileInfilter(*it)) filelist.push_back(*it);
@@ -143,6 +150,7 @@ std::list<std::string> FWassets::FileResourceManager::GetResourceList(IResourceF
 
 	return filelist;
 }
+
 
 // ==================================================================================== 
 

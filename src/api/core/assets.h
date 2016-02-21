@@ -27,23 +27,12 @@ namespace FWassets {
 	};
 
 	// ----------
-	/// @todo ezt kulon fileba majd, ha lehet, vagy nem 
 	/// An interface to create filters over resources
-	class IResourceFilter
+	class ResourceFilter : ResourceFilter
 	{
 	public:
-		IResourceFilter() {}
-		virtual ~IResourceFilter() {}
-
-		virtual int isFileInfilter(std::string path) = 0;
-
-	};
-
-	class ResourceFilterExtension : IResourceFilter
-	{
-	public:
-		ResourceFilterExtension(const char ** const & extensions, size_t count);
-		virtual ~ResourceFilterExtension() {}
+		ResourceFilter(const char ** const & extensions, size_t count);
+		virtual ~ResourceFilter() {}
 
 		int isFileInfilter(std::string path);
 
@@ -54,6 +43,8 @@ namespace FWassets {
 	};
 
 	// ----------
+	
+	typedef std::list<std::string> fileleist_t;
 
 	/// An interface for resource obtaining mechnaism
 	class IResourceFactory 
@@ -68,8 +59,8 @@ namespace FWassets {
 		virtual IResourceRef GetResourceByName(std::string name) = 0;
 		virtual IResourceRef GetResourceByUUID(Guid uuid) = 0;
 
-		typedef std::list<std::string> fileleist_t;
 		virtual fileleist_t GetResourceList() { return std::list<std::string>(); };
+		virtual fileleist_t GetResourceList(ResourceFilter * filter) {}
 
 
 	};
@@ -90,8 +81,8 @@ namespace FWassets {
 		virtual IResourceRef GetResourceByName(std::string name);
 		virtual IResourceRef GetResourceByUUID(Guid uuid);
 
-		virtual std::list<std::string> GetResourceList();
-		virtual std::list<std::string> GetResourceList(IResourceFilter * filter);
+		virtual fileleist_t GetResourceList();
+		virtual fileleist_t GetResourceList(ResourceFilter * filter);
 
 	private:
 		std::string m_root;
