@@ -25,6 +25,7 @@ namespace FWassets{
 	/**
 	A base class for collectable render assets for bulk loading
 	*/
+
 	class IRenderAsset : virtual public Referencable
 	{
 		friend class IRenderAssetManager;
@@ -87,7 +88,7 @@ namespace FWassets{
 		///@{
 		/**
 		Ha van asset manager beallitva a render assetek fele, azok minden set name es guid hivaskor meghivjak ezeket.
-		Ha lehet, erdmes elobb beallítani az nevet es az uuid-t, majd aztan beallitani az asset managert, es hozza adni az asset repokohz a dolgokat.
+		Ha lehet, erdmes elobb beallitani az nevet es az uuid-t, majd aztan beallitani az asset managert, es hozza adni az asset repokohz a dolgokat.
 		*/
 		void ChangeName(IRenderAsset* obj, std::string newname);
 		void ChangeUUID(IRenderAsset *obj, Guid newuuid);
