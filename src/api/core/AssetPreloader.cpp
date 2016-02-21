@@ -33,9 +33,8 @@ AssetPreloader::~AssetPreloader()
 #include "../render/texture.h"
 #include "../render/text.h"
 
-using FWrender::Texture;
 using FWrender::TextureFromBitmap;
-using FWrender::TextureRef;
+using FWrender::TextureAsset;
 
 void FWassets::AssetPreloader::LoadCache()
 {
@@ -45,44 +44,43 @@ void FWassets::AssetPreloader::LoadCache()
 		if (m_filters[i] == nullptr)
 			continue;
 
-		filelist_t filelist;
 		for (size_t j = 0; j < this->m_factories.size(); j++) {
-			filelist_t ret_filelist = this->m_factories[j]->GetResourceList(m_filters[i]);
-			filelist.insert(filelist.end(), ret_filelist.begin(), ret_filelist.end());
-		}
+			IResourceFactory *loader = this->m_factories[j];
+			filelist_t filelist = loader->GetResourceList(m_filters[i]);
 
-		if (!filelist.empty()) for (filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++) 
-		{
-
-			// + trim path goez here 
-			std::string filename = *it;
-
-			switch (i) {
-			case FWassets::IRenderAsset::RA_TYPE_Texture :
+			if (!filelist.empty()) for (filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++)
 			{
-				TextureRef texture = new Texture;
-				texture->SetName(filename);
 
-				/// ennek itten szamtalan hibaja van kerem
-				// TextureFromBitmap* generator = new TextureFromBitmap(FWassets::IResourceRef(), texture);
+				std::string filename = *it, name, path, ext;
+				ResourceFilter::trimpath(filename, path, name, ext);
 
-			}
-			break;
+				IRenderAsset::RA_type_e type = (IRenderAsset::RA_type_e) i;
 
-			case FWassets::IRenderAsset::RA_TYPE_Font:
-			{}
-			break;
+				switch (type) 
+				{
+				case FWassets::IRenderAsset::RA_TYPE_Texture:
+				{
+					TextureAsset* texture = new TextureAsset;
+					texture->SetName(name);
 
-			// a tobbiekkel egyelore nem foglalkozunk; ide jonnek majd azok is
-			//case FWassets::IRenderAsset::RA_TYPE_Material:
-			//{}
-			//break;
+					m_generated_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), texture));
+					AddObject(texture);
+				}
+				break;
 
-			//case FWassets::IRenderAsset::RA_TYPE_Shader:
-			//{}
-			//break;
+				case FWassets::IRenderAsset::RA_TYPE_Font:
+				{}
+				break;
 
+				// a tobbiekkel egyelore nem foglalkozunk; ide jonnek majd azok is
+				//case FWassets::IRenderAsset::RA_TYPE_Material:
+				//{}
+				//break;
 
+				//case FWassets::IRenderAsset::RA_TYPE_Shader:
+				//{}
+				//break;
+				}
 			}
 		}
 	}
