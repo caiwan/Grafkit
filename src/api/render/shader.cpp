@@ -47,8 +47,8 @@ void Shader::LoadFromFile(ID3D11Device * const & device, LPCSTR entry, LPCWCHAR 
 	// D3D11_BUFFER_DESC matrixBufferDesc;
 
 	// input checking
-	if (!entry) throw new EX(NullPointerException);
-	if (!file) throw new EX(NullPointerException);
+	if (!entry) throw EX(NullPointerException);
+	if (!file) throw EX(NullPointerException);
 
 	this->m_type = type;
 
@@ -70,7 +70,7 @@ void Shader::LoadFromFile(ID3D11Device * const & device, LPCSTR entry, LPCWCHAR 
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			throw new EX(MissingShaderException);
+			throw EX(MissingShaderException);
 		}
 	}
 
