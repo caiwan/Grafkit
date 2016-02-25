@@ -30,8 +30,9 @@ AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : FWassets::IRenderAs
 
 AssetPreloader::~AssetPreloader()
 {
+	/// @todo ez itt baszik valamit eppen - double delete?
 	for (size_t i = 0; i < IRenderAsset::RA_TYPE_COUNT; i++) {
-		delete m_filters[rules[i].type];
+		//delete m_filters[rules[i].type];
 	}
 }
 
@@ -41,6 +42,7 @@ AssetPreloader::~AssetPreloader()
 #include "../render/text.h"
 
 using FWrender::TextureFromBitmap;
+using FWrender::TextureAssetRef;
 using FWrender::TextureAsset;
 
 void FWassets::AssetPreloader::LoadCache()
@@ -70,8 +72,10 @@ void FWassets::AssetPreloader::LoadCache()
 					TextureAsset* texture = new TextureAsset;
 					texture->SetName(name);
 
-					m_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), texture));
-					AddObject(texture);
+					// get the pointer right from the asset container, and feed it 
+					TextureAssetRef txptr = dynamic_cast<TextureAsset*>(m_assets[AddObject(texture)].Get()); 
+					m_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), txptr));
+					
 				}
 				break;
 
