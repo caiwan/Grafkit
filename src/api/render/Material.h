@@ -91,13 +91,20 @@ namespace FWrender {
 		std::vector<TextureAssetRef> m_texture_buckets[TT_COUNT];
 		ShaderRef m_framgentShader;
 
-		struct reflection_texture_entity 
+		struct reflection_texture_entity
 		{
 			FWrender::Shader::BoundResourceRecord *brecord;
-			TextureAssetRef texture;
+			Texture* texture;
+
+			/*reflection_texture_entity() : brecord(nullptr), texture() {}
+			reflection_texture_entity(reflection_texture_entity &other)
+			{
+				this->brecord = other.brecord;
+				this->texture = other.texture;
+			}*/
 		};
 
-		std::vector<struct reflection_texture_entity> m_reflected_textures;
+		std::vector<reflection_texture_entity> m_reflected_textures;
 	};
 
 	typedef Ref<MaterialBase> MaterialRef;

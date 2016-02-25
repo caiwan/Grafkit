@@ -112,11 +112,11 @@ void FWrender::MaterialBase::ReflectTextures()
 				}
 				
 				if (brecord->IsValid()) {
-					struct reflection_texture_entity entity;
+					reflection_texture_entity entity;
 
 					// remeljuk nem akad ossze az elozoleg besetelt textura, ami nincs ebben benne
 					entity.brecord = brecord;
-					entity.texture = m_texture_buckets[i][j];
+					entity.texture = m_texture_buckets[i][j]->Get();
 					m_reflected_textures.push_back(entity);
 
 					LOG(TRACE) << "Reflected texture" << txname;
