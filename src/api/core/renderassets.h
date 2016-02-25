@@ -82,7 +82,7 @@ namespace FWassets{
 		/**
 		Hozzaadja az assetet a repohoz.
 		*/
-		void AddObject(IRenderAsset* obj);
+		size_t AddObject(IRenderAsset* obj);
 		void RemoveObject(IRenderAsset* obj);
 
 		///@{
@@ -97,9 +97,11 @@ namespace FWassets{
 		IRenderAsset* GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid);
 		IRenderAsset* GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name);
 
-	private:
-		typedef std::map<std::string, IRenderAsset*> name_map_t;
-		typedef std::map<Guid, IRenderAsset*> id_map_t;
+	protected:
+		std::vector<Ref<IRenderAsset>> m_assets;
+
+		typedef std::map<std::string, size_t> name_map_t;
+		typedef std::map<Guid, size_t> id_map_t;
 
 		name_map_t m_mapNames[IRenderAsset::RA_TYPE_COUNT];
 		id_map_t m_mapID[IRenderAsset::RA_TYPE_COUNT];
