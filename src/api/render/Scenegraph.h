@@ -2,29 +2,23 @@
 #include <stack>
 #include "../math/matrix.h"
 #include "Actor.h"
-//#include "tree.h"
 #include "renderer.h"
 
 namespace FWrender {
-	class Scenegraph : virtual public Referencable //, public TreeParser
+	class Scene //: virtual public Referencable
 	{
 		public:
-			Scenegraph();
-			~Scenegraph();
+			Scene();
+			~Scene();
+
+			///@ todo kamerat, es fenyforrasokat itt kezelje(?)
+			///@ accoarding to Gargaj: kell egy preframe process, ami kiszuli a kamerat es a fenyeket, majd azzal rendereli le a tobbi nodeot
 
 			void Render(FWrender::Renderer & render);
 
-		// -- tree parser implementation
-		protected:
-			void renderNode(FWrender::Renderer & render, Actor *& p_actor);
-			void push();
-			void pop();
-
 		private:
-			FWmath::Matrix m_matrix;
-			std::stack<FWmath::Matrix> m_matrix_stack;
+			Actor* m_pScenegraph;
 
-			Actor* m_pRoot;
-
+			// fenyek + camera
 	};
 }

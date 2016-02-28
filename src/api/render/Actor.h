@@ -8,48 +8,54 @@
 #include "Material.h"
 #include "texture.h"
 
+#include "../math/matrix.h"
+
 #include "../core/renderassets.h"
 
 #include <vector>
+#include <stack>
 
 namespace FWrender {
+
+	class Scene;
 
 	class Entity3DEvents;
 	class Actor;
 
 	class Entity3D : public virtual Referencable, virtual public FWassets::IRenderAsset
 	{
-		friend class Actor;
-		public:
-			Entity3D();
-			virtual ~Entity3D();
+	friend class Actor;
+	public:
+		Entity3D();
+		virtual ~Entity3D();
 
-			ShaderAssetRef &GetVertexShader() { return this->m_vertexShader; }
-			void SetVertexShader(ShaderAssetRef shader) { this->m_vertexShader = shader; }
+		ShaderAssetRef &GetVertexShader() { return this->m_vertexShader; }
+		void SetVertexShader(ShaderAssetRef shader) { this->m_vertexShader = shader; }
 			
-			MaterialRef &GetMaterial() { return this->m_material; }
-			void SetMaterial(MaterialRef material) { this->m_material = material; }
+		MaterialRef &GetMaterial() { return this->m_material; }
+		void SetMaterial(MaterialRef material) { this->m_material = material; }
 
-			///@{
-			///Ezek a materialbol veszik ki a shadert, ha megosztott material van, akkor mindenkiet modositja
-			///Kulonben ha zero a material, akkor gaz van
-			ShaderAssetRef GetFragmentShader() { return this->m_material.Valid()?this->m_material->GetShader():ShaderAssetRef(); }
-			void SetFragmentShader(ShaderRef shader) { this->m_vertexShader = shader; }
-			///@}
+		///@{
+		///Ezek a materialbol veszik ki a shadert, ha megosztott material van, akkor mindenkiet modositja
+		///Kulonben ha zero a material, akkor gaz van
+		ShaderAssetRef GetFragmentShader() { return this->m_material.Valid()?this->m_material->GetShader():ShaderAssetRef(); }
+		void SetFragmentShader(ShaderRef shader) { this->m_vertexShader = shader; }
+		///@}
 
-			Actor * const & GetParent() { return m_parent; }
+		///@todo az actor felol lehessen updatelni a shadert + a materialt
 
-			virtual void Render(FWrender::Renderer& deviceContext) = 0;
+		//Actor * const & GetParent() { return m_parent; }
 
-		protected:	
-			Actor* m_parent;
-			ShaderAssetRef m_vertexShader;
-			MaterialRef m_material;
+		virtual void Render(FWrender::Renderer& deviceContext) = 0;
 
-			/// @todo + transformation matrix
-			/// @todo + bounding box, ha kell 1
+	protected:	
+		//Actor* m_parent;
+		ShaderAssetRef m_vertexShader;
+		MaterialRef m_material;
 
-			virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Entity3D; }
+		/// @todo + bounding box, ha kell 1
+
+		virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Entity3D; }
 	};
 
 
@@ -62,29 +68,38 @@ namespace FWrender {
 
 
 	/**
-	An actor node 
-	Todo: advanced architectural design goez here 
+	An actor node - ez a scenegraph es a nodeja
 	*/
-	class Actor : public virtual Referencable
+	class Actor //: public virtual Referencable
 	{
+	friend class Scene;
+	public:
+		Actor();
+		~Actor();
 
-		public:
-			Actor();
-			Actor(const Actor&);
-			~Actor();
+		FWmath::Matrix& Matrix() { return m_viewMatrix; };
 
-			virtual void Render(ID3D11DeviceContext* deviceContext) = 0;
+		virtual void Render(FWrender::Renderer &render);
 
-		protected:
-			//void updateShader();	///@todo implement
-			//void callDraw();		///@todo implement
+	private:
+		void push();
+		void pop();
 
-			//ActorEvents* m_events;
+		FWmath::Matrix m_viewMatrix;	///< aktualis modelnezeti matzrix
+		std::stack<FWmath::Matrix> m_matrixStack; ///< matrix stack
 
-			/// @todo + transformation
+	protected:
+		///@todo ezek kellenek-e?
+		//void updateShader();	///@todo implement
+		//void callDraw();		///@todo implement
+		//ActorEvents* m_events;
 
-			std::vector<Ref<Entity3D>> entities;
+		FWmath::Matrix m_viewMatrix;
+
+		Actor* m_pParent;
+		std::vector<Actor*> m_pChildren;
+		std::vector<Ref<Entity3D>> m_pEntities;
 	};
 
-	typedef Ref<Actor> ActorRef;
+	//typedef Ref<Actor> ActorRef;
 }

@@ -12,14 +12,14 @@ namespace FWmodel {
 	class AssimpLoader : public FWassets::IRenderAssetBuilder
 	{
 	public:
-		AssimpLoader(FWassets::IResourceRef resource, FWrender::Scenegraph * const & scenegraph);
+		AssimpLoader(FWassets::IResourceRef resource, FWrender::Scene * const & scenegraph);
 		~AssimpLoader();
 
 		virtual void operator () (FWassets::IRenderAssetManager * const &assman);
 
 	private:
 		FWassets::IResourceRef m_resource;
-		FWrender::Scenegraph * const & m_scenegraph;
+		FWrender::Scene * const & m_scenegraph;
 		std::string m_name_prefix; //name prefix for every created objects
 	};
 

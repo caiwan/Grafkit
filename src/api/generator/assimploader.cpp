@@ -101,7 +101,7 @@ namespace {
 	}
 }
 
-FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::Scenegraph * const & scenegraph) :
+FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::Scene * const & scenegraph) :
 	IRenderAssetBuilder(),
 	m_scenegraph(scenegraph), m_resource(resource),
 	m_name_prefix()

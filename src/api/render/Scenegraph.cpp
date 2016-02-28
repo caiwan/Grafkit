@@ -4,36 +4,24 @@
 using FWrender::Actor;
 using FWrender::Entity3D;
 
-FWrender::Scenegraph::Scenegraph():
-	m_pRoot(nullptr)
+FWrender::Scene::Scene():
+	m_pScenegraph(nullptr)
 {
 }
 
 
-FWrender::Scenegraph::~Scenegraph()
+FWrender::Scene::~Scene()
 {
-	delete m_pRoot;
+	delete m_pScenegraph;
 }
 
 
-void FWrender::Scenegraph::Render(FWrender::Renderer &render)
+void FWrender::Scene::Render(FWrender::Renderer &render)
 {
-}
+	// prerender process goez here
 
+	// + kamerat + fenyket at kell tudni adni valahol meg
 
-void FWrender::Scenegraph::renderNode(FWrender::Renderer & render, Actor *& p_actor)
-{
-}
-
-
-void FWrender::Scenegraph::push()
-{
-	m_matrix_stack.push(m_matrix);
-}
-
-
-void FWrender::Scenegraph::pop()
-{
-	m_matrix = m_matrix_stack.top();
-	m_matrix_stack.pop();
+	// render scenegraph
+	m_pScenegraph->Render(render);
 }
