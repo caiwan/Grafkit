@@ -31,23 +31,23 @@ void FWrender::Actor::Render(FWrender::Renderer & render)
 		m_pEntities[i]->Render(render);
 	}
 
-	push();
+	/*push();
 
 	for (size_t i = 0; i < this->m_pChildren.size(); i++) {
 		m_pChildren[i]->Render(render);
 	}
 
-	pop();
+	pop();*/
 }
 
 /// @todo nem jo, a bejarast a scene-be kell tenni, nem ide :C
 
-void FWrender::Actor::push()
-{
-	m_matrixStack.push()
-}
-
-void FWrender::Actor::pop()
-{
-}
-
+//void FWrender::Actor::push()
+//{
+//	m_matrixStack.push()
+//}
+//
+//void FWrender::Actor::pop()
+//{
+//}
+//

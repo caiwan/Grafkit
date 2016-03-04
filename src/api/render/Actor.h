@@ -82,8 +82,8 @@ namespace FWrender {
 		virtual void Render(FWrender::Renderer &render);
 
 	private:
-		void push();
-		void pop();
+		/*void push();
+		void pop();*/
 
 		FWmath::Matrix m_viewMatrix;	///< aktualis modelnezeti matzrix
 		std::stack<FWmath::Matrix> m_matrixStack; ///< matrix stack
