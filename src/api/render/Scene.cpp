@@ -1,4 +1,4 @@
-#include "Scenegraph.h"
+#include "Scene.h"
 #include "Actor.h"
 
 using FWrender::Actor;
@@ -23,5 +23,35 @@ void FWrender::Scene::Render(FWrender::Renderer &render)
 	// + kamerat + fenyket at kell tudni adni valahol meg
 
 	// render scenegraph
-	m_pScenegraph->Render(render);
+	RenderNode(render, m_pScenegraph);
+}
+
+void FWrender::Scene::RenderNode(FWrender::Renderer & render, Actor * actor, int maxdepth)
+{
+	if (maxdepth < 0) return;
+	if (!actor) return;
+
+	m_cureentViewMatrix.Multiply(actor->Matrix());
+
+	// setup camera goez here
+
+	actor->Render(render);	///todo CAMERA + FENYEK paramter atadasa esetleg ??
+	push();
+	
+	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
+		RenderNode(render, actor->m_pChildren[i], maxdepth - 1);
+	}
+	
+	pop();
+}
+
+void FWrender::Scene::push()
+{
+	this->m_viewMatrixStack.push(m_cureentViewMatrix);
+}
+
+void FWrender::Scene::pop()
+{
+	m_cureentViewMatrix = this->m_viewMatrixStack.top();
+	this->m_viewMatrixStack.pop();
 }

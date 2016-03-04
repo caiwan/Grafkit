@@ -3,6 +3,7 @@
 #include "../math/matrix.h"
 #include "Actor.h"
 #include "renderer.h"
+#include "tree.h"
 
 namespace FWrender {
 	class Scene //: virtual public Referencable
@@ -16,10 +17,18 @@ namespace FWrender {
 
 		void Render(FWrender::Renderer & render);
 
-	private:
+	protected:
 		Actor* m_pScenegraph;
-
 		// fenyek + camera
+
+	private:
+
+		void RenderNode(FWrender::Renderer & render, Actor* actor, int maxdepth = TREE_MAXDEPTH);
+		void push();
+		void pop();
+
+		FWmath::Matrix m_cureentViewMatrix;
+		std::stack<FWmath::Matrix> m_viewMatrixStack; 
 
 	private:
 			
