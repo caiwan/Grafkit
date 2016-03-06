@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Actor.h"
+#include "camera.h"
 
 using FWrender::Actor;
 using FWrender::Entity3D;
@@ -18,12 +19,24 @@ FWrender::Scene::~Scene()
 
 void FWrender::Scene::Render(FWrender::Renderer &render)
 {
-	// prerender process goez here
+	PreRender(render);
 
 	// + kamerat + fenyket at kell tudni adni valahol meg
 
 	// render scenegraph
 	RenderNode(render, m_pScenegraph);
+}
+
+void FWrender::Scene::PreRender(FWrender::Renderer & render)
+{
+	// fogja a camera nodeot
+	// kiszamolja a framere vonatkozoan a koordinatat
+	// beseteli a cameraRef-be
+	// orul
+
+	// ugyanezt a fenyekre
+
+	// minden nodeot prerendererel, ha kell;
 }
 
 void FWrender::Scene::RenderNode(FWrender::Renderer & render, Actor * actor, int maxdepth)

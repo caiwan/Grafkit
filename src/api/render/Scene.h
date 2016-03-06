@@ -21,8 +21,14 @@ namespace FWrender {
 		Actor* m_pScenegraph;
 		// fenyek + camera
 
-	private:
+		Actor* m_pCameraNode;
+		std::vector<Actor*> m_pvLightNodes;
+		
+		//std::vector<LightRef> m_rvLights;
+		CameraRef m_rCamera;
 
+	private:
+		void PreRender(FWrender::Renderer & render);
 		void RenderNode(FWrender::Renderer & render, Actor* actor, int maxdepth = TREE_MAXDEPTH);
 		void push();
 		void pop();
