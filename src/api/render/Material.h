@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "dxtypes.h"
-#include "reference.h"
 #include "renderer.h"
 #include "texture.h"
 #include "shader.h"
@@ -13,7 +12,7 @@
 namespace FWrender {
 
 	/// Using materials as a stuct. For now. 
-	struct Material {
+	struct Material_t {
 		float4 ambient, diffuse, specular, emission;
 		float specularLevel;
 		float shininess;
@@ -37,15 +36,16 @@ namespace FWrender {
 		TT_COUNT	// count
 	};
 
-	///@todo three.js mintajara tobbfele materrial tipust lehessen legyartani, ha kell~ 
-	class MaterialBase : virtual public Referencable, virtual public FWassets::IRenderAsset
+	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
+	///@todo aligned new-t mindenre
+	class MaterialBase : virtual public FWassets::IRenderAsset
 	{
 	public:
 		MaterialBase();
 		~MaterialBase();
 
 		/// @todo ez nem ilyen lesz a jovoben
-		operator Material& () { return this->m_mater; }
+		operator Material_t& () { return this->m_mater; }
 
 		/// @todo valahogy ide valamilyen kulcs-ertek parok formajaban kellene a cbuffer cuccait betolni. 
 		float4 &GetAmbient() { return m_mater.ambient; }
@@ -88,7 +88,7 @@ namespace FWrender {
 		*/
 		void ReflectTextures();
 
-		struct Material m_mater;
+		struct Material_t m_mater;
 
 		std::vector<TextureAssetRef> m_texture_buckets[TT_COUNT];
 		ShaderAssetRef m_framgentShader;

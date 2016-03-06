@@ -22,7 +22,7 @@ namespace FWrender {
 	class Entity3DEvents;
 	class Actor;
 
-	class Entity3D : public virtual Referencable, virtual public FWassets::IRenderAsset
+	class Entity3D : virtual public FWassets::IRenderAsset
 	{
 	friend class Actor;
 	public:
