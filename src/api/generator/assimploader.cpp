@@ -66,10 +66,11 @@ using FWassets::IRenderAsset;
 	(SRC)->Get(_AI_ENUM, scalar);\
 }
 
-FWmath::Matrix ai4x4MatrixToFWMatrix(void* _m)
+FWmath::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 {
-	if (!_m) throw EX(NullPointerException);
-	aiMatrix4x4 *m = (aiMatrix4x4 *)_m;
+	if (!m) 
+		throw EX(NullPointerException);
+
 	return FWmath::Matrix(
 		m->a1, m->a2, m->a3, m->a4,
 		m->b1, m->b2, m->b3, m->b4,
@@ -120,8 +121,8 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 // Parse assimp scenegraph 
 // ================================================================================================================================================================
 
-
-void assimp_parseScenegraph(aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH) 
+///@todo assmant hasznlaj
+void assimp_parseScenegraph(std::vector<ModelRef> &models,  aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH)
 {
 	size_t i=0, j=0, k = 0;
 
@@ -133,19 +134,18 @@ void assimp_parseScenegraph(aiNode* ai_node, Actor** actor_node, int maxdepth = 
 
 	Actor* actor = new Actor();
 	
-
-	// setup element
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
-		// ezt kell besetelni a nodeokba entitykkent
+		actor->GetEntities().push_back(models[mesh_id]);
 	}
 
 	actor->SetName(ai_node->mName.C_Str());
+	actor->Matrix() = ai4x4MatrixToFWMatrix(&ai_node->mTransformation);
 
 	// next nodes
 	for (i = 0; i < ai_node->mNumChildren; i++) {
 		Actor *child = nullptr;
-		assimp_parseScenegraph(ai_node->mChildren[i], &child, maxdepth - 1);
+		assimp_parseScenegraph(models, ai_node->mChildren[i], &child, maxdepth - 1);
 		actor->AddChild(child);
 	}
 
@@ -418,10 +418,8 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 	m_scenegraph->SetRootNode(s.actor_node);
 
 #else // fallback: recursive fill 
-
-	// folyt kov. 
 	Actor* root_node = new Actor;
-	assimp_parseScenegraph(scene->mRootNode, &root_node);
+	assimp_parseScenegraph(models, scene->mRootNode, &root_node);
 	m_scenegraph->SetRootNode(root_node);
 
 #endif
