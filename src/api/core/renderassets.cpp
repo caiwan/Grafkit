@@ -8,6 +8,8 @@
 using namespace FWassets;
 using namespace FWdebugExceptions;
 
+///@todo ezt ki kell pucolni teljesen
+
 FWassets::IRenderAsset::IRenderAsset() 
 	//: m_assman(nullptr)
 {
@@ -37,6 +39,7 @@ Guid FWassets::IRenderAsset::GenerateUUID()
 	return this->m_guid;
 }
 
+#ifdef _HAS_IRenderAssetRepository 
 // ==================================================================================================================================== 
 size_t FWassets::IRenderAssetRepository::AddObject(IRenderAsset * obj)
 {
@@ -172,6 +175,8 @@ FWassets::IRenderAssetRepository::bucket_t * FWassets::IRenderAssetRepository::G
 	return &it->second;
 }
 
+#endif // _HAS_IRenderAssetRepository 
+
 // ==================================================================================================================================== 
 FWassets::IRenderAssetManager::IRenderAssetManager()
 {
@@ -183,13 +188,13 @@ FWassets::IRenderAssetManager::~IRenderAssetManager()
 	// ... 
 }
 
-IRenderAssetRepository * FWassets::IRenderAssetManager::GetRepository(std::string name)
-{
-	if (!m_repository[name])
-		m_repository[name] = newRenderAssetRepository();
-
-	return m_repository[name];
-}
+//IRenderAssetRepository * FWassets::IRenderAssetManager::GetRepository(std::string name)
+//{
+//	if (!m_repository[name])
+//		m_repository[name] = newRenderAssetRepository();
+//
+//	return m_repository[name];
+//}
 
 
 // ==================================================================================================================================== 

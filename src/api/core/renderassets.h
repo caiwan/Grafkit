@@ -22,8 +22,9 @@ namespace FWassets{
 	class IRenderAsset;
 	class IRenderAssetManager;
 	class IRenderAssetBuilder;
-	class IRenderAssetRepository;
+	//class IRenderAssetRepository;
 
+	///@todo ezt ki kell pucolni teljesen
 
 	/**
 	A base class for collectable render assets for bulk loading
@@ -57,6 +58,9 @@ namespace FWassets{
 	///@todo a render asset manager asset repositorykat tarol; 
 	///@todo a repositiry-k tartoznak egy-egy generatorhoz; esetleg csatolhatok egy scenehez. - mindezek nevvel lennenek ellatva
 
+	// erre egyelore most nem lesz szukseg; visszadobom az asset managerbe a maradekot
+#if 0
+#define _HAS_IRenderAssetRepository 
 	/**
 	IRenderAssetRepository;
 		- *Ezen belul bucketek vannak, amik a generatoron belul felhasznalt, es elert asseteket taroljak.												  *
@@ -108,9 +112,10 @@ namespace FWassets{
 		name_bucket_map_t m_bucket;
 	};
 
-	
+#endif 
+
 	///@todod harelease-ben forditod, akkor eleg egy ":"
-#define ROOT_REPOSITORY ":root"
+//#define ROOT_REPOSITORY ":root"
 
 	/**
 	An asset manager that 
@@ -130,22 +135,19 @@ namespace FWassets{
 		virtual FWrender::Renderer & GetDeviceContext() = 0;
 
 		///Arra az esetre, ha valamit kezdeni akarunk vele
-		virtual IRenderAssetRepository* newRenderAssetRepository() { return new IRenderAssetRepository(); }
+		//virtual IRenderAssetRepository* newRenderAssetRepository() { return new IRenderAssetRepository(); }
 
-		IRenderAssetRepository* GetRepository(std::string name);
+		//IRenderAssetRepository* GetRepository(std::string name);
 
 	protected:
-		typedef std::map<std::string, IRenderAssetRepository*> repository_map_t;
-		repository_map_t m_repository;
-
-
-		///@todo valahova ide be kellene rakni egy mapet, ami megfelelteti az uuid-t a megfelelo rempository bucktjanak az objektumokat
+		/*typedef std::map<std::string, IRenderAssetRepository*> repository_map_t;
+		repository_map_t m_repository;*/
 	};
 
 	///@todo ez az egesz hobelebanc itten e teljes revizionalasra, es ujratervezesre szorul.
 
 	/**
-	ez az az interface, ami a bejovo input ertekre - nev, vagy uuid, legeneralja a megfelelo asset buildert
+	Ezt gyujti be a preloader, es gyartja le a megfelelo asseteket
 	*/
 	class IRenderAssetBuilder
 	{

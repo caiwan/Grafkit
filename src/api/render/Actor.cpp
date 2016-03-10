@@ -3,7 +3,7 @@
 
 using namespace FWrender;
 
-FWrender::Entity3D::Entity3D() : FWassets::IRenderAsset()
+FWrender::Entity3D::Entity3D() //: FWassets::IRenderAsset()
 {
 }
 
@@ -32,8 +32,9 @@ void FWrender::Actor::Render(FWrender::Renderer & render)
 	}
 }
 
-void FWrender::Actor::AddChild(Actor * child)
+void FWrender::Actor::AddChild(Actor*  child)
 {
 	m_pChildren.push_back(child);
 	child->m_pParent = this;
 }
+

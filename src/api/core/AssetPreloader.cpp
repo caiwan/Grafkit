@@ -23,12 +23,14 @@ using FWrender::ShaderAssetRef;
 using FWrender::ShaderAsset;
 using FWrender::ShaderType_e;
 
+///@todo kipucolni a kodot
+
 namespace {
 
 	enum {
 		TEXTURES,
 		FONT,
-		SHADERS
+		//SHADERS
 	};
 
 	struct {
@@ -39,13 +41,15 @@ namespace {
 		const char *extensions[8];
 	} rules[] = {
 		{ TEXTURES, TEXTURE_BUCKET, "./textures/", {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
-		/* { FONT_BUCKET , "./fonts/", {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },*/ 
-		{ SHADERS, SHADER_BUCKET , "./shaders/",{ "hlsl", "fx", "vs", "fs", "gm", "cp", "ps", nullptr, }, },
+		/* {FONT, FONT_BUCKET "./fonts/", {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },*/ 
+		
+		///@todo a textura betoltes on-the-fly lesz
+		//{ SHADERS, SHADER_BUCKET , "./shaders/",{ "hlsl", "fx", "vs", "fs", "gm", "cp", "ps", nullptr, }, },
 	};
 
-	const char * shader_postfix[] = {
+	/*const char * shader_postfix[] = {
 	"", "vertex", "pixel", "gemoetry", "compute"
-	};
+	};*/
 }
 
 AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : FWassets::IRenderAssetManager(), m_pPreloader(nullptr)
@@ -73,7 +77,7 @@ void FWassets::AssetPreloader::LoadCache()
 {
 	/// --- itt becacheli az osszes filet, mait lehet
 
-	IRenderAssetRepository* repo = this->GetRepository(ROOT_REPOSITORY);
+	//IRenderAssetRepository* repo = this->GetRepository(ROOT_REPOSITORY);
 
 	for (size_t i = 0; i < m_filters.size(); i++) 
 	{
@@ -114,6 +118,7 @@ void FWassets::AssetPreloader::LoadCache()
 
 				///@todo a shader betoltes legyen inkabb on-the-fly
 				///@todo: honnan tudjuk, hogy milyen shadert, es honnan generaltunk le?
+# if 0
 				case SHADERS:		/** Vegigprobalunk mindenfele shader tipust*/
 				{
 					///@todo eloforditott shaderekkel is tudjon kezdeni valamit
@@ -137,7 +142,7 @@ void FWassets::AssetPreloader::LoadCache()
 						m_builders.push_back(new ShaderLoader(loader->GetResourceByName(filename), sh_typ, shPtr));
 					}
 				}
-
+#endif
 				break;
 				}
 			}

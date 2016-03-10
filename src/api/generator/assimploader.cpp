@@ -90,15 +90,15 @@ namespace {
 		enum texture_type_e tt;
 	}
 	texture_load_map[] = {
-		aiTextureType_NONE,		TT_aux,
-		aiTextureType_DIFFUSE,  TT_diffuse,
-		aiTextureType_SPECULAR, TT_specular,
-		aiTextureType_AMBIENT,  TT_aux,
-		aiTextureType_EMISSIVE, TT_aux,
-		aiTextureType_HEIGHT,   TT_aux,
-		aiTextureType_NORMALS,   TT_normal,
-		aiTextureType_SHININESS, TT_shiniess,
-		aiTextureType_OPACITY,   TT_alpha,
+		aiTextureType_NONE,		    TT_aux,
+		aiTextureType_DIFFUSE,      TT_diffuse,
+		aiTextureType_SPECULAR,     TT_specular,
+		aiTextureType_AMBIENT,      TT_aux,
+		aiTextureType_EMISSIVE,     TT_aux,
+		aiTextureType_HEIGHT,       TT_aux,
+		aiTextureType_NORMALS,      TT_normal,
+		aiTextureType_SHININESS,    TT_shiniess,
+		aiTextureType_OPACITY,      TT_alpha,
 		aiTextureType_DISPLACEMENT, TT_bump,
 		aiTextureType_LIGHTMAP,		TT_aux,
 		aiTextureType_REFLECTION,	TT_reflect,
@@ -143,7 +143,8 @@ void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Ac
 		actor->GetEntities().push_back((Model*)repo->GetObjPtr(MODEL_BUCKET, mesh_id).Get());
 	}
 
-	actor->SetName(ai_node->mName.C_Str());
+	///@todo nevet kell nekunk setelni valamikor?
+	/*actor->SetName(ai_node->mName.C_Str());*/
 	actor->Matrix() = ai4x4MatrixToFWMatrix(&ai_node->mTransformation);
 
 	// next nodes
@@ -199,7 +200,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
 	}
 
-	IRenderAssetRepository* asset_repo = assman->GetRepository(GetCounter());
+	//IRenderAssetRepository* asset_repo = assman->GetRepository(GetCounter());
 
 	int i = 0, j = 0, k = 0, l = 0;
 	std::vector<MaterialRef> materials;
@@ -216,8 +217,9 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			MaterialRef material = new MaterialBase();
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
-			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
-				material->SetName(name.C_Str());
+			///@todo nevekre szuksegunk ven-e?
+			//if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
+			//	material->SetName(name.C_Str());
 
 			j = 0;
 			aiReturn texFound = AI_FAILURE;
@@ -238,18 +240,19 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
 			// -> valahol a loaderen kivul kell megtenni a shader kijelolest, illetve betoltest
-			///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre~
+			///@todo itt a materialt hozzuk lere valahogy, on-the-fly
 			ShaderAssetRef shader_fs = (ShaderAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 			material->SetShader(shader_fs);
 
 			materials.push_back(material);
-			asset_repo->AddObject(material);
+			//asset_repo->AddObject(material);
 		}
 	}
 	
 	// Itt letre kell hozni egy uj shadert -> igazabol ezt valahol kivul kellene megtenni
 	
 	///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre
+	///@todo itt specialis materialt hozzunk letre, ami betolti a shadert, ha kell 
 	ShaderAssetRef shader_vs = (ShaderAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 	
 	/*
@@ -268,9 +271,10 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			ModelRef model = new Model();
 			aiMesh* curr_mesh = scene->mMeshes[i];
 
-			aiString name;
-			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
-			model->SetName(mesh_name);	///@todo valami modelszamlalora utalo nyom/jel is legyen benne 
+			///@todo nevet kell nekunk setelni valamikor?
+			//aiString name;
+			// const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
+			//model->SetName(mesh_name);
 
 			///@todo ezeken a neveket ki kell pakolni valahova
 			///@todo kell egy olyan mesh generator, ami nem a shaderbol szedi ossze az input layoutot
@@ -305,7 +309,8 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			}
 
 			models.push_back(model);
-			asset_repo->AddObject(model);
+			
+			//asset_repo->AddObject(model);
 		}
 	}
 
@@ -328,8 +333,9 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			// --
 			std::string name(curr_camera->mName.C_Str());
 
-			camera->SetName(name);
-			asset_repo->AddObject(camera);
+			///@todo nevet kell nekunk setelni valamikor?
+			//camera->SetName(name);
+			//asset_repo->AddObject(camera);
 		}
 	}
 
@@ -376,7 +382,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			light->SetName(std::string(curr_light->mName.C_Str()));
 
 			lights.push_back(light);
-			asset_repo->AddObject(light);
+			//asset_repo->AddObject(light);
 		}
 	}
 

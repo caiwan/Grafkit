@@ -36,11 +36,11 @@ namespace FWrender {
 		TT_COUNT	// count
 	};
 
-#define MATERIAL_BUCKET ":material"
+//#define MATERIAL_BUCKET ":material"
 
 	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
 	///@todo aligned new-t mindenre
-	class MaterialBase : virtual public FWassets::IRenderAsset
+	class MaterialBase //: virtual public FWassets::IRenderAsset
 	{
 	public:
 		MaterialBase();
@@ -78,7 +78,7 @@ namespace FWrender {
 		/// Legyen public arra az esetre, ha megis ... 
 		virtual void ReflectShader();
 
-		virtual const char* GetBucketID() { return MATERIAL_BUCKET; }
+		//virtual const char* GetBucketID() { return MATERIAL_BUCKET; }
 
 	protected:
 		/**

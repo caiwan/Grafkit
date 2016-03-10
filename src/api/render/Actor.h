@@ -22,9 +22,9 @@ namespace FWrender {
 	class Entity3DEvents;
 	class Actor;
 
-#define ENTITY3D_BUCKET ":entity3d"
+//#define ENTITY3D_BUCKET ":entity3d"
 
-	class Entity3D : public FWassets::IRenderAsset /*, virtual public Referencable*/
+	class Entity3D //: public //FWassets::IRenderAsset /*, virtual public Referencable*/
 	{
 	friend class Actor;
 	public:
@@ -57,23 +57,28 @@ namespace FWrender {
 
 		/// @todo + bounding box, ha kell 1
 
-		virtual const char* GetBucketID() { return ENTITY3D_BUCKET; }
+		//virtual const char* GetBucketID() { return ""; }
 	};
 
-
+	// ez egyszer jol jon majd
+#if 0
 	class Entity3DEvents {
 		friend class Entity3D;
 		protected:
 			virtual void onUpdateShaderParams(ID3D11DeviceContext* deviceContext, Shader*& shader) {}
 			virtual void onRender(ID3D11DeviceContext* deviceContext, Actor*& actor) {}
 	};
+#endif 
 
-#define ACTOR_BUCKET ":actor"
+//#define ACTOR_BUCKET ":actor"
+
+	//class Actor;
+	//typedef Ref<Actor> ActorRef;
 
 	/**
 	An actor node - ez a scenegraph es a nodeja
 	*/
-	class Actor : public FWassets::IRenderAsset 
+	class Actor //: public FWassets::IRenderAsset 
 	{
 	friend class Scene;
 	public:
@@ -89,13 +94,13 @@ namespace FWrender {
 
 		std::vector<Ref<Entity3D>>& GetEntities() { return m_pEntities; }
 
-		virtual const char* GetBucketID() { return ACTOR_BUCKET; }
+		//virtual const char* GetBucketID() { return ACTOR_BUCKET; }
 
 	protected:
-		///@todo ezek kellenek-e?
 
-		//void updateShader();	///@todo implement
-		//void callDraw();		///@todo implement
+		///@todo ezek kellenek-e?
+		//void updateShader();	
+		//void callDraw();		
 		//ActorEvents* m_events;
 
 		FWmath::Matrix m_viewMatrix;
