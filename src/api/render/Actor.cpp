@@ -19,9 +19,6 @@ Grafkit::Actor::Actor() : m_viewMatrix()
 
 Grafkit::Actor::~Actor()
 {
-	for (size_t j = 0; j < m_pChildren.size(); j++) {
-		delete m_pChildren[j];
-	}
 }
 
 void Grafkit::Actor::Render(Grafkit::Renderer & render, Scene * scene)

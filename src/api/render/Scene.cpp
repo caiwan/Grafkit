@@ -13,12 +13,10 @@ Grafkit::Scene::Scene():
 
 Grafkit::Scene::~Scene()
 {
-	delete m_pScenegraph;
 }
 
-void Grafkit::Scene::Render(Grafkit::Renderer & render /*, ShaderRef &FS, ShaderRef &VS*/)
+void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
-
 	m_cureentViewMatrix.Identity();
 	
 	PreRender(render);
