@@ -80,6 +80,9 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 
 	m_cureentViewMatrix.Multiply(actor->Matrix());
 
+	matrix viewMatrix = XMMatrixTranspose(m_cureentViewMatrix.Get());
+	m_vertexShader["MatrixBuffer"]["viewMatrix"] = viewMatrix;
+
 	actor->Render(render, this);
 	push();
 	

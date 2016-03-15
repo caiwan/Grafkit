@@ -520,6 +520,10 @@ Shader::ConstantBufferRecord::ConstantBufferRecord() :
 	// DebugBreak();
 }
 
+Grafkit::Shader::ConstantBufferRecord::~ConstantBufferRecord()
+{
+}
+
 
 Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
 	ConstantBufferRecord()
@@ -590,7 +594,7 @@ inline void * Shader::ConstantBufferRecord::GetMappedPtr()
 }
 
 
-void Shader::ConstantBufferRecord::Set(void * data)
+void Shader::ConstantBufferRecord::Set(const void * const data)
 {
 	if (!this->m_pDC) {
 		LOG(TRACE) << "No buffer was created"; //<< this->m_description.Name;
@@ -603,7 +607,7 @@ void Shader::ConstantBufferRecord::Set(void * data)
 }
 
 
-void Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width)
+void Shader::ConstantBufferRecord::Set(const void * const pData, size_t offset, size_t width)
 {
 	if (!m_buffer) {
 		LOG(TRACE) << "No buffer was created"; // << this->m_description.Name;
@@ -647,6 +651,10 @@ Shader::ConstantBufferElement::ConstantBufferElement():
 	m_pBufferRecord(nullptr)
 {
 	// do nothing here. 
+}
+
+Grafkit::Shader::ConstantBufferElement::~ConstantBufferElement()
+{
 }
 
 
@@ -699,6 +707,62 @@ D3D11_SHADER_TYPE_DESC & const Grafkit::Shader::ConstantBufferElement::GetTypeDe
 	return this->m_type_desc;
 }
 
+void Grafkit::Shader::ConstantBufferElement::set(const void * const v)
+{
+	if (m_pBufferRecord) m_pBufferRecord->Set((&v), m_var_desc.StartOffset, (size_t)m_var_desc.Size);
+}
+
+#define _MAP_BEGIN(RECORD, VSIZE) \
+	if (RECORD && VSIZE) { \
+		RECORD->Map();
+
+#define _MAP_POINTER(PTR, TYPE, RECORD, OFFSET) \
+	TYPE* PTR = reinterpret_cast<TYPE*>(((BYTE*)RECORD->GetMappedPtr()) + OFFSET)
+
+#define _MAP_END(RECORD)\
+		RECORD->Unmap(); \
+	}
+
+void Grafkit::Shader::ConstantBufferElement::set(float v0)
+{
+	_MAP_BEGIN(m_pBufferRecord, (m_var_desc.Size == 4*1)) {
+		_MAP_POINTER(pv, float, m_pBufferRecord, m_var_desc.StartOffset);
+		pv[0] = v0;
+	}
+	_MAP_END(m_pBufferRecord);
+}
+
+void Grafkit::Shader::ConstantBufferElement::set(float v0, float v1)
+{
+	_MAP_BEGIN(m_pBufferRecord, (m_var_desc.Size == 4*2)) {
+		_MAP_POINTER(pv, float, m_pBufferRecord, m_var_desc.StartOffset);
+		pv[0] = v0, pv[1] = v1;
+	}
+	_MAP_END(m_pBufferRecord);
+}
+
+void Grafkit::Shader::ConstantBufferElement::set(float v0, float v1, float v2)
+{
+	_MAP_BEGIN(m_pBufferRecord, (m_var_desc.Size == 4 * 3)) {
+		_MAP_POINTER(pv, float, m_pBufferRecord, m_var_desc.StartOffset);
+		pv[0] = v0, pv[1] = v1, pv[2] = v2;
+	}
+	_MAP_END(m_pBufferRecord);
+}
+
+void Grafkit::Shader::ConstantBufferElement::set(float v0, float v1, float v2, float v3)
+{
+	_MAP_BEGIN(m_pBufferRecord, (m_var_desc.Size == 4 * 4)) {
+		_MAP_POINTER(pv, float, m_pBufferRecord, m_var_desc.StartOffset);
+		pv[0] = v0, pv[1] = v1, pv[3] = v2, pv[4] = v3;
+	}
+	_MAP_END(m_pBufferRecord);
+}
+
+#undef _MAP_BEGIN
+#undef _MAP_POINTER
+#undef _MAP_END
+
 // ============================================================================================================
 // Bindable/Bindig Resource record
 
@@ -717,5 +781,3 @@ Grafkit::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BIN
 }
 
 // ============================================================================================================
-
-

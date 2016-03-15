@@ -83,6 +83,7 @@ namespace Grafkit {
 
 		ConstantBufferRecord &operator[] (const char* name);	///@todo std::stringre is!
 		ConstantBufferRecord &operator[] (size_t id);
+
 		size_t GetConstantBufferCount() { return this->m_vBuffers.size(); }
 
 		size_t GetBResourceCount() { return this->m_vBResources.size(); }
@@ -135,41 +136,44 @@ namespace Grafkit {
 
 		class ConstantBufferRecord
 		{
-			friend class Shader;
+		friend class Shader;
+		friend class ConstantBufferElement;
 
-			public:
-				// This class has to have a public accessable default constructor due to std::map
-				ConstantBufferRecord();
-			protected:
-				ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
+		public:
+			// This class has to have a public accessable default constructor due to std::map
+			ConstantBufferRecord();
+			~ConstantBufferRecord();
 
-			public:
-				void Set(void* pData);
-				void Set(void* pData, size_t offset, size_t width);
+		protected:
+			ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
 
-				size_t GetElementCount() { return this->m_vConstVars.size(); }
-				ConstantBufferElement& operator[](const char* name);
-				ConstantBufferElement& operator[](size_t id);
+		public:
+			void Set(const void* const pData);
+			void Set(const void* const pData, size_t offset, size_t width);
 
-				D3D11_SHADER_BUFFER_DESC& const GetBufferDesc() { return this->m_description; }
+			size_t GetElementCount() { return this->m_vConstVars.size(); }
+			ConstantBufferElement& operator[](const char* name);
+			ConstantBufferElement& operator[](size_t id);
 
-			private:
-				void Map();
-				void Unmap();
-				void *GetMappedPtr();
+			D3D11_SHADER_BUFFER_DESC& const GetBufferDesc() { return this->m_description; }
 
-				ID3D11DeviceContext* m_pDC;
-				D3D11_MAPPED_SUBRESOURCE m_mappedResource;
-				D3D11_SHADER_BUFFER_DESC m_description;
-				ID3D11Buffer *m_buffer;
-				UINT m_slot;
+		protected:
+			void Map();
+			void Unmap();
+			void *GetMappedPtr();
+		private:
+			ID3D11DeviceContext* m_pDC;
+			D3D11_MAPPED_SUBRESOURCE m_mappedResource;
+			D3D11_SHADER_BUFFER_DESC m_description;
+			ID3D11Buffer *m_buffer;
+			UINT m_slot;
 
-			protected:
-				typedef std::map<std::string, size_t> cb_variableMap_t;
-				cb_variableMap_t m_mapConstVars;
+		protected:
+			typedef std::map<std::string, size_t> cb_variableMap_t;
+			cb_variableMap_t m_mapConstVars;
 
-				// a getterek miatt kell
-				std::vector<ConstantBufferElement> m_vConstVars;
+			// a getterek miatt kell
+			std::vector<ConstantBufferElement> m_vConstVars;
 
 		};
 
@@ -178,37 +182,41 @@ namespace Grafkit {
 		*/
 		class ConstantBufferElement
 		{
-			friend class ConstantBufferRecord;
-			public:
-				ConstantBufferElement();
+		friend class ConstantBufferRecord;
+		public:
+			ConstantBufferElement();
+			~ConstantBufferElement();
 
-			protected:
-				ConstantBufferElement(Shader::ConstantBufferRecord* parent_record, ID3D11ShaderReflectionVariable* shader_variable);
+		protected:
+			ConstantBufferElement(Shader::ConstantBufferRecord* parent_record, ID3D11ShaderReflectionVariable* shader_variable);
 
-			public:
-				/// @todo implement 
-				void operator= (float v);
+		public:
+			/// @todo implement 
+			void operator= (float v) { set(&v); }
 
-				void operator= (float3 v);
-				void operator= (float2 v);
-				void operator= (float4 v);
+			void operator= (const float3 &v) { set(&v); }
+			void operator= (const float2 &v) { set(&v); }
+			void operator= (const float4 &v) { set(&v); }
+			void operator= (const matrix &v) { set(&v); }
 
-				/// @todo 16-os alignmentet meg kell szerelni
-				//void operator= (Grafkit::Matrix v);
+			/// @todo 16-os alignmentet meg kell szerelni
+			//void operator= (Grafkit::Matrix v);
 
-				void set(float v1);
-				void set(float v1, float v2);
-				void set(float v1, float v2, float v3);
-				void set(float v1, float v2, float v3, float v4);
+			void set(const void * const v);
 
-				D3D11_SHADER_VARIABLE_DESC & const GetVarDesc();
-				D3D11_SHADER_TYPE_DESC & const GetTypeDesc();
+			void set(const float v0);
+			void set(const float v0, const float v1);
+			void set(const float v0, const float v1, const float v2);
+			void set(const float v0, const float v1, const float v2, const float v3);
 
-			protected:
-				Shader::ConstantBufferRecord* m_pBufferRecord;
+			D3D11_SHADER_VARIABLE_DESC & const GetVarDesc();
+			D3D11_SHADER_TYPE_DESC & const GetTypeDesc();
 
-				D3D11_SHADER_VARIABLE_DESC m_var_desc;
-				D3D11_SHADER_TYPE_DESC m_type_desc;
+		protected:
+			Shader::ConstantBufferRecord* m_pBufferRecord;
+
+			D3D11_SHADER_VARIABLE_DESC m_var_desc;
+			D3D11_SHADER_TYPE_DESC m_type_desc;
 		};
 
 		/**
