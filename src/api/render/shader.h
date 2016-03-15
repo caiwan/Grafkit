@@ -33,6 +33,18 @@ namespace Grafkit {
 	class ShaderRes;
 	class ShaderResRef;
 
+	class ShaderParamManager {
+		// ... 
+	public:
+
+	};
+
+	class ShaderResourceManager {
+		// ... 
+	public:
+
+	};
+
 	// ================================================================================================================================
 	__declspec(align(16)) class Shader : virtual public Referencable, public AlignedNew<Shader>
 	// class Shader : virtual public Referencable
@@ -77,19 +89,31 @@ namespace Grafkit {
 			D3D11_INPUT_ELEMENT_DESC desc;
 			UINT width;
 			UINT offset;
-
-			InputElementRecord() {}
 		};
 
-		ConstantBufferRecord &operator[] (const char* name);	///@todo std::stringre is!
-		ConstantBufferRecord &operator[] (size_t id);
+		// ----
+		// access constant buffers and variables 
+		size_t GetParamCount();
+		size_t GetParamCount(size_t id);
 
-		size_t GetConstantBufferCount() { return this->m_vBuffers.size(); }
+		ShaderParamManager GetParam(const char* name);
+		ShaderParamManager GetParam(std::string* name);
+		ShaderParamManager GetParam(size_t id);
 
-		size_t GetBResourceCount() { return this->m_vBResources.size(); }
-		BoundResourceRecord & GetBResource(const char*const name);		///@todo std::stringre is!
-		BoundResourceRecord & GetBResource(size_t id);
+		ShaderParamManager GetParam(const char* name, const char* varname);
+		ShaderParamManager GetParam(std::string* name, std::string varname);
+		ShaderParamManager GetParam(size_t id, const char* varname);
+		ShaderParamManager GetParam(size_t id, size_t vid);
 
+		// ----
+		// access bounded resources
+		size_t GetBResCount();
+		ShaderParamManager GetBRes(const char * name);
+		ShaderParamManager GetBRes(std::string name);
+		ShaderParamManager GetBRes(size_t id);
+
+		// ----
+		// access input layout 
 		size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
 		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
 
@@ -110,22 +134,55 @@ namespace Grafkit {
 		ID3D11VertexShader* m_vxShader;
 		ID3D11PixelShader* m_pxShader;
 
-		ID3D11InputLayout* m_layout;
+		// 
 
 		ID3D11ShaderReflection *m_pReflector;
 
-		typedef std::vector<InputElementRecord> inputElements_t;
-		inputElements_t m_mapInputElems;
+		// -- constant buffer
+		// Constant buffer variable 
+		struct CBVar {
+			D3D11_SHADER_VARIABLE_DESC m_var_desc;
+			D3D11_SHADER_TYPE_DESC m_type_desc;
+		};
+
+		typedef std::map<std::string, size_t> cb_variableMap_t;
+		typedef cb_variableMap_t::iterator cb_variableMap_it;
+
+		// constant buffer record 
+		struct CBRecord {
+			D3D11_MAPPED_SUBRESOURCE m_mappedResource;
+			D3D11_SHADER_BUFFER_DESC m_description;
+			ID3D11Buffer *m_buffer;
+			UINT m_slot;
+
+			cb_variableMap_t m_mapConstVars;
+			std::vector<CBVar> m_vConstVars;
+		};
 
 		typedef std::map<std::string, size_t> bufferMap_t;
-		bufferMap_t m_mapBuffers;
-		std::vector<ConstantBufferRecord> m_vBuffers;
+		typedef bufferMap_t::iterator bufferMap_it;
 
-		std::vector<std::string> m_inputNames;
+		bufferMap_t m_mapBuffers;
+		std::vector<CBRecord> m_vBuffers;
+
+		// -- input layout 
+		typedef std::vector<InputElementRecord> inputElements_t;
+		inputElements_t m_mapInputElems;
+		ID3D11InputLayout* m_layout;
+
+		// -- bounded resource
+
+		struct BResRecord {
+			D3D11_SHADER_INPUT_BIND_DESC m_desc;
+			void *m_boundSource;
+		};
 
 		typedef std::map<std::string, size_t> bResourceMap_t;
+		typedef bResourceMap_t::iterator bResourceMap_it;
 		bResourceMap_t m_mapBResources;
-		std::vector<BoundResourceRecord> m_vBResources;
+		std::vector<BResRecord> m_vBResources;
+
+		// -- output sampler
 
 	public:
 		// ==========================================================================================
@@ -134,6 +191,7 @@ namespace Grafkit {
 		the reflection record for a certain constant buffer and aids to set variables into it
 		*/
 
+#if 0
 		class ConstantBufferRecord
 		{
 		friend class Shader;
@@ -239,7 +297,7 @@ namespace Grafkit {
 
 				int m_is_valid;
 		};
-
+#endif
 	};
 
 	// ================================================================================================================================
@@ -256,8 +314,8 @@ namespace Grafkit {
 		friend class ShaderResRef;
 
 	public:
-		Shader::ConstantBufferRecord& operator[](const char *name) { return this->ptr->operator[](name); }
-		Shader::ConstantBufferRecord& operator[](size_t id) { return this->ptr->operator[](id); }
+		// Shader::ConstantBufferRecord& operator[](const char *name) { return this->ptr->operator[](name); }
+		// Shader::ConstantBufferRecord& operator[](size_t id) { return this->ptr->operator[](id); }
 
 		ShaderRes() : IResource() {}
 		ShaderRes(Shader* ptr) : IResource(), ShaderRef_t(ptr) {}
@@ -303,12 +361,6 @@ namespace Grafkit {
 	};
 
 	// ================================================================================================================================
-
-	class ShaderParamManager {
-		// ... 
-	public:
-
-	};
 
 }
 

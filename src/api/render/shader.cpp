@@ -154,7 +154,7 @@ void Shader::Shutdown()
 		this->m_vxShader = nullptr;
 	}
 
-	this->m_inputNames.clear();
+	// todo: a tobbinek is torlest kell 
 }
 
 
@@ -235,59 +235,59 @@ void Shader::CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuff
 }
 
 
-Shader::ConstantBufferRecord& Shader::operator[](const char * name)
-{
-	static ConstantBufferRecord null_object;
-
-	if (this->m_mapBuffers.empty()) {
-		// no recorded items, keep moving on
-		return null_object;
-	}
-
-	bufferMap_t::iterator it = this->m_mapBuffers.find(name);
-	if (it == this->m_mapBuffers.end()) {
-		// no item found, moving on
-		return null_object;
-	}
-
-	return this->operator[](it->second);
-}
-
-
-Shader::ConstantBufferRecord & Grafkit::Shader::operator[](size_t id)
-{
-	static ConstantBufferRecord null_object;
-
-	if (id >= this->m_vBuffers.size()) {
-		return null_object;
-	}
-
-	return this->m_vBuffers[id];
-}
-
-
-Shader::BoundResourceRecord & Grafkit::Shader::GetBResource(const char * const name)
-{
-	static BoundResourceRecord null_object;
-
-	bResourceMap_t::iterator it = this->m_mapBResources.find(name);
-	if (it == this->m_mapBResources.end()) {
-		return null_object;
-	}
-
-	return this->GetBResource(it->second);
-}
-
-
-Shader::BoundResourceRecord & Grafkit::Shader::GetBResource(size_t id)
-{
-	static BoundResourceRecord null_object;
-	if (id >= this->m_vBResources.size())
-	{
-		return null_object;
-	}
-	return this->m_vBResources[id];
-}
+//Shader::ConstantBufferRecord& Shader::operator[](const char * name)
+//{
+//	static ConstantBufferRecord null_object;
+//
+//	if (this->m_mapBuffers.empty()) {
+//		// no recorded items, keep moving on
+//		return null_object;
+//	}
+//
+//	bufferMap_t::iterator it = this->m_mapBuffers.find(name);
+//	if (it == this->m_mapBuffers.end()) {
+//		// no item found, moving on
+//		return null_object;
+//	}
+//
+//	return this->operator[](it->second);
+//}
+//
+//
+//Shader::ConstantBufferRecord & Grafkit::Shader::operator[](size_t id)
+//{
+//	static ConstantBufferRecord null_object;
+//
+//	if (id >= this->m_vBuffers.size()) {
+//		return null_object;
+//	}
+//
+//	return this->m_vBuffers[id];
+//}
+//
+//
+//Shader::BoundResourceRecord & Grafkit::Shader::GetBResource(const char * const name)
+//{
+//	static BoundResourceRecord null_object;
+//
+//	bResourceMap_t::iterator it = this->m_mapBResources.find(name);
+//	if (it == this->m_mapBResources.end()) {
+//		return null_object;
+//	}
+//
+//	return this->GetBResource(it->second);
+//}
+//
+//
+//Shader::BoundResourceRecord & Grafkit::Shader::GetBResource(size_t id)
+//{
+//	static BoundResourceRecord null_object;
+//	if (id >= this->m_vBResources.size())
+//	{
+//		return null_object;
+//	}
+//	return this->m_vBResources[id];
+//}
 
 
 void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
@@ -509,7 +509,7 @@ void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 	}
 }
 
-
+#if 0
 // =============================================================================================================================
 Shader::ConstantBufferRecord::ConstantBufferRecord() : 
 	m_pDC(nullptr),
@@ -779,5 +779,7 @@ Grafkit::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BIN
 	LOG(TRACE) << "BoundResource:" << desc.Name << "type: " << desc.Type << desc.BindPoint 
 		<< desc.BindCount << desc.Dimension << desc.NumSamples << desc.ReturnType << desc.uFlags;
 }
+
+#endif 
 
 // ============================================================================================================
