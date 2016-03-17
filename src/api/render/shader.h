@@ -36,6 +36,41 @@ namespace Grafkit {
 	class ShaderParamManager {
 		// ... 
 	public:
+		ShaderParamManager(Renderer &render, Shader*shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype =0);
+
+		void operator= (float v) { Set(&v); }
+
+		void operator= (const float3 &v) { Set(&v); }
+		void operator= (const float2 &v) { Set(&v); }
+		void operator= (const float4 &v) { Set(&v); }
+		void operator= (const matrix &v) { Set(&v); }
+
+		/// @todo 16-os alignmentet meg kell szerelni
+		//void operator= (Grafkit::Matrix v);
+
+		void Set(const void * const pData);
+		void Set(const void * const pData, size_t offset, size_t width);
+
+		void Set(const float v0);
+		void Set(const float v0, const float v1);
+		void Set(const float v0, const float v1, const float v2);
+		void Set(const float v0, const float v1, const float v2, const float v3);
+
+		D3D11_MAPPED_SUBRESOURCE GetappedResourceDesc();
+		D3D11_SHADER_BUFFER_DESC GetBufferDesc(); //{ return this->m_description; }
+
+		D3D11_SHADER_VARIABLE_DESC GetVarDesc(); // {return this->}
+		D3D11_SHADER_TYPE_DESC  GetTypeDesc();
+
+		int IsValid() { return (m_pShader != nullptr); }
+		int IsSubtype() { return m_is_subtype; }
+
+	private:
+		Renderer & m_rRender;
+		Shader * m_pShader;
+
+		int m_is_subtype;
+		size_t m_id, m_vid;
 
 	};
 
@@ -65,8 +100,8 @@ namespace Grafkit {
 			@param file source file of vertex shader
 			@param type type of shader @see Grafkit::ShaderType_e
 		*/
-		void LoadFromFile(ID3D11Device* const & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
-		void LoadFromMemory(ID3D11Device* const & device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
+		void LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
+		void LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
 
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
@@ -76,7 +111,7 @@ namespace Grafkit {
 		//virtual enum RA_type_e GetBucketID() { return Grafkit::IResource::RA_TYPE_Shader; }
 
 	private:
-		void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
+		void CompileShader(Renderer & device, ID3D10Blob* shaderBuffer);
 
 	public:
 
@@ -93,24 +128,37 @@ namespace Grafkit {
 
 		// ----
 		// access constant buffers and variables 
-		size_t GetParamCount();
-		size_t GetParamCount(size_t id);
+		size_t GetParamCount() { return this->m_vCBuffers.size(); }
+		size_t GetParamCount(size_t id) { this->m_vCBuffers[id].m_vConstVars.size(); } ///@todo bounds check
 
-		ShaderParamManager GetParam(const char* name);
-		ShaderParamManager GetParam(std::string* name);
-		ShaderParamManager GetParam(size_t id);
+		///@todo ezeblol csinaljon valaki operator[]-t
 
-		ShaderParamManager GetParam(const char* name, const char* varname);
-		ShaderParamManager GetParam(std::string* name, std::string varname);
-		ShaderParamManager GetParam(size_t id, const char* varname);
-		ShaderParamManager GetParam(size_t id, size_t vid);
+		inline ShaderParamManager GetParam(Renderer &render, const char* name) { return GetParam(render, std::string(name)); }
+		inline ShaderParamManager GetParam(Renderer &render, std::string name);
+		inline ShaderParamManager GetParam(Renderer &render, size_t id);
+									
+		inline ShaderParamManager GetParam(Renderer &render, const char* name, const char* varname) { return GetParam(render, std::string(name), std::string(name)); }
+		inline ShaderParamManager GetParam(Renderer &render, std::string name, std::string varname);
+		inline ShaderParamManager GetParam(Renderer &render, size_t id, const char* varname) { return GetParam(render, id, std::string(varname)); }
+		inline ShaderParamManager GetParam(Renderer &render, size_t id, std::string varname);
+		inline ShaderParamManager GetParam(Renderer &render, size_t id, size_t vid);
+
+		inline void* MapParamBuffer(Renderer& render, size_t id);
+		inline void* GetMappedPtr(size_t id);
+		inline void UnMapParamBuffer(Renderer& render, size_t id);
+		
+		inline D3D11_MAPPED_SUBRESOURCE GetCBMappedResourceDesc(size_t id);
+		inline D3D11_SHADER_BUFFER_DESC GetCBDescription(size_t id);
+		
+		inline D3D11_SHADER_VARIABLE_DESC GetCBVariableDescriptor(size_t id, size_t vid);
+		inline D3D11_SHADER_TYPE_DESC GetCBTypeDescriptor(size_t id, size_t vid);
 
 		// ----
 		// access bounded resources
-		size_t GetBResCount();
-		ShaderParamManager GetBRes(const char * name);
-		ShaderParamManager GetBRes(std::string name);
-		ShaderParamManager GetBRes(size_t id);
+		size_t GetBResCount() { return this->m_vBResources.size(); }
+		ShaderParamManager GetBRes(Renderer &render, const char * name) { return GetBRes(render, std::string(name)); }
+		ShaderParamManager GetBRes(Renderer &render, std::string name);
+		ShaderParamManager GetBRes(Renderer &render, size_t id);
 
 		// ----
 		// access input layout 
@@ -127,7 +175,7 @@ namespace Grafkit {
 	private:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
 		void GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth);
-		void BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer);
+		void BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer);
 
 	private:
 		ShaderType_e m_type;
@@ -136,6 +184,7 @@ namespace Grafkit {
 
 		// 
 
+	protected:
 		ID3D11ShaderReflection *m_pReflector;
 
 		// -- constant buffer
@@ -159,11 +208,11 @@ namespace Grafkit {
 			std::vector<CBVar> m_vConstVars;
 		};
 
-		typedef std::map<std::string, size_t> bufferMap_t;
-		typedef bufferMap_t::iterator bufferMap_it;
+		typedef std::map<std::string, size_t> CBMap_t;
+		typedef CBMap_t::iterator CBMap_it_t;
 
-		bufferMap_t m_mapBuffers;
-		std::vector<CBRecord> m_vBuffers;
+		CBMap_t m_mapCBuffers;
+		std::vector<CBRecord> m_vCBuffers;
 
 		// -- input layout 
 		typedef std::vector<InputElementRecord> inputElements_t;
@@ -177,9 +226,9 @@ namespace Grafkit {
 			void *m_boundSource;
 		};
 
-		typedef std::map<std::string, size_t> bResourceMap_t;
-		typedef bResourceMap_t::iterator bResourceMap_it;
-		bResourceMap_t m_mapBResources;
+		typedef std::map<std::string, size_t> BResMap_t;
+		typedef BResMap_t::iterator BResMap_it_t;
+		BResMap_t m_mapBResources;
 		std::vector<BResRecord> m_vBResources;
 
 		// -- output sampler
