@@ -1,5 +1,7 @@
 #pragma once
 
+#include "texture.h"
+
 #include "renderer.h"
 #include "particle.h"
 
