@@ -114,7 +114,7 @@ namespace Grafkit
 	};
 
 	// ================================================================================================================================================
-
+	///@tod ezt a jovoben kicsit szebben ki kellene vitelezni
 	class QuadGenerator {
 	public:
 		QuadGenerator(ID3D11Device *const& device, ShaderRef &shader) : m_meshGen(device, shader) {}
