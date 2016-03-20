@@ -192,16 +192,15 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 			BResRecord &brRecord = this->m_bResources[i];
 			if (brRecord.m_boundSource != nullptr) {
 				
-				switch (brRecord.m_desc.Type) {
+				/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
+				if (brRecord.m_desc.BindCount != 1)
+					DebugBreak();
 
+				switch (brRecord.m_desc.Type) {
 				case D3D_SIT_TEXTURE: 
 				{
 					///@todo ezzel kell meg valamit kezdeni 
 					ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
-
-					/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
-					if (brRecord.m_desc.BindCount != 1)
-						DebugBreak();
 
 					if (m_type == ST_Vertex) {
 						deviceContext->VSSetShaderResources(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &ppResV);
@@ -210,17 +209,25 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 						deviceContext->PSSetShaderResources(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &ppResV);
 					}
 
-					// zero, mindenesetre
-					brRecord.m_boundSource = nullptr;
-
 				} break;
 
 				case D3D_SIT_SAMPLER:
 				{
-					// ... 
+					ID3D11SamplerState * pSampler = (ID3D11SamplerState*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
+
+					///@todo ezzel kell meg valamit kezdeni 
+					if (m_type == ST_Vertex) {
+						deviceContext->VSSetSamplers(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &pSampler);
+					}
+					else if (m_type == ST_Pixel) {
+						deviceContext->PSSetSamplers(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &pSampler);
+					}
 				}break;
 				
 				}
+
+				// zero, mindenesetre
+				brRecord.m_boundSource = nullptr;
 			}
 		}
 	}

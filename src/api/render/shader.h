@@ -357,17 +357,19 @@ namespace Grafkit {
 
 // Definition of exceptions
 
-DEFINE_EXCEPTION(MissingShaderException, 1100, "Missing shader file")
+#define EX_ERROR_SHADER 1100
+
+DEFINE_EXCEPTION(MissingShaderException, EX_ERROR_SHADER + 0, "Missing shader file")
 
 ///@todo ezeket at kell pakolni a shader exceptionbe majd
-DEFINE_EXCEPTION(VSCrerateException, 1101, "Could not create vertex shader")
-DEFINE_EXCEPTION(FSCrerateException, 1102, "Could not create framgent shader")
+DEFINE_EXCEPTION(VSCrerateException, EX_ERROR_SHADER + 1, "Could not create vertex shader")
+DEFINE_EXCEPTION(FSCrerateException, EX_ERROR_SHADER + 2, "Could not create framgent shader")
 
-DEFINE_EXCEPTION(InputLayoutCreateException, 1103, "Could not create input layout")
-DEFINE_EXCEPTION(ConstantBufferCreateException, 1104, "Could not create constant buffer")
-DEFINE_EXCEPTION(ConstantBufferLocateException, 1106, "Could not locate constant buffer")
-DEFINE_EXCEPTION(ConstantBufferMapException, 1108, "Could not map constant buffer")
-DEFINE_EXCEPTION(BoundResourceLocateException, 1109, "Could not locate bound resouce")
+DEFINE_EXCEPTION(InputLayoutCreateException, EX_ERROR_SHADER + 3, "Could not create input layout")
+DEFINE_EXCEPTION(ConstantBufferCreateException, EX_ERROR_SHADER + 4, "Could not create constant buffer")
+DEFINE_EXCEPTION(ConstantBufferLocateException, EX_ERROR_SHADER + 5, "Could not locate constant buffer")
+DEFINE_EXCEPTION(ConstantBufferMapException, EX_ERROR_SHADER + 6, "Could not map constant buffer")
+DEFINE_EXCEPTION(BoundResourceLocateException, EX_ERROR_SHADER + 7, "Could not locate bound resouce")
 
 ///@Todo ennek teljesen sajat exceptiont kell definialni
 
