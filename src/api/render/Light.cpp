@@ -17,7 +17,7 @@ void Grafkit::BaseLight::SetShaderCB(ShaderRef &rPShader)
 {
 	m_light.type = this->GetLightType();
 
-	rPShader["light"].Set(&m_light);	///@todo multiple light sources
+	rPShader["light"] = &m_light;
 }
 
 // ============================================================================================================
