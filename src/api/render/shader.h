@@ -120,7 +120,6 @@ namespace Grafkit {
 			return (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount) ? m_cBuffers[id].m_cbVars[vid].m_type_desc : D3D11_SHADER_TYPE_DESC();
 		}
 
-
 		// ----
 		// access bounded resources
 		///@todo bounds check
@@ -230,28 +229,35 @@ namespace Grafkit {
 				
 				inline size_t GetVarCount() { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParamCount() : 0; }
 
-				inline void operator= (float v) { Set(&v); }
+				inline void operator= (float v) { SetP(&v); }
 			
-				inline void operator= (void* v) { Set(v); }
+				inline void operator= (void* v) { SetP(v); }
 				
-				inline void operator= (const float3 &v) { Set(&v); }
-				inline void operator= (const float2 &v) { Set(&v); }
-				inline void operator= (const float4 &v) { Set(&v); }
-				inline void operator= (const matrix &v) { Set(&v); }
+				inline void operator= (const float3 &v) { SetP(&v); }
+				inline void operator= (const float2 &v) { SetP(&v); }
+				inline void operator= (const float4 &v) { SetP(&v); }
+				inline void operator= (const matrix &v) { SetP(&v); }
 
-				inline void Set(const void * const pData) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData) : this->m_pShader->SetParamPtr(m_id, pData); }
-				inline void Set(const void * const pData, size_t width, size_t offset = 0) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); }
+				inline void SetP(const void * const pData, size_t width = 0, size_t offset = 0) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); }
 
-				inline void Set(const float v0);
-				inline void Set(const float v0, const float v1);
-				inline void Set(const float v0, const float v1, const float v2);
-				inline void Set(const float v0, const float v1, const float v2, const float v3);
+				inline void SetF(const float v0);
+				inline void SetF(const float v0, const float v1);
+				inline void SetF(const float v0, const float v1, const float v2);
+				inline void SetF(const float v0, const float v1, const float v2, const float v3);
 
+				
 				inline D3D11_SHADER_BUFFER_DESC GetBufferDesc() { return (this->IsValid()) ? this->m_pShader->GetCBDescription(m_id) : D3D11_SHADER_BUFFER_DESC(); }
 				
 				inline D3D11_SHADER_VARIABLE_DESC GetVarDesc() { return (this->IsValid()) ? this->m_pShader->GetCBVariableDescriptor(m_id, m_vid) : D3D11_SHADER_VARIABLE_DESC(); }
 				inline D3D11_SHADER_TYPE_DESC  GetTypeDesc() { return (this->IsValid()) ? this->m_pShader->GetCBTypeDescriptor(m_id, m_vid) : D3D11_SHADER_TYPE_DESC(); }
 				
+
+				operator D3D11_SHADER_BUFFER_DESC () { this->GetBufferDesc(); }
+				
+				operator D3D11_SHADER_VARIABLE_DESC  () { this->GetVarDesc(); }
+				operator D3D11_SHADER_TYPE_DESC   () { this->GetTypeDesc(); }
+				
+
 				inline int IsValid() { return (m_pShader != nullptr); }
 				inline int IsSubtype() { return m_is_subtype; }
 

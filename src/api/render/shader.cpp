@@ -335,7 +335,7 @@ void Shader::SetParamPtr(size_t id, size_t vid, const void const * pData, size_t
 		else
 			DebugBreak();
 
-		CopyMemory(this->MapParamBuffer(id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+		CopyMemory((BYTE*)this->MapParamBuffer(id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
 		this->UnMapParamBuffer(id);
 	}
 }
@@ -347,11 +347,7 @@ void* Shader::MapParamBuffer(size_t id, int isDiscard)
 		HRESULT result = 0;
 
 		CBRecord & cbRecord = m_cBuffers[id];
-		result = m_pDC->Map(cbRecord.m_buffer, 0, 
-			//isDiscard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 
-			// D3D11_MAP_WRITE,
-			D3D11_MAP_WRITE_DISCARD,
-			0, &cbRecord.m_mappedResource);
+		result = m_pDC->Map(cbRecord.m_buffer, 0, 	D3D11_MAP_WRITE_DISCARD, 0, &cbRecord.m_mappedResource);
 		if (FAILED(result)) {
 			throw EX_DETAILS(ConstantBufferMapException, "Cannot map buffer to a resource");
 		}
@@ -689,37 +685,37 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 // =============================================================================================================================
 
-inline void Shader::ShaderParamManager::Set(const float v0)
+inline void Shader::ShaderParamManager::SetF(const float v0)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[1];
 		v[0] = v0;
-		Set(v);
+		SetP(v);
 	}
 }
 
-inline void Shader::ShaderParamManager::Set(const float v0, const float v1)
+inline void Shader::ShaderParamManager::SetF(const float v0, const float v1)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[2];
 		v[0] = v0;
 		v[1] = v1;
-		Set(v);
+		SetP(v);
 	}
 }
 
-inline void Shader::ShaderParamManager::Set(const float v0, const float v1, const float v2)
+inline void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[3];
 		v[0] = v0;
 		v[1] = v1;
 		v[2] = v2;
-		Set(v);
+		SetP(v);
 	}
 }
 
-inline void Shader::ShaderParamManager::Set(const float v0, const float v1, const float v2, const float v3)
+inline void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2, const float v3)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[4];
@@ -727,7 +723,7 @@ inline void Shader::ShaderParamManager::Set(const float v0, const float v1, cons
 		v[1] = v1;
 		v[2] = v2;
 		v[3] = v3;
-		Set(v);
+		SetP(v);
 	}
 }
 
