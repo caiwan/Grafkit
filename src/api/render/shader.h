@@ -10,7 +10,7 @@
 
 #include "dxtypes.h"
 #include "renderer.h"
-#include "texture.h"
+// #include "texture.h"
 
 #include "../core/resource.h"
 #include "../core/ResourceBuilder.h"
@@ -277,15 +277,21 @@ namespace Grafkit {
 
 				~ShaderResourceManager() {}
 
-				void operator= (void* v) { Set(v); }
+				//void operator= (void* v) { Set(v); }
+				void operator= (ID3D11ShaderResourceView* v) { Set(v); }
+				void operator= (ID3D11SamplerState* v) { Set(v); }
 
-				void Set(void* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
+				void Set(ID3D11ShaderResourceView* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
+				void Set(ID3D11SamplerState* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
 
 				inline D3D11_SHADER_INPUT_BIND_DESC GetDescriptor() { if (IsValid()) m_pShader->GetBResDesc(m_id); }
 
 				int IsValid() { return (m_pShader != nullptr); }
 
 			private:
+
+				void Set(void* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
+
 				Shader * m_pShader;
 				size_t m_id;
 			};
