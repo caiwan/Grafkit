@@ -8,6 +8,8 @@
 #include "render/Material.h"
 #include "render/shader.h"
 
+#include "render/effect.h"
+
 #include "math/matrix.h"
 
 #include "core/asset.h"
@@ -48,14 +50,13 @@ protected:
 		Ref<Scene> scene;
 
 		TextureSamplerRef m_textureSampler;
-		TextureRef m_texOut;
-
 		ActorRef m_rootActor;
+
+		EffectComposerRef m_postfx;
 
 		float t;
 
-		ShaderRef m_vertexShader;
-		ShaderRef m_fragmentShader;
+		ShaderRef m_vertexShader, m_fragmentShader;
 		
 		int init() {
 			// --- ezeket kell osszeszedni egy initwindowban
@@ -97,10 +98,10 @@ protected:
 
 
 			SimpleMeshGenerator generator(render, m_vertexShader);
-			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
-			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
+			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
 			
-			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
+			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
 
 			// -- setup scene 
 			scene = new Scene();
@@ -134,8 +135,8 @@ protected:
 
 			// -- setup postfx 
 
-			m_texOut = new Texture();
-			m_texOut->Initialize(render);
+			m_postfx = new EffectComposer();
+			m_postfx->Initialize(render);
 
 			// --- 
 
@@ -151,16 +152,15 @@ protected:
 		// ==================================================================================================================
 		int mainloop() {
 
-			m_texOut->SetRenderTargetView(render);
+			m_postfx->BindInput(render);
 
 			// pre fx-pass
 			this->render.BeginScene();
-			{				
+			{
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 
-				Shader::ShaderResourceManager rm = m_fragmentShader->GetBRes("SampleType");// = m_textureSampler->GetSamplerState();
-				rm = m_textureSampler->GetSamplerState();
+				m_fragmentShader->GetBRes("SampleType") = m_textureSampler->GetSamplerState();
 
 				scene->PreRender(render);
 				scene->Render(render);
@@ -170,6 +170,7 @@ protected:
 			this->render.EndScene();
 
 			// render fx chain 
+			m_postfx->Render(render);
 
 			return 0;
 		};

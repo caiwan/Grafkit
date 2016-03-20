@@ -16,11 +16,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\assets\postfx\postfx.hlsl">
+    <None Include="..\..\assets\postfx\postfxEngine.hlsl">
       <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\assets\postfx\texture.hlsl">
+    </None>
+    <None Include="..\..\assets\postfx\postfx.hlsl">
       <Filter>Resource Files</Filter>
-    </FxCompile>
+    </None>
+    <None Include="..\..\assets\postfx\texture.hlsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
