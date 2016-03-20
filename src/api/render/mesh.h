@@ -112,6 +112,19 @@ namespace Grafkit
 			typedef std::map<std::string, const void* > mapPtr_t;
 			mapPtr_t m_mapPtr;
 	};
+
+	// ================================================================================================================================================
+
+	class QuadGenerator {
+	public:
+		QuadGenerator(ID3D11Device *const& device, ShaderRef &shader) : m_meshGen(device, shader) {}
+		~QuadGenerator() {}
+
+		MeshRef operator() (MeshRef input = nullptr);
+
+	private:
+		SimpleMeshGenerator m_meshGen;
+	};
 }
 
 // --- excpetions 

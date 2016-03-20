@@ -65,7 +65,7 @@ void Grafkit::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
 	this->m_buffer = elem;
 }
 
-// ========================================================================
+// ================================================================================================================================================
 Grafkit::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * const & device, ShaderRef &shader)
 	: m_device(device), m_shader(shader)
 {
@@ -207,4 +207,15 @@ void Grafkit::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCoun
 	delete[] indices; indices = 0;
 
 	mesh->addIndices(indexBuffer, indexCount);
+}
+
+// ================================================================================================================================================
+
+#include "../builtin_data/cube.h"
+
+MeshRef Grafkit::QuadGenerator::operator()(MeshRef input)
+{
+	m_meshGen["POSITION"] = GrafkitData::quad;
+	m_meshGen["TEXCOORD"] = GrafkitData::quad_texcoord;
+	return m_meshGen(4, 6, GrafkitData::quadIndices, input);
 }
