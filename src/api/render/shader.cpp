@@ -593,9 +593,11 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC out_desc;
 		this->m_pReflector->GetOutputParameterDesc(i, &out_desc);
-
-		// ... 
-		///@todo fetch through rainbow 
+		
+		OutputTargetRecord rec;
+		rec.desc = out_desc;
+		
+		m_outputTargets.push_back(rec);
 	}
 
 	// return; 

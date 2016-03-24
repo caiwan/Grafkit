@@ -80,6 +80,10 @@ namespace Grafkit {
 			UINT offset;
 		};
 
+		struct OutputTargetRecord {
+			D3D11_SIGNATURE_PARAMETER_DESC desc;
+		};
+
 		// ----
 		// access constant buffers and variables 
 		///@todo bounds check
@@ -189,10 +193,10 @@ namespace Grafkit {
 
 		CBMap_t m_mapCBuffers;
 		size_t m_cBufferCount;
-		CBRecord *m_cBuffers;
+		CBRecord *m_cBuffers;	///@todo ezek is legyenek vektorok majd 
 
 		// -- input layout 
-		typedef std::vector<InputElementRecord> inputElements_t;	///@todo std::vectort el kell tuntetni innen
+		typedef std::vector<InputElementRecord> inputElements_t;
 		inputElements_t m_mapInputElems;
 		ID3D11InputLayout* m_layout;
 
@@ -211,6 +215,7 @@ namespace Grafkit {
 		BResRecord* m_bResources;
 
 		// -- output sampler
+		std::vector<OutputTargetRecord> m_outputTargets;
 
 		// ================================================================================================================================
 
