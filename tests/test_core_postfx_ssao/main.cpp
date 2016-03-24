@@ -74,32 +74,22 @@ protected:
 			CameraRef camera = new Camera;
 			camera->SetPosition(0.0f, 0.0f, -10.0f);
 
-			// -- texture
-			TextureResRef texture = new TextureRes();
-
-			TextureFromBitmap txgen( m_file_loader->Get("Normap.jpg"), texture );
-			txgen(this);
-
-			// -- texture sampler
-			m_textureSampler = new TextureSampler();
-			m_textureSampler->Initialize(render);
-
 			// -- load shader
 			m_vertexShader = new Shader();
-			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"./flat.hlsl", ST_Vertex);
 
 			m_fragmentShader = new Shader();
-			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"./flat.hlsl", ST_Pixel);
 
 			// -- model 
 			ModelRef model = new Model;
 			model->SetMaterial(new MaterialBase);
-			model->GetMaterial()->AddTexture(texture, "diffuse");
 
 
 			SimpleMeshGenerator generator(render, m_vertexShader);
 			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
 			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
+			generator["NORMAL"] = (void*)GrafkitData::cubeNormals;
 			
 			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
 
@@ -108,14 +98,14 @@ protected:
 			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
 			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
 			
-			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
-			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
+			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(2.25, 0, 0); modelActor->AddChild(modelActorL);
+			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-2.25, 0, 0); modelActor->AddChild(modelActorR);
 
-			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
-			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
+			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 2.25, 0); modelActor->AddChild(modelActorU);
+			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -2.25, 0); modelActor->AddChild(modelActorD);
 
-			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
-			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
+			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 2.25); modelActor->AddChild(modelActorF);
+			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -2.25); modelActor->AddChild(modelActorB);
 			
 
 			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
@@ -158,9 +148,10 @@ protected:
 			this->render.BeginScene();
 			{
 				m_rootActor->Matrix().Identity();
-				m_rootActor->Matrix().RotateRPY(t,0,0);
+				m_rootActor->Matrix().RotateRPY(t, 2.23234*t, 3.2645*t);
+				//m_rootActor->Matrix().RotateRPY(t, 0,0);
 
-				m_fragmentShader->GetBRes("SampleType") = m_textureSampler->GetSamplerState();
+				// m_fragmentShader->GetBRes("SampleType") = m_textureSampler->GetSamplerState();
 
 				scene->PreRender(render);
 				scene->Render(render);

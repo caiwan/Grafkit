@@ -16,11 +16,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\assets\postfx_ssao\flat.hlsl">
+    <None Include="..\..\assets\postfx_ssao\flat.hlsl">
       <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="..\..\assets\postfx_ssao\ssao.hlsl">
+    </None>
+    <None Include="..\..\assets\postfx_ssao\ssao.hlsl">
       <Filter>Resource Files</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>
