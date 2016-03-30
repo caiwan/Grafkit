@@ -130,7 +130,15 @@ protected:
 
 			ShaderRef ssao_shader = new Shader();
 			ssao_shader->LoadFromFile(render, "TexturePixelShader", L"./ssao.hlsl", ST_Pixel);
+	
 			m_postfx->AddPass(new EffectPass()); m_postfx[0]->Initialize(render, ssao_shader);
+			
+			// render pass n>0 inputjai
+			TextureRef tx_normals = new Texture(); tx_normals->Initialize(render);
+			TextureRef tx_position = new Texture(); tx_position->Initialize(render);
+
+			m_postfx[0]->SetInput("normals", tx_normals); m_postfx->SetInput(1, tx_normals);
+			m_postfx[0]->SetInput("position", tx_position); m_postfx->SetInput(2, tx_position);
 
 
 
