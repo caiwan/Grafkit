@@ -35,15 +35,16 @@ namespace Grafkit {
 
 		/** Beallitja az elso read buffert a rendererenek, a render passhoz
 		*/
-		virtual void BindInput(Renderer &render, size_t in = 0);
+		void BindInput(Renderer &render);
 
 		/** Vegigmegy a render chainen
 		*/
-		virtual void Render(Renderer &render);
+		void Render(Renderer &render, int autoflush = 1);
+		void Flush(Renderer &render);
 
-		void setInput(size_t bind, TextureRef tex) { m_input_map[bind] = tex; }
-		TextureRef getInput(size_t bind) { auto it = m_input_map.find(bind); return it == m_input_map.end() ? TextureRef() : it->second; }
-		void clearInput() { m_input_map.clear(); }
+		void SetInput(size_t bind, TextureRef tex) { m_input_map[bind] = tex; }
+		TextureRef GetInput(size_t bind) { auto it = m_input_map.find(bind); return it == m_input_map.end() ? TextureRef() : it->second; }
+		void ClearInput() { m_input_map.clear(); }
 
 	protected:
 		/**
@@ -88,7 +89,7 @@ namespace Grafkit {
 		EffectComposerRef(EffectComposerRef &other) : EffectComposerRef_t(other) {}
 		EffectComposerRef(EffectComposer *other) : EffectComposerRef_t(other) {}
 
-		EffectPassRef operator [] (size_t id) { return Valid() ? this->ptr->GetEffect(id) : EffectPassRef(); }
+		EffectPassRef operator [] (int id) { return Valid() ? this->ptr->GetEffect(id) : EffectPassRef(); }
 	};
 
 	// ===================================================================================================
@@ -108,14 +109,14 @@ namespace Grafkit {
 
 		ShaderRef GetShader() { return m_shader; }
 
-		void setOutput(size_t bind, TextureRef tex) {m_output_map[bind] = tex; }
-		void setInput(std::string name, TextureRef tex) { m_input_map[name] = tex; }
+		void SetOutput(size_t bind, TextureRef tex) {m_output_map[bind] = tex; }
+		void SetInput(std::string name, TextureRef tex) { m_input_map[name] = tex; }
 
-		void clearOutputs() { m_output_map.clear();  }
-		void clearInputs() { m_input_map.clear(); }
+		void ClearOutputs() { m_output_map.clear();  }
+		void ClearInputs() { m_input_map.clear(); }
 
-		TextureRef getOutput(size_t bind); 
-		TextureRef getInput(std::string name);
+		TextureRef GetOutput(size_t bind); 
+		TextureRef GetInput(std::string name);
 
 	private:
 		ShaderRef m_shader;

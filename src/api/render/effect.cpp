@@ -90,9 +90,9 @@ void Grafkit::EffectComposer::Shutdown()
 }
 
 // ---------------------------------------------------------------------------------------------------
-void Grafkit::EffectComposer::BindInput(Renderer & render, size_t in)
+void Grafkit::EffectComposer::BindInput(Renderer & render)
 {
-	render.SetRenderTargetView(m_pTexRead->GetRenderTargetView(), in);
+	render.SetRenderTargetView(m_pTexRead->GetRenderTargetView(), 0);
 
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
 		if (it->second.Valid()) {
@@ -102,9 +102,11 @@ void Grafkit::EffectComposer::BindInput(Renderer & render, size_t in)
 }
 
 // ---------------------------------------------------------------------------------------------------
-void Grafkit::EffectComposer::Render(Renderer & render)
+void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 {
 	RenderChain(render);
+	if (autoflush)
+		this->Flush(render);
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -126,33 +128,37 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 {
 	///@todo a kozbenso effektek inputjait is bindelje ossze
 
-	// a render passban a write bufferbe irutnk elozoleg, igy meg kell cserelni a chain render elott
-	this->SwapBuffers();
+	m_shaderFullscreenQuad->Render(render);
 
-	for (fx_chain_it_t it = this->m_effectChain.begin(); it != this->m_effectChain.end(); it++) {
+	for (size_t i = 0; i < m_effectChain.size(); i++)
+	{
+		EffectPass *fx = m_effectChain[i].Get();
 		this->m_pTexWrite->SetRenderTargetView(render);
 		render.BeginScene();
 		{
-			if ((*it)->GetShader().Valid()) {
-				(*it)->GetShader()->GetBRes("backBuffer") = m_pTexBack->GetTextureResource();
-				(*it)->GetShader()->GetBRes("effectInput") = m_pTexRead->GetTextureResource();
-				(*it)->GetShader()->GetBRes("SampleType") = m_textureSampler->GetSamplerState();
-				(*it)->Render(render);
+			if (fx && fx->GetShader().Valid()) {
+				fx->GetShader()->GetBRes("backBuffer") = m_pTexBack->GetTextureResource();
+				fx->GetShader()->GetBRes("effectInput") = m_pTexRead->GetTextureResource();
+				fx->GetShader()->GetBRes("SampleType") = m_textureSampler->GetSamplerState();
+				fx->Render(render);
 			}
 
 			m_fullscreenquad->RenderMesh(render);
 		}
 
-		render.EndScene();
 		this->SwapBuffers();
 	}
+}
 
+void Grafkit::EffectComposer::Flush(Renderer & render)
+{
 	// present the result 
 	render.SetRenderTargetView();
+	render.BeginScene();
 
 	m_shaderFullscreenQuad->Render(render);
 	m_shaderCopyScreen->Render(render);
-	m_shaderCopyScreen->GetBRes("effectInput") = m_pTexWrite->GetTextureResource();
+	m_shaderCopyScreen->GetBRes("effectInput") = m_pTexRead->GetTextureResource();
 
 	m_fullscreenquad->RenderMesh(render);
 
@@ -202,13 +208,13 @@ void Grafkit::EffectPass::Render(Renderer & render)
 	m_shader->Render(render);
 }
 
-TextureRef Grafkit::EffectPass::getOutput(size_t bind)
+TextureRef Grafkit::EffectPass::GetOutput(size_t bind)
 {
 	auto it = m_output_map.find(bind);
 	return it == m_output_map.end() ? TextureRef() : it->second;
 }
 
-TextureRef Grafkit::EffectPass::getInput(std::string name)
+TextureRef Grafkit::EffectPass::GetInput(std::string name)
 {
 	auto it = m_input_map.find(name);
 	return it == m_input_map.end() ? TextureRef() : it->second;

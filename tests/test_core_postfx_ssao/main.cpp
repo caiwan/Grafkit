@@ -128,6 +128,12 @@ protected:
 			m_postfx = new EffectComposer();
 			m_postfx->Initialize(render);
 
+			ShaderRef ssao_shader = new Shader();
+			ssao_shader->LoadFromFile(render, "TexturePixelShader", L"./ssao.hlsl", ST_Pixel);
+			m_postfx->AddPass(new EffectPass()); m_postfx[0]->Initialize(render, ssao_shader);
+
+
+
 			// --- 
 
 			return 0;
@@ -158,10 +164,11 @@ protected:
 
 				this->t += 0.01;
 			}
-			this->render.EndScene();
 
 			// render fx chain 
 			m_postfx->Render(render);
+
+			this->render.EndScene();
 
 			return 0;
 		};
