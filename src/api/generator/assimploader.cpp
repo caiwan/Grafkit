@@ -210,11 +210,14 @@ Grafkit::AssimpLoader::~AssimpLoader()
 // ================================================================================================================================================================
 void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * source)
 {
-	SceneRef outScene; // = new Scene();
-	if (outScene.Invalid()) {
-		outScene = new Scene();
+	SceneResRef dstScene = dynamic_cast<SceneRes*>(source);
+	if (dstScene.Invalid()) {
+		/// @todo thorw exception, de szerintem nem kell 
+		return;
 	}
 
+
+	SceneRef outScene = new Scene();
 	outScene->SetName(m_srcName);
 
 	IAssetRef srcAsset = this->GetSourceAsset(reman);
@@ -494,9 +497,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 	
 	}
 
-	// hogy a faszomba van ez
-
-	// add to resman
-	// resman->Add(outScene);
-	// source->Ass
+	// 3.
+	if (dstScene->Valid()) {
+		dstScene->Release();
+	}
+	dstScene->AssingnRef(scene);
 }
