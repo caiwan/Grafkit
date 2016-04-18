@@ -19,7 +19,7 @@ void BaseLight::SetShaderCB(ShaderRef &rPShader)
 {
 	m_light.type = this->GetLightType();
 
-	rPShader["light"] = &m_light;
+	((Shader)(*rPShader))["light"] = &m_light;
 }
 
 // ============================================================================================================

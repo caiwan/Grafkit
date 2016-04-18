@@ -69,7 +69,14 @@ namespace Grafkit{
 	*/
 	template <typename T> class Resource : public IResource, public Ref<T>
 	{
-		// ... 
+	public:
+		Resource() : IResource(), Ref<T>() {}
+		Resource(Resource* ptr) : IResource(), Ref<T>(ptr) {}
+		Resource(Ref<Resource> ref) : IResource(), Ref<T>(ref) {}
+
+		operator Ref<T> () { return Ref<T>(dynamic_cast<T*>(this->Get())); }
+		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
+		operator T& () { return *(this->Get()); }
 	};
 
 }
