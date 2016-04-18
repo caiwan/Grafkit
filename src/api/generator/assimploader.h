@@ -15,14 +15,10 @@ namespace Grafkit {
 	class AssimpLoader : public Grafkit::IResourceBuilder
 	{
 	public:
-		AssimpLoader(std::string source_name, Grafkit::SceneRef & scenegraph);
+		AssimpLoader(std::string source_name);
 		~AssimpLoader();
 
-		virtual void load(IResourceManager * const & assman);
-
-	private:
-		/*Grafkit::IAssetRef m_resource;
-		Grafkit::Scene * const & m_scenegraph;*/
+		virtual void Load(IResourceManager * const & resman, IResource * source);
 	};
 
 }

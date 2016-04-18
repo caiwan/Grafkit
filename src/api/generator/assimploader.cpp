@@ -138,7 +138,7 @@ namespace {
 }
 
 #if 0
-TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IResourceManager * const & assman)
+TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IResourceManager * const & reman)
 {
 	aiString path;
 	TextureAssetRef textureAsset;
@@ -148,7 +148,7 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 
 	if (result == AI_SUCCESS && path.data[0]) {
 		//textureAsset = (TextureAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(TEXTURE_BUCKET, name).Get();
-		textureAsset = (TextureAsset*)assman->GetObjectByName(TEXTURE_BUCKET, name);
+		textureAsset = (TextureAsset*)reman->GetObjectByName(TEXTURE_BUCKET, name);
 
 	}
 
@@ -196,10 +196,7 @@ void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Ac
 // ================================================================================================================================================================
 // Head
 // ================================================================================================================================================================
-
-
-Grafkit::AssimpLoader::AssimpLoader(std::string source_name, Grafkit::SceneRef & scenegraph) 
-	: IResourceBuilder(source_name, source_name, scenegraph) // itt megegyezik a filenev, es az objektum nev
+Grafkit::AssimpLoader::AssimpLoader(std::string source_name) : IResourceBuilder(source_name, source_name) 
 {
 }
 
@@ -207,19 +204,20 @@ Grafkit::AssimpLoader::~AssimpLoader()
 {
 }
 
+
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
+void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * source)
 {
-	SceneRef outScene = m_dstResource;
+	SceneRef outScene; // = new Scene();
 	if (outScene.Invalid()) {
 		outScene = new Scene();
 	}
 
 	outScene->SetName(m_srcName);
 
-	IAssetRef srcAsset = this->GetSourceAsset(assman);
+	IAssetRef srcAsset = this->GetSourceAsset(reman);
 
 	if (!srcAsset) {
 		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
@@ -265,7 +263,7 @@ void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
 					///@todo 
 #if 0
-					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, assman), texture_load_map[k].tt);
+					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, reman), texture_load_map[k].tt);
 #endif
 				}
 			}
@@ -281,7 +279,7 @@ void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
 			
 			///@todo itt a materialt hozzuk lere valahogy, on-the-fly
 #if 0
-			ShaderResRef shader_fs = (ShaderRes*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
+			ShaderResRef shader_fs = (ShaderRes*)reman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 			material->SetShader(shader_fs);
 #endif 
 			materials.push_back(material);
@@ -294,7 +292,7 @@ void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
 	///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre
 	///@todo itt specialis materialt hozzunk letre, ami betolti a shadert, ha kell 
 #if 0
-	ShaderResRef shader_vs = (ShaderRes*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
+	ShaderResRef shader_vs = (ShaderRes*)reman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 #endif 
 
 	/*
@@ -323,7 +321,7 @@ void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
 			///@todo kell egy olyan mesh generator, ami nem a shaderbol szedi ossze az input layoutot
 
 #if 0
-			SimpleMeshGenerator generator(assman->GetDeviceContext(), shader_vs);
+			SimpleMeshGenerator generator(reman->GetDeviceContext(), shader_vs);
 			generator["POSITION"] = curr_mesh->mVertices; 
 			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0];  ///@todo ha tobb textura van akkor toltse be azokat is majd 
 			generator["NORMAL"] = curr_mesh->mNormals;
@@ -423,8 +421,8 @@ void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
 			assimp_color_f4(curr_light->mColorDiffuse, light->GetDiffuse());
 			assimp_color_f4(curr_light->mColorSpecular, light->GetSpecular());
 
-
-			light->SetName(std::string(curr_light->mName.C_Str()));
+			///@todo ez kell-e majd?
+			// light->SetName(std::string(curr_light->mName.C_Str()));
 
 			lights.push_back(light);
 			//asset_repo->AddObject(light);
@@ -496,9 +494,9 @@ void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
 	
 	}
 
+	// hogy a faszomba van ez
 
 	// add to resman
-	assman->Add(outScene);
-
-	m_dstResource = outScene;
+	// resman->Add(outScene);
+	// source->Ass
 }
