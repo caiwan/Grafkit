@@ -216,9 +216,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 		return;
 	}
 
-
 	SceneRef outScene = new Scene();
-	outScene->SetName(m_srcName);
+	// outScene->SetName(m_srcName);
 
 	IAssetRef srcAsset = this->GetSourceAsset(reman);
 
@@ -501,5 +500,5 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 	if (dstScene->Valid()) {
 		dstScene->Release();
 	}
-	dstScene->AssingnRef(scene);
+	dstScene->AssingnRef(outScene);
 }

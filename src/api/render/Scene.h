@@ -21,8 +21,7 @@ namespace Grafkit {
 
 #define SCENE_BUCKET "scene"
 
-	__declspec(align(16)) class Scene : public IResource, public AlignedNew<Scene>
-	// class Scene : public IResource 
+	__declspec(align(16)) class Scene : virtual public Referencable, public AlignedNew<Scene>
 	{
 	public:
 		Scene();
@@ -80,4 +79,8 @@ namespace Grafkit {
 	private:
 			
 	};
+
+	typedef Ref<Scene> SceneRef;
+	typedef Resource<Scene> SceneRes;
+	typedef Ref<SceneRes> SceneResRef;
 }
