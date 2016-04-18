@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "utils/exceptions.h"
+
 #include "utils/resource.h"
 #include "utils/ResourceBuilder.h"
 #include "utils/ResourceManager.h"
@@ -56,6 +58,39 @@ public:
 		thing->SetAsd(0x010101);
 
 		// 3.
+		dstThing->AssingnRef(thing);
+
+	}
+};
+
+class ErrorousThingLoader : public Grafkit::IResourceBuilder {
+public:
+	ErrorousThingLoader(std::string name) : Grafkit::IResourceBuilder(name, name) {}
+	virtual ~ErrorousThingLoader() {}
+
+	virtual Grafkit::IResource* NewResource() {
+		return new ThingResource();
+	}
+
+	virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) {
+		// 1.
+		ThingResourceRef dstThing = dynamic_cast<ThingResource*>(source);
+		if (dstThing.Invalid()) {
+			return;
+		}
+
+		// 2.
+		ThingRef thing = new Thing();
+		
+		// oops, something happened intentionally 
+		throw EX(FWdebugExceptions::NullPointerException); 
+		
+		thing->SetAsd(0x010101);
+
+		// 3.
+		if (dstThing->Valid()) {
+			dstThing->Release();
+		}
 		dstThing->AssingnRef(thing);
 
 	}
