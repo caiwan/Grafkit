@@ -96,9 +96,9 @@ virtual Grafkit::Clonable* createObj() const \
 	/// Another solution is create factories inside the object as 'clonable' , and feed them into the clonables collenction
 	/// This should prevent unnesesarry construction calling and memory usage, and crashes due to the uninitialized framework
 #define CLONEABLE_FACTORY_DECL(className)\
-class Factory : public FWutils::Clonable { \
+class Factory : public Grafkit::Clonable { \
 public: \
-	virtual FWutils::Clonable* createObj() const \
+	virtual Grafkit::Clonable* createObj() const \
 	{ \
 		return new className(); \
 	} \
