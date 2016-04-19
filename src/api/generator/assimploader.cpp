@@ -204,6 +204,11 @@ Grafkit::AssimpLoader::~AssimpLoader()
 {
 }
 
+IResource * Grafkit::AssimpLoader::NewResource()
+{
+	return new SceneRes();
+}
+
 
 // ================================================================================================================================================================
 // It does the trick

@@ -19,6 +19,8 @@ namespace Grafkit {
 		~AssimpLoader();
 
 		virtual void Load(IResourceManager * const & resman, IResource * source);
+
+		virtual IResource* NewResource();
 	};
 
 }
