@@ -126,6 +126,9 @@ void Grafkit::StructPack::calcSize()
 // ========================================================
 
 #ifdef _USE_STDC_MALLOC_
+
+// standard std allokatorok hasznalata
+
 void * Grafkit::StructPack::alloc(size_t size)
 {
 	return malloc(size);
@@ -134,6 +137,36 @@ void * Grafkit::StructPack::alloc(size_t size)
 void Grafkit::StructPack::free(void * ptr)
 {
 	free(ptr);
+}
+
+void Grafkit::StructPack::zeroMemory(void * ptr, size_t size)
+{
+	memset(ptr, 0, size);
+}
+
+#else //_USE_LIBC_ALLOCATOR
+
+// aligned allokatorok hasznalata 
+
+#define ALIGNMENT 16
+
+void * Grafkit::StructPack::alloc(size_t size)
+{
+	const size_t alignment = ALIGNMENT;
+
+	static_assert(alignment > 8, "AlignedNew is only useful for types with > 8 byte alignment.");
+
+	void* ptr = _aligned_malloc(size, alignment);
+
+	if (!ptr)
+		throw std::bad_alloc();
+
+	return ptr;
+}
+
+void Grafkit::StructPack::free(void * ptr)
+{
+	_aligned_free(ptr);
 }
 
 void Grafkit::StructPack::zeroMemory(void * ptr, size_t size)

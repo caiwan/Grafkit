@@ -4,7 +4,8 @@
 #include "exceptions.h"
 
 
-#define _USE_STDC_MALLOC_
+/// ezt kell majd definialni forditaskor 
+// #define _USE_STDC_MALLOC_
 
 namespace Grafkit {
 	/**
