@@ -22,31 +22,42 @@ TextureLoader::~TextureLoader()
 
 	LOGGER(LOG(INFO) << "Loading texture from resource");
 
+void Grafkit::TextureFromBitmap::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
+{
+	TextureResRef dstTexture = dynamic_cast<TextureRes*>(source);
+	if (dstTexture.Invalid()) {
+		throw EX(NullPointerException);
+	}
+
+	// --- load texture 
+	TextureRef texture = new Texture();
+
+	LOGGER(log(info) << "loading texture from resource");
+	
 	int x = 0, y = 0, ch = 0;
-	/// @todo resize;
-
-	IAssetRef asset = this->GetSourceAsset(assman);
-
-	// kikenyszeritett RGBA mod
+	IAssetRef asset = this->GetSourceAsset(resman);
+	
+	// kikenyszeritett rgba mod
 	UCHAR *data = stbi_load_from_memory((UCHAR *)asset->GetData(), asset->GetSize(), &x, &y, &ch, 0);
+	
+	/// @todo resize;
 
 	if (!data)
 	{
 		throw EX_DETAILS(BitmapLoadException, stbi_failure_reason());
 	}
 
-	TextureRef texture = new Texture();
-	if (texture.Invalid())
-		texture = new Texture();
+	texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, x, y, ch));
 
-	try {
-		texture->Initialize(assman->GetDeviceContext(), new Bitmap(data, x, y, ch));
-	}
-	catch (FWdebug::Exception &e) {
-		// do nothing here yet.
-		throw e;
+	// --- xchg texture 
+	if (dstTexture->Valid()) {
+		dstTexture->Release();
 	}
 
-	outTexture = texture;
-	m_dstResource = outTexture;
+	dstTexture->AssingnRef(texture);
+}
+
+IResource * Grafkit::ITextureBuilder::NewResource()
+{
+	return new TextureRes;
 }
