@@ -35,7 +35,6 @@ namespace Grafkit {
 
 	// ================================================================================================================================
 	__declspec(align(16)) class Shader : virtual public Referencable, public AlignedNew<Shader>
-	// class Shader : virtual public Referencable
 	{
 
 	public:
