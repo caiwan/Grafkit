@@ -17,6 +17,7 @@
 #include "utils/ResourceManager.h"
 
 #include "generator/TextureLoader.h"
+#include "generator/ShaderLoader.h"
 
 using namespace Grafkit;
 
@@ -64,7 +65,7 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetManager("");
+			this->m_file_loader = new FileAssetManager("./../../assets/rotating_cube/");
 
 			// --------------------------------------------------
 
@@ -73,8 +74,9 @@ protected:
 			m_camera->SetPosition(0.0f, 0.0f, -10.0f);
 
 			// -- texture
-			TextureResRef textureRes = new TextureRes();
-			TextureFromBitmap *textureLoader = new TextureFromBitmap("c:\\Users\\psari\\prog\\grafkit2\\assets\\rotating_cube\\normap.jpg");
+			
+			TextureFromBitmap *textureLoader = new TextureFromBitmap("normap.jpg");
+			TextureResRef textureRes = (TextureRes*)textureLoader->NewResource();
 			textureLoader->Load(this, textureRes);
 
 			this->m_texture = textureRes->Get();
@@ -85,16 +87,25 @@ protected:
 			m_textureSampler = new TextureSampler();
 
 			// -- load shader
-			m_vertexShader = new Shader();
-			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"c:\\Users\\psari\\prog\\grafkit2\\assets\\rotating_cube\\texture.hlsl", ST_Vertex);
+			
+			ShaderLoader *vShaderLoader = new ShaderLoader("vshader", "texture.hlsl", "TextureVertexShader", ST_Vertex);
+			ShaderResRef vShaderRef = (ShaderRes*)(vShaderLoader->NewResource());
+			vShaderLoader->Load(this, vShaderRef);
+			
+			m_vertexShader = vShaderRef->Get();
 
-			m_fragmentShader = new Shader();
-			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"c:\\Users\\psari\\prog\\grafkit2\\assets\\rotating_cube\\texture.hlsl", ST_Pixel);
+			delete vShaderLoader;
+
+			ShaderLoader *pShaderLoader = new ShaderLoader("pshader", "texture.hlsl", "TexturePixelShader", ST_Pixel);
+			ShaderResRef pShaderRef = (ShaderRes*)(pShaderLoader->NewResource());
+			pShaderLoader->Load(this, pShaderRef);
+
+			m_fragmentShader = pShaderRef->Get();
+
+			delete pShaderLoader;
 
 			// -- model 
 			this->m_model = new Model;
-			// m_model->SetMaterial(new MaterialBase);
-			// m_model->GetMaterial()->AddTexture(new TextureRes(this->m_texture), "diffuse");
 
 			// -- generator
 			SimpleMeshGenerator generator(render, m_vertexShader);
