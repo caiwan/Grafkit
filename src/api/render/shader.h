@@ -27,10 +27,6 @@ namespace Grafkit {
 		ST_COUNT
 	};
 
-	class Shader;
-	class ShaderRes;
-	class ShaderResRef;
-
 	///opt out operator overlaoding (= and [])
 #define SHADER_NO_OPERATOR_ENHANCEMENT
 
@@ -317,8 +313,8 @@ namespace Grafkit {
 	// ================================================================================================================================
 
 	typedef Ref<Shader> ShaderRef;
-	typedef Grafkit::Resource<Shader> ShaderResource;
-	typedef Ref<ShaderResource> ShaderResourceRef;
+	typedef Grafkit::Resource<Shader> ShaderRes;
+	typedef Ref<ShaderRes> ShaderResRef;
 
 }
 
