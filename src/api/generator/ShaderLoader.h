@@ -17,6 +17,8 @@ namespace Grafkit {
 
 		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
 
+		virtual IResource* NewResource();
+
 	protected:
 		ShaderType_e m_type;
 		std::string m_entrypoint;
