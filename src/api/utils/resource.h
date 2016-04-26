@@ -74,6 +74,9 @@ namespace Grafkit{
 		Resource(Resource* ptr) : IResource(), Ref<T>(ptr) {}
 		Resource(Ref<Resource> ref) : IResource(), Ref<T>(ref) {}
 
+		Resource(Ref<T> tref) : IResource(), Ref<T>(tref) {}
+		Resource(T* tptr) : IResource(), Ref<T>(tptr) {}
+
 		operator Ref<T> () { return Ref<T>(dynamic_cast<T*>(this->Get())); }
 		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
 		operator T& () { return *(this->Get()); }
