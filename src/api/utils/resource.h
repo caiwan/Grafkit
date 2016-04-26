@@ -71,6 +71,7 @@ namespace Grafkit{
 	{
 	public:
 		Resource() : IResource(), Ref<T>() {}
+
 		Resource(Resource* ptr) : IResource(), Ref<T>(ptr) {}
 		Resource(Ref<Resource> ref) : IResource(), Ref<T>(ref) {}
 
