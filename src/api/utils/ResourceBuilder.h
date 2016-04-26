@@ -17,7 +17,7 @@ namespace Grafkit {
 	class IResourceBuilder
 	{
 		public:
-			IResourceBuilder(std::string name, std::string sourcename) : m_name(name), m_srcName(name) {}
+			IResourceBuilder(std::string name, std::string sourcename) : m_name(name), m_srcName(sourcename) {}
 			virtual ~IResourceBuilder() {}
 
 			std::string GetName() { return m_name; }
