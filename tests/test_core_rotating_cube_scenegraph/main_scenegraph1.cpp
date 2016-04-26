@@ -17,6 +17,8 @@
 #include "utils/ResourceManager.h"
 
 #include "generator/TextureLoader.h"
+#include "generator/ShaderLoader.h"
+
 
 using namespace Grafkit;
 
@@ -52,8 +54,8 @@ protected:
 
 		float t;
 
-		ShaderRef m_vertexShader;
-		ShaderRef m_fragmentShader;
+		ShaderResRef m_vertexShader;
+		ShaderResRef m_fragmentShader;
 		
 		int init() {
 			// --- ezeket kell osszeszedni egy initwindowban
@@ -63,7 +65,7 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetManager("./");
+			this->m_file_loader = new FileAssetManager("./../../assets/rotating_cube/");
 
 			// --------------------------------------------------
 
@@ -80,11 +82,11 @@ protected:
 			m_textureSampler = new TextureSampler();
 
 			// -- load shader
-			m_vertexShader = new Shader();
-			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
+			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
-			m_fragmentShader = new Shader();
-			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+			// -- precalc
+			this->DoPrecalc();
 
 			// -- model 
 			ModelRef model = new Model;
@@ -97,9 +99,6 @@ protected:
 			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
 			
 			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
-
-			// --- 
-			this->DoPrecalc();
 
 			// -- setup scene 
 			scene = new Scene();
