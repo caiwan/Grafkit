@@ -80,6 +80,7 @@ protected:
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
+			m_textureSampler->Initialize(render);
 
 			// -- load shader
 			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));

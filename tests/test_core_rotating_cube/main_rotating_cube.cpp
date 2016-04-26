@@ -85,6 +85,7 @@ protected:
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
+			m_textureSampler->Initialize(render);
 
 			// -- load shader
 			
