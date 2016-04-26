@@ -31,7 +31,8 @@ namespace Grafkit {
 	class ShaderRes;
 	class ShaderResRef;
 
-
+	///opt out operator overlaoding (= and [])
+#define SHADER_NO_OPERATOR_ENHANCEMENT
 
 	// ================================================================================================================================
 	__declspec(align(16)) class Shader : virtual public Referencable, public AlignedNew<Shader>
@@ -87,8 +88,10 @@ namespace Grafkit {
 		size_t GetParamCount() { return this->m_cBufferCount; }
 		size_t GetParamCount(size_t id) { return id>=this->m_cBufferCount?0:this->m_cBuffers[id].m_cbVarCount; }
 
+#ifndef SHADER_NO_OPERATOR_ENHANCEMENT
 		ShaderParamManager operator[](const char* name) { return GetParam(std::string(name)); }
 		ShaderParamManager operator[](size_t id) { return GetParam(id); }
+#endif //SHADER_NO_OPERATOR_ENHANCEMENT
 
 		ShaderParamManager GetParam(const char* name) { return GetParam(std::string(name)); }
 		ShaderParamManager GetParam(std::string name);
@@ -226,11 +229,17 @@ namespace Grafkit {
 
 				~ShaderParamManager() {}
 
-				inline ShaderParamManager operator[](const char* name) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, name) : ShaderParamManager(); }
-				inline ShaderParamManager operator[](size_t id) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, id) : ShaderParamManager(); }
+#ifndef SHADER_NO_OPERATOR_ENHANCEMENT
+				inline ShaderParamManager operator[](const char* name) { return Get(name); }
+				inline ShaderParamManager operator[](size_t id) { return Get(id); }
+#endif //SHADER_NO_OPERATOR_ENHANCEMENT
 				
+				inline ShaderParamManager Get(const char* name) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, name) : ShaderParamManager(); }
+				inline ShaderParamManager Get(size_t id) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, id) : ShaderParamManager(); }
+
 				inline size_t GetVarCount() { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParamCount() : 0; }
 
+#ifndef SHADER_NO_OPERATOR_ENHANCEMENT
 				inline void operator= (float v) { SetP(&v); }
 			
 				inline void operator= (void* v) { SetP(v); }
@@ -239,6 +248,7 @@ namespace Grafkit {
 				inline void operator= (const float2 &v) { SetP(&v); }
 				inline void operator= (const float4 &v) { SetP(&v); }
 				inline void operator= (const matrix &v) { SetP(&v); }
+#endif //SHADER_NO_OPERATOR_ENHANCEMENT
 
 				inline void SetP(const void * const pData, size_t width = 0, size_t offset = 0) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); }
 
@@ -279,10 +289,14 @@ namespace Grafkit {
 
 				~ShaderResourceManager() {}
 
+				
+#ifndef SHADER_NO_OPERATOR_ENHANCEMENT
 				//void operator= (void* v) { Set(v); }
 				void operator= (ID3D11ShaderResourceView* v) { Set(v); }
 				void operator= (ID3D11SamplerState* v) { Set(v); }
+#endif //SHADER_NO_OPERATOR_ENHANCEMENT
 
+				//void Set(void * p) {this->m_pShader->SetBResPointer(m_id, p); }
 				void Set(ID3D11ShaderResourceView* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
 				void Set(ID3D11SamplerState* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
 

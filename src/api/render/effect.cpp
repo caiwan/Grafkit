@@ -142,9 +142,9 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 		render.BeginScene();
 		{
 			if (fx && fx->GetShader().Valid()) {
-				fx->GetShader()->GetBRes("backBuffer") = m_pTexBack->GetTextureResource();
-				fx->GetShader()->GetBRes("effectInput") = m_pTexRead->GetTextureResource();
-				fx->GetShader()->GetBRes("SampleType") = m_textureSampler->GetSamplerState();
+				fx->GetShader()->GetBRes("backBuffer").Set(m_pTexBack->GetTextureResource());
+				fx->GetShader()->GetBRes("effectInput").Set(m_pTexRead->GetTextureResource());
+				fx->GetShader()->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 				fx->Render(render);
 			}
 
@@ -164,7 +164,7 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 
 	m_shaderFullscreenQuad->Render(render);
 
-	m_shaderCopyScreen->GetBRes("effectInput") = m_pTexRead->GetTextureResource();
+	m_shaderCopyScreen->GetBRes("effectInput").Set(m_pTexRead->GetTextureResource());
 	m_shaderCopyScreen->Render(render);
 
 	m_fullscreenquad->RenderMesh(render);
@@ -213,7 +213,7 @@ size_t Grafkit::EffectPass::BindOutputs(Renderer &render)
 void Grafkit::EffectPass::Render(Renderer & render)
 {
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
-		m_shader->GetBRes(it->first) = it->second->GetTextureResource();
+		m_shader->GetBRes(it->first).Set(it->second->GetTextureResource());
 	}
 	m_shader->Render(render);
 }
