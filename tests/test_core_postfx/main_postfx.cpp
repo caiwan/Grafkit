@@ -12,13 +12,15 @@
 
 #include "math/matrix.h"
 
-#include "core/asset.h"
-#include "core/AssetFactory.h"
-#include "core/AssetFile.h"
-
-#include "core/ResourceManager.h"
+#include "utils/asset.h"
+#include "utils/AssetFactory.h"
+#include "utils/AssetFile.h"
+		  
+#include "utils/ResourceManager.h"
 
 #include "generator/TextureLoader.h"
+#include "generator/ShaderLoader.h"
+
 
 using namespace Grafkit;
 
@@ -56,7 +58,8 @@ protected:
 
 		float t;
 
-		ShaderRef m_vertexShader, m_fragmentShader;
+		ShaderResRef m_vertexShader;
+		ShaderResRef m_fragmentShader;
 		
 		int init() {
 			// --- ezeket kell osszeszedni egy initwindowban
@@ -66,7 +69,7 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetManager("./");
+			this->m_file_loader = new FileAssetManager("./../../assets/postfx/");
 
 			// --------------------------------------------------
 
@@ -77,19 +80,18 @@ protected:
 			// -- texture
 			TextureResRef texture = new TextureRes();
 
-			TextureFromBitmap txgen( m_file_loader->Get("Normap.jpg"), texture );
-			txgen(this);
+			texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
 			m_textureSampler->Initialize(render);
 
 			// -- load shader
-			m_vertexShader = new Shader();
-			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
+			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
-			m_fragmentShader = new Shader();
-			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+			// 
+			this->DoPrecalc();
 
 			// -- model 
 			ModelRef model = new Model;
@@ -157,10 +159,12 @@ protected:
 			// pre fx-pass
 			this->render.BeginScene();
 			{
+				ShaderRef fragmentShader = this->m_fragmentShader->Get();
+
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 
-				m_fragmentShader->GetBRes("SampleType") = m_textureSampler->GetSamplerState();
+				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 
 				scene->PreRender(render);
 				scene->Render(render);
@@ -179,8 +183,8 @@ protected:
 		FileAssetManager *m_file_loader;
 
 	public:
-		//FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
-		Renderer & GetDeviceContext() { return this->render; };
+		IAssetFactory *GetAssetFactory() { return m_file_loader; }
+		Renderer & GetDeviceContext() { return this->render; }
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)

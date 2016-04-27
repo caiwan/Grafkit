@@ -148,10 +148,12 @@ protected:
 		int mainloop() {
 			this->render.BeginScene();
 			{				
+				ShaderRef fragmentShader = this->m_fragmentShader->Get();
+
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 
-				// ((Shader)(*m_fragmentShader))["SampleType"] = m_textureSampler->GetSamplerState();
+				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 
 				scene->PreRender(render);
 				scene->Render(render);
