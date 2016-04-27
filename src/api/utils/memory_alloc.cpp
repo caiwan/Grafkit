@@ -123,7 +123,7 @@ void MallocTrk::resize(const char *msg, int newsize, const char *file, int line,
 
 void MallocTrk::write_allocationTable() {
 	FILE* fp_ = NULL;
-	if (fopen_s(&fp, MALLOC_TRK_LEAK_FILENAME, "wb")) throw 2;
+	if (fopen_s(&fp_, MALLOC_TRK_LEAK_FILENAME, "wb")) throw 2;
 	if (!fp_) throw 1;
 
 	int mem = 0;

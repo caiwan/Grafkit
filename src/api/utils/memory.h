@@ -6,13 +6,14 @@
 	- macro `NO_ALIGNED_ALLOC` will opt out allocation with 16 byte alignemnt
 */
 
+#define NO_MEMORY_TRACKING
 
 #ifndef __MEMORY_TRACKING_MODULE_H__
 #define __MEMORY_TRACKING_MODULE_H__
 
 #include <cstdlib>
 
-///@todo aligned malloc everywhere
+///@todo wipe this, use crtdbg
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -32,6 +33,9 @@ extern void * _DBG_malloc  (size_t size,               const char *file, int lin
 extern void * _DBG_realloc (void *ptr, size_t size,    const char *file, int line);
 extern void * _DBG_calloc  (size_t count, size_t size, const char *file, int line);
 extern void   _DBG_free    (void *ptr,                 const char *file, int line);
+
+extern void * _DBG_aligned_malloc(size_t size, size_t alignment, const char *file, int line);
+extern void   _DBG_aligned_free(void *ptr,                       const char *file, int line);
 
 #ifdef __cplusplus
 }
@@ -58,10 +62,16 @@ extern void   _DBG_free    (void *ptr,                 const char *file, int lin
 #define DBG_REALLOC(ptr, newsize)	_DBG_realloc(ptr, newsize, __FILE__, __LINE__)
 #define DBG_FREE(ptr)				_DBG_free(ptr, __FILE__, __LINE__)
 
+#define DBG_aligned_malloc(size, alignment)  _DBG_aligned_malloc(size, alignment, __FILE__, __LINE__)
+#define DBG_aligned_free(ptr) 	 _DBG_aligned_free(ptr, __FILE__, __LINE__)
+
 #define malloc DBG_MALLOC
 #define calloc DBG_CALLOC
 #define realloc DBG_REALLOC
 #define free DBG_FREE
+
+#define _aligned_malloc DBG_aligned_malloc
+#define _aligned_free DBG_aligned_free
 
 #else /*NO_MEMORY_TRACKING*/
 

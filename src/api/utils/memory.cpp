@@ -1,13 +1,15 @@
+#define NO_NEW_OVERDEFINE
+// #define NO_MEMORY_TRACKING
+
 #include "../stdafx.h"
 
 /// http://stackoverflow.com/questions/438515/how-to-track-memory-allocations-in-c-especially-new-delete
 
-#define NO_NEW_OVERDEFINE
 #include "memory.h"
-#undef NO_NEW_OVERDEFINE
 
 
-#ifdef NO_MEMORY_TRACKING
+
+#ifndef NO_MEMORY_TRACKING
 #define TRACK(x) x
 
 #include "memory_alloc.h"
@@ -33,7 +35,7 @@ namespace {
 
 	void __cdecl deleteTracker(const char *file, int line) {
 		///@todo nem threadsafe
-		strcpy(__deleteFile, file);
+		strcpy_s(__deleteFile, 4096, file);
 		__deleteLine = line;
 	}
 }
@@ -107,3 +109,18 @@ void _DBG_free(void *p, const char *file, int line){
 	TRACK(remove("free", file, line, pp));
 	free(pp);
 }
+
+void * _DBG_aligned_malloc(size_t size, size_t alignment, const char * file, int line)
+{
+	void *p = _aligned_malloc(size, alignment);
+	TRACK(add("_aligned_malloc", size, file, line, p));
+	return p;
+}
+
+void _DBG_aligned_free(void * ptr, const char * file, int line)
+{
+	void *pp = ptr;
+	TRACK(remove("_aligned_free", file, line, pp));
+	_aligned_free(pp);
+}
+
