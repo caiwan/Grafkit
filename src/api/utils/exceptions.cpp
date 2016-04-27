@@ -1,7 +1,5 @@
 #include "../stdafx.h"
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #include "exceptions.h"
 
 #include <cstring>
@@ -27,7 +25,7 @@ FWdebug::Exception::Exception(int errorCode, const char * message, const char * 
 	if (details) {
 		size_t slen = strlen(details);
 		char* data = new char[slen + 1];
-		strcpy(data, details);
+		strcpy_s(data, slen + 1, details);
 		*(const_cast<char**>(&m_details)) = data;
 	}
 }
@@ -43,9 +41,10 @@ char const * FWdebug::Exception::what() const
 	if (m_formattedMessage)
 		return m_formattedMessage;
 
-	m_formattedMessage = new char[strlen(this->m_message) + 512];
-	sprintf(
-		this->m_formattedMessage, 
+	size_t bsize = strlen(this->m_message) + 512;
+	m_formattedMessage = new char[bsize];
+	sprintf_s(
+		this->m_formattedMessage, bsize,
 		"%#x: %s in function %s in file %s, at line %d. %s", 
 		this->m_code, this->m_message, this->m_function, this->m_file, 
 		this->m_line, m_details ? m_details : ""
