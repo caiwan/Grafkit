@@ -53,7 +53,7 @@ void * Grafkit::StructPack::operator()(size_t count)
 	this->m_record_count = count;
 
 	if (this->m_buffer) { 
-		this->free(this->m_buffer); 
+		this->dealloc(this->m_buffer); 
 	}
 	
 	this->calcSize();
@@ -136,7 +136,7 @@ void * Grafkit::StructPack::alloc(size_t size)
 	return malloc(size);
 }
 
-void Grafkit::StructPack::free(void * ptr)
+void Grafkit::StructPack::dealloc(void * ptr)
 {
 	free(ptr);
 }
@@ -166,7 +166,7 @@ void * Grafkit::StructPack::alloc(size_t size)
 	return ptr;
 }
 
-void Grafkit::StructPack::free(void * ptr)
+void Grafkit::StructPack::dealloc(void * ptr)
 {
 	_aligned_free(ptr);
 }

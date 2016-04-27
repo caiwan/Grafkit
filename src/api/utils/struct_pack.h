@@ -58,7 +58,7 @@ namespace Grafkit {
 		Allocation procedure is hidden in a member function due overriding it
 		*/
 		virtual void* alloc(size_t size);
-		virtual void free (void* ptr);
+		virtual void dealloc (void* ptr);
 		virtual void zeroMemory(void* ptr, size_t size);
 		/**
 		@}
