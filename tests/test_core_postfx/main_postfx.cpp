@@ -137,9 +137,11 @@ protected:
 
 			// -- setup postfx 
 
-			m_postfx = new EffectComposer();
-			m_postfx->Initialize(render);
-
+			m_postfx = new EffectComposer(); m_postfx->Initialize(render);
+			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(0)->Initialize(render, sahder);
+			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(1)->Initialize(render, sahder);
+			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(2)->Initialize(render, sahder);
+			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(3)->Initialize(render, sahder);
 			// --- 
 
 			return 0;
