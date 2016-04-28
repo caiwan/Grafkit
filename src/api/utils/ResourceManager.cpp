@@ -39,6 +39,16 @@ void IResourceManager::Remove(const std::string & pName)
 
 void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
 {	
+	ResourceMap_t::const_iterator it = m_resources.find(builder->GetName());
+	
+	// Ha nincs resource, elotoltjuk. 
+	if (it == m_resources.end()) {
+		Reload(builder);
+	}
+}
+
+void Grafkit::IResourceManager::Reload(IResourceBuilder * builder)
+{
 	IResource *resource = builder->NewResource();
 	resource->SetName(builder->GetName());
 	Add(resource);

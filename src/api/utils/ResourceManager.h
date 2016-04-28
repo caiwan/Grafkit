@@ -29,6 +29,8 @@ namespace Grafkit {
 		void Load(IResourceBuilder* builder);
 		template<class T> Ref<T> Load(IResourceBuilder* builder);
 
+		void Reload(IResourceBuilder* builder);
+
 		virtual void DoPrecalc();
 
 		void ClearLoadStack();
