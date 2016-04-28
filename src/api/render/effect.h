@@ -29,7 +29,7 @@ namespace Grafkit {
 		void Initialize(Renderer &render);
 		void Shutdown();
 
-		void AddPass(EffectPassRef in_fx) { m_effectChain.push_back(in_fx); }
+		size_t AddPass(EffectPassRef in_fx) { m_effectChain.push_back(in_fx); return m_effectChain.size() - 1; }
 
 		EffectPassRef GetEffect(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
 
