@@ -20,16 +20,16 @@ namespace GenIterator{
 	};
 }
 
-Iterator * TreeNode::getIterator()
+Iterator * TreeNode::GetIterator()
 {
-	return this->getIterator(TREE_TRAVEL_preorder);
+	return this->GetIterator(TREE_TRAVEL_preorder);
 }
 
 // ====================================================================================================================================================================================
 // Implementation of BinaryTree
 // ====================================================================================================================================================================================
 
-Iterator * BinaryTree::getIterator(enum TRAVELSAL_Gen_Type mode)
+Iterator * BinaryTree::GetIterator(enum TRAVELSAL_Gen_Type mode)
 {
 	switch (mode) {
 	case TREE_TRAVEL_preorder:
@@ -42,7 +42,7 @@ Iterator * BinaryTree::getIterator(enum TRAVELSAL_Gen_Type mode)
 }
 
 // editing
-BinaryTree * BinaryTree::insertChild(BinaryTree * &childNode){
+BinaryTree * BinaryTree::InsertChild(BinaryTree * &childNode){
 	if (childNode!= nullptr){
 		throw EX_DETAILS(NotImplementedMethodException, "Ket elem koze torteno beszuras meg nincs kesz");
 	}else{
@@ -52,34 +52,34 @@ BinaryTree * BinaryTree::insertChild(BinaryTree * &childNode){
 	return childNode;
 }
 
-BinaryTree * BinaryTree::detachChild(BinaryTree * & oldChild)
+BinaryTree * BinaryTree::DetachChild(BinaryTree * & oldChild)
 {
 	BinaryTree * oldChildCopy = oldChild;
-	oldChildCopy->setParent(nullptr);
+	oldChildCopy->SetParent(nullptr);
 	oldChild = nullptr;
 	return oldChildCopy;
 }
 
-void BinaryTree::setParent(BinaryTree * parent)
+void BinaryTree::SetParent(BinaryTree * parent)
 {
 	/// @todo refcount, ha kell 
 	this->m_pParentNode = parent;
 }
 
-void BinaryTree::setLeftChild(BinaryTree * child)
+void BinaryTree::SetLeftChild(BinaryTree * child)
 {
 	/// @todo refcount, ha kell 
 	this->m_pLeftChild = child;
 }
 
-void BinaryTree::setRightChild(BinaryTree * child)
+void BinaryTree::SetRightChild(BinaryTree * child)
 {
 	/// @todo refcount, ha kell 
 	this->m_pRightChild = child;
 }
 
 
-//void BinaryTree::removeNode()
+//void BinaryTree::RemoveNode()
 //{
 //	/// @todo refcount, ha kell 
 //	// isten bassza meg 
@@ -97,21 +97,21 @@ void BinaryTree::setRightChild(BinaryTree * child)
 //	///@ todo ezeket a bejaro fuggvenyeket ki kene venni inkabb kulon metodusokba
 //	switch (mode) {
 //	case NP_search_inorder: // visit, left, right
-//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->HasNode()) parser->ParseNode(this);
 //		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
 //		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
 //		break;
 //	
 //	case NP_search_preorder: // left, visit, right
 //		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
-//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->HasNode()) parser->ParseNode(this);
 //		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
 //		break;
 //	
 //	case NP_search_postorder: // left, right, visit
 //		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
 //		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
-//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->HasNode()) parser->ParseNode(this);
 //		break;
 //	}
 //
@@ -120,37 +120,37 @@ void BinaryTree::setRightChild(BinaryTree * child)
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 /// @todo folyt kov http://www.geeksforgeeks.org/inorder-tree-traversal-without-recursion/
-int BinaryTree::PreorderIterator::isDone()
+int BinaryTree::PreorderIterator::IsDone()
 {
 	return m_sNode.empty() && m_pCurrent == nullptr;
 }
 
-void BinaryTree::PreorderIterator::next()
+void BinaryTree::PreorderIterator::Next()
 {
 	BinaryTree *node = (BinaryTree *)m_pCurrent;
 	if (node != nullptr) {
 		if (m_parser)
-			m_parser->parseNode(node);
+			m_parser->ParseNode(node);
 
-		if (node->hasRight()) {
+		if (node->HasRight()) {
 			// push, right
 			if (m_parser)
-				m_parser->push(node);
+				m_parser->Push(node);
 			m_sNode.push(node);
 
-			node = node->getRightChild();
+			node = node->GetRightChild();
 		}
 
 		if (m_parser)
-			m_parser->push(node);
+			m_parser->Push(node);
 
 		// itt nem pusholunk a stackbe, csak a parsert hivjuk meg
-		node = node->getLeftChild();
+		node = node->GetLeftChild();
 	}
 	else {
 		// pop 
 		if (m_parser)
-			m_parser->pop(node);
+			m_parser->Pop(node);
 		node = (BinaryTree *)m_sNode.top();
 		m_sNode.pop();
 	}
@@ -159,10 +159,10 @@ void BinaryTree::PreorderIterator::next()
 	m_pCurrent = node;
 }
 
-int BinaryTree::PreorderIterator::hasNext()
+int BinaryTree::PreorderIterator::HasNext()
 {
 	BinaryTree * node = (BinaryTree *)m_pCurrent;
-	return node && (node->hasLeft() || node->hasRight());
+	return node && (node->HasLeft() || node->HasRight());
 }
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -171,25 +171,25 @@ int BinaryTree::PreorderIterator::hasNext()
 // Implementation of ChainTree
 // ====================================================================================================================================================================================
 
-void ChainTree::setParent(ChainTree *&parent){
+void ChainTree::SetParent(ChainTree *&parent){
 	if (parent)
 		parent->m_pChild = this;
 	this->m_pParentNode = parent;
 }	
 
-void ChainTree::setChild(ChainTree *&child){
+void ChainTree::SetChild(ChainTree *&child){
 	if (child)
 		child->m_pParentNode = this;
 	this->m_pChild = child;
 }	
 
-void ChainTree::setLeft(ChainTree *&left){
+void ChainTree::SetLeft(ChainTree *&left){
 	if (left)
 		left->m_pRight = this;
 	this->m_pLeft = left;
 }
 
-void ChainTree::setRight(ChainTree *&right){
+void ChainTree::SetRight(ChainTree *&right){
 	if (right)
 		right->m_pLeft = this;
 	this->m_pRight = right;
@@ -198,14 +198,14 @@ void ChainTree::setRight(ChainTree *&right){
 // -------- 
 
 /// @todo nem szur be rendesen
-ChainTree* ChainTree::insertChild(ChainTree *child){
+ChainTree* ChainTree::InsertChild(ChainTree *child){
 	ChainTree *newchild = child;
 	if (newchild== nullptr) {
 		newchild = new ChainTree(this);
 	}
 
 	this->m_pChild = newchild;
-	this->m_pFarRightChild->insertRight(newchild);
+	this->m_pFarRightChild->InsertRight(newchild);
 	this->m_pFarRightChild = newchild;
 	
 	// is it was the first element
@@ -215,12 +215,12 @@ ChainTree* ChainTree::insertChild(ChainTree *child){
 	return newchild;
 }
 
-Iterator * ChainTree::getIterator(TRAVELSAL_Gen_Type mode)
+Iterator * ChainTree::GetIterator(TRAVELSAL_Gen_Type mode)
 {
 	return nullptr;
 }
 
-ChainTree* ChainTree::insertNeighbour(ChainTree* _newNode, ChainTree*& insSide, ChainTree*&parentSide)
+ChainTree* ChainTree::InsertNeighbour(ChainTree* _newNode, ChainTree*& insSide, ChainTree*&parentSide)
 {
 	if (m_pParentNode == nullptr) {
 		throw EX_DETAILS(InvalidOperationException, "A node without valid root can not have neighbours");
@@ -245,12 +245,12 @@ ChainTree* ChainTree::insertNeighbour(ChainTree* _newNode, ChainTree*& insSide, 
 	}
 }
 
-inline ChainTree* ChainTree::insertLeft(ChainTree *left) {
-	return insertNeighbour(left, m_pLeft, this->getParent()->m_pFarLeftChild);
+inline ChainTree* ChainTree::InsertLeft(ChainTree *left) {
+	return InsertNeighbour(left, m_pLeft, this->GetParent()->m_pFarLeftChild);
 }
 
-inline ChainTree* ChainTree::insertRight(ChainTree *right){
-	return insertNeighbour(right, m_pRight, this->getParent()->m_pFarRightChild);
+inline ChainTree* ChainTree::InsertRight(ChainTree *right){
+	return InsertNeighbour(right, m_pRight, this->GetParent()->m_pFarRightChild);
 }
 
 //void ChainTree::parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth) {
@@ -263,7 +263,7 @@ inline ChainTree* ChainTree::insertRight(ChainTree *right){
 //
 //	if (mode == NP_search_inorder) {
 //		parser->push();
-//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->HasNode()) parser->ParseNode(this);
 //		if (this->hasChild()) m_pChild->parse(parser, mode, maxdepth - 1);
 //
 //		parser->pop();
@@ -273,7 +273,7 @@ inline ChainTree* ChainTree::insertRight(ChainTree *right){
 //	else {
 //		parser->push();
 //		if (this->hasChild()) m_pChild->parse(parser, mode, maxdepth - 1);
-//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->HasNode()) parser->ParseNode(this);
 //
 //		parser->pop();
 //
@@ -285,18 +285,18 @@ inline ChainTree* ChainTree::insertRight(ChainTree *right){
 // Implementation of ListTree
 // ====================================================================================================================================================================================
 
-void ListTree::setParent(ListTree *parent, int autoAddParent)
+void ListTree::SetParent(ListTree *parent, int autoAddParent)
 {
 	this->m_pParentNode = parent;
 }
 
-void ListTree::insertChild(ListTree *child)
+void ListTree::InsertChild(ListTree *child)
 {
 	this->m_vChildren.push_back(child);
-	child->setParent(this, 0);
+	child->SetParent(this, 0);
 }
 
-Iterator * ListTree::getIterator(TRAVELSAL_Gen_Type mode)
+Iterator * ListTree::GetIterator(TRAVELSAL_Gen_Type mode)
 {
 	return nullptr;
 }
@@ -315,8 +315,8 @@ Iterator * ListTree::getIterator(TRAVELSAL_Gen_Type mode)
 //	if (mode == NP_search_inorder) {
 //		// kurrens node feldolg
 //
-//		if (this->hasNode())
-//			parser->parseNode(this);
+//		if (this->HasNode())
+//			parser->ParseNode(this);
 //
 //		// kozvetlen leszarmazott
 //		if (this->hasChild()) {
@@ -334,8 +334,8 @@ Iterator * ListTree::getIterator(TRAVELSAL_Gen_Type mode)
 //			}
 //		}
 //
-//		if (this->hasNode())
-//			parser->parseNode(this);
+//		if (this->HasNode())
+//			parser->ParseNode(this);
 //	}
 //
 //	parser->pop();

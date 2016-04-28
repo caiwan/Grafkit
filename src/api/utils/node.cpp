@@ -16,7 +16,7 @@ Node::~Node()
 {
 }
 
-void Node::insertNodeBefore(Node * node)
+void Node::InsertNodeBefore(Node * node)
 {
 	node->m_rNodePrev = m_rNodePrev;
 
@@ -27,7 +27,7 @@ void Node::insertNodeBefore(Node * node)
 	node->m_rNodeNext = this;
 }
 
-void Node::insertNodeAfter(Node * node)
+void Node::InsertNodeAfter(Node * node)
 {
 	node->m_rNodeNext = this->m_rNodeNext;
 
@@ -38,7 +38,7 @@ void Node::insertNodeAfter(Node * node)
 	node->m_rNodePrev = this;
 }
 
-Node* Node::removeNode()
+Node* Node::RemoveNode()
 {
 	m_rNodePrev->m_rNodeNext = m_rNodeNext;
 	m_rNodeNext->m_rNodePrev = m_rNodePrev;
@@ -49,7 +49,7 @@ Node* Node::removeNode()
 	return this;
 }
 
-Iterator * Node::getIterator()
+Iterator * Node::GetIterator()
 {
 	return new NodeIterator(this);
 }
@@ -74,13 +74,13 @@ NodeIterator::NodeIterator(Node* start, int isBreakChain) : NodeIterator()
 	{
 		// find very first item and link it
 		while (head->m_rNodePrev!= nullptr){
-			head = head->getPrevNode();
+			head = head->GetPrevNode();
 		} 
 		head->m_rNodePrev = m_zero;
 	
 		// find very last item
 		while (foot->m_rNodeNext!= nullptr) {
-			foot = foot->getNextNode();
+			foot = foot->GetNextNode();
 		}
 
 		foot->m_rNodeNext = m_zero;
@@ -102,43 +102,43 @@ NodeIterator::~NodeIterator()
 	delete m_zero;
 }
 
-void NodeIterator::first()
+void NodeIterator::First()
 {
-	this->m_current = this->m_zero->getNextNode();
+	this->m_current = this->m_zero->GetNextNode();
 }
 
-void NodeIterator::last()
+void NodeIterator::Last()
 {
-	this->m_current = this->m_zero->getPrevNode();
+	this->m_current = this->m_zero->GetPrevNode();
 }
 
-int NodeIterator::isDone()
+int NodeIterator::IsDone()
 {
 	return m_current == m_zero;
 }
 
-void NodeIterator::next()
+void NodeIterator::Next()
 {
 	m_current = m_current->m_rNodeNext;
 }
 
-void NodeIterator::previous()
+void NodeIterator::Previous()
 {
 	m_current = m_current->m_rNodePrev;
 }
 
-int NodeIterator::hasNext()
+int NodeIterator::HasNext()
 {
 	return m_current->m_rNodeNext != m_zero;
 }
 
-int NodeIterator::hasPrev()
+int NodeIterator::HasPrev()
 {
 	return m_current->m_rNodePrev != m_zero;
 }
 
-void NodeIterator::deleteChain()
+void NodeIterator::DeleteChain()
 {
-	for (first(); isDone(); next())
-		delete getCurrent();
+	for (First(); IsDone(); Next())
+		delete GetCurrent();
 }

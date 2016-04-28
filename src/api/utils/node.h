@@ -16,24 +16,24 @@ class Node : virtual public Iterable{
 		Node();
 		virtual ~Node();
 
-		void insertNodeBefore(Node* node);
-		void insertNodeAfter(Node* node);
+		void InsertNodeBefore(Node* node);
+		void InsertNodeAfter(Node* node);
 	
-		Node* getPrevNode() { return this->m_rNodePrev;}
-		Node* getNextNode() { return this->m_rNodeNext; }
+		Node* GetPrevNode() { return this->m_rNodePrev;}
+		Node* GetNextNode() { return this->m_rNodeNext; }
 
-		Node* removeNode();
+		Node* RemoveNode();
 		
-		template<typename T> T* getObjectDynamic() { return dynamic_cast<T*>(m_pObject); }
-		template<typename T> T* getObjectStatic() { return static_cast<T*>(m_pObject); }
-		template<typename T> T* getObject() { return (T*)m_pObject; }
+		template<typename T> T* GetDynamic() { return dynamic_cast<T*>(m_pObject); }
+		template<typename T> T* GetStatic() { return static_cast<T*>(m_pObject); }
+		template<typename T> T* Get() { return (T*)m_pObject; }
 
-		template<typename T> void setObject(T* obj) { m_pObject = obj; }
-		void setObject(void* obj) {m_pObject = obj; }
+		template<typename T> void Set(T* obj) { m_pObject = obj; }
+		void Set(void* obj) {m_pObject = obj; }
 
-		int hasNode() { return m_pObject != nullptr; }
+		int HasNode() { return m_pObject != nullptr; }
 
-		Iterator* getIterator();
+		Iterator* GetIterator();
 
 	protected:
 		Node* m_rNodePrev;
@@ -51,23 +51,23 @@ public:
 	NodeIterator(Node* start, int isBreakChain = false);
 	~NodeIterator();
 
-	void first();
-	void last();
-	int isDone();
+	void First();
+	void Last();
+	int IsDone();
 
-	void next();
-	void previous();
+	void Next();
+	void Previous();
 	
-	int hasNext();
-	int hasPrev();
+	int HasNext();
+	int HasPrev();
 
-	Node* getCurrent() { return m_current; }
+	Node* GetCurrent() { return m_current; }
 
 	// todo ... 
-	Node* getFirst() { return m_zero->m_rNodeNext; }
-	Node* getLast() { return m_zero->m_rNodePrev; }
+	Node* GetFirst() { return m_zero->m_rNodeNext; }
+	Node* GetLast() { return m_zero->m_rNodePrev; }
 
-	void deleteChain();
+	void DeleteChain();
 
 private:
 	Node* m_current;

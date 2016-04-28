@@ -24,20 +24,20 @@ public:
 	Iterator() {}
 	virtual ~Iterator() {}
 
-	virtual void first() = 0;
-	virtual void last() = 0;
-	virtual int isDone() = 0;	
+	virtual void First() = 0;
+	virtual void Last() = 0;
+	virtual int IsDone() = 0;	
 
-	virtual void next() = 0;
-	virtual void previous() = 0;
+	virtual void Next() = 0;
+	virtual void Previous() = 0;
 	
 
-	virtual int hasNext() = 0;
-	virtual int hasPrev() = 0;
+	virtual int HasNext() = 0;
+	virtual int HasPrev() = 0;
 	
 	///@todo operator ++,-- and (bool) for isDone
 
-	virtual Node* getCurrent() = 0;
+	virtual Node* GetCurrent() = 0;
 };
 
 /// Iterable interface that generates an iterator for a certain class
@@ -45,7 +45,7 @@ class Iterable {
 	
 public:
 	virtual ~Iterable() {}
-	virtual Iterator* getIterator() = 0;
+	virtual Iterator* GetIterator() = 0;
 };
 
 // =================================================================================

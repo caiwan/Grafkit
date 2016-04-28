@@ -3,7 +3,7 @@
 
 //#include "../../GKSDK_config.h"
 
-#ifdef UTILS_XML_PARSER
+//#ifdef UTILS_XML_PARSER
 
 #include <string>
 
@@ -214,6 +214,6 @@ private:
 //
 ////////////////////////////////////////
 
-#endif // UTILS_XML_PARSER
+//#endif // UTILS_XML_PARSER
 
 #endif //__XML_H_

@@ -40,19 +40,19 @@ public:
 
 protected:
 	/// Visit node 
-	virtual void parseNode(TreeNode* node) = 0;
+	virtual void ParseNode(TreeNode* node) = 0;
 
 	/**
 	Push node
 	@param node parent node that being pushed into a stack
 	*/
-	virtual void push(TreeNode* node) = 0;
+	virtual void Push(TreeNode* node) = 0;
 
 	/**
 	Pop node
 	@param node the node that popped out of the stack
 	*/
-	virtual void pop(TreeNode*) = 0;
+	virtual void Pop(TreeNode*) = 0;
 };
 
 /**
@@ -71,20 +71,20 @@ public:
 	TreeIterator(TreeNode* root) : Iterator(), m_parser(nullptr), m_pCurrent(nullptr), m_pRoot(root) {}
 	~TreeIterator() {}
 
-	virtual void first() { m_pCurrent = m_pRoot; };
-	virtual void last() {};		///< Not supported
-	virtual void previous() {}	///< not supported
-	virtual int hasPrev() { return false; }; ///< not supported
+	virtual void First() { m_pCurrent = m_pRoot; };
+	virtual void Last() {};		///< Not supported
+	virtual void Previous() {}	///< not supported
+	virtual int HasPrev() { return false; }; ///< not supported
 
 	//virtual Node* getCurrent() { return dynamic_cast<Node*>(m_pCurrent); }
-	virtual Node* getCurrent() { return (Node*)(m_pCurrent); } ///@todo a picaert nem megy a static vagy dynamic cast
+	virtual Node* GetCurrent() { return (Node*)(m_pCurrent); } ///@todo a picaert nem megy a static vagy dynamic cast
 
-	void setParser(TreeParser* parser) { this->m_parser = parser; }
+	void SetParser(TreeParser* parser) { this->m_parser = parser; }
 
 	// ezeket kell implementalni:
-	virtual int isDone() = 0;
-	virtual void next() = 0;
-	virtual int hasNext() = 0;
+	virtual int IsDone() = 0;
+	virtual void Next() = 0;
+	virtual int HasNext() = 0;
 
 protected:
 	TreeNode *m_pRoot, *m_pCurrent;
@@ -122,10 +122,10 @@ class TreeNode : public Node
 		//implementation of Iterable Interafce
 
 		///Alabol preorder iteratort hoz letre
-		virtual Iterator* getIterator();
-		virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode) = 0;
+		virtual Iterator* GetIterator();
+		virtual Iterator* GetIterator(enum TRAVELSAL_Gen_Type mode) = 0;
 
-		bool hasParent() { return this->m_pParentNode != nullptr; }
+		bool HasParent() { return this->m_pParentNode != nullptr; }
 
 	protected:
 		TreeNode *m_pParentNode;
@@ -142,33 +142,33 @@ public:
 	~BinaryTree() {}
 
 	// editing the tree
-	void setParent(BinaryTree* parent);
-	void setLeftChild(BinaryTree* child);
-	void setRightChild(BinaryTree* child);
+	void SetParent(BinaryTree* parent);
+	void SetLeftChild(BinaryTree* child);
+	void SetRightChild(BinaryTree* child);
 
-	bool hasLeft() { return this->m_pLeftChild != nullptr;}
-	bool hasRight() { return this->m_pRightChild != nullptr;}
+	bool HasLeft() { return this->m_pLeftChild != nullptr;}
+	bool HasRight() { return this->m_pRightChild != nullptr;}
 
-	BinaryTree* insertLeftChild()  {return insertChild(m_pLeftChild);}
-	BinaryTree* insertRightChild() {return insertChild(m_pRightChild);}
+	BinaryTree* InsertLeftChild()  {return InsertChild(m_pLeftChild);}
+	BinaryTree* InsertRightChild() {return InsertChild(m_pRightChild);}
 				  
-	BinaryTree* getLeftChild()  { return this->m_pLeftChild; }
-	BinaryTree* getRightChild() { return this->m_pRightChild; }
+	BinaryTree* GetLeftChild()  { return this->m_pLeftChild; }
+	BinaryTree* GetRightChild() { return this->m_pRightChild; }
 				  
-	BinaryTree* getParent() { return (BinaryTree*)this->m_pParentNode; }
+	BinaryTree* GetParent() { return (BinaryTree*)this->m_pParentNode; }
 
 	///@todo add remove features somehow 
 
-	BinaryTree* detachLeftChild() {return this->detachChild(this->m_pLeftChild);}
-	BinaryTree* detachRighChild() {return this->detachChild(this->m_pRightChild);}
+	BinaryTree* DetachLeftChild() {return this->DetachChild(this->m_pLeftChild);}
+	BinaryTree* DetachRighChild() {return this->DetachChild(this->m_pRightChild);}
 
-	virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode = TREE_TRAVEL_preorder);
+	virtual Iterator* GetIterator(enum TRAVELSAL_Gen_Type mode = TREE_TRAVEL_preorder);
 
 protected:
 	BinaryTree* m_pLeftChild, *m_pRightChild;
 				  
-	BinaryTree* insertChild(BinaryTree* &childNode);
-	BinaryTree* detachChild(BinaryTree* &oldChild);
+	BinaryTree* InsertChild(BinaryTree* &childNode);
+	BinaryTree* DetachChild(BinaryTree* &oldChild);
 
 	protected:
 		class PreorderIterator : public TreeIterator {
@@ -176,9 +176,9 @@ protected:
 			PreorderIterator(BinaryTree* root) : TreeIterator(root){}
 			~PreorderIterator() {}
 			
-			virtual int isDone();
-			virtual void next(); 
-			virtual int hasNext();
+			virtual int IsDone();
+			virtual void Next(); 
+			virtual int HasNext();
 		};
 		
 		/*class InorderIterator : public TreeIterator {
@@ -199,33 +199,33 @@ class ChainTree : public TreeNode
 		// ---------------- // ----------------
 		///@{
 		/// GET Method
-		ChainTree* getParent() {return (ChainTree*)this->m_pParentNode;}	///< @return Pointer of the parent tree. Null if root.
-		ChainTree* getChild() {return this->m_pChild;}	///< @return Pointer of the child. Null is there's none.
-		ChainTree* getLeft() {return this->m_pLeft;}		///< @return Pointer of the left neighbour. Null is there's no more of them.
-		ChainTree* getRight() {return this->m_pRight;}	///< @return Pointer of the right neighbour	Null is there's no more of them.
+		ChainTree* GetParent() {return (ChainTree*)this->m_pParentNode;}	///< @return Pointer of the parent tree. Null if root.
+		ChainTree* GetChild() {return this->m_pChild;}	///< @return Pointer of the child. Null is there's none.
+		ChainTree* GetLeft() {return this->m_pLeft;}		///< @return Pointer of the left neighbour. Null is there's no more of them.
+		ChainTree* GetRight() {return this->m_pRight;}	///< @return Pointer of the right neighbour	Null is there's no more of them.
 
 		
-		bool hasChild() { return this->m_pChild != nullptr; }
-		bool hasLeft() { return this->m_pLeft != nullptr; }
-		bool hasRight() { return this->m_pRight != nullptr; }
+		bool HasChild() { return this->m_pChild != nullptr; }
+		bool HasLeft() { return this->m_pLeft != nullptr; }
+		bool HasRight() { return this->m_pRight != nullptr; }
 		///@}
 
 		// ---------------- // ----------------
 		/// @{
 		/// SET Method
-		void setParent(ChainTree*& parent);		///< @param parent new parent
-		void setChild(ChainTree*& child);		///< @param child new child
-		void setLeft(ChainTree*& left);			///< @param left new left neignour 
-		void setRight(ChainTree*& right);		///< @param right new right neignour 
+		void SetParent(ChainTree*& parent);		///< @param parent new parent
+		void SetChild(ChainTree*& child);		///< @param child new child
+		void SetLeft(ChainTree*& left);			///< @param left new left neignour 
+		void SetRight(ChainTree*& right);		///< @param right new right neignour 
 		/// @}
 	
 		// ---------------- // ----------------
 		/// @{
 		/// INSERT Method
 
-		ChainTree* insertChild(ChainTree *child = nullptr);
-		ChainTree* insertLeft(ChainTree *left = nullptr);
-		ChainTree* insertRight(ChainTree *right= nullptr);
+		ChainTree* InsertChild(ChainTree *child = nullptr);
+		ChainTree* InsertLeft(ChainTree *left = nullptr);
+		ChainTree* InsertRight(ChainTree *right= nullptr);
 
 		///@todo szukseg eseten a hianyzo elemeket potplni kellene
 		/// @}
@@ -252,10 +252,10 @@ class ChainTree : public TreeNode
 
 		// ---------------- // ----------------
 		/// Bejaro algoritmus
-		virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode);
+		virtual Iterator* GetIterator(enum TRAVELSAL_Gen_Type mode);
 
 	protected:
-		ChainTree* insertNeighbour(ChainTree* newNode, ChainTree *& insSide, ChainTree *& parentSide);
+		ChainTree* InsertNeighbour(ChainTree* newNode, ChainTree *& insSide, ChainTree *& parentSide);
 
 
 		ChainTree* m_pChild;
@@ -280,18 +280,18 @@ class ListTree : public TreeNode
 		// ---------------- // ----------------
 		///@{
 		/// GET Method
-		ListTree* getParent() {return (ListTree*)this->m_pParentNode;} ///< @return Pointer of the parent tree. Null if root.
-		ListTree* getChild(int n) {return this->m_vChildren[n];}	///< @return Pointer of the child. Null is there's none.
-		size_t getChildCount(){return this->m_vChildren.size();}		///< @return Pointer of the child. Null is there's none.
+		ListTree* GetParent() {return (ListTree*)this->m_pParentNode;} ///< @return Pointer of the parent tree. Null if root.
+		ListTree* GetChild(int n) {return this->m_vChildren[n];}	///< @return Pointer of the child. Null is there's none.
+		size_t GetChildCount(){return this->m_vChildren.size();}		///< @return Pointer of the child. Null is there's none.
 
-		bool hasParent() { return this->m_pParentNode != nullptr; }
-		bool hasChild() {return !this->m_vChildren.empty();}
+		bool HasParent() { return this->m_pParentNode != nullptr; }
+		bool HasChild() {return !this->m_vChildren.empty();}
 		/// @}
 
 		// ---------------- // ----------------
 		/// @{
 		/// SET Method
-		void setParent(ListTree* parent, int autoAddParent = 1);		///< @param parent new parent
+		void SetParent(ListTree* parent, int autoAddParent = 1);		///< @param parent new parent
 		///@todo set helyett valami replace muvelet kell, ami kicsereli az adott al-fat az uj al-fara.
 		//void setChild(int n, ListTree* child);  ///< @param child new child
 		/// @}
@@ -299,7 +299,7 @@ class ListTree : public TreeNode
 		// ---------------- // ----------------
 		/// @{
 		/// INSERT Method
-		void insertChild(ListTree* child);	
+		void InsertChild(ListTree* child);	
 		//inline ListTree* insertChild() {ListTree *next = new ListTree(); insertChild(next); return next;}
 
 		//ListTree* void insertNext(ListTree* node);
@@ -320,10 +320,10 @@ class ListTree : public TreeNode
 		// ---------------- // ----------------
 		/// @{
 		/// DELETE Method
-		inline void deleteChild(int n){delete this->m_vChildren[n]; this->m_vChildren[n] = NULL;}
+		inline void DeleteChild(int n){delete this->m_vChildren[n]; this->m_vChildren[n] = nullptr;}
 		/// @}
 
-		virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode);
+		virtual Iterator* GetIterator(enum TRAVELSAL_Gen_Type mode);
 
 	private:
 		std::vector<ListTree*> m_vChildren;

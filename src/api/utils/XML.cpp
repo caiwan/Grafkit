@@ -2,7 +2,7 @@
 
 #include "XML.h"
 
-#ifdef UTILS_XML_PARSER
+// #ifdef UTILS_XML_PARSER
 
 #include <fstream>
 #include <stack>
@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "../../debug/memory.h"
+// #include "../../debug/memory.h"
 
 using namespace std;
 
@@ -586,4 +586,4 @@ void Attribute::AppendAsText(string *strText) {
 	*strText += *m_strName + "=\"" + *m_strValue + "\"";
 }
 
-#endif // UTILS_XML_PARSER
+//#endif // UTILS_XML_PARSER
