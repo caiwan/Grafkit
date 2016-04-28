@@ -55,6 +55,10 @@ protected:
 		ActorRef m_rootActor;
 
 		EffectComposerRef m_postfx;
+		
+		ShaderResRef m_fxFXAA;
+		ShaderResRef m_fxFishEye;
+		ShaderResRef m_fxVhs;
 
 		float t;
 
@@ -89,6 +93,10 @@ protected:
 			// -- load shader
 			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
 			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
+
+			m_fxFXAA = Load<ShaderRes>(new ShaderLoader("xFXAA", "texture.hlsl", "TextureVertexShader", ST_Pixel));
+			m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "texture.hlsl", "TextureVertexShader", ST_Pixel));
+			m_fxVhs = Load<ShaderRes>(new ShaderLoader("xVhs", "texture.hlsl", "TextureVertexShader", ST_Pixel));
 
 			// 
 			this->DoPrecalc();
@@ -136,12 +144,16 @@ protected:
 			scene->SetFShader(m_fragmentShader);
 
 			// -- setup postfx 
-
+			size_t k = 0;
 			m_postfx = new EffectComposer(); m_postfx->Initialize(render);
-			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(0)->Initialize(render, sahder);
-			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(1)->Initialize(render, sahder);
-			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(2)->Initialize(render, sahder);
-			m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(3)->Initialize(render, sahder);
+			
+			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFXAA);
+			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFishEye);
+			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxVhs);
+			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
+			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
+			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
+
 			// --- 
 
 			return 0;
