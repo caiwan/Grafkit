@@ -129,7 +129,7 @@ void Grafkit::LoggerHandler::FileLoggerHandler::Write(Grafkit::Logger::message_t
 		if (this->m_stderr) 
 			fprintf_s(this->m_stderr, "%s\r\n", message->message);
 	}
-	else {
+	/*else*/ {
 		if(this->m_stdout) 
 			fprintf_s(this->m_stdout, "%s\r\n", message->message);
 	}
