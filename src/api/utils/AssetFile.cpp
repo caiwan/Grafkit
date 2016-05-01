@@ -55,6 +55,8 @@ IAssetRef FileAssetManager::Get(std::string name)
 	std::string fullname = m_root + name;
 	fopen_s(&fp, fullname.c_str(), "rb");
 
+	LOGGER(Log::Logger().Info("Accessin file %s", fullname.c_str()));
+
 	if (!fp) {
 		throw EX_DETAILS(AssetLoadException, fullname.c_str());
 	}

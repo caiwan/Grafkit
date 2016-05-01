@@ -57,11 +57,22 @@ void Grafkit::IResourceManager::Reload(IResourceBuilder * builder)
 
 void Grafkit::IResourceManager::DoPrecalc()
 {
+	size_t i = 0;
+	size_t len = m_builders.size();
+
+	// an event before loader
+
 	for (BuilderList_t::iterator it = m_builders.begin(); it != m_builders.end(); it++) {
+		LOGGER(Log::Logger().Trace("Preloading item %d of %d", i, len));
 		if (*it) {
 			(*it)->Load(this, Get<IResource>((*it)->GetName()));
 		}
+		// event after item had loaded
+		
+		i++;
 	}
+
+	// an event after loader
 
 	ClearLoadStack();
 }
