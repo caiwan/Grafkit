@@ -94,9 +94,9 @@ protected:
 			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
 			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
-			m_fxFXAA = Load<ShaderRes>(new ShaderLoader("xFXAA", "texture.hlsl", "TextureVertexShader", ST_Pixel));
-			m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "texture.hlsl", "TextureVertexShader", ST_Pixel));
-			m_fxVhs = Load<ShaderRes>(new ShaderLoader("xVhs", "texture.hlsl", "TextureVertexShader", ST_Pixel));
+			m_fxFXAA = Load<ShaderRes>(new ShaderLoader("xFXAA", "fxaa.hlsl", "FXAA", ST_Pixel));
+			m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "fisheye.hlsl", "TextureVertexShader", ST_Pixel));
+			m_fxVhs = Load<ShaderRes>(new ShaderLoader("xVhs", "vhstape.hlsl", "TextureVertexShader", ST_Pixel));
 
 			// 
 			this->DoPrecalc();
