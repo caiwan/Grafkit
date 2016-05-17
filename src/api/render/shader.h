@@ -236,22 +236,22 @@ namespace Grafkit {
 				inline size_t GetVarCount() { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParamCount() : 0; }
 
 #ifndef SHADER_NO_OPERATOR_ENHANCEMENT
-				inline void operator= (float v) { SetP(&v); }
+				void operator= (float v) { SetP(&v); }
 			
-				inline void operator= (void* v) { SetP(v); }
+				void operator= (void* v) { SetP(v); }
 				
-				inline void operator= (const float3 &v) { SetP(&v); }
-				inline void operator= (const float2 &v) { SetP(&v); }
-				inline void operator= (const float4 &v) { SetP(&v); }
-				inline void operator= (const matrix &v) { SetP(&v); }
+				void operator= (const float3 &v) { SetP(&v); }
+				void operator= (const float2 &v) { SetP(&v); }
+				void operator= (const float4 &v) { SetP(&v); }
+				void operator= (const matrix &v) { SetP(&v); }
 #endif //SHADER_NO_OPERATOR_ENHANCEMENT
 
 				inline void SetP(const void * const pData, size_t width = 0, size_t offset = 0) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); }
 
-				inline void SetF(const float v0);
-				inline void SetF(const float v0, const float v1);
-				inline void SetF(const float v0, const float v1, const float v2);
-				inline void SetF(const float v0, const float v1, const float v2, const float v3);
+				void SetF(const float v0);
+				void SetF(const float v0, const float v1);
+				void SetF(const float v0, const float v1, const float v2);
+				void SetF(const float v0, const float v1, const float v2, const float v3);
 
 				
 				inline D3D11_SHADER_BUFFER_DESC GetBufferDesc() { return (this->IsValid()) ? this->m_pShader->GetCBDescription(m_id) : D3D11_SHADER_BUFFER_DESC(); }

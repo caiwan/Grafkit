@@ -699,7 +699,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 // =============================================================================================================================
 
-inline void Shader::ShaderParamManager::SetF(const float v0)
+void Shader::ShaderParamManager::SetF(const float v0)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[1];
@@ -708,7 +708,7 @@ inline void Shader::ShaderParamManager::SetF(const float v0)
 	}
 }
 
-inline void Shader::ShaderParamManager::SetF(const float v0, const float v1)
+void Shader::ShaderParamManager::SetF(const float v0, const float v1)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[2];
@@ -718,7 +718,7 @@ inline void Shader::ShaderParamManager::SetF(const float v0, const float v1)
 	}
 }
 
-inline void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2)
+void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[3];
@@ -729,7 +729,7 @@ inline void Shader::ShaderParamManager::SetF(const float v0, const float v1, con
 	}
 }
 
-inline void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2, const float v3)
+void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2, const float v3)
 {
 	if (this->IsValid() && this->IsSubtype()) {
 		float v[4];
