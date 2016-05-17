@@ -238,6 +238,8 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 {
 	m_pDC = device.GetDeviceContext();
 
+	LOGGER(Log::Logger().Info("--- Compiling shader"));
+
 	HRESULT result = 0;
 	if (this->m_type == ST_Vertex) {
 		// Create the vertex shader from the buffer.
@@ -255,6 +257,8 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 			throw EX(FSCrerateException);
 		}
 	}
+
+	LOGGER(Log::Logger().Info("--- Compiling shader OK"));
 
 	this->BuildReflection(device, shaderBuffer);
 }
