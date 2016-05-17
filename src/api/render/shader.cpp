@@ -238,7 +238,7 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 {
 	m_pDC = device.GetDeviceContext();
 
-	LOGGER(Log::Logger().Info("--- Compiling shader"));
+	LOGGER(Log::Logger().Info("- Compiling shader"));
 
 	HRESULT result = 0;
 	if (this->m_type == ST_Vertex) {
@@ -258,7 +258,7 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 		}
 	}
 
-	LOGGER(Log::Logger().Info("--- Compiling shader OK"));
+	LOGGER(Log::Logger().Info("- Compiling shader OK"));
 
 	this->BuildReflection(device, shaderBuffer);
 }
@@ -547,6 +547,8 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	// fetch input descriptors
 	this->m_mapInputElems.clear();
 
+	LOGGER(Log::Logger().Trace("-- Reflection"));
+
 	std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
 	for (size_t i = 0; i < desc.InputParameters; i++)
 	{
@@ -573,7 +575,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		// -- determine DXGI format
 		this->GetDXGIFormat(input_desc, elementDesc.Format, elem.width);
 
-		// --- 
+		LOGGER(Log::Logger().Trace("--- Input element: %s [%d], Format = {%d, %d}", input_desc.SemanticName, input_desc.SemanticIndex, elementDesc.Format, elem.width));
 
 		elements.push_back(elementDesc);
 		
@@ -602,6 +604,8 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		OutputTargetRecord rec;
 		rec.desc = out_desc;
 		
+		LOGGER(Log::Logger().Trace("--- Output params: %s [%d]", out_desc.SemanticName, out_desc.SemanticIndex));
+
 		m_outputTargets.push_back(rec);
 	}
 
@@ -642,7 +646,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
 		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
 
-		//LOGGER(LOG(TRACE) << "Constant buffer record" << cbRecord.m_description.Name << cbRecord.m_description.Size << cbRecord.m_description.Type);
+		LOGGER(Log::Logger().Trace("--- Constant Buffer: %s [%d], Format = {%d, %d}", cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size));
 
 		// build up cbuffer variables
 		cbRecord.m_cbVarCount = cbRecord.m_description.Variables;
@@ -666,7 +670,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 				throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain shader reflection type description");
 			}
 
-			// LOGGER(LOG(TRACE) << "Shader vairable created " << cbRecord.m_description.Name << cbVar.m_var_desc.Name << cbVar.m_type_desc.Name;);
+			LOGGER(Log::Logger().Trace("---- Variable: %s [%d], Format = {%s, %d, %d}", cbVar.m_var_desc.Name, j, cbVar.m_type_desc.Name, cbVar.m_var_desc.Size, cbVar.m_var_desc.StartOffset));
 
 			cbRecord.m_cbVarMap[cbVar.m_var_desc.Name] = j;
 		}
@@ -690,6 +694,8 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 		brRecord.m_boundSource = nullptr;
 		brRecord.m_desc = brDesc;
+
+		LOGGER(Log::Logger().Trace("--- Bounded Resource: %s [%d], Format = {%d}", brRecord.m_desc.Name, i, brRecord.m_desc.Type));
 
 		m_mapBResources[brDesc.Name] = i;
 	}

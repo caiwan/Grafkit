@@ -62,6 +62,9 @@ namespace {
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::Initialize(Renderer & render)
 {
+	
+	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
+
 	m_texOut[0] = new Texture(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[0];
 	m_texOut[1] = new Texture(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[1];
 	m_texOut[2] = new Texture(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[2];
@@ -83,6 +86,8 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 	// -- 
 	m_textureSampler = new TextureSampler();
 	m_textureSampler->Initialize(render);
+
+	LOGGER(Log::Logger().Trace("FX Chain OK"));
 }
 
 void Grafkit::EffectComposer::Shutdown()

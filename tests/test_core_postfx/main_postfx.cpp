@@ -95,8 +95,8 @@ protected:
 			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 			m_fxFXAA = Load<ShaderRes>(new ShaderLoader("xFXAA", "fxaa.hlsl", "FXAA", ST_Pixel));
-			m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "fisheye.hlsl", "TextureVertexShader", ST_Pixel));
-			m_fxVhs = Load<ShaderRes>(new ShaderLoader("xVhs", "vhstape.hlsl", "TextureVertexShader", ST_Pixel));
+			// m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "fisheye.hlsl", "TextureVertexShader", ST_Pixel));
+			// m_fxVhs = Load<ShaderRes>(new ShaderLoader("xVhs", "vhstape.hlsl", "TextureVertexShader", ST_Pixel));
 
 			// 
 			this->DoPrecalc();
@@ -148,8 +148,8 @@ protected:
 			m_postfx = new EffectComposer(); m_postfx->Initialize(render);
 			
 			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFXAA);
-			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFishEye);
-			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxVhs);
+			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFishEye);
+			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxVhs);
 			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
 			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
 			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
@@ -174,21 +174,27 @@ protected:
 			this->render.BeginScene();
 			{
 				ShaderRef fragmentShader = this->m_fragmentShader->Get();
+				ShaderRef fxaaShader = this->m_fxFXAA->Get();
 
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 
 				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+				
+				float2 res = float2();
+				render.GetScreenSizef(res.x, res.y);
+				fxaaShader->GetParam("FXAA").Get("resolution").SetF(res.x, res.y);
 
 				scene->PreRender(render);
 				scene->Render(render);
 
 				this->t += 0.01;
 			}
-			this->render.EndScene();
 
 			// render fx chain 
 			m_postfx->Render(render);
+			
+			this->render.EndScene();
 
 			return 0;
 		};
