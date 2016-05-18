@@ -95,7 +95,7 @@ protected:
 			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 			m_fxFXAA = Load<ShaderRes>(new ShaderLoader("xFXAA", "fxaa.hlsl", "FXAA", ST_Pixel));
-			// m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "fisheye.hlsl", "TextureVertexShader", ST_Pixel));
+			m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "fisheye.hlsl", "fisheyeProc", ST_Pixel));
 			// m_fxVhs = Load<ShaderRes>(new ShaderLoader("xVhs", "vhstape.hlsl", "TextureVertexShader", ST_Pixel));
 
 			// 
@@ -148,7 +148,7 @@ protected:
 			m_postfx = new EffectComposer(); m_postfx->Initialize(render);
 			
 			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFXAA);
-			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFishEye);
+			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFishEye);
 			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxVhs);
 			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
 			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
@@ -175,6 +175,7 @@ protected:
 			{
 				ShaderRef fragmentShader = this->m_fragmentShader->Get();
 				ShaderRef fxaaShader = this->m_fxFXAA->Get();
+				ShaderRef fishEyeShader = this->m_fxFishEye->Get();
 
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
@@ -184,6 +185,8 @@ protected:
 				float2 res = float2();
 				render.GetScreenSizef(res.x, res.y);
 				fxaaShader->GetParam("FXAA").Get("resolution").SetF(res.x, res.y);
+
+				fishEyeShader->GetParam("Fisheye").Get("theta").SetF(0.5);
 
 				scene->PreRender(render);
 				scene->Render(render);
