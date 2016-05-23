@@ -25,12 +25,15 @@
     <ClCompile Include="builtin_data\c64palette.cpp" />
     <ClCompile Include="builtin_data\cbm64font.cpp" />
     <ClCompile Include="builtin_data\cube.cpp" />
+    <ClCompile Include="core\Music.cpp" />
+    <ClCompile Include="core\MusicFMOD.cpp" />
     <ClCompile Include="core\ResourcePreloader.cpp" />
     <ClCompile Include="core\input.cpp" />
     <ClCompile Include="core\system.cpp" />
     <ClCompile Include="core\window.cpp" />
     <ClCompile Include="generator\assimploader.cpp" />
     <ClCompile Include="generator\FontmapLoader.cpp" />
+    <ClCompile Include="generator\MusicFmodLoader.cpp" />
     <ClCompile Include="generator\ShaderLoader.cpp" />
     <ClCompile Include="generator\TextureLoader.cpp" />
     <ClCompile Include="render\Actor.cpp" />
@@ -65,18 +68,23 @@
     <ClCompile Include="utils\struct_pack.cpp" />
     <ClCompile Include="utils\tree.cpp" />
     <ClCompile Include="utils\XML.cpp" />
+    <ClCompile Include="valtracker\rocket\device.c" />
+    <ClCompile Include="valtracker\rocket\track.c" />
+    <ClCompile Include="valtracker\valtracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h" />
     <ClInclude Include="builtin_data\cbm64Font.h" />
     <ClInclude Include="builtin_data\cube.h" />
+    <ClInclude Include="core\Music.h" />
+    <ClInclude Include="core\MusicFMOD.h" />
     <ClInclude Include="core\ResourcePreloader.h" />
-    <ClInclude Include="core\asset.h" />
     <ClInclude Include="core\input.h" />
     <ClInclude Include="core\system.h" />
     <ClInclude Include="core\window.h" />
     <ClInclude Include="generator\assimploader.h" />
     <ClInclude Include="generator\FontmapLoader.h" />
+    <ClInclude Include="generator\MusicFmodLoader.h" />
     <ClInclude Include="generator\ShaderLoader.h" />
     <ClInclude Include="generator\TextureLoader.h" />
     <ClInclude Include="math\matrix.h" />
@@ -118,6 +126,11 @@
     <ClInclude Include="utils\struct_pack.h" />
     <ClInclude Include="utils\tree.h" />
     <ClInclude Include="utils\XML.h" />
+    <ClInclude Include="valtracker\rocket\base.h" />
+    <ClInclude Include="valtracker\rocket\device.h" />
+    <ClInclude Include="valtracker\rocket\sync.h" />
+    <ClInclude Include="valtracker\rocket\track.h" />
+    <ClInclude Include="valtracker\valtracker.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BFF1AD5F-469C-4EBE-8C53-698DAE473A13}</ProjectGuid>

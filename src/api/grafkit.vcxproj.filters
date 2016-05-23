@@ -27,6 +27,12 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{9a87692b-f92c-4d4c-992b-25310a0c1ddd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\valtracker">
+      <UniqueIdentifier>{7470adac-da03-444a-b930-aaff6f3a0e94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\valtracker\rocket">
+      <UniqueIdentifier>{6bde4260-a312-485f-8b2b-974887b0f80f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="FWrender.cd" />
@@ -161,6 +167,24 @@
     <ClCompile Include="utils\XML.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="valtracker\valtracker.cpp">
+      <Filter>Source Files\valtracker</Filter>
+    </ClCompile>
+    <ClCompile Include="valtracker\rocket\device.c">
+      <Filter>Source Files\valtracker\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="valtracker\rocket\track.c">
+      <Filter>Source Files\valtracker\rocket</Filter>
+    </ClCompile>
+    <ClCompile Include="core\MusicFMOD.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\Music.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\MusicFmodLoader.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -230,9 +254,6 @@
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="core\ResourcePreloader.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\asset.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="generator\TextureLoader.h">
@@ -315,6 +336,30 @@
     </ClInclude>
     <ClInclude Include="utils\XML.h">
       <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="valtracker\valtracker.h">
+      <Filter>Source Files\valtracker</Filter>
+    </ClInclude>
+    <ClInclude Include="valtracker\rocket\base.h">
+      <Filter>Source Files\valtracker\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="valtracker\rocket\device.h">
+      <Filter>Source Files\valtracker\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="valtracker\rocket\sync.h">
+      <Filter>Source Files\valtracker\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="valtracker\rocket\track.h">
+      <Filter>Source Files\valtracker\rocket</Filter>
+    </ClInclude>
+    <ClInclude Include="core\MusicFMOD.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Music.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\MusicFmodLoader.h">
+      <Filter>Source Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
