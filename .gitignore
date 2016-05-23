@@ -214,5 +214,7 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 
-tests.VC.opendb
+*.VC.opendb
+*.VC.db
+
 /src/ShaderEditor/shader-error.txt
