@@ -13,162 +13,164 @@
 #include "utils/asset.h"
 #include "utils/AssetFactory.h"
 #include "utils/AssetFile.h"
-		  
+
 #include "utils/ResourceManager.h"
 
 #include "generator/TextureLoader.h"
+#include "generator/ShaderLoader.h"
+
 
 using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
 class Application : public System, public IResourceManager
-{  
+{
 public:
 	Application() : System(),
 		m_file_loader(nullptr)
-		{
-			int screenWidth, screenHeight;
+	{
+		int screenWidth, screenHeight;
 
-			screenWidth = 800;
-			screenHeight = 600;
+		screenWidth = 800;
+		screenHeight = 600;
 
-			t = 0;
+		t = 0;
 
-			// initwindowot is ertelmesebb helyre kell rakni
-			InitializeWindows(screenWidth, screenHeight);
-		}
-		
-		~Application() {
-		}
+		// initwindowot is ertelmesebb helyre kell rakni
+		InitializeWindows(screenWidth, screenHeight);
+	}
+
+	~Application() {
+	}
 
 protected:
-		Renderer render;
-		Ref<Scene> scene;
+	Renderer render;
+	Ref<Scene> scene;
 
-		TextureSamplerRef m_textureSampler;
+	TextureSamplerRef m_textureSampler;
 
-		ActorRef m_rootActor;
+	ActorRef m_rootActor;
 
-		float t;
+	float t;
 
-		ShaderRef m_vertexShader;
-		ShaderRef m_fragmentShader;
-		
-		int init() {
-			// --- ezeket kell osszeszedni egy initwindowban
-			const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
-			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
+	ShaderResRef m_vertexShader;
+	ShaderResRef m_fragmentShader;
 
-			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+	int init() {
+		// --- ezeket kell osszeszedni egy initwindowban
+		const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
+		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
 
-			// init file loader
-			this->m_file_loader = new FileAssetManager("./");
+		this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
-			// --------------------------------------------------
+		// init file loader
+		this->m_file_loader = new FileAssetManager("./../../assets/rotating_cube/");
 
-			// -- camera
-			CameraRef camera = new Camera;
-			camera->SetPosition(0.0f, 0.0f, -10.0f);
+		// --------------------------------------------------
 
-			// -- texture
-			TextureResRef texture = new TextureRes();
+		// -- camera
+		CameraRef camera = new Camera;
+		camera->SetPosition(0.0f, 0.0f, -10.0f);
 
-			texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
+		// -- texture
+		TextureResRef texture = new TextureRes();
 
-			// -- texture sampler
-			m_textureSampler = new TextureSampler();
+		texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
 
-			// -- load shader
-			m_vertexShader = new Shader();
-			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+		// -- texture sampler
+		m_textureSampler = new TextureSampler();
+		m_textureSampler->Initialize(render);
 
-			m_fragmentShader = new Shader();
-			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+		// -- load shader
+		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
+		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
-			// -- model 
-			ModelRef model = new Model;
-			model->SetMaterial(new MaterialBase);
-			model->GetMaterial()->AddTexture(texture, "diffuse");
+		// -- precalc
+		this->DoPrecalc();
+
+		// -- model 
+		ModelRef model = new Model;
+		model->SetMaterial(new MaterialBase);
+		model->GetMaterial()->AddTexture(texture, "diffuse");
 
 
-			SimpleMeshGenerator generator(render, m_vertexShader);
-			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-			
-			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
+		SimpleMeshGenerator generator(render, m_vertexShader);
+		generator["POSITION"] = (void*)GrafkitData::cubeVertices;
+		generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
 
-			// --- 
-			this->DoPrecalc();
+		generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
 
-			// -- setup scene 
-			scene = new Scene();
-			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
-			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
-			
-			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
-			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
+		// -- setup scene 
+		scene = new Scene();
+		ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
+		ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
 
-			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
-			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
+		ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
+		ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
 
-			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
-			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
-			
+		ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
+		ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
 
-			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
+		ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
+		ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
 
-			ActorRef rootActor = new Actor();
-			rootActor->AddChild(cameraActor);
-			rootActor->AddChild(modelActor);
 
-			m_rootActor = rootActor;
+		// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
 
-			scene->SetRootNode(rootActor);
-			scene->SetCameraNode(cameraActor);
-			// scene->AddLightNode(lightActor);
+		ActorRef rootActor = new Actor();
+		rootActor->AddChild(cameraActor);
+		rootActor->AddChild(modelActor);
 
-			scene->SetVShader(m_vertexShader);
-			scene->SetFShader(m_fragmentShader);
+		m_rootActor = rootActor;
 
-			// --- 
+		scene->SetRootNode(rootActor);
+		scene->SetCameraNode(cameraActor);
+		// scene->AddLightNode(lightActor);
 
-			this->t = 0;
+		scene->SetVShader(m_vertexShader);
+		scene->SetFShader(m_fragmentShader);
 
-			return 0;
-		};
-		
-		// ==================================================================================================================
+		// --- 
 
-		void release() {
-			this->render.Shutdown();
-		};
+		this->t = 0;
 
-		// ==================================================================================================================
-		int mainloop() {
-			this->render.BeginScene();
-			{				
-				m_rootActor->Matrix().Identity();
-				m_rootActor->Matrix().RotateRPY(t,0,0);
+		return 0;
+	};
 
-				// ((Shader)(*m_fragmentShader))["SampleType"] = m_textureSampler->GetSamplerState();
+	// ==================================================================================================================
 
-				scene->PreRender(render);
-				scene->Render(render);
+	void release() {
+		this->render.Shutdown();
+	};
 
-				this->t += 0.01;
-			}
+	// ==================================================================================================================
+	int mainloop() {
+		this->render.BeginScene();
+		{
+			ShaderRef fragmentShader = this->m_fragmentShader->Get();
 
-			this->render.EndScene();
-			return 0;
-		};
-	
-	private:
-		FileAssetManager *m_file_loader;
+			m_rootActor->Matrix().Identity();
+			m_rootActor->Matrix().RotateRPY(t, 0, 0);
 
-	public:
-		IAssetFactory* GetAssetFactory() { return m_file_loader; };
-		Renderer & GetDeviceContext() { return this->render; };
+			fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+
+			scene->PreRender(render);
+			scene->Render(render);
+
+			this->t += 0.01;
+		}
+
+		this->render.EndScene();
+		return 0;
+	};
+
+private:
+	FileAssetManager *m_file_loader;
+
+public:
+	IAssetFactory* GetAssetFactory() { return m_file_loader; };
+	Renderer & GetDeviceContext() { return this->render; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
