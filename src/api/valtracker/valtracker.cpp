@@ -3,12 +3,14 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <cmath>
 
 #include "rocket/base.h"
 #include "rocket/track.h"
 #include "rocket/sync.h"
 
 using namespace Grafkit;
+using namespace FWdebugExceptions;
 
 //****************************************************************************************//
 // timer callbackek
@@ -41,21 +43,32 @@ namespace {
 }
 
 //****************************************************************************************//
-Timer::Timer(FWplayer::Music *music, long lengthMS, double beatPerMin, int rowPerBeat){
-	this->music = music;
-	this->length = (double)lengthMS;
-	this->bpm = beatPerMin;
-	this->rpb = rowPerBeat;
+//Timer::Timer(FWplayer::Music *music, long lengthMS, double beatPerMin, int rowPerBeat){
+//	this->music = music;
+//	this->length = (double)lengthMS;
+//	this->bpm = beatPerMin;
+//	this->rpb = rowPerBeat;
+//
+//	this->rowLength = (6000.0) / (bpm*rpb);	///@todo timerrel valami el van baszódva
+//	//this->rowLength = (60.0 * 1000.0) / (bpm*rpb);
+//	//this->rowLength = 60.0 / (bpm*rpb);
+//
+//	this->rocket = NULL;
+//}
 
-	this->rowLength = (6000.0) / (bpm*rpb);	///@todo timerrel valami el van baszódva
-	//this->rowLength = (60.0 * 1000.0) / (bpm*rpb);
-	//this->rowLength = 60.0 / (bpm*rpb);
-
-	this->rocket = NULL;
+Grafkit::Timer::Timer() : 
+	m_music(),
+	m_length(0),
+	m_pauseFlag(0),
+	m_rocket(nullptr),
+	m_rowLength(0),
+	m_rpb(0)
+{
+	strcpy(this->m_ipaddress, "127.0.0.1");
 }
 
 Timer::~Timer(){
-	this->release();
+	this->Shutdown();
 }
 
 void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, long lengthMS, double beatPerMin, int rowPerBeat)
@@ -63,85 +76,85 @@ void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, long lengthMS, doubl
 }
 
 // Rocket specific stuff // 
-void Timer::connect(const char *_ipaddr){
+void Timer::Connect(const char *_ipaddr){
 	if (!_ipaddr)
-		strcpy(this->ipaddress, "127.0.0.1");
+		strcpy(this->m_ipaddress, "127.0.0.1");
 	else
-		strncpy(this->ipaddress, _ipaddr, 32);
+		strncpy(this->m_ipaddress, _ipaddr, 32);
 
 /* <ROCKET SPECIFIC> */
-		rocket = sync_create_device("script/sync");
-		if (!rocket) throw new NoRocketDeviceException();
+		m_rocket = sync_create_device("script/sync");
+		if (!m_rocket) throw EX(NoRocketDeviceException);
 
 #ifndef SYNC_PLAYER
 		//sync_set_callbacks(rocket, &timer_cb, this);
 		//if (sync_connect(rocket, this->ipaddress, SYNC_DEFAULT_PORT))
 		//        throw new NoRocketDeviceException();
 
-		int row = this->getRowI(); //debugging madorfakor
-		if (sync_update(rocket, row, &timer_cb, this))
-				if (sync_connect(rocket, this->ipaddress, SYNC_DEFAULT_PORT))
-						throw new NoRocketDeviceException();
+		int row = this->GetRowI(); //debugging madorfakor
+		if (sync_update(m_rocket, row, &timer_cb, this))
+				if (sync_connect(m_rocket, this->m_ipaddress, SYNC_DEFAULT_PORT))
+						throw EX(NoRocketDeviceException);
 
 #endif /*SYNC_PLAYER*/
 /* </ROCKET SPECIFIC>*/
 }
 
-void Timer::update(){
+void Timer::Update(){
 /* <ROCKET SPECIFIC> */
 #ifndef SYNC_PLAYER
-		int row = this->getRowI(); //debugging madorfakor
-		if (sync_update(rocket, row, &timer_cb, this))
-				if (sync_connect(rocket, this->ipaddress, SYNC_DEFAULT_PORT))
-						throw new NoRocketDeviceException();
+		int row = this->GetRowI(); //debugging madorfakor
+		if (sync_update(m_rocket, row, &timer_cb, this))
+				if (sync_connect(m_rocket, this->m_ipaddress, SYNC_DEFAULT_PORT))
+						throw EX(NoRocketDeviceException);
 #endif /*SYNC_PLAYER*/
 /* </ROCKET SPECIFIC>*/
 }
 
-void Timer::release(){
-	if (this->rocket) sync_destroy_device(rocket);
-	this->rocket = NULL;
+void Timer::Shutdown(){
+	if (this->m_rocket) sync_destroy_device(m_rocket);
+	this->m_rocket = NULL;
 }
 
-void Timer::togglePause(int flag){
+void Timer::TogglePause(int flag){
 		bool e = (flag != 0);
-		this->music->pause(e);
-		this->pauseFlag = e;
+		Music()->Pause(e);
+		m_pauseFlag = e;
 }
 
 //****************************************************************************************//
-void Timer::setRow(int row) const {
-		double d = (float)row * (this->rowLength);
-		this->music->setTimems(d);
+void Timer::SetRow(int row) const {
+		double d = (float)row * (m_rowLength);
+		Music()->SetTimems(d);
 }
 
-double Timer::getRowD() const {
-		double t = this->getTimems(), d = t / this->rowLength;
+double Timer::GetRowD() const {
+		double t = this->GetTimems(), d = t / this->m_rowLength;
 		return d; // + 00001; // TODO: scaling
 }
 
-int Timer::getRowI() const {
-		//return (int)floor(this->getRowD());
-		float d =this->getRowD();
+int Timer::GetRowI() const {
+		//return (int)floor(this->GetRowD());
+		float d =this->GetRowD();
 		int i = (int)(d);
 		if (d-(float)i > 0.50) ++i;
 		return i;
 }
 
-double Timer::getRowD(double t) const {
-		double d = t / this->rowLength;
+double Timer::GetRowD(double t) const {
+		double d = t / this->m_rowLength;
 		return d; // + 00001; // TODO: scaling
 }
 
-int Timer::getRowI(double t) const {
-		//return (int)floor(this->getRowD());
-		float d =this->getRowD(t);
+int Timer::GetRowI(double t) const {
+		//return (int)floor(this->GetRowD());
+		float d =this->GetRowD(t);
 		int i = (int)(d);
 		if (d-(float)i > 0.50) ++i;
 		return i;
 }
 
-int Timer::getEnd() const{
+int Timer::GetEnd() const{
 #ifndef SYNC_PLAYER
 		return 0;       // keep goin forever
 #else
@@ -150,23 +163,23 @@ int Timer::getEnd() const{
 }
 
 //****************************************************************************************//
-ValueTracker::ValueTracker(Timer* timer){
-	this->mainTimer = timer;
+ValueTracker::ValueTracker(Timer* timer) : m_mainTimer(timer)
+{
 }
 
 ValueTracker::~ValueTracker(){
-	//delete this->mainTimer;
+	//delete this->m_mainTimer;
 }
 //****************************************************************************************//
 
 ValueTracker::Track::Track(ValueTracker *parent, val_track_e type, const char *name, const char *vclassName, const char *vname){
-	this->parent = parent;
-	this->type = type;
+	this->m_parent = parent;
+	this->m_type = type;
 
 	char _name[256], _vclass[256], _vname[256];
 	int subtracks = 0;
 	
-	switch (this->type)
+	switch (this->m_type)
 	{
 	case VTT_bool_switch:
 	case VTT_switch:
@@ -175,28 +188,28 @@ ValueTracker::Track::Track(ValueTracker *parent, val_track_e type, const char *n
 		subtracks = 1;
 		break;
 
-	case VTT_vec2:
-		if (!vname) throw new InvalidTrackNameException();
+	case VTT_Float2:
+		if (!vname) throw EX(InvalidTrackNameException);
 		subtracks = 2;
 		break;
 
-	case VTT_vec3:
-		if (!vname) throw new InvalidTrackNameException();
+	case VTT_Float3:
+		if (!vname) throw EX(InvalidTrackNameException);
 		subtracks = 3;
 		break;
 
-	case VTT_vec4:
-		if (!vname) throw new InvalidTrackNameException();
+	case VTT_Float4:
+		if (!vname) throw EX(InvalidTrackNameException);
 		subtracks = 4;
 		break;
 	}
 
-	for (int i=0; i<0; i++) this->tacks[i] = NULL;
+	for (int i=0; i<0; i++) this->m_tacks[i] = NULL;
 
 	for (int i=0; i<subtracks; i++){
 		if (!vname) sprintf(_name, "%s.%s", name, vclassName);
 			else sprintf(_name, "%s.%s.%c", name, vclassName, vname[i]);
-			this->tacks[i] = sync_get_track(this->parent->mainTimer->rocket, _name);
+			this->m_tacks[i] = sync_get_track(this->m_parent->m_mainTimer->m_rocket, _name);
 	}
 
 }
@@ -206,51 +219,53 @@ ValueTracker::Track::~Track(){
 }
 ///////////////////
 
-int ValueTracker::Track::getBool(double t){
-	float d = this->parent->mainTimer->getRowD(t);
-	float v = sync_get_val(this->tacks[0], d);
+int ValueTracker::Track::GetBool(double t){
+	float d = this->m_parent->m_mainTimer->GetRowD(t);
+	float v = sync_get_val(this->m_tacks[0], d);
 	return (v>.75); 
 }
 
-int ValueTracker::Track::getSwitch(double t){
-	float d = this->parent->mainTimer->getRowD(t);
-	float v = sync_get_val(this->tacks[0], d);
+int ValueTracker::Track::GetSwitch(double t){
+	float d = this->m_parent->m_mainTimer->GetRowD(t);
+	float v = sync_get_val(this->m_tacks[0], d);
 	return floor(v);
 }
 
-float ValueTracker::Track::getScalar(double t){
-	float d = this->parent->mainTimer->getRowD(t);
-	float v = sync_get_val(this->tacks[0], d);
+float ValueTracker::Track::GetScalar(double t){
+	float d = this->m_parent->m_mainTimer->GetRowD(t);
+	float v = sync_get_val(this->m_tacks[0], d);
 	return v;
 }
 
-float ValueTracker::Track::getVelocity(double t){
-	float d = this->parent->mainTimer->getRowD(t);
-	float v = sync_get_val(this->tacks[0], d);
-	return FWmath::clampf(v, 0, 1);
+float ValueTracker::Track::GetVelocity(double t){
+	float d = this->m_parent->m_mainTimer->GetRowD(t);
+	float v = sync_get_val(this->m_tacks[0], d);
+	return v;
 }
 
-vec2float ValueTracker::Track::getVec2(double t){
-	float d = this->parent->mainTimer->getRowD(t);
-	vec2float hugyosfoskarika = vec2float(
-		sync_get_val(this->tacks[0], d),
-		sync_get_val(this->tacks[1], d));
-	return hugyosfoskarika;
+float2 ValueTracker::Track::GetFloat2(double t){
+	float d = this->m_parent->m_mainTimer->GetRowD(t);
+	float2 res;
+	res.x = sync_get_val(this->m_tacks[0], d),
+	res.y = sync_get_val(this->m_tacks[1], d);
+	return res;
 }
 
-vec3float ValueTracker::Track::getVec3(double t){
-	float d = this->parent->mainTimer->getRowD(t);
-	return vec3float(
-		sync_get_val(this->tacks[0], d), 
-		sync_get_val(this->tacks[1], d),
-		sync_get_val(this->tacks[2], d) );
+float3 ValueTracker::Track::GetFloat3(double t){
+	float d = this->m_parent->m_mainTimer->GetRowD(t);
+	float3 res;
+	res.x = sync_get_val(this->m_tacks[0], d),
+	res.y = sync_get_val(this->m_tacks[1], d),
+	res.z = sync_get_val(this->m_tacks[2], d);
+	return res;
 }
 
-vec4float ValueTracker::Track::getVec4(double t){
-	float d = this->parent->mainTimer->getRowD(t);
-	return vec4float(
-		sync_get_val(this->tacks[0], d), 
-		sync_get_val(this->tacks[1], d),
-		sync_get_val(this->tacks[2], d),
-		sync_get_val(this->tacks[2], d) );
+float4 ValueTracker::Track::GetFloat4(double t){
+	float d = this->m_parent->m_mainTimer->GetRowD(t);
+	float4 res;
+	res.x= sync_get_val(this->m_tacks[0], d), 
+	res.y= sync_get_val(this->m_tacks[1], d),
+	res.z= sync_get_val(this->m_tacks[2], d),
+	res.w= sync_get_val(this->m_tacks[2], d);
+	return res;
 }
