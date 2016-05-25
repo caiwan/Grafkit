@@ -242,7 +242,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 
 	//IRenderAssetRepository* asset_repo = assman->GetRepository(GetCounter());
 
-	int i = 0, j = 0, k = 0, l = 0;
+	size_t i = 0, j = 0, k = 0, l = 0;
 	std::vector<MaterialRef> materials;
 	std::vector<ModelRef> models;
 	std::vector<CameraRef> cameras;

@@ -306,7 +306,7 @@ Shader::ShaderParamManager Shader::GetParam(size_t id, size_t vid)
 
 // ============================================================================================================================================
 
-void Shader::SetParamPtr(size_t id, const void const * pData, size_t size, size_t offset)
+void Shader::SetParamPtr(size_t id, const void  * const pData, size_t size, size_t offset)
 {
 	if (id < m_cBufferCount) 
 	{
@@ -329,7 +329,7 @@ void Shader::SetParamPtr(size_t id, const void const * pData, size_t size, size_
 }
 
 ///@todo ez egyelore nem mukodik 
-void Shader::SetParamPtr(size_t id, size_t vid, const void const * pData, size_t size, size_t offset)
+void Shader::SetParamPtr(size_t id, size_t vid, const void  * const pData, size_t size, size_t offset)
 {
 	if (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount)
 	{
@@ -550,7 +550,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	LOGGER(Log::Logger().Trace("-- Reflection"));
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
-	for (size_t i = 0; i < desc.InputParameters; i++)
+	for (UINT i = 0; i < desc.InputParameters; i++)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
 		this->m_pReflector->GetInputParameterDesc(i, &input_desc);
@@ -596,7 +596,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 
 	// fetch output desctiptor
-	for (size_t i = 0; i < desc.OutputParameters; i++)
+	for (UINT i = 0; i < desc.OutputParameters; i++)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC out_desc;
 		this->m_pReflector->GetOutputParameterDesc(i, &out_desc);
@@ -615,7 +615,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	m_cBufferCount = desc.ConstantBuffers;
 	m_cBuffers = new CBRecord[m_cBufferCount];
 
-	for (size_t i = 0; i < desc.ConstantBuffers; i++)
+	for (UINT i = 0; i < desc.ConstantBuffers; i++)
 	{
 		CBRecord & cbRecord = m_cBuffers[i];
 		cbRecord.m_slot = 0;
@@ -652,7 +652,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		cbRecord.m_cbVarCount = cbRecord.m_description.Variables;
 		cbRecord.m_cbVars = new CBVar[cbRecord.m_cbVarCount];
 
-		for (size_t j = 0; j < cbRecord.m_cbVarCount; j++) {
+		for (UINT j = 0; j < cbRecord.m_cbVarCount; j++) {
 			ID3D11ShaderReflectionVariable* shader_variable = pConstBuffer->GetVariableByIndex(j);
 			CBVar &cbVar = cbRecord.m_cbVars[j];
 

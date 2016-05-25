@@ -99,8 +99,8 @@ namespace Grafkit {
 		ShaderParamManager GetParam(size_t id, std::string varname);
 		ShaderParamManager GetParam(size_t id, size_t vid);
 
-		void SetParamPtr(size_t id, const void const * pData, size_t size = 0, size_t offset = 0);
-		void SetParamPtr(size_t id, size_t vid, const void const * pData, size_t size = 0, size_t offset = 0);
+		void SetParamPtr(size_t id, const void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParamPtr(size_t id, size_t vid, const void * const pData, size_t size = 0, size_t offset = 0);
 
 	protected:
 		void* MapParamBuffer(size_t id, int isDiscard = 1);
