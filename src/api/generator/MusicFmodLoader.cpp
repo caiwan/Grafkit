@@ -50,11 +50,15 @@ namespace {
 
 	MusicFMOD::~MusicFMOD(void)
 	{
+		Stop();
+		m_system->close();
+		// Itt elvileg valamikor meg kellene szunnie a tobbi handlernek valamikor
 	}
 
 	void MusicFMOD::Initialize(IAssetRef asset)
 	{
-		/*const void* data, unsigned int len*/
+		const void* data = asset->GetData();
+		size_t len = asset->GetSize();
 		
 		FMOD_RESULT result;
 		FMOD_CREATESOUNDEXINFO exinfo;
@@ -91,98 +95,56 @@ namespace {
 
 	void MusicFMOD::Play()
 	{
+		FMOD_RESULT result = m_system->playSound(FMOD_CHANNEL_FREE, m_sound, false, &m_channel);
+		FMOD_ERRCHECK(result);
 	}
 
 	void MusicFMOD::Stop()
 	{
+		FMOD_RESULT result = m_channel->stop();
+		FMOD_ERRCHECK(result);
 	}
 
 	void MusicFMOD::Pause(bool e)
 	{
+		bool b = 0;
+		m_channel->isPlaying(&b);
+		
+		if (!b && !e) {
+			Play();
+		}
+		
+		FMOD_RESULT result = m_channel->setPaused(e);
 	}
 
 	unsigned int MusicFMOD::GetTimeSample()
 	{
-		return 0;
+		unsigned int t = 0;
+		m_channel->getPosition(&t, FMOD_TIMEUNIT_PCM);
+		return t;
 	}
 
 	void MusicFMOD::SetTimeSample(unsigned int t)
 	{
+		m_channel->setPosition(t, FMOD_TIMEUNIT_PCM);
 	}
 
 	void MusicFMOD::SetLoop(bool e)
 	{
+		if (e) 
+			m_channel->setMode(FMOD_LOOP_NORMAL);
+		else 
+			m_channel->setMode(FMOD_LOOP_OFF);
 	}
 
 	int MusicFMOD::IsPlaying()
 	{
-		return 0;
+		bool b = 0, p = 0;
+		m_channel->isPlaying(&b);
+		m_channel->getPaused(&p);
+		return b && !p;
 	}
 
-
-//
-//	void MusicFMOD::init(const void* data, unsigned int len) {
-
-//		init();
-//	}
-//
-//	void MusicFMOD::init() {
-
-//	}
-//
-//	MusicFMOD::MusicFMOD(const char* filename) :
-//		Music(), AudioVisPRovider(),
-//
-//		res(NULL),
-//		sound(NULL),
-//		system(NULL),
-//		channel(NULL)
-//	{
-//		FMOD_RESULT result;
-//
-//		System_Create(&this->system);
-//		result = system->init(1, FMOD_INIT_NORMAL, 0);
-//
-//		///@todo ha nem szerkesztoben van hasznalva, akkor create strem, kulonben sound < makrokkal elintezni
-//		result = this->system->createSound(filename, FMOD_SOFTWARE | FMOD_CREATESAMPLE | FMOD_UNIQUE | FMOD_LOOP_OFF | FMOD_2D | FMOD_ACCURATETIME, 0, &this->sound);
-//		//result = this->system->createStream(filename, FMOD_HARDWARE | FMOD_CREATESAMPLE, 0, &this->sound);
-//
-//		///@todo check 'result'
-//
-//		init();
-//	}
-//
-//	MusicFMOD::MusicFMOD(const void* data, unsigned int len) :
-//		Music(), // FFTProvider(),
-//
-//		res(NULL),
-//		sound(NULL),
-//		system(NULL),
-//		channel(NULL)
-//	{
-//		init(data, len);
-//	}
-//
-//	MusicFMOD::MusicFMOD(Resource *res) :
-//		Music(), // FFTProvider(),
-//
-//		res(NULL),
-//		sound(NULL),
-//		system(NULL),
-//		channel(NULL)
-//	{
-//		if (!res) throw NullPointerException();
-//
-//		res->load();
-//		init(res->getData(), (unsigned int)res->getLength());
-//	}
-//
-//	MusicFMOD::~MusicFMOD(void)
-//	{
-//		this->stop();
-//		//@todo: toroljon le minden mas resource-t is
-//		if (this->res) delete res;
-//	}
 //
 //	void MusicFMOD::play()
 //	{

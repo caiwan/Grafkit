@@ -19,3 +19,5 @@ namespace Grafkit {
 	};
 
 }
+
+DEFINE_EXCEPTION(MusicLoadException, 0, "Could not load music from disk");
