@@ -33,7 +33,7 @@ namespace Grafkit{
 	/**
 	A base class for collectable render assets for bulk loading and reloading 
 	*/
-	class IResource : virtual public Referencable
+	class IResource : /*virtual*/ public Referencable
 	{
 		friend class IResourceManager;
 		friend class IRenderAssetRepository;
@@ -81,6 +81,8 @@ namespace Grafkit{
 		operator Ref<T> () { return Ref<T>(dynamic_cast<T*>(this->Get())); }
 		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
 		operator T& () { return *(this->Get()); }
+
 	};
 
 }
+

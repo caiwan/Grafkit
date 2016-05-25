@@ -1,7 +1,4 @@
 #include "valtracker.h"
-#include "debug/exceptions.h"
-
-#include "math/math.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -11,10 +8,7 @@
 #include "rocket/track.h"
 #include "rocket/sync.h"
 
-using FWscene::Timer;
-
-#define NoRocketDeviceException() ExceptionEX(200, "No Rocket device")
-#define InvalidTrackNameException() ExceptionEX(201, "Invalid track name")
+using namespace Grafkit;
 
 //****************************************************************************************//
 // timer callbackek
@@ -23,19 +17,19 @@ namespace {
 		void timer_pause(void *d, int flag)
 		{
 				Timer *dd = (Timer*)d;  
-				dd->togglePause(flag);
+				dd->TogglePause(flag);
 		}
 
 		void timer_set_row(void *d, int row)
 		{
 				Timer *dd = (Timer*)d;
-				dd->setRow(row);
+				dd->SetRow(row);
 		}
 
 		int timer_is_playing(void *d)
 		{
 				Timer *dd = (Timer*)d;
-				return (int)!dd->getPauseFlag();
+				return (int)!dd->GetPauseFlag();
 		}
 
 		struct sync_cb timer_cb = {
@@ -47,7 +41,7 @@ namespace {
 }
 
 //****************************************************************************************//
-FWscene::Timer::Timer(FWplayer::Music *music, long lengthMS, double beatPerMin, int rowPerBeat){
+Timer::Timer(FWplayer::Music *music, long lengthMS, double beatPerMin, int rowPerBeat){
 	this->music = music;
 	this->length = (double)lengthMS;
 	this->bpm = beatPerMin;
@@ -60,12 +54,16 @@ FWscene::Timer::Timer(FWplayer::Music *music, long lengthMS, double beatPerMin, 
 	this->rocket = NULL;
 }
 
-FWscene::Timer::~Timer(){
+Timer::~Timer(){
 	this->release();
 }
 
+void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, long lengthMS, double beatPerMin, int rowPerBeat)
+{
+}
+
 // Rocket specific stuff // 
-void FWscene::Timer::connect(const char *_ipaddr){
+void Timer::connect(const char *_ipaddr){
 	if (!_ipaddr)
 		strcpy(this->ipaddress, "127.0.0.1");
 	else
@@ -89,7 +87,7 @@ void FWscene::Timer::connect(const char *_ipaddr){
 /* </ROCKET SPECIFIC>*/
 }
 
-void FWscene::Timer::update(){
+void Timer::update(){
 /* <ROCKET SPECIFIC> */
 #ifndef SYNC_PLAYER
 		int row = this->getRowI(); //debugging madorfakor
@@ -100,29 +98,29 @@ void FWscene::Timer::update(){
 /* </ROCKET SPECIFIC>*/
 }
 
-void FWscene::Timer::release(){
+void Timer::release(){
 	if (this->rocket) sync_destroy_device(rocket);
 	this->rocket = NULL;
 }
 
-void FWscene::Timer::togglePause(int flag){
+void Timer::togglePause(int flag){
 		bool e = (flag != 0);
 		this->music->pause(e);
 		this->pauseFlag = e;
 }
 
 //****************************************************************************************//
-void FWscene::Timer::setRow(int row) const {
+void Timer::setRow(int row) const {
 		double d = (float)row * (this->rowLength);
 		this->music->setTimems(d);
 }
 
-double FWscene::Timer::getRowD() const {
+double Timer::getRowD() const {
 		double t = this->getTimems(), d = t / this->rowLength;
 		return d; // + 00001; // TODO: scaling
 }
 
-int FWscene::Timer::getRowI() const {
+int Timer::getRowI() const {
 		//return (int)floor(this->getRowD());
 		float d =this->getRowD();
 		int i = (int)(d);
@@ -130,12 +128,12 @@ int FWscene::Timer::getRowI() const {
 		return i;
 }
 
-double FWscene::Timer::getRowD(double t) const {
+double Timer::getRowD(double t) const {
 		double d = t / this->rowLength;
 		return d; // + 00001; // TODO: scaling
 }
 
-int FWscene::Timer::getRowI(double t) const {
+int Timer::getRowI(double t) const {
 		//return (int)floor(this->getRowD());
 		float d =this->getRowD(t);
 		int i = (int)(d);
@@ -143,7 +141,7 @@ int FWscene::Timer::getRowI(double t) const {
 		return i;
 }
 
-int FWscene::Timer::getEnd() const{
+int Timer::getEnd() const{
 #ifndef SYNC_PLAYER
 		return 0;       // keep goin forever
 #else
@@ -152,16 +150,16 @@ int FWscene::Timer::getEnd() const{
 }
 
 //****************************************************************************************//
-FWscene::ValueTracker::ValueTracker(Timer* timer){
+ValueTracker::ValueTracker(Timer* timer){
 	this->mainTimer = timer;
 }
 
-FWscene::ValueTracker::~ValueTracker(){
+ValueTracker::~ValueTracker(){
 	//delete this->mainTimer;
 }
 //****************************************************************************************//
 
-FWscene::ValueTracker::Track::Track(ValueTracker *parent, val_track_e type, const char *name, const char *vclassName, const char *vname){
+ValueTracker::Track::Track(ValueTracker *parent, val_track_e type, const char *name, const char *vclassName, const char *vname){
 	this->parent = parent;
 	this->type = type;
 
@@ -203,36 +201,36 @@ FWscene::ValueTracker::Track::Track(ValueTracker *parent, val_track_e type, cons
 
 }
 
-FWscene::ValueTracker::Track::~Track(){
+ValueTracker::Track::~Track(){
 	
 }
 ///////////////////
 
-int FWscene::ValueTracker::Track::getBool(double t){
+int ValueTracker::Track::getBool(double t){
 	float d = this->parent->mainTimer->getRowD(t);
 	float v = sync_get_val(this->tacks[0], d);
 	return (v>.75); 
 }
 
-int FWscene::ValueTracker::Track::getSwitch(double t){
+int ValueTracker::Track::getSwitch(double t){
 	float d = this->parent->mainTimer->getRowD(t);
 	float v = sync_get_val(this->tacks[0], d);
 	return floor(v);
 }
 
-float FWscene::ValueTracker::Track::getScalar(double t){
+float ValueTracker::Track::getScalar(double t){
 	float d = this->parent->mainTimer->getRowD(t);
 	float v = sync_get_val(this->tacks[0], d);
 	return v;
 }
 
-float FWscene::ValueTracker::Track::getVelocity(double t){
+float ValueTracker::Track::getVelocity(double t){
 	float d = this->parent->mainTimer->getRowD(t);
 	float v = sync_get_val(this->tacks[0], d);
 	return FWmath::clampf(v, 0, 1);
 }
 
-vec2float FWscene::ValueTracker::Track::getVec2(double t){
+vec2float ValueTracker::Track::getVec2(double t){
 	float d = this->parent->mainTimer->getRowD(t);
 	vec2float hugyosfoskarika = vec2float(
 		sync_get_val(this->tacks[0], d),
@@ -240,7 +238,7 @@ vec2float FWscene::ValueTracker::Track::getVec2(double t){
 	return hugyosfoskarika;
 }
 
-vec3float FWscene::ValueTracker::Track::getVec3(double t){
+vec3float ValueTracker::Track::getVec3(double t){
 	float d = this->parent->mainTimer->getRowD(t);
 	return vec3float(
 		sync_get_val(this->tacks[0], d), 
@@ -248,7 +246,7 @@ vec3float FWscene::ValueTracker::Track::getVec3(double t){
 		sync_get_val(this->tacks[2], d) );
 }
 
-vec4float FWscene::ValueTracker::Track::getVec4(double t){
+vec4float ValueTracker::Track::getVec4(double t){
 	float d = this->parent->mainTimer->getRowD(t);
 	return vec4float(
 		sync_get_val(this->tacks[0], d), 

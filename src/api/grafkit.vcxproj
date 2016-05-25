@@ -26,7 +26,6 @@
     <ClCompile Include="builtin_data\cbm64font.cpp" />
     <ClCompile Include="builtin_data\cube.cpp" />
     <ClCompile Include="core\Music.cpp" />
-    <ClCompile Include="core\MusicFMOD.cpp" />
     <ClCompile Include="core\ResourcePreloader.cpp" />
     <ClCompile Include="core\input.cpp" />
     <ClCompile Include="core\system.cpp" />
@@ -58,8 +57,18 @@
     <ClCompile Include="utils\guid.cpp" />
     <ClCompile Include="utils\json.cpp" />
     <ClCompile Include="utils\logger.cpp" />
-    <ClCompile Include="utils\memory.cpp" />
-    <ClCompile Include="utils\memory_alloc.cpp" />
+    <ClCompile Include="utils\memory.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="utils\memory_alloc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="utils\node.cpp" />
     <ClCompile Include="utils\persistent.cpp" />
     <ClCompile Include="utils\resource.cpp" />
@@ -67,7 +76,12 @@
     <ClCompile Include="utils\ResourceManager.cpp" />
     <ClCompile Include="utils\struct_pack.cpp" />
     <ClCompile Include="utils\tree.cpp" />
-    <ClCompile Include="utils\XML.cpp" />
+    <ClCompile Include="utils\XML.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="valtracker\rocket\device.c" />
     <ClCompile Include="valtracker\rocket\track.c" />
     <ClCompile Include="valtracker\valtracker.cpp" />
@@ -77,7 +91,6 @@
     <ClInclude Include="builtin_data\cbm64Font.h" />
     <ClInclude Include="builtin_data\cube.h" />
     <ClInclude Include="core\Music.h" />
-    <ClInclude Include="core\MusicFMOD.h" />
     <ClInclude Include="core\ResourcePreloader.h" />
     <ClInclude Include="core\input.h" />
     <ClInclude Include="core\system.h" />
@@ -114,9 +127,19 @@
     <ClInclude Include="utils\iterator.h" />
     <ClInclude Include="utils\json.h" />
     <ClInclude Include="utils\logger.h" />
-    <ClInclude Include="utils\memory.h" />
+    <ClInclude Include="utils\memory.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="utils\memory_align.h" />
-    <ClInclude Include="utils\memory_alloc.h" />
+    <ClInclude Include="utils\memory_alloc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="utils\node.h" />
     <ClInclude Include="utils\persistent.h" />
     <ClInclude Include="utils\reference.h" />
@@ -125,7 +148,12 @@
     <ClInclude Include="utils\ResourceManager.h" />
     <ClInclude Include="utils\struct_pack.h" />
     <ClInclude Include="utils\tree.h" />
-    <ClInclude Include="utils\XML.h" />
+    <ClInclude Include="utils\XML.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="valtracker\rocket\base.h" />
     <ClInclude Include="valtracker\rocket\device.h" />
     <ClInclude Include="valtracker\rocket\sync.h" />

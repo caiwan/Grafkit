@@ -176,9 +176,6 @@
     <ClCompile Include="valtracker\rocket\track.c">
       <Filter>Source Files\valtracker\rocket</Filter>
     </ClCompile>
-    <ClCompile Include="core\MusicFMOD.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
     <ClCompile Include="core\Music.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
@@ -351,9 +348,6 @@
     </ClInclude>
     <ClInclude Include="valtracker\rocket\track.h">
       <Filter>Source Files\valtracker\rocket</Filter>
-    </ClInclude>
-    <ClInclude Include="core\MusicFMOD.h">
-      <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="core\Music.h">
       <Filter>Source Files\core</Filter>

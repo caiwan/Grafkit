@@ -1,7 +1,9 @@
 #pragma once 
 
-#include "player/player.h"
-#include "math/vectors.h"
+#include "../stdafx.h"
+
+#include "../core/Music.h"
+#include "../render/dxtypes.h"
 
 /* <ROCKET SPECIFIC> */
 struct sync_track;
@@ -9,45 +11,37 @@ struct sync_device;
 typedef const sync_track sync_track_t;
 /* </ ROCKET SPECIFIC> */
 
-namespace FWscene{
+namespace Grafkit{
 	class ValueTracker;
 
 	class Timer{
 		friend ValueTracker;
 
-		private:
-			// TOOD: erre ennel sokkal szebb megoldast kell talalni :)
-			FWplayer::Music *music;
-			int pauseFlag;
-
-			double length, bpm, rpb, rowLength;
-
-			sync_device *rocket;
-			char ipaddress[32];
-
 		public:
-			Timer(FWplayer::Music *music, long lengthMS, double beatPerMin, int rowPerBeat);
+			Timer();
 			~Timer();
 
+			void Initialize(Grafkit::MusicResRef music, long lengthMS, double beatPerMin, int rowPerBeat);
+
 		// synctracker wrapper
-			void setRow(int row) const;
-			double getRowD() const;
-			int getRowI() const;
+			void SetRow(int row) const;
+			double GetRowD() const;
+			int GetRowI() const;
 			
-			double getRowD(double timems) const;
-			int getRowI(double timems) const;
+			double GetRowD(double timems) const;
+			int GetRowI(double timems) const;
 
-			inline double getTime() const {return this->music->getTime();}
-			inline double getTimems() const {return this->music->getTimems();}
+			inline double GetTime() const {return Music()->GetTime();}
+			inline double GetTimems() const {return Music()->GetTimems();}
 						
-			void togglePause(int flag);
-			inline bool getPauseFlag() const {return this->pauseFlag != 0;}
+			void TogglePause(int flag);
+			inline bool GetPauseFlag() const {return m_pauseFlag != 0;}
 
-			inline double getLengthMS() const {return this->length;}
-			inline double getLength() const {return this->length/1000.;}
+			inline double GetLengthMS() const {return m_length;}
+			inline double GetLength() const {return m_length/1000.;}
 
-			inline void play() {this->music->play(); this->pauseFlag = 0;}
-			inline void stop() {this->music->stop(); this->pauseFlag = 1;}
+			inline void Play() { Music()->Play(); this->m_pauseFlag = 0;}
+			inline void Stop() { Music()->Stop(); this->m_pauseFlag = 1;}
 
 			int getEnd() const;
 
@@ -55,9 +49,21 @@ namespace FWscene{
 			Csatlakozik a Rockethez.
 			A pathnek leteznie kell `./sync/` kulonben nem mukodik, es nem ad vissza hibat
 			*/
-			void connect(const char *_ipaddr = NULL);
-			void update();
-			void release();
+			void Connect(const char *_ipaddr = NULL);
+			void Update();
+			void Release();
+
+		private:
+
+			Grafkit::Music* const Music() const { return this->m_music->Get()->Get(); }
+
+			Grafkit::MusicResRef m_music;
+			int m_pauseFlag;
+
+			double m_length, m_bpm, m_rpb, m_rowLength;
+
+			sync_device *m_rocket;
+			char m_ipaddress[32];
 	};
 	
 	enum val_track_e {
@@ -65,16 +71,14 @@ namespace FWscene{
 		VTT_switch,      // integer (clamp down)
 		VTT_scalar,      // scalar value
 		VTT_velocity,    // valocity value 0..1
-		VTT_vec2,        // 2D vector - xy
-		VTT_vec3,        // 3D vector - xyz
-		VTT_vec4,        // 4D vector - xyzw
+		VTT_Float2,        // 2D vector - xy
+		VTT_Float3,        // 3D vector - xyz
+		VTT_Float4,        // 4D vector - xyzw
 		VTT_VCOUNT
 	};
 
 	class ValueTracker{
-		private:
-			Timer *mainTimer;
-		
+
 		protected:
 			class Track{
 				protected:
@@ -86,9 +90,9 @@ namespace FWscene{
 					int getSwitch(double t);
 					float getScalar(double t);
 					float getVelocity(double t);
-					vec2float getVec2(double t);
-					vec3float getVec3(double t);
-					vec4float getVec4(double t);
+					float2 getFloat2(double t);
+					float3 getFloat3(double t);
+					float4 getFloat4(double t);
 
 				public:
 					Track(ValueTracker *parent, val_track_e type, const char *name, const char *vclassName, const char *vname);
@@ -99,11 +103,16 @@ namespace FWscene{
 			ValueTracker(Timer* timer);
 			~ValueTracker();
 
-			inline const Timer* getTimer(){return this->mainTimer;}
-			inline void update(){this->mainTimer->update();}
+			inline const Timer* getTimer(){return this->m_mainTimer;}
+			inline void update(){this->m_mainTimer->Update();}
+
+		private:
+			Timer *m_mainTimer;
+
+	
 
 			// Track classes
-
+		public:
 			/**
 				Has boolean value only. 0 or 1
 			*/
@@ -114,7 +123,7 @@ namespace FWscene{
 					virtual ~BoolTrack(){}
 
 					inline int get(double t){return this->getBool(t);}
-					inline int get(){return this->getBool(this->parent->mainTimer->getTimems());} // NPR vedelem?
+					inline int get(){return this->getBool(this->parent->m_mainTimer->GetTimems());} // NPR vedelem?
 			};
 			
 			/**
@@ -127,7 +136,7 @@ namespace FWscene{
 					virtual ~SwitchTrack(){}
 
 					inline int get(double t){return this->getSwitch(t);}
-					inline int get(){return this->getSwitch(this->parent->mainTimer->getTimems());}
+					inline int get(){return this->getSwitch(this->parent->m_mainTimer->GetTimems());}
 			};
 			
 			/**
@@ -140,7 +149,7 @@ namespace FWscene{
 					virtual ~ScalarTrack(){}
 
 					inline float get(double t){return this->getScalar(t);}
-					inline float get(){return this->getScalar(this->parent->mainTimer->getTimems());}
+					inline float get(){return this->getScalar(this->parent->m_mainTimer->GetTimems());}
 			};
 
 			/**
@@ -153,48 +162,48 @@ namespace FWscene{
 					virtual ~VelocityTrack(){}
 
 					inline float get(double t){return this->getVelocity(t);}
-					inline float get(){return this->getVelocity(this->parent->mainTimer->getTimems());}
+					inline float get(){return this->getVelocity(this->parent->m_mainTimer->GetTimems());}
 			};
 
 			/**
 				Two component vector. Creates two channel.
 			*/
 
-			class Vec2Track : public Track{
+			class Float2Track : public Track{
 				public:
-					Vec2Track(ValueTracker *parent, const char *name, const char *vclassName, const char *vname): 
-					  Track(parent, VTT_vec2, name, vclassName, vname){}
-					virtual ~Vec2Track(){}
+					Float2Track(ValueTracker *parent, const char *name, const char *vclassName, const char *vname): 
+					  Track(parent, VTT_Float2, name, vclassName, vname){}
+					virtual ~Float2Track(){}
 
-					inline vec2float get(double t){return this->getVec2(t);}
-					inline vec2float get(){return this->getVec2(this->parent->mainTimer->getTimems());}
+					inline float2 get(double t){return this->getFloat2(t);}
+					inline float2 get(){return this->getFloat2(this->parent->m_mainTimer->GetTimems());}
 			};
 
 
 			/**
 				Three component vector. Creates three channel.
 			*/
-			class Vec3Track : public Track{
+			class Float3Track : public Track{
 				public: 
-					Vec3Track(ValueTracker *parent, const char *name, const char *vclassName, const char *vname): 
-					  Track(parent, VTT_vec3, name, vclassName, vname){}
-					virtual ~Vec3Track(){}
+					Float3Track(ValueTracker *parent, const char *name, const char *vclassName, const char *vname): 
+					  Track(parent, VTT_Float3, name, vclassName, vname){}
+					virtual ~Float3Track(){}
 
-					inline vec3float get(double t){return this->getVec3(t);}
-					inline vec3float get(){return this->getVec3(this->parent->mainTimer->getTimems());}
+					inline float3 get(double t){return this->getFloat3(t);}
+					inline float3 get(){return this->getFloat3(this->parent->m_mainTimer->GetTimems());}
 			};
 
 			/**
 				Four component vector. Creates four channel.
 			*/
-			class Vec4Track : public Track{
+			class Float4Track : public Track{
 				public: 
-					Vec4Track(ValueTracker *parent, const char *name, const char *vclassName, const char *vname): 
-					  Track(parent, VTT_vec4, name, vclassName, vname){}
-					virtual ~Vec4Track(){}
+					Float4Track(ValueTracker *parent, const char *name, const char *vclassName, const char *vname): 
+					  Track(parent, VTT_Float4, name, vclassName, vname){}
+					virtual ~Float4Track(){}
 
-					inline vec4float get(double t){return this->getVec4(t);}
-					inline vec4float get(){return this->getVec4(this->parent->mainTimer->getTimems());}
+					inline float4 get(double t){return this->getFloat4(t);}
+					inline float4 get(){return this->getFloat4(this->parent->m_mainTimer->GetTimems());}
 			};
 
 
@@ -211,17 +220,21 @@ namespace FWscene{
 			inline ValueTracker::ScalarTrack* newScalarTrack(const char *name, const char *vclassName, const char *vname = NULL){
 				return new ValueTracker::ScalarTrack(this, name, vclassName, vname);}
 
-			inline ValueTracker::Vec2Track* newVec2Track(const char *name, const char *vclassName, const char *vname){
-				return new ValueTracker::Vec2Track(this, name, vclassName, vname);}
+			inline ValueTracker::Float2Track* newFloat2Track(const char *name, const char *vclassName, const char *vname){
+				return new ValueTracker::Float2Track(this, name, vclassName, vname);}
 
-			inline ValueTracker::Vec3Track* newVec3Track(const char *name, const char *vclassName, const char *vname){
-				return new ValueTracker::Vec3Track(this, name, vclassName, vname);}
+			inline ValueTracker::Float3Track* newFloat3Track(const char *name, const char *vclassName, const char *vname){
+				return new ValueTracker::Float3Track(this, name, vclassName, vname);}
 
-			inline ValueTracker::Vec4Track* newVec4Track(const char *name, const char *vclassName, const char *vname){
-				return new ValueTracker::Vec4Track(this, name, vclassName, vname);}
+			inline ValueTracker::Float4Track* newFloat4Track(const char *name, const char *vclassName, const char *vname){
+				return new ValueTracker::Float4Track(this, name, vclassName, vname);}
 
 	};
 
 	// ... 
+
 };
+
+DEFINE_EXCEPTION(NoRocketDeviceException, 200, "No Rocket device")
+DEFINE_EXCEPTION(InvalidTrackNameException, 201, "Invalid track name")
 
