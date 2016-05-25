@@ -213,7 +213,7 @@ ValueTracker::Track::~Track(){
 int ValueTracker::Track::GetBool(double t){
 	double d = this->m_parent->m_mainTimer->GetRowD(t);
 	double v = sync_get_val(this->m_tacks[0], d);
-	return (v>.75); 
+	return (v>.5); 
 }
 
 int ValueTracker::Track::GetSwitch(double t){
@@ -231,7 +231,7 @@ float ValueTracker::Track::GetScalar(double t){
 float ValueTracker::Track::GetVelocity(double t){
 	double d = this->m_parent->m_mainTimer->GetRowD(t);
 	double v = sync_get_val(this->m_tacks[0], d);
-	return v;
+	return (float)v;
 }
 
 float2 ValueTracker::Track::GetFloat2(double t){

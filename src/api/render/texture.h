@@ -23,22 +23,22 @@ namespace Grafkit
 	class Bitmap : public Referencable {
 	public:
 		Bitmap() : m_bmsize(0), m_ch(0), m_x(0), m_y(0), m_data(nullptr), m_stride(0) {}
-		Bitmap(void* data, size_t x, size_t y, size_t ch) : m_bmsize(0), m_ch(ch), m_x(x), m_y(y), m_data(data) { m_bmsize = x*y*ch; m_stride = x*ch; }
+		Bitmap(void* data, UINT x, UINT y, UINT ch) : m_bmsize(0), m_ch(ch), m_x(x), m_y(y), m_data(data) { m_bmsize = x*y*ch; m_stride = x*ch; }
 		~Bitmap() { free(m_data); }
 
 		virtual void* GetData() { return m_data; }
 		virtual size_t GetSize() { return m_bmsize; }
 
-		size_t GetX() { return m_x; }
-		size_t GetY() { return m_y; }
-		size_t GetCh() { return m_ch; }
-		size_t GetStride() { return m_stride; }
+		UINT GetX() { return m_x; }
+		UINT GetY() { return m_y; }
+		UINT GetCh() { return m_ch; }
+		UINT GetStride() { return m_stride; }
 
 		/// @todo resize if needed 
 
 	private:
 		void *m_data;
-		size_t m_bmsize, m_stride, m_x, m_y, m_ch;
+		UINT m_bmsize, m_stride, m_x, m_y, m_ch;
 	};
 
 	typedef Ref<Bitmap> BitmapResourceRef;

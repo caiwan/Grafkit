@@ -30,7 +30,7 @@ Texture::~Texture()
 
 void Grafkit::Texture::Initialize(Renderer & device, BitmapResourceRef bitmap)
 {
-	size_t x = bitmap->GetX(), y = bitmap->GetY(), ch = bitmap->GetCh();
+	UINT x = bitmap->GetX(), y = bitmap->GetY(), ch = bitmap->GetCh();
 
 	HRESULT result = 0;
 
