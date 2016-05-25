@@ -10,6 +10,7 @@ namespace Grafkit {
 
 	class MusicFmodLoader : public Grafkit::IResourceBuilder {
 
+	public:
 		MusicFmodLoader(std::string source_name);
 		~MusicFmodLoader();
 

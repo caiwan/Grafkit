@@ -8,6 +8,8 @@
 #include "render/Material.h"
 #include "render/shader.h"
 
+#include "valtracker/valtracker.h"
+
 #include "math/matrix.h"
 
 #include "utils/asset.h"
@@ -18,7 +20,7 @@
 
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
-
+#include "generator/MusicFmodLoader.h"
 
 using namespace Grafkit;
 
@@ -47,6 +49,10 @@ public:
 protected:
 	Renderer render;
 	Ref<Scene> scene;
+
+	MusicResRef music;
+	Timer* timer;
+	ValueTracker *valTracker;
 
 	TextureSamplerRef m_textureSampler;
 
@@ -85,6 +91,9 @@ protected:
 		// -- load shader
 		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
+
+		// -- load music
+		music = Load<MusicRes>(new MusicFmodLoader("zaka.mp3"));
 
 		// -- precalc
 		this->DoPrecalc();
@@ -134,6 +143,9 @@ protected:
 		// --- 
 
 		// Setup syctracker
+		timer = new Timer();
+		timer->Initialize(music, 21670, 180, 8);
+		valTracker = new ValueTracker(timer);
 
 		this->t = 0;
 
@@ -144,6 +156,8 @@ protected:
 
 	void release() {
 		this->render.Shutdown();
+		delete valTracker;
+		delete timer;
 	};
 
 	// ==================================================================================================================

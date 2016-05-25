@@ -145,55 +145,6 @@ namespace {
 		return b && !p;
 	}
 
-//
-//	void MusicFMOD::play()
-//	{
-//		FMOD_RESULT result = this->system->playSound(FMOD_CHANNEL_FREE, this->sound, false, &this->channel);
-//	}
-//
-//	void MusicFMOD::stop()
-//	{
-//		FMOD_RESULT result = this->channel->stop();
-//	}
-//
-//	void MusicFMOD::pause(bool e)
-//	{
-//		bool b = 0;
-//		this->channel->isPlaying(&b);
-//
-//		if (!b && !e) {
-//			this->play();
-//		}
-//
-//		FMOD_RESULT result = this->channel->setPaused(e);
-//	}
-//
-//	unsigned int MusicFMOD::getTimeSample()
-//	{
-//		unsigned int t = 0;
-//		this->channel->getPosition(&t, FMOD_TIMEUNIT_PCM);
-//		return t;
-//	}
-//
-//	void MusicFMOD::setTimeSample(unsigned int t)
-//	{
-//		this->channel->setPosition(t, FMOD_TIMEUNIT_PCM);
-//	}
-//
-//	void MusicFMOD::setLoop(bool e)
-//	{
-//		if (e) this->channel->setMode(FMOD_LOOP_NORMAL);
-//		else this->channel->setMode(FMOD_LOOP_OFF);
-//	}
-//
-//	int MusicFMOD::isPlaying()
-//	{
-//		bool b = 0, p = 0;
-//		this->channel->isPlaying(&b);
-//		this->channel->getPaused(&p);
-//		return b && !p;
-//	}
-//
 }
 
 /// ====================================================================================================================================================
