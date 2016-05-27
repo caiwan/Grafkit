@@ -93,7 +93,7 @@ protected:
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- load music
-		music = Load<MusicRes>(new MusicFmodLoader("zaka.mp3"));
+		music = Load<MusicRes>(new MusicFmodLoader("AceMan - Go Back To The River!.mp3"));
 
 		// -- precalc
 		this->DoPrecalc();

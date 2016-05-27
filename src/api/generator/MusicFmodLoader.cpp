@@ -164,5 +164,5 @@ void Grafkit::MusicFmodLoader::Load(IResourceManager * const & resman, IResource
 
 IResource * Grafkit::MusicFmodLoader::NewResource()
 {
-	return nullptr;
+	return nullptr; //folytkov
 }
