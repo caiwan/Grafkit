@@ -72,7 +72,7 @@ namespace {
 		FMOD::System_Create(&m_system);
 		result = m_system->init(1, FMOD_INIT_NORMAL, 0); FMOD_ERRCHECK(result);
 		
-		///@todo ha nem szerkesztoben van hasznalva, akkor create strem, kulonben sound < makrokkal elintezni
+		///@todo ha nem szerkesztoben van hasznalva, akkor create stream, kulonben sound < makrokkal elintezni
 		//result = this->system->createStream((char*)data, FMOD_OPENMEMORY | FMOD_HARDWARE, &exinfo, &this->sound); FMOD_ERRCHECK(result);
 		result = m_system->createSound((char*)data, FMOD_OPENMEMORY | FMOD_SOFTWARE | FMOD_CREATESAMPLE | FMOD_UNIQUE | FMOD_LOOP_OFF | FMOD_2D | FMOD_ACCURATETIME, &exinfo, &m_sound); FMOD_ERRCHECK(result);
 
