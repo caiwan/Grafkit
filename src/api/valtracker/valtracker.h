@@ -56,7 +56,7 @@ namespace Grafkit{
 
 		private:
 
-			Grafkit::Music* const Music() const { return this->m_music->Get()->Get(); }
+			Grafkit::Music* const Music() const { return this->m_music->Get(); }
 
 			Grafkit::MusicResRef m_music;
 			int m_pauseFlag;

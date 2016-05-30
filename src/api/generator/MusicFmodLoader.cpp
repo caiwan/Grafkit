@@ -18,6 +18,7 @@ namespace {
 		virtual ~MusicFMOD(void);
 
 		void Initialize(IAssetRef asset);
+		void Shutdown();
 
 		virtual void Play();
 		virtual void Stop();
@@ -50,7 +51,7 @@ namespace {
 
 	MusicFMOD::~MusicFMOD(void)
 	{
-		Stop();
+		Shutdown();
 		m_system->close();
 		// Itt elvileg valamikor meg kellene szunnie a tobbi handlernek valamikor
 	}
@@ -91,6 +92,12 @@ namespace {
 		//this->system->getSoftwareFormat(&this->samplePerSec, &format, &numoutputchannels, &maxinputchannels, &resamplemethod, &bits);
 
 		LOGGER(Log::Logger().Info("Music loaded. Length = %d samples; %.3f sec ", m_length, (float)m_length / (float)m_samplePerSec));
+	}
+
+	void MusicFMOD::Shutdown()
+	{
+		if(IsPlaying()) 
+			Stop();
 	}
 
 	void MusicFMOD::Play()
@@ -160,9 +167,20 @@ Grafkit::MusicFmodLoader::~MusicFmodLoader()
 
 void Grafkit::MusicFmodLoader::Load(IResourceManager * const & resman, IResource * source)
 {
+	MusicResRef dest = dynamic_cast<MusicRes*>(source);
+	if (dest.Invalid()) {
+		throw EX(NullPointerException);
+	}
+
+	Music* music = new MusicFMOD();
+
+	IAssetRef asset = this->GetSourceAsset(resman);
+	music->Initialize(asset);
+
+	dest->AssingnRef(music);
 }
 
 IResource * Grafkit::MusicFmodLoader::NewResource()
 {
-	return nullptr; //folytkov
+	return new MusicRes();
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../stdafx.h"
+#include "../utils/asset.h"
 #include "../utils/resource.h"
 
 /*
@@ -14,6 +15,9 @@ namespace Grafkit {
 		//-- virtualis metodusok, amiket implementalni kell --//
 		Music();
 		virtual ~Music();
+
+		virtual void Initialize(IAssetRef asset) = 0;
+		virtual void Shutdown() = 0;
 
 		virtual void Play() = 0;	///< play stuff
 		virtual void Stop() = 0;	///< stop stuff 
@@ -47,7 +51,7 @@ namespace Grafkit {
 	};
 
 	typedef Ref<Music> MusicRef;
-	typedef Resource<MusicRef> MusicRes;
+	typedef Resource<Music> MusicRes;
 	typedef Ref<MusicRes> MusicResRef;
 
 }
