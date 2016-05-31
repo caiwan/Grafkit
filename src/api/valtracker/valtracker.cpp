@@ -50,7 +50,7 @@ Grafkit::Timer::Timer() :
 	m_pauseFlag(0),
 	m_rocket(nullptr),
 	m_rowLength(0),
-	m_rpb(0)
+	m_rowPerBeat(0)
 {
 	strcpy_s(this->m_ipaddress, 32, "127.0.0.1");
 }
@@ -59,8 +59,11 @@ Timer::~Timer(){
 	this->Shutdown();
 }
 
-void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, long lengthMS, double beatPerMin, int rowPerBeat)
+void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, double lengthMS, double beatPerMin, int rowPerBeat)
 {
+	m_music = music;
+	m_bpm = (beatPerMin), m_length = (lengthMS), m_rowPerBeat = (rowPerBeat); 
+	m_rowLength = (60000.0) / (m_bpm*m_rowPerBeat);
 }
 
 // Rocket specific stuff // 

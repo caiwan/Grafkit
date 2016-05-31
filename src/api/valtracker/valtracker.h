@@ -21,7 +21,7 @@ namespace Grafkit{
 			Timer();
 			~Timer();
 
-			void Initialize(Grafkit::MusicResRef music, long lengthMS, double beatPerMin, int rowPerBeat);
+			void Initialize(Grafkit::MusicResRef music, double lengthMS, double beatPerMin, int rowPerBeat);
 			void Shutdown();
 
 			/**
@@ -61,7 +61,7 @@ namespace Grafkit{
 			Grafkit::MusicResRef m_music;
 			int m_pauseFlag;
 
-			double m_length, m_bpm, m_rpb, m_rowLength;
+			double m_length, m_bpm, m_rowPerBeat, m_rowLength;
 
 			sync_device *m_rocket;
 			char m_ipaddress[32];

@@ -144,7 +144,8 @@ protected:
 
 		// Setup syctracker
 		timer = new Timer();
-		timer->Initialize(music, 21670, 180, 8);
+		timer->Initialize(music, music->Get()->GetLengthms(), 180, 8);
+		timer->Connect();
 		valTracker = new ValueTracker(timer);
 
 		this->t = 0;
@@ -164,6 +165,8 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
+			this->t = timer->GetTime();
+
 			ShaderRef fragmentShader = this->m_fragmentShader->Get();
 
 			m_rootActor->Matrix().Identity();
@@ -174,7 +177,8 @@ protected:
 			scene->PreRender(render);
 			scene->Render(render);
 
-			this->t += 0.01;
+			timer->Update();
+
 		}
 
 		this->render.EndScene();
