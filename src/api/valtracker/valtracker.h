@@ -125,8 +125,8 @@ namespace Grafkit{
 					  Track(parent, VTT_bool_switch, name, vclassName, vname){}
 					virtual ~BoolTrack(){}
 
-					inline int get(double t){return this->GetBool(t);}
-					inline int get(){return this->GetBool(this->m_parent->m_mainTimer->GetTimems());} // NPR vedelem?
+					inline int Get(double t){return this->GetBool(t);}
+					inline int Get(){return this->GetBool(this->m_parent->m_mainTimer->GetTimems());} // NPR vedelem?
 			};
 			
 			/**
@@ -138,8 +138,8 @@ namespace Grafkit{
 						Track(parent, VTT_switch, name, vclassName, vname){}
 					virtual ~SwitchTrack(){}
 
-					inline int get(double t){return this->GetSwitch(t);}
-					inline int get(){return this->GetSwitch(this->m_parent->m_mainTimer->GetTimems());}
+					inline int Get(double t){return this->GetSwitch(t);}
+					inline int Get(){return this->GetSwitch(this->m_parent->m_mainTimer->GetTimems());}
 			};
 			
 			/**
@@ -151,8 +151,8 @@ namespace Grafkit{
 						Track(parent, VTT_scalar, name, vclassName, vname){}
 					virtual ~ScalarTrack(){}
 
-					inline float get(double t){return this->GetScalar(t);}
-					inline float get(){return this->GetScalar(this->m_parent->m_mainTimer->GetTimems());}
+					inline float Get(double t){return this->GetScalar(t);}
+					inline float Get(){return this->GetScalar(this->m_parent->m_mainTimer->GetTimems());}
 			};
 
 			/**
@@ -164,8 +164,8 @@ namespace Grafkit{
 						Track(parent, VTT_velocity, name, vclassName, vname){}
 					virtual ~VelocityTrack(){}
 
-					inline float get(double t){return this->GetVelocity(t);}
-					inline float get(){return this->GetVelocity(this->m_parent->m_mainTimer->GetTimems());}
+					inline float Get(double t){return this->GetVelocity(t);}
+					inline float Get(){return this->GetVelocity(this->m_parent->m_mainTimer->GetTimems());}
 			};
 
 			/**
@@ -178,8 +178,8 @@ namespace Grafkit{
 					  Track(parent, VTT_Float2, name, vclassName, vname){}
 					virtual ~Float2Track(){}
 
-					inline float2 get(double t){return this->GetFloat2(t);}
-					inline float2 get(){return this->GetFloat2(this->m_parent->m_mainTimer->GetTimems());}
+					inline float2 Get(double t){return this->GetFloat2(t);}
+					inline float2 Get(){return this->GetFloat2(this->m_parent->m_mainTimer->GetTimems());}
 			};
 
 
@@ -192,8 +192,8 @@ namespace Grafkit{
 					  Track(parent, VTT_Float3, name, vclassName, vname){}
 					virtual ~Float3Track(){}
 
-					inline float3 get(double t){return this->GetFloat3(t);}
-					inline float3 get(){return this->GetFloat3(this->m_parent->m_mainTimer->GetTimems());}
+					inline float3 Get(double t){return this->GetFloat3(t);}
+					inline float3 Get(){return this->GetFloat3(this->m_parent->m_mainTimer->GetTimems());}
 			};
 
 			/**
@@ -205,8 +205,8 @@ namespace Grafkit{
 					  Track(parent, VTT_Float4, name, vclassName, vname){}
 					virtual ~Float4Track(){}
 
-					inline float4 get(double t){return this->GetFloat4(t);}
-					inline float4 get(){return this->GetFloat4(this->m_parent->m_mainTimer->GetTimems());}
+					inline float4 Get(double t){return this->GetFloat4(t);}
+					inline float4 Get(){return this->GetFloat4(this->m_parent->m_mainTimer->GetTimems());}
 			};
 
 
