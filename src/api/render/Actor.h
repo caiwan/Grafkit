@@ -89,6 +89,8 @@ namespace Grafkit {
 		~Actor();
 
 		Grafkit::Matrix& Matrix() { return m_viewMatrix; }
+		Grafkit::Matrix& Transform() { return m_transformMatrix; }
+
 		virtual void Render(Grafkit::Renderer &render, Scene* scene);
 
 		/// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
@@ -109,6 +111,7 @@ namespace Grafkit {
 		//ActorEvents* m_events;
 
 		Grafkit::Matrix m_viewMatrix;
+		Grafkit::Matrix m_transformMatrix; // transzformacio a view matrix teterjen
 
 		Ref<Actor> m_pParent;
 		std::vector<Ref<Actor>> m_pChildren;

@@ -81,6 +81,7 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 	push();
 
 	m_currentWorldMatrix.Multiply(actor->Matrix());
+	m_currentWorldMatrix.Multiply(actor->Transform());
 	matrix viewMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
 	//((Shader)(*m_vertexShader))["MatrixBuffer"]["worldMatrix"] = viewMatrix;
 	m_vertexShader->GetParam("MatrixBuffer").Get("worldMatrix").SetP(&viewMatrix);
