@@ -158,3 +158,18 @@ Grafkit::LoggerHandler::ConsoleLogger::~ConsoleLogger()
 {
 	// ... ? 
 }
+
+void Grafkit::LoggerHandler::ConsoleLogger::Write(Grafkit::Logger::message_t * const & message)
+{
+	if (!message)
+		return;
+
+	if (message->type == Logger::LOG_ERROR || message->type == Logger::LOG_WARN) {
+		if (this->m_stderr)
+			fprintf_s(this->m_stderr, "%s\r\n", message->message);
+	}
+	else {
+		if (this->m_stdout)
+			fprintf_s(this->m_stdout, "%s\r\n", message->message);
+	}
+}

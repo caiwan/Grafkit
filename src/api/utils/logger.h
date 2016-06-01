@@ -117,7 +117,7 @@ namespace Grafkit {
 			ConsoleLogger();
 			~ConsoleLogger();
 		protected:
-			// virtual void Write(Grafkit::Logger::message_t * const & message);
+			virtual void Write(Grafkit::Logger::message_t * const & message);
 
 		private:
 			FILE* m_stdout;
