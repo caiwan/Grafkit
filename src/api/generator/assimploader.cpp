@@ -137,31 +137,49 @@ namespace {
 	};
 }
 
-#if 0
-TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IResourceManager * const & reman)
+/**
+ * AI materialbol textura infot extractol, majd resouce managerbol kiszedi a texturat hozza. 
+ * @param source ai textura tipus; milyen mapra van felhuzva - e.g. Diffuse, Normal, ... 
+ * @param material ai forras material, amibol a texturat ki kell venni
+ * @param submode ai materialon belul a teztura indexe
+ * @param resman globalis resurce manager
+ * @return textura resource peldany referencia
+*/
+TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IResourceManager * const & resman)
 {
 	aiString path;
-	TextureAssetRef textureAsset;
+	TextureResRef  texture;
 	aiReturn result = material->GetTexture(source, subnode, &path);
 
 	std::string name = path.C_Str();
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		//textureAsset = (TextureAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(TEXTURE_BUCKET, name).Get();
-		textureAsset = (TextureAsset*)reman->GetObjectByName(TEXTURE_BUCKET, name);
-
+		texture = resman->Get<TextureRes>(name);
 	}
 
-	return textureAsset;
+	return texture;
 }
-#endif
 
 // ================================================================================================================================================================
 // Parse assimp scenegraph 
 // ================================================================================================================================================================
 
-///@todo assmant hasznlaj
-void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH)
+/* Ezeket toltuk majd be, illetve adjuk a scenegraphoz */
+typedef struct {
+	std::vector<MaterialRef> materials;
+	std::vector<ModelRef> models;
+	std::vector<CameraRef> cameras;
+	std::vector<LightRef> lights;
+} resourceRepo_t;
+
+/**
+ * AI forras scenebol felepiti a scenegraphot a betoltott nodeokbol
+ * @param repo a betoltott elemek mapje
+ * @param ai_node feldolgozas alatti ai scenegraph node
+ * @param actor_node az a scenegraph node, mai epp feltoltunk
+ * @param maxdepth stack overflow ellen
+*/
+void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH)
 {
 	size_t i=0, j=0, k = 0;
 
@@ -175,13 +193,18 @@ void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Ac
 	
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
-		///@todo 
-		//actor->GetEntities().push_back((Model*)repo->GetObjPtr(MODEL_BUCKET, mesh_id).Get());
+		// ezt fel kell tolteni:
+		//actor->AddEntity();
 	}
 
-	///@todo nevet kell nekunk setelni valamikor?
-	/*actor->SetName(ai_node->mName.C_Str());*/
+	actor->SetName(ai_node->mName.C_Str());
 	actor->Matrix() = ai4x4MatrixToFWMatrix(&ai_node->mTransformation);
+	
+	// ezekkel mit lehet meg kezdeni:
+	//for (i = 0; i < ai_node->mMetaData->mNumProperties; i++) {
+	//	//aiMetadata *meta = ai_node->mMetaData->Get( // ->Get(ai_node->mMetaData->mKeys[i]);
+	//	// meta->
+	//}
 
 	// next nodes
 	for (i = 0; i < ai_node->mNumChildren; i++) {
@@ -213,7 +236,7 @@ IResource * Grafkit::AssimpLoader::NewResource()
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * source)
+void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * source)
 {
 	SceneResRef dstScene = dynamic_cast<SceneRes*>(source);
 	if (dstScene.Invalid()) {
@@ -224,11 +247,12 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 	SceneRef outScene = new Scene();
 	// outScene->SetName(m_srcName);
 
-	IAssetRef srcAsset = this->GetSourceAsset(reman);
+	resourceRepo_t resourceMap;
 
-	if (!srcAsset) {
+	IAssetRef srcAsset = this->GetSourceAsset(resman);
+
+	if (!srcAsset || !srcAsset->GetData())
 		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
-	}
 
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?
@@ -236,17 +260,15 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 		aiProcessPreset_TargetRealtime_Quality | /*aiProcess_GenNormals |*/ 0
 	);
 
-	if (!scene) {
+	if (!scene)
 		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
-	}
-
-	//IRenderAssetRepository* asset_repo = assman->GetRepository(GetCounter());
 
 	size_t i = 0, j = 0, k = 0, l = 0;
-	std::vector<MaterialRef> materials;
-	std::vector<ModelRef> models;
-	std::vector<CameraRef> cameras;
-	std::vector<LightRef> lights;
+	resourceRepo_t resourceRepo;
+	std::vector<MaterialRef> &materials = resourceMap.materials;
+	std::vector<ModelRef> &models = resourceMap.models;
+	std::vector<CameraRef> &cameras = resourceMap.cameras;
+	std::vector<LightRef> &lights = resourceMap.lights;
 
 	// -- load materials
 	if (scene->HasMaterials()) {
@@ -258,20 +280,19 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
 			///@todo nevekre szuksegunk ven-e?
-			//if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
-			//	material->SetName(name.C_Str());
+			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
+				material->SetName(name.C_Str());
 
 			j = 0;
 			aiReturn texFound = AI_FAILURE;
 
 			// -- -- load textures
-			// textura-> material 
+			// textura -> material 
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
-					///@todo 
-#if 0
-					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, reman), texture_load_map[k].tt);
-#endif
+					material->AddTexture(
+						assimpTexture(texture_load_map[k].ai, curr_mat, j, resman), texture_map_names[texture_load_map[k].tt]
+					);
 				}
 			}
 
@@ -282,31 +303,11 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS, material->GetShininess());
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
-			// -> valahol a loaderen kivul kell megtenni a shader kijelolest, illetve betoltest
-			
-			///@todo itt a materialt hozzuk lere valahogy, on-the-fly
-#if 0
-			ShaderResRef shader_fs = (ShaderRes*)reman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
-			material->SetShader(shader_fs);
-#endif 
 			materials.push_back(material);
-			//asset_repo->AddObject(material);
+			///@todo itt a resource managert kellene hasznalni
 		}
 	}
 	
-	// Itt letre kell hozni egy uj shadert -> igazabol ezt valahol kivul kellene megtenni
-	
-	///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre
-	///@todo itt specialis materialt hozzunk letre, ami betolti a shadert, ha kell 
-#if 0
-	ShaderResRef shader_vs = (ShaderRes*)reman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
-#endif 
-
-	/*
-	if (shader_vs.Invalid())
-		throw EX_DETAILS(AssimpParseException, "Could not found default vertex shader"); 
-	*/
-
 	// ----------------------------------------
 	// scene loading
 	if (scene->HasMeshes()) 
@@ -314,21 +315,16 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 		for (i = 0; i<scene->mNumMeshes; i++) 
 		{
 			// -- meshes
-			
-			ModelRef model = new Model();
+			ModelRef mesh = new Model();
 			aiMesh* curr_mesh = scene->mMeshes[i];
-
-			///@todo nevet kell nekunk setelni valamikor?
 			
-			//aiString name;
-			// const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
-			//model->SetName(mesh_name);
+			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
+			mesh->SetName(mesh_name);
 
-			///@todo ezeken a neveket ki kell pakolni valahova
-			///@todo kell egy olyan mesh generator, ami nem a shaderbol szedi ossze az input layoutot
+			// --- ezen a ponton ismeri kellene az input layoutot valahogyan
 
 #if 0
-			SimpleMeshGenerator generator(reman->GetDeviceContext(), shader_vs);
+			SimpleMeshGenerator generator(resman->GetDeviceContext(), shader_vs);
 			generator["POSITION"] = curr_mesh->mVertices; 
 			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0];  ///@todo ha tobb textura van akkor toltse be azokat is majd 
 			generator["NORMAL"] = curr_mesh->mNormals;
@@ -349,18 +345,17 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 					indices.push_back(curr_face->mIndices[k]);
 			}
 #if 0
-			generator(curr_mesh->mNumVertices, indices.size(), &indices[0], model);
+			generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
 #endif 
 			// -- lookup materials
 			int mat_index = curr_mesh->mMaterialIndex;
 			if (materials.size()>mat_index)
 			{
-				model->SetMaterial(materials[mat_index]);
+				mesh->SetMaterial(materials[mat_index]);
 			}
 
-			models.push_back(model);
-			
-			//asset_repo->AddObject(model);
+			models.push_back(mesh);
+			///@todo itt a resource managert kellene hasznalni
 		}
 	}
 
@@ -438,55 +433,10 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & reman, IResource * s
 
 	// build up scenegraph
 
-
-
-# if 0 // ez pedig tok meno lett volna, ha mukodik rekurzio nelkuk,majd legkozelebb
-
-	struct stack_elem_t {
-		aiNode* ai_node;
-		Actor* actor_node;
-		size_t j;
-	};
-
-	std::stack<struct stack_elem_t> node_stack;
-	
-	stack_elem_t s;
-	s.actor_node = new Actor;
-	s.ai_node = scene->mRootNode;
-	s.j = 0;
-
-	//aiNode* curr_node = scene->mRootNode;
-
-	while (! node_stack.empty() || s.ai_node) {
-		if (s.ai_node) {
-			// setup node
-			// s.actor_node = new Actor();
-
-			// visit next node 
-			if (s.ai_node->mNumChildren > 0) {
-				// push
-				s.j = 0;
-				s.actor_node = nullptr;
-				node_stack.push(s);
-			}
-			s.ai_node = s.ai_node->mChildren[s.j];
-			s.j++;
-		}
-		else {
-			// pop
-			s = node_stack.top();
-			node_stack.pop();
-		}
-	}
-
-	outScene->SetRootNode(s.actor_node);
-
-#else // fallback: recursive fill 
 	ActorRef root_node = new Actor;
-	// assimp_parseScenegraph(asset_repo, scene->mRootNode, &root_node);
+	assimp_parseScenegraph(resourceMap, scene->mRootNode, &root_node);
 	outScene->SetRootNode(root_node);
 
-#endif
 
 	// kamera helyenek kiszedese a scenegraphbol
 	if (scene->HasCameras()) {
