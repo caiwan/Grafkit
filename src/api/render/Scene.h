@@ -34,7 +34,9 @@ namespace Grafkit {
 
 		// --- 
 
-		CameraRef GetCamera() { return dynamic_cast<Camera*>(this->m_pCameraNode->GetEntities()[0].Get()); }
+		CameraRef GetCamera() { 
+			return (this->m_pCameraNode.Valid() && !this->m_pCameraNode->GetEntities().empty()) ? dynamic_cast<Camera*>(this->m_pCameraNode->GetEntities()[0].Get()) : nullptr;
+		}
 
 		void SetCameraNode(ActorRef &camera);
 		void AddLightNode(ActorRef &light);
