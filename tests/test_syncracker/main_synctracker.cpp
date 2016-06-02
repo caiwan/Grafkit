@@ -201,12 +201,12 @@ protected:
 			
 			rot_rpy = trk_rotate_root->Get(); m_rootActor->Matrix().Identity(); m_rootActor->Matrix().RotateRPY(rot_rpy.x, rot_rpy.y, rot_rpy.z);
 
-			rot_rp = trk_rotate_r->Get(); modelActorR->Transform().Identity(); modelActorR->Transform().RotateRPY(rot_rp.x, rot_rp.y,0);
-			rot_rp = trk_rotate_l->Get(); modelActorL->Transform().Identity(); modelActorL->Transform().RotateRPY(rot_rp.x, rot_rp.y,0);
-			rot_rp = trk_rotate_u->Get(); modelActorU->Transform().Identity(); modelActorU->Transform().RotateRPY(rot_rp.x, rot_rp.y,0);
-			rot_rp = trk_rotate_d->Get(); modelActorD->Transform().Identity(); modelActorD->Transform().RotateRPY(rot_rp.x, rot_rp.y,0);
-			rot_rp = trk_rotate_f->Get(); modelActorF->Transform().Identity(); modelActorF->Transform().RotateRPY(rot_rp.x, rot_rp.y,0);
-			rot_rp = trk_rotate_b->Get(); modelActorB->Transform().Identity(); modelActorB->Transform().RotateRPY(rot_rp.x, rot_rp.y,0);
+			rot_rp = trk_rotate_r->Get(); modelActorR->Transform().Identity(); modelActorR->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
+			rot_rp = trk_rotate_l->Get(); modelActorL->Transform().Identity(); modelActorL->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
+			rot_rp = trk_rotate_u->Get(); modelActorU->Transform().Identity(); modelActorU->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
+			rot_rp = trk_rotate_d->Get(); modelActorD->Transform().Identity(); modelActorD->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
+			rot_rp = trk_rotate_f->Get(); modelActorF->Transform().Identity(); modelActorF->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
+			rot_rp = trk_rotate_b->Get(); modelActorB->Transform().Identity(); modelActorB->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
 			
 
 			fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
