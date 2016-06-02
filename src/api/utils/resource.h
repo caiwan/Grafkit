@@ -24,9 +24,6 @@ namespace Grafkit{
 	class IResource;
 	class IResourceManager;
 	class IResourceBuilder;
-	//class IRenderAssetRepository;
-
-	// typedef Ref<Resource> IResourceRef;
 
 	///@todo ezt ki kell pucolni teljesen
 
@@ -36,8 +33,6 @@ namespace Grafkit{
 	class IResource : virtual public Referencable
 	{
 		friend class IResourceManager;
-		friend class IRenderAssetRepository;
-		friend class IRenderAssetGenerator;
 
 	public:
 		IResource();
