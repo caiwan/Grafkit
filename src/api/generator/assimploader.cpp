@@ -153,7 +153,8 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 
 	std::string name = path.C_Str();
 
-	if (result == AI_SUCCESS && path.data[0]) {
+	if (result == AI_SUCCESS /*&& path.data[0]*/) {
+		LOGGER(Log::Logger().Trace("--- %s", name.c_str()));
 		texture = resman->Get<TextureRes>(name);
 	}
 
@@ -190,12 +191,35 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 		return;
 
 	ActorRef actor = new Actor();
+
+	LOGGER(
+		int depth = TREE_MAXDEPTH - maxdepth;
+		char tab[TREE_MAXDEPTH];
+		tab[depth] = 0;
+		while (depth--) {
+			tab[depth] = ' ';
+		}
+	);
+
+	const char * name = ai_node->mName.C_Str();
+	LOGGER(Log::Logger().Trace(" %s%s [%d]", tab, name, ai_node->mNumMeshes));
 	
+	actor->SetName(name);
+
+	LOGGER(
+		size_t buflen = strlen(tab) + 8 * ai_node->mNumMeshes + 256;
+		char *buf = new char[buflen];
+		sprintf_s(buf, buflen, "%s meshes:", tab);
+	);
+	// ---
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
-		// ezt fel kell tolteni:
-		//actor->AddEntity();
+		actor->AddEntity(repo.models[mesh_id]);
+		LOGGER(sprintf_s(buf, buflen, "%s %d,", buf, i));
 	}
+
+	LOGGER(if(ai_node->mNumMeshes) Log::Logger().Trace(" %s", buf));
+	LOGGER(delete[] buf);
 
 	actor->SetName(ai_node->mName.C_Str());
 	actor->Matrix() = ai4x4MatrixToFWMatrix(&ai_node->mTransformation);
@@ -272,7 +296,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	std::vector<LightRef> &lights = resourceMap.lights;
 
 	// -- load materials
+
 	if (scene->HasMaterials()) {
+		LOGGER(Log::Logger().Trace("Materials"));
 		for (i = 0; i<scene->mNumMaterials; i++) {
 			aiString path, name;
 
@@ -281,8 +307,16 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
 			///@todo nevekre szuksegunk ven-e?
-			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
+			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) {
 				material->SetName(name.C_Str());
+			}
+			else {
+				char buff[256];
+				sprintf_s(buff, "material%d", j);
+				material->SetName(buff);
+			}
+				
+			LOGGER(Log::Logger().Trace("- #%d %s", i, material->GetName().c_str()));
 
 			j = 0;
 			aiReturn texFound = AI_FAILURE;
@@ -291,6 +325,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			// textura -> material 
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
+					LOGGER(Log::Logger().Trace("-- texture #%s #%d", texture_map_names[texture_load_map[k].tt], j));
 					material->AddTexture(
 						assimpTexture(texture_load_map[k].ai, curr_mat, j, resman), texture_map_names[texture_load_map[k].tt]
 					);
@@ -313,6 +348,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	// scene loading
 	if (scene->HasMeshes()) 
 	{
+		LOGGER(Log::Logger().Trace("Meshes"));
 		// forras sema
 		ShaderRef inputSchema = m_schSrc->Get();
 		if (inputSchema.Invalid())
@@ -325,6 +361,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			aiMesh* curr_mesh = scene->mMeshes[i];
 			
 			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
+			LOGGER(Log::Logger().Trace("- #%d %s", i, mesh_name));
 			mesh->SetName(mesh_name);
 
 			SimpleMeshGenerator generator(resman->GetDeviceContext(), inputSchema);
@@ -366,9 +403,15 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 	// load cameras
 	if (scene->HasCameras()) {
+		LOGGER(Log::Logger().Trace("Cameras"));
 		for (j = 0; j < scene->mNumCameras; j++) {
 			CameraRef camera = new Camera();
 			aiCamera *curr_camera = scene->mCameras[j];
+
+			const char* camera_name = curr_camera->mName.C_Str();
+			LOGGER(Log::Logger().Trace("- #%d %s", j, camera_name));
+
+			camera->SetName(camera_name);
 
 			camera->SetFOV(180.*curr_camera->mHorizontalFOV / M_PI);
 			camera->SetClippingPlanes(curr_camera->mClipPlaneNear, curr_camera->mClipPlaneFar);
@@ -391,9 +434,14 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 	// load lights
 	if (scene->HasLights()) {
+		LOGGER(Log::Logger().Trace("Lights"));
 		for (j = 0; j < scene->mNumLights; j++) {
 			LightRef light; 
 			aiLight *curr_light = scene->mLights[i];
+
+			const char *light_name = curr_light->mName.C_Str();
+			LOGGER(Log::Logger().Trace("- #%d %s %d", j, light_name, curr_light->mType));
+		
 
 			// light <- assimp light
 			switch (curr_light->mType) {
@@ -439,6 +487,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	// build up scenegraph
 
 	ActorRef root_node = new Actor;
+	LOGGER(Log::Logger().Trace("Building scenegraph"));
 	assimp_parseScenegraph(resourceMap, scene->mRootNode, root_node);
 	outScene->SetRootNode(root_node);
 
