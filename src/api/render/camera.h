@@ -1,10 +1,8 @@
-
 #pragma once
 
 #include "Actor.h"
 
-#include "../utils/memory_align.h"
-#include "../utils/reference.h"
+#include "../stdafx.h"
 #include "../math/matrix.h"
 
 #include "renderer.h"
@@ -12,13 +10,11 @@
 namespace Grafkit {
 
 	class Camera;
-	// class PerspectiveCamera;	///@todo implement this, see trello notes
+	// class PerspectiveCamera;		///@todo implement this, see trello notes
 	// class OrthoCamera;			///@todo implement this, see trello notes
-
-#define CAMERA_BUCKET "camera"
-
 	// 
-	class Camera : public Grafkit::Entity3D
+
+	__declspec(align(16)) class Camera : public AlignedNew<Camera>, public Grafkit::Entity3D
 	{
 	public:
 		Camera();
@@ -62,7 +58,7 @@ namespace Grafkit {
 		Matrix& GetProjectionMatrix() { return m_projectionMatrix; }
 		Matrix& GetOrthoMatrix() { return m_orthoMatrix; }
 
-		virtual const char* GetBucketID() { return CAMERA_BUCKET; }
+		//virtual const char* GetBucketID() { return CAMERA_BUCKET; }
 
 	private:
 		float3 m_position;
