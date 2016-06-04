@@ -179,7 +179,7 @@ typedef struct {
  * @param actor_node az a scenegraph node, mai epp feltoltunk
  * @param maxdepth stack overflow ellen
 */
-void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH)
+void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &actor_node, int maxdepth = TREE_MAXDEPTH)
 {
 	size_t i=0, j=0, k = 0;
 
@@ -189,7 +189,7 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, Actor** acto
 	if (maxdepth < 0)
 		return;
 
-	Actor* actor = new Actor();
+	ActorRef actor = new Actor();
 	
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
@@ -208,18 +208,19 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, Actor** acto
 
 	// next nodes
 	for (i = 0; i < ai_node->mNumChildren; i++) {
-		Actor *child = nullptr;
-		assimp_parseScenegraph(repo, ai_node->mChildren[i], &child, maxdepth - 1);
+		ActorRef child = nullptr;
+		assimp_parseScenegraph(repo, ai_node->mChildren[i], child, maxdepth - 1);
 		actor->AddChild(child);
 	}
 
-	*actor_node = actor;
+	actor_node = actor;
 }
 
 // ================================================================================================================================================================
 // Head
 // ================================================================================================================================================================
-Grafkit::AssimpLoader::AssimpLoader(std::string source_name) : IResourceBuilder(source_name, source_name) 
+Grafkit::AssimpLoader::AssimpLoader(std::string source_name, ShaderResRef schemanticSource) : IResourceBuilder(source_name, source_name),
+m_schSrc(schemanticSource)
 {
 }
 
@@ -312,6 +313,11 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	// scene loading
 	if (scene->HasMeshes()) 
 	{
+		// forras sema
+		ShaderRef inputSchema = m_schSrc->Get();
+		if (inputSchema.Invalid())
+			throw new EX_DETAILS(NullPointerException, "Nincs meg a shader input sema. Rendezd ugy a loader stacket, hogy a shader elobb legyen, mint a model betolto.");
+
 		for (i = 0; i<scene->mNumMeshes; i++) 
 		{
 			// -- meshes
@@ -321,32 +327,31 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
 			mesh->SetName(mesh_name);
 
-			// --- ezen a ponton ismeri kellene az input layoutot valahogyan
-
-#if 0
-			SimpleMeshGenerator generator(resman->GetDeviceContext(), shader_vs);
+			SimpleMeshGenerator generator(resman->GetDeviceContext(), inputSchema);
 			generator["POSITION"] = curr_mesh->mVertices; 
-			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0];  ///@todo ha tobb textura van akkor toltse be azokat is majd 
+			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0]; 
 			generator["NORMAL"] = curr_mesh->mNormals;
 			generator["TANGENT"] = curr_mesh->mTangents; 
-#endif
-			// -> a generalas reszet is a pointerek es a shader beallitasa utan 
-			///@todo a shadert lehessen a generalas elott geallitani, ne pedig a generator konstruktoraban, sot; ezzel lehetove kellene tenni, hogy csaerelheto legyen a shader a scenegraph eloallitasa utan, de meg a redner elott a preloader szekvenciaban~
 
 			// -- faces
 
 			///@todo az indexek gyujteset lehessen kulturaltabb modon is vegezni valahogy
-			std::vector<int> indices;
+			if (curr_mesh->HasFaces()) {
+				std::vector<int> indices;
 
-			for (j = 0; j < curr_mesh->mNumFaces; j++)
-			{
-				aiFace *curr_face = &curr_mesh->mFaces[j];
-				for (k = 0; k < curr_face->mNumIndices; k++)
-					indices.push_back(curr_face->mIndices[k]);
+				for (j = 0; j < curr_mesh->mNumFaces; j++)
+				{
+					aiFace *curr_face = &curr_mesh->mFaces[j];
+					for (k = 0; k < curr_face->mNumIndices; k++)
+						indices.push_back(curr_face->mIndices[k]);
+				}
+
+				generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
 			}
-#if 0
-			generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
-#endif 
+			else {
+				///@todo arra az esetre is kell valamit kitalalni, amikor nincsenek facek, csak vertexek.
+			}
+
 			// -- lookup materials
 			int mat_index = curr_mesh->mMaterialIndex;
 			if (materials.size()>mat_index)
@@ -434,7 +439,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	// build up scenegraph
 
 	ActorRef root_node = new Actor;
-	assimp_parseScenegraph(resourceMap, scene->mRootNode, &root_node);
+	assimp_parseScenegraph(resourceMap, scene->mRootNode, root_node);
 	outScene->SetRootNode(root_node);
 
 
