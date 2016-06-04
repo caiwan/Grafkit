@@ -5,6 +5,8 @@
 #include "render/Material.h"
 #include "render/shader.h"
 
+#include "generator/ShaderLoader.h"
+
 #include "generator/assimploader.h"
 #include "render/Scene.h"
 
@@ -41,9 +43,8 @@ protected:
 
 	float t;
 
-	// TextureShaderClass *shader_texture;
-	ShaderRef shader_vs;
-	ShaderRef shader_fs;
+	ShaderResRef m_vertexShader;
+	ShaderResRef m_fragmentShader;
 
 	int init() {
 		//this->render = new Renderer();
@@ -64,13 +65,23 @@ protected:
 		camera = new Camera();
 		camera->SetPosition(0.0f, 0.0f, -5.0f);
 
+		// -- load shader
+		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
+		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
+
 		// -- model 
-		scene = new SceneRes();
-		scene = this->Load<SceneRes>(new AssimpLoader("./models/tegla.3ds"));
+		scene = this->Load<SceneRes>(new AssimpLoader("./models/tegla.3ds", m_vertexShader));
 
 		this->t = 0;
 
 		DoPrecalc();
+
+		ActorRef camera_actor = new Actor;
+		camera_actor->AddEntity(camera);
+		scene->Get()->SetCameraNode(camera_actor);
+
+		scene->Get()->SetVShader(m_vertexShader);
+		scene->Get()->SetFShader(m_fragmentShader);
 
 		return 0;
 	};
