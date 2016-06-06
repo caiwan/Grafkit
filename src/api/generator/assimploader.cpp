@@ -168,11 +168,16 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 // ================================================================================================================================================================
 
 /* Ezeket toltuk majd be, illetve adjuk a scenegraphoz */
+
+typedef std::map<std::string, ActorRef> actorMap_t;
+typedef actorMap_t::iterator actorMap_it;
+
 typedef struct {
 	std::vector<MaterialRef> materials;
 	std::vector<ModelRef> models;
 	std::vector<CameraRef> cameras;
 	std::vector<LightRef> lights;
+	actorMap_t actors;
 } resourceRepo_t;
 
 /**
@@ -229,6 +234,8 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 	//	//aiMetadata *meta = ai_node->mMetaData->Get( // ->Get(ai_node->mMetaData->mKeys[i]);
 	//	// meta->
 	//}
+
+	repo.actors[actor->GetName] = actor;
 
 	// next nodes
 	for (i = 0; i < ai_node->mNumChildren; i++) {
@@ -392,8 +399,6 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			generator["TEXCOORD"] = &texuvs[0];
 			generator["NORMAL"] = &normals[0];
 			generator["TANGENT"] = &tangents[0];
-			
-
 #endif
 			// -- faces
 
@@ -516,18 +521,34 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	assimp_parseScenegraph(resourceMap, scene->mRootNode, root_node);
 	outScene->SetRootNode(root_node);
 
-
 	// kamera helyenek kiszedese a scenegraphbol
 	if (scene->HasCameras()) {
+		for (i = 0; i < scene->mNumCameras; i++) {
+			aiCamera *curr_camera = scene->mCameras[i];
+
+			// ... 
+		}
 	}
 	
 	// fenyek helyenek kiszedese a scenegraphbol
 	if (scene->HasLights()) {
+		for (i = 0; i < scene->mNumLights; i++) {
+			aiLight * curr_light = scene->mLights[i];
+
+			//...
+		}
 	}
 
-	// animation - ha kell a jovoben; 
+	// --- Animacio kiszedese
 	if (scene->HasAnimations()) {
-	
+		for (i = 0; i < scene->mNumAnimations; i++) {
+			aiAnimation *curr_anim = scene->mAnimations[i];
+			aiString name = curr_anim->mName;
+
+			// itt kell tudni, hogy kihez tartozik majd az animacio
+
+			/* (...) */
+		}
 	}
 
 	// 3.
