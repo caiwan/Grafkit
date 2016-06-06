@@ -13,6 +13,14 @@ namespace Grafkit {
 
 	class IAssetFactory;
 
+	/// Ez lesz majd a betoltocsik
+	class PreloadEvents {
+	public:
+		virtual void OnBeginLoad() = 0;
+		virtual void OnElemLoad(size_t actual, size_t count) = 0;
+		virtual void OnEndLoad() = 0;
+	};
+
 	class IResourceManager
 	{
 	public:
@@ -38,7 +46,7 @@ namespace Grafkit {
 		virtual Renderer &GetDeviceContext() = 0;	///@todo, ha kell, akkor egy makroval ki kell venni
 		virtual IAssetFactory *GetAssetFactory() = 0;
 
-	private:
+	protected:
 
 		typedef std::map<std::string, Ref<IResource>> ResourceMap_t;
 		ResourceMap_t m_resources;
