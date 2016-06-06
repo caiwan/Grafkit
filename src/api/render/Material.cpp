@@ -54,7 +54,9 @@ void Grafkit::MaterialBase::Render(Renderer& render, ShaderRef &shader)
 	//(*shader)["material"] = &m_material;
 	shader->GetParam("material").SetP(&m_material);
 
+	
 	for (textureMap_it_t it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
-		shader->GetBRes(it->first).Set((*it->second)->GetTextureResource());
+		if (it->second.Valid() && it->second->Valid())
+			shader->GetBRes(it->first).Set((*it->second)->GetTextureResource());
 	}
 }
