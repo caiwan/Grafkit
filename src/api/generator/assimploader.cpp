@@ -235,7 +235,7 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 	//	// meta->
 	//}
 
-	repo.actors[actor->GetName] = actor;
+	repo.actors[actor->GetName()] = actor;
 
 	// next nodes
 	for (i = 0; i < ai_node->mNumChildren; i++) {
