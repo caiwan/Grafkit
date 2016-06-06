@@ -31,9 +31,18 @@ namespace Grafkit{
 	*/
 	class TextureFromBitmap : public ITextureBuilder
 	{
-		public:
-			TextureLoader();
-			~TextureLoader();
+	public:
+		TextureFromBitmap(std::string source_name);
+		TextureFromBitmap(std::string name, std::string source_name);
+		~TextureFromBitmap();
+
+		///@todo implement resize
+		void Resize(int x, int y) { m_w = x, m_h = y; }
+
+		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+
+	protected:
+		int m_w, m_h;
 	};
 }
 

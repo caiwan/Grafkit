@@ -6,8 +6,12 @@ TextureLoader::TextureLoader()
 {
 }
 
+Grafkit::TextureFromBitmap::TextureFromBitmap(std::string name, std::string source_name) : ITextureBuilder(name, source_name),
+	m_w(0), m_h(0)
+{
+}
 
-TextureLoader::~TextureLoader()
+Grafkit::TextureFromBitmap::~TextureFromBitmap()
 {
 	TextureResRef outTexture = (TextureResRef_t)m_dstResource;
 
