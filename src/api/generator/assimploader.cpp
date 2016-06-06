@@ -158,6 +158,8 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 	if (result == AI_SUCCESS /*&& path.data[0]*/) {
 		LOGGER(Log::Logger().Trace("--- %s", name.c_str()));
 		texture = resman->Get<TextureRes>(name);
+		if (texture->Invalid())
+			throw EX_DETAILS(NullPointerException, name.c_str());
 	}
 
 	return texture;
