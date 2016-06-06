@@ -1,18 +1,22 @@
-namespace GrafkitData{
-	extern const float * const triangle;
-	extern const unsigned short * const triangleIndices;
-	extern const unsigned short triangleIndicesLen;
+/**
+ *  @file
+ *  @brief static geometry data 
+ */
+namespace GrafkitData {
+	extern const float * const triangle;					///< Vertices of a single triangle
+	extern const unsigned short * const triangleIndices;	///< Indices of a single triangle
+	extern const unsigned short triangleIndicesLen;         ///< Number of indices of a signle triangle
 
-	extern const float * const quad;
-	extern const float * const quad2;
-	extern const float * const quad_texcoord;
-	extern const   int * const quadIndices;
+	extern const float * const quad;                        ///< Vertices of a single quad [-1..1]
+	extern const float * const quad2;                       ///< Vertices of a single quad [0..1]
+	extern const float * const quad_texcoord;               ///< Texture coordinates of a single quad; 2 component
+	extern const   int * const quadIndices;                 ///< Indices of a single quad
 
-	extern const float * const cubeVertices;
-	extern const float * const cubeNormals;
-	extern const float * const cubeTextureUVs;
-	extern const   int * const cubeIndices;
+	extern const float * const cubeVertices;                ///< Vertices of a cube
+	extern const float * const cubeNormals;                 ///< Normals of a cube
+	extern const float * const cubeTextureUVs;              ///< Textire coordinates of a cube
+	extern const   int * const cubeIndices;                 ///< Indices of a cube
 
-	extern const unsigned int cubeVertexLength;
-	extern const unsigned int cubeIndicesLength;
+	extern const unsigned int cubeVertexLength;             ///< Number of vertices of a cube
+	extern const unsigned int cubeIndicesLength;            ///< Number of indices of a cube
 }
