@@ -63,7 +63,7 @@ protected:
 
 		// -- camera
 		camera = new Camera();
-		camera->SetPosition(0.0f, 0.0f, -5.0f);
+		camera->SetPosition(20.0f, 20.0f, -150.0f);
 
 		// -- load shader
 		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
