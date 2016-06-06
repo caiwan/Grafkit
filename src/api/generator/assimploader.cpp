@@ -31,6 +31,8 @@ using namespace FWdebugExceptions;
 // Assimp helpers
 // ================================================================================================================================================================
 
+
+
 // aiVector3D to float3
 #define assimp_v3d_f3(SRC, DST)\
 {\
@@ -193,24 +195,22 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 	ActorRef actor = new Actor();
 
 	LOGGER(
-		int depth = TREE_MAXDEPTH - maxdepth;
-		char tab[TREE_MAXDEPTH];
-		tab[depth] = 0;
-		while (depth--) {
-			tab[depth] = ' ';
-		}
+		int depth = TREE_MAXDEPTH - maxdepth; char tab[TREE_MAXDEPTH]; tab[depth] = 0;
+		while (depth--) tab[depth] = ' ';
 	);
 
 	const char * name = ai_node->mName.C_Str();
+	
 	LOGGER(Log::Logger().Trace(" %s%s [%d]", tab, name, ai_node->mNumMeshes));
 	
-	actor->SetName(name);
-
 	LOGGER(
 		size_t buflen = strlen(tab) + 8 * ai_node->mNumMeshes + 256;
 		char *buf = new char[buflen];
 		sprintf_s(buf, buflen, "%s meshes:", tab);
 	);
+
+	actor->SetName(name);
+
 	// ---
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
@@ -365,11 +365,36 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			mesh->SetName(mesh_name);
 
 			SimpleMeshGenerator generator(resman->GetDeviceContext(), inputSchema);
+
+#if 0 /*itt ki kell masolni a pervertex strukturat, mert nem passzol*/
 			generator["POSITION"] = curr_mesh->mVertices; 
 			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0]; 
 			generator["NORMAL"] = curr_mesh->mNormals;
 			generator["TANGENT"] = curr_mesh->mTangents; 
+#else
+			
+			std::vector<float4> vertices;
+			std::vector<float2> texuvs;
+			std::vector<float4> normals;
+			std::vector<float4> tangents;
 
+			for (k = 0; k < curr_mesh->mNumVertices; k++) {
+				float4 v; 
+				aiVector3D *p;
+				assimp_v3d_f4(curr_mesh->mVertices[k], v, 1.); vertices.push_back(v);
+				assimp_v3d_f4(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs.push_back(float2(v.x, v.y));
+				assimp_v3d_f4(curr_mesh->mNormals[k], v, 1.); normals.push_back(v);
+				assimp_v3d_f4(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
+			}
+
+			/**/
+			generator["POSITION"] = &vertices[0];
+			generator["TEXCOORD"] = &texuvs[0];
+			generator["NORMAL"] = &normals[0];
+			generator["TANGENT"] = &tangents[0];
+			
+
+#endif
 			// -- faces
 
 			///@todo az indexek gyujteset lehessen kulturaltabb modon is vegezni valahogy
