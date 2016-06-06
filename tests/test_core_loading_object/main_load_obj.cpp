@@ -14,10 +14,11 @@
 
 #include "utils/AssetFile.h"
 #include "utils/ResourceManager.h"
+#include "core/ResourcePreloader.h"
 
 using namespace Grafkit;
 
-class Application : public Grafkit::System, public Grafkit::IResourceManager // Grafkit::AssetPreloader
+class Application : public Grafkit::System, protected Grafkit::AssetPreloader
 {
 public:
 	Application() : Grafkit::System(),
@@ -61,6 +62,8 @@ protected:
 		// init file loader
 		this->m_file_loader = new Grafkit::FileAssetManager("./");
 
+		LoadCache();
+
 		// -- camera
 		camera = new Camera();
 		camera->SetPosition(20.0f, 20.0f, -150.0f);
@@ -87,8 +90,7 @@ protected:
 	};
 
 	void release() {
-		// this->SaveCache();
-
+		SaveCache();
 		this->render.Shutdown();
 	};
 
