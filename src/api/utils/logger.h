@@ -8,16 +8,7 @@
 
 #pragma once
 
-//#define USE_LOGGER
-//
-//#ifndef __LOGGER_H__
-//
-//#ifndef USE_LOGGER
-//
-//#define LOGGER(x) 
-//
-//#else // USE_LOGGER
-
+#define HAS_LOGGER 1
 #define LOGGER(x) x
 
 #include <cstdio>
