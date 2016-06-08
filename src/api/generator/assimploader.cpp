@@ -212,8 +212,8 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 	
 	LOGGER(
 		size_t buflen = strlen(tab) + 8 * ai_node->mNumMeshes + 256;
-		char *buf = new char[buflen];
-		sprintf_s(buf, buflen, "%s meshes:", tab);
+		char kbuf[4096];
+		sprintf_s(kbuf, 4096, "%s meshes:", tab);
 	);
 
 	actor->SetName(name);
@@ -221,12 +221,13 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 	// ---
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
+		if (repo.models.size() <= mesh_id)
+			throw EX(OutOfBoundsException);
 		actor->AddEntity(repo.models[mesh_id]);
-		LOGGER(sprintf_s(buf, buflen, "%s %d,", buf, i));
+		LOGGER(sprintf_s(kbuf, buflen, "%s %d,", kbuf, i));
 	}
 
-	LOGGER(if(ai_node->mNumMeshes) Log::Logger().Trace(" %s", buf));
-	LOGGER(delete[] buf);
+	LOGGER(if(ai_node->mNumMeshes) Log::Logger().Trace(" %s", kbuf));
 
 	actor->SetName(ai_node->mName.C_Str());
 	actor->Matrix() = ai4x4MatrixToFWMatrix(&ai_node->mTransformation);
@@ -321,7 +322,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			}
 			else {
 				char buff[256];
-				sprintf_s(buff, "material%d", j);
+				sprintf_s(buff, "material%d", i);
 				material->SetName(buff);
 			}
 				
@@ -361,7 +362,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		// forras sema
 		ShaderRef inputSchema = m_schSrc->Get();
 		if (inputSchema.Invalid())
-			throw new EX_DETAILS(NullPointerException, "Nincs meg a shader input sema. Rendezd ugy a loader stacket, hogy a shader elobb legyen, mint a model betolto.");
+			throw EX_DETAILS(NullPointerException, "Nincs meg a shader input sema. Rendezd ugy a loader stacket, hogy a shader elobb legyen, mint a model betolto.");
 
 		for (i = 0; i<scene->mNumMeshes; i++) 
 		{
@@ -375,12 +376,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			SimpleMeshGenerator generator(resman->GetDeviceContext(), inputSchema);
 
-#if 0 /*itt ki kell masolni a pervertex strukturat, mert nem passzol*/
-			generator["POSITION"] = curr_mesh->mVertices; 
-			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0]; 
-			generator["NORMAL"] = curr_mesh->mNormals;
-			generator["TANGENT"] = curr_mesh->mTangents; 
-#else
+#if 1
 			
 			std::vector<float4> vertices;
 			std::vector<float2> texuvs;
@@ -391,16 +387,23 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 				float4 v; 
 				aiVector3D *p;
 				assimp_v3d_f4(curr_mesh->mVertices[k], v, 1.); vertices.push_back(v);
-				assimp_v3d_f4(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs.push_back(float2(v.x, v.y));
 				assimp_v3d_f4(curr_mesh->mNormals[k], v, 1.); normals.push_back(v);
-				assimp_v3d_f4(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
+				
+				if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
+					assimp_v3d_f4(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
+					assimp_v3d_f4(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs.push_back(float2(v.x, v.y));
+				}
+					
 			}
 
 			/**/
 			generator["POSITION"] = &vertices[0];
-			generator["TEXCOORD"] = &texuvs[0];
 			generator["NORMAL"] = &normals[0];
-			generator["TANGENT"] = &tangents[0];
+
+			if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
+				generator["TEXCOORD"] = &texuvs[0];
+				generator["TANGENT"] = &tangents[0];
+			}
 #endif
 			// -- faces
 
@@ -408,14 +411,14 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			if (curr_mesh->HasFaces()) {
 				std::vector<int> indices;
 
-				for (j = 0; j < curr_mesh->mNumFaces; j++)
+				for (i = 0; i < curr_mesh->mNumFaces; i++)
 				{
-					aiFace *curr_face = &curr_mesh->mFaces[j];
+					aiFace *curr_face = &curr_mesh->mFaces[i];
 					for (k = 0; k < curr_face->mNumIndices; k++)
 						indices.push_back(curr_face->mIndices[k]);
 				}
 
-				generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
+				// generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
 			}
 			else {
 				///@todo arra az esetre is kell valamit kitalalni, amikor nincsenek facek, csak vertexek.
@@ -436,12 +439,12 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	// load cameras
 	if (scene->HasCameras()) {
 		LOGGER(Log::Logger().Trace("Cameras"));
-		for (j = 0; j < scene->mNumCameras; j++) {
+		for (i = 0; i < scene->mNumCameras; i++) {
 			CameraRef camera = new Camera();
-			aiCamera *curr_camera = scene->mCameras[j];
+			aiCamera *curr_camera = scene->mCameras[i];
 
 			const char* camera_name = curr_camera->mName.C_Str();
-			LOGGER(Log::Logger().Trace("- #%d %s", j, camera_name));
+			LOGGER(Log::Logger().Trace("- #%d %s", i, camera_name));
 
 			camera->SetName(camera_name);
 
@@ -463,16 +466,16 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			//asset_repo->AddObject(camera);
 		}
 	}
-
+#if 1
 	// load lights
 	if (scene->HasLights()) {
 		LOGGER(Log::Logger().Trace("Lights"));
-		for (j = 0; j < scene->mNumLights; j++) {
+		for (i = 0; i < scene->mNumLights; i++) {
 			LightRef light; 
 			aiLight *curr_light = scene->mLights[i];
 
 			const char *light_name = curr_light->mName.C_Str();
-			LOGGER(Log::Logger().Trace("- #%d %s %d", j, light_name, curr_light->mType));
+			LOGGER(Log::Logger().Trace("- #%d %s %d", i, light_name, curr_light->mType));
 		
 
 			// light <- assimp light
@@ -516,6 +519,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		}
 	}
 
+#endif
 	// build up scenegraph
 
 	ActorRef root_node = new Actor;
