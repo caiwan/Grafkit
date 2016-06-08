@@ -37,7 +37,7 @@ namespace Grafkit
 
 	protected:
 		Window m_window;
-		Input* m_Input;
+		Input* m_pInput;
 	};
 
 }

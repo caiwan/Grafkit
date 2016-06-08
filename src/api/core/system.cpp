@@ -12,7 +12,7 @@
 using namespace Grafkit;
 
 System::System()
-	: Window::WindowHandler() , m_window(this), m_Input(nullptr)
+	: Window::WindowHandler() , m_window(this), m_pInput(nullptr)
 {
 	// init logger 
 	LOGGER(Log::Logger().Info("---- APPSTART ----"));
@@ -20,6 +20,8 @@ System::System()
 
 System::~System()
 {
+	delete m_pInput;
+
 }
 
 int System::execute() {
@@ -116,7 +118,7 @@ LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
 		case WM_KEYDOWN:
 		{
 			// If a key is pressed send it to the input object so it can record that state.
-			m_Input->KeyDown((unsigned int)wparam);
+			m_pInput->KeyDown((unsigned int)wparam);
 			return 0;
 		}
 
@@ -124,7 +126,7 @@ LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
 		case WM_KEYUP:
 		{
 			// If a key is released then send it to the input object so it can unset the state for that key.
-			m_Input->KeyUp((unsigned int)wparam);
+			m_pInput->KeyUp((unsigned int)wparam);
 			return 0;
 		}
 
@@ -143,14 +145,8 @@ void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen
 	this->m_window.createWindow(screenWidth, screenHeight, fullscreen);
 	this->m_window.showWindow();
 
-	m_Input = new Input;
-	if (!m_Input)
-	{
-		///@todo dobjon exceptiont
-		return;
-	}
-
-	m_Input->Initialize();
+	m_pInput = new Input();
+	m_pInput->Initialize();
 
 }
 
