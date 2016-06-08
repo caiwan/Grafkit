@@ -11,7 +11,14 @@
 ///@todo aligned new-t mindenre
 namespace Grafkit{
 
-#define LIGHT_BUCKET "light"
+	/// FiRG RULEZ
+#define __A_PICSABA_EZZEL_A_SZARRAL
+
+#ifndef __A_PICSABA_EZZEL_A_SZARRAL
+#define _BAZDMEG_GECI(x) __declspec(align(16)) class x : public BaseLight, public AlignedNew<x>
+#else /*__A_PICSABA_EZZEL_A_SZARRAL*/
+#define _BAZDMEG_GECI(x) class x : public BaseLight
+#endif /*__A_PICSABA_EZZEL_A_SZARRAL*/
 
 	class BaseLight;
 	typedef Ref<BaseLight> LightRef; 
@@ -42,8 +49,6 @@ namespace Grafkit{
 
 		/// Setup the corresponding constant buffer inside the shader
 		void SetShaderCB(ShaderRef &rPShader);
-
-		virtual const char* GetBucketID() { return LIGHT_BUCKET; }
 
 	protected:
 
@@ -77,8 +82,9 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	__declspec(align(16)) class PointLight : public BaseLight, public AlignedNew<PointLight>
+	//__declspec(align(16)) class PointLight : public BaseLight, public AlignedNew<PointLight>
 	// class PointLight : public BaseLight 
+	_BAZDMEG_GECI(PointLight)
 	{
 	public:
 		PointLight() : BaseLight () {}
@@ -88,8 +94,10 @@ namespace Grafkit{
 		virtual enum type_t GetLightType() { return T_point; }
 	};
 
-	__declspec(align(16)) class DirectionalLight : public BaseLight, public AlignedNew<DirectionalLight>
+	// ============================================================================================================
+	//__declspec(align(16)) class DirectionalLight : public BaseLight, public AlignedNew<DirectionalLight>
 	// class DirectionalLight : public BaseLight
+	_BAZDMEG_GECI(DirectionalLight)
 	{
 		public:
 		DirectionalLight() : BaseLight() {}
@@ -100,8 +108,10 @@ namespace Grafkit{
 
 	};
 
-	__declspec(align(16)) class SpotLight : public BaseLight, public AlignedNew<SpotLight>
+	// ============================================================================================================
+	//__declspec(align(16)) class SpotLight : public BaseLight, public AlignedNew<SpotLight>
 	// class SpotLight : public BaseLight
+	_BAZDMEG_GECI(SpotLight)
 	{
 	public:
 		SpotLight() : BaseLight() {}
@@ -111,8 +121,10 @@ namespace Grafkit{
 		virtual enum type_t GetLightType() { return T_spot; }
 	};
 
-	__declspec(align(16)) class AmbientLight : public BaseLight, public AlignedNew<AmbientLight>
+	// ============================================================================================================
+	//__declspec(align(16)) class AmbientLight : public BaseLight, public AlignedNew<AmbientLight>
 	// class AmbientLight : public BaseLight
+	_BAZDMEG_GECI(AmbientLight)
 	{
 	public:
 		AmbientLight() : BaseLight() {}
