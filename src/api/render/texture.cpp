@@ -110,7 +110,8 @@ void Grafkit::Texture::Initialize(Renderer & device, BitmapResourceRef bitmap)
 		throw EX(TextureCreateException);
 	}
 
-	if (data != bitmap->GetData()) delete data;
+	if (data != bitmap->GetData()) 
+		delete[] data;
 	delete[] initialData;
 
 	// --- shderresourceref
