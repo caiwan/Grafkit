@@ -53,7 +53,7 @@ protected:
 		// --- ezeket kell osszeszedni egy initwindowban
 		const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
 		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
-		const float SCREEN_DEPTH = 0.1f, SCREEN_NEAR = 1000.f;
+		const float SCREEN_DEPTH = 0.1f, SCREEN_NEAR = 3000.f;
 
 		int result = 0;
 
@@ -66,14 +66,14 @@ protected:
 
 		// -- camera
 		camera = new Camera();
-		camera->SetPosition(20.0f, 20.0f, -150.0f);
+		camera->SetPosition(50.0f, 30.0f, -500.0f);
 
 		// -- load shader
 		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new AssimpLoader("./models/tegla.3ds", m_vertexShader));
+		scene = this->Load<SceneRes>(new AssimpLoader("./models/duck.fbx", m_vertexShader));
 
 		this->t = 0;
 
