@@ -11,6 +11,9 @@
 #define DEBUG_ASSERT(x)
 #endif
 
+/// Safe ptr release
+#define RELEASE(refptr) if(refptr) {refptr->Release(); refptr = nullptr;}
+
 /**
 	Baseclass for all classes that support reference counting.
  */

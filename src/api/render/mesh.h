@@ -45,9 +45,7 @@ namespace Grafkit
 				ID3D11Buffer *buffer;
 				UINT stride, offset;
 
-				BufferStateDescriptor() {
-					buffer = NULL;
-					stride, offset = 0;
+				BufferStateDescriptor() : buffer(nullptr), stride(0), offset(0) {
 				}
 			};
 

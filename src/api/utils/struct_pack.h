@@ -52,7 +52,7 @@ namespace Grafkit {
 		/// Calculates sizes and fills internal offsets 
 		void calcSize();
 
-	protected:
+	public:
 		/**
 		@{
 		Allocation procedure is hidden in a member function due overriding it

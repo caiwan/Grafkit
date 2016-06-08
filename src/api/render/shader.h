@@ -81,8 +81,8 @@ namespace Grafkit {
 		// ----
 		// access constant buffers and variables 
 		///@todo bounds check
-		size_t GetParamCount() { return this->m_cBufferCount; }
-		size_t GetParamCount(size_t id) { return id>=this->m_cBufferCount?0:this->m_cBuffers[id].m_cbVarCount; }
+		size_t GetParamCount() { return this->m_cBuffers.size(); }
+		size_t GetParamCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
 
 #ifndef SHADER_NO_OPERATOR_ENHANCEMENT
 		ShaderParamManager operator[](const char* name) { return GetParam(std::string(name)); }
@@ -110,20 +110,20 @@ namespace Grafkit {
 	public:
 
 		D3D11_SHADER_BUFFER_DESC GetCBDescription(size_t id) {
-			return (id < m_cBufferCount) ? m_cBuffers[id].m_description : D3D11_SHADER_BUFFER_DESC();
+			return m_cBuffers[id].m_description;
 		}
 		
 		D3D11_SHADER_VARIABLE_DESC GetCBVariableDescriptor(size_t id, size_t vid) {
-			return (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount) ? m_cBuffers[id].m_cbVars[vid].m_var_desc : D3D11_SHADER_VARIABLE_DESC();
+			return m_cBuffers[id].m_cbVars[vid].m_var_desc;
 		}
 		D3D11_SHADER_TYPE_DESC GetCBTypeDescriptor(size_t id, size_t vid) {
-			return (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount) ? m_cBuffers[id].m_cbVars[vid].m_type_desc : D3D11_SHADER_TYPE_DESC();
+			return m_cBuffers[id].m_cbVars[vid].m_type_desc;
 		}
 
 		// ----
 		// access bounded resources
 		///@todo bounds check
-		size_t GetBResCount() { return this->m_bResourceCount; }
+		size_t GetBResCount() { return this->m_bResources.size(); }
 		ShaderResourceManager GetBRes(const char * name) { return GetBRes(std::string(name)); }
 		ShaderResourceManager GetBRes(std::string name);
 		ShaderResourceManager GetBRes(size_t id);
@@ -180,16 +180,14 @@ namespace Grafkit {
 			UINT m_slot;
 
 			cb_variableMap_t m_cbVarMap;
-			size_t m_cbVarCount;
-			CBVar *m_cbVars;
+			std::vector<CBVar> m_cbVars;
 		};
 
 		typedef std::map<std::string, size_t> CBMap_t;
 		typedef CBMap_t::iterator CBMap_it_t;
 
 		CBMap_t m_mapCBuffers;
-		size_t m_cBufferCount;
-		CBRecord *m_cBuffers;	///@todo ezek is legyenek vektorok majd 
+		std::vector<CBRecord> m_cBuffers;
 
 		// -- input layout 
 		typedef std::vector<InputElementRecord> inputElements_t;
@@ -207,8 +205,7 @@ namespace Grafkit {
 		typedef BResMap_t::iterator BResMap_it_t;
 		BResMap_t m_mapBResources;
 		
-		size_t  m_bResourceCount;
-		BResRecord* m_bResources;
+		std::vector<BResRecord> m_bResources;
 
 		// -- output sampler
 		std::vector<OutputTargetRecord> m_outputTargets;

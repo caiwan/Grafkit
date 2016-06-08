@@ -39,7 +39,7 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, Shader
 	ID3D10Blob* errorMessage = nullptr;
 	ID3D10Blob* shaderBuffer = nullptr;
 
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
+//	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 	unsigned int numElements = 0;
 	
 	// D3D11_BUFFER_DESC matrixBufferDesc;
@@ -75,7 +75,8 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, Shader
 	this->CompileShader(device, shaderBuffer);
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
-	shaderBuffer->Release();
+	RELEASE(shaderBuffer);
+	RELEASE(errorMessage);
 }
 
 
@@ -120,30 +121,30 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 	this->CompileShader(device, shaderBuffer);
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
-	shaderBuffer->Release();
+	RELEASE(shaderBuffer);
+	RELEASE(errorMessage);
 }
 
 
 void Shader::Shutdown()
 {
-	if (this->m_pReflector){
-		this->m_pReflector->Release();
-		this->m_pReflector = nullptr;
+	RELEASE(this->m_pReflector);
+	RELEASE(this->m_layout);
+	RELEASE(this->m_pxShader);
+	RELEASE(this->m_vxShader);
+
+	for (size_t i = 0; i < GetParamCount(); i++) {
+
+		/*for (size_t j = 0; j < GetParamCount(i); j++) {
+			m_cBuffers[i].m_cbVars[j]
+		}*/
+
+		RELEASE(m_cBuffers[i].m_buffer);
+		delete[] m_cBuffers[i].m_cpuBuffer; m_cBuffers[i].m_cpuBuffer = nullptr;
 	}
 
-	if (this->m_layout) {
-		this->m_layout->Release();
-		this->m_layout = nullptr;
-	}
-
-	if (this->m_pxShader) {
-		this->m_pxShader->Release();
-		this->m_pxShader = nullptr;
-	}
-	if (this->m_vxShader) {
-		this->m_vxShader->Release();
-		this->m_vxShader = nullptr;
-	}
+	/*for (size_t i = 0; i < GetBResCount(); i++) {
+	}*/
 
 	///@todo delete input layout elements
 	///@todo delete constant buffer variables + buffer
@@ -168,10 +169,10 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 	}
 
 	// duck the constant buffers around
-	if (this->m_cBufferCount) 
+	if (this->GetParamCount()) 
 	{
 
-		for (size_t i = 0; i < this->m_cBufferCount; i++){
+		for (size_t i = 0; i < this->GetParamCount(); i++){
 			ID3D11Buffer* buffer = this->m_cBuffers[i].m_buffer;
 			UINT slot = this->m_cBuffers[i].m_slot;
 
@@ -188,7 +189,7 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 	// duck through the resources
 	//if (this->m_bResourceCount) 
 	{
-		for (size_t i = 0; i < this->m_bResourceCount; i++) {
+		for (size_t i = 0; i < this->GetBResCount(); i++) {
 			BResRecord &brRecord = this->m_bResources[i];
 			if (brRecord.m_boundSource != nullptr) {
 				
@@ -227,7 +228,7 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 				}
 
 				// zero, mindenesetre
-				brRecord.m_boundSource = nullptr;
+				// brRecord.m_boundSource = nullptr;
 			}
 		}
 	}
@@ -274,9 +275,10 @@ Shader::ShaderParamManager Shader::GetParam(std::string name)
 	return ShaderParamManager();
 }
 
+///@todo safe get
 Shader::ShaderParamManager Shader::GetParam(size_t id)
 {
-	return (id < m_cBufferCount) ? ShaderParamManager(this, id) : ShaderParamManager();
+	return ShaderParamManager(this, id);
 }
 
 Shader::ShaderParamManager Shader::GetParam(std::string name, std::string varname)
@@ -299,16 +301,17 @@ Shader::ShaderParamManager Shader::GetParam(size_t id, std::string varname)
 	return ShaderParamManager();
 }
 
+///@todo safe get
 Shader::ShaderParamManager Shader::GetParam(size_t id, size_t vid)
 {
-	return (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount) ? ShaderParamManager(this, id, vid, 1) : ShaderParamManager();
+	return ShaderParamManager(this, id, vid, 1);
 }
 
 // ============================================================================================================================================
 
 void Shader::SetParamPtr(size_t id, const void  * const pData, size_t size, size_t offset)
 {
-	if (id < m_cBufferCount) 
+	if (id < GetParamCount()) 
 	{
 		if (size == 0) {
 			size = m_cBuffers[id].m_description.Size;
@@ -331,7 +334,7 @@ void Shader::SetParamPtr(size_t id, const void  * const pData, size_t size, size
 ///@todo ez egyelore nem mukodik 
 void Shader::SetParamPtr(size_t id, size_t vid, const void  * const pData, size_t size, size_t offset)
 {
-	if (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount)
+	if (id < GetParamCount() && vid < GetParamCount(id))
 	{
 		offset += m_cBuffers[id].m_cbVars[vid].m_var_desc.StartOffset;
 		
@@ -397,19 +400,21 @@ Shader::ShaderResourceManager Shader::GetBRes(std::string name)
 	return ShaderResourceManager();
 }
 
+///@todo safe get
 Shader::ShaderResourceManager Shader::GetBRes(size_t id)
 {
-	return (id < m_bResourceCount) ? ShaderResourceManager(this, id) : ShaderResourceManager();
+	return ShaderResourceManager(this, id);
 }
 
+///@todo safe get
 D3D11_SHADER_INPUT_BIND_DESC Shader::GetBResDesc(size_t id)
 {
-	return (id < m_bResourceCount) ? m_bResources[id].m_desc : D3D11_SHADER_INPUT_BIND_DESC();
+	return m_bResources[id].m_desc;
 }
 
 void Shader::SetBResPointer(size_t id, void * ptr)
 {
-	if (id < m_bResourceCount)
+	if (id < GetBResCount())
 		this->m_bResources[id].m_boundSource = ptr;
 }
 
@@ -609,15 +614,11 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		m_outputTargets.push_back(rec);
 	}
 
-	// return; 
-
 	// fetch constant buffers
-	m_cBufferCount = desc.ConstantBuffers;
-	m_cBuffers = new CBRecord[m_cBufferCount];
 
 	for (UINT i = 0; i < desc.ConstantBuffers; i++)
 	{
-		CBRecord & cbRecord = m_cBuffers[i];
+		CBRecord cbRecord; // = m_cBuffers[i];
 		cbRecord.m_slot = 0;
 		cbRecord.m_buffer = nullptr;
 
@@ -649,12 +650,10 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		LOGGER(Log::Logger().Trace("--- Constant Buffer: %s [%d], Format = {%d, %d}", cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size));
 
 		// build up cbuffer variables
-		cbRecord.m_cbVarCount = cbRecord.m_description.Variables;
-		cbRecord.m_cbVars = new CBVar[cbRecord.m_cbVarCount];
 
-		for (UINT j = 0; j < cbRecord.m_cbVarCount; j++) {
+		for (UINT j = 0; j < cbRecord.m_description.Variables; j++) {
 			ID3D11ShaderReflectionVariable* shader_variable = pConstBuffer->GetVariableByIndex(j);
-			CBVar &cbVar = cbRecord.m_cbVars[j];
+			CBVar cbVar;
 
 			// feltolt 
 			result = shader_variable->GetDesc(&cbVar.m_var_desc);
@@ -672,17 +671,17 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 			LOGGER(Log::Logger().Trace("---- Variable: %s [%d], Format = {%s, %d, %d}", cbVar.m_var_desc.Name, j, cbVar.m_type_desc.Name, cbVar.m_var_desc.Size, cbVar.m_var_desc.StartOffset));
 
+			cbRecord.m_cbVars.push_back(cbVar);
 			cbRecord.m_cbVarMap[cbVar.m_var_desc.Name] = j;
 		}
 
+		m_cBuffers.push_back(cbRecord);
 		m_mapCBuffers[cbRecord.m_description.Name] = i;
 	}
 
 	// fetch bounded resources 
-	this->m_bResourceCount = desc.BoundResources;
-	this->m_bResources = new BResRecord[this->m_bResourceCount];
 
-	for (size_t i = 0; i < m_bResourceCount; i++) {
+	for (size_t i = 0; i < desc.BoundResources; i++) {
 		D3D11_SHADER_INPUT_BIND_DESC brDesc;
 		result = this->m_pReflector->GetResourceBindingDesc(i, &brDesc);
 
@@ -690,13 +689,14 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 			throw EX(BoundResourceLocateException);
 		}
 
-		BResRecord &brRecord = this->m_bResources[i];
+		BResRecord brRecord;
 
 		brRecord.m_boundSource = nullptr;
 		brRecord.m_desc = brDesc;
 
 		LOGGER(Log::Logger().Trace("--- Bounded Resource: %s [%d], Format = {%d}", brRecord.m_desc.Name, i, brRecord.m_desc.Type));
 
+		m_bResources.push_back(brRecord);
 		m_mapBResources[brDesc.Name] = i;
 	}
 

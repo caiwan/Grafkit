@@ -376,54 +376,23 @@ void Renderer::Shutdown()
 		m_swapChain->SetFullscreenState(false, nullptr);
 	}
 
-	if(m_rasterState)
-	{
-		m_rasterState->Release();
-		m_rasterState = 0;
-	}
+	RELEASE(m_rasterState);
+	RELEASE(m_depthStencilView);
+	RELEASE(m_depthStencilState)
+	RELEASE(m_depthStencilBuffer);
+	RELEASE(m_myRenderTargetView);
+	RELEASE(m_deviceContext);
+	RELEASE(m_swapChain);
 
-	if(m_depthStencilView)
-	{
-		m_depthStencilView->Release();
-		m_depthStencilView = 0;
-	}
+	//if(m_device)
+	//{
+	//	// Assign a nullptr to the ref will automatically release and delete it
+	//	this->AssingnRef(nullptr);
+	//	m_device = nullptr;
+	//}
 
-	if(m_depthStencilState)
-	{
-		m_depthStencilState->Release();
-		m_depthStencilState = 0;
-	}
-
-	if(m_depthStencilBuffer)
-	{
-		m_depthStencilBuffer->Release();
-		m_depthStencilBuffer = 0;
-	}
-
-	if(m_myRenderTargetView)
-	{
-		m_myRenderTargetView->Release();
-		m_myRenderTargetView = 0;
-	}
-
-	if(m_deviceContext)
-	{
-		m_deviceContext->Release();
-		m_deviceContext = 0;
-	}
-
-	if(m_device)
-	{
-		// Assign a nullptr to the ref will automatically release and delete it
-		this->AssingnRef(nullptr);
-		m_device = 0;
-	}
-
-	if(m_swapChain)
-	{
-		m_swapChain->Release();
-		m_swapChain = 0;
-	}
+	RELEASE(m_device);
+	this->ptr = nullptr;
 
 	return;
 }

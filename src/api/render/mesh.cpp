@@ -39,20 +39,8 @@ void Grafkit::Mesh::RenderMesh(ID3D11DeviceContext * dev)
 
 void Grafkit::Mesh::Shutdown()
 {
-	if (m_indexBuffer)
-	{
-		m_indexBuffer->Release();
-		m_indexBuffer = 0;
-	}
-
-	//for (int i = 0; i < this->m_buffers.size(); i++) {
-	//	this->m_buffers[i].buffer->Release();
-	//}
-
-	if (this->m_buffer.buffer)
-		this->m_buffer.buffer->Release();
-
-	return;
+	RELEASE(m_indexBuffer);
+	RELEASE(m_buffer.buffer);
 }
 
 void Grafkit::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
@@ -149,7 +137,7 @@ MeshRef Grafkit::SimpleMeshGenerator::operator()(size_t vertexCount, size_t inde
 	}
 
 	// delete[] vertex_data; //vertex_data = 0;
-	/// @todo delete vertex_buffer_data 
+	packer.dealloc(vertex_buffer_data);
 
 	this->createIndexBuffer(mesh, indexCount, indices);
 	mesh->addElement(vertexBuffer, packer.getRecordWidth(), 0);
