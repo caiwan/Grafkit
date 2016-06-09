@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../utils/memory_align.h"
+#include "../stdafx.h"
 
-#include "dxtypes.h"
+#include "Actor.h"
+
 #include "renderer.h"
 #include "shader.h"
 
@@ -11,19 +12,10 @@
 ///@todo aligned new-t mindenre
 namespace Grafkit{
 
-	/// FiRG RULEZ
-// #define __A_PICSABA_EZZEL_A_SZARRAL
-
-#ifndef __A_PICSABA_EZZEL_A_SZARRAL
-#define _BAZDMEG_GECI(x) __declspec(align(16)) class x : public BaseLight, public AlignedNew<x>
-#else /*__A_PICSABA_EZZEL_A_SZARRAL*/
-#define _BAZDMEG_GECI(x) class x : public BaseLight
-#endif /*__A_PICSABA_EZZEL_A_SZARRAL*/
-
 	class BaseLight;
 	typedef Ref<BaseLight> LightRef; 
 
-	class BaseLight : virtual public Referencable
+	class BaseLight : virtual public Referencable, public Entity3D
 	{
 	public:
 		BaseLight();
@@ -49,6 +41,8 @@ namespace Grafkit{
 
 		/// Setup the corresponding constant buffer inside the shader
 		void SetShaderCB(ShaderRef &rPShader);
+
+		void Render(Grafkit::Renderer& deviceContext, Scene* scene);
 
 	protected:
 
@@ -80,6 +74,15 @@ namespace Grafkit{
 		float4 m_direction;
 
 	};
+
+	/// FiRG RULEZ
+// #define __A_PICSABA_EZZEL_A_SZARRAL
+
+#ifndef __A_PICSABA_EZZEL_A_SZARRAL
+#define _BAZDMEG_GECI(x) __declspec(align(16)) class x : public BaseLight, public AlignedNew<x>
+#else /*__A_PICSABA_EZZEL_A_SZARRAL*/
+#define _BAZDMEG_GECI(x) class x : public BaseLight
+#endif /*__A_PICSABA_EZZEL_A_SZARRAL*/
 
 	// ============================================================================================================
 	//__declspec(align(16)) class PointLight : public BaseLight, public AlignedNew<PointLight>
