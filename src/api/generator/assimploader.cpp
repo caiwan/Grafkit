@@ -411,11 +411,12 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			if (curr_mesh->HasFaces()) {
 				std::vector<int> indices;
 
-				for (i = 0; i < curr_mesh->mNumFaces; i++)
+				for (j = 0; j < curr_mesh->mNumFaces; j++)
 				{
-					aiFace *curr_face = &curr_mesh->mFaces[i];
-					for (k = 0; k < curr_face->mNumIndices; k++)
+					aiFace *curr_face = &curr_mesh->mFaces[j];
+					for (k = 0; k < curr_face->mNumIndices; k++) {
 						indices.push_back(curr_face->mIndices[k]);
+					}
 				}
 
 				// generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
