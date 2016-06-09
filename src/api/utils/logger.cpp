@@ -156,7 +156,7 @@ Grafkit::LoggerHandler::ConsoleLogger::ConsoleLogger()
 
 Grafkit::LoggerHandler::ConsoleLogger::~ConsoleLogger()
 {
-	// ... ? 
+	fclose(m_stdout);
 }
 
 void Grafkit::LoggerHandler::ConsoleLogger::Write(Grafkit::Logger::message_t * const & message)

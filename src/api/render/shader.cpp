@@ -177,7 +177,7 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 			UINT slot = this->m_cBuffers[i].m_slot;
 
 			if (this->m_type == ST_Vertex) {
-				deviceContext->VSSetConstantBuffers(slot, 1, &buffer);
+				deviceContext->VSSetConstantBuffers(slot, 1, &buffer); ///@todo itt valami memoryleak van; 
 
 			}
 			else if (this->m_type == ST_Pixel) {

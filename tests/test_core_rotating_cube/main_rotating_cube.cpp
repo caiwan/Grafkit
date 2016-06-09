@@ -126,6 +126,7 @@ protected:
 
 		void release() {
 			this->render.Shutdown();
+			delete this->m_file_loader; this->m_file_loader = nullptr;
 		};
 
 		// ==================================================================================================================
