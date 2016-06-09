@@ -39,6 +39,9 @@ using namespace FWdebugExceptions;
 	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z;\
 }
 
+#define assimp_v3d_f3_set(SRC, DST)\
+(DST((SRC).x, (SRC).y, (SRC).z))
+
 // aiVector3D to float4
 #define assimp_v3d_f4(SRC, DST, W)\
 {\
@@ -292,7 +295,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?
 	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
-		aiProcessPreset_TargetRealtime_Quality | /*aiProcess_GenNormals |*/ 0
+		aiProcessPreset_TargetRealtime_Quality | aiProcess_ConvertToLeftHanded | /*aiProcess_GenNormals |*/ 0
 	);
 
 	if (!scene)
@@ -418,7 +421,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 					}
 				}
 
-				// generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
+				generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
 			}
 			else {
 				///@todo arra az esetre is kell valamit kitalalni, amikor nincsenek facek, csak vertexek.
@@ -452,14 +455,11 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			camera->SetClippingPlanes(curr_camera->mClipPlaneNear, curr_camera->mClipPlaneFar);
 
 			// camera <- assmimp camera
-			assimp_v3d_f3(curr_camera->mPosition, camera->GetPosition());
-			assimp_v3d_f3(curr_camera->mLookAt, camera->GetLookAt());
-			assimp_v3d_f3(curr_camera->mUp, camera->GetUp());
+			assimp_v3d_f3_set(curr_camera->mPosition, camera->SetPosition);
+			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLookAt);
+			assimp_v3d_f3_set(curr_camera->mUp, camera->SetUp);
 
 			// itt van meg aspekt, amivel kezdeni lehetne valamit
-
-			// --
-			std::string name(curr_camera->mName.C_Str());
 
 			cameras.push_back(camera);
 		}
@@ -510,7 +510,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			assimp_color_f4(curr_light->mColorSpecular, light->GetSpecular());
 
 			///@todo ez kell-e majd?
-			// light->SetName(std::string(curr_light->mName.C_Str()));
+			light->SetName(light_name);
 
 			lights.push_back(light);
 		}
@@ -533,6 +533,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			actorMap_it it = resourceRepo.actors.find(name);
 			if (it != resourceRepo.actors.end()) {
 				it->second->AddEntity(cameras[i]);
+				outScene->AddCameraNode(it->second);
 			}
 
 		}
@@ -548,6 +549,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			actorMap_it it = resourceRepo.actors.find(name);
 			if (it != resourceRepo.actors.end()) {
 				it->second->AddEntity(lights[i]);
+				outScene->AddLightNode(it->second);
 			}
 		}
 	}
