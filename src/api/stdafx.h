@@ -2,6 +2,9 @@
 
 #include "math/matrix.h"
 
+// dx datatypes
+#include "render/dxtypes.h"
+
 // serilaizer
 #include "utils/dynamics.h"
 #include "utils/persistent.h"
