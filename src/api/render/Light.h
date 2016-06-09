@@ -12,7 +12,7 @@
 namespace Grafkit{
 
 	/// FiRG RULEZ
-#define __A_PICSABA_EZZEL_A_SZARRAL
+// #define __A_PICSABA_EZZEL_A_SZARRAL
 
 #ifndef __A_PICSABA_EZZEL_A_SZARRAL
 #define _BAZDMEG_GECI(x) __declspec(align(16)) class x : public BaseLight, public AlignedNew<x>
