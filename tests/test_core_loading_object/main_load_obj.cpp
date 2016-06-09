@@ -73,7 +73,7 @@ protected:
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new AssimpLoader("./models/duck.fbx", m_vertexShader));
+		scene = this->Load<SceneRes>(new AssimpLoader("./models/cornell.fbx", m_vertexShader));
 
 		this->t = 0;
 
