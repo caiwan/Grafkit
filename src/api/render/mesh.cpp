@@ -164,9 +164,9 @@ void Grafkit::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCoun
 	// --- 
 
 	// -- indices buffer + copy 
-	ULONG* indices = NULL;
+	ULONG* indices = nullptr;
 	indices = new ULONG[indexCount];	// zero nem kell?
-
+	// ZeroMemory(indices, indexCount * sizeof(indexCount[0]));
 										// !copy
 	for (size_t i = 0; i < indexCount; i++)
 	{
@@ -192,7 +192,7 @@ void Grafkit::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCoun
 		throw EX(CreateIndevBufferException);
 	}
 
-	delete[] indices; indices = 0;
+	delete[] indices; indices = nullptr;
 
 	mesh->addIndices(indexBuffer, indexCount);
 }
