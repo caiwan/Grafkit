@@ -282,7 +282,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	SceneRef outScene = new Scene();
 	// outScene->SetName(m_srcName);
 
-	resourceRepo_t resourceMap;
+	
 
 	IAssetRef srcAsset = this->GetSourceAsset(resman);
 
@@ -300,10 +300,10 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 	size_t i = 0, j = 0, k = 0, l = 0;
 	resourceRepo_t resourceRepo;
-	std::vector<MaterialRef> &materials = resourceMap.materials;
-	std::vector<ModelRef> &models = resourceMap.models;
-	std::vector<CameraRef> &cameras = resourceMap.cameras;
-	std::vector<LightRef> &lights = resourceMap.lights;
+	std::vector<MaterialRef> &materials = resourceRepo.materials;
+	std::vector<ModelRef> &models = resourceRepo.models;
+	std::vector<CameraRef> &cameras = resourceRepo.cameras;
+	std::vector<LightRef> &lights = resourceRepo.lights;
 
 	// -- load materials
 
@@ -385,7 +385,6 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			for (k = 0; k < curr_mesh->mNumVertices; k++) {
 				float4 v; 
-				aiVector3D *p;
 				assimp_v3d_f4(curr_mesh->mVertices[k], v, 1.); vertices.push_back(v);
 				assimp_v3d_f4(curr_mesh->mNormals[k], v, 1.); normals.push_back(v);
 				
@@ -462,9 +461,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			// --
 			std::string name(curr_camera->mName.C_Str());
 
-			///@todo nevet kell nekunk setelni valamikor?
-			//camera->SetName(name);
-			//asset_repo->AddObject(camera);
+			cameras.push_back(camera);
 		}
 	}
 #if 1
@@ -516,7 +513,6 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			// light->SetName(std::string(curr_light->mName.C_Str()));
 
 			lights.push_back(light);
-			//asset_repo->AddObject(light);
 		}
 	}
 
@@ -525,15 +521,20 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 	ActorRef root_node = new Actor;
 	LOGGER(Log::Logger().Trace("Building scenegraph"));
-	assimp_parseScenegraph(resourceMap, scene->mRootNode, root_node);
+	assimp_parseScenegraph(resourceRepo, scene->mRootNode, root_node);
 	outScene->SetRootNode(root_node);
 
 	// kamera helyenek kiszedese a scenegraphbol
 	if (scene->HasCameras()) {
 		for (i = 0; i < scene->mNumCameras; i++) {
 			aiCamera *curr_camera = scene->mCameras[i];
+			std::string name = curr_camera->mName.C_Str();
 
-			// ... 
+			actorMap_it it = resourceRepo.actors.find(name);
+			if (it != resourceRepo.actors.end()) {
+				it->second->AddEntity(cameras[i]);
+			}
+
 		}
 	}
 	
@@ -542,15 +543,23 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		for (i = 0; i < scene->mNumLights; i++) {
 			aiLight * curr_light = scene->mLights[i];
 
-			//...
+			std::string name = curr_light->mName.C_Str();
+
+			actorMap_it it = resourceRepo.actors.find(name);
+			if (it != resourceRepo.actors.end()) {
+				it->second->AddEntity(lights[i]);
+			}
 		}
 	}
 
 	// --- Animacio kiszedese
 	if (scene->HasAnimations()) {
+		LOGGER(Log::Logger().Trace("Animation"));
 		for (i = 0; i < scene->mNumAnimations; i++) {
 			aiAnimation *curr_anim = scene->mAnimations[i];
 			aiString name = curr_anim->mName;
+
+			LOGGER(Log::Logger().Trace("- #%d : %s", i, name.C_Str()));
 
 			// itt kell tudni, hogy kihez tartozik majd az animacio
 
