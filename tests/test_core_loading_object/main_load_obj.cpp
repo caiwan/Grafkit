@@ -53,7 +53,6 @@ protected:
 		// --- ezeket kell osszeszedni egy initwindowban
 		const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
 		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
-		const float SCREEN_DEPTH = 0.1f, SCREEN_NEAR = 3000.f;
 
 		int result = 0;
 
@@ -66,14 +65,16 @@ protected:
 
 		// -- camera
 		camera = new Camera();
-		camera->SetPosition(50.0f, 30.0f, -500.0f);
+		camera->SetPosition(50.0f, 30.0f, -150.0f);
+		camera->SetClippingPlanes(30, 3000);
+		camera->SetName("picsatengely");
 
 		// -- load shader
 		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new AssimpLoader("./models/cornell.fbx", m_vertexShader));
+		scene = this->Load<SceneRes>(new AssimpLoader("models/cornell.fbx", m_vertexShader));
 
 		this->t = 0;
 
@@ -81,7 +82,9 @@ protected:
 
 		ActorRef camera_actor = new Actor;
 		camera_actor->AddEntity(camera);
-		scene->Get()->SetCameraNode(camera_actor);
+		camera_actor->SetName("picsatengely_szinesz");
+		scene->Get()->AddCameraNode(camera_actor);
+		scene->Get()->SetActiveCamera(scene->Get()->GetCameraCount() - 1);
 
 		scene->Get()->SetVShader(m_vertexShader);
 		scene->Get()->SetFShader(m_fragmentShader);
@@ -97,6 +100,7 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
+			(*this->scene)->PreRender(render);
 
 			(*this->scene)->Render(render);
 
