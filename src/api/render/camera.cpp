@@ -94,8 +94,6 @@ void Camera::Calculate(Renderer& renderer)
 
 	m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
 	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
-
-	return;
 }
 
 
