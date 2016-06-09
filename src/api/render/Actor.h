@@ -30,36 +30,8 @@ namespace Grafkit {
 	public:
 		Entity3D();
 		virtual ~Entity3D();
-
-		/*ShaderResRef &GetVertexShader() { return this->m_vertexShader; }
-		void SetVertexShader(ShaderResRef shader) { this->m_vertexShader = shader; }*/
-			
-		// MaterialRef &GetMaterial() { return this->m_material; }
-		// void SetMaterial(MaterialRef material) { this->m_material = material; }
-
-		///@{
-		///Ezek a materialbol veszik ki a shadert, ha megosztott material van, akkor mindenkiet modositja
-		///Kulonben ha zero a material, akkor gaz van
-		// ShaderResRef GetFragmentShader() { return this->m_fragmentShader; }
-		// void SetFragmentShader(ShaderResRef shader) { this->m_fragmentShader = shader; }
-		///@}
-
-		///@todo az actor felol lehessen updatelni a shadert + a materialt
-
-		//Actor * const & GetParent() { return m_parent; }
-
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene) = 0;
 		
-	protected:	
-		//Actor* m_parent;
-		// ShaderResRef m_vertexShader;
-		// ShaderResRef m_fragmentShader;
-
-		//MaterialRef m_material;
-
-		/// @todo + bounding box, ha kell 1 (Axis aligned bounding box)
-
-		virtual const char* GetBucketID() { return ENTITY3D_BUCKET; }
 	};
 
 	// ez egyszer jol jon majd
