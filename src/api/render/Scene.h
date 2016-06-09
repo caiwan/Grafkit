@@ -30,19 +30,21 @@ namespace Grafkit {
 		void PreRender(Grafkit::Renderer & render);
 		void Render(Grafkit::Renderer & render);
 
-		void SetRootNode(ActorRef &root) { m_pScenegraph = root; }
+		void SetRootNode(ActorRef root) { m_pScenegraph = root; }
 
 		// --- 
+		
+		void AddCameraNode(ActorRef camera);
+		void SetActiveCamera(size_t id = 0) { m_activeCamera = m_cameraNodes[id]; }
+		ActorRef GetActiveCamera() { return m_activeCamera; }
 
-		CameraRef GetCamera() { 
-			return (this->m_pCameraNode.Valid() && !this->m_pCameraNode->GetEntities().empty()) ? dynamic_cast<Camera*>(this->m_pCameraNode->GetEntities()[0].Get()) : nullptr;
-		}
+		size_t GetCameraCount() { return m_cameraNodes.size(); }
+		ActorRef GetCamera(size_t id) { return m_cameraNodes[id]; }
 
-		void SetCameraNode(ActorRef &camera);
-		void AddLightNode(ActorRef &light);
+		void AddLightNode(ActorRef light);
 
-		LightRef GetLight(int n) { return dynamic_cast<BaseLight*>(this->m_pvLightNodes[n]->GetEntities()[0].Get()); }
-		size_t GetLightCount() { return this->m_pvLightNodes.size(); }
+		ActorRef GetLight(int n) { return this->m_lightNodes[n]; }
+		size_t GetLightCount() { return this->m_lightNodes.size(); }
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
@@ -58,8 +60,9 @@ namespace Grafkit {
 		ActorRef m_pScenegraph;
 		// fenyek + camera
 
-		ActorRef m_pCameraNode;
-		std::vector<ActorRef> m_pvLightNodes;
+		ActorRef m_activeCamera;
+		std::vector<ActorRef> m_cameraNodes;
+		std::vector<ActorRef> m_lightNodes;
 		
 		// std::vector<LightRef> m_rvLights;
 		// CameraRef m_rCamera;
@@ -77,9 +80,12 @@ namespace Grafkit {
 
 		Grafkit::Matrix m_currentWorldMatrix;
 		std::stack<Grafkit::Matrix> m_worldMatrixStack; 
+		
+		Grafkit::Matrix m_cameraViewMatrix;
+		Grafkit::Matrix m_cameraProjectionMatrix;
 
 	private:
-			
+		Grafkit::Matrix CalcNodeTransformTree(ActorRef &actor, Grafkit::Matrix &matrix);
 	};
 
 	typedef Ref<Scene> SceneRef;

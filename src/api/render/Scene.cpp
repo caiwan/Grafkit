@@ -7,6 +7,8 @@
 using Grafkit::Actor;
 using Grafkit::Entity3D;
 
+using namespace FWdebugExceptions;
+
 Grafkit::Scene::Scene():
 	m_pScenegraph(nullptr)
 {
@@ -29,14 +31,14 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 		matrix projectionMatrix;
 	} viewMatrices;
 
-	CameraRef &camera = GetCamera();
-	camera->Calculate(render);
+	// CameraRef &camera = GetActiveCamera();
+	// camera->Calculate(render);
 
 	viewMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
-	viewMatrices.viewMatrix = XMMatrixTranspose(camera->GetViewMatrix().Get());
-	viewMatrices.projectionMatrix = XMMatrixTranspose(camera->GetProjectionMatrix().Get());
+	
+	viewMatrices.viewMatrix = XMMatrixTranspose(m_cameraViewMatrix.Get());
+	viewMatrices.projectionMatrix = XMMatrixTranspose(m_cameraProjectionMatrix.Get());
 
-	//((Shader)(*m_vertexShader))["MatrixBuffer"] = &viewMatrices;
 	m_vertexShader->GetParam("MatrixBuffer").SetP(&viewMatrices);
 
 	//ez itt elviekben jo kell, hogy legyen
@@ -47,30 +49,49 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	RenderNode(render, m_pScenegraph);
 }
 
-void Grafkit::Scene::SetCameraNode(ActorRef & camera)
+void Grafkit::Scene::AddCameraNode(ActorRef camera)
 {
-	m_pCameraNode = camera;
+	m_cameraNodes.push_back(camera);
+	SetActiveCamera();
 }
 
-void Grafkit::Scene::AddLightNode(ActorRef & light)
+void Grafkit::Scene::AddLightNode(ActorRef light)
 {
-	m_pvLightNodes.push_back(light);
+	m_lightNodes.push_back(light);
 }
 
 
 void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
-	// fogja a camera nodeot
-	// kiszamolja a framere vonatkozoan a koordinatat
-	// beseteli a cameraRef-be
-	// orul
+	// --- kamera
+	ActorRef &cameraActor = GetActiveCamera();
+	if (cameraActor.Valid() && (!cameraActor->GetEntities().empty() && cameraActor->GetEntities()[0].Valid())) {
+		// itt csak az elso entitast vesszuk figyelembe
+		Camera * camera = dynamic_cast<Camera *>(cameraActor->GetEntities()[0].Get());
+		if (camera) {
+			camera->Calculate(render);
+			m_cameraProjectionMatrix = camera->GetProjectionMatrix();
 
+			m_cameraViewMatrix = CalcNodeTransformTree(cameraActor, camera->GetViewMatrix());
+		}
+		else {
+			throw EX(NullPointerException);
+		}
+	}
+	else {
+		throw EX_DETAILS(NullPointerException, "Camera actor nem jo, vagy Nem seteltel be a nodeba kamerat");
+	}
+	
+	// --- fenyek
 	// ugyanezt a fenyekre
-	for (size_t i = 0; i < m_pvLightNodes.size(); i++) {
+	for (size_t i = 0; i < m_lightNodes.size(); i++) {
 		// ... 
 	}
 
+	return;
+
 	// minden nodeot prerendererel, ha kell;
+	// ... 
 }
 
 void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)
@@ -106,4 +127,24 @@ void Grafkit::Scene::pop()
 {
 	m_currentWorldMatrix = this->m_worldMatrixStack.top();
 	this->m_worldMatrixStack.pop();
+}
+
+Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor, Grafkit::Matrix & matrix)
+{
+	ActorRef & node = actor;
+
+	Matrix result = matrix;
+
+	do {
+		Matrix mat;
+		mat.Multiply(actor->Matrix());
+		mat.Multiply(actor->Transform());
+		mat.Multiply(result);
+
+		result = mat;
+
+		node = node->GetParent();
+	} while (node.Valid());
+
+	return result;
 }
