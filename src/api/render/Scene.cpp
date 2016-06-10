@@ -133,7 +133,7 @@ Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor, Grafkit:
 {
 	ActorRef & node = actor;
 
-	Matrix result = matrix;
+	Matrix result; // = matrix;
 
 	do {
 		Matrix mat;
@@ -145,6 +145,8 @@ Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor, Grafkit:
 
 		node = node->GetParent();
 	} while (node.Valid());
+
+	result.Multiply(matrix);
 
 	return result;
 }
