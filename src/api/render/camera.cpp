@@ -85,6 +85,7 @@ void Camera::Calculate(Renderer& renderer)
 	upVector = XMVector3TransformCoord(upVector, rotationMatrix);
 
 	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
+	lookAtVector = XMVector3Normalize(lookAtVector);
 
 	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
 
