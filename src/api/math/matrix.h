@@ -149,6 +149,14 @@ namespace Grafkit {
 			mat = XMMatrixTranspose(mat);
 		}
 
+		/// Invert matrix
+		void InvertTransformation() {
+			/*
+			Egy transformacios matrix inverze megeyeyik a felso 3x3 minormatrix transfromaltjaval, es a 
+			3. oszlopbol kepzett 3 komponensu vektor inverzevel
+			*/
+		}
+
 		// ===
 		// --- operations
 
