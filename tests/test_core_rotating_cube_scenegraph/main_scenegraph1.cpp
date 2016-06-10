@@ -71,6 +71,7 @@ protected:
 
 			// -- camera
 			CameraRef camera = new Camera;
+			// camera->SetPosition(20.0f, 5.0f, -10.0f);
 			camera->SetPosition(0.0f, 0.0f, -10.0f);
 
 			// -- texture
