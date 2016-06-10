@@ -125,7 +125,7 @@ protected:
 			m_rootActor = rootActor;
 
 			scene->SetRootNode(rootActor);
-			scene->SetCameraNode(cameraActor);
+			scene->AddCameraNode(cameraActor);
 			// scene->AddLightNode(lightActor);
 
 			scene->SetVShader(m_vertexShader);
