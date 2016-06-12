@@ -72,7 +72,7 @@ protected:
 			// -- camera
 			CameraRef camera = new Camera;
 			// camera->SetPosition(20.0f, 5.0f, -10.0f);
-			camera->SetPosition(0.0f, 0.0f, -10.0f);
+			camera->SetPosition(0.0f, 0.0f, -1.0f);
 
 			// -- texture
 			TextureResRef texture = new TextureRes();
@@ -131,6 +131,10 @@ protected:
 
 			scene->SetVShader(m_vertexShader);
 			scene->SetFShader(m_fragmentShader);
+
+			cameraActor->Matrix().Identity();
+			cameraActor->Matrix().Translate(0,0,10);
+
 
 			// --- 
 
