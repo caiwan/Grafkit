@@ -134,25 +134,29 @@ Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor, Grafkit:
 {
 	ActorRef & node = actor;
 
-	Matrix result; // = matrix;
+	Matrix result = matrix;
 
 	do {
-		Matrix mat, matTM;
-		
+		Matrix mat, matTM = actor->Transform();
 		matTM.Multiply(actor->Matrix());
-		matTM.Multiply(actor->Transform());
-		matTM.Invert();
-		
-		mat.Multiply(matTM);
+
+		mat.Identity();
+#if 1
+		mat = matTM;
 		mat.Multiply(result);
+
+		result = mat;
+#else 
+		mat.Multiply(result);
+		mat = matTM;
+		
+#endif
 
 		result = mat;
 
 		node = node->GetParent();
 	} while (node.Valid());
 
-	// result.Transpose();
-	result.Multiply(matrix);
 
 	return result;
 }
