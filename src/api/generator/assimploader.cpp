@@ -78,12 +78,21 @@ Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 	if (!m) 
 		throw EX(NullPointerException);
 
+#if 0 
 	return Grafkit::Matrix(
 		m->a1, m->a2, m->a3, m->a4,
 		m->b1, m->b2, m->b3, m->b4,
 		m->c1, m->c2, m->c3, m->c4,
 		m->d1, m->d2, m->d3, m->d4
-		);
+	);
+#else
+	return Grafkit::Matrix(
+		m->a1, m->b1, m->c1, m->d1,
+		m->a2, m->b2, m->c2, m->d2,
+		m->a3, m->b3, m->c3, m->d3,
+		m->a4, m->b4, m->c4, m->d4
+	);
+#endif
 }
 
 namespace {
@@ -161,7 +170,7 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 	if (result == AI_SUCCESS /*&& path.data[0]*/) {
 		LOGGER(Log::Logger().Trace("--- %s", name.c_str()));
 		texture = resman->Get<TextureRes>(name);
-		if (texture->Invalid())
+		if (texture.Invalid() || texture->Invalid())
 			throw EX_DETAILS(NullPointerException, name.c_str());
 	}
 
@@ -295,7 +304,10 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?
 	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
-		aiProcessPreset_TargetRealtime_Quality | aiProcess_ConvertToLeftHanded | /*aiProcess_GenNormals |*/ 0
+		aiProcessPreset_TargetRealtime_Quality | 
+		aiProcess_ConvertToLeftHanded |
+		// aiProcess_GenNormals |
+		0
 	);
 
 	if (!scene)
