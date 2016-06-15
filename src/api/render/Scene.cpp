@@ -23,8 +23,7 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
 	m_currentWorldMatrix.Identity();
 	
-	// + kamerat + fenyket at kell tudni adni valahol meg
-
+	// ezt a semat ki kell baszni innen 
 	struct {
 		matrix worldMatrix;
 		matrix viewMatrix;
@@ -72,8 +71,8 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 			camera->Calculate(render);
 			m_cameraProjectionMatrix = camera->GetProjectionMatrix();
 
-			m_cameraViewMatrix = camera->GetViewMatrix();
-			m_cameraViewMatrix = CalcNodeTransformTree(cameraActor, m_cameraViewMatrix);
+			//m_cameraViewMatrix = camera->GetViewMatrix();
+			m_cameraViewMatrix = CalcNodeTransformTree(cameraActor, camera->GetViewMatrix());
 		}
 		else {
 			throw EX(NullPointerException);
@@ -104,13 +103,10 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 
 	m_currentWorldMatrix.Multiply(actor->Matrix());
 	m_currentWorldMatrix.Multiply(actor->Transform());
-	matrix viewMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
-	//((Shader)(*m_vertexShader))["MatrixBuffer"]["worldMatrix"] = viewMatrix;
-	m_vertexShader->GetParam("MatrixBuffer").Get("worldMatrix").SetP(&viewMatrix);
+	matrix worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
+	m_vertexShader->GetParam("MatrixBuffer").Get("worldMatrix").SetP(&worldMatrix);
 
 	actor->Render(render, this);
-	
-	//push();
 	
 	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
 		RenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);
