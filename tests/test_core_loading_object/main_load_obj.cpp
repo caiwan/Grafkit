@@ -65,8 +65,7 @@ protected:
 
 		// -- camera
 		camera = new Camera();
-		camera->SetPosition(50.0f, 30.0f, -150.0f);
-		camera->SetClippingPlanes(30, 3000);
+		camera->SetPosition(00.0f, 00.0f, -10.0f);
 		camera->SetName("picsatengely");
 
 		// -- load shader
@@ -74,7 +73,7 @@ protected:
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new AssimpLoader("models/cornell.fbx", m_vertexShader));
+		scene = this->Load<SceneRes>(new AssimpLoader("models/cube.dae", m_vertexShader));
 
 		this->t = 0;
 
@@ -101,10 +100,7 @@ protected:
 		this->render.BeginScene();
 		{
 			(*this->scene)->PreRender(render);
-
 			(*this->scene)->Render(render);
-
-			this->t += 0.001;
 		}
 
 		this->render.EndScene();
