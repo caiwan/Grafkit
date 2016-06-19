@@ -78,7 +78,7 @@ Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 	if (!m) 
 		throw EX(NullPointerException);
 
-#if 0 
+#if 1
 	return Grafkit::Matrix(
 		m->a1, m->a2, m->a3, m->a4,
 		m->b1, m->b2, m->b3, m->b4,
