@@ -65,7 +65,10 @@ protected:
 
 		// -- camera
 		camera = new Camera();
-		camera->SetPosition(00.0f, 00.0f, -10.0f);
+		// float x = 7.48113f, y = 6.50764f, z = -5.34367f;
+		float x = 0, y = 0, z = 1;
+		// camera->SetPosition(7.48113f, 6.50764f, -5.34367f);
+		camera->SetPosition(-x,-z,-y);
 		camera->SetName("picsatengely");
 
 		// -- load shader
@@ -81,6 +84,8 @@ protected:
 
 		ActorRef camera_actor = new Actor;
 		camera_actor->AddEntity(camera);
+		scene->Get()->GetRootNode()->AddChild(camera_actor);
+		
 		camera_actor->SetName("picsatengely_szinesz");
 		scene->Get()->AddCameraNode(camera_actor);
 		scene->Get()->SetActiveCamera(scene->Get()->GetCameraCount() - 1);
