@@ -31,6 +31,7 @@ namespace Grafkit {
 		void Render(Grafkit::Renderer & render);
 
 		void SetRootNode(ActorRef root) { m_pScenegraph = root; }
+		ActorRef& GetRootNode() { return m_pScenegraph; }
 
 		// --- 
 		
