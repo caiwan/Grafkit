@@ -72,7 +72,7 @@ protected:
 			// -- camera
 			CameraRef camera = new Camera;
 			// camera->SetPosition(20.0f, 5.0f, -10.0f);
-			camera->SetPosition(0.0f, 0.0f, -1.0f);
+			camera->SetPosition(0.0f, 0.0f, 0.0f);
 
 			// -- texture
 			TextureResRef texture = new TextureRes();
@@ -155,8 +155,14 @@ protected:
 			{				
 				ShaderRef fragmentShader = this->m_fragmentShader->Get();
 
+				/*
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
+				*/
+
+				scene->GetActiveCamera()->Transform().Identity();
+				scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
+				
 
 				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 
