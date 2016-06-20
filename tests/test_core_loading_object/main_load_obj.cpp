@@ -65,8 +65,10 @@ protected:
 
 		// -- camera
 		camera = new Camera();
-		// camera->SetPosition(0.0f, 30.0f, -150.0f);
-		// camera->SetClippingPlanes(30, 3000);
+		// float x = 7.48113f, y = 6.50764f, z = -5.34367f;
+		float x = 0, y = 0, z = -10;
+		// camera->SetPosition(7.48113f, 6.50764f, -5.34367f);
+		camera->SetPosition(-x,-z,-y);
 		camera->SetName("picsatengely");
 
 		// -- load shader
@@ -74,7 +76,7 @@ protected:
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new AssimpLoader("models/kockak.dae", m_vertexShader));
+		scene = this->Load<SceneRes>(new AssimpLoader("models/cube.dae", m_vertexShader));
 
 		this->t = 0;
 
