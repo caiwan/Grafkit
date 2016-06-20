@@ -238,7 +238,7 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 	LOGGER(if(ai_node->mNumMeshes) Log::Logger().Trace(" %s", kbuf));
 
 	actor->SetName(ai_node->mName.C_Str());
-	actor->Matrix() = ai4x4MatrixToFWMatrix(&ai_node->mTransformation);
+	actor->Matrix().Set(ai4x4MatrixToFWMatrix(&ai_node->mTransformation));
 	
 	// ezekkel mit lehet meg kezdeni:
 	//for (i = 0; i < ai_node->mMetaData->mNumProperties; i++) {
@@ -532,7 +532,13 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	assimp_parseScenegraph(resourceRepo, scene->mRootNode, root_node);
 	outScene->SetRootNode(root_node);
 
-	// kamera helyenek kiszedese a scenegraphbol
+	/* Workaround: 
+	 * a root node matrixat identbe kell tenni, mert vices dolgokat csinal
+	 */
+
+	root_node->Matrix().Identity();
+
+	// --- kamera helyenek kiszedese a scenegraphbol
 	if (scene->HasCameras()) {
 		for (i = 0; i < scene->mNumCameras; i++) {
 			aiCamera *curr_camera = scene->mCameras[i];

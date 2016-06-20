@@ -160,6 +160,9 @@ namespace Grafkit {
 		// ===
 		// --- operations
 
+		void Set(const Matrix& m) { mat = m.mat; }
+		void Set(const matrix& m) { mat = m; }
+
 		/// @note operator= valamiert nem mukodik, kiveve, ha ... 
 		Matrix& operator= (const Matrix& m) 
 		{
