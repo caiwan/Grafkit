@@ -463,6 +463,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			camera->SetClippingPlanes(curr_camera->mClipPlaneNear, curr_camera->mClipPlaneFar);
 
 			// camera <- assmimp camera
+			
 			assimp_v3d_f3_set(curr_camera->mPosition, camera->SetPosition);
 			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLookAt);
 			assimp_v3d_f3_set(curr_camera->mUp, camera->SetUp);
@@ -536,7 +537,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	 * a root node matrixat identbe kell tenni, mert vices dolgokat csinal
 	 */
 
-	root_node->Matrix().Identity();
+	// root_node->Matrix().Identity();
 
 	// --- kamera helyenek kiszedese a scenegraphbol
 	if (scene->HasCameras()) {

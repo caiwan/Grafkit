@@ -1,3 +1,6 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "core/system.h"
 
 #include "render/renderer.h"
@@ -38,11 +41,12 @@ public:
 
 protected:
 	Renderer render;
-	CameraRef camera;
 	
-	SceneResRef scene;
+	ActorRef m_currCameraActor;
+	
+	SceneResRef m_scene;
 
-	float t;
+	float m_t;
 
 	ShaderResRef m_vertexShader;
 	ShaderResRef m_fragmentShader;
@@ -63,36 +67,21 @@ protected:
 
 		LoadCache();
 
-		// -- camera
-		camera = new Camera();
-		// float x = 7.48113f, y = 6.50764f, z = -5.34367f;
-		float x = 0, y = 0, z = -10;
-		// camera->SetPosition(7.48113f, 6.50764f, -5.34367f);
-		camera->SetPosition(-x,-z,-y);
-		camera->SetName("picsatengely");
-
 		// -- load shader
 		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new AssimpLoader("models/cube.dae", m_vertexShader));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/fuckyou.dae", m_vertexShader));
 
-		this->t = 0;
+		m_t = 0;
 
 		DoPrecalc();
 
-		ActorRef camera_actor = new Actor;
-		camera_actor->AddEntity(camera);
-		scene->Get()->GetRootNode()->AddChild(camera_actor);
-		
-		camera_actor->SetName("picsatengely_szinesz");
-		scene->Get()->AddCameraNode(camera_actor);
+		m_currCameraActor = m_scene->Get()->GetActiveCamera();
 
-		scene->Get()->SetActiveCamera(scene->Get()->GetCameraCount() - 1);
-
-		scene->Get()->SetVShader(m_vertexShader);
-		scene->Get()->SetFShader(m_fragmentShader);
+		m_scene->Get()->SetVShader(m_vertexShader);
+		m_scene->Get()->SetFShader(m_fragmentShader);
 
 		return 0;
 	};
@@ -105,8 +94,16 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
-			(*this->scene)->PreRender(render);
-			(*this->scene)->Render(render);
+			float alpha = - M_PI / 2;
+
+			m_currCameraActor->Transform().Identity();
+			//m_currCameraActor->Transform().RotateRPY(-alpha, alpha, 0);
+			//m_currCameraActor->Transform().Translate(alpha, 0, 0);
+
+			(*this->m_scene)->PreRender(render);
+			(*this->m_scene)->Render(render);
+
+			m_t += 0.001;
 		}
 
 		this->render.EndScene();
