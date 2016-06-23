@@ -19,7 +19,7 @@ Camera::Camera() : Entity3D()
 	m_screenWidth = 100;
 
 	m_position = float3(0, 0, 0);
-	m_lookAt = float3(0, 0, 1);
+	m_look = float3(0, 0, 1);
 	m_up = float3(0, 1, 0);
 	m_rotation = float3(0, 0, 0);
 }
@@ -38,11 +38,11 @@ void Camera::SetPosition(float x, float y, float z)
 }
 
 
-void Grafkit::Camera::SetLookAt(float x, float y, float z)
+void Grafkit::Camera::SetLook(float x, float y, float z)
 {
-	m_lookAt.x=x;
-	m_lookAt.y=y;
-	m_lookAt.z=z;
+	m_look.x=x;
+	m_look.y=y;
+	m_look.z=z;
 }
 
 void Grafkit::Camera::SetUp(float x, float y, float z)
@@ -65,7 +65,7 @@ void Camera::SetRotation(float x, float y, float z)
 void Camera::Calculate(Renderer& renderer)
 {
 	XMFLOAT3 up, lookAt;
-	XMVECTOR upVector, positionVector, lookAtVector;
+	XMVECTOR upVector, positionVector, lookVector;
 	float yaw, pitch, roll;
 	XMMATRIX rotationMatrix;
 
@@ -73,7 +73,7 @@ void Camera::Calculate(Renderer& renderer)
 
 	positionVector = XMLoadFloat3(&m_position);
 
-	lookAtVector = XMLoadFloat3(&m_lookAt);
+	lookVector = XMLoadFloat3(&m_look);
 
 	pitch = m_rotation.x * 0.0174532925f;
 	yaw   = m_rotation.y * 0.0174532925f;
@@ -81,49 +81,20 @@ void Camera::Calculate(Renderer& renderer)
 
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
-	lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
+	lookVector = XMVector3TransformCoord(lookVector, rotationMatrix);
 	upVector = XMVector3TransformCoord(upVector, rotationMatrix);
 
-	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
-	lookAtVector = XMVector3Normalize(lookAtVector);
+	lookVector = XMVectorAdd(positionVector, lookVector);
+	lookVector = XMVector3Normalize(lookVector);
 
 	renderer.GetScreenSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
-#if 1
-
-	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+	m_viewMatrix = XMMatrixLookToLH(positionVector, lookVector, upVector);
 
 	// --- projection & ortho --- 
 	m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
 	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
 
-#else
 
-	m_viewMatrix = XMMatrixLookAtRH(positionVector, lookAtVector, upVector);
-
-	// --- projection & ortho --- 
-	m_projectionMatrix = XMMatrixPerspectiveFovRH(m_fov, m_aspect, m_znear, m_zfar);
-	m_orthoMatrix = XMMatrixOrthographicRH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
-
-#endif
 	}
-
-
-//void Camera::GetViewMatrix(matrix& viewMatrix)
-//{
-//	viewMatrix = m_viewMatrix;
-//}
-//
-//
-//void Grafkit::Camera::GetProjectionMatrix(matrix & matrix)
-//{
-//	matrix = m_projectionMatrix;
-//}
-//
-//
-//void Grafkit::Camera::GetOrthoMatrix(matrix & matrix)
-//{
-//	matrix = m_orthoMatrix;
-//}
-

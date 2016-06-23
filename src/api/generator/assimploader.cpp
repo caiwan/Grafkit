@@ -384,8 +384,6 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			mesh->SetName(mesh_name);
 
 			SimpleMeshGenerator generator(resman->GetDeviceContext(), inputSchema);
-
-#if 1
 			
 			std::vector<float4> vertices;
 			std::vector<float2> texuvs;
@@ -412,7 +410,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 				generator["TEXCOORD"] = &texuvs[0];
 				generator["TANGENT"] = &tangents[0];
 			}
-#endif
+
 			// -- faces
 
 			///@todo az indexek gyujteset lehessen kulturaltabb modon is vegezni valahogy
@@ -463,9 +461,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			// camera <- assmimp camera
 			
 			assimp_v3d_f3_set(curr_camera->mPosition, camera->SetPosition);
-			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLookAt);
+			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLook);
 			assimp_v3d_f3_set(curr_camera->mUp, camera->SetUp);
-			// camera->SetUp(0, -1, 0);
 
 			// itt van meg aspekt, amivel kezdeni lehetne valamit
 

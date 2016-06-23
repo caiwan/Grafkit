@@ -26,7 +26,7 @@ namespace Grafkit {
 		void SetPosition(float x, float y, float z);
 		float3 &GetPosition() { return this->m_position; }
 		
-		void SetLookAt(float x, float y, float z);
+		void SetLook(float x, float y, float z);
 		float3 &GetLookAt() { return this->m_position; }
 
 		void SetUp(float x, float y, float z);
@@ -62,7 +62,7 @@ namespace Grafkit {
 
 	private:
 		float3 m_position;
-		float3 m_lookAt;
+		float3 m_look;
 		float3 m_up;
 		float3 m_rotation;
 
