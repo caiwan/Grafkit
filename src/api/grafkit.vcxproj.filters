@@ -128,22 +128,7 @@
     <ClCompile Include="utils\exceptions.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\guid.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\json.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="utils\logger.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\memory.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\memory_alloc.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\node.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\persistent.cpp">
@@ -159,12 +144,6 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\struct_pack.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\tree.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\XML.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="valtracker\valtracker.cpp">
@@ -286,28 +265,10 @@
     <ClInclude Include="utils\exceptions.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\guid.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\iterator.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\json.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
     <ClInclude Include="utils\logger.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\memory.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
     <ClInclude Include="utils\memory_align.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\memory_alloc.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\node.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="utils\persistent.h">
@@ -326,12 +287,6 @@
       <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="utils\struct_pack.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\tree.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\XML.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="valtracker\valtracker.h">

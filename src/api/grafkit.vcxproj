@@ -54,34 +54,12 @@
     <ClCompile Include="utils\AssetFactory.cpp" />
     <ClCompile Include="utils\AssetFile.cpp" />
     <ClCompile Include="utils\exceptions.cpp" />
-    <ClCompile Include="utils\guid.cpp" />
-    <ClCompile Include="utils\json.cpp" />
     <ClCompile Include="utils\logger.cpp" />
-    <ClCompile Include="utils\memory.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="utils\memory_alloc.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="utils\node.cpp" />
     <ClCompile Include="utils\persistent.cpp" />
     <ClCompile Include="utils\resource.cpp" />
     <ClCompile Include="utils\ResourceBuilder.cpp" />
     <ClCompile Include="utils\ResourceManager.cpp" />
     <ClCompile Include="utils\struct_pack.cpp" />
-    <ClCompile Include="utils\tree.cpp" />
-    <ClCompile Include="utils\XML.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="valtracker\rocket\device.c" />
     <ClCompile Include="valtracker\rocket\track.c" />
     <ClCompile Include="valtracker\valtracker.cpp" />
@@ -123,37 +101,14 @@
     <ClInclude Include="utils\dirent.h" />
     <ClInclude Include="utils\dynamics.h" />
     <ClInclude Include="utils\exceptions.h" />
-    <ClInclude Include="utils\guid.h" />
-    <ClInclude Include="utils\iterator.h" />
-    <ClInclude Include="utils\json.h" />
     <ClInclude Include="utils\logger.h" />
-    <ClInclude Include="utils\memory.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="utils\memory_align.h" />
-    <ClInclude Include="utils\memory_alloc.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="utils\node.h" />
     <ClInclude Include="utils\persistent.h" />
     <ClInclude Include="utils\reference.h" />
     <ClInclude Include="utils\resource.h" />
     <ClInclude Include="utils\ResourceBuilder.h" />
     <ClInclude Include="utils\ResourceManager.h" />
     <ClInclude Include="utils\struct_pack.h" />
-    <ClInclude Include="utils\tree.h" />
-    <ClInclude Include="utils\XML.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="valtracker\rocket\base.h" />
     <ClInclude Include="valtracker\rocket\device.h" />
     <ClInclude Include="valtracker\rocket\sync.h" />
