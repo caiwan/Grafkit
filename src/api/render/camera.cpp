@@ -87,15 +87,27 @@ void Camera::Calculate(Renderer& renderer)
 	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 	lookAtVector = XMVector3Normalize(lookAtVector);
 
-	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
-
-	// --- projection & ortho --- 
 	renderer.GetScreenSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
+#if 1
+
+	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+
+	// --- projection & ortho --- 
 	m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
 	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
-}
+
+#else
+
+	m_viewMatrix = XMMatrixLookAtRH(positionVector, lookAtVector, upVector);
+
+	// --- projection & ortho --- 
+	m_projectionMatrix = XMMatrixPerspectiveFovRH(m_fov, m_aspect, m_znear, m_zfar);
+	m_orthoMatrix = XMMatrixOrthographicRH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
+
+#endif
+	}
 
 
 //void Camera::GetViewMatrix(matrix& viewMatrix)

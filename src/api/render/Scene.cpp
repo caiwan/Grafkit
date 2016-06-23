@@ -71,8 +71,11 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 			camera->Calculate(render);
 			m_cameraProjectionMatrix = camera->GetProjectionMatrix();
 
-			// m_cameraViewMatrix = camera->GetViewMatrix();
-			m_cameraViewMatrix = CalcNodeTransformTree(cameraActor, camera->GetViewMatrix());
+			Matrix mc = camera->GetViewMatrix();
+			//mc.Invert();
+			
+			m_cameraViewMatrix = CalcNodeTransformTree(cameraActor);
+			m_cameraViewMatrix.Multiply(mc);
 		}
 		else {
 			throw EX(NullPointerException);
@@ -126,41 +129,22 @@ void Grafkit::Scene::pop()
 	this->m_worldMatrixStack.pop();
 }
 
-Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor, Grafkit::Matrix & matrix)
+Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor)
 {
 	ActorRef & node = actor;
 
-	Matrix result;// = matrix;
+	Matrix result;
 
 	do {
-		Matrix mat;
-#if 0
-		MAtrix matTM = actor->Transform();
+		Matrix matTM = actor->Transform();
 		matTM.Multiply(actor->Matrix());
-#else
-		Matrix matTM = actor->Matrix();
-		matTM.Multiply(actor->Transform());
-#endif
+
 		matTM.Invert();
-		mat.Identity();
-#if 0
-		mat = matTM;
-		mat.Multiply(result);
 
-		result = mat;
-#else 
-		mat.Multiply(result);
-		mat.Multiply(matTM);
-		
-#endif
-
-		result = mat;
-		
+		result.Multiply(matTM);
 
 		node = node->GetParent();
 	} while (node.Valid());
-
-	result.Multiply(matrix);
 
 	return result;
 }

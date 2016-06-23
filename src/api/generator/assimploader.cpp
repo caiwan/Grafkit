@@ -31,8 +31,6 @@ using namespace FWdebugExceptions;
 // Assimp helpers
 // ================================================================================================================================================================
 
-
-
 // aiVector3D to float3
 #define assimp_v3d_f3(SRC, DST)\
 {\
@@ -302,7 +300,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
 		aiProcessPreset_TargetRealtime_Quality | 
 		aiProcess_ConvertToLeftHanded |
-		// aiProcess_GenNormals |
+		// aiProcess_GenNormals | // ez valamiert elszarik
 		0
 	);
 
@@ -467,6 +465,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			assimp_v3d_f3_set(curr_camera->mPosition, camera->SetPosition);
 			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLookAt);
 			assimp_v3d_f3_set(curr_camera->mUp, camera->SetUp);
+			// camera->SetUp(0, -1, 0);
 
 			// itt van meg aspekt, amivel kezdeni lehetne valamit
 

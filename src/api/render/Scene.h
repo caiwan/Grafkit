@@ -86,7 +86,7 @@ namespace Grafkit {
 		Grafkit::Matrix m_cameraProjectionMatrix;
 
 	private:
-		Grafkit::Matrix CalcNodeTransformTree(ActorRef &actor, Grafkit::Matrix &matrix);
+		Grafkit::Matrix CalcNodeTransformTree(ActorRef &actor);
 	};
 
 	typedef Ref<Scene> SceneRef;
