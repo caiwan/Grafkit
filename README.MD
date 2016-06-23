@@ -9,3 +9,9 @@ TBD. It currently uses a subrepo as package manager, because NuGet is not enough
 
 - Fmod (not Bass)
 - Assimp
+
+# Future plans
+
+- Make it work
+- Win Function
+- Take world domination
