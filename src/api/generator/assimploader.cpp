@@ -195,7 +195,7 @@ typedef struct {
  * @param actor_node az a scenegraph node, mai epp feltoltunk
  * @param maxdepth stack overflow ellen
 */
-void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &actor_node, int maxdepth = TREE_MAXDEPTH)
+void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &actor_node, int maxdepth = 1024)
 {
 	size_t i=0, j=0, k = 0;
 
@@ -208,7 +208,7 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 	ActorRef actor = new Actor();
 
 	LOGGER(
-		int depth = TREE_MAXDEPTH - maxdepth; char tab[TREE_MAXDEPTH]; tab[depth] = 0;
+		int depth = 1024 - maxdepth; char tab[1024]; tab[depth] = 0;
 		while (depth--) tab[depth] = ' ';
 	);
 
