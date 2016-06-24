@@ -1,0 +1,9 @@
+*.jpg binary
+*.png binary
+*.ogg binary
+*.mp3 binary
+*.zip binary
+*.hlsl text eol=crlf
+*.dae text eol=lf
+*.fbx binary
+*.3ds binary
