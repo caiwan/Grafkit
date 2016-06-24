@@ -2,15 +2,10 @@
 
 #include <stack>
 
-#include "../utils/tree.h"
-#include "../utils/memory_align.h"
-
-#include "../math/matrix.h"
+#include "../stdafx.h"
 
 #include "renderer.h"
-
 #include "Actor.h"
-
 #include "camera.h"
 #include "Light.h"
 
@@ -64,16 +59,12 @@ namespace Grafkit {
 		ActorRef m_activeCamera;
 		std::vector<ActorRef> m_cameraNodes;
 		std::vector<ActorRef> m_lightNodes;
-		
-		// std::vector<LightRef> m_rvLights;
-		// CameraRef m_rCamera;
 
-		//shader_pair_t m_shader;
 		ShaderRef m_vertexShader;
 		ShaderRef m_fragmentShader;
 
 	private:
-		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = TREE_MAXDEPTH);
+		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
 		void push();
 		void pop();
 
