@@ -27,11 +27,11 @@ namespace Grafkit{
 		friend class IResourceManager;
 
 	public:
-		IResource();
-		virtual ~IResource();
+		IResource() {}
+		virtual ~IResource() {}
 
 		std::string GetName() { return this->m_name; }
-		void SetName(std::string name);
+		void SetName(std::string name) { m_name = name; }
 
 	protected:
 		/// Sets asset manager 
@@ -61,4 +61,3 @@ namespace Grafkit{
 	};
 
 }
-

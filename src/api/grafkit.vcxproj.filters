@@ -131,9 +131,6 @@
     <ClCompile Include="utils\persistent.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\resource.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="utils\ResourceBuilder.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
