@@ -116,9 +116,6 @@
     <ClCompile Include="utils\archive.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="utils\asset.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="utils\AssetFactory.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>

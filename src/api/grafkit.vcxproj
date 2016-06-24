@@ -50,7 +50,6 @@
     <ClCompile Include="render\texture.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="utils\archive.cpp" />
-    <ClCompile Include="utils\asset.cpp" />
     <ClCompile Include="utils\AssetFactory.cpp" />
     <ClCompile Include="utils\AssetFile.cpp" />
     <ClCompile Include="utils\exceptions.cpp" />
