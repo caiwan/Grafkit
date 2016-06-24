@@ -14,8 +14,6 @@ namespace Grafkit {
 	class Scene;
 	typedef Ref<Scene> SceneRef;
 
-#define SCENE_BUCKET "scene"
-
 	__declspec(align(16)) class Scene : virtual public Referencable, public AlignedNew<Scene>
 	{
 	public:
@@ -50,11 +48,8 @@ namespace Grafkit {
 		void SetVShader(ShaderRef &VS) {this->m_vertexShader = VS; }
 		void SetFShader(ShaderRef &FS) {this->m_fragmentShader = FS; }
 
-		virtual const char* GetBucketID() { return SCENE_BUCKET; }
-
 	protected:
 		ActorRef m_pScenegraph;
-		// fenyek + camera
 
 		ActorRef m_activeCamera;
 		std::vector<ActorRef> m_cameraNodes;
