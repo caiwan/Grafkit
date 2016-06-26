@@ -28,10 +28,10 @@
       <FileName>core\AssetFactory.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Grafkit::FileAssetManager">
+  <Class Name="Grafkit::FileAssetFactory">
     <Position X="2.75" Y="0.5" Width="1.5" />
     <NestedTypes>
-      <Class Name="Grafkit::FileAssetManager::FileAsset" Collapsed="true">
+      <Class Name="Grafkit::FileAssetFactory::FileAsset" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>core\AssetFile.h</NewMemberFileName>
         </TypeIdentifier>

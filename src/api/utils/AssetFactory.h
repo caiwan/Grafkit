@@ -4,12 +4,12 @@
 #include <string>
 #include <set>
 
-#include "exceptions.h"
-#include "reference.h"
-
+#include "../stdafx.h"
 #include "asset.h"
 
 namespace Grafkit {
+
+	class IResourceManager;
 
 	// ----------
 	/// An interface to create filters over resources
@@ -41,6 +41,8 @@ namespace Grafkit {
 		// IAssetFactory(const char ** const & extensions, size_t count);
 
 		virtual ~IAssetFactory() {}
+
+		virtual void PollEvents(IResourceManager *resman) {}
 
 	public:
 

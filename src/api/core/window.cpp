@@ -94,7 +94,7 @@ void Window::init() {
 	windowClass.hInstance = GetModuleHandle(NULL);
 	windowClass.hbrBackground = (HBRUSH)(COLOR_APPWORKSPACE);
 	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	windowClass.lpszClassName = L"Engine";
+	windowClass.lpszClassName = "Engine";
 	if (RegisterClassEx(&windowClass) == 0)
 	{
 		MessageBox(HWND_DESKTOP, _T("RegisterClassEx Failed!"), _T("Error"), MB_OK | MB_ICONEXCLAMATION);
@@ -141,7 +141,7 @@ void Window::createWindow(int sx, int sy, int isfullscreen){
 		windowFrame = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU ;
 	}
 
-	this->hWnd = CreateWindowExW(windowExStyle, _T("Engine"), this->wndtitle, windowStyle | windowFrame, windowRect.top, windowRect.left, windowRect.right, windowRect.bottom, NULL, NULL, GetModuleHandle( 0 ), NULL );
+	this->hWnd = CreateWindowEx(windowExStyle, _T("Engine"), this->wndtitle, windowStyle | windowFrame, windowRect.top, windowRect.left, windowRect.right, windowRect.bottom, NULL, NULL, GetModuleHandle( 0 ), NULL );
 
 	if( hWnd == NULL ){
 		MessageBox (HWND_DESKTOP, _T("Cannot create window"), _T("Error"), MB_OK | MB_ICONEXCLAMATION);

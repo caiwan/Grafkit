@@ -6,30 +6,46 @@
 #include "AssetFactory.h"
 
 namespace Grafkit {
-	// loads resources from file
-	class FileAssetManager : public IAssetFactory
+
+	/** 
+		File event watcher interface a live reloadingohz
+	*/
+	class IFileEventWatch {
+	public:
+		IFileEventWatch() {}
+		virtual ~IFileEventWatch() {}
+
+		virtual void Poll(IResourceManager *resman) = 0;
+	};
+
+	/**
+		Filebol allit elo asseteket	
+	*/
+	class FileAssetFactory : public IAssetFactory
 	{
 	public:
 		class FileAsset;
 
 	public:
-		//FileAssetManager(const char* root);
-		FileAssetManager(std::string root);
-		~FileAssetManager();
+		FileAssetFactory(std::string root);
+		~FileAssetFactory();
 
 		virtual IAssetRef Get(std::string name);
-		//virtual IAssetRef GetResourceByUUID(Guid uuid);
 
 		virtual filelist_t GetAssetList();
 		virtual filelist_t GetAssetList(AssetFileFilter * filter);
+
+		virtual void PollEvents(IResourceManager *resman);
 
 	private:
 		std::string m_root;
 		filelist_t m_dirlist;
 
+		IFileEventWatch *m_eventWatcher;
+
 	public:
 		class FileAsset : public IAsset {
-			friend class FileAssetManager;
+			friend class FileAssetFactory;
 		public:
 			FileAsset() : m_size(0), m_data(nullptr) {}
 			~FileAsset();

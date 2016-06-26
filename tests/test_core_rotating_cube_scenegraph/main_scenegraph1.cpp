@@ -66,7 +66,7 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetManager("./../assets/");
+			this->m_file_loader = new FileAssetFactory("./../assets/");
 
 			// --------------------------------------------------
 
@@ -204,7 +204,7 @@ protected:
 		};
 	
 	private:
-		FileAssetManager *m_file_loader;
+		FileAssetFactory *m_file_loader;
 
 	public:
 		IAssetFactory* GetAssetFactory() { return m_file_loader; };

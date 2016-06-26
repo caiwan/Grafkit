@@ -74,7 +74,7 @@ class Window
 	private:
 		WindowHandler *& handler;
 
-		WCHAR wndtitle[512];
+		CHAR wndtitle[512];
 
 		int w_height, w_width;
 		int r_height, r_width;

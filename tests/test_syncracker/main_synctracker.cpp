@@ -88,7 +88,7 @@ protected:
 		this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 		// init file loader
-		this->m_file_loader = new FileAssetManager("./../../assets/rotating_cube/");
+		this->m_file_loader = new FileAssetFactory("./../../assets/rotating_cube/");
 
 		// --------------------------------------------------
 
@@ -223,7 +223,7 @@ protected:
 	};
 
 private:
-	FileAssetManager *m_file_loader;
+	FileAssetFactory *m_file_loader;
 
 public:
 	IAssetFactory* GetAssetFactory() { return m_file_loader; };

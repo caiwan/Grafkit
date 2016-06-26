@@ -66,7 +66,7 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetManager("./");
+			this->m_file_loader = new FileAssetFactory("./");
 
 			// --------------------------------------------------
 
@@ -180,7 +180,7 @@ protected:
 		};
 	
 	private:
-		FileAssetManager *m_file_loader;
+		FileAssetFactory *m_file_loader;
 
 	public:
 		// Grafkit::IResourceManager* 

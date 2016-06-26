@@ -63,7 +63,7 @@ protected:
 		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 		// init file loader
-		this->m_file_loader = new Grafkit::FileAssetManager("./../assets/");
+		this->m_file_loader = new Grafkit::FileAssetFactory("./../assets/");
 
 		LoadCache();
 
@@ -72,7 +72,7 @@ protected:
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "fx/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/shphere.dae", m_vertexShader));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/kockak.fbx", m_vertexShader));
 
 		m_t = 0;
 
@@ -96,7 +96,7 @@ protected:
 		{
 			float alpha = - M_PI / 2;
 
-			m_currCameraActor->Transform().Identity();
+			// m_currCameraActor->Transform().Identity();
 			//m_currCameraActor->Transform().RotateRPY(-alpha, alpha, 0);
 			//m_currCameraActor->Transform().Translate(alpha, 0, 0);
 
