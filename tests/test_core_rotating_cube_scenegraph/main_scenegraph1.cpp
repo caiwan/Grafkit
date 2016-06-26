@@ -51,6 +51,7 @@ protected:
 		TextureSamplerRef m_textureSampler;
 
 		ActorRef m_rootActor;
+		ActorRef m_cameraActor;
 
 		float t;
 
@@ -65,27 +66,28 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetManager("./../../assets/rotating_cube/");
+			this->m_file_loader = new FileAssetManager("./../assets/");
 
 			// --------------------------------------------------
 
+			/* Itt letrhozzuk a kamerat, hozzaadjuk a scenehez, de nem kapcsoljuk hozza a scenegraphoz. */
+
 			// -- camera
+			/* Az alap kamera origoban van, +z iranzba nez, es +y felfele irany */
 			CameraRef camera = new Camera;
-			// camera->SetPosition(20.0f, 5.0f, -10.0f);
-			camera->SetPosition(0.0f, 0.0f, 0.0f);
 
 			// -- texture
 			TextureResRef texture = new TextureRes();
 
-			texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
+			texture = this->Load<TextureRes>(new TextureFromBitmap("textures/Untitled.png"));
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
 			m_textureSampler->Initialize(render);
 
 			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
-			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
+			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "fx/texture.hlsl", "TextureVertexShader", ST_Vertex));
+			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "fx/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 			// -- precalc
 			this->DoPrecalc();
@@ -104,36 +106,59 @@ protected:
 
 			// -- setup scene 
 			scene = new Scene();
-			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
-			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
 			
-			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
-			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
-
-			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
-			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
-
-			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
-			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
+			m_cameraActor = new Actor(); 
+			m_cameraActor->AddEntity(camera);
 			
+			/* Kocka kozepen */
+			ActorRef modelActor = new Actor(); 
+			modelActor->AddEntity(model);
+			
+			/*
+			Alap right-handed koordinatarendszer szerint osszerakunk egy keresztet
+			Ezeket adjuk hozza a belso kockahoz
+			*/
+			float3 cica[] = {
+				{ 1, 0, 0 }, /* Jobb */ { -1, 0, 0 }, /* Bal */
+				{ 0, 1, 0 }, /* fent */ {  0,-1, 0 }, /* lent */
+				{ 0, 0, -1}, /* elol */ {  0, 0, 1 }, /* hatul */
+			};
 
-			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
+			// size_t i = 5; // egyesevel itt lehet hozzaadni/elvenni
+			for (size_t i = 0; i < 6; i++)
+			{
+				ActorRef actor = new Actor();
+				actor->AddEntity(model);
+				modelActor->AddChild(actor);
 
-			ActorRef rootActor = new Actor();
-			rootActor->AddChild(cameraActor);
-			rootActor->AddChild(modelActor);
+				float3 v = cica[i];
+				v.x *= 3;
+				v.y *= 3;
+				v.z *= 3;
+				
+				actor->Matrix().Translate(v);
+				
+			}
 
-			m_rootActor = rootActor;
+			// kozepso kockat elrejtjuk
+			modelActor->Hide();
 
-			scene->SetRootNode(rootActor);
-			scene->AddCameraNode(cameraActor);
+			/*
+			Kockak felfuzese a rootba
+			*/
+			m_rootActor = new Actor();
+			m_rootActor->AddChild(m_cameraActor);
+			m_rootActor->AddChild(modelActor);
+
+			scene->SetRootNode(m_rootActor);
+			scene->AddCameraNode(m_cameraActor);
 			// scene->AddLightNode(lightActor);
 
 			scene->SetVShader(m_vertexShader);
 			scene->SetFShader(m_fragmentShader);
 
-			cameraActor->Matrix().Identity();
-			cameraActor->Matrix().Translate(0,0,10);
+			m_cameraActor->Matrix().Identity();
+			m_cameraActor->Matrix().Translate(0,0,-10);
 
 
 			// --- 
@@ -155,21 +180,23 @@ protected:
 			{				
 				ShaderRef fragmentShader = this->m_fragmentShader->Get();
 
-				/*
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
-				*/
 
-				scene->GetActiveCamera()->Transform().Identity();
-				scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
+				// scene->GetActiveCamera()->Transform().Identity();
+				// scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
 				
+				float f = abs(sin(t));
+				m_cameraActor->Transform().Identity();
+				m_cameraActor->Transform().Translate(0,0,f);
+
 
 				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 
 				scene->PreRender(render);
 				scene->Render(render);
 
-				this->t += 0.01;
+				this->t += 0.1;
 			}
 
 			this->render.EndScene();
