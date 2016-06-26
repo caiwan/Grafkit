@@ -76,6 +76,11 @@ namespace Grafkit {
 			this->mat = DirectX::XMMatrixScaling(v.x, v.y, v.z);
 		}
 
+		void Scale(float x, float y, float z)
+		{
+			this->mat = DirectX::XMMatrixScaling(x, y, z);
+		}
+
 		/// Mixed scale and translate operation
 		void ScaleAndTranslate(float3 s, float3 t)
 		{
@@ -108,39 +113,39 @@ namespace Grafkit {
 			/// @todo TBD
 		}
 
-		/// Create orthographic projection
-		void Ortho(float vwidth, float vheigt, float znear, float zfar) 
-		{
-#ifdef USE_LEFT_HANDED_SYSTEM
-			(*this) = DirectX::XMMatrixOrthographicLH(vwidth, vheigt, znear, zfar);
-#else //USE_LEFT_HANDED_SYSTEM
-			(*this) = DirectX::XMMatrixOrthographicRH(vwidth, vheigt, znear, zfar);
-#endif //USE_LEFT_HANDED_SYSTEM
-		}
-		
-		/**
-			Crete perspective projection from screen metrics
-		*/
-		void PerspectiveXY(float vWidth, float vHeight, float zNear, float zFar) 
-		{
-#ifdef USE_LEFT_HANDED_SYSTEM
-			(*this) = DirectX::XMMatrixPerspectiveLH(vWidth, vHeight, zNear, zFar);
-#else //USE_LEFT_HANDED_SYSTEM
-			(*this) = DirectX::XMMatrixPerspectiveRH(vWidth, vHeight, zNear, zFar);
-#endif //USE_LEFT_HANDED_SYSTEM		
-		}
-
-		/**
-		Crete perspective projection from screen metrics
-		*/
-		void Perspective(float aspect, float fov, float zNear, float zFar)
-		{
-#ifdef USE_LEFT_HANDED_SYSTEM
-			(*this) = DirectX::XMMatrixPerspectiveFovLH(aspect, fov, zNear, zFar);
-#else //USE_LEFT_HANDED_SYSTEM
-			(*this) = DirectX::XMMatrixPerspectiveFovLH(aspect, fov, zNear, zFar);
-#endif //USE_LEFT_HANDED_SYSTEM		
-		}
+//		/// Create orthographic projection
+//		void Ortho(float vwidth, float vheigt, float znear, float zfar) 
+//		{
+//#ifdef USE_LEFT_HANDED_SYSTEM
+//			(*this) = DirectX::XMMatrixOrthographicLH(vwidth, vheigt, znear, zfar);
+//#else //USE_LEFT_HANDED_SYSTEM
+//			(*this) = DirectX::XMMatrixOrthographicRH(vwidth, vheigt, znear, zfar);
+//#endif //USE_LEFT_HANDED_SYSTEM
+//		}
+//		
+//		/**
+//			Crete perspective projection from screen metrics
+//		*/
+//		void PerspectiveXY(float vWidth, float vHeight, float zNear, float zFar) 
+//		{
+//#ifdef USE_LEFT_HANDED_SYSTEM
+//			(*this) = DirectX::XMMatrixPerspectiveLH(vWidth, vHeight, zNear, zFar);
+//#else //USE_LEFT_HANDED_SYSTEM
+//			(*this) = DirectX::XMMatrixPerspectiveRH(vWidth, vHeight, zNear, zFar);
+//#endif //USE_LEFT_HANDED_SYSTEM		
+//		}
+//
+//		/**
+//		Crete perspective projection from screen metrics
+//		*/
+//		void Perspective(float aspect, float fov, float zNear, float zFar)
+//		{
+//#ifdef USE_LEFT_HANDED_SYSTEM
+//			(*this) = DirectX::XMMatrixPerspectiveFovLH(aspect, fov, zNear, zFar);
+//#else //USE_LEFT_HANDED_SYSTEM
+//			(*this) = DirectX::XMMatrixPerspectiveFovLH(aspect, fov, zNear, zFar);
+//#endif //USE_LEFT_HANDED_SYSTEM		
+//		}
 
 		// --- lookat
 
