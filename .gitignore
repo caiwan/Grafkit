@@ -217,4 +217,6 @@ ModelManifest.xml
 *.VC.opendb
 *.VC.db
 
-/src/ShaderEditor/shader-error.txt
+shader-error.txt
+*.exe
+*.dll
