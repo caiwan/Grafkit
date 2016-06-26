@@ -63,16 +63,16 @@ protected:
 		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 		// init file loader
-		this->m_file_loader = new Grafkit::FileAssetManager("./");
+		this->m_file_loader = new Grafkit::FileAssetManager("./../assets/");
 
 		LoadCache();
 
 		// -- load shader
-		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
-		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
+		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "fx/texture.hlsl", "TextureVertexShader", ST_Vertex));
+		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "fx/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/fuckyou.dae", m_vertexShader));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/shphere.dae", m_vertexShader));
 
 		m_t = 0;
 
