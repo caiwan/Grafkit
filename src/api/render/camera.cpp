@@ -75,9 +75,9 @@ void Camera::Calculate(Renderer& renderer)
 
 	lookVector = XMLoadFloat3(&m_look);
 
-	pitch = m_rotation.x * 0.0174532925f;
-	yaw   = m_rotation.y * 0.0174532925f;
-	roll  = m_rotation.z * 0.0174532925f;
+	pitch = m_rotation.x;
+	yaw   = m_rotation.y;
+	roll  = m_rotation.z;
 
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
