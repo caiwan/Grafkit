@@ -72,11 +72,10 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 			m_cameraProjectionMatrix = camera->GetProjectionMatrix();
 
 			Matrix mc = camera->GetViewMatrix();
-			
-			Matrix fasz = CalcNodeTransformTree(cameraActor);
+			Matrix ms = CalcNodeTransformTree(cameraActor);
 
 			m_cameraViewMatrix = mc;
-			m_cameraViewMatrix.Multiply(fasz);
+			m_cameraViewMatrix.Multiply(ms);
 			m_cameraViewMatrix.Invert();
 		}
 		else {
@@ -111,11 +110,13 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 	matrix worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
 	m_vertexShader->GetParam("MatrixBuffer").Get("worldMatrix").SetP(&worldMatrix);
 
-	actor->Render(render, this);
+	if (!actor->IsHidden())
+		actor->Render(render, this);
 	
-	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
-		RenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);
-	}
+	if (!actor->IsChildrenHidden())
+		for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
+			RenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);
+		}
 	
 	pop();
 }
@@ -141,8 +142,8 @@ Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor)
 		Matrix matTM = actor->Matrix();
 		matTM.Multiply(actor->Transform());
 
-		Matrix mat = result;
-		mat.Multiply(matTM);
+		Matrix mat = matTM;
+		mat.Multiply(result);
 
 		result = mat;
 

@@ -44,8 +44,6 @@ namespace Grafkit {
 	};
 #endif 
 
-#define ACTOR_BUCKET "actor"
-
 	class Actor;
 	typedef Ref<Actor> ActorRef;
 
@@ -53,7 +51,6 @@ namespace Grafkit {
 	An actor node - ez a scenegraph es a nodeja
 	*/
 	__declspec(align(16)) class Actor : public Grafkit::IResource, public AlignedNew<Actor>
-	// class Actor : public Grafkit::IResource 
 	{
 	friend class Scene;
 	public:
@@ -73,7 +70,20 @@ namespace Grafkit {
 
 		std::vector<Ref<Entity3D>>& GetEntities() { return m_pEntities; }
 
-		virtual const char* GetBucketID() { return ACTOR_BUCKET; }
+		/** Elrejti az akutalis nodeot, a gyerkeket meghagyja, a render atlepi */
+		void Hide() { m_is_nodeHidden = 1; }
+
+		/** a renderban latszik az akualis node */
+		void Show() { m_is_nodeHidden = 0; }
+
+		/** Elrejti az akutalis node gyerekeit, a render atlepi a fat */
+		void HideChildren() { m_is_childrenHidden = 1; }
+
+		/** latszanak a node gyerekei */
+		void ShowChildren() { m_is_childrenHidden = 0; }
+
+		int IsHidden() { return m_is_nodeHidden; }
+		int IsChildrenHidden() { return m_is_childrenHidden; }
 
 	protected:
 
@@ -82,8 +92,11 @@ namespace Grafkit {
 		//void callDraw();		
 		//ActorEvents* m_events;
 
-		Grafkit::Matrix m_viewMatrix;
-		Grafkit::Matrix m_transformMatrix; // transzformacio a view matrix teterjen
+		Grafkit::Matrix m_viewMatrix;			///< Node transyformacioja
+		Grafkit::Matrix m_transformMatrix;		///< Kulon transyformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
+
+		int m_is_nodeHidden;
+		int m_is_childrenHidden;
 
 		Ref<Actor> m_pParent;
 		std::vector<Ref<Actor>> m_pChildren;
