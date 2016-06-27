@@ -22,7 +22,7 @@ namespace Grafkit{
 	friend Thread;
 		
 	public:
-		virtual int run() = 0;
+		virtual int Run() = 0;
 		virtual ~Runnable(){}
 	};
 	
@@ -39,14 +39,14 @@ namespace Grafkit{
 			
 		virtual ~Thread();
 
-		void start();
-		void stop();
-		void join();
+		void Start();
+		void Stop();
+		void Join();
 
 		///@todo ez helyett valami mas megoldas kell 
-		void recreate();
+		// void Recreate();
 
-		static int getCPUCount();
+		static int GetCPUCount();
 
 
 	private:
@@ -75,8 +75,8 @@ namespace Grafkit{
 		Semaphore();
 		~Semaphore();
 
-		UINT getNext();
-		void reset();
+		UINT GetNext();
+		void Reset();
 
 	private:
 		UINT m_count;

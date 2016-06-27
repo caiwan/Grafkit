@@ -24,7 +24,7 @@ DWORD WINAPI Thread::startThreadRunnable(LPVOID pVoid) {
 		throw EX(NullPointerException);
 
 	Thread* rThread = static_cast<Thread*>(pVoid);
-	rThread->m_lastResult = rThread->m_pRunnable->run();
+	rThread->m_lastResult = rThread->m_pRunnable->Run();
 	
 	ExitThread(rThread->m_lastResult);
 	return 0;
@@ -44,7 +44,7 @@ DWORD WINAPI Thread::startThread(LPVOID pVoid) {
 
 Thread::~Thread() {
 	if(m_wThreadID != GetCurrentThreadId()) {
-		this->stop();
+		this->Stop();
 		DWORD rc = CloseHandle(m_hThread);
 /*
 		if(!rc)
@@ -53,7 +53,7 @@ Thread::~Thread() {
 	}
 }
 
-void Thread::start() {
+void Thread::Start() {
 	//assert(m_hThread);
 	if(!this->m_hThread)
 		throw EX_DETAILS(ThreadException, "ResumeThread failed !m_hThread");
@@ -65,15 +65,15 @@ void Thread::start() {
 	}
 }
 
-void Thread::join() {
+void Thread::Join() {
 	WaitForSingleObject(this->m_hThread, INFINITE);
 }
 
-void Thread::stop(){
+void Thread::Stop(){
 	WaitForSingleObject(this->m_hThread, 250);
 	TerminateThread(this->m_hThread, 0);
 }
-
+/*
 void Thread::recreate(){
 	this->stop();
 	DWORD rc = CloseHandle(m_hThread);
@@ -85,9 +85,9 @@ void Thread::recreate(){
 	}
 	if (!m_hThread) 
 		throw EX_DETAILS(ThreadException, "_beginthreadex failed");
-}
+}*/
 
-int Thread::getCPUCount(){
+int Thread::GetCPUCount(){
 	SYSTEM_INFO si;
 	GetSystemInfo( &si );
 	if (si.dwNumberOfProcessors > 128) return 128;
@@ -107,13 +107,13 @@ Grafkit::Semaphore::~Semaphore()
 		CloseHandle(m_hMutex);
 }
 
-void Semaphore::reset(){
+void Semaphore::Reset(){
 	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
 	m_count = 0;
 	ReleaseMutex(m_hMutex); ///@todo handle error 
 }
 
-UINT Semaphore::getNext(){
+UINT Semaphore::GetNext(){
 	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
 	UINT res = m_count++;
 	ReleaseMutex(m_hMutex); ///@todo handle error 
