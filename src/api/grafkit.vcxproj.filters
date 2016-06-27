@@ -155,6 +155,9 @@
     <ClCompile Include="generator\MusicFmodLoader.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
+    <ClCompile Include="core\thread_win32.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -303,6 +306,9 @@
     </ClInclude>
     <ClInclude Include="generator\MusicFmodLoader.h">
       <Filter>Source Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="core\thread.h">
+      <Filter>Source Files\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

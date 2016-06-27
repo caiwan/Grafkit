@@ -1,93 +1,93 @@
-#include "../../framework.h"
 #include "thread.h"
-#include "../../debug/exceptions.h"
 
-using namespace FWcore;
+using namespace Grafkit;
+using namespace FWdebugExceptions;
 
-Thread::Thread(Runnable *r) : runnable(r) {
-	if(!runnable)
-		throw new ExceptionEX(5000, "Runnable *r failed ");
-	//hThread = (HANDLE)_beginthreadex(NULL,0,Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &wThreadID);
-	this->hThread = CreateThread(NULL, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->wThreadID);
-	if(!hThread)
-		throw new ExceptionEX(5001, "_beginthreadex failed");
+Thread::Thread(Runnable *r) : m_pRunnable(r) {
+	if(!m_pRunnable)
+		throw EX_DETAILS(ThreadException, "Runnable *r failed ");
+	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
+	this->m_hThread = CreateThread(nullptr, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
+	if(!m_hThread)
+		throw EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
-Thread::Thread() : runnable(NULL) {
-	//hThread = (HANDLE)_beginthreadex(NULL,0,Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &wThreadID);
-	this->hThread = CreateThread(NULL, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->wThreadID);
-	if(!hThread)
-		throw new ExceptionEX(5002, "_beginthreadex failed");
+Thread::Thread() : m_pRunnable(nullptr) {
+	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
+	this->m_hThread = CreateThread(nullptr, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
+	if(!m_hThread)
+		throw EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
 DWORD WINAPI Thread::startThreadRunnable(LPVOID pVoid) {
 	if (!pVoid) 
-		throw new EXCEPT_NullPointerException(); //ExceptionEX(5003, "Nullpointer error");
+		throw EX(NullPointerException);
 
 	Thread* rThread = static_cast<Thread*>(pVoid);
-	rThread->result = rThread->runnable->run();
+	rThread->m_lastResult = rThread->m_pRunnable->run();
 	
-	ExitThread(rThread->result);
+	ExitThread(rThread->m_lastResult);
 	return 0;
 }
 
 DWORD WINAPI Thread::startThread(LPVOID pVoid) {
-	if (!pVoid) 
-		throw new EXCEPT_NullPointerException(); //ExceptionEX(5003, "Nullpointer error");
+	if (!pVoid)
+		throw EX(NullPointerException);
 
 	Thread* aThread = static_cast<Thread*>(pVoid);
 	//aThread->status = TS_run;
-	aThread->result = aThread->run();
+	aThread->m_lastResult = aThread->run();
 
-	ExitThread(aThread->result);
+	ExitThread(aThread->m_lastResult);
 	return 0;
 }
 
 Thread::~Thread() {
-	if(wThreadID != GetCurrentThreadId()) {
+	if(m_wThreadID != GetCurrentThreadId()) {
 		this->stop();
-		DWORD rc = CloseHandle(hThread);
+		DWORD rc = CloseHandle(m_hThread);
 /*
 		if(!rc)
-			throw new ExceptionEX(5003, "CloseHandle failed");			
+			throw EX_DETAILS(ThreadException, 5003, "CloseHandle failed");			
 */
 	}
 }
 
 void Thread::start() {
-	//assert(hThread);
-	if(!this->hThread)
-		throw new ExceptionEX(5004, "ResumeThread failed !hThread");
+	//assert(m_hThread);
+	if(!this->m_hThread)
+		throw EX_DETAILS(ThreadException, "ResumeThread failed !m_hThread");
 
-	DWORD rc = ResumeThread(hThread);
+	DWORD rc = ResumeThread(m_hThread);
 	if(rc == -1){
-		FWcore::writeLog(true, MSG_warn, "Last error %d", GetLastError());
-		throw new ExceptionEX(5005, "ResumeThread failed !rc");
+		// FWcore::writeLog(true, MSG_warn, "Last error %d", GetLastError());
+		throw EX_DETAILS(ThreadException, "ResumeThread failed !rc");
 	}
 }
 
 void Thread::join() {
-	WaitForSingleObject(this->hThread, INFINITE);
+	WaitForSingleObject(this->m_hThread, INFINITE);
 }
 
 void Thread::stop(){
-	WaitForSingleObject(this->hThread, 250);
-	TerminateThread(this->hThread, 0);
+	WaitForSingleObject(this->m_hThread, 250);
+	TerminateThread(this->m_hThread, 0);
 }
 
 void Thread::recreate(){
 	this->stop();
-	DWORD rc = CloseHandle(hThread);
-	hThread = NULL;
-	if (!runnable){
-		this->hThread = CreateThread(NULL, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->wThreadID);
+	DWORD rc = CloseHandle(m_hThread);
+	m_hThread = nullptr;
+	if (!m_pRunnable){
+		this->m_hThread = CreateThread(nullptr, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	}else{
-		this->hThread = CreateThread(NULL, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->wThreadID);
+		this->m_hThread = CreateThread(nullptr, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	}
-	if (!hThread) throw new ExceptionEX(5001, "_beginthreadex failed");
+	if (!m_hThread) 
+		throw EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
-int Thread::getNumberOfCPUs(){
+int Thread::getCPUCount(){
 	SYSTEM_INFO si;
 	GetSystemInfo( &si );
 	if (si.dwNumberOfProcessors > 128) return 128;
@@ -96,24 +96,27 @@ int Thread::getNumberOfCPUs(){
 
 /////////////////////////////////////////////////////////
 
-Semaphore::Semaphore(){
-	this->lock = 0;
-	this->num = 0;
+Semaphore::Semaphore() : m_count(0)
+{
+	m_hMutex = CreateMutex(nullptr, FALSE, nullptr);
+}
+
+Grafkit::Semaphore::~Semaphore()
+{
+	if (m_hMutex)
+		CloseHandle(m_hMutex);
 }
 
 void Semaphore::reset(){
-	this->lock = 0;
-	this->num = 0;
+	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
+	m_count = 0;
+	ReleaseMutex(m_hMutex); ///@todo handle error 
 }
 
-int Semaphore::getNext(){
-	if (!this->lock++){
-		int res = num;
-		num ++;
-		lock = 0;
-		return res;
-	} else {
-		while (this->lock);
-		return this->getNext();
-	}
+UINT Semaphore::getNext(){
+	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
+	UINT res = m_count++;
+	ReleaseMutex(m_hMutex); ///@todo handle error 
+
+	return res;
 }

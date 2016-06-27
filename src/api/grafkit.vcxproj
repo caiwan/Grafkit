@@ -29,6 +29,7 @@
     <ClCompile Include="core\ResourcePreloader.cpp" />
     <ClCompile Include="core\input.cpp" />
     <ClCompile Include="core\system.cpp" />
+    <ClCompile Include="core\thread_win32.cpp" />
     <ClCompile Include="core\window.cpp" />
     <ClCompile Include="generator\assimploader.cpp" />
     <ClCompile Include="generator\FontmapLoader.cpp" />
@@ -70,6 +71,7 @@
     <ClInclude Include="core\ResourcePreloader.h" />
     <ClInclude Include="core\input.h" />
     <ClInclude Include="core\system.h" />
+    <ClInclude Include="core\thread.h" />
     <ClInclude Include="core\window.h" />
     <ClInclude Include="generator\assimploader.h" />
     <ClInclude Include="generator\FontmapLoader.h" />
