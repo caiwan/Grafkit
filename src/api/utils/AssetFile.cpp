@@ -5,13 +5,15 @@
 
 #ifndef LIVE_RELEASE
 
+#include "../core/thread.h"
+
 #include <windows.h>
 #include <Winbase.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <tchar.h>
 
-#endif /*LIVE_RELEASE*/
+#endif /*LIVE_RELEASE*/  
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -56,7 +58,7 @@ namespace LiveReload {
 		https://developersarea.wordpress.com/2014/09/26/win32-file-watcher-api-to-monitor-directory-changes/
 	*/
 
-	class WatchDirectory : public IFileEventWatch {
+	class WatchDirectory : public IFileEventWatch, public Thread {
 	private:
 		HANDLE m_hDir;
 		CHAR m_lpszDirName[MAX_PATH];
@@ -66,7 +68,7 @@ namespace LiveReload {
 
 	public:
 
-		WatchDirectory(LPCSTR path)
+		WatchDirectory(LPCSTR path) : Thread()
 		{
 			m_hDir = CreateFile(path, GENERIC_READ | FILE_LIST_DIRECTORY,
 				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -78,6 +80,8 @@ namespace LiveReload {
 				return; //cannot open folder
 			}
 			lstrcpy(m_lpszDirName, path);
+
+			LOGGER(Log::Logger().Info("Creating watcher for directory: %s", path));
 		}
 
 		~WatchDirectory() {
@@ -85,8 +89,14 @@ namespace LiveReload {
 				CloseHandle(m_hDir);
 		}
 
-		void Poll(IResourceManager *resman){
-			char buf[2048];
+		int Run() {
+			do {
+				Poll();
+			} while (true);
+		}
+
+		void Poll(){
+			char buf[4096];
 			DWORD nRet;
 			BOOL result = TRUE;
 			char filename[MAX_PATH];
@@ -170,6 +180,7 @@ FileAssetFactory::FileAssetFactory(std::string root) :
 	/* Livereload */
 #ifndef LIVE_RELEASE
 	m_eventWatcher = new LiveReload::WatchDirectory(root.c_str());
+	((LiveReload::WatchDirectory*)m_eventWatcher)->Start();
 #endif
 }
 
@@ -177,6 +188,7 @@ FileAssetFactory::FileAssetFactory(std::string root) :
 FileAssetFactory::~FileAssetFactory()
 {
 #ifndef LIVE_RELEASE
+	((LiveReload::WatchDirectory*)m_eventWatcher)->Join();
 	if (m_eventWatcher) delete m_eventWatcher;
 #endif
 }
@@ -224,9 +236,14 @@ std::list<std::string> FileAssetFactory::GetAssetList(AssetFileFilter * filter)
 
 void Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 {
-#ifndef LIVE_RELEASE
-	m_eventWatcher->Poll(resman);
-#endif
+//#ifndef LIVE_RELEASE
+//	static unsigned int count;
+//	if (count == 0) {
+//		m_eventWatcher->Poll(resman);
+//		count = 120;
+//	}
+//	count--;
+//#endif
 }
 
 

@@ -15,7 +15,7 @@ namespace Grafkit {
 		IFileEventWatch() {}
 		virtual ~IFileEventWatch() {}
 
-		virtual void Poll(IResourceManager *resman) = 0;
+		virtual void Poll() = 0;
 	};
 
 	/**
