@@ -90,6 +90,7 @@ namespace LiveReload {
 		}
 
 		int Run() {
+			LOGGER(Log::Logger().Trace("Thread started"));
 			do {
 				Poll();
 			} while (true);

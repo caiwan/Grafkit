@@ -48,6 +48,8 @@ namespace Grafkit{
 
 		static int GetCPUCount();
 
+	protected:
+		virtual int Run() { return 0; }
 
 	private:
 		HANDLE m_hThread;
@@ -61,7 +63,6 @@ namespace Grafkit{
 		// stores return value from run()
 		int m_lastResult;
 
-		virtual int run() { return 0; }
 
 		static DWORD WINAPI startThreadRunnable(LPVOID pVoid);
 		static DWORD WINAPI startThread(LPVOID pVoid);

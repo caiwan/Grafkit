@@ -36,7 +36,7 @@ DWORD WINAPI Thread::startThread(LPVOID pVoid) {
 
 	Thread* aThread = static_cast<Thread*>(pVoid);
 	//aThread->status = TS_run;
-	aThread->m_lastResult = aThread->run();
+	aThread->m_lastResult = aThread->Run();
 
 	ExitThread(aThread->m_lastResult);
 	return 0;
