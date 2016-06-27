@@ -13,7 +13,7 @@
 #include "utils/asset.h"
 #include "utils/AssetFactory.h"
 #include "utils/AssetFile.h"
-		  
+
 #include "utils/ResourceManager.h"
 
 #include "generator/TextureLoader.h"
@@ -25,163 +25,193 @@ using namespace Grafkit;
 #include "builtin_data/cube.h"
 
 class Application : public System, public IResourceManager
-{  
+{
 public:
 	Application() : System(),
 		m_file_loader(nullptr)
-		{
-			int screenWidth, screenHeight;
+	{
+		int screenWidth, screenHeight;
 
-			screenWidth = 800;
-			screenHeight = 600;
+		screenWidth = 800;
+		screenHeight = 600;
 
-			t = 0;
+		t = 0;
 
-			// initwindowot is ertelmesebb helyre kell rakni
-			InitializeWindows(screenWidth, screenHeight);
-		}
-		
-		~Application() {
-		}
+		// initwindowot is ertelmesebb helyre kell rakni
+		InitializeWindows(screenWidth, screenHeight);
+	}
+
+	~Application() {
+	}
 
 protected:
-		Renderer render;
-		Ref<Scene> scene;
+	Renderer render;
+	Ref<Scene> scene;
 
-		TextureSamplerRef m_textureSampler;
+	TextureSamplerRef m_textureSampler;
 
-		ActorRef m_rootActor;
+	ActorRef m_rootActor;
+	ActorRef m_cameraActor;
 
-		float t;
+	float t;
 
-		ShaderResRef m_vertexShader;
-		ShaderResRef m_fragmentShader;
-		
-		int init() {
-			// --- ezeket kell osszeszedni egy initwindowban
-			const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
-			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
+	ShaderResRef m_vertexShader;
+	ShaderResRef m_fragmentShader;
 
-			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+	int init() {
+		// --- ezeket kell osszeszedni egy initwindowban
+		const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
+		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
 
-			// init file loader
-			this->m_file_loader = new FileAssetFactory("./../assets/rotating_cube/");
+		this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
-			// --------------------------------------------------
+		// init file loader
+		this->m_file_loader = new FileAssetFactory("./../assets/");
 
-			// -- camera
-			CameraRef camera = new Camera;
-			// camera->SetPosition(20.0f, 5.0f, -10.0f);
-			camera->SetPosition(0.0f, 0.0f, 0.0f);
+		// --------------------------------------------------
 
-			// -- texture
-			TextureResRef texture = new TextureRes();
+		/* Itt letrhozzuk a kamerat, hozzaadjuk a scenehez, de nem kapcsoljuk hozza a scenegraphoz. */
 
-			texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
+		// -- camera
+		/* Az alap kamera origoban van, +z iranzba nez, es +y felfele irany */
+		CameraRef camera = new Camera;
 
-			// -- texture sampler
-			m_textureSampler = new TextureSampler();
-			m_textureSampler->Initialize(render);
+		// -- texture
+		TextureResRef texture = new TextureRes();
 
-			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
-			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
+		texture = this->Load<TextureRes>(new TextureFromBitmap("textures/Untitled.png"));
 
-			// -- precalc
-			this->DoPrecalc();
+		// -- texture sampler
+		m_textureSampler = new TextureSampler();
+		m_textureSampler->Initialize(render);
 
-			// -- model 
-			ModelRef model = new Model;
-			model->SetMaterial(new MaterialBase);
-			model->GetMaterial()->AddTexture(texture, "diffuse");
+		// -- load shader
+		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "fx/texture.hlsl", "TextureVertexShader", ST_Vertex));
+		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "fx/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
+		// -- precalc
+		this->DoPrecalc();
 
-			SimpleMeshGenerator generator(render, m_vertexShader);
-			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-			
-			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
-
-			// -- setup scene 
-			scene = new Scene();
-			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
-			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
-			
-			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
-			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
-
-			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
-			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
-
-			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
-			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
-			
-
-			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
-
-			ActorRef rootActor = new Actor();
-			rootActor->AddChild(cameraActor);
-			rootActor->AddChild(modelActor);
-
-			m_rootActor = rootActor;
-
-			scene->SetRootNode(rootActor);
-			scene->AddCameraNode(cameraActor);
-			// scene->AddLightNode(lightActor);
-
-			scene->SetVShader(m_vertexShader);
-			scene->SetFShader(m_fragmentShader);
-
-			cameraActor->Matrix().Identity();
-			cameraActor->Matrix().Translate(0,0,10);
+		// -- model 
+		ModelRef model = new Model;
+		model->SetMaterial(new MaterialBase);
+		model->GetMaterial()->AddTexture(texture, "diffuse");
 
 
-			// --- 
+		SimpleMeshGenerator generator(render, m_vertexShader);
+		generator["POSITION"] = (void*)GrafkitData::cubeVertices;
+		generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
 
-			this->t = 0;
+		generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
 
-			return 0;
-		};
-		
-		// ==================================================================================================================
+		// -- setup scene 
+		scene = new Scene();
 
-		void release() {
-			this->render.Shutdown();
+		m_cameraActor = new Actor();
+		m_cameraActor->AddEntity(camera);
+
+		/* Kocka kozepen */
+		ActorRef modelActor = new Actor();
+		modelActor->AddEntity(model);
+
+		/*
+		Alap right-handed koordinatarendszer szerint osszerakunk egy keresztet
+		Ezeket adjuk hozza a belso kockahoz
+		*/
+		float3 cica[] = {
+			{ 1, 0, 0 }, /* Jobb */{ -1, 0, 0 }, /* Bal */
+			{ 0, 1, 0 }, /* fent */{ 0,-1, 0 }, /* lent */
+			{ 0, 0, -1 }, /* elol */{ 0, 0, 1 }, /* hatul */
 		};
 
-		// ==================================================================================================================
-		int mainloop() {
-			this->render.BeginScene();
-			{				
-				ShaderRef fragmentShader = this->m_fragmentShader->Get();
+		// size_t i = 5; // egyesevel itt lehet hozzaadni/elvenni
+		for (size_t i = 0; i < 6; i++)
+		{
+			ActorRef actor = new Actor();
+			actor->AddEntity(model);
+			modelActor->AddChild(actor);
 
-				/*
-				m_rootActor->Matrix().Identity();
-				m_rootActor->Matrix().RotateRPY(t,0,0);
-				*/
+			float3 v = cica[i];
+			v.x *= 3;
+			v.y *= 3;
+			v.z *= 3;
 
-				scene->GetActiveCamera()->Transform().Identity();
-				scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
-				
+			actor->Matrix().Translate(v);
 
-				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+		}
 
-				scene->PreRender(render);
-				scene->Render(render);
+		// kozepso kockat elrejtjuk
+		modelActor->Hide();
 
-				this->t += 0.01;
-			}
+		/*
+		Kockak felfuzese a rootba
+		*/
+		m_rootActor = new Actor();
+		m_rootActor->AddChild(m_cameraActor);
+		m_rootActor->AddChild(modelActor);
 
-			this->render.EndScene();
-			return 0;
-		};
-	
-	private:
-		FileAssetFactory *m_file_loader;
+		scene->SetRootNode(m_rootActor);
+		scene->AddCameraNode(m_cameraActor);
+		// scene->AddLightNode(lightActor);
 
-	public:
-		IAssetFactory* GetAssetFactory() { return m_file_loader; };
-		Renderer & GetDeviceContext() { return this->render; };
+		scene->SetVShader(m_vertexShader);
+		scene->SetFShader(m_fragmentShader);
+
+		m_cameraActor->Matrix().Identity();
+		m_cameraActor->Matrix().Translate(0, 0, -10);
+
+
+		// --- 
+
+		this->t = 0;
+
+		return 0;
+	};
+
+	// ==================================================================================================================
+
+	void release() {
+		this->render.Shutdown();
+	};
+
+	// ==================================================================================================================
+	int mainloop() {
+		this->render.BeginScene();
+		{
+			ShaderRef fragmentShader = this->m_fragmentShader->Get();
+
+			m_rootActor->Matrix().Identity();
+			m_rootActor->Matrix().RotateRPY(t, 0, 0);
+
+			// scene->GetActiveCamera()->Transform().Identity();
+			// scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
+
+			float f = abs(sin(t));
+			m_cameraActor->Transform().Identity();
+			m_cameraActor->Transform().Translate(0, 0, f);
+
+
+			fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+
+			scene->PreRender(render);
+			scene->Render(render);
+
+			this->t += 0.1;
+		}
+
+		this->render.EndScene();
+
+		/* this->m_file_loader->PollEvents(this); */
+
+		return 0;
+	};
+
+private:
+	FileAssetFactory *m_file_loader;
+
+public:
+	IAssetFactory* GetAssetFactory() { return m_file_loader; };
+	Renderer & GetDeviceContext() { return this->render; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
