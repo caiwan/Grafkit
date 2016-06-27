@@ -6,7 +6,9 @@
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+
 
 #include "../utils/reference.h"
 #include "../utils/exceptions.h"
@@ -47,10 +49,6 @@ namespace Grafkit {
 		Renderer();
 		virtual ~Renderer();
 
-		///@todo  alignmenttel kezdeni kell valamit majd 
-		// void* operator new(size_t);
-		// void operator delete(void*);
-
 		///@todo viewporttal kell kezdnei valmait majd 
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen);
 		void Shutdown();
@@ -64,13 +62,11 @@ namespace Grafkit {
 		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
 		void SetSurface(int screenW, int screenH);
 
-		// void SetRenderTargetViewCount(size_t n = 0) { m_renderTargetViewCount = n < RENDER_TARGET_MAX ? n: RENDER_TARGET_MAX; }
 		void ApplyRenderTargetView(size_t count = 1);
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
 
 		// --- getters
 		ID3D11Device* GetDevice() { return this->m_device; }
-		// operator ID3D11Device *() { return this->m_device; }
 		operator ID3D11Device * const &() { return this->m_device; }
 
 		ID3D11DeviceContext* GetDeviceContext() { return this->m_deviceContext; }
