@@ -166,26 +166,6 @@
       <Project>{bff1ad5f-469c-4ebe-8c53-698dae473a13}</Project>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\assets\postfx\fisheye.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\assets\postfx\fxaa.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\assets\postfx\postfx.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\assets\postfx\postfxEngine.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\assets\postfx\texture.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\assets\postfx\vhstape.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

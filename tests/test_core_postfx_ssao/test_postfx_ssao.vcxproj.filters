@@ -11,14 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\assets\postfx_ssao\flat.hlsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\assets\postfx_ssao\ssao.hlsl">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main_ssao.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
