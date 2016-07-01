@@ -1,13 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="..\assets\fx\fisheye.hlsl" />
-    <FxCompile Include="..\assets\fx\flat.hlsl" />
-    <FxCompile Include="..\assets\fx\fxaa.hlsl" />
-    <FxCompile Include="..\assets\fx\postfx.hlsl" />
-    <FxCompile Include="..\assets\fx\postfxEngine.hlsl" />
-    <FxCompile Include="..\assets\fx\ssao.hlsl" />
-    <FxCompile Include="..\assets\fx\texture.hlsl" />
-    <FxCompile Include="..\assets\fx\vhstape.hlsl" />
+    <None Include="..\assets\fx\fisheye.hlsl" />
+    <None Include="..\assets\fx\flat.hlsl" />
+    <None Include="..\assets\fx\fxaa.hlsl" />
+    <None Include="..\assets\fx\postfx.hlsl" />
+    <None Include="..\assets\fx\postfxEngine.hlsl" />
+    <None Include="..\assets\fx\ssao.hlsl" />
+    <None Include="..\assets\fx\texture.hlsl" />
+    <None Include="..\assets\fx\vhstape.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="commons">
+      <UniqueIdentifier>{8e16ed8f-23f4-4a7c-a86a-5d2c2e5e37f7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\assets\fx\commons\layout.hlsl">
+      <Filter>commons</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
