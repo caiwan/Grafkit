@@ -71,10 +71,10 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 
 	// --- 
 	m_shaderFullscreenQuad = new Shader();
-	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), ST_Vertex);
+	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), ST_Vertex, "FullscreenQuad");
 
 	m_shaderCopyScreen = new Shader();
-	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), ST_Pixel);
+	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), ST_Pixel, "CopyScreen");
 
 	// --- 
 	SimpleMeshGenerator meshGen(render, m_shaderFullscreenQuad);
