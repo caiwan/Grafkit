@@ -14,15 +14,14 @@
 namespace Grafkit{
 	/**
 	Ez egy olyan dolog, ami automatikusan betolt, es cachel resourcokat
+	Dirty hack of mine
+	Ide fogom behackelni a livereload managert is 
 	*/
 	class AssetPreloader : public Grafkit::IResourceManager
 	{
 	public:
 		AssetPreloader(PreloadEvents* pPreloader = nullptr);
 		~AssetPreloader();
-
-		//Grafkit::IAssetFactory* GetResourceFactory();
-		virtual Grafkit::Renderer & GetDeviceContext() = 0;
 
 		void LoadCache();
 		void SaveCache();

@@ -9,7 +9,6 @@
 
 #include <cstdio>
 
-
 using namespace std;
 using namespace Grafkit;
 
@@ -33,7 +32,7 @@ Shader::~Shader()
 	this->Shutdown();
 }
 
-void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
+void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type, ID3DInclude* pInclude, D3D_SHADER_MACRO* pDefines)
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = nullptr;
@@ -50,12 +49,13 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, Shader
 
 	this->m_type = type;
 
+
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
-		result = D3DCompileFromFile(file, nullptr, nullptr, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompileFromFile(file, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 	else if (type == ST_Pixel) {
-		result = D3DCompileFromFile(file, nullptr, nullptr, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompileFromFile(file, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 
 	if (FAILED(result))
@@ -80,7 +80,7 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, Shader
 }
 
 
-void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
+void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type, LPCSTR name, ID3DInclude* pInclude, D3D_SHADER_MACRO* pDefines)
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = nullptr;
@@ -94,10 +94,10 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
-		result = D3DCompile(source, size, nullptr, nullptr, nullptr, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompile(source, size, nullptr, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 	else if (type == ST_Pixel) {
-		result = D3DCompile(source, size, nullptr, nullptr, nullptr, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompile(source, size, nullptr, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 	else {
 		throw EX_DETAILS(MissingShaderException, "Attempting to load an unknown type of shader");

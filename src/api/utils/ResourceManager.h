@@ -30,7 +30,6 @@ namespace Grafkit {
 		template<class T> Ref<T> Get(const std::string &pName) const;
 
 		void Add(Ref<IResource> pResource);
-
 		void Remove(const std::string &pName);
 		
 		// preloader
@@ -46,18 +45,20 @@ namespace Grafkit {
 		virtual Renderer &GetDeviceContext() = 0;	///@todo, ha kell, akkor egy makroval ki kell venni
 		virtual IAssetFactory *GetAssetFactory() = 0;
 
+		/**
+			Resource tipusokra (shader, texture) regisztral egy relativ eleresi utvonalat 
+		*/
+		void AddResourcePath(std::string resourceClass, std::string path);
+		std::string GetResourcePath(std::string resourceClass);
+
 	protected:
-
-		typedef std::map<std::string, Ref<IResource>> ResourceMap_t;
-		ResourceMap_t m_resources;
-
-		// ResourceMap_t::const_iterator AddLoad(IResourceBuilder* builder);
-		typedef std::list<IResourceBuilder*> BuilderList_t;
-		BuilderList_t m_builders;
+		std::map<std::string, std::string> m_pathMap;
+		std::map<std::string, Ref<IResource>> m_resources;
+		std::list<IResourceBuilder*> m_builders;
 	};
 
 	template<class T> inline Ref<T> IResourceManager::Get(const std::string &pName) const {
-		ResourceMap_t::const_iterator it = m_resources.find(pName);
+		auto it = m_resources.find(pName);
 
 		if (it != m_resources.end()) {
 			return Ref<T>(dynamic_cast<T*>(it->second.Get()));
@@ -74,9 +75,5 @@ namespace Grafkit {
 }
 
 DEFINE_EXCEPTION(NoAssetFoundByNameException, 1, "No asset found by the given name");
-#ifndef _NO_UUID_
-DEFINE_EXCEPTION(NoAssetFoundByUUIDException, 2, "No asset found by the given UUID");
-#endif //_NO_UUID_
 DEFINE_EXCEPTION(NoAssetBucketFoundException, 3, "No asset bucket found");
-
 DEFINE_EXCEPTION(UpdateResourceExcpetion, 4, "Cannot update resource");

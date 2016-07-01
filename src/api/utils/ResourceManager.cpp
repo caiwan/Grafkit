@@ -31,7 +31,7 @@ void IResourceManager::Add(Ref<IResource> pResource)
 
 void IResourceManager::Remove(const std::string & pName)
 {
-	ResourceMap_t::iterator it = m_resources.find(pName);
+	auto it = m_resources.find(pName);
 	if (it != m_resources.end()) {
 		m_resources.erase(it); // feltehetoleg a resouece manager torli maga utan a ptr-t
 	}
@@ -39,7 +39,7 @@ void IResourceManager::Remove(const std::string & pName)
 
 void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
 {	
-	ResourceMap_t::const_iterator it = m_resources.find(builder->GetName());
+	auto it = m_resources.find(builder->GetName());
 	
 	// Ha nincs resource, elotoltjuk. 
 	if (it == m_resources.end()) {
@@ -62,7 +62,7 @@ void Grafkit::IResourceManager::DoPrecalc()
 
 	// an event before loader
 
-	for (BuilderList_t::iterator it = m_builders.begin(); it != m_builders.end(); it++) {
+	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
 		LOGGER(Log::Logger().Trace("Preloading item %d of %d", i, len));
 		if (*it) {
 			(*it)->Load(this, Get<IResource>((*it)->GetName()));
@@ -79,11 +79,24 @@ void Grafkit::IResourceManager::DoPrecalc()
 
 void Grafkit::IResourceManager::ClearLoadStack()
 {
-	for (BuilderList_t::iterator it = m_builders.begin(); it != m_builders.end(); it++) {
+	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
 		if (*it) {
 			delete (*it);
 		}
 	}
 
 	m_builders.clear();
+}
+
+void Grafkit::IResourceManager::AddResourcePath(std::string resourceType, std::string path)
+{
+	m_pathMap[resourceType] = path;
+}
+
+std::string Grafkit::IResourceManager::GetResourcePath(std::string resourceClass)
+{
+	auto it = m_pathMap.find(resourceClass);
+	if (it != m_pathMap.end())
+		return it->second;
+	return std::string();
 }

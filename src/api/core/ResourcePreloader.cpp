@@ -8,7 +8,6 @@ using namespace FWdebugExceptions;
 
 using namespace Grafkit;
 
-/*#include "../render/texture.h"*/
 #include "../generator/TextureLoader.h"
 
 // egyelore csak a texturakat cacheljuk be elore
@@ -21,7 +20,7 @@ namespace {
 		const char *path;
 		const char *extensions[8];
 	} preloadFilters[] = {
-		{ TEXTURES, "./textures/", {"jpg", "png", "tga", "gif", "dds", nullptr, nullptr, nullptr, }, },
+		{ TEXTURES, "./textures/", {"jpg", "png", "tga", "gif", "dds", "bmp", nullptr, nullptr, }, },
 	};
 }
 
@@ -31,8 +30,15 @@ AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IResourceM
 	for (size_t i = 0; i < sizeof(preloadFilters) / sizeof(preloadFilters[0]); i++) {
 		m_filters.push_back(new AssetFileFilter(preloadFilters[i].extensions, 8));
 	}
-}
 
+	/* Alap resource pathek */
+	this->AddResourcePath("texture", "textures/");
+	this->AddResourcePath("shader", "shaders/");
+	this->AddResourcePath("shaderincludesystem", "shaders/");
+	this->AddResourcePath("shaderincludelocal", "shaders/");
+	this->AddResourcePath("model", "models/");
+	this->AddResourcePath("syncdata", "sync/");
+}
 
 AssetPreloader::~AssetPreloader()
 {

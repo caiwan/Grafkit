@@ -2,8 +2,13 @@
 
 #include "ShaderLoader.h"
 
+#include "../utils/ResourceBuilder.h"
+#include "../utils/AssetFactory.h"
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
+
+// =============================================================================================================================
 
 namespace {
 	const char *default_entry_point_names[ShaderType_e::ST_COUNT] = {
@@ -22,6 +27,47 @@ namespace {
 		"gs"
 	};
 }
+
+// =============================================================================================================================
+
+typedef Resource<IAsset> IAssetRes;
+
+class IncludeProvider : public ID3DInclude {
+public:
+
+	IncludeProvider(IResourceManager * const & resman) : m_resman(resman)
+	{
+	}
+
+	HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) {
+		IAssetRef asset;
+		std::string relpath;
+		switch (IncludeType) {
+		case D3D_INCLUDE_LOCAL:
+			relpath = m_resman->GetResourcePath("shaderincludelocal") + pFileName;
+			break;
+		case D3D_INCLUDE_SYSTEM:
+			relpath = m_resman->GetResourcePath("shaderincludesystem") + pFileName;
+			break;
+
+		default:
+			return E_FAIL;
+		}
+
+		asset = m_resman->GetAssetFactory()->Get(relpath);
+
+		return E_FAIL;
+	}
+
+	HRESULT __stdcall Close(LPCVOID pData) {
+		return E_FAIL;
+	}
+
+private:
+	IResourceManager * const &m_resman;
+};
+
+// =============================================================================================================================
 
 Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type) : Grafkit::IResourceBuilder(name, sourcename),
 	m_type(type)
@@ -49,7 +95,9 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 	// load from asset
 	if (asset.Valid()) {
 		// LOGGER(LOG(TRACE) << "Lading shader from resource" << m_type << m_name << "@" << m_entrypoint;);
-		shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_type);
+		ID3DInclude * pInclude= new IncludeProvider(resman);
+		shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_type, m_name.c_str(), pInclude, nullptr);
+		delete pInclude;
 	}
 	else {
 		///@todo load from compiled shader
