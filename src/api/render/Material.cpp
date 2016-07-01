@@ -14,18 +14,18 @@ using std::vector;
 
 // ====================================
 
-TextureResRef Grafkit::MaterialBase::GetTexture(std::string bindName)
+TextureResRef Grafkit::BaseMaterial::GetTexture(std::string bindName)
 {
-	textureMap_it_t it = this->m_textures.find(bindName);
+	auto it = this->m_textures.find(bindName);
 	if (it != m_textures.end()) {
 		return it->second;
 	}
 	return TextureResRef();
 }
 
-void Grafkit::MaterialBase::SetTexture(TextureResRef texture, std::string bindName)
+void Grafkit::BaseMaterial::SetTexture(TextureResRef texture, std::string bindName)
 {
-	textureMap_it_t it = this->m_textures.find(bindName);
+	auto it = this->m_textures.find(bindName);
 	if (it != m_textures.end()) {
 		it->second = texture;
 	}
@@ -34,14 +34,14 @@ void Grafkit::MaterialBase::SetTexture(TextureResRef texture, std::string bindNa
 	}
 }
 
-void Grafkit::MaterialBase::AddTexture(TextureResRef texture, std::string bindName)
+void Grafkit::BaseMaterial::AddTexture(TextureResRef texture, std::string bindName)
 {
 	m_textures[bindName] = texture;
 }
 
-void Grafkit::MaterialBase::RemoveTexture(TextureResRef texture, std::string bindName)
+void Grafkit::BaseMaterial::RemoveTexture(TextureResRef texture, std::string bindName)
 {
-	textureMap_it_t it = this->m_textures.find(bindName);
+	auto it = this->m_textures.find(bindName);
 	if (it != m_textures.end()) {
 		m_textures.erase(it);
 	}
@@ -49,13 +49,13 @@ void Grafkit::MaterialBase::RemoveTexture(TextureResRef texture, std::string bin
 
 // ====================================
 
-void Grafkit::MaterialBase::Render(Renderer& render, ShaderRef &shader)
+void Grafkit::BaseMaterial::Render(Renderer& render, ShaderRef &shader)
 {
 	//(*shader)["material"] = &m_material;
 	shader->GetParam("material").SetP(&m_material);
 
 	
-	for (textureMap_it_t it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
+	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
 		if (it->second.Valid() && it->second->Valid())
 			shader->GetBRes(it->first).Set((*it->second)->GetTextureResource());
 	}

@@ -322,7 +322,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			aiString path, name;
 
 			/// @todo milyen material kell 
-			MaterialRef material = new MaterialBase();
+			MaterialRef material = new BaseMaterial();
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
 			///@todo nevekre szuksegunk ven-e?

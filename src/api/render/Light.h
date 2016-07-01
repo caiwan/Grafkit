@@ -28,7 +28,7 @@ namespace Grafkit{
 		float4 &GetBasePosition() { return m_position; }
 		float4 &GetBaseDirection() { return m_direction; }
 
-		float4 &GetAmbient() { return m_light.T_ambient; }
+		float4 &GetAmbient() { return m_light.ambient; }
 		float4 &GetDiffuse() { return m_light.diffuse; }
 		float4 &GetSpecular() { return m_light.specular; }
 
@@ -58,7 +58,7 @@ namespace Grafkit{
 			float4 position;
 			float4 direction;
 
-			float4 T_ambient;
+			float4 ambient;
 			float4 diffuse;
 			float4 specular;
 
@@ -75,19 +75,9 @@ namespace Grafkit{
 
 	};
 
-	/// FiRG RULEZ
-// #define __A_PICSABA_EZZEL_A_SZARRAL
-
-#ifndef __A_PICSABA_EZZEL_A_SZARRAL
-#define _BAZDMEG_GECI(x) __declspec(align(16)) class x : public BaseLight, public AlignedNew<x>
-#else /*__A_PICSABA_EZZEL_A_SZARRAL*/
-#define _BAZDMEG_GECI(x) class x : public BaseLight
-#endif /*__A_PICSABA_EZZEL_A_SZARRAL*/
-
 	// ============================================================================================================
-	//__declspec(align(16)) class PointLight : public BaseLight, public AlignedNew<PointLight>
+	__declspec(align(16)) class PointLight : public BaseLight, public AlignedNew<PointLight>
 	// class PointLight : public BaseLight 
-	_BAZDMEG_GECI(PointLight)
 	{
 	public:
 		PointLight() : BaseLight () {}
@@ -98,9 +88,8 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	//__declspec(align(16)) class DirectionalLight : public BaseLight, public AlignedNew<DirectionalLight>
+	__declspec(align(16)) class DirectionalLight : public BaseLight, public AlignedNew<DirectionalLight>
 	// class DirectionalLight : public BaseLight
-	_BAZDMEG_GECI(DirectionalLight)
 	{
 		public:
 		DirectionalLight() : BaseLight() {}
@@ -112,9 +101,8 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	//__declspec(align(16)) class SpotLight : public BaseLight, public AlignedNew<SpotLight>
+	__declspec(align(16)) class SpotLight : public BaseLight, public AlignedNew<SpotLight>
 	// class SpotLight : public BaseLight
-	_BAZDMEG_GECI(SpotLight)
 	{
 	public:
 		SpotLight() : BaseLight() {}
@@ -125,9 +113,8 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	//__declspec(align(16)) class AmbientLight : public BaseLight, public AlignedNew<AmbientLight>
+	__declspec(align(16)) class AmbientLight : public BaseLight, public AlignedNew<AmbientLight>
 	// class AmbientLight : public BaseLight
-	_BAZDMEG_GECI(AmbientLight)
 	{
 	public:
 		AmbientLight() : BaseLight() {}

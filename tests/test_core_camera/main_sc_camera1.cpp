@@ -94,7 +94,7 @@ protected:
 
 		// -- model 
 		ModelRef model = new Model;
-		model->SetMaterial(new MaterialBase);
+		model->SetMaterial(new BaseMaterial);
 		model->GetMaterial()->AddTexture(texture, "diffuse");
 
 
