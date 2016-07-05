@@ -31,6 +31,7 @@ namespace {
 // =============================================================================================================================
 
 typedef Resource<IAsset> IAssetRes;
+typedef Ref<IAssetRes> IAssetResRef;
 
 class IncludeProvider : public ID3DInclude {
 public:
@@ -54,13 +55,33 @@ public:
 			return E_FAIL;
 		}
 
-		asset = m_resman->GetAssetFactory()->Get(relpath);
+		try {
+			asset = m_resman->GetAssetFactory()->Get(relpath);
+			*ppData = asset->GetData();
+			*pBytes = asset->GetSize();
 
-		return E_FAIL;
+			// -- resmanhoz hozzaad
+			char buffer[256];
+			sprintf_s(buffer, "pointer@%d", asset->GetData());
+			IAssetResRef assetRes = new IAssetRes(asset);
+			assetRes->SetName(buffer);
+			m_resman->Add(assetRes);
+
+		}
+		catch (AssetLoadException &e) {
+			LOGGER(Log::Logger().Error(e.what()));
+			return E_FAIL;
+		}
+		return S_OK;
 	}
 
 	HRESULT __stdcall Close(LPCVOID pData) {
-		return E_FAIL;
+		// -- resmanbol kiszed
+		char buffer[256];
+		sprintf_s(buffer, "pointer@%d", pData);
+		m_resman->Remove(buffer);
+
+		return S_OK;
 	}
 
 private:

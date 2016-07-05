@@ -1,23 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <None Include="..\assets\fx\fisheye.hlsl" />
-    <None Include="..\assets\fx\flat.hlsl" />
-    <None Include="..\assets\fx\fxaa.hlsl" />
-    <None Include="..\assets\fx\postfx.hlsl" />
-    <None Include="..\assets\fx\postfxEngine.hlsl" />
-    <None Include="..\assets\fx\ssao.hlsl" />
-    <None Include="..\assets\fx\texture.hlsl" />
-    <None Include="..\assets\fx\vhstape.hlsl" />
+    <FxCompile Include="..\assets\shaders\default.hlsl" />
+    <FxCompile Include="..\assets\shaders\fisheye.hlsl" />
+    <FxCompile Include="..\assets\shaders\flat.hlsl" />
+    <FxCompile Include="..\assets\shaders\fxaa.hlsl" />
+    <FxCompile Include="..\assets\shaders\postfx.hlsl" />
+    <FxCompile Include="..\assets\shaders\postfxEngine.hlsl" />
+    <FxCompile Include="..\assets\shaders\ssao.hlsl" />
+    <FxCompile Include="..\assets\shaders\texture.hlsl" />
+    <FxCompile Include="..\assets\shaders\vhstape.hlsl" />
+    <FxCompile Include="..\assets\shaders\commons\layout.hlsl">
+      <Filter>commons</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="commons">
-      <UniqueIdentifier>{8e16ed8f-23f4-4a7c-a86a-5d2c2e5e37f7}</UniqueIdentifier>
+      <UniqueIdentifier>{fa8468d9-da69-4035-ac2d-a18c99532c5a}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\assets\fx\commons\layout.hlsl">
-      <Filter>commons</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

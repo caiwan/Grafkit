@@ -18,6 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\assets\shaders\commons\layout.hlsl" />
+    <FxCompile Include="..\assets\shaders\default.hlsl" />
+    <FxCompile Include="..\assets\shaders\fisheye.hlsl" />
+    <FxCompile Include="..\assets\shaders\flat.hlsl" />
+    <FxCompile Include="..\assets\shaders\fxaa.hlsl" />
+    <FxCompile Include="..\assets\shaders\postfx.hlsl" />
+    <FxCompile Include="..\assets\shaders\postfxEngine.hlsl" />
+    <FxCompile Include="..\assets\shaders\ssao.hlsl" />
+    <FxCompile Include="..\assets\shaders\texture.hlsl" />
+    <FxCompile Include="..\assets\shaders\vhstape.hlsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DF25AD4B-EAF1-4063-B977-990C049BDDE9}</ProjectGuid>
     <RootNamespace>shaders</RootNamespace>
@@ -109,35 +121,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="..\assets\fx\fisheye.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\fx\flat.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\fx\fxaa.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\fx\postfx.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\fx\postfxEngine.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\fx\ssao.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\fx\texture.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\fx\vhstape.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\assets\fx\commons\layout.hlsl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
