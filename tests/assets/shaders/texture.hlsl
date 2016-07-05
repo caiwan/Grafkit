@@ -1,3 +1,4 @@
+#include "commons/layout.hlsl"
 
 // GLOBALS //
 cbuffer MatrixBuffer
@@ -7,23 +8,17 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
+cbuffer {
+	float4 ambient, diffuse, specular, emission;
+	float specularLevel;
+	float shininess;
+	int type;
+};
+
 Texture2D diffuse;
 SamplerState SampleType;
 
 // TYPEDEFS //
-
-struct PixelInputType
-{
-	float4 position : SV_POSITION; 
-	float2 tex : TEXCOORD;
-};
-
-struct VertexInputType
-{
-	float4 position : POSITION;
-	float2 tex : TEXCOORD;
-};
-
 
 // VertexShader
 //------------------------------------------------------------------------------------
