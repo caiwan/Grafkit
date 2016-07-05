@@ -8,11 +8,11 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
-cbuffer {
-	float4 ambient, diffuse, specular, emission;
-	float specularLevel;
-	float shininess;
-	int type;
+cbuffer light {
+	float4 l_ambient, l_diffuse, l_specular, l_emission;
+	float l_specularLevel;
+	float l_shininess;
+	int l_type;
 };
 
 Texture2D diffuse;
