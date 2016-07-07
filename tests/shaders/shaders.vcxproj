@@ -19,16 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\assets\shaders\commons\layout.hlsl" />
+    <FxCompile Include="..\assets\shaders\commons\projection.hlsl" />
+    <FxCompile Include="..\assets\shaders\commons\lightmaterial.hlsl" />
     <FxCompile Include="..\assets\shaders\default.hlsl" />
-    <FxCompile Include="..\assets\shaders\fisheye.hlsl" />
-    <FxCompile Include="..\assets\shaders\flat.hlsl" />
-    <FxCompile Include="..\assets\shaders\fxaa.hlsl" />
-    <FxCompile Include="..\assets\shaders\postfx.hlsl" />
-    <FxCompile Include="..\assets\shaders\postfxEngine.hlsl" />
-    <FxCompile Include="..\assets\shaders\ssao.hlsl" />
-    <FxCompile Include="..\assets\shaders\texture.hlsl" />
-    <FxCompile Include="..\assets\shaders\vhstape.hlsl" />
+    <None Include="..\assets\shaders\fisheye.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\flat.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\fxaa.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\postfx.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\postfxEngine.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\ssao.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\texture.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\vhstape.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DF25AD4B-EAF1-4063-B977-990C049BDDE9}</ProjectGuid>

@@ -2,15 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <FxCompile Include="..\assets\shaders\default.hlsl" />
-    <FxCompile Include="..\assets\shaders\fisheye.hlsl" />
-    <FxCompile Include="..\assets\shaders\flat.hlsl" />
-    <FxCompile Include="..\assets\shaders\fxaa.hlsl" />
-    <FxCompile Include="..\assets\shaders\postfx.hlsl" />
-    <FxCompile Include="..\assets\shaders\postfxEngine.hlsl" />
-    <FxCompile Include="..\assets\shaders\ssao.hlsl" />
-    <FxCompile Include="..\assets\shaders\texture.hlsl" />
-    <FxCompile Include="..\assets\shaders\vhstape.hlsl" />
-    <FxCompile Include="..\assets\shaders\commons\layout.hlsl">
+    <FxCompile Include="..\assets\shaders\commons\lightmaterial.hlsl">
+      <Filter>commons</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\shaders\commons\projection.hlsl">
       <Filter>commons</Filter>
     </FxCompile>
   </ItemGroup>
@@ -18,5 +13,15 @@
     <Filter Include="commons">
       <UniqueIdentifier>{fa8468d9-da69-4035-ac2d-a18c99532c5a}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\assets\shaders\fisheye.hlsl" />
+    <None Include="..\assets\shaders\flat.hlsl" />
+    <None Include="..\assets\shaders\fxaa.hlsl" />
+    <None Include="..\assets\shaders\postfx.hlsl" />
+    <None Include="..\assets\shaders\postfxEngine.hlsl" />
+    <None Include="..\assets\shaders\ssao.hlsl" />
+    <None Include="..\assets\shaders\texture.hlsl" />
+    <None Include="..\assets\shaders\vhstape.hlsl" />
   </ItemGroup>
 </Project>
