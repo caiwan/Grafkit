@@ -51,10 +51,11 @@ namespace Grafkit {
 
 	protected:
 		struct material_t {
+			int type;	/* Material tipusa */
 			float4 ambient, diffuse, specular, emission;
 			float specularLevel;
 			float shininess;
-			int type;	/* Material tipusa */
+			
 		};
 
 		struct material_t m_material;
