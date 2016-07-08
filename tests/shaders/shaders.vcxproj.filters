@@ -1,15 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="..\assets\shaders\default.hlsl" />
-    <FxCompile Include="..\assets\shaders\commons\lightmaterial.hlsl">
-      <Filter>commons</Filter>
-    </FxCompile>
-    <FxCompile Include="..\assets\shaders\commons\projection.hlsl">
-      <Filter>commons</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="commons">
       <UniqueIdentifier>{fa8468d9-da69-4035-ac2d-a18c99532c5a}</UniqueIdentifier>
     </Filter>
@@ -23,5 +14,9 @@
     <None Include="..\assets\shaders\ssao.hlsl" />
     <None Include="..\assets\shaders\texture.hlsl" />
     <None Include="..\assets\shaders\vhstape.hlsl" />
+    <None Include="..\assets\shaders\commons\projection.hlsl">
+      <Filter>commons</Filter>
+    </None>
+    <None Include="..\assets\shaders\default.hlsl" />
   </ItemGroup>
 </Project>

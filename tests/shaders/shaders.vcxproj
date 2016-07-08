@@ -19,9 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\assets\shaders\commons\projection.hlsl" />
-    <FxCompile Include="..\assets\shaders\commons\lightmaterial.hlsl" />
-    <FxCompile Include="..\assets\shaders\default.hlsl" />
+    <None Include="..\assets\shaders\commons\projection.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\assets\shaders\default.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <None Include="..\assets\shaders\fisheye.hlsl">
       <FileType>Document</FileType>
     </None>
