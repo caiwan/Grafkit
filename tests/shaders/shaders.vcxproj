@@ -19,9 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\assets\shaders\commons\projection.hlsl">
-      <FileType>Document</FileType>
-    </None>
     <None Include="..\assets\shaders\default.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -41,9 +38,6 @@
       <FileType>Document</FileType>
     </None>
     <None Include="..\assets\shaders\ssao.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\assets\shaders\texture.hlsl">
       <FileType>Document</FileType>
     </None>
     <None Include="..\assets\shaders\vhstape.hlsl">

@@ -86,8 +86,8 @@ protected:
 			m_textureSampler->Initialize(render);
 
 			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
-			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
+			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "", ST_Vertex));
+			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "", ST_Pixel));
 
 			// -- precalc
 			this->DoPrecalc();
@@ -95,7 +95,7 @@ protected:
 			// -- model 
 			ModelRef model = new Model;
 			model->SetMaterial(new BaseMaterial());
-			model->GetMaterial()->AddTexture(texture, "diffuse");
+			model->GetMaterial()->AddTexture(texture, "t_diffuse");
 
 
 			SimpleMeshGenerator generator(render, m_vertexShader);
@@ -189,9 +189,6 @@ protected:
 				float f = abs(sin(t));
 				m_cameraActor->Transform().Identity();
 				m_cameraActor->Transform().Translate(0,0,f);
-
-
-				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 
 				scene->PreRender(render);
 				scene->Render(render);
