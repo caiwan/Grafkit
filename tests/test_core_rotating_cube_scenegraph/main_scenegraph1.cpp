@@ -86,15 +86,15 @@ protected:
 			m_textureSampler->Initialize(render);
 
 			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "fx/texture.hlsl", "TextureVertexShader", ST_Vertex));
-			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "fx/texture.hlsl", "TexturePixelShader", ST_Pixel));
+			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/texture.hlsl", "TextureVertexShader", ST_Vertex));
+			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 			// -- precalc
 			this->DoPrecalc();
 
 			// -- model 
 			ModelRef model = new Model;
-			model->SetMaterial(new MaterialBase);
+			model->SetMaterial(new BaseMaterial());
 			model->GetMaterial()->AddTexture(texture, "diffuse");
 
 
