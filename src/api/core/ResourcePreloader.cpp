@@ -30,14 +30,6 @@ AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IResourceM
 	for (size_t i = 0; i < sizeof(preloadFilters) / sizeof(preloadFilters[0]); i++) {
 		m_filters.push_back(new AssetFileFilter(preloadFilters[i].extensions, 8));
 	}
-
-	/* Alap resource pathek */
-	this->AddResourcePath("texture", "textures/");
-	this->AddResourcePath("shader", "shaders/");
-	this->AddResourcePath("shaderincludesystem", "shaders/");
-	this->AddResourcePath("shaderincludelocal", "shaders/");
-	this->AddResourcePath("model", "models/");
-	this->AddResourcePath("syncdata", "sync/");
 }
 
 AssetPreloader::~AssetPreloader()

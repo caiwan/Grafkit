@@ -8,6 +8,13 @@ using namespace FWdebugExceptions;
 
 IResourceManager::IResourceManager()
 {
+	/* Alap resource pathek */
+	this->AddResourcePath("texture", "textures/");
+	this->AddResourcePath("shader", "shaders/");
+	this->AddResourcePath("shaderincludesystem", "shaders/lib");
+	this->AddResourcePath("shaderincludelocal", "shaders/");
+	this->AddResourcePath("model", "models/");
+	this->AddResourcePath("syncdata", "sync/");
 }
 
 IResourceManager::~IResourceManager()

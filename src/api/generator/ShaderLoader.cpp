@@ -1,3 +1,4 @@
+
 #include "../stdafx.h"
 
 #include "ShaderLoader.h"
@@ -17,14 +18,6 @@ namespace {
 		"mainPixel",
 		"mainCompute",
 		"mainGeometry"
-	};
-
-	const char *type_names[ShaderType_e::ST_COUNT] = {
-		"",
-		"vs",
-		"ps",
-		"cs",
-		"gs"
 	};
 }
 
