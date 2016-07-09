@@ -59,12 +59,9 @@ struct PixelInputType
 	float4 tangent : TANGENT;
 	float4 binormal : BINORMAL;
 	
-	float2 tex : TEXCOORD0;
+	float4 tex : TEXCOORD0;
+	float4 worldPosition : TEXCOORD1;
 
-	float4 lightPos1 : TEXCOORD1;
-	float4 lightPos2 : TEXCOORD2;
-	float4 lightPos3 : TEXCOORD3;
-	float4 lightPos4 : TEXCOORD4;
 };
 
 
@@ -84,6 +81,11 @@ PixelInputType mainVertex(VertexInputType input)
 	PixelInputType output;
 
 	input.position.w = 1.0f;
+
+	output.worldPosition = input.position;
+	output.worldPosition = mul(output.worldPosition, viewMatrix);
+	output.worldPosition.xyz = output.worldPosition.xyz / output.worldPosition.w;
+
 	output.position = input.position;
 	output.position = mul(output.position, worldMatrix);
 	output.position = mul(output.position, viewMatrix);
@@ -110,22 +112,8 @@ PixelInputType mainVertex(VertexInputType input)
 	output.binormal = mul(output.binormal, projectionMatrix);
 	output.binormal = normalize(output.binormal);
 
-	//output.lightPos1.w = 0.0f;
-	//output.lightPos2.w = 0.0f;
-	//output.lightPos3.w = 0.0f;
-	//output.lightPos4.w = 0.0f;
-
-	//output.lightPos1.xyz = lights[0].l_position.xyz - output.position.xyz;
-	//output.lightPos2.xyz = lights[1].l_position.xyz - output.position.xyz;
-	//output.lightPos3.xyz = lights[2].l_position.xyz - output.position.xyz;
-	//output.lightPos4.xyz = lights[3].l_position.xyz - output.position.xyz;
-
-	//output.lightPos1 = normalize(output.lightPos1);
-	//output.lightPos2 = normalize(output.lightPos2);
-	//output.lightPos3 = normalize(output.lightPos3);
-	//output.lightPos4 = normalize(output.lightPos4);
-
-	output.tex = input.tex;
+	output.tex.zw = float2(0.0f, 1.0f);
+	output.tex.xy = input.tex.xy;
 
 	return output;
 }
