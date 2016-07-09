@@ -39,7 +39,7 @@ cbuffer light
 		float l_ca, l_la, l_qa;
 
 		float l_angle, l_falloff;
-	} lights[4];
+	} lights[16];
 
 }
 
