@@ -60,17 +60,17 @@ void CEditorView::InitScene(CXDrawingDevice * parent)
 	if (!dynamic_cast<CXD3D*>(parent))
 		return;
 
-	FWrender::Renderer &render = *(dynamic_cast<CXD3D*>(parent));
+	Grafkit::Renderer &render = *(dynamic_cast<CXD3D*>(parent));
 
-	this->m_fullscreen_quad = new FWrender::Model();
+	this->m_fullscreen_quad = new Grafkit::Model();
 
-	this->m_shader_vertex = new FWrender::Shader();
-	this->m_shader_vertex->LoadFromMemory(render, "main", defaultVertexShader, 65536, FWrender::ST_Vertex);
+	this->m_shader_vertex = new Grafkit::Shader();
+	this->m_shader_vertex->LoadFromMemory(render, "main", defaultVertexShader, 65536, Grafkit::ST_Vertex);
 
 	// +++ compile PSHader
 
 	// build model
-	FWrender::SimpleMeshGenerator generator(render, m_shader_vertex);
+	Grafkit::SimpleMeshGenerator generator(render, m_shader_vertex);
 	generator["POSITION"] = FWBuiltInData::quad;
 	generator["TEXCOORD"] = FWBuiltInData::quad_texcoord;
 
@@ -89,9 +89,9 @@ void CEditorView::DrawScene(CXDrawingDevice * parent)
 	if (!dynamic_cast<CXD3D*>(parent))
 		return;
 
-	FWrender::Renderer &render = *(dynamic_cast<CXD3D*>(parent));
+	Grafkit::Renderer &render = *(dynamic_cast<CXD3D*>(parent));
 
-	FWrender::ShaderRef pxshader = pDoc->m_shader_src.GetShader();
+	Grafkit::ShaderRef pxshader = pDoc->m_shader_src.GetShader();
 	if (pxshader.Invalid())
 		return;
 
@@ -231,7 +231,7 @@ void CEditorView::OnShaderCompile()
 	if (!pDoc)
 		return;
 
-	FWrender::Renderer &render = m_xd3d_view;
+	Grafkit::Renderer &render = m_xd3d_view;
 
 	theApp.GetMainFrame()->GetShaderEditorWnd().docFromEditor();
 	pDoc->m_shader_src.CompileShader(render);

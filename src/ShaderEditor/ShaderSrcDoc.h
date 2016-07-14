@@ -37,12 +37,12 @@ public:
 	CShaderSrcDoc();
 	~CShaderSrcDoc();
 
-	int CompileShader(FWrender::Renderer &render);
+	int CompileShader(Grafkit::Renderer &render);
 	void FlushErrors();
 
 	const int IsHasErrors() const {return m_is_has_errors;}	///< @return 1 ha tortent hiba a forditas soran, kulonben 0 
 
-	FWrender::ShaderRef GetShader(){return this->m_shader;}
+	Grafkit::ShaderRef GetShader(){return this->m_shader;}
 		
 	void SetShaderSource(TCHAR *in_src) {this->m_shader_source = in_src; }
 	CString &GetShaderSource() { return this->m_shader_source;}
@@ -60,7 +60,7 @@ protected:
 protected:
 	CString m_shader_source;
 
-	FWrender::ShaderRef m_shader;	///< Shader objektum, amit frissiteni kell.
+	Grafkit::ShaderRef m_shader;	///< Shader objektum, amit frissiteni kell.
 	int m_is_has_errors;
 
 	mapBufferRecord_t m_lBuffers;

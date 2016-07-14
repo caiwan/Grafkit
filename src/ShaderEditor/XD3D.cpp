@@ -2,7 +2,7 @@
 #include "XD3D.h"
 
 
-CXD3D::CXD3D() : CXDrawingDevice(), FWrender::Renderer()
+CXD3D::CXD3D() : CXDrawingDevice(), Grafkit::Renderer()
 {
 }
 

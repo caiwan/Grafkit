@@ -5,7 +5,7 @@
 
 class CXD3D :
 	public CXDrawingDevice,
-	public FWrender::Renderer
+	public Grafkit::Renderer
 {
 public:
 	CXD3D();

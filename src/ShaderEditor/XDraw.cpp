@@ -123,7 +123,7 @@ void CXDrawingDevice::OnSize(UINT nType, int cx, int cy)
 
 	if (0 >= cx || 0 >= cy || nType == SIZE_MINIMIZED) return;
 
-	//FWrender::applyView(cx, cy);
+	//Grafkit::applyView(cx, cy);
 	this->CXResizeRenderSurface(cx, cy);
 
 	// -- ez minek kellett itt anno vajon?

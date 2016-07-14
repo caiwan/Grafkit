@@ -8,7 +8,7 @@
 
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
-using FWrender::Shader;
+using Grafkit::Shader;
 
 // aliases for nested classes 
 using BufferRecord = CShaderSrcDoc::BufferRecord;
@@ -33,15 +33,15 @@ CShaderSrcDoc::CShaderSrcDoc() :
 CShaderSrcDoc::~CShaderSrcDoc(){
 }
 
-int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
+int CShaderSrcDoc::CompileShader(Grafkit::Renderer &render){
 	// shader objektum cserevel dolgozik
-	FWrender::ShaderRef newshader;
+	Grafkit::ShaderRef newshader;
 
 	try{
 		this->m_is_has_errors = 1;
 
-		newshader = new FWrender::Shader();
-		newshader->LoadFromMemory(render, "main", m_shader_source, m_shader_source.GetLength(), FWrender::ST_Pixel);
+		newshader = new Grafkit::Shader();
+		newshader->LoadFromMemory(render, "main", m_shader_source, m_shader_source.GetLength(), Grafkit::ST_Pixel);
 	
 		m_shader = newshader;
 

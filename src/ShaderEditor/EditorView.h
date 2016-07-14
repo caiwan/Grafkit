@@ -43,8 +43,8 @@ public:
 protected:
 
 	// fields
-	FWrender::ShaderRef m_shader_vertex;
-	FWrender::ModelRef m_fullscreen_quad;
+	Grafkit::ShaderRef m_shader_vertex;
+	Grafkit::ModelRef m_fullscreen_quad;
 
 	CXD3D m_xd3d_view;
 
