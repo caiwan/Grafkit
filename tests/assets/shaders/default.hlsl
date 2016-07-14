@@ -12,35 +12,37 @@ cbuffer MatrixBuffer
 *
 */
 
+struct Material {
+	int m_type;
+	float4 m_ambient, m_diffuse, m_specular, m_emission;
+	float m_specularLevel;
+	float m_shininess;
+} material;
+
+struct Light
+{
+	int l_type;
+	float4 l_position;
+	float4 l_direction;
+
+	float4 l_ambient;
+	float4 l_diffuse;
+	float4 l_specular;
+
+	float l_ca, l_la, l_qa;
+
+	float l_angle, l_falloff;
+};
+
 cbuffer material
 {
-	struct {
-		int m_type;
-		float4 m_ambient, m_diffuse, m_specular, m_emission;
-		float m_specularLevel;
-		float m_shininess;
-	} material;
+	struct Material material;
 };
 
 cbuffer light
 {
 	int is_lightOn[4];
-
-	struct
-	{
-		int l_type;
-		float4 l_position;
-		float4 l_direction;
-
-		float4 l_ambient;
-		float4 l_diffuse;
-		float4 l_specular;
-
-		float l_ca, l_la, l_qa;
-
-		float l_angle, l_falloff;
-	} lights[16];
-
+	struct Light lights[16];
 }
 
 struct VertexInputType
@@ -61,15 +63,13 @@ struct PixelInputType
 	
 	float4 tex : TEXCOORD0;
 	float4 worldPosition : TEXCOORD1;
-
 };
-
 
 SamplerState SampleType {
 	Filter = MIN_MAG_MIP_LINEAR;
 	AddressU = Wrap;
 	AddressV = Wrap;
-};;
+};
 
 Texture2D t_diffuse;
 Texture2D t_normal;
@@ -120,11 +120,32 @@ PixelInputType mainVertex(VertexInputType input)
 
 // PixelShader
 //------------------------------------------------------------------------------------
+
+
+//float4 calcPhongBlinn(float4 worldPosition, float4 texel, float4 normal, Material material, Light light)
+//{
+//	float4 p = light.l_position;
+//	float3 d = normalize(worldPosition - p);
+//	float lambda = saturate(dot(normal, -d)); /* lambert */
+//	lambda *= (light.qa / dot(p - worldPosition, p - worldPosition));
+//	
+//	float3 h = normalize(normalize(CameraPos - worldPosition) - d);
+//
+//	float e = pow(saturate(dot(h, input.Normal)), material.m_shininess); /* specular */
+//
+//	return float4(saturate(
+//		material.m_ambient +
+//		(material.m_diffuse * light.l_diffuse * lambda * 0.6) + 
+//		(material.m_specular * light.l_specular * e * 0.5) 
+//	), 1);
+//}
+
 float4 mainPixel(PixelInputType input) : SV_TARGET
 {
 	float4 textureColor = float4(0,0,0,1);
 	textureColor = t_diffuse.Sample(SampleType, input.tex);
-	//textureColor.x = 0;
-	//textureColor.w = 1;
+	
+	//float4 color0 = calcPointLight(input, material, lights[0]);
+
 	return textureColor;
 }
