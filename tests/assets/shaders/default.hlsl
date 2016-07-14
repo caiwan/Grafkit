@@ -17,7 +17,7 @@ struct Material {
 	float4 m_ambient, m_diffuse, m_specular, m_emission;
 	float m_specularLevel;
 	float m_shininess;
-} material;
+};
 
 struct Light
 {
