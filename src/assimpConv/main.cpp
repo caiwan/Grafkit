@@ -19,13 +19,15 @@
 using namespace std;
 using namespace ideup;
 
-int main(int argc, char* argv[])
+
+int run(int argc, char* argv[])
 {
 	Arguments args;
 
 	args.add("help", 'h').description("Shows this help message.").flag(true);
 	args.add("input", 'i').description("Input filename").required(true);
 	args.add("output", 'o').description("Output filename").required(true);
+	args.add("format", 'f').description("Output format.");
 	args.add("coords").description("Swap coordinate system axes. (xyz, xzy, ... )");
 	args.add("textures").description("Strip texture filenames").flag(true);
 
@@ -45,22 +47,29 @@ int main(int argc, char* argv[])
 	string outFileName = args.get("output").value();
 	string outExtension;
 
-	// strip file extension
+	// determine file format
+	if (!args.get("format").isFound())
 	{
 		string::size_type n;
 		string s = outFileName;
-		//do 
-		{
-			n = s.find_last_of('.');
-			if (n != string::npos) {
-				s = s.substr(n + 1);
-			}
-		} 
-		//while (n != string::npos);
-		outExtension = s;
+
+		n = s.find_last_of('.');
+		if (n != string::npos) {
+			s = s.substr(n + 1);
+		}
+		if (s.empty()) {
+			outExtension = "assbin";
+			cout << "WARNING: No file extension was given. Using assbin format for default." << endl;
+		}
+		else {
+			outExtension = s;
+		}
+	}
+	else {
+		outExtension = args.get("format").value();
 	}
 
-	//
+	// import scene 
 	Assimp::Importer aiImporter;
 	aiScene const * scene = aiImporter.ReadFile(inFileName.c_str(),
 		aiProcessPreset_TargetRealtime_Quality |
@@ -83,4 +92,10 @@ int main(int argc, char* argv[])
 	}
 
 	return 0;
+}
+
+
+int main(int argc, char* argv[]) {
+	int result = run(argc, argv);
+	return result;
 }
