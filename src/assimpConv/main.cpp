@@ -19,6 +19,19 @@
 using namespace std;
 using namespace ideup;
 
+aiTextureType textureTypes[] = {
+	aiTextureType_DIFFUSE,
+	aiTextureType_SPECULAR,
+	aiTextureType_AMBIENT,
+	aiTextureType_EMISSIVE,
+	aiTextureType_HEIGHT,
+	aiTextureType_NORMALS,
+	aiTextureType_SHININESS,
+	aiTextureType_OPACITY,
+	aiTextureType_DISPLACEMENT,
+	aiTextureType_LIGHTMAP,
+	aiTextureType_REFLECTION
+}; 
 
 int run(int argc, char* argv[])
 {
@@ -28,8 +41,8 @@ int run(int argc, char* argv[])
 	args.add("input", 'i').description("Input filename").required(true);
 	args.add("output", 'o').description("Output filename").required(true);
 	args.add("format", 'f').description("Output format.");
-	args.add("coords").description("Swap coordinate system axes. (xyz, xzy, ... )");
-	args.add("textures").description("Strip texture filenames").flag(true);
+	args.add("axis").description("Change axis order of the cordinate system.. (like xyz, xzy, ... )");
+	args.add("textures").description("Strip path from texture filenames").flag(true);
 
 	// parse args
 	if (!args.evaluate(argc, argv)) {
@@ -81,6 +94,48 @@ int run(int argc, char* argv[])
 		cout << aiImporter.GetErrorString() << endl;
 		return 1;
 	}
+
+	// flip axes
+	if (args.get("axes").isFound()) {
+		string axesOrder = args.get("axes").value();
+		if (axesOrder.length() != 3) {
+			cout << args.getHelpMessage() << endl;
+			return 1;
+		}
+
+		char order[3];
+		size_t k = 3;
+		while (k--) {
+			char a = axesOrder.at(k), b = -1;
+			switch (a) {
+				case 'x': case 'X': b = 0; break;
+				case 'y': case 'Y': b = 1; break;
+				case 'z': case 'Z': b = 2; break;
+				default:
+					cout << args.getHelpMessage() << endl;
+					return 1;
+			}
+			order[k] = b;
+		}
+
+		// TODO hogyan ??? mit ??? 
+	}
+
+	// strip texture filenames
+	if (args.get("textures").isFound) {
+		if (scene->HasMaterials()) {
+			for (size_t i = 0; i < scene->mNumMaterials; i++) {
+				aiMaterial const * material = scene->mMaterials[i];
+				for (size_t j = 0; j < sizeof(textureTypes) / sizeof(textureTypes[0]); j++) {
+					for (size_t k = 0; k < material->GetTextureCount(textureTypes[j]); k++) {
+						// ... 
+						/// TODO folytkov
+					}
+				}
+			}
+		}
+	}
+
 
 	// save 
 	Assimp::Exporter aiExporter;
