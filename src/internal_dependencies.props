@@ -9,7 +9,7 @@
       <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(solutiondir)src\api;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)src\api;$(SolutionDir)externals\include\; </AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
