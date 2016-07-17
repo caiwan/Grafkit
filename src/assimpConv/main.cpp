@@ -50,7 +50,7 @@ int run(int argc, char* argv[])
 	args.add("help", 'h').description("Shows this help message.").flag(true);
 	args.add("input", 'i').description("Input filename").required(true);
 	args.add("output", 'o').description("Output filename").required(true);
-	args.add("format", 'f').description("Output format.");
+	args.add("format", 'f').description("Output format. Overrides file extension.");
 	args.add("axis").description("Change axis order of the cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
 	args.add("textures").description("Strip path from texture filenames").flag(true);
 
@@ -127,6 +127,17 @@ int run(int argc, char* argv[])
 					cout << args.getHelpMessage() << endl;
 					return 1;
 			}
+<<<<<<< .mine
+
+			switch (c) {
+				case '+': d = +1; break;
+				case '-': d = -1; break;
+			default:
+				cout << args.getHelpMessage() << endl;
+				return 1;
+			}
+
+=======
 
 			switch (c) {
 			case '+': d = +1; break;
@@ -136,6 +147,7 @@ int run(int argc, char* argv[])
 				return 1;
 			}
 
+>>>>>>> .theirs
 			order[k] = b;
 			polarity[k] = d;
 		}
