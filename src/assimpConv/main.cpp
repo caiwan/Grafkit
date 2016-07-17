@@ -19,6 +19,8 @@
 using namespace std;
 using namespace ideup;
 
+typedef unsigned int uint;
+
 aiTextureType textureTypes[] = {
 	aiTextureType_DIFFUSE,
 	aiTextureType_SPECULAR,
@@ -33,6 +35,14 @@ aiTextureType textureTypes[] = {
 	aiTextureType_REFLECTION
 }; 
 
+inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
+	aiVector3D v;
+	v.x = (*vertices)[order[0]] * polarity[0];
+	v.x = (*vertices)[order[1]] * polarity[1];
+	v.x = (*vertices)[order[2]] * polarity[2];
+	*vertices = v;
+}
+
 int run(int argc, char* argv[])
 {
 	Arguments args;
@@ -41,7 +51,7 @@ int run(int argc, char* argv[])
 	args.add("input", 'i').description("Input filename").required(true);
 	args.add("output", 'o').description("Output filename").required(true);
 	args.add("format", 'f').description("Output format.");
-	args.add("axis").description("Change axis order of the cordinate system.. (like xyz, xzy, ... )");
+	args.add("axis").description("Change axis order of the cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
 	args.add("textures").description("Strip path from texture filenames").flag(true);
 
 	// parse args
@@ -96,17 +106,19 @@ int run(int argc, char* argv[])
 	}
 
 	// flip axes
-	if (args.get("axes").isFound()) {
+	if (args.get("axes").isFound() && scene->HasMeshes()) {
 		string axesOrder = args.get("axes").value();
-		if (axesOrder.length() != 3) {
+		if (axesOrder.length() != 6) {
 			cout << args.getHelpMessage() << endl;
 			return 1;
 		}
 
 		char order[3];
-		size_t k = 3;
+		char polarity[3];
+		uint k = 3;
 		while (k--) {
-			char a = axesOrder.at(k), b = -1;
+			char a = axesOrder.at(2*k), b = -1;
+			char c = axesOrder.at(2*k+1), d = 1;
 			switch (a) {
 				case 'x': case 'X': b = 0; break;
 				case 'y': case 'Y': b = 1; break;
@@ -115,22 +127,51 @@ int run(int argc, char* argv[])
 					cout << args.getHelpMessage() << endl;
 					return 1;
 			}
+
+			switch (c) {
+			case '+': d = +1; break;
+			case '-': d = -1; break;
+			default:
+				cout << args.getHelpMessage() << endl;
+				return 1;
+			}
+
 			order[k] = b;
+			polarity[k] = d;
 		}
 
-		// TODO hogyan ??? mit ??? 
+		for (uint i = 0; i < scene->mNumMeshes; i++) {
+			aiMesh * const mesh = scene->mMeshes[i];
+			for (uint j = 0; j < mesh->mNumVertices; j++) {
+				swap_vertices(&mesh->mVertices[j], order, polarity);
+				swap_vertices(&mesh->mNormals[j], order, polarity);
+			}
+		}
+
 	}
 
 	// strip texture filenames
-	if (args.get("textures").isFound) {
-		if (scene->HasMaterials()) {
-			for (size_t i = 0; i < scene->mNumMaterials; i++) {
-				aiMaterial const * material = scene->mMaterials[i];
-				for (size_t j = 0; j < sizeof(textureTypes) / sizeof(textureTypes[0]); j++) {
-					for (size_t k = 0; k < material->GetTextureCount(textureTypes[j]); k++) {
-						// ... 
-						/// TODO folytkov
+	if (args.get("textures").isFound && scene->HasMaterials()) {
+		for (uint i = 0; i < scene->mNumMaterials; i++) {
+			aiMaterial const * material = scene->mMaterials[i];
+			for (uint j = 0; j < sizeof(textureTypes) / sizeof(textureTypes[0]); j++) {
+				aiTextureType tt = textureTypes[j];
+				for (uint k = 0; k < material->GetTextureCount(tt); k++) {
+					aiString aiPath;
+					material->GetTexture(tt, k, &aiPath);
+					string path = aiPath.C_Str();
+					{
+						string s = path;
+						string::size_type n;
+						n = s.find_last_of('/');
+						if (n != string::npos) {
+							s  = s.substr(n + 1);
+						}
+						if (!s.empty()) {
+							path = s;
+						}
 					}
+					// textura filenev vissza
 				}
 			}
 		}
@@ -148,7 +189,6 @@ int run(int argc, char* argv[])
 
 	return 0;
 }
-
 
 int main(int argc, char* argv[]) {
 	int result = run(argc, argv);
