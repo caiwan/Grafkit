@@ -163,7 +163,7 @@ int run(int argc, char* argv[])
 	}
 
 	// strip texture filenames
-	if (args.get("textures").isFound && scene->HasMaterials()) {
+	if (args.get("textures").isFound() && scene->HasMaterials()) {
 		for (uint i = 0; i < scene->mNumMaterials; i++) {
 			aiMaterial const * material = scene->mMaterials[i];
 			for (uint j = 0; j < sizeof(textureTypes) / sizeof(textureTypes[0]); j++) {
