@@ -107,8 +107,8 @@ int run(int argc, char* argv[])
 	}
 
 	// flip axes
-	if (args.get("axes").isFound() && scene->HasMeshes()) {
-		string axesOrder = args.get("axes").value();
+	if (args.get("axis").isFound() && scene->HasMeshes()) {
+		string axesOrder = args.get("axis").value();
 		if (axesOrder.length() != 6) {
 			cout << args.getHelpMessage() << endl;
 			return 1;
@@ -118,8 +118,8 @@ int run(int argc, char* argv[])
 		char polarity[3];
 		uint k = 3;
 		while (k--) {
-			char a = axesOrder.at(2*k), b = -1;
-			char c = axesOrder.at(2*k+1), d = 1;
+			char c = axesOrder.at(2*k), b = -1;
+			char a = axesOrder.at(2*k+1), d = 1;
 			switch (a) {
 				case 'x': case 'X': b = 0; break;
 				case 'y': case 'Y': b = 1; break;
@@ -175,7 +175,14 @@ int run(int argc, char* argv[])
 					// textura filenev vissza
 				}
 			}
+			/*
+			for (uint l = 0; l < material->mNumProperties; l++) {
+				cout << material->mProperties[l]->mKey.C_Str() << endl;
+			}
+			cout << endl;
+			*/
 		}
+
 	}
 
 
