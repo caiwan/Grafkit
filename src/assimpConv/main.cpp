@@ -51,12 +51,13 @@ int run(int argc, char* argv[])
 	args.add("input", 'i').description("Input filename").required(true);
 	args.add("output", 'o').description("Output filename").required(true);
 	args.add("format", 'f').description("Output format. Overrides file extension.");
-	args.add("axis").description("Change axis order of the cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
-	args.add("textures").description("Strip path from texture filenames").flag(true);
+	args.add("axis", 'x').description("Change axis order of the cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
+	args.add("textures", 't').description("Strip path from texture filenames").flag(true);
 
 	// parse args
 	if (!args.evaluate(argc, argv)) {
 		cout << args.getErrorMessage() << endl;
+		cout << args.getHelpMessage() << endl;
 		return 1;
 	}
 
