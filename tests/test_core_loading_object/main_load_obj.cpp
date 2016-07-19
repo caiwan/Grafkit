@@ -72,7 +72,7 @@ protected:
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "fx/texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/kockak.fbx", m_vertexShader));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/kockak.bin", m_vertexShader));
 
 		m_t = 0;
 
