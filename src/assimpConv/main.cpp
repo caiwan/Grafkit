@@ -127,7 +127,6 @@ int run(int argc, char* argv[])
 					cout << args.getHelpMessage() << endl;
 					return 1;
 			}
-<<<<<<< .mine
 
 			switch (c) {
 				case '+': d = +1; break;
@@ -137,17 +136,6 @@ int run(int argc, char* argv[])
 				return 1;
 			}
 
-=======
-
-			switch (c) {
-			case '+': d = +1; break;
-			case '-': d = -1; break;
-			default:
-				cout << args.getHelpMessage() << endl;
-				return 1;
-			}
-
->>>>>>> .theirs
 			order[k] = b;
 			polarity[k] = d;
 		}
