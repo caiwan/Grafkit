@@ -220,3 +220,5 @@ ModelManifest.xml
 shader-error.txt
 *.exe
 *.dll
+
+*.assbin
