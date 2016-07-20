@@ -148,7 +148,6 @@ int run(int argc, char* argv[])
 				swap_vertices(&mesh->mNormals[j], order, polarity);
 			}
 		}
-
 	}
 
 	// strip texture filenames
@@ -163,28 +162,39 @@ int run(int argc, char* argv[])
 					string path = aiPath.C_Str();
 					{
 						string s = path;
-						string::size_type n;
+						string::size_type n, m;
 						n = s.find_last_of('/');
+						m = s.find_last_of('\\');
 						if (n != string::npos) {
 							s  = s.substr(n + 1);
 						}
+						else if (m != string::npos) {
+							s = s.substr(m + 1);
+						}
+
 						if (!s.empty()) {
 							path = s;
 						}
 					}
+
 					// textura filenev vissza
+					const aiMaterialProperty* pp = nullptr;
+					if (aiGetMaterialProperty(material, AI_MATKEY_TEXTURE(tt, k), &pp) == AI_SUCCESS) {
+						aiMaterialProperty* pProp = const_cast<aiMaterialProperty*>(pp);
+						if (aiPTI_String == pProp->mType) {
+							size_t newLen = path.length() + 4;
+							char* newData = (char*)malloc(newLen);
+							(*(uint*)(&newData[0])) = path.length();
+							memcpy_s(&newData[4], newLen, path.c_str(), path.length());
+							free(pProp->mData);
+							pProp->mData = newData;
+							pProp->mDataLength = newLen;
+						}
+					}
 				}
 			}
-			/*
-			for (uint l = 0; l < material->mNumProperties; l++) {
-				cout << material->mProperties[l]->mKey.C_Str() << endl;
-			}
-			cout << endl;
-			*/
 		}
-
 	}
-
 
 	// save 
 	Assimp::Exporter aiExporter;
