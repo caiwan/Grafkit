@@ -11,7 +11,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main_load_obj.cpp">
+    <ClCompile Include="main_load_obj2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -96,8 +96,8 @@ int run(int argc, char* argv[])
 	// import scene 
 	Assimp::Importer aiImporter;
 	aiScene const * scene = aiImporter.ReadFile(inFileName.c_str(),
-		aiProcessPreset_TargetRealtime_Quality |
-		aiProcess_ConvertToLeftHanded |
+		// aiProcessPreset_TargetRealtime_Quality |
+		// aiProcess_ConvertToLeftHanded |
 		0);
 
 	if (scene == nullptr) {
@@ -182,10 +182,10 @@ int run(int argc, char* argv[])
 					if (aiGetMaterialProperty(material, AI_MATKEY_TEXTURE(tt, k), &pp) == AI_SUCCESS) {
 						aiMaterialProperty* pProp = const_cast<aiMaterialProperty*>(pp);
 						if (aiPTI_String == pProp->mType) {
-							size_t newLen = path.length() + 4;
+							size_t newLen = path.length() + 5;
 							char* newData = (char*)malloc(newLen);
 							(*(uint*)(&newData[0])) = path.length();
-							memcpy_s(&newData[4], newLen, path.c_str(), path.length());
+							memcpy_s(&newData[4], path.length()+1, path.c_str(), path.length()+1);
 							free(pProp->mData);
 							pProp->mData = newData;
 							pProp->mDataLength = newLen;
