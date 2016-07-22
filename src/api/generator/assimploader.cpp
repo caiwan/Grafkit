@@ -396,7 +396,10 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 				assimp_v3d_f4(curr_mesh->mNormals[k], v, 1.); normals.push_back(v);
 				
 				if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
-					assimp_v3d_f4(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
+					// @todo valamiert nincs mindig tangent
+					if (curr_mesh->mTangents) {
+						assimp_v3d_f4(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
+					}
 					assimp_v3d_f4(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs.push_back(float2(v.x, v.y));
 				}
 					
@@ -408,7 +411,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
 				generator["TEXCOORD"] = &texuvs[0];
-				generator["TANGENT"] = &tangents[0];
+				if (curr_mesh->mTangents)
+					generator["TANGENT"] = &tangents[0];
 			}
 
 			// -- faces
