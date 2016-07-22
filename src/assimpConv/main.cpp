@@ -38,8 +38,8 @@ aiTextureType textureTypes[] = {
 inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 	aiVector3D v;
 	v.x = (*vertices)[order[0]] * polarity[0];
-	v.x = (*vertices)[order[1]] * polarity[1];
-	v.x = (*vertices)[order[2]] * polarity[2];
+	v.y = (*vertices)[order[1]] * polarity[1];
+	v.z = (*vertices)[order[2]] * polarity[2];
 	*vertices = v;
 }
 
@@ -96,6 +96,7 @@ int run(int argc, char* argv[])
 	// import scene 
 	Assimp::Importer aiImporter;
 	aiScene const * scene = aiImporter.ReadFile(inFileName.c_str(),
+		aiProcess_CalcTangentSpace |
 		// aiProcessPreset_TargetRealtime_Quality |
 		// aiProcess_ConvertToLeftHanded |
 		0);
