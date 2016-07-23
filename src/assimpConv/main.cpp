@@ -97,6 +97,7 @@ int run(int argc, char* argv[])
 	Assimp::Importer aiImporter;
 	aiScene const * scene = aiImporter.ReadFile(inFileName.c_str(),
 		aiProcess_CalcTangentSpace |
+		aiProcess_GenSmoothNormals |
 		// aiProcessPreset_TargetRealtime_Quality |
 		// aiProcess_ConvertToLeftHanded |
 		0);
