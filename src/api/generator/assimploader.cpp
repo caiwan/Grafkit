@@ -133,15 +133,15 @@ namespace {
 
 	const char *texture_map_names[TT_COUNT] =
 	{
-		"diffuse",
-		"alpha",
-		"normal",
-		"shiniess",
-		"specular",
-		"selfillum",
-		"reflect",
-		"bump",
-		"aux",
+		"t_diffuse",
+		"t_alpha",
+		"t_normal",
+		"t_shiniess",
+		"t_specular",
+		"t_selfillum",
+		"t_reflect",
+		"t_bump",
+		"t_aux",
 	};
 }
 
@@ -300,6 +300,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
 		aiProcessPreset_TargetRealtime_Quality | 
 		aiProcess_ConvertToLeftHanded |
+		// aiProcess_CalcTangentSpace |
+		// aiProcess_GenSmoothNormals |
 		// aiProcess_GenNormals | // ez valamiert elszarik
 		0
 	);
