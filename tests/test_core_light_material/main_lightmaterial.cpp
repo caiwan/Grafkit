@@ -87,7 +87,7 @@ protected:
 
 		// -- load shader
 		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "", ST_Vertex));
-		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "", ST_Pixel));
+		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixelPhongNoTexture", ST_Pixel));
 
 		// -- precalc
 		this->DoPrecalc();
@@ -101,6 +101,7 @@ protected:
 		SimpleMeshGenerator generator(render, m_vertexShader);
 		generator["POSITION"] = (void*)GrafkitData::cubeVertices;
 		generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
+		generator["NORMAL"] = (void*)GrafkitData::cubeNormals;
 
 		generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
 
