@@ -47,7 +47,16 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 
 inline void swap_matrix_columns(aiMatrix4x4& matrix, char order[], char polarity[]) {
 	aiMatrix4x4 m;
-	// ...
+	for (int i = 0; i < 4; i++) {
+		/*m.m[i][0] = matrix.m[i][order[0]] * polarity[0];
+		m.m[i][1] = matrix.m[i][order[1]] * polarity[1];
+		m.m[i][2] = matrix.m[i][order[2]] * polarity[2];
+		m.m[i][3] = matrix.m[i][3];*/
+		m.m[0][i] = matrix.m[order[0]][i] * polarity[0];
+		m.m[1][i] = matrix.m[order[1]][i] * polarity[1];
+		m.m[2][i] = matrix.m[order[2]][i] * polarity[2];
+		m.m[3][i] = matrix.m[3][i];
+	}
 	matrix = m;
 }
 
@@ -161,8 +170,6 @@ int run(int argc, char* argv[])
 		}
 
 		// reorder matrices
-		
-		// http://www.geeksforgeeks.org/iterative-preorder-traversal/
 		if (scene->mRootNode && scene->mRootNode->mNumChildren)
 		{
 			bool done = false;
@@ -178,7 +185,7 @@ int run(int argc, char* argv[])
 					swap_matrix_columns(node->mTransformation, order, polarity);
 				}
 				
-				// push
+				// push next
 				for (uint i=0; i<node->mNumChildren; i++){
 					stack.push(node->mChildren[i]);
 				}
