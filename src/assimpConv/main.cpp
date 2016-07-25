@@ -5,6 +5,8 @@
 	@author Caiwan
 */
 
+#include<stack>
+
 #include "Arguments.hpp"
 
 #include "assimp/Importer.hpp"
@@ -41,6 +43,12 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 	v.y = (*vertices)[order[1]] * polarity[1];
 	v.z = (*vertices)[order[2]] * polarity[2];
 	*vertices = v;
+}
+
+inline void swap_matrix_columns(aiMatrix4x4& matrix, char order[], char polarity[]) {
+	aiMatrix4x4 m;
+	// ...
+	matrix = m;
 }
 
 int run(int argc, char* argv[])
@@ -142,7 +150,8 @@ int run(int argc, char* argv[])
 			order[k] = b;
 			polarity[k] = d;
 		}
-
+		
+		// reorder vertices
 		for (uint i = 0; i < scene->mNumMeshes; i++) {
 			aiMesh * const mesh = scene->mMeshes[i];
 			for (uint j = 0; j < mesh->mNumVertices; j++) {
@@ -150,6 +159,41 @@ int run(int argc, char* argv[])
 				swap_vertices(&mesh->mNormals[j], order, polarity);
 			}
 		}
+
+		// reorder matrices
+		
+		// http://www.geeksforgeeks.org/iterative-preorder-traversal/
+		if (scene->mRootNode && scene->mRootNode->mNumChildren)
+		{
+			bool done = false;
+			stack<aiNode*> stack;
+			
+			stack.push(scene->mRootNode);
+
+			while (!stack.empty()) {
+				aiNode *node = stack.top(); stack.pop();
+
+				// yield current node
+				if (node) {
+					swap_matrix_columns(node->mTransformation, order, polarity);
+				}
+				
+				// push
+				for (uint i=0; i<node->mNumChildren; i++){
+					stack.push(node->mChildren[i]);
+				}
+			}
+		}
+
+		// reorder animations
+		if (scene->HasAnimations()) {
+			for (uint i = 0; i < scene->mNumAnimations; i++) {
+				aiAnimation* anim = scene->mAnimations[i];
+				// ... reverse engineer
+				cout << anim->mName.C_Str() << endl;
+			}
+		}
+
 	}
 
 	// strip texture filenames
