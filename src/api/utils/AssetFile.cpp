@@ -104,19 +104,20 @@ namespace LiveReload {
 		}
 
 		void Poll(){
-			char buf[4096];
+			char buf[8192];
 			DWORD nRet;
 			BOOL result = TRUE;
 			char filename[MAX_PATH];
 
 			OVERLAPPED PollingOverlap;
 
-			FILE_NOTIFY_INFORMATION* pNotify;
+			FILE_NOTIFY_INFORMATION* pNotify = nullptr;
 			int offset;
 			PollingOverlap.OffsetHigh = 0;
 			PollingOverlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 			while (result)
 			{
+				ZeroMemory(buf, 8192);
 				result = ReadDirectoryChangesW(
 					m_hDir,// handle to the directory to be watched
 					&buf,// pointer to the buffer to receive the read results
@@ -133,14 +134,17 @@ namespace LiveReload {
 					&PollingOverlap,// pointer to structure needed for overlapped I/O
 					NULL);
 
-				WaitForSingleObject(PollingOverlap.hEvent, INFINITE);
+				WaitForSingleObject(PollingOverlap.hEvent, 250);
+
 				offset = 0;
 				int rename = 0;
 				char oldName[260];
 				char newName[260];
-				do
+
+				pNotify = (FILE_NOTIFY_INFORMATION*)((char*)buf + offset);
+
+				while (pNotify != nullptr && pNotify->NextEntryOffset) //(offset != 0);
 				{
-					pNotify = (FILE_NOTIFY_INFORMATION*)((char*)buf + offset);
 					strcpy_s(filename, "");
 					int filenamelen = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName, pNotify->FileNameLength / 2, filename, sizeof(filename), NULL, NULL);
 					filename[pNotify->FileNameLength / 2] = 0;
@@ -174,7 +178,7 @@ namespace LiveReload {
 
 					offset += pNotify->NextEntryOffset;
 
-				} while (pNotify->NextEntryOffset); //(offset != 0);
+				} 
 			}
 
 		}
@@ -202,7 +206,7 @@ FileAssetFactory::FileAssetFactory(std::string root) :
 FileAssetFactory::~FileAssetFactory()
 {
 #ifndef LIVE_RELEASE
-	((LiveReload::WatchDirectory*)m_eventWatcher)->Join();
+	((LiveReload::WatchDirectory*)m_eventWatcher)->Stop();
 	if (m_eventWatcher) delete m_eventWatcher;
 #endif
 }
@@ -258,6 +262,7 @@ void Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 			w->m_isReloadEngine = 0;
 			throw EX(LiveReloadCannotReloadItem);
 		}
+		count = 80;
 	}
 	count--;
 #endif
