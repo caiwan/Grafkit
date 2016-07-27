@@ -55,6 +55,7 @@ namespace Grafkit {
 	friend class Scene;
 	public:
 		Actor();
+		Actor(Ref<Entity3D> entity);
 		~Actor();
 
 		Grafkit::Matrix& Matrix() { return m_viewMatrix; }
@@ -104,3 +105,4 @@ namespace Grafkit {
 	};
 
 }
+

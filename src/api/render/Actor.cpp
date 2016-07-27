@@ -15,10 +15,19 @@ Grafkit::Entity3D::~Entity3D()
 
 // =================================================================
 
-Grafkit::Actor::Actor() : m_viewMatrix(), m_transformMatrix(),
+Grafkit::Actor::Actor() : 
+	m_viewMatrix(), m_transformMatrix(),
 	m_is_childrenHidden(0),
 	m_is_nodeHidden(0)
 {
+}
+
+Grafkit::Actor::Actor(Ref<Entity3D> entity) : 
+	m_viewMatrix(), m_transformMatrix(),
+	m_is_childrenHidden(0),
+	m_is_nodeHidden(0)
+{
+	AddEntity(entity);
 }
 
 Grafkit::Actor::~Actor()
