@@ -69,10 +69,10 @@ protected:
 
 		// -- load shader
 		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "mainVertex", ST_Vertex));
-		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixel", ST_Pixel));
+		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixelPhongNoTexture", ST_Pixel));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/shphere.assbin", m_vertexShader));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/sphere.assbin", m_vertexShader));
 
 		m_t = 0;
 
