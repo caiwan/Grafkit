@@ -134,18 +134,18 @@ namespace LiveReload {
 					&PollingOverlap,// pointer to structure needed for overlapped I/O
 					NULL);
 
-				WaitForSingleObject(PollingOverlap.hEvent, 250);
+				WaitForSingleObject(PollingOverlap.hEvent, INFINITE);
 
 				offset = 0;
 				int rename = 0;
 				char oldName[260];
 				char newName[260];
 
-				pNotify = (FILE_NOTIFY_INFORMATION*)((char*)buf + offset);
-
-				while (pNotify != nullptr && pNotify->NextEntryOffset) //(offset != 0);
+				do
 				{
-					strcpy_s(filename, "");
+					pNotify = (FILE_NOTIFY_INFORMATION*)((char*)buf + offset);
+
+					filename[0] = 0;
 					int filenamelen = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName, pNotify->FileNameLength / 2, filename, sizeof(filename), NULL, NULL);
 					filename[pNotify->FileNameLength / 2] = 0;
 					switch (pNotify->Action)
@@ -178,7 +178,7 @@ namespace LiveReload {
 
 					offset += pNotify->NextEntryOffset;
 
-				} 
+				} while (pNotify->NextEntryOffset); //(offset != 0);
 			}
 
 		}
