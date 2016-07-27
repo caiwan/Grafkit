@@ -45,19 +45,22 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 	*vertices = v;
 }
 
-inline void swap_matrix_columns(aiMatrix4x4& matrix, char order[], char polarity[]) {
+inline aiMatrix4x4 swap_matrix_columns(aiMatrix4x4 matrix, char order[], char polarity[]) {
 	aiMatrix4x4 m;
 	for (int i = 0; i < 4; i++) {
-		/*m.m[i][0] = matrix.m[i][order[0]] * polarity[0];
+#if 1
+		m.m[i][0] = matrix.m[i][order[0]] * polarity[0];
 		m.m[i][1] = matrix.m[i][order[1]] * polarity[1];
 		m.m[i][2] = matrix.m[i][order[2]] * polarity[2];
-		m.m[i][3] = matrix.m[i][3];*/
+		m.m[i][3] = matrix.m[i][3];
+#else
 		m.m[0][i] = matrix.m[order[0]][i] * polarity[0];
 		m.m[1][i] = matrix.m[order[1]][i] * polarity[1];
 		m.m[2][i] = matrix.m[order[2]][i] * polarity[2];
 		m.m[3][i] = matrix.m[3][i];
+#endif
 	}
-	matrix = m;
+	return m;
 }
 
 int run(int argc, char* argv[])
@@ -68,8 +71,13 @@ int run(int argc, char* argv[])
 	args.add("input", 'i').description("Input filename").required(true);
 	args.add("output", 'o').description("Output filename").required(true);
 	args.add("format", 'f').description("Output format. Overrides file extension.");
-	args.add("axis", 'x').description("Change axis order of the cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
+	args.add("axis", 'x').description("Change axis order of the vertex cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
+	args.add("up", 'u').description("shanges the up vector of all the cameras (like +y, -z ... )");
 	args.add("textures", 't').description("Strip path from texture filenames").flag(true);
+
+
+	Assimp::Importer aiImporter;
+	Assimp::Exporter aiExporter;
 
 	// parse args
 	if (!args.evaluate(argc, argv)) {
@@ -81,6 +89,7 @@ int run(int argc, char* argv[])
 	// print help
 	if (argc == 1 || args.get("help").isFound()) {
 		cout << args.getHelpMessage() << endl;
+		// +++ supported file formats
 		return 0;
 	}
  
@@ -111,7 +120,6 @@ int run(int argc, char* argv[])
 	}
 
 	// import scene 
-	Assimp::Importer aiImporter;
 	aiScene const * scene = aiImporter.ReadFile(inFileName.c_str(),
 		aiProcess_CalcTangentSpace |
 		aiProcess_GenSmoothNormals |
@@ -170,6 +178,7 @@ int run(int argc, char* argv[])
 		}
 
 		// reorder matrices
+#if 1
 		if (scene->mRootNode && scene->mRootNode->mNumChildren)
 		{
 			bool done = false;
@@ -182,7 +191,7 @@ int run(int argc, char* argv[])
 
 				// yield current node
 				if (node) {
-					swap_matrix_columns(node->mTransformation, order, polarity);
+					node->mTransformation = swap_matrix_columns(node->mTransformation, order, polarity);
 				}
 				
 				// push next
@@ -191,7 +200,11 @@ int run(int argc, char* argv[])
 				}
 			}
 		}
+#endif //0
 
+		// scene->mRootNode->mTransformation = aiMatrix4x4();
+
+#if 0
 		// reorder animations
 		if (scene->HasAnimations()) {
 			for (uint i = 0; i < scene->mNumAnimations; i++) {
@@ -200,8 +213,15 @@ int run(int argc, char* argv[])
 				cout << anim->mName.C_Str() << endl;
 			}
 		}
+#endif //0
 
 	}
+
+	// shange the up vector
+	if (args.get("up").isFound() && scene->HasCameras()) {
+		// ... 
+	}
+
 
 	// strip texture filenames
 	if (args.get("textures").isFound() && scene->HasMaterials()) {
@@ -250,7 +270,6 @@ int run(int argc, char* argv[])
 	}
 
 	// save 
-	Assimp::Exporter aiExporter;
 
 	if (aiExporter.Export(scene, outExtension, outFileName) != aiReturn_SUCCESS) {
 		cout << "Could not save model file" << endl;
