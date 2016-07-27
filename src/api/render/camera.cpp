@@ -19,7 +19,7 @@ Camera::Camera() : Entity3D()
 	m_screenWidth = 100;
 
 	m_position = float3(0, 0, 0);
-	m_look = float3(0, 0, 1);
+	m_look = float3(0, 0, 0);
 	m_up = float3(0, 1, 0);
 	m_rotation = float3(0, 0, 0);
 }
@@ -85,12 +85,14 @@ void Camera::Calculate(Renderer& renderer)
 	upVector = XMVector3TransformCoord(upVector, rotationMatrix);
 
 	lookVector = XMVectorAdd(positionVector, lookVector);
-	lookVector = XMVector3Normalize(lookVector);
+	lookVector = XMVector4Normalize(lookVector);
+	// lookVector
 
 	renderer.GetScreenSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
 	m_viewMatrix = XMMatrixLookToLH(positionVector, lookVector, upVector);
+	//m_viewMatrix = XMMatrixLookAtLH(positionVector, lookVector, upVector);
 
 	// --- projection & ortho --- 
 	m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
