@@ -44,6 +44,10 @@ void IResourceManager::Remove(const std::string & pName)
 	}
 }
 
+void IResourceManager::RemoveAll() {
+	m_resources.clear();
+}
+
 void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
 {	
 	auto it = m_resources.find(builder->GetName());

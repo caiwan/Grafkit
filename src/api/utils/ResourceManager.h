@@ -31,6 +31,7 @@ namespace Grafkit {
 
 		void Add(Ref<IResource> pResource);
 		void Remove(const std::string &pName);
+		void RemoveAll();
 		
 		// preloader
 		void Load(IResourceBuilder* builder);
