@@ -48,7 +48,7 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 inline aiMatrix4x4 swap_matrix_columns(aiMatrix4x4 matrix, char order[], char polarity[]) {
 	aiMatrix4x4 m;
 	for (int i = 0; i < 4; i++) {
-#if 1
+#if 0
 		m.m[i][0] = matrix.m[i][order[0]] * polarity[0];
 		m.m[i][1] = matrix.m[i][order[1]] * polarity[1];
 		m.m[i][2] = matrix.m[i][order[2]] * polarity[2];
@@ -169,6 +169,8 @@ int run(int argc, char* argv[])
 		}
 		
 		// reorder vertices
+		
+#if 0
 		for (uint i = 0; i < scene->mNumMeshes; i++) {
 			aiMesh * const mesh = scene->mMeshes[i];
 			for (uint j = 0; j < mesh->mNumVertices; j++) {
@@ -176,7 +178,7 @@ int run(int argc, char* argv[])
 				swap_vertices(&mesh->mNormals[j], order, polarity);
 			}
 		}
-
+#endif // 0		
 		// reorder matrices
 #if 0
 		if (scene->mRootNode && scene->mRootNode->mNumChildren)
@@ -200,9 +202,17 @@ int run(int argc, char* argv[])
 				}
 			}
 		}
-#endif //0
+#endif // 0
 
-		// scene->mRootNode->mTransformation = aiMatrix4x4();
+		// reorder cameras
+		if (scene->HasCameras()) {
+			for (uint i = 0; i < scene->mNumCameras; i++) {
+				aiCamera *camera = scene->mCameras[i];
+
+				// camera->mUp = aiVector3D(0, 0, -1);
+
+			}
+		}
 
 #if 0
 		// reorder animations
@@ -219,7 +229,8 @@ int run(int argc, char* argv[])
 
 	// shange the up vector
 	if (args.get("up").isFound() && scene->HasCameras()) {
-		// ... 
+		// string cameraUp = args.get("up").value();
+
 	}
 
 
