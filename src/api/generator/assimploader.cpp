@@ -71,6 +71,17 @@ using namespace FWdebugExceptions;
 	(SRC)->Get(_AI_ENUM, scalar);\
 }
 
+// blender workaround miatt kell
+// vertex order nem oke, (x y z) -> (x -z y)
+#if 0
+#define assimp_vertices(SRC, DST, W)\
+{\
+	(DST).x = (SRC).x, (DST).y = -(SRC).z, (DST).z = (SRC).y, (DST).w = (W);\
+}
+#else 
+#define assimp_vertices(SRC, DST, W) assimp_v3d_f4(SRC, DST, W)
+#endif
+
 Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 {
 	if (!m) 
@@ -300,9 +311,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
 		aiProcessPreset_TargetRealtime_Quality | 
 		aiProcess_ConvertToLeftHanded |
-		// aiProcess_CalcTangentSpace |
-		// aiProcess_GenSmoothNormals |
-		// aiProcess_GenNormals | // ez valamiert elszarik
+		aiProcess_CalcTangentSpace |
+		aiProcess_GenSmoothNormals |
+		//aiProcess_GenNormals | // ez valamiert elszarik
 		0
 	);
 
@@ -394,15 +405,15 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			for (k = 0; k < curr_mesh->mNumVertices; k++) {
 				float4 v; 
-				assimp_v3d_f4(curr_mesh->mVertices[k], v, 1.); vertices.push_back(v);
-				assimp_v3d_f4(curr_mesh->mNormals[k], v, 1.); normals.push_back(v);
+				assimp_vertices(curr_mesh->mVertices[k], v, 1.); vertices.push_back(v);
+				assimp_vertices(curr_mesh->mNormals[k], v, 1.); normals.push_back(v);
 				
 				if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
 					// @todo valamiert nincs mindig tangent
 					if (curr_mesh->mTangents) {
-						assimp_v3d_f4(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
+						assimp_vertices(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
 					}
-					assimp_v3d_f4(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs.push_back(float2(v.x, v.y));
+					assimp_vertices(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs.push_back(float2(v.x, v.y));
 				}
 					
 			}

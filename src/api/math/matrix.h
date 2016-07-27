@@ -108,45 +108,11 @@ namespace Grafkit {
 		}
 
 
-		/// Do a complex transformation 
-		void Transform() {
-			/// @todo TBD
+		// tengelyeket megcsereli a matrixban (xyz => x-zy)
+		void FlipAxisXZY() {
+			//... 
 		}
-
-//		/// Create orthographic projection
-//		void Ortho(float vwidth, float vheigt, float znear, float zfar) 
-//		{
-//#ifdef USE_LEFT_HANDED_SYSTEM
-//			(*this) = DirectX::XMMatrixOrthographicLH(vwidth, vheigt, znear, zfar);
-//#else //USE_LEFT_HANDED_SYSTEM
-//			(*this) = DirectX::XMMatrixOrthographicRH(vwidth, vheigt, znear, zfar);
-//#endif //USE_LEFT_HANDED_SYSTEM
-//		}
-//		
-//		/**
-//			Crete perspective projection from screen metrics
-//		*/
-//		void PerspectiveXY(float vWidth, float vHeight, float zNear, float zFar) 
-//		{
-//#ifdef USE_LEFT_HANDED_SYSTEM
-//			(*this) = DirectX::XMMatrixPerspectiveLH(vWidth, vHeight, zNear, zFar);
-//#else //USE_LEFT_HANDED_SYSTEM
-//			(*this) = DirectX::XMMatrixPerspectiveRH(vWidth, vHeight, zNear, zFar);
-//#endif //USE_LEFT_HANDED_SYSTEM		
-//		}
-//
-//		/**
-//		Crete perspective projection from screen metrics
-//		*/
-//		void Perspective(float aspect, float fov, float zNear, float zFar)
-//		{
-//#ifdef USE_LEFT_HANDED_SYSTEM
-//			(*this) = DirectX::XMMatrixPerspectiveFovLH(aspect, fov, zNear, zFar);
-//#else //USE_LEFT_HANDED_SYSTEM
-//			(*this) = DirectX::XMMatrixPerspectiveFovLH(aspect, fov, zNear, zFar);
-//#endif //USE_LEFT_HANDED_SYSTEM		
-//		}
-
+		
 		// --- lookat
 
 		/// Transpose matrix
