@@ -1,9 +1,7 @@
 /**
-	@brief
 */
 
-#ifndef _System_H_
-#define _System_H_
+#pragma once 
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -42,4 +40,4 @@ namespace Grafkit
 
 }
 
-#endif
+

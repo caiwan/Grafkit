@@ -2,14 +2,12 @@
 
 #include "System.h"
 #include "input.h"
-
-#include "../utils/exceptions.h"
-
-#include "../utils/logger.h"
+#include "livereload.h"
 
 ///@todo add log mock
 
 using namespace Grafkit;
+using namespace FWdebugExceptions;
 
 System::System()
 	: Window::WindowHandler() , m_window(this), m_pInput(nullptr)
@@ -35,8 +33,11 @@ int System::execute() {
 	// --- init
 	
 	// +++ crete graphics device here 
-	
+#ifndef LIVE_RELEASE
+	bool reload = false;
 	do {
+		reload = false;
+#endif //LIVE_RELEASE
 		// + exception handling
 		try
 		{
@@ -88,6 +89,12 @@ int System::execute() {
 			}
 
 		}
+#ifndef LIVE_RELEASE
+		catch (LiveReloadCannotReloadItem &ex) {
+			LOGGER(Log::Logger().Error(ex.what()));
+			reload = true;
+		}
+#endif //LIVE_RELEASE
 		catch (FWdebug::Exception& ex)
 		{
 			///@todo handle exceptions here 
@@ -99,13 +106,14 @@ int System::execute() {
 		}
 		// ================================================================================================================================
 		// --- teardown
+		{
+			this->release();
+			this->ShutdownWindows();
+		}
 
-	} while (0);
-
-	{
-		this->release();
-		this->ShutdownWindows();
-	}
+#ifndef LIVE_RELEASE
+	} while (reload);
+#endif //LIVE_RELEASE
 
 	return 0;
 }

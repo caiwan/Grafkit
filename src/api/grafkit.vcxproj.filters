@@ -310,5 +310,8 @@
     <ClInclude Include="core\thread.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="core\livereload.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
