@@ -108,15 +108,18 @@ int System::execute() {
 		// --- teardown
 		{
 			this->release();
-			this->ShutdownWindows();
 		}
 
 #ifndef LIVE_RELEASE
 	} while (reload);
 #endif //LIVE_RELEASE
 
+	this->ShutdownWindows();
+
 	return 0;
 }
+
+
 
 LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 	{

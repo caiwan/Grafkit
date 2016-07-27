@@ -34,9 +34,23 @@ public:
 
 		// initwindowot is ertelmesebb helyre kell rakni
 		InitializeWindows(screenWidth, screenHeight);
+
+		//this->render = new Renderer();
+
+		// --- ezeket kell osszeszedni egy initwindowban
+		screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
+		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
+
+		int result = 0;
+
+		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+		this->m_file_loader = new Grafkit::FileAssetFactory("./../assets/");
 	}
 
 	~Application() {
+		// release();
+		delete m_file_loader;
+		this->render.Shutdown();
 	}
 
 protected:
@@ -52,19 +66,6 @@ protected:
 	ShaderResRef m_fragmentShader;
 
 	int init() {
-		//this->render = new Renderer();
-
-		// --- ezeket kell osszeszedni egy initwindowban
-		const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
-		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
-
-		int result = 0;
-
-		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
-
-		// init file loader
-		this->m_file_loader = new Grafkit::FileAssetFactory("./../assets/");
-
 		LoadCache();
 
 		// -- load shader
@@ -88,7 +89,7 @@ protected:
 
 	void release() {
 		SaveCache();
-		this->render.Shutdown();
+		RemoveAll();
 	};
 
 	int mainloop() {
