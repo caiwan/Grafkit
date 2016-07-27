@@ -3,6 +3,8 @@
 #include "ResourceManager.h"
 #include "dirent.h"
 
+#include "../core/livereload.h"
+
 #ifndef LIVE_RELEASE
 
 #include "../core/thread.h"
@@ -67,8 +69,13 @@ namespace LiveReload {
 		OVERLAPPED Overlapped;
 
 	public:
+		/// @todo eleminate miserable hack
+		int m_isReloadEngine;
 
-		WatchDirectory(LPCSTR path) : Thread()
+	public:
+
+		WatchDirectory(LPCSTR path) : Thread(),
+			m_isReloadEngine(0)
 		{
 			m_hDir = CreateFile(path, GENERIC_READ | FILE_LIST_DIRECTORY,
 				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -142,18 +149,24 @@ namespace LiveReload {
 					case FILE_ACTION_ADDED:
 						LOGGER(Log::Logger().Info("The file is added to the directory: [%s] \n", filename));
 						break;
+					
 					case FILE_ACTION_REMOVED:
 						LOGGER(Log::Logger().Info("The file is removed from the directory: [%s] \n", filename));
 						break;
+					
 					case FILE_ACTION_MODIFIED:
-						LOGGER(Log::Logger().Info("The file is modified. This can be a change in the time stamp or attributes: [%s]\n", filename));
+						LOGGER(Log::Logger().Info("The file is modified. This can be a change in the time stamp or attributes: [%s]", filename));
+						m_isReloadEngine = 1;
 						break;
+
 					case FILE_ACTION_RENAMED_OLD_NAME:
 						LOGGER(Log::Logger().Info("The file was renamed and this is the old name: [%s]\n", filename));
 						break;
+					
 					case FILE_ACTION_RENAMED_NEW_NAME:
 						LOGGER(Log::Logger().Info("The file was renamed and this is the new name: [%s]\n", filename));
 						break;
+					
 					default:
 						LOGGER(Log::Logger().Info("\nDefault error.\n"));
 						break;
@@ -237,14 +250,17 @@ std::list<std::string> FileAssetFactory::GetAssetList(AssetFileFilter * filter)
 
 void Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 {
-//#ifndef LIVE_RELEASE
-//	static unsigned int count;
-//	if (count == 0) {
-//		m_eventWatcher->Poll(resman);
-//		count = 120;
-//	}
-//	count--;
-//#endif
+#ifndef LIVE_RELEASE
+	static unsigned char count;
+	if (count == 0) {
+		LiveReload::WatchDirectory* w = ((LiveReload::WatchDirectory*)m_eventWatcher);
+		if (w && w->m_isReloadEngine){
+			w->m_isReloadEngine = 0;
+			throw EX(LiveReloadCannotReloadItem);
+		}
+	}
+	count--;
+#endif
 }
 
 

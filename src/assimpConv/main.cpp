@@ -178,7 +178,7 @@ int run(int argc, char* argv[])
 		}
 
 		// reorder matrices
-#if 1
+#if 0
 		if (scene->mRootNode && scene->mRootNode->mNumChildren)
 		{
 			bool done = false;

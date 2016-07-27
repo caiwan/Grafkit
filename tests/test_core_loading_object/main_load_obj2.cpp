@@ -107,6 +107,9 @@ protected:
 		}
 
 		this->render.EndScene();
+
+		this->GetAssetFactory()->PollEvents(this);
+
 		return 0;
 	};
 
