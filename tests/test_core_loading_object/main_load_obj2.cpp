@@ -48,7 +48,6 @@ public:
 	}
 
 	~Application() {
-		// release();
 		delete m_file_loader;
 		this->render.Shutdown();
 	}
@@ -75,9 +74,19 @@ protected:
 		// -- model 
 		m_scene = this->Load<SceneRes>(new AssimpLoader("models/sphere.assbin", m_vertexShader));
 
-		m_t = 0;
-
 		DoPrecalc();
+
+		
+		// m_currCameraActor->Matrix().Identity();
+
+		// add new dummy camera
+		CameraRef camera = new Camera();
+		//camera->SetPosition(7.48, -5.34, -6.5);
+		camera->SetPosition(0, 10, 0);
+		ActorRef cameraActor = new Actor(camera);
+
+		m_scene->Get()->AddCameraNode(cameraActor);
+		m_scene->Get()->SetActiveCamera(1);
 
 		m_currCameraActor = m_scene->Get()->GetActiveCamera();
 
@@ -95,16 +104,10 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
-			float alpha = - M_PI / 2;
-
-			// m_currCameraActor->Transform().Identity();
-			//m_currCameraActor->Transform().RotateRPY(-alpha, alpha, 0);
-			//m_currCameraActor->Transform().Translate(alpha, 0, 0);
 
 			(*this->m_scene)->PreRender(render);
 			(*this->m_scene)->Render(render);
 
-			m_t += 0.001;
 		}
 
 		this->render.EndScene();
