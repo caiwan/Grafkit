@@ -56,6 +56,7 @@ protected:
 	Renderer render;
 	
 	ActorRef m_currCameraActor;
+	CameraRef m_camera;
 	
 	SceneResRef m_scene;
 
@@ -80,10 +81,10 @@ protected:
 		// m_currCameraActor->Matrix().Identity();
 
 		// add new dummy camera
-		CameraRef camera = new Camera();
+		m_camera = new Camera();
 		//camera->SetPosition(7.48, -5.34, -6.5);
-		camera->SetPosition(0, 10, 0);
-		ActorRef cameraActor = new Actor(camera);
+		m_camera->SetPosition(-5, 6, 15);
+		ActorRef cameraActor = new Actor(m_camera);
 
 		m_scene->Get()->AddCameraNode(cameraActor);
 		m_scene->Get()->SetActiveCamera(1);
@@ -92,6 +93,8 @@ protected:
 
 		m_scene->Get()->SetVShader(m_vertexShader);
 		m_scene->Get()->SetFShader(m_fragmentShader);
+
+		m_t = 0;
 
 		return 0;
 	};
@@ -104,6 +107,9 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
+			m_t += .01;
+
+			m_camera->SetPosition(0, -5, 15*(1.25+sin(m_t)));
 
 			(*this->m_scene)->PreRender(render);
 			(*this->m_scene)->Render(render);

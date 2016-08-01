@@ -66,16 +66,26 @@ void Camera::Calculate(Renderer& renderer)
 {
 
 	// lofasz a seggedbe kis geci 
+	// http://www.gamedev.net/page/resources/_/technical/directx-and-xna/directx-11-c-game-camera-r2978
 
-	float3 pos = float3(0, 0, 5);
+#if 0
+	float3 pos = float3(-5, 6, 15);
 	float3 center = float3(0, 0, 0);
 	float3 up = float3(0,1,0);
- 
+#else
+	float3 pos = m_position;
+	float3 center = m_look;
+	float3 up = m_up;
+#endif
+
 	XMVECTOR v_pos = XMLoadFloat3(&pos);
-	XMVECTOR v_center = XMLoadFloat3(&center);
+	XMVECTOR v_look, v_center = XMLoadFloat3(&center);
 	XMVECTOR v_up = XMLoadFloat3(&up);
 
-	m_viewMatrix = XMMatrixLookAtLH(v_pos, v_center, v_up);
+	v_look = XMVectorSubtract(v_pos, v_center); 
+	v_look = XMVector3Normalize(v_look);
+	
+	m_viewMatrix = XMMatrixLookToLH(v_pos, v_look, v_up);
 
 #if 0
 	XMFLOAT3 up, lookAt;
