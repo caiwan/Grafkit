@@ -88,7 +88,7 @@ protected:
 		ActorRef cameraActor = new Actor(m_camera);
 
 		m_scene->Get()->AddCameraNode(cameraActor);
-		m_scene->Get()->SetActiveCamera(1);
+		// m_scene->Get()->SetActiveCamera(1);
 
 		m_currCameraActor = m_scene->Get()->GetActiveCamera();
 
