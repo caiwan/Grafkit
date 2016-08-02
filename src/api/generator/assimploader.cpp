@@ -484,6 +484,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLookTo); // aiLookat == lookTowardsVector
 			assimp_v3d_f3_set(curr_camera->mUp, camera->SetUp);
 
+			// camera->SetUp(0, -1, 0);
+
 			// itt van meg aspekt, amivel kezdeni lehetne valamit
 
 			cameras.push_back(camera);

@@ -77,6 +77,7 @@ namespace FWdebugExceptions {\
 
 // --------------------------------------------------------------------------------
 DEFINE_EXCEPTION(NullPointerException, 1, "Null pointer")
+DEFINE_EXCEPTION(AssertFailException, 1, "Assertion failure")
 DEFINE_EXCEPTION(InvalidFormatException, 2, "Invalid format")
 DEFINE_EXCEPTION(InvalidOperationException, 3, "Invalid operation committed")
 DEFINE_EXCEPTION(InvalidParameterException, 4, "Invalid parameter")
@@ -84,5 +85,13 @@ DEFINE_EXCEPTION(ResourceNotFound, 5, "Resource or asset not found")
 DEFINE_EXCEPTION(FileNotFoundException, 6, "File not found")
 DEFINE_EXCEPTION(OutOfBoundsException, 7, "Index out of bounds");
 DEFINE_EXCEPTION(NotImplementedMethodException, 8, "Method that being called has no implementation");
+
+#ifndef LIVE_RELEASE
+#define ASSERT(EXP) if ((EXP) != 0) throw EX(FWdebugExceptions::AssertFailException)
+#define ASSERT_DETAILS(EXP, REASON) if ((EXP) != 0) throw EX_DETAILS(FWdebugExceptions::AssertFailException, REASON)
+#else //LIVE_RELEASE
+#define ASSERT(EXP) 
+#define ASSERT_DETAILS(EXP, REASON) 
+#endif //LIVE_RELEASE
 
 #endif // __EXCEPTIONS_H__

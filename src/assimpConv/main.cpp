@@ -181,6 +181,8 @@ int run(int argc, char* argv[])
 #endif // 0		
 		// reorder matrices
 #if 0
+		map<string, aiMatrix4x4> matrixMap;
+		map<string, aiNode*> nodeMap;
 		if (scene->mRootNode && scene->mRootNode->mNumChildren)
 		{
 			bool done = false;
@@ -193,6 +195,11 @@ int run(int argc, char* argv[])
 
 				// yield current node
 				if (node) {
+					// store node and old matrix
+					string name = node->mName.C_Str();
+					matrixMap[name] = node->mTransformation;
+					nodeMap[name] = node;
+
 					node->mTransformation = swap_matrix_columns(node->mTransformation, order, polarity);
 				}
 				
@@ -204,15 +211,23 @@ int run(int argc, char* argv[])
 		}
 #endif // 0
 
+#if 0
 		// reorder cameras
 		if (scene->HasCameras()) {
 			for (uint i = 0; i < scene->mNumCameras; i++) {
+				
+				// reset camera matrices
 				aiCamera *camera = scene->mCameras[i];
-
-				// camera->mUp = aiVector3D(0, 0, -1);
+				string name = camera->mName.C_Str();
+				auto itMatrix = matrixMap.find(name);
+				auto itNode = nodeMap.find(name);
+				
+				if (itMatrix != matrixMap.end() && itNode != nodeMap.end())
+					itNode->second->mTransformation = itMatrix->second;
 
 			}
 		}
+#endif 
 
 #if 0
 		// reorder animations

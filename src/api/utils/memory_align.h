@@ -54,4 +54,3 @@ template<typename TDerived> struct AlignedNew
 		operator delete(ptr);
 	}
 };
-

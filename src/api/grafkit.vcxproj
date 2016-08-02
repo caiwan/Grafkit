@@ -67,6 +67,7 @@
     <ClInclude Include="builtin_data\c64palette.h" />
     <ClInclude Include="builtin_data\cbm64Font.h" />
     <ClInclude Include="builtin_data\cube.h" />
+    <ClInclude Include="core\archetype.h" />
     <ClInclude Include="core\livereload.h" />
     <ClInclude Include="core\Music.h" />
     <ClInclude Include="core\ResourcePreloader.h" />

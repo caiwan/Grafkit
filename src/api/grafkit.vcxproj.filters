@@ -33,6 +33,9 @@
     <Filter Include="Source Files\valtracker\rocket">
       <UniqueIdentifier>{6bde4260-a312-485f-8b2b-974887b0f80f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\utils\persistent">
+      <UniqueIdentifier>{cc3b1e06-d364-4b29-8df7-bc0c025448b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="FWrender.cd" />
@@ -113,9 +116,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utils\archive.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="utils\AssetFactory.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -126,9 +126,6 @@
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\logger.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\persistent.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
     <ClCompile Include="utils\ResourceBuilder.cpp">
@@ -157,6 +154,12 @@
     </ClCompile>
     <ClCompile Include="core\thread_win32.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\archive.cpp">
+      <Filter>Source Files\utils\persistent</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\persistent.cpp">
+      <Filter>Source Files\utils\persistent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -241,9 +244,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\archive.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
     <ClInclude Include="utils\asset.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
@@ -256,9 +256,6 @@
     <ClInclude Include="utils\dirent.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\dynamics.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
     <ClInclude Include="utils\exceptions.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
@@ -266,9 +263,6 @@
       <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="utils\memory_align.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\persistent.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="utils\reference.h">
@@ -312,6 +306,18 @@
     </ClInclude>
     <ClInclude Include="core\livereload.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\archetype.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\archive.h">
+      <Filter>Source Files\utils\persistent</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\dynamics.h">
+      <Filter>Source Files\utils\persistent</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\persistent.h">
+      <Filter>Source Files\utils\persistent</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
