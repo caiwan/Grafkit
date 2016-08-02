@@ -45,23 +45,10 @@ namespace Grafkit {
 		}
 
 		///@{
-		///translation
-		void Translate(float3 &v)
-		{
-			this->mat = DirectX::XMMatrixTranslation(v.x, v.y, v.z);			
-		}
-
-		void Translate(float x, float y, float z)
-		{
-			this->mat = DirectX::XMMatrixTranslation(x, y, z);
-		}
-		///@}
-
-		///@{
 		/// Multiply
 		void Multiply(matrix &m)
 		{
-			this->mat = DirectX::XMMatrixMultiply(this->mat, m);
+			this->mat = DirectX::XMMatrixMultiply(m, this->mat);
 		}
 
 		void Multiply(Matrix &m)
@@ -70,15 +57,28 @@ namespace Grafkit {
 		}
 		///@}
 
+		///@{
+		///translation
+		void Translate(float3 &v)
+		{
+			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixTranslation(v.x, v.y, v.z));
+		}
+
+		void Translate(float x, float y, float z)
+		{
+			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixTranslation(x, y, z));
+		}
+		///@}
+
 		/// banana for
 		void Scale(float3 &v)
 		{
-			this->mat = DirectX::XMMatrixScaling(v.x, v.y, v.z);
+			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(v.x, v.y, v.z));
 		}
 
 		void Scale(float x, float y, float z)
 		{
-			this->mat = DirectX::XMMatrixScaling(x, y, z);
+			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(x, y, z));
 		}
 
 		/// Mixed scale and translate operation
@@ -93,36 +93,28 @@ namespace Grafkit {
 		void Rotate(float3 v, float phi)
 		{
 			dxvector vv;
-			DirectX::XMLoadFloat3(&v);
-			this->mat = DirectX::XMMatrixRotationNormal(vv, phi);
+			vv = DirectX::XMLoadFloat3(&v);
+			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationNormal(vv, phi));
 		}
 
 		/// @todo https://en.wikipedia.org/wiki/Euler_angles
-		//void RotateEuler(float3 v) {
-		//}
 
 		/// Roll-Pitch-Yaw rotation
 		void RotateRPY(float roll, float pitch, float yaw)
 		{
-			this->mat = DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw);
-		}
-
-
-		// tengelyeket megcsereli a matrixban (xyz => x-zy)
-		void FlipAxisXZY() {
-			//... 
+			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw));
 		}
 		
 		// --- lookat
 
 		/// Transpose matrix
 		void Transpose() {
-			mat = XMMatrixTranspose(mat);
+			mat = DirectX::XMMatrixTranspose(mat);
 		}
 
 		/// Invert matrix
 		void Invert() {
-			mat = XMMatrixInverse(nullptr, mat);
+			mat = DirectX::XMMatrixInverse(nullptr, mat);
 		}
 
 		// ===
