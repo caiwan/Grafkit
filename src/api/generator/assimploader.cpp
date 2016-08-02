@@ -464,8 +464,11 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	if (scene->HasCameras()) {
 		LOGGER(Log::Logger().Trace("Cameras"));
 		for (i = 0; i < scene->mNumCameras; i++) {
-			CameraRef camera = new Camera();
+			
 			aiCamera *curr_camera = scene->mCameras[i];
+			
+			/// TODO az assimp nem kezeli kulon a perspektiv kamerat
+			CameraRef camera = new PerspectiveCamera();
 
 			const char* camera_name = curr_camera->mName.C_Str();
 			LOGGER(Log::Logger().Trace("- #%d %s", i, camera_name));
@@ -478,7 +481,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			// camera <- assmimp camera
 			
 			assimp_v3d_f3_set(curr_camera->mPosition, camera->SetPosition);
-			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLook);
+			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLookTo); // aiLookat == lookTowardsVector
 			assimp_v3d_f3_set(curr_camera->mUp, camera->SetUp);
 
 			// itt van meg aspekt, amivel kezdeni lehetne valamit

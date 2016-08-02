@@ -81,9 +81,10 @@ protected:
 		// m_currCameraActor->Matrix().Identity();
 
 		// add new dummy camera
-		m_camera = new Camera();
+		m_camera = new PerspectiveCamera();
 		//camera->SetPosition(7.48, -5.34, -6.5);
 		m_camera->SetPosition(-5, 6, 15);
+		m_camera->SetLookAt(0, 0, 0);
 		ActorRef cameraActor = new Actor(m_camera);
 
 		m_scene->Get()->AddCameraNode(cameraActor);
@@ -109,7 +110,7 @@ protected:
 		{
 			m_t += .01;
 
-			m_camera->SetPosition(0, -5, 15*(1.25+sin(m_t)));
+			m_camera->SetPosition(0, -10, 15*(1.25+sin(m_t)));
 
 			(*this->m_scene)->PreRender(render);
 			(*this->m_scene)->Render(render);

@@ -9,6 +9,7 @@ using namespace Grafkit;
 
 Camera::Camera() : Entity3D()
 {
+	m_mode = LOOK_TO;
 	m_fov = M_PI / 4.0f;
 
 	m_znear = 1.0;
@@ -19,7 +20,7 @@ Camera::Camera() : Entity3D()
 	m_screenWidth = 100;
 
 	m_position = float3(0, 0, 0);
-	m_look = float3(0, 0, 0);
+	m_look = float3(0, 0, 1);
 	m_up = float3(0, 1, 0);
 	m_rotation = float3(0, 0, 0);
 }
@@ -38,11 +39,20 @@ void Camera::SetPosition(float x, float y, float z)
 }
 
 
-void Grafkit::Camera::SetLook(float x, float y, float z)
+void Grafkit::Camera::SetLookAt(float x, float y, float z)
 {
+	m_mode = LOOK_AT;
 	m_look.x=x;
 	m_look.y=y;
 	m_look.z=z;
+}
+
+void Grafkit::Camera::SetLookTo(float x, float y, float z)
+{
+	m_mode = LOOK_TO;
+	m_look.x = x;
+	m_look.y = y;
+	m_look.z = z;
 }
 
 void Grafkit::Camera::SetUp(float x, float y, float z)
@@ -65,7 +75,8 @@ void Camera::SetRotation(float x, float y, float z)
 void Camera::Calculate(Renderer& renderer)
 {
 
-	// lofasz a seggedbe kis geci 
+	// itt kilukadta akamera, fixelni kell egy kicsit
+	
 	// http://www.gamedev.net/page/resources/_/technical/directx-and-xna/directx-11-c-game-camera-r2978
 
 #if 0
@@ -78,14 +89,64 @@ void Camera::Calculate(Renderer& renderer)
 	float3 up = m_up;
 #endif
 
-	XMVECTOR v_pos = XMLoadFloat3(&pos);
-	XMVECTOR v_look, v_center = XMLoadFloat3(&center);
-	XMVECTOR v_up = XMLoadFloat3(&up);
+	XMVECTOR v0, v1, v2;
+	XMVECTOR s, u, f;
+	XMVECTOR E = XMLoadFloat3(&pos);
+	XMVECTOR C = XMLoadFloat3(&center);
+	XMVECTOR U = XMLoadFloat3(&up);
 
-	v_look = XMVectorSubtract(v_pos, v_center); 
-	v_look = XMVector3Normalize(v_look);
-	
-	m_viewMatrix = XMMatrixLookToLH(v_pos, v_look, v_up);
+	// look at a reference point 
+	if (m_mode == LOOK_AT) {
+		//f = XMVectorSubtract(C, E);
+		f = XMVectorSubtract(E, C);
+		f = XMVector3Normalize(f);	// lookat
+	}
+	// look towards a drirection
+	else if(m_mode == LOOK_TO) {
+		f = C;	// lookat = center 
+	}
+
+#if 0
+	m_viewMatrix = XMMatrixLookToLH(E, f, U);
+#else 
+
+	// kezzel fel kell irni a kamera matrixot, mert a D3D-s feliras valamiert nem okes. 
+	// https://github.com/g-truc/glm/blob/316460408a5ef0338029a7c8f387ac49a2f1561c/glm/gtc/matrix_transform.inl#L638
+
+	s = XMVector3Cross(U, f);	// right
+
+	u = XMVector3Cross(f, s);	// up
+
+	v0 = XMVector3Dot(s, E);
+	v1 = XMVector3Dot(u, E);
+	v2 = XMVector3Dot(f, E);
+
+	float3 sv, uv, fv;
+	float vv0, vv1, vv2;
+
+	XMStoreFloat3(&sv, s);
+	XMStoreFloat3(&uv, u);
+	XMStoreFloat3(&fv, f);
+#if 0
+	XMStoreFloat(&vv0, v0);
+	XMStoreFloat(&vv1, v1);
+	XMStoreFloat(&vv2, v2);
+#else
+	XMVectorGetXPtr(&vv0, E);
+	XMVectorGetYPtr(&vv1, E);
+	XMVectorGetZPtr(&vv2, E);
+#endif
+
+	m_viewMatrix = Matrix(
+		sv.x, sv.y, sv.z, 0,
+		uv.x, uv.y, uv.z, 0,
+		fv.x, fv.y, fv.z, 0,
+		-vv0, -vv1, -vv2, 1
+	);
+
+	m_viewMatrix.RotateRPY(m_rotation.x, m_rotation.y, m_rotation.z);
+
+#endif // 0
 
 #if 0
 	XMFLOAT3 up, lookAt;
@@ -127,7 +188,7 @@ void Camera::Calculate(Renderer& renderer)
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
 	// --- projection & ortho --- 
-	m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
+	m_perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
 	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
 
 

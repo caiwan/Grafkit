@@ -10,15 +10,17 @@
 namespace Grafkit {
 
 	class Camera;
-	// class PerspectiveCamera;		///@todo implement this, see trello notes
-	// class OrthoCamera;			///@todo implement this, see trello notes
+	class PerspectiveCamera;		///@todo implement this, see trello notes
+	class OrthoCamera;			///@todo implement this, see trello notes
 	// 
 
-	__declspec(align(16)) class Camera : public AlignedNew<Camera>, public Grafkit::Entity3D
+	/** Basic camera class */
+	/*__declspec(align(16)) class Camera : public AlignedNew<Camera>, public Grafkit::Entity3D*/
+	class Camera : public Entity3D
 	{
 	public:
 		Camera();
-		~Camera();
+		virtual ~Camera();
 
 	/*	void* operator new(size_t);
 		void  operator delete(void*);
@@ -26,8 +28,15 @@ namespace Grafkit {
 		void SetPosition(float x, float y, float z);
 		float3 &GetPosition() { return this->m_position; }
 		
-		void SetLook(float x, float y, float z);
-		float3 &GetLookAt() { return this->m_position; }
+		/// Camera looka at a reference point 
+		void SetLookAt(float x, float y, float z);
+		void SetLookAt(float3 p) { SetLookAt(p.x, p.y, p.z); }
+
+		/// Camera looks towards a given vector
+		void SetLookTo(float x, float y, float z);
+		void SetLookTo(float3 p) { SetLookTo(p.x, p.y, p.z); }
+
+		float3 &GetLook() { return this->m_position; }
 
 		void SetUp(float x, float y, float z);
 		float3 &GetUp() { return this->m_up; }
@@ -53,12 +62,19 @@ namespace Grafkit {
 		//skip render, nothing to do with it. 
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene) {}
 
-		///@todo ezzel kell kezdeni valamit a jovoben:
 		Matrix& GetViewMatrix() { return m_viewMatrix; }
-		Matrix& GetProjectionMatrix() { return m_projectionMatrix; }
+		Matrix& GetPerspectiveMatrix() { return m_perspectiveMatrix; }
 		Matrix& GetOrthoMatrix() { return m_orthoMatrix; }
 
-		//virtual const char* GetBucketID() { return CAMERA_BUCKET; }
+		virtual Matrix& getProjrctionjMatrix() = 0;
+
+		enum camera_mode { LOOK_TO, LOOK_AT };
+		enum camera_mode getMode() {
+			return m_mode;
+		}
+		
+		enum camera_type { PERSPECTIVE, ORTHOGRAPHIC };
+		virtual enum camera_type getType() = 0;
 
 	private:
 		float3 m_position;
@@ -70,8 +86,36 @@ namespace Grafkit {
 		float m_aspect, m_screenWidth, m_screenHeight;
 		float m_fov;
 
+		enum camera_mode m_mode;
+	
+	protected:
 		Grafkit::Matrix m_viewMatrix;
-		Grafkit::Matrix m_projectionMatrix;
+		Grafkit::Matrix m_perspectiveMatrix;
 		Grafkit::Matrix m_orthoMatrix;
 	};
+
+	/** Perspective camera */
+	__declspec(align(16)) class PerspectiveCamera : public AlignedNew<PerspectiveCamera>, public Camera
+	{
+	public:
+		PerspectiveCamera() : Camera() {
+		}
+
+		virtual Matrix& getProjrctionjMatrix() { return m_perspectiveMatrix; }
+
+		virtual enum camera_type getType() { return PERSPECTIVE; }
+	};
+
+	/** Orthographic camera */
+	__declspec(align(16)) class OrthoCamera : public AlignedNew<OrthoCamera>, public Camera
+	{
+	public:
+		OrthoCamera() : Camera() {
+		}
+
+		virtual Matrix& getProjrctionjMatrix() { return m_orthoMatrix; }
+
+		virtual enum camera_type getType() { return ORTHOGRAPHIC; }
+	};
+
 }

@@ -69,7 +69,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 		Camera * camera = dynamic_cast<Camera *>(cameraActor->GetEntities()[0].Get());
 		if (camera) {
 			camera->Calculate(render);
-			m_cameraProjectionMatrix = camera->GetProjectionMatrix();
+			m_cameraProjectionMatrix = camera->GetPerspectiveMatrix();
 
 			Matrix mc = camera->GetViewMatrix();
 			Matrix ms = CalcNodeTransformTree(cameraActor);
