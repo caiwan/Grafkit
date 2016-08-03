@@ -1,6 +1,6 @@
 #pragma once
 #include "../render/dxtypes.h"
-#include "../utils/memory_align.h"
+#include "../utils/memory.h"
 
 namespace Grafkit {
 	/**

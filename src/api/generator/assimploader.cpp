@@ -1,9 +1,16 @@
-#include "../stdafx.h"
-
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <stack>
 #include <vector>
+
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+#include "assimp/material.h"
+#include "assimp/mesh.h"
+#include "assimp/matrix4x4.h"
+
+#include "../stdafx.h"
 
 #include "../utils/resource.h"
 #include "../utils/ResourceManager.h"
@@ -14,13 +21,6 @@
 #include "../render/model.h"
 #include "../render/camera.h"
 #include "../render/light.h"
-
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-#include "assimp/material.h"
-#include "assimp/mesh.h"
-#include "assimp/matrix4x4.h"
 
 #include "assimploader.h"
 

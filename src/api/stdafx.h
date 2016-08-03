@@ -9,14 +9,14 @@
 #include "utils/dynamics.h"
 #include "utils/persistent.h"
 
+// logger
+#include "utils/logger.h"
+
 // memory management
-#include "utils/memory_align.h"
+#include "utils/memory.h"
 
 //reference counter
 #include "utils/reference.h"
-
-// logger
-#include "utils/logger.h"
 
 //exceptions 
 #include "utils/exceptions.h"

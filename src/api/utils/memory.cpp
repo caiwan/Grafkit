@@ -1,108 +1,61 @@
-#define NO_NEW_OVERDEFINE
+#define NO_NEW_OVERRIDE
 #include "memory.h"
-#undef NO_NEW_OVERDEFINE
+#undef NO_NEW_OVERRIDE
 
-//#if 0
+#ifndef LIVE_RELEASE
 
-//#define NO_ALLOC_MAPING
-
-// http://stackoverflow.com/questions/438515/how-to-track-memory-allocations-in-c-especially-new-delete
-
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-
-//#include <hash_map>
-#include <map>
-
-#include <windows.h>
-
-using namespace std;
-
-///@todo memory alloc tesztet singleton osztallyal kell megcsinalni -> konstrukt es destrukt automatikusan
-
-#ifndef DEBUG_NO_MEMORY_ALLOC_TRACKING
-#ifdef CORE_DUMPING
-
-#include "memory_alloc.h"
-
-//#define ALLOC_TRACKING
-#define ALLOC_TRACKING_V2
-
-namespace {
-	void add(const char *msg, unsigned int size, const char *file, int line, void *ptr){
-		MallocTrk::instance().add(msg, size, file, line, ptr);
-	}
-
-	void remove(const char *msg, const char *file, int line, void *ptr){
-		MallocTrk::instance().remove(msg, file, line, ptr);
-	}
-
-	void resize(const char *msg, int newsize, const char *file, int line, void *ptr, void *newptr){
-		MallocTrk::instance().resize(msg, newsize, file, line, ptr, newptr);
+/**/
+track_printer::~track_printer() 
+{
+	FILE* fp = nullptr;
+	fopen_s(&fp, "memory.log", "wb");
+	if (fp) {
+		auto it = track->begin();
+		while (it != track->end()) {
+			const track_record &tr = it->second;
+			fprintf_s(fp, "%d bytes at %s %s line %d\n", tr.size, tr.file.c_str(), tr.function.c_str(), tr.line);
+			++it;
+		}
+		fflush(fp); fclose(fp);
 	}
 }
 
-void* __cdecl operator new(unsigned int size, const char *file, int line){
-	void *p = malloc(size); //memset(p, 0, size);
-#ifdef MEMORY_CLEAR_ALLOC
-	memset(p, 0, size);
-#endif 
-	add("new", size, file, line, p);
-	return p;
+
+/**/
+track_type * get_map() {
+	// don't use normal new to avoid infinite recursion.
+	static track_type * track = new (std::malloc(sizeof *track)) track_type;
+	static track_printer printer(track);
+	return track;
 }
 
-namespace{
-	static char __deleteFile[4096];
-	static int __deleteLine;
+void add_alloc(void * mem, std::size_t size, const char * file, const char * function, unsigned int line)
+{
+	(*get_map())[mem] = track_record(size, file, function, line);
 }
 
-void __cdecl operator delete(void *p){
-	void *pp = p;
-	remove("delete", __deleteFile, __deleteLine, p);
-	free(pp);
+void remove_alloc(void * mem)
+{
+	if (get_map()->erase(mem) == 0) {
+		// this indicates a serious bug
+		// Grafkit::Log::Logger().Error("bug: mem at %d, bytes wasn't allocated by us", mem);
+	}
 }
 
-// ez kisse fura megoldas
-void __cdecl deleteTracker(const char *file, int line){
-#if defined ALLOC_TRACKING || defined ALLOC_TRACKING_V2
-	strcpy(__deleteFile, file);
-	__deleteLine = line;
-#endif
+/**/
+void * __cdecl operator new(std::size_t size, const char* file, const char* function, unsigned int line) throw(std::bad_alloc) {
+	// we are required to return non-null
+	void * mem = std::malloc(size == 0 ? 1 : size);
+	if (mem == 0) {
+		throw std::bad_alloc();
+	}
+	add_alloc(mem, size, file, function, line);
+	return mem;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-
-void *DBG_malloc(size_t size, const char *file, int line){
-	void *p = malloc(size); //memset(p, 0, size);
-#ifdef MEMORY_CLEAR_ALLOC
-	memset(p, 0, size);
-#endif
-	add("malloc", size, file, line, p);
-	return p;
+void __cdecl operator delete(void * mem) throw() {
+	remove_alloc(mem);
+	std::free(mem);
 }
 
-void *DBG_realloc (void *ptr, size_t size, const char *file, int line){
-	void *p = ptr, *pp = NULL;
-	size_t oldsize = 0, newsize = size;
-
-	p = realloc(ptr, size);
-
-	resize("realloc", size, file, line, ptr, p);
-	return p;
-}
-
-void *DBG_calloc(size_t count, size_t size, const char *file, int line){
-	void *p = calloc(count, size); //memset(p, 0, size);
-	add("calloc", size, file, line, p);
-	return p;
-}
-
-void  DBG_free(void *p, const char *file, int line){
-	void *pp = p;
-	remove("free", file, line, pp);
-	free(pp);
-}
-
-#endif /*CORE_DUMPING*/
-#endif /*DEBUG_NO_MEMORY_ALLOC_TRACKING*/
+#endif //LIVE_RELEASE

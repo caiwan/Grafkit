@@ -4,7 +4,7 @@
 #include <map>
 
 #include "../utils/resource.h"
-#include "../utils/memory_align.h"
+#include "../utils/memory.h"
 
 #include "dxtypes.h"
 #include "renderer.h"

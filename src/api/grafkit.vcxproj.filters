@@ -161,9 +161,6 @@
     <ClCompile Include="utils\persistent.cpp">
       <Filter>Source Files\utils\persistent</Filter>
     </ClCompile>
-    <ClCompile Include="utils\memory_alloc.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="utils\memory.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -268,9 +265,6 @@
     <ClInclude Include="utils\logger.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\memory_align.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
     <ClInclude Include="utils\reference.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
@@ -324,9 +318,6 @@
     </ClInclude>
     <ClInclude Include="utils\persistent.h">
       <Filter>Source Files\utils\persistent</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\memory_alloc.h">
-      <Filter>Source Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="utils\memory.h">
       <Filter>Source Files\utils</Filter>

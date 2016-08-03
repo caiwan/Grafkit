@@ -1,83 +1,165 @@
-#ifndef MEMORY_TRACKING_MODULE_H__
-#define MEMORY_TRACKING_MODULE_H__
+#pragma once 
 
-#include "../GKSDK_config.h"
+#include <malloc.h>
+#include <exception>
+#include <map>
+#include <allocators>
 
-#include <cstdlib>
+#include "logger.h"
 
-///////////////////////////////////////////////////////////////////////
-#ifndef DEBUG_NO_MEMORY_ALLOC_TRACKING
-#ifdef CORE_DUMPING
+/*
+	http://stackoverflow.com/questions/438515/how-to-track-memory-allocations-in-c-especially-new-delete
+	http://www.flipcode.com/archives/How_To_Find_Memory_Leaks.shtml
+*/
 
-//#ifndef __cplusplus
-//void *__cdecl operator new[](unsigned int size); //fuck you dry
-//void *__cdecl operator new[](unsigned int size, const char *file, int line);
-void *__cdecl operator new(unsigned int size, const char *file, int line);
-void __cdecl operator delete(void *p); // ??
-//inline void __cdecl operator delete[](void *p){operator delete(p);}
-extern void __cdecl deleteTracker(const char *file, int line);
-//#endif /*__cplusplus*/
+#ifndef LIVE_RELEASE
+template<typename T> struct track_alloc : std::allocator<T>
+{
+	typedef typename std::allocator<T>::pointer pointer;
+	typedef typename std::allocator<T>::size_type size_type;
 
-#ifdef __cplusplus
-extern "C" {
-#endif /*__cplusplus*/
+	template<typename U>
+	struct rebind {
+		typedef track_alloc<U> other;
+	};
 
-extern void * DBG_malloc  (size_t size,               const char *file, int line);
-extern void * DBG_realloc (void *ptr, size_t size,    const char *file, int line);
-extern void * DBG_calloc  (size_t count, size_t size, const char *file, int line);
-extern void   DBG_free    (void *ptr,                 const char *file, int line);
+	track_alloc() {}
 
-#ifdef __cplusplus
-}
-#endif /*__cplusplus*/
+	template<typename U> track_alloc(track_alloc<U> const& u) :std::allocator<T>(u)
+	{
+	}
 
-#endif /*CORE_DUMPING*/
+	pointer allocate(size_type size, std::allocator<void>::const_pointer = 0)
+	{
+		void * p = std::malloc(size * sizeof(T));
+		if (p == 0) {
+			throw std::bad_alloc();
+		}
+		return static_cast<pointer>(p);
+	}
 
-#else /*DEBUG_NO_MEMORY_ALLOC_TRACKING*/
-#define NO_NEW_OVERDEFINE
-#endif /*DEBUG_NO_MEMORY_ALLOC_TRACKING*/
+	void deallocate(pointer p, size_type) {
+		std::free(p);
+	}
+};
 
-extern void write_allocationTable();
+struct track_record {
+	track_record() :
+		size(0),
+		file(""),
+		function(""),
+		line(0)
+	{
+	}
 
-#ifndef NO_NEW_OVERDEFINE
+	track_record(std::size_t size, std::string file, std::string function, unsigned int line) :
+		size(size),
+		file(file),
+		function(function),
+		line(line)
+	{
+	}
 
-//#ifndef __cplusplus
-#ifdef CORE_DUMPING
-#define DEBUG_NEW new(__FILE__, __LINE__)
-#define DEBUG_DELETE deleteTracker(__FILE__, __LINE__), delete
-//#define DEBUG_DELETE_A deleteTracker(__FILE__, __LINE__), delete[]
-//#endif /*__cplusplus*/
+	std::size_t size;
+	std::string file, function;
+	unsigned int line;
+};
 
-#define DBG_MALLOC(size)			DBG_malloc(size,		__FILE__, __LINE__)
-#define DBG_CALLOC(count, size)		DBG_calloc(count, size, __FILE__, __LINE__)
-#define DBG_REALLOC(ptr, newsize)	DBG_realloc(ptr, newsize, __FILE__, __LINE__)
-#define DBG_FREE(ptr)				DBG_free(ptr, __FILE__, __LINE__)
+typedef std::map< void*, track_record, std::less<void*>, track_alloc< std::pair<void* const, track_record> > > track_type;
 
-#else /*CORE_DUMPING*/
+struct track_printer {
+	track_type * track;
+	track_printer(track_type * track) : track(track) {}
+	~track_printer();
+};
 
-#define DEBUG_NEW new
-#define DEBUG_DELETE delete
-//#define DEBUG_DELETE_A delete[]
+extern track_type * get_map();
 
-#define DBG_MALLOC(size) malloc(size)
-#define DBG_CALLOC(count, size) calloc(count, size)
-#define DBG_REALLOC(ptr, newsize) realloc(ptr, newsize)
-#define DBG_FREE(ptr) free(ptr)
+extern void add_alloc(void* mem, std::size_t size, const char* file, const char* function, unsigned int line);
+extern void remove_alloc(void* mem);
 
-#endif /*CORE_DUMPING*/
+extern void * __cdecl operator new(std::size_t size, const char* file, const char* function, unsigned int line) throw(std::bad_alloc);
+extern void __cdecl operator delete(void * mem) throw();
 
-//#ifndef __cplusplus
+#endif //LIVE_RELEASE
+
+/**
+===================================================================================================
+
+Aligned new, taken from DXTK
+https://raw.githubusercontent.com/Microsoft/DirectXTK/master/Src/AlignedNew.h
+
+===================================================================================================
+*/
+
+/**
+// Derive from this to customize operator new and delete for
+// types that have special heap alignment requirements.
+//
+// Example usage:
+//
+//      __declspec(align(16)) struct MyAlignedType : public AlignedNew<MyAlignedType>
+*/
+
+template<typename TDerived> struct AlignedNew
+{
+	// Allocate aligned memory.
+#ifndef LIVE_RELEASE
+	static void* operator new (size_t size, const char* file, const char* function, unsigned int line) throw(std::bad_alloc)
+#else // LIVE_RELEASE
+	static void* operator new (size_t size) throw(std::bad_alloc)
+#endif //LIVE_RELEASE
+	{
+		const size_t alignment = __alignof(TDerived);
+		static_assert(alignment > 8, "AlignedNew is only useful for types with > 8 byte alignment. Did you forget a __declspec(align) on TDerived?");
+
+		void* mem = _aligned_malloc(size, alignment);
+
+		if (!mem)
+			throw std::bad_alloc();
+
+#ifndef LIVE_RELEASE
+		add_alloc(mem, size, file, function, line);
+#endif
+
+		return mem;
+	}
+
+	// Free aligned memory.
+	static void operator delete (void* ptr) throw()
+	{
+#ifndef LIVE_RELEASE
+		remove_alloc(ptr);
+#endif //LIVE_RELEASE
+
+		_aligned_free(ptr);
+	}
+
+
+	// Array overloads.
+#ifndef LIVE_RELEASE
+	static void* operator new[](size_t size, const char* file, const char* function, unsigned int line) 
+	{
+		return operator new(size, file, function, line);
+	}
+#else //LIVE_RELEASE
+	static void* operator new[](size_t size) 
+	{
+		return operator new(size);
+	}
+#endif // LIVE_RELEASE
+
+	static void operator delete[](void* ptr)
+	{
+		operator delete(ptr);
+	}
+
+};
+
+#ifndef LIVE_RELEASE
+/* override new */
+#ifndef NO_NEW_OVERRIDE
+#define DEBUG_NEW new(__FILE__, __FUNCTION__, __LINE__)
 #define new DEBUG_NEW
-#define delete DEBUG_DELETE
-//#define delete[] DEBUG_DELETE_A
-//#endif /*__cplusplus*/
-
-#define malloc DBG_MALLOC
-#define calloc DBG_CALLOC
-#define realloc DBG_REALLOC
-#define free DBG_FREE
-
-#endif /*NO_NEW_OVERDEFINE*/
-
-#endif /*MEMORY_TRACKING_MODULE_H__*/
-///////////////////////////////////////////////////////////////////////
+#endif /*NO_NEW_OVERRIDE*/
+#endif /*LIVE_RELEASE*/

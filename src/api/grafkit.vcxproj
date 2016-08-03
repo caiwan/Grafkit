@@ -56,7 +56,6 @@
     <ClCompile Include="utils\exceptions.cpp" />
     <ClCompile Include="utils\logger.cpp" />
     <ClCompile Include="utils\memory.cpp" />
-    <ClCompile Include="utils\memory_alloc.cpp" />
     <ClCompile Include="utils\persistent.cpp" />
     <ClCompile Include="utils\ResourceBuilder.cpp" />
     <ClCompile Include="utils\ResourceManager.cpp" />
@@ -107,8 +106,6 @@
     <ClInclude Include="utils\exceptions.h" />
     <ClInclude Include="utils\logger.h" />
     <ClInclude Include="utils\memory.h" />
-    <ClInclude Include="utils\memory_align.h" />
-    <ClInclude Include="utils\memory_alloc.h" />
     <ClInclude Include="utils\persistent.h" />
     <ClInclude Include="utils\reference.h" />
     <ClInclude Include="utils\resource.h" />

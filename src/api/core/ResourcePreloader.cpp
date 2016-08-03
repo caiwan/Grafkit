@@ -24,6 +24,8 @@ namespace {
 	};
 }
 
+/// @TODO init + shutdown
+
 AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IResourceManager()
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
@@ -34,6 +36,9 @@ AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IResourceM
 
 AssetPreloader::~AssetPreloader()
 {
+	for (size_t i = 0; i < m_filters.size(); i++) {
+		delete m_filters[i];
+	}
 }
 
 // ============================================================================================================

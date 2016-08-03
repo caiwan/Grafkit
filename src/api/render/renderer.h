@@ -12,7 +12,7 @@
 
 #include "../utils/reference.h"
 #include "../utils/exceptions.h"
-#include "../utils/memory_align.h"
+#include "../utils/memory.h"
 
 #include "dxtypes.h"
 
