@@ -88,7 +88,7 @@ protected:
 		ActorRef cameraActor = new Actor(m_camera);
 
 		m_scene->Get()->AddCameraNode(cameraActor);
-		m_scene->Get()->SetActiveCamera(1);
+		m_scene->Get()->SetActiveCamera(0);
 
 		m_currCameraActor = m_scene->Get()->GetActiveCamera();
 
@@ -110,7 +110,9 @@ protected:
 		{
 			m_t += .01;
 
-			m_camera->SetPosition(0, -10, 15*(1.25+sin(m_t)));
+			// m_camera->SetPosition(0, -10, 15*(1.25+sin(m_t)));
+			m_currCameraActor->Transform().Identity();
+			// m_currCameraActor->Transform().Translate(0, 0, 15 * sin(m_t));
 
 			(*this->m_scene)->PreRender(render);
 			(*this->m_scene)->Render(render);
