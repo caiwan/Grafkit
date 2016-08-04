@@ -1,5 +1,5 @@
 /**
-	A quick and dirtz thool that loads, converts and saves models 
+	A quick and dirtz thool that loads, converts and saves models
 	to the native format of assimp.
 
 	@author Caiwan
@@ -35,7 +35,7 @@ aiTextureType textureTypes[] = {
 	aiTextureType_DISPLACEMENT,
 	aiTextureType_LIGHTMAP,
 	aiTextureType_REFLECTION
-}; 
+};
 
 inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 	aiVector3D v;
@@ -48,17 +48,10 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 inline aiMatrix4x4 swap_matrix_columns(aiMatrix4x4 matrix, char order[], char polarity[]) {
 	aiMatrix4x4 m;
 	for (int i = 0; i < 4; i++) {
-#if 0
-		m.m[i][0] = matrix.m[i][order[0]] * polarity[0];
-		m.m[i][1] = matrix.m[i][order[1]] * polarity[1];
-		m.m[i][2] = matrix.m[i][order[2]] * polarity[2];
-		m.m[i][3] = matrix.m[i][3];
-#else
 		m.m[0][i] = matrix.m[order[0]][i] * polarity[0];
 		m.m[1][i] = matrix.m[order[1]][i] * polarity[1];
 		m.m[2][i] = matrix.m[order[2]][i] * polarity[2];
 		m.m[3][i] = matrix.m[3][i];
-#endif
 	}
 	return m;
 }
@@ -72,7 +65,8 @@ int run(int argc, char* argv[])
 	args.add("output", 'o').description("Output filename").required(true);
 	args.add("format", 'f').description("Output format. Overrides file extension.");
 	args.add("axis", 'x').description("Change axis order of the vertex cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
-	args.add("up", 'u').description("shanges the up vector of all the cameras (like +y, -z ... )");
+	args.add("flip", 'p').description("Flips the camera 180 deg around one given axis.");
+	args.add("lh").description("convert to left handed").flag(true);
 	args.add("textures", 't').description("Strip path from texture filenames").flag(true);
 
 
@@ -92,7 +86,7 @@ int run(int argc, char* argv[])
 		// +++ supported file formats
 		return 0;
 	}
- 
+
 	string inFileName = args.get("input").value();
 	string outFileName = args.get("output").value();
 	string outExtension;
@@ -119,12 +113,12 @@ int run(int argc, char* argv[])
 		outExtension = args.get("format").value();
 	}
 
+	bool isLH = args.get("lh").isFound();
+
 	// import scene 
 	aiScene const * scene = aiImporter.ReadFile(inFileName.c_str(),
-		aiProcess_CalcTangentSpace |
-		aiProcess_GenSmoothNormals |
-		// aiProcessPreset_TargetRealtime_Quality |
-		// aiProcess_ConvertToLeftHanded |
+		aiProcessPreset_TargetRealtime_Quality |
+		(!isLH ? 0 : aiProcess_ConvertToLeftHanded) |
 		0);
 
 	if (scene == nullptr) {
@@ -134,7 +128,9 @@ int run(int argc, char* argv[])
 	}
 
 	// flip axes
-	if (args.get("axis").isFound() && scene->HasMeshes()) {
+	if (args.get("axis").isFound() && scene->HasMeshes())
+	{
+
 		string axesOrder = args.get("axis").value();
 		if (axesOrder.length() != 6) {
 			cout << args.getHelpMessage() << endl;
@@ -145,20 +141,20 @@ int run(int argc, char* argv[])
 		char polarity[3];
 		uint k = 3;
 		while (k--) {
-			char c = axesOrder.at(2*k), b = -1;
-			char a = axesOrder.at(2*k+1), d = 1;
+			char c = axesOrder.at(2 * k), b = -1;
+			char a = axesOrder.at(2 * k + 1), d = 1;
 			switch (a) {
-				case 'x': case 'X': b = 0; break;
-				case 'y': case 'Y': b = 1; break;
-				case 'z': case 'Z': b = 2; break;
-				default:
-					cout << args.getHelpMessage() << endl;
-					return 1;
+			case 'x': case 'X': b = 0; break;
+			case 'y': case 'Y': b = 1; break;
+			case 'z': case 'Z': b = 2; break;
+			default:
+				cout << args.getHelpMessage() << endl;
+				return 1;
 			}
 
 			switch (c) {
-				case '+': d = +1; break;
-				case '-': d = -1; break;
+			case '+': d = +1; break;
+			case '-': d = -1; break;
 			default:
 				cout << args.getHelpMessage() << endl;
 				return 1;
@@ -167,10 +163,9 @@ int run(int argc, char* argv[])
 			order[k] = b;
 			polarity[k] = d;
 		}
-		
+
 		// reorder vertices
-		
-#if 0
+
 		for (uint i = 0; i < scene->mNumMeshes; i++) {
 			aiMesh * const mesh = scene->mMeshes[i];
 			for (uint j = 0; j < mesh->mNumVertices; j++) {
@@ -178,56 +173,123 @@ int run(int argc, char* argv[])
 				swap_vertices(&mesh->mNormals[j], order, polarity);
 			}
 		}
-#endif // 0		
-		// reorder matrices
-#if 0
+	}
+	// reorder matrices
+
+	if (args.get("flip").isFound() && scene->mRootNode && scene->mRootNode->mNumChildren){
+		string flip = args.get("flip").value();
+
+		if (flip.length() != 1) {
+			cout << args.getHelpMessage() << endl;
+			return 1;
+		}
+
+		// http://www.mathplanet.com/education/geometry/transformations/transformation-using-matrices
+		// http://web.iitd.ac.in/~hegde/cad/lecture/L6_3dtrans.pdf
+
+		aiMatrix4x4 axis_rotation; 
+		aiMatrix4x4 plane_reflect;
+		
+		/* Elforgatja egy tengely menten, es tukrozi a meroleges sikon. */
+		switch (flip.at(0)) {
+		// x, yz
+		case 'x': case 'X': 
+			axis_rotation = aiMatrix4x4(
+				1, 0, 0, 0,
+				0, -1, 0, 0,
+				0, 0, -1, 0,
+				0, 0, 0, 1
+			);
+
+			plane_reflect = aiMatrix4x4(
+				-1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			);
+
+			break;
+		// y, xz
+		case 'y': case 'Y': 
+			axis_rotation = aiMatrix4x4(
+				-1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, -1, 0,
+				0, 0, 0, 1
+			);
+
+			plane_reflect = aiMatrix4x4(
+				1, 0, 0, 0,
+				0, -1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			);
+			break;
+
+		// z, xy
+		case 'z': case 'Z': 
+			axis_rotation = aiMatrix4x4(
+				-1, 0, 0, 0,
+				0, -1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			);
+
+			plane_reflect = aiMatrix4x4(
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, -1, 0,
+				0, 0, 0, 1
+			);
+
+			break;
+		}
+
 		map<string, aiMatrix4x4> matrixMap;
 		map<string, aiNode*> nodeMap;
-		if (scene->mRootNode && scene->mRootNode->mNumChildren)
-		{
-			bool done = false;
-			stack<aiNode*> stack;
-			
-			stack.push(scene->mRootNode);
 
-			while (!stack.empty()) {
-				aiNode *node = stack.top(); stack.pop();
+		bool done = false;
+		stack<aiNode*> stack;
 
-				// yield current node
-				if (node) {
-					// store node and old matrix
-					string name = node->mName.C_Str();
-					matrixMap[name] = node->mTransformation;
-					nodeMap[name] = node;
+		stack.push(scene->mRootNode);
 
-					node->mTransformation = swap_matrix_columns(node->mTransformation, order, polarity);
-				}
-				
-				// push next
-				for (uint i=0; i<node->mNumChildren; i++){
-					stack.push(node->mChildren[i]);
-				}
+		while (!stack.empty()) {
+			aiNode *node = stack.top(); stack.pop();
+
+			// yield current node
+			if (node) {
+				// store node and old matrix
+				string name = node->mName.C_Str();
+				matrixMap[name] = node->mTransformation;
+				nodeMap[name] = node;
+			}
+
+			// push next
+			for (uint i = 0; i < node->mNumChildren; i++) {
+				stack.push(node->mChildren[i]);
 			}
 		}
-#endif // 0
 
-#if 0
-		// reorder cameras
+		// flip cameras
 		if (scene->HasCameras()) {
 			for (uint i = 0; i < scene->mNumCameras; i++) {
-				
+
 				// reset camera matrices
 				aiCamera *camera = scene->mCameras[i];
 				string name = camera->mName.C_Str();
 				auto itMatrix = matrixMap.find(name);
 				auto itNode = nodeMap.find(name);
-				
-				if (itMatrix != matrixMap.end() && itNode != nodeMap.end())
-					itNode->second->mTransformation = itMatrix->second;
+
+				if (itMatrix != matrixMap.end() && itNode != nodeMap.end()) {
+
+					aiMatrix4x4 matrix = itNode->second->mTransformation;
+					itNode->second->mTransformation = /*plane_reflect * */ axis_rotation * matrix;
+
+				}
 
 			}
 		}
-#endif 
+	}
 
 #if 0
 		// reorder animations
@@ -240,73 +302,71 @@ int run(int argc, char* argv[])
 		}
 #endif //0
 
-	}
+		//// shange the up vector
+		//if (args.get("up").isFound() && scene->HasCameras()) {
+		//	// string cameraUp = args.get("up").value();
 
-	// shange the up vector
-	if (args.get("up").isFound() && scene->HasCameras()) {
-		// string cameraUp = args.get("up").value();
-
-	}
+		//}
 
 
-	// strip texture filenames
-	if (args.get("textures").isFound() && scene->HasMaterials()) {
-		for (uint i = 0; i < scene->mNumMaterials; i++) {
-			aiMaterial const * material = scene->mMaterials[i];
-			for (uint j = 0; j < sizeof(textureTypes) / sizeof(textureTypes[0]); j++) {
-				aiTextureType tt = textureTypes[j];
-				for (uint k = 0; k < material->GetTextureCount(tt); k++) {
-					aiString aiPath;
-					material->GetTexture(tt, k, &aiPath);
-					string path = aiPath.C_Str();
-					{
-						string s = path;
-						string::size_type n, m;
-						n = s.find_last_of('/');
-						m = s.find_last_of('\\');
-						if (n != string::npos) {
-							s  = s.substr(n + 1);
+		// strip texture filenames
+		if (args.get("textures").isFound() && scene->HasMaterials()) {
+			for (uint i = 0; i < scene->mNumMaterials; i++) {
+				aiMaterial const * material = scene->mMaterials[i];
+				for (uint j = 0; j < sizeof(textureTypes) / sizeof(textureTypes[0]); j++) {
+					aiTextureType tt = textureTypes[j];
+					for (uint k = 0; k < material->GetTextureCount(tt); k++) {
+						aiString aiPath;
+						material->GetTexture(tt, k, &aiPath);
+						string path = aiPath.C_Str();
+						{
+							string s = path;
+							string::size_type n, m;
+							n = s.find_last_of('/');
+							m = s.find_last_of('\\');
+							if (n != string::npos) {
+								s = s.substr(n + 1);
+							}
+							else if (m != string::npos) {
+								s = s.substr(m + 1);
+							}
+
+							if (!s.empty()) {
+								path = s;
+							}
 						}
-						else if (m != string::npos) {
-							s = s.substr(m + 1);
-						}
 
-						if (!s.empty()) {
-							path = s;
-						}
-					}
-
-					// textura filenev vissza
-					const aiMaterialProperty* pp = nullptr;
-					if (aiGetMaterialProperty(material, AI_MATKEY_TEXTURE(tt, k), &pp) == AI_SUCCESS) {
-						aiMaterialProperty* pProp = const_cast<aiMaterialProperty*>(pp);
-						if (aiPTI_String == pProp->mType) {
-							size_t newLen = path.length() + 5;
-							char* newData = (char*)malloc(newLen);
-							(*(uint*)(&newData[0])) = path.length();
-							memcpy_s(&newData[4], path.length()+1, path.c_str(), path.length()+1);
-							free(pProp->mData);
-							pProp->mData = newData;
-							pProp->mDataLength = newLen;
+						// textura filenev vissza
+						const aiMaterialProperty* pp = nullptr;
+						if (aiGetMaterialProperty(material, AI_MATKEY_TEXTURE(tt, k), &pp) == AI_SUCCESS) {
+							aiMaterialProperty* pProp = const_cast<aiMaterialProperty*>(pp);
+							if (aiPTI_String == pProp->mType) {
+								size_t newLen = path.length() + 5;
+								char* newData = (char*)malloc(newLen);
+								(*(uint*)(&newData[0])) = path.length();
+								memcpy_s(&newData[4], path.length() + 1, path.c_str(), path.length() + 1);
+								free(pProp->mData);
+								pProp->mData = newData;
+								pProp->mDataLength = newLen;
+							}
 						}
 					}
 				}
 			}
 		}
+
+		// save 
+
+		if (aiExporter.Export(scene, outExtension, outFileName) != aiReturn_SUCCESS) {
+			cout << "Could not save model file" << endl;
+			cout << aiExporter.GetErrorString() << endl;
+			return 1;
+		}
+
+		return 0;
 	}
 
-	// save 
-
-	if (aiExporter.Export(scene, outExtension, outFileName) != aiReturn_SUCCESS) {
-		cout << "Could not save model file" << endl;
-		cout << aiExporter.GetErrorString() << endl;
-		return 1;
+	int main(int argc, char* argv[]) {
+		int result = run(argc, argv);
+		return result;
 	}
-
-	return 0;
-}
-
-int main(int argc, char* argv[]) {
-	int result = run(argc, argv);
-	return result;
-}
