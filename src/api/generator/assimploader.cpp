@@ -309,11 +309,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?
 	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
-		aiProcessPreset_TargetRealtime_Quality | 
 		aiProcess_ConvertToLeftHanded |
-		aiProcess_CalcTangentSpace |
-		aiProcess_GenSmoothNormals |
-		//aiProcess_GenNormals | // ez valamiert elszarik
 		0
 	);
 
