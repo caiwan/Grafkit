@@ -196,17 +196,35 @@ int run(int argc, char* argv[])
 		// http://www.mathplanet.com/education/geometry/transformations/transformation-using-matrices
 		// http://web.iitd.ac.in/~hegde/cad/lecture/L6_3dtrans.pdf
 
-		/*aiMatrix4x4 axis_rotation;
-		aiMatrix4x4 plane_reflect;*/
+		aiMatrix4x4 rotation;
+		
 
 		/* Elforgatja egy tengely menten, es tukrozi a meroleges sikon. */
 		// fuck it
 		switch (flip.at(0)) {
 		case 'x': case 'X':
+			rotation = aiMatrix4x4(
+				1, 0, 0, 0,
+				0, -1, 0, 0,
+				0, 0, -1, 0,
+				0, 0, 0, 1
+			);
 			break;
 		case 'y': case 'Y':
+			rotation = aiMatrix4x4(
+				-1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, -1, 0,
+				0, 0, 0, 1
+			);
 			break;
 		case 'z': case 'Z':
+			rotation = aiMatrix4x4(
+				-1, 0, 0, 0,
+				0, -1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			);
 			break;
 		default:
 			cout << args.getHelpMessage() << endl;
@@ -251,6 +269,7 @@ int run(int argc, char* argv[])
 
 					aiMatrix4x4 matrix = itNode->second->mTransformation;
 
+#if 0
 					// sad man's low-end compensation
 					aiVector3D x(matrix.a1, matrix.b1, matrix.c1);	// x axis
 					aiVector3D U(matrix.a2, matrix.b2, matrix.c2);	// y axis = up vector
@@ -258,17 +277,19 @@ int run(int argc, char* argv[])
 					aiVector3D E(matrix.a4, matrix.b4, matrix.c4);	// origin
 
 					//U.Set(0, 1, 0);
-					
+
+					aiVector3D a = aiVector3D(1, 1, 1);
 
 					// flip vectors
-					E.x = -E.x;
-					E.y = -E.y;
-					E.z = E.z;
-					
-					L = -E;
-					L.Normalize();
+					E.x = E.x * a.x;
+					E.y = E.y * a.x;
+					E.z = E.z * a.x;
 
-					U = -U;
+					L.x = L.x = a.x;
+					L.y = L.y = a.y;
+					L.z = L.z = a.z;
+
+					U = U;
 
 					// screen = x,y, forward = z
 					aiVector3D s, u, f, p;
@@ -283,6 +304,10 @@ int run(int argc, char* argv[])
 						s.z, u.z, f.z, p.z,
 						0, 0, 0, 1
 					);
+#else
+					matrix = rotation * matrix;
+
+#endif // 0
 
 					itNode->second->mTransformation = matrix;
 
