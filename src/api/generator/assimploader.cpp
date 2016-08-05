@@ -471,7 +471,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			camera->SetName(camera_name);
 
-			camera->SetFOV(180.*curr_camera->mHorizontalFOV / M_PI);
+			camera->SetFOV(curr_camera->mHorizontalFOV);
 			camera->SetClippingPlanes(curr_camera->mClipPlaneNear, curr_camera->mClipPlaneFar);
 
 			// camera <- assmimp camera
