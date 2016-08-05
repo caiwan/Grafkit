@@ -75,19 +75,11 @@ void Camera::SetRotation(float x, float y, float z)
 void Camera::Calculate(Renderer& renderer)
 {
 
-	// itt kilukadta akamera, fixelni kell egy kicsit
-	
 	// http://www.gamedev.net/page/resources/_/technical/directx-and-xna/directx-11-c-game-camera-r2978
 
-#if 0
-	float3 pos = float3(-5, 6, 15);
-	float3 center = float3(0, 0, 0);
-	float3 up = float3(0,1,0);
-#else
 	float3 pos = m_position;
 	float3 center = m_look;
 	float3 up = m_up;
-#endif
 
 	XMVECTOR v0, v1, v2;
 	XMVECTOR s, u, f;
@@ -127,15 +119,10 @@ void Camera::Calculate(Renderer& renderer)
 	XMStoreFloat3(&sv, s);
 	XMStoreFloat3(&uv, u);
 	XMStoreFloat3(&fv, f);
-#if 0
-	XMStoreFloat(&vv0, v0);
-	XMStoreFloat(&vv1, v1);
-	XMStoreFloat(&vv2, v2);
-#else
+
 	XMVectorGetXPtr(&vv0, E);
 	XMVectorGetYPtr(&vv1, E);
 	XMVectorGetZPtr(&vv2, E);
-#endif
 
 	m_viewMatrix = Matrix(
 		sv.x, sv.y, sv.z, 0,
@@ -145,42 +132,6 @@ void Camera::Calculate(Renderer& renderer)
 	);
 
 	m_viewMatrix.RotateRPY(m_rotation.x, m_rotation.y, m_rotation.z);
-
-#endif // 0
-
-#if 0
-	XMFLOAT3 up, lookAt;
-	XMVECTOR upVector, positionVector, lookVector;
-	float yaw, pitch, roll;
-	XMMATRIX rotationMatrix, cica;
-
-	upVector = XMLoadFloat3(&m_up);
-
-	positionVector = XMLoadFloat3(&m_position);
-	positionVector = XMVectorSetW(positionVector, 1.f);
-
-	lookVector = XMLoadFloat3(&m_look);
-	lookVector = XMVectorSetW(lookVector, 1.f);
-
-	pitch = m_rotation.x;
-	yaw = m_rotation.y;
-	roll = m_rotation.z;
-
-	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-
-	// lookVector = XMVector3TransformCoord(lookVector, rotationMatrix);
-	upVector = XMVector3TransformCoord(upVector, rotationMatrix);
-	upVector = XMVectorSetW(upVector, 0.f);
-
-	// lookVector = XMVectorAdd(positionVector, lookVector);
-	// lookVector = XMVector3Normalize(lookVector);
-	// lookVector = XMVectorSetW(lookVector, 1.f);
-
-// http://stackoverflow.com/questions/19484601/3d-first-person-camera-strafing-at-angle
-
-	
-	//m_viewMatrix = XMMatrixLookToLH(positionVector, lookVector, upVector);
-	m_viewMatrix = cica = XMMatrixLookAtLH(positionVector, lookVector, upVector);
 
 #endif // 0
 
