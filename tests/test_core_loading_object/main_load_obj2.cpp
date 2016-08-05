@@ -112,7 +112,8 @@ protected:
 
 			// m_camera->SetPosition(0, -10, 15*(1.25+sin(m_t)));
 			m_currCameraActor->Transform().Identity();
-			// m_currCameraActor->Transform().Translate(0, 0, 15 * sin(m_t));
+			float f = 5 * sin(m_t);
+			m_currCameraActor->Transform().Translate(0, 0, 0);
 
 			(*this->m_scene)->PreRender(render);
 			(*this->m_scene)->Render(render);
