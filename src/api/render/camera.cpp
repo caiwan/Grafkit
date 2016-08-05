@@ -10,7 +10,7 @@ using namespace Grafkit;
 Camera::Camera() : Entity3D()
 {
 	m_mode = LOOK_TO;
-	m_fov = M_PI / 4.0f;
+	m_hFov = M_PI / 4.0f;
 
 	m_znear = 1.0;
 	m_zfar = 1000.;
@@ -139,7 +139,11 @@ void Camera::Calculate(Renderer& renderer)
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
 	// --- projection & ortho --- 
-	m_perspectiveMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
+
+	float fov = M_PI / 4;
+	fov = 2 * atanf(tanf(m_hFov / 2) / m_aspect);
+
+	m_perspectiveMatrix = XMMatrixPerspectiveFovLH(fov, m_aspect, m_znear, m_zfar);
 	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
 
 

@@ -47,7 +47,8 @@ namespace Grafkit {
 		void SetAspect(float aspect) { this->m_aspect = aspect; }
 		/// @todo GetAspect()
 		
-		void SetFOV(float fov) { this->m_fov = fov; }
+		/// Horizontal FOV in radian
+		void SetFOV(float fov) { this->m_hFov = fov; }
 		/// @todo GetFOV()
 		
 		void SetClippingPlanes(float znear, float zfar) { this->m_znear = znear, this->m_zfar = zfar; }
@@ -84,7 +85,7 @@ namespace Grafkit {
 
 		float m_znear, m_zfar;
 		float m_aspect, m_screenWidth, m_screenHeight;
-		float m_fov;
+		float m_hFov;
 
 		enum camera_mode m_mode;
 	
