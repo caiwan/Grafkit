@@ -21,7 +21,7 @@ namespace Grafkit{
 
 		virtual void Shutdown() = 0;
 
-	private:
+	protected:
 		int _m_init;
 
 #endif //LIVE_RELEASE

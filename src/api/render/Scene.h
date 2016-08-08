@@ -8,37 +8,43 @@
 #include "Actor.h"
 #include "camera.h"
 #include "Light.h"
+#include "../core/archetype.h"
 
 namespace Grafkit {
 
 	class Scene;
 	typedef Ref<Scene> SceneRef;
 
-	__declspec(align(16)) class Scene : virtual public Referencable, public AlignedNew<Scene>
+	__declspec(align(16)) class Scene : virtual public Referencable, /*public Grafkit::Object, */ public AlignedNew<Scene>
 	{
 	public:
 		Scene();
 		~Scene();
 
+		void Initialize(ActorRef root);
+		void Shutdown();
+
 		void PreRender(Grafkit::Renderer & render);
 		void Render(Grafkit::Renderer & render);
 
-		void SetRootNode(ActorRef root) { m_pScenegraph = root; }
 		ActorRef& GetRootNode() { return m_pScenegraph; }
 
 		// --- 
 		
 		void AddCameraNode(ActorRef camera);
+		void SetActiveCamera(std::string name);
 		void SetActiveCamera(size_t id = 0) { m_activeCamera = m_cameraNodes[id]; }
 		ActorRef GetActiveCamera() { return m_activeCamera; }
 
 		size_t GetCameraCount() { return m_cameraNodes.size(); }
 		ActorRef GetCamera(size_t id) { return m_cameraNodes[id]; }
+		ActorRef GetCamera(std::string name);
 
 		void AddLightNode(ActorRef light);
 
-		ActorRef GetLight(int n) { return this->m_lightNodes[n]; }
 		size_t GetLightCount() { return this->m_lightNodes.size(); }
+		ActorRef GetLight(int n) { return this->m_lightNodes[n]; }
+		ActorRef GetLight(std::string name);
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
@@ -63,6 +69,10 @@ namespace Grafkit {
 		void Push();
 		void Pop();
 
+		std::map<std::string, ActorRef> m_cameraMap;
+		std::map<std::string, ActorRef> m_lightMap;
+		std::map<std::string, ActorRef> m_nodeMap;
+
 		Grafkit::Matrix m_cameraMatrix;
 
 		Grafkit::Matrix m_currentWorldMatrix;
@@ -79,3 +89,4 @@ namespace Grafkit {
 	typedef Resource<Scene> SceneRes;
 	typedef Ref<SceneRes> SceneResRef;
 }
+

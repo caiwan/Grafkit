@@ -545,7 +545,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	ActorRef root_node = new Actor;
 	LOGGER(Log::Logger().Trace("Building scenegraph"));
 	assimp_parseScenegraph(resourceRepo, scene->mRootNode, root_node);
-	outScene->SetRootNode(root_node);
+	outScene->Initialize(root_node);
 
 	/* Workaround: 
 	 * a root node matrixat identbe kell tenni, mert vices dolgokat csinal

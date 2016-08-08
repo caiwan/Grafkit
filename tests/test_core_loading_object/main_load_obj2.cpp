@@ -48,7 +48,7 @@ public:
 	}
 
 	~Application() {
-		delete m_file_loader;
+		delete m_file_loader;	///TODO: shutdown elotte
 		this->render.Shutdown();
 	}
 

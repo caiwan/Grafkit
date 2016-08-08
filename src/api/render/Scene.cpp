@@ -4,12 +4,11 @@
 #include "Actor.h"
 #include "camera.h"
 
-using Grafkit::Actor;
-using Grafkit::Entity3D;
-
+using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 Grafkit::Scene::Scene():
+	// Object(),
 	m_pScenegraph(nullptr)
 {
 }
@@ -17,6 +16,40 @@ Grafkit::Scene::Scene():
 
 Grafkit::Scene::~Scene()
 {
+}
+
+void Grafkit::Scene::Initialize(ActorRef root)
+{
+	m_pScenegraph = root;
+	
+	/// @Todo itt lehetne cachelni a scenegraphot, jol.
+
+	std::stack<ActorRef> stack;
+	stack.push(root);
+
+	while (stack.empty()) {
+		ActorRef node = stack.top(); stack.pop();
+		
+		// yield node
+		m_nodeMap[node->GetName()] = node;
+
+		// push next
+		for(auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
+			stack.push(*it);
+	}
+	
+//#ifndef LIVE_RELEASE
+//	_m_init++;
+//#endif
+}
+
+void Grafkit::Scene::Shutdown()
+{
+	/// TODO: ... 
+
+//#ifndef LIVE_RELEASE
+//	_m_init--;
+//#endif
 }
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
@@ -51,12 +84,37 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 void Grafkit::Scene::AddCameraNode(ActorRef camera)
 {
 	m_cameraNodes.push_back(camera);
+	m_cameraMap[camera->GetName()] = camera;
 	SetActiveCamera();
+}
+
+void Grafkit::Scene::SetActiveCamera(std::string name)
+{
+	auto it = m_cameraMap.find(name);
+	if (it != m_cameraMap.end())
+		m_activeCamera = it->second;
+}
+
+ActorRef Grafkit::Scene::GetCamera(std::string name)
+{
+	auto it = m_cameraMap.find(name);
+	if (it != m_cameraMap.end())
+		return it->second;
+	return ActorRef();
 }
 
 void Grafkit::Scene::AddLightNode(ActorRef light)
 {
 	m_lightNodes.push_back(light);
+	m_lightMap[light->GetName()] = light;
+}
+
+ActorRef Grafkit::Scene::GetLight(std::string name)
+{
+	auto it = m_lightMap.find(name);
+	if (it != m_lightMap.end())
+		return it->second;
+	return ActorRef();
 }
 
 

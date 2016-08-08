@@ -67,6 +67,8 @@ namespace Grafkit {
 		void AddChild(Actor* child);
 		Ref<Actor> GetParent() { return m_pParent; }
 
+		std::vector<Ref<Actor>>& GetChildren() { return this->m_pChildren; }
+
 		void AddEntity(Ref<Entity3D> entity) { m_pEntities.push_back(entity); }
 
 		std::vector<Ref<Entity3D>>& GetEntities() { return m_pEntities; }
