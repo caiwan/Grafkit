@@ -17,6 +17,19 @@ struct Material {
 	float4 ambient, diffuse, specular, emission;
 	float specularLevel;
 	float shininess;
+
+	int has_t_diffuse;		///< 1st map
+	int has_t_alpha;		///< alpha map
+	int has_t_normal;		///< bump map
+	int has_t_shiniess; 	///< shininess map
+	int has_t_specular;	///< specular map
+	int has_t_selfillum;	///< self illumination map
+	int has_t_reflect;		///< reflection map
+	int has_t_bump;		///< bump map
+	int has_t_aux0;		///< aux texture, used for pretty much everything else
+	int has_t_aux1;		///< aux texture, used for pretty much everything else
+	int has_t_aux2;		///< aux texture, used for pretty much everything else
+	int has_t_aux3;		///< aux texture, used for pretty much everything else
 };
 
 struct Light
@@ -74,12 +87,6 @@ SamplerState SampleType {
 Texture2D t_diffuse;
 Texture2D t_normal;
 Texture2D t_specular;
-
-cbuffer tx {
-	int t_is_diffuse;
-	int t_is_normal;
-	int t_is_specular;
-};
 
 PixelInputType mainVertex(VertexInputType input)
 {
@@ -193,36 +200,35 @@ PixelInputType mainVertex(VertexInputType input)
 
 float4 mainPixel(PixelInputType input) : SV_TARGET
 {
-	float4 textureColor = float4(0,0,0,1);
-	textureColor = t_diffuse.Sample(SampleType, input.tex);
+	float4 color = float4(0,0,0,1);
 	
-	//float4 color0 = calcPointLight(input, material, lights[0]);
 
-	return textureColor;
+	if (material.has_t_diffuse == 1)
+		color = t_diffuse.Sample(SampleType, input.tex);
+	else
+		color = material.diffuse;
+
+	// phong light
+	if (material.type == 1) {
+		float3 lp = float3(10, 10, 10);
+
+		// proto
+		float3 p = input.worldPosition.xyz;
+		float3 mp = lp - p;
+		float3 E = normalize(-p);
+		float3 N = input.normal.xyz;
+		float3 L = normalize(mp); float d = length(mp);
+		// flaot3 
+
+		float lambda = dot(N, L);
+		// float theta = dot(R, E);
+
+		// color = calcPointLight(input, material, lights[0]);
+		color.xyz = color * float3(lambda, lambda, lambda);
+		// color.xyz = .5 + N.xyz * .5; // normal szar, puszi
+	}
+
+	return color;
 }
 
 //------------------------------------------------------------------------------------
-
-float4 mainPixelPhongNoTexture(PixelInputType input) : SV_TARGET
-{
-	float4 color = float4(0,0,0,1);
-	//color = input.worldPosition;
-
-	float3 lp = float3(10, 10, 10);
-
-	// proto
-	float3 p = input.worldPosition.xyz;
-	float3 mp = lp - p;
-	float3 E = normalize(-p);
-	float3 N = input.normal.xyz;
-	float3 L = normalize(mp); float d = length(mp);
-	// flaot3 
-
-	float lambda = dot(N, L);
-	// float theta = dot(R, E);
-
-	//color = calcPointLight(input, material, lights[0]);
-	color.xyz = float3(lambda, lambda, lambda);
-	color.xyz = .5 + N.xyz * .5; // normal szar, puszi
-	return color;
-}

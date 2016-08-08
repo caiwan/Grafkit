@@ -72,7 +72,7 @@ protected:
 		// -- load shader
 		m_vs = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "mainVertex", ST_Vertex));
 		m_fs = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixel", ST_Pixel));
-		m_fs_2 = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixelPhongNoTexture", ST_Pixel));
+		// m_fs_2 = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixelPhongNoTexture", ST_Pixel));
 
 		// -- model 
 		m_scene = this->Load<SceneRes>(new AssimpLoader("models/sphere.assbin", m_vs));

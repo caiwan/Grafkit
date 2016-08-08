@@ -102,57 +102,25 @@ Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 
 namespace {
 
-	///Based on 3ds format's 
-	enum texture_type_e {
-		// regular types	
-		TT_diffuse,	///< 1st map
-
-		TT_alpha,		///< alpha map
-		TT_normal,		///< bump map
-		TT_shiniess,	///< shininess map
-		TT_specular,	///< specular map
-		TT_selfillum,	///< self illumination map
-		TT_reflect,		///< reflection map
-		TT_bump,		///< bump map
-
-		TT_aux, ///< aux texture, used for pretty much everything else
-
-		TT_COUNT	// count
-	};
-
 	// AI texture -- internal texture type mapping 
 	const struct {
 		enum aiTextureType ai;
-		enum texture_type_e tt;
+		enum BaseMaterial::texture_type_e tt;
 	}
 	texture_load_map[] = {
-		aiTextureType_NONE,		    TT_aux,
-		aiTextureType_DIFFUSE,      TT_diffuse,
-		aiTextureType_SPECULAR,     TT_specular,
-		aiTextureType_AMBIENT,      TT_aux,
-		aiTextureType_EMISSIVE,     TT_aux,
-		aiTextureType_HEIGHT,       TT_aux,
-		aiTextureType_NORMALS,      TT_normal,
-		aiTextureType_SHININESS,    TT_shiniess,
-		aiTextureType_OPACITY,      TT_alpha,
-		aiTextureType_DISPLACEMENT, TT_bump,
-		aiTextureType_LIGHTMAP,		TT_aux,
-		aiTextureType_REFLECTION,	TT_reflect,
-		aiTextureType_UNKNOWN,		TT_aux,
-	};
-
-
-	const char *texture_map_names[TT_COUNT] =
-	{
-		"t_diffuse",
-		"t_alpha",
-		"t_normal",
-		"t_shiniess",
-		"t_specular",
-		"t_selfillum",
-		"t_reflect",
-		"t_bump",
-		"t_aux",
+		aiTextureType_NONE,		    BaseMaterial::TT_aux0,
+		aiTextureType_DIFFUSE,      BaseMaterial::TT_diffuse,
+		aiTextureType_SPECULAR,     BaseMaterial::TT_specular,
+		aiTextureType_AMBIENT,      BaseMaterial::TT_aux0,
+		aiTextureType_EMISSIVE,     BaseMaterial::TT_aux0,
+		aiTextureType_HEIGHT,       BaseMaterial::TT_aux0,
+		aiTextureType_NORMALS,      BaseMaterial::TT_normal,
+		aiTextureType_SHININESS,    BaseMaterial::TT_shiniess,
+		aiTextureType_OPACITY,      BaseMaterial::TT_alpha,
+		aiTextureType_DISPLACEMENT, BaseMaterial::TT_bump,
+		aiTextureType_LIGHTMAP,		BaseMaterial::TT_aux0,
+		aiTextureType_REFLECTION,	BaseMaterial::TT_reflect,
+		aiTextureType_UNKNOWN,		BaseMaterial::TT_aux0,
 	};
 }
 
@@ -353,10 +321,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			// textura -> material 
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
-					LOGGER(Log::Logger().Trace("-- texture #%s #%d", texture_map_names[texture_load_map[k].tt], j));
-					material->AddTexture(
-						assimpTexture(texture_load_map[k].ai, curr_mat, j, resman), texture_map_names[texture_load_map[k].tt]
-					);
+					LOGGER(Log::Logger().Trace("-- texture #%s #%d", texture_load_map[k].tt, j));
+					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, resman), texture_load_map[k].tt);
 				}
 			}
 

@@ -12,7 +12,32 @@ using namespace FWdebugExceptions;
 
 using std::vector;
 
+namespace {
+	const char *texture_map_names[BaseMaterial::TT_COUNT] =
+	{
+		"t_diffuse",
+		"t_alpha",
+		"t_normal",
+		"t_shiniess",
+		"t_specular",
+		"t_selfillum",
+		"t_reflect",
+		"t_bump",
+		"t_aux0",
+		"t_aux1",
+		"t_aux1",
+		"t_aux3"
+	};
+}
+
 // ====================================
+
+Grafkit::BaseMaterial::BaseMaterial() : IResource()
+{
+	ZeroMemory(&m_material, sizeof(m_material));
+	
+	m_material.type = MT_phong_blinn;
+}
 
 TextureResRef Grafkit::BaseMaterial::GetTexture(std::string bindName)
 {
@@ -47,6 +72,24 @@ void Grafkit::BaseMaterial::RemoveTexture(TextureResRef texture, std::string bin
 	}
 }
 
+void Grafkit::BaseMaterial::SetTexture(TextureResRef texture, texture_type_e slot)
+{
+	this->SetTexture(texture, texture_map_names[slot]);
+	this->m_material.has_texture[slot] = 1;
+}
+
+void Grafkit::BaseMaterial::AddTexture(TextureResRef texture, texture_type_e slot)
+{
+	this->AddTexture(texture, texture_map_names[slot]);
+	this->m_material.has_texture[slot] = 1;
+}
+
+void Grafkit::BaseMaterial::RemoveTexture(TextureResRef texture, texture_type_e slot)
+{
+	this->RemoveTexture(texture, texture_map_names[slot]);
+	this->m_material.has_texture[slot] = 0;
+}
+
 // ====================================
 
 void Grafkit::BaseMaterial::Render(Renderer& render, ShaderRef &_shader)
@@ -65,3 +108,4 @@ void Grafkit::BaseMaterial::Render(Renderer& render, ShaderRef &_shader)
 			shader->GetBRes(it->first).Set((*it->second)->GetTextureResource());
 	}
 }
+

@@ -19,7 +19,34 @@ namespace Grafkit {
 	//class BaseMaterial : public Grafkit::IResource 
 	{
 	public:
-		BaseMaterial() : IResource(), m_material() {};
+		enum material_type_e {
+			MT_flat,
+			MT_phong_blinn,
+			MT_COUNT
+		};
+
+		enum texture_type_e {
+			// regular types	
+			TT_diffuse,	///< 1st map
+
+			TT_alpha,		///< alpha map
+			TT_normal,		///< bump map
+			TT_shiniess,	///< shininess map
+			TT_specular,	///< specular map
+			TT_selfillum,	///< self illumination map
+			TT_reflect,		///< reflection map
+			TT_bump,		///< bump map
+
+			TT_aux0,		///< aux texture, used for pretty much everything else
+			TT_aux1,		///< aux texture, used for pretty much everything else
+			TT_aux2,		///< aux texture, used for pretty much everything else
+			TT_aux3,		///< aux texture, used for pretty much everything else
+
+			TT_COUNT	// count
+		};
+	
+	public:
+		BaseMaterial();
 		~BaseMaterial() {}
 
 		/// @todo ez nem ilyen lesz a jovoben
@@ -47,16 +74,48 @@ namespace Grafkit {
 		void AddTexture(TextureResRef texture, std::string bindName);
 		void RemoveTexture(TextureResRef texture, std::string bindName);
 
+		void SetTexture(TextureResRef texture, texture_type_e slot);
+		void AddTexture(TextureResRef texture, texture_type_e slot);
+		void RemoveTexture(TextureResRef texture, texture_type_e slot);
+
 		virtual void Render(Renderer& render, ShaderRef &shader);
 
 		//void OverrideFShader(ShaderRef shader) { m_override_fshader = shader; }
 
 	protected:
 		struct material_t {
-			int type;	/* Material tipusa */
-			float4 ambient, diffuse, specular, emission;
-			float specularLevel;
-			float shininess;
+			
+			// erre valamiert sikit
+			material_t(){}
+			
+			union {
+				int type;	/* Material tipusa */
+				char ___0[16]; // az integert paddolni kell 16-ra
+			};
+
+			union {
+				struct {
+					float4 ambient, diffuse, specular, emission;
+				};
+				char ___1[4*16]; // a float4 eleve 16-ra van paddolva
+			};
+
+			union {
+				float specularLevel;
+				char ___2[4];
+			};
+
+			union {
+				float shininess;
+				char ___3[4];
+			};
+
+			// miserable hack
+			union {
+				int has_texture[TT_COUNT];
+				// ezt mire kell paddolni
+				char ___4[TT_COUNT * 16];
+			};
 			
 		};
 
@@ -69,15 +128,5 @@ namespace Grafkit {
 	};
 
 	typedef Ref<BaseMaterial> MaterialRef;
-
-	/// @Todo material generator + kulonbozo tipusu materialok generalasa
-
-	/* 
-	+ Flat
-	+ Phong
-	+ Phong-Blinn
-	+ Lambert
-	+ Shader
-	*/
 
 }
