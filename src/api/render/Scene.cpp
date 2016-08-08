@@ -103,7 +103,7 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 	if (maxdepth < 0) return;
 	if (!actor) return;
 
-	push();
+	Push();
 
 	m_currentWorldMatrix.Multiply(actor->Matrix());
 	m_currentWorldMatrix.Multiply(actor->Transform());
@@ -118,15 +118,15 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 			RenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);
 		}
 	
-	pop();
+	Pop();
 }
 
-void Grafkit::Scene::push()
+void Grafkit::Scene::Push()
 {
 	this->m_worldMatrixStack.push(m_currentWorldMatrix);
 }
 
-void Grafkit::Scene::pop()
+void Grafkit::Scene::Pop()
 {
 	m_currentWorldMatrix = this->m_worldMatrixStack.top();
 	this->m_worldMatrixStack.pop();

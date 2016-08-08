@@ -60,8 +60,8 @@ namespace Grafkit {
 
 	private:
 		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
-		void push();
-		void pop();
+		void Push();
+		void Pop();
 
 		Grafkit::Matrix m_cameraMatrix;
 
