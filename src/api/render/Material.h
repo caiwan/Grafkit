@@ -80,8 +80,6 @@ namespace Grafkit {
 
 		virtual void Render(Renderer& render, ShaderRef &shader);
 
-		//void OverrideFShader(ShaderRef shader) { m_override_fshader = shader; }
-
 	protected:
 		struct material_t {
 			
