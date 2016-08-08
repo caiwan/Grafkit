@@ -49,6 +49,8 @@ namespace Grafkit {
 
 		virtual void Render(Renderer& render, ShaderRef &shader);
 
+		//void OverrideFShader(ShaderRef shader) { m_override_fshader = shader; }
+
 	protected:
 		struct material_t {
 			int type;	/* Material tipusa */
@@ -61,6 +63,8 @@ namespace Grafkit {
 		struct material_t m_material;
 
 		std::map<std::string, TextureResRef> m_textures;
+
+		ShaderRef m_override_fshader;
 
 	};
 

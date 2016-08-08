@@ -73,7 +73,7 @@ namespace Grafkit {
 
 		std::vector<Ref<Entity3D>>& GetEntities() { return m_pEntities; }
 
-		/** Elrejti az akutalis nodeot, a gyerkeket meghagyja, a render atlepi */
+		/** Elrejti az akutalis nodeot, a gyerkeket meghagyja, a rendert atlepi */
 		void Hide() { m_is_nodeHidden = 1; }
 
 		/** a renderban latszik az akualis node */

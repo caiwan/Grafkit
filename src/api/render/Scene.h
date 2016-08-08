@@ -46,6 +46,8 @@ namespace Grafkit {
 		ActorRef GetLight(int n) { return this->m_lightNodes[n]; }
 		ActorRef GetLight(std::string name);
 
+		MaterialRef GetMaterial(std::string name);
+
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
@@ -72,6 +74,7 @@ namespace Grafkit {
 		std::map<std::string, ActorRef> m_cameraMap;
 		std::map<std::string, ActorRef> m_lightMap;
 		std::map<std::string, ActorRef> m_nodeMap;
+		std::map<std::string, MaterialRef> m_materialMap;
 
 		Grafkit::Matrix m_cameraMatrix;
 

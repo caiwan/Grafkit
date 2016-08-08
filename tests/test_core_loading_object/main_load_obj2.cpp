@@ -62,18 +62,20 @@ protected:
 
 	float m_t;
 
-	ShaderResRef m_vertexShader;
-	ShaderResRef m_fragmentShader;
+	ShaderResRef m_vs;
+	ShaderResRef m_fs;
+	ShaderResRef m_fs_2;
 
 	int init() {
 		LoadCache();
 
 		// -- load shader
-		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "mainVertex", ST_Vertex));
-		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixel", ST_Pixel));
+		m_vs = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "mainVertex", ST_Vertex));
+		m_fs = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixel", ST_Pixel));
+		m_fs_2 = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixelPhongNoTexture", ST_Pixel));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/sphere.assbin", m_vertexShader));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/sphere.assbin", m_vs));
 
 		DoPrecalc();
 
@@ -91,10 +93,12 @@ protected:
 
 		m_scene->Get()->SetActiveCamera("Camera");
 
+		//m_scene->Get()->GetMaterial("Material")->OverrideFShader(m_fs_2);
+
 		m_currCameraActor = m_scene->Get()->GetActiveCamera();
 
-		m_scene->Get()->SetVShader(m_vertexShader);
-		m_scene->Get()->SetFShader(m_fragmentShader);
+		m_scene->Get()->SetVShader(m_vs);
+		m_scene->Get()->SetFShader(m_fs);
 
 		m_t = 0;
 

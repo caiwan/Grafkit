@@ -75,6 +75,11 @@ Texture2D t_diffuse;
 Texture2D t_normal;
 Texture2D t_specular;
 
+cbuffer tx {
+	int t_is_diffuse;
+	int t_is_normal;
+	int t_is_specular;
+};
 
 PixelInputType mainVertex(VertexInputType input)
 {

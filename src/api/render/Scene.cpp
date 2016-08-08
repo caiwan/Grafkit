@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "Actor.h"
+#include "model.h"
 #include "camera.h"
 
 using namespace Grafkit;
@@ -27,11 +28,21 @@ void Grafkit::Scene::Initialize(ActorRef root)
 	std::stack<ActorRef> stack;
 	stack.push(root);
 
-	while (stack.empty()) {
+	while (!stack.empty()) {
 		ActorRef node = stack.top(); stack.pop();
 		
 		// yield node
 		m_nodeMap[node->GetName()] = node;
+		
+		// collect material for models
+		for (auto entity = node->GetEntities().begin(); entity != node->GetEntities().end(); entity++) {
+			const Model * model = dynamic_cast<Model*>((*entity).Get());
+			if (model) {
+				MaterialRef material = model->GetMaterial();
+				if (material.Valid())
+					m_materialMap[material->GetName()] = material;
+			}
+		}
 
 		// push next
 		for(auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
@@ -117,6 +128,13 @@ ActorRef Grafkit::Scene::GetLight(std::string name)
 	return ActorRef();
 }
 
+MaterialRef Grafkit::Scene::GetMaterial(std::string name)
+{
+	auto it = m_materialMap.find(name);
+	if (it != m_materialMap.end())
+		return it->second;
+	return MaterialRef();
+}
 
 void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
