@@ -269,45 +269,7 @@ int run(int argc, char* argv[])
 
 					aiMatrix4x4 matrix = itNode->second->mTransformation;
 
-#if 0
-					// sad man's low-end compensation
-					aiVector3D x(matrix.a1, matrix.b1, matrix.c1);	// x axis
-					aiVector3D U(matrix.a2, matrix.b2, matrix.c2);	// y axis = up vector
-					aiVector3D L(matrix.a3, matrix.b3, matrix.c3);	// z axis = lookat vector
-					aiVector3D E(matrix.a4, matrix.b4, matrix.c4);	// origin
-
-					//U.Set(0, 1, 0);
-
-					aiVector3D a = aiVector3D(1, 1, 1);
-
-					// flip vectors
-					E.x = E.x * a.x;
-					E.y = E.y * a.x;
-					E.z = E.z * a.x;
-
-					L.x = L.x = a.x;
-					L.y = L.y = a.y;
-					L.z = L.z = a.z;
-
-					U = U;
-
-					// screen = x,y, forward = z
-					aiVector3D s, u, f, p;
-					f = L;
-					s = crossProduct(U, f);
-					u = crossProduct(f, s);
-					p = E;
-
-					matrix = aiMatrix4x4(
-						s.x, u.x, f.x, p.x,
-						s.y, u.y, f.y, p.y,
-						s.z, u.z, f.z, p.z,
-						0, 0, 0, 1
-					);
-#else
 					matrix = rotation * matrix;
-
-#endif // 0
 
 					itNode->second->mTransformation = matrix;
 
