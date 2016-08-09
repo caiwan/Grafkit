@@ -96,11 +96,6 @@ void Grafkit::BaseMaterial::Render(Renderer& render, ShaderRef &_shader)
 {
 	ShaderRef shader = _shader; 
 
-	//if (m_override_fshader.Valid()) {
-	//	m_override_fshader->Render(render);
-	//	shader = m_override_fshader;
-	//}
-	
 	shader->GetParam("material").SetP(&m_material);
 
 	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {

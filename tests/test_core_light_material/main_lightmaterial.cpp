@@ -151,7 +151,7 @@ protected:
 		m_rootActor->AddChild(m_cameraActor);
 		m_rootActor->AddChild(modelActor);
 
-		scene->SetRootNode(m_rootActor);
+		scene->Initialize(m_rootActor);
 		scene->AddCameraNode(m_cameraActor);
 		// scene->AddLightNode(lightActor);
 
