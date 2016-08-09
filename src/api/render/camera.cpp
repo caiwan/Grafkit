@@ -23,6 +23,8 @@ Camera::Camera() : Entity3D()
 	m_look = float3(0, 0, 1);
 	m_up = float3(0, 1, 0);
 	m_rotation = float3(0, 0, 0);
+
+	m_type = PERSPECTIVE;
 }
 
 

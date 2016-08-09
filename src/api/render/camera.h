@@ -16,7 +16,7 @@ namespace Grafkit {
 
 	/** Basic camera class */
 	/*__declspec(align(16)) class Camera : public AlignedNew<Camera>, public Grafkit::Entity3D*/
-	class Camera : public Entity3D
+	__declspec(align(16)) class Camera : public Entity3D, public AlignedNew<Camera>
 	{
 	public:
 		Camera();
@@ -67,15 +67,30 @@ namespace Grafkit {
 		Matrix& GetPerspectiveMatrix() { return m_perspectiveMatrix; }
 		Matrix& GetOrthoMatrix() { return m_orthoMatrix; }
 
-		virtual Matrix& getProjrctionjMatrix() = 0;
+		virtual Matrix& getProjrctionjMatrix() {
+			switch(m_type){
+			case ORTHOGRAPHIC:
+				return m_orthoMatrix;
+			//case PERSPECTIVE:
+			default:
+				return m_perspectiveMatrix;
+			}
+		}
 
 		enum camera_mode { LOOK_TO, LOOK_AT };
 		enum camera_mode getMode() {
 			return m_mode;
 		}
 		
+		/** van sajnos olyan eset, amikor a kamera tipusant nem tudjuk elore */
 		enum camera_type { PERSPECTIVE, ORTHOGRAPHIC };
-		virtual enum camera_type getType() = 0;
+		virtual void setType(enum camera_type t) {
+			m_type = t;
+		}
+
+		virtual enum camera_type getType() {
+			return m_type;
+		}
 
 	private:
 		float3 m_position;
@@ -87,6 +102,7 @@ namespace Grafkit {
 		float m_aspect, m_screenWidth, m_screenHeight;
 		float m_hFov;
 
+		enum camera_type m_type; // hack: van, ahol kezzel kell a kamerat atvaltnai perpective/ortho kozott
 		enum camera_mode m_mode;
 	
 	protected:
@@ -96,7 +112,7 @@ namespace Grafkit {
 	};
 
 	/** Perspective camera */
-	__declspec(align(16)) class PerspectiveCamera : public AlignedNew<PerspectiveCamera>, public Camera
+	/*__declspec(align(16))*/ class PerspectiveCamera : /*public AlignedNew<PerspectiveCamera>,*/ public Camera
 	{
 	public:
 		PerspectiveCamera() : Camera() {
@@ -104,18 +120,20 @@ namespace Grafkit {
 
 		virtual Matrix& getProjrctionjMatrix() { return m_perspectiveMatrix; }
 
+		virtual void setType(enum camera_type t) { }
 		virtual enum camera_type getType() { return PERSPECTIVE; }
 	};
 
 	/** Orthographic camera */
-	__declspec(align(16)) class OrthoCamera : public AlignedNew<OrthoCamera>, public Camera
+	/*__declspec(align(16))*/ class OrthoCamera : /*public AlignedNew<OrthoCamera>, */ public Camera
 	{
 	public:
 		OrthoCamera() : Camera() {
 		}
 
 		virtual Matrix& getProjrctionjMatrix() { return m_orthoMatrix; }
-
+		
+		virtual void setType(enum camera_type t) { }
 		virtual enum camera_type getType() { return ORTHOGRAPHIC; }
 	};
 
