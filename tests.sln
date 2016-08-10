@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaders", "tests\shaders\sh
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_light_material", "tests\test_core_light_material\test_light_material.vcxproj", "{8534F215-0E7F-4366-8B7F-7C3981B23D2E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_assimp_animation", "tests\test_assimp_animation\test_assimp_animation.vcxproj", "{9E2553D4-0EB6-4371-9DC0-13FD46052128}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -138,6 +140,16 @@ Global
 		{8534F215-0E7F-4366-8B7F-7C3981B23D2E}.Release|x64.Build.0 = Release|x64
 		{8534F215-0E7F-4366-8B7F-7C3981B23D2E}.Release|x86.ActiveCfg = Release|Win32
 		{8534F215-0E7F-4366-8B7F-7C3981B23D2E}.Release|x86.Build.0 = Release|Win32
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Debug|x64.ActiveCfg = Debug|x64
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Debug|x64.Build.0 = Debug|x64
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Debug|x86.ActiveCfg = Debug|Win32
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Debug|x86.Build.0 = Debug|Win32
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Release|x64.ActiveCfg = Release|x64
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Release|x64.Build.0 = Release|x64
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Release|x86.ActiveCfg = Release|Win32
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,5 +164,6 @@ Global
 		{7897E32E-BEF4-404A-ADA5-31C9D6D1AF26} = {974579C5-E06B-43E9-A219-165CDC86E7F5}
 		{DF25AD4B-EAF1-4063-B977-990C049BDDE9} = {974579C5-E06B-43E9-A219-165CDC86E7F5}
 		{8534F215-0E7F-4366-8B7F-7C3981B23D2E} = {974579C5-E06B-43E9-A219-165CDC86E7F5}
+		{9E2553D4-0EB6-4371-9DC0-13FD46052128} = {974579C5-E06B-43E9-A219-165CDC86E7F5}
 	EndGlobalSection
 EndGlobal
