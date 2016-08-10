@@ -32,11 +32,12 @@ namespace {
 
 // ====================================
 
-Grafkit::BaseMaterial::BaseMaterial() : IResource()
+Grafkit::BaseMaterial::BaseMaterial(enum BaseMaterial::material_type_e t) : IResource()
 {
 	ZeroMemory(&m_material, sizeof(m_material));
+	m_material.diffuse = float4(1, 1, 1, 0);
 	
-	m_material.type = MT_phong_blinn;
+	m_material.type = t;
 }
 
 TextureResRef Grafkit::BaseMaterial::GetTexture(std::string bindName)

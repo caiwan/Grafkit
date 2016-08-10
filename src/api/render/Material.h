@@ -46,7 +46,7 @@ namespace Grafkit {
 		};
 	
 	public:
-		BaseMaterial();
+		BaseMaterial(enum BaseMaterial::material_type_e t = MT_phong_blinn);
 		~BaseMaterial() {}
 
 		/// @todo ez nem ilyen lesz a jovoben
