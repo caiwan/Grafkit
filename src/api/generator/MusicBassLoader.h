@@ -8,11 +8,11 @@
 
 namespace Grafkit {
 
-	class MusicFmodLoader : public Grafkit::IResourceBuilder {
+	class MusicBassLoader : public Grafkit::IResourceBuilder {
 
 	public:
-		MusicFmodLoader(std::string source_name);
-		~MusicFmodLoader();
+		MusicBassLoader(std::string source_name);
+		~MusicBassLoader();
 
 		virtual void Load(IResourceManager * const & resman, IResource * source);
 
@@ -22,4 +22,3 @@ namespace Grafkit {
 }
 
 DEFINE_EXCEPTION(MusicLoadException, 0, "Could not load music from disk");
-DEFINE_EXCEPTION(MusicDeviceInitException, 0, "Could not init playback device");

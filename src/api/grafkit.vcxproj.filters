@@ -164,6 +164,9 @@
     <ClCompile Include="utils\memory.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="generator\MusicBassLoader.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -321,6 +324,9 @@
     </ClInclude>
     <ClInclude Include="utils\memory.h">
       <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\MusicBassLoader.h">
+      <Filter>Source Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
