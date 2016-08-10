@@ -37,23 +37,18 @@ namespace {
 
 	};
 
-#define FMOD_ERRCHECK(x) \
-	if ((x) != FMOD_OK) \
-	throw EX_DETAILS(MusicLoadException, "FMOD ERROR"); // new ExceptionEX((int)x, "FMOD error");
-
 	MusicBass::MusicBass() : Music(),
 		m_stream(0),
 		m_is_playing(0),
 		asset()
 	{
-		//int res = BASS_Init(-1, 44100, 0, 0, 0);
+		int res = BASS_Init(-1, 44100, 0, 0, 0);
 
-		//if (!res) {
-		//	// int errcode = BASS_ErrorGetCode();
-		//	throw EX(MusicDeviceInitException);
-		//}
+		if (!res) {
+			// int errcode = BASS_ErrorGetCode();
+			throw EX(MusicDeviceInitException);
+		}
 
-		//m_samplePerSec = 44100;
 	}
 
 	MusicBass::~MusicBass(void)
@@ -65,32 +60,32 @@ namespace {
 
 	void MusicBass::Initialize(IAssetRef asset)
 	{
-		//const void* data = asset->GetData();
-		//size_t len = asset->GetSize();
+		const void* data = asset->GetData();
+		size_t len = asset->GetSize();
 
-		//m_stream = BASS_StreamCreateFile(TRUE, data, 0, len,
-		//	BASS_STREAM_PRESCAN |
-		//	0
-		//);
+		m_stream = BASS_StreamCreateFile(TRUE, data, 0, len,
+			BASS_STREAM_PRESCAN |
+			0
+		);
 
-		//if (!m_stream) {
-		//	// int errcode = BASS_ErrorGetCode();
-		//	throw EX(MusicDeviceInitException);
-		//}
+		if (!m_stream) {
+			// int errcode = BASS_ErrorGetCode();
+			throw EX(MusicDeviceInitException);
+		}
 
-		//BASS_ChannelGetLength(m_stream, BASS_POS_BYTE);
+		BASS_ChannelGetLength(m_stream, BASS_POS_BYTE);
 
 	}
 
 	void MusicBass::Shutdown()
 	{
-		//if(IsPlaying()) 
-		//	Stop();
+		BASS_Stop();
+		BASS_Free();
 	}
 
 	void MusicBass::Play()
 	{
-		//BASS_ChannelPlay(m_stream, 1);
+		BASS_ChannelPlay(m_stream, 1);
 		//m_is_playing = 1;
 	}
 

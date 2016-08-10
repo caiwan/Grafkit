@@ -22,3 +22,4 @@ namespace Grafkit {
 }
 
 DEFINE_EXCEPTION(MusicLoadException, 0, "Could not load music from disk");
+DEFINE_EXCEPTION(MusicDeviceInitException, 0, "Could not init playback device");
