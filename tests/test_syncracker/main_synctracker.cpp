@@ -20,7 +20,7 @@
 
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
-#include "generator/MusicFmodLoader.h"
+#include "generator/MusicBassLoader.h"
 
 using namespace Grafkit;
 
@@ -55,25 +55,15 @@ protected:
 	ValueTracker *valTracker;
 
 	ValueTracker::Float3Track *trk_rotate_root;
-	ValueTracker::Float2Track *trk_rotate_r;
-	ValueTracker::Float2Track *trk_rotate_l;
-	ValueTracker::Float2Track *trk_rotate_u;
-	ValueTracker::Float2Track *trk_rotate_d;
-	ValueTracker::Float2Track *trk_rotate_f;
-	ValueTracker::Float2Track *trk_rotate_b;
-
+	ValueTracker::Float2Track *trk_rotate[10];
+	
 	TextureSamplerRef m_textureSampler;
 
 	ActorRef m_rootActor;
 
 	ActorRef cameraActor;
-	ActorRef modelActor	;
-	ActorRef modelActorL;
-	ActorRef modelActorR;
-	ActorRef modelActorU;
-	ActorRef modelActorD;
-	ActorRef modelActorF;
-	ActorRef modelActorB;
+	ActorRef modelActor;
+	ActorRef modelActors[10];
 
 	float t;
 
@@ -95,6 +85,7 @@ protected:
 		// -- camera
 		CameraRef camera = new Camera;
 		camera->SetPosition(0.0f, 0.0f, -10.0f);
+		camera->SetLookAt(0, 0, 0);
 
 		// -- texture
 		TextureResRef texture = new TextureRes();
@@ -110,14 +101,21 @@ protected:
 		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
 
 		// -- load music
-		music = Load<MusicRes>(new MusicFmodLoader("AceMan - Go Back To The River!.mp3"));
+		music = Load<MusicRes>(new MusicBassLoader("AceMan - Go Back To The River!.mp3"));
 
 		// -- precalc
 		this->DoPrecalc();
 
+		// -- precalc utan egybol allitsuk be a synctrackert 
+		// Setup syctracker
+		timer = new Timer();
+		timer->Initialize(music, music->Get()->GetLengthms(), 180, 8);
+		timer->Connect();
+		valTracker = new ValueTracker(timer);
+
 		// -- model 
 		ModelRef model = new Model;
-		model->SetMaterial(new MaterialBase);
+		model->SetMaterial(new BaseMaterial());
 		model->GetMaterial()->AddTexture(texture, "diffuse");
 
 
@@ -132,48 +130,58 @@ protected:
 		this->cameraActor = new Actor(); cameraActor->AddEntity(camera);
 		this->modelActor = new Actor(); modelActor->AddEntity(model);
 		
-		this->modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
-		this->modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
+		/*
+		Alap right-handed koordinatarendszer szerint osszerakunk egy keresztet
+		Ezeket adjuk hozza a belso kockahoz
+		*/
+		float3 cica[] = {
+			{ 1, 0, 0 }, /* Jobb */{ -1, 0, 0 }, /* Bal */
+			{ 0, 1, 0 }, /* fent */{ 0,-1, 0 }, /* lent */
+			{ 0, 0, -1 }, /* elol */{ 0, 0, 1 }, /* hatul */
+		};
+
+		char names[] = "r\0l\0u\0d\0f\0b";	/*right, left, up, down, front, back*/
+
+		this->trk_rotate_root = valTracker->newFloat3Track("root", "r", "rpy");
+
 		
-		this->modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
-		this->modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
-		
-		this->modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
-		this->modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
+
+		// size_t i = 5; 
+		for (size_t i = 0; i < 6; i++)
+		{
+			ActorRef actor = new Actor();
+			actor->AddEntity(model);
+			modelActor->AddChild(actor);
+			modelActors[i] = actor;
+
+			float3 v = cica[i];
+			v.x *= 3;
+			v.y *= 3;
+			v.z *= 3;
+
+			actor->Matrix().Translate(v);
+
+			this->trk_rotate[i] = valTracker->newFloat2Track("b", &names[2*i], "rpy");
+
+		}
 
 
 		// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
 
 		ActorRef rootActor = new Actor();
-		rootActor->AddChild(cameraActor);
+		// rootActor->AddChild(cameraActor);
 		rootActor->AddChild(modelActor);
 
 		m_rootActor = rootActor;
 
-		scene->SetRootNode(rootActor);
-		scene->SetCameraNode(cameraActor);
+		scene->Initialize(rootActor);
+		scene->AddCameraNode(cameraActor);
 		// scene->AddLightNode(lightActor);
 
 		scene->SetVShader(m_vertexShader);
 		scene->SetFShader(m_fragmentShader);
 
 		// --- 
-
-		// Setup syctracker
-		timer = new Timer();
-		timer->Initialize(music, music->Get()->GetLengthms(), 180, 8);
-		timer->Connect();
-		valTracker = new ValueTracker(timer);
-
-		
-		this->trk_rotate_root = valTracker->newFloat3Track("root", "r", "rpy");
-		this->trk_rotate_r = valTracker->newFloat2Track("r", "r", "rpy");
-		this->trk_rotate_l = valTracker->newFloat2Track("l", "r", "rpy");
-		this->trk_rotate_u = valTracker->newFloat2Track("u", "r", "rpy");
-		this->trk_rotate_d = valTracker->newFloat2Track("d", "r", "rpy");
-		this->trk_rotate_f = valTracker->newFloat2Track("f", "r", "rpy");
-		this->trk_rotate_b = valTracker->newFloat2Track("b", "r", "rpy");
-		
 
 		this->t = 0;
 
@@ -201,13 +209,12 @@ protected:
 			
 			rot_rpy = trk_rotate_root->Get(); m_rootActor->Matrix().Identity(); m_rootActor->Matrix().RotateRPY(rot_rpy.x, rot_rpy.y, rot_rpy.z);
 
-			rot_rp = trk_rotate_r->Get(); modelActorR->Transform().Identity(); modelActorR->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
-			rot_rp = trk_rotate_l->Get(); modelActorL->Transform().Identity(); modelActorL->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
-			rot_rp = trk_rotate_u->Get(); modelActorU->Transform().Identity(); modelActorU->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
-			rot_rp = trk_rotate_d->Get(); modelActorD->Transform().Identity(); modelActorD->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
-			rot_rp = trk_rotate_f->Get(); modelActorF->Transform().Identity(); modelActorF->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
-			rot_rp = trk_rotate_b->Get(); modelActorB->Transform().Identity(); modelActorB->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
-			
+
+			for (int i = 0; i < 6; i++) {
+				rot_rp = trk_rotate[i]->Get(); 
+				modelActors[i]->Transform().Identity(); 
+				modelActors[i]->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
+			}
 
 			fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 

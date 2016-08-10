@@ -94,8 +94,8 @@ protected:
 
 			// -- model 
 			ModelRef model = new Model;
-			model->SetMaterial(new BaseMaterial());
-			model->GetMaterial()->AddTexture(texture, "t_diffuse");
+			model->SetMaterial(new BaseMaterial(BaseMaterial::MT_flat));
+			model->GetMaterial()->AddTexture(texture, BaseMaterial::TT_diffuse);
 
 
 			SimpleMeshGenerator generator(render, m_vertexShader);
@@ -150,7 +150,7 @@ protected:
 			m_rootActor->AddChild(m_cameraActor);
 			m_rootActor->AddChild(modelActor);
 
-			scene->SetRootNode(m_rootActor);
+			scene->Initialize(m_rootActor);
 			scene->AddCameraNode(m_cameraActor);
 			// scene->AddLightNode(lightActor);
 
