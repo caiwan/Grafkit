@@ -151,20 +151,64 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 }
 
 // ================================================================================================================================================================
+// Assimp animation provider
+// ================================================================================================================================================================
+
+namespace {
+	class AssimpAnimation : public Animation {
+	public:
+
+		AssimpAnimation() {}
+		~AssimpAnimation() {}
+
+		void Initilaize(ActorRef actor, aiNodeAnim* nodeAnim) {
+			m_actor = actor; m_nodeAnim = nodeAnim;
+		}
+
+		void Shutdown();
+		void Update(double t);
+
+	private:
+		aiNodeAnim* m_nodeAnim;
+	};
+
+	// --------------------------------
+
+	void AssimpAnimation::Shutdown()
+	{
+	}
+
+	void AssimpAnimation::Update(double t)
+	{
+		//m_nodeAnim->mNumPositionKeys
+	}
+
+	// --------------------------------
+	class AssimpScene : public Scene {
+	public:
+		AssimpScene(const aiScene* scene) : m_aiScene(scene){}
+		~AssimpScene() {
+			delete m_aiScene;
+		}
+
+	private:
+		const aiScene* m_aiScene;
+	};
+	
+}
+
+// ================================================================================================================================================================
 // Parse assimp scenegraph 
 // ================================================================================================================================================================
 
 /* Ezeket toltuk majd be, illetve adjuk a scenegraphoz */
-
-typedef std::map<std::string, ActorRef> actorMap_t;
-typedef actorMap_t::iterator actorMap_it;
 
 typedef struct {
 	std::vector<MaterialRef> materials;
 	std::vector<ModelRef> models;
 	std::vector<CameraRef> cameras;
 	std::vector<LightRef> lights;
-	actorMap_t actors;
+	std::map<std::string, ActorRef> actors;
 } resourceRepo_t;
 
 /**
@@ -264,11 +308,6 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		return;
 	}
 
-	SceneRef outScene = new Scene();
-	// outScene->SetName(m_srcName);
-
-	
-
 	IAssetRef srcAsset = this->GetSourceAsset(resman);
 
 	if (!srcAsset || !srcAsset->GetData())
@@ -280,6 +319,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		// aiProcess_ConvertToLeftHanded |
 		0
 	);
+
+	SceneRef outScene = new AssimpScene(scene);
 
 	if (!scene)
 		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
@@ -525,7 +566,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			aiCamera *curr_camera = scene->mCameras[i];
 			std::string name = curr_camera->mName.C_Str();
 
-			actorMap_it it = resourceRepo.actors.find(name);
+			auto it = resourceRepo.actors.find(name);
 			if (it != resourceRepo.actors.end()) {
 				it->second->AddEntity(cameras[i]);
 				outScene->AddCameraNode(it->second);
@@ -541,7 +582,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			std::string name = curr_light->mName.C_Str();
 
-			actorMap_it it = resourceRepo.actors.find(name);
+			auto it = resourceRepo.actors.find(name);
 			if (it != resourceRepo.actors.end()) {
 				it->second->AddEntity(lights[i]);
 				outScene->AddLightNode(it->second);
@@ -558,7 +599,14 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			LOGGER(Log::Logger().Trace("- #%d : %s", i, name.C_Str()));
 
-			// itt kell tudni, hogy kihez tartozik majd az animacio
+			for (j = 0; j < curr_anim->mNumChannels; j++) {
+				aiNodeAnim * curr_nodeAnim = curr_anim->mChannels[j];
+				auto it = resourceRepo.actors.find(curr_nodeAnim->mNodeName.C_Str());
+				if (it != resourceRepo.actors.end()) {
+					AssimpAnimation* anim = new AssimpAnimation();
+					anim->Initilaize(it->second, curr_nodeAnim);
+				}
+			}
 
 			/* (...) */
 		}

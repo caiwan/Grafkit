@@ -15,6 +15,9 @@ namespace Grafkit {
 	class Scene;
 	typedef Ref<Scene> SceneRef;
 
+	class Animation;
+	typedef Ref<Animation> AnimationRef;
+
 	__declspec(align(16)) class Scene : virtual public Referencable, /*public Grafkit::Object, */ public AlignedNew<Scene>
 	{
 	public:
@@ -48,6 +51,9 @@ namespace Grafkit {
 
 		MaterialRef GetMaterial(std::string name);
 
+		void AddAnimation(AnimationRef anim);
+		void UpdateAnimation(double t) { m_animation_time = t; }
+
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
@@ -62,6 +68,10 @@ namespace Grafkit {
 		ActorRef m_activeCamera;
 		std::vector<ActorRef> m_cameraNodes;
 		std::vector<ActorRef> m_lightNodes;
+
+		std::vector<AnimationRef> m_animations;
+
+		double m_animation_time;
 
 		ShaderRef m_vertexShader;
 		ShaderRef m_fragmentShader;
@@ -91,5 +101,22 @@ namespace Grafkit {
 	typedef Ref<Scene> SceneRef;
 	typedef Resource<Scene> SceneRes;
 	typedef Ref<SceneRes> SceneResRef;
+
+	/**
+	Animation layer / interface for scenes
+	*/
+	class Animation : virtual public Referencable {
+	public:
+		Animation(){}
+		~Animation(){}
+
+		virtual void Shutdown() = 0;
+		
+		virtual void Update(double time) = 0;
+
+	protected:
+		ActorRef m_actor;
+
+	};
 }
 

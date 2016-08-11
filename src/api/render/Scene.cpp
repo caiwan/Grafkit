@@ -136,6 +136,11 @@ MaterialRef Grafkit::Scene::GetMaterial(std::string name)
 	return MaterialRef();
 }
 
+void Grafkit::Scene::AddAnimation(AnimationRef anim)
+{
+	m_animations.push_back(anim);
+}
+
 void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
 	// --- kamera
