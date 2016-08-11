@@ -23,32 +23,24 @@ namespace {
 		virtual void Play();
 		virtual void Stop();
 		virtual void Pause(bool e);
+		virtual void Update();
 
-		virtual unsigned int GetTimeSample();
-		virtual void SetTimeSample(unsigned int t);
+		virtual unsigned long GetTimeSample();
+		virtual void SetTimeSample(unsigned long t);
 		virtual void SetLoop(bool e);
 		virtual int IsPlaying();
 
 	protected:
 		HSTREAM m_stream;
-		int m_is_playing;
 
-		Grafkit::IAssetRef asset;
+		Grafkit::IAssetRef m_asset;
 
 	};
 
 	MusicBass::MusicBass() : Music(),
 		m_stream(0),
-		m_is_playing(0),
-		asset()
+		m_asset()
 	{
-		int res = BASS_Init(-1, 44100, 0, 0, 0);
-
-		if (!res) {
-			// int errcode = BASS_ErrorGetCode();
-			throw EX(MusicDeviceInitException);
-		}
-
 	}
 
 	MusicBass::~MusicBass(void)
@@ -60,10 +52,18 @@ namespace {
 
 	void MusicBass::Initialize(IAssetRef asset)
 	{
-		const void* data = asset->GetData();
-		size_t len = asset->GetSize();
+		m_asset = asset;
+		const void* data = m_asset->GetData();
+		size_t data_size = m_asset->GetSize();
 
-		m_stream = BASS_StreamCreateFile(TRUE, data, 0, len,
+		int res = BASS_Init(-1, 44100, 0, 0, 0);
+
+		if (!res) {
+			// int errcode = BASS_ErrorGetCode();
+			throw EX(MusicDeviceInitException);
+		}
+
+		m_stream = BASS_StreamCreateFile(TRUE, data, 0, data_size,
 			BASS_STREAM_PRESCAN |
 			0
 		);
@@ -73,69 +73,76 @@ namespace {
 			throw EX(MusicDeviceInitException);
 		}
 
-		BASS_ChannelGetLength(m_stream, BASS_POS_BYTE);
+		BASS_Start();
 
+		BASS_CHANNELINFO info;
+		BASS_ChannelGetInfo(m_stream, &info);
+
+		m_length = BASS_ChannelGetLength(m_stream, BASS_POS_BYTE);
+		
+		// length in byte -> samples 
+		int sstride = 2; 
+		if (info.flags & BASS_SAMPLE_8BITS) sstride = 1; else if (info.flags & BASS_SAMPLE_FLOAT) sstride = 4;
+
+		m_samplePerSec = info.freq * sstride * info.chans;
+	
+		
+		Play();
 	}
 
 	void MusicBass::Shutdown()
 	{
+		BASS_ChannelStop(m_stream);
+		BASS_StreamFree(m_stream);
 		BASS_Stop();
 		BASS_Free();
 	}
 
 	void MusicBass::Play()
 	{
-		BASS_ChannelPlay(m_stream, 1);
-		//m_is_playing = 1;
+		BASS_ChannelPlay(m_stream, 0);
 	}
 
 	void MusicBass::Stop()
 	{
-		//BASS_ChannelStop(m_stream);
-		//m_is_playing = 0;
+		BASS_ChannelStop(m_stream);
 	}
 
 	void MusicBass::Pause(bool e)
 	{
-	
-		//if (!m_is_playing && !e) {
-		//	BASS_ChannelPlay(m_stream, 0);
-		//	m_is_playing = 1;
-		//}
-		//else {
-		//	BASS_Pause();
-		//	m_is_playing = 0;
-		//}
+		bool b = IsPlaying();
+		if (!b && !e) {
+			BASS_ChannelPlay(m_stream, 0);
+		}
+		else {
+			BASS_ChannelPause(m_stream);
+		}
 	}
 
-	unsigned int MusicBass::GetTimeSample()
+	void MusicBass::Update()
 	{
-		//QWORD pos = BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE);
-		//return pos;
-		return 0;
+		BASS_Update(0);
 	}
 
-	void MusicBass::SetTimeSample(unsigned int t)
+	unsigned long MusicBass::GetTimeSample()
 	{
-		//m_channel->setPosition(t, FMOD_TIMEUNIT_PCM);
+		QWORD pos = BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE);
+		return pos;
+	}
+
+	void MusicBass::SetTimeSample(unsigned long t)
+	{
+		BASS_ChannelSetPosition(m_stream, t, BASS_POS_BYTE);
 	}
 
 	void MusicBass::SetLoop(bool e)
 	{
-		// nincsilyen
+		BASS_ChannelFlags(m_stream, BASS_SAMPLE_LOOP * e, BASS_SAMPLE_LOOP);
 	}
 
 	int MusicBass::IsPlaying()
 	{
-		/*bool b = 0, p = 0;
-		m_channel->isPlaying(&b);
-		m_channel->getPaused(&p);
-		return b && !p;
-
-		BASS_CHANNELINFO info;
-		BASS_ChannelGetInfo(m_stream, &info);*/
-
-		return 0;
+		return BASS_ChannelIsActive(m_stream) == BASS_ACTIVE_PLAYING;
 	}
 
 }

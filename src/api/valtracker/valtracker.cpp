@@ -99,6 +99,7 @@ void Timer::Update(){
 				if (sync_connect(m_rocket, this->m_ipaddress, SYNC_DEFAULT_PORT))
 						throw EX(NoRocketDeviceException);
 #endif /*SYNC_PLAYER*/
+		this->m_music->Get()->Update();
 /* </ROCKET SPECIFIC>*/
 }
 
