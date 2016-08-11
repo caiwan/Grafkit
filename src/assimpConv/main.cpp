@@ -53,17 +53,6 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 	*vertices = v;
 }
 
-inline aiMatrix4x4 swap_matrix_columns(aiMatrix4x4 matrix, char order[], char polarity[]) {
-	aiMatrix4x4 m;
-	for (int i = 0; i < 4; i++) {
-		m.m[0][i] = matrix.m[order[0]][i] * polarity[0];
-		m.m[1][i] = matrix.m[order[1]][i] * polarity[1];
-		m.m[2][i] = matrix.m[order[2]][i] * polarity[2];
-		m.m[3][i] = matrix.m[3][i];
-	}
-	return m;
-}
-
 int run(int argc, char* argv[])
 {
 	Arguments args;
@@ -280,13 +269,21 @@ int run(int argc, char* argv[])
 #endif
 	}
 
-#if 0
+#if 1
 	// reorder animations
 	if (scene->HasAnimations()) {
 		for (uint i = 0; i < scene->mNumAnimations; i++) {
 			aiAnimation* anim = scene->mAnimations[i];
-			// ... reverse engineer
-			cout << anim->mName.C_Str() << endl;
+
+			// auto naming, because having no name might cause crashes when loading
+			if (anim->mName.length == 0) {
+				aiString name;
+				stringstream ss;
+				ss << "Animation" << i;
+				name.Append(ss.str().c_str());
+				anim->mName = name;
+			}
+			// .. further transformations goes here 
 		}
 	}
 #endif //0
