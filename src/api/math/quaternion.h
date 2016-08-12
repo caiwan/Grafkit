@@ -38,16 +38,12 @@ namespace Grafkit {
 		}
 
 		// --- konverziok
-		operator Grafkit::Matrix () const {
-			// a defult konstruktor miatt automatikusan fogja letrehozni
+
+		operator matrix() const {
 			return DirectX::XMMatrixRotationQuaternion(q);
 		}
 
-		operator matrix () const {
-			return DirectX::XMMatrixRotationQuaternion(q);
-		}
-
-		operator float4 () const {
+		operator float4() const {
 			float4 res;
 			DirectX::XMStoreFloat4(&res, q);
 			return res;

@@ -46,6 +46,10 @@ namespace Grafkit {
 		Matrix(const Matrix &m) : mat(m.mat) {
 		}
 
+		Matrix(const Quaternion &q) {
+			mat = (matrix)q;
+		}
+
 		// identity
 		void Identity() {
 			 this->mat = DirectX::XMMatrixIdentity();
