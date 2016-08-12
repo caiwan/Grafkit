@@ -73,7 +73,8 @@ protected:
 		m_fs = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixel", ST_Pixel));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_test1.assbin", m_vs));
+		//m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_test1.assbin", m_vs));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_complex.assbin", m_vs));
 
 		DoPrecalc();
 
@@ -100,7 +101,7 @@ protected:
 		{
 			m_t += .01;
 
-			(*this->m_scene)->UpdateAnimation(fmod(m_t, 5));
+			(*this->m_scene)->UpdateAnimation(fmod(m_t, 10.5));
 			(*this->m_scene)->PreRender(render);
 			(*this->m_scene)->Render(render);
 
