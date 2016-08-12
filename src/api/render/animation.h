@@ -29,8 +29,12 @@ namespace Grafkit {
 		void SetName(std::string name) { m_name = name; }
 		std::string GetName() const { return m_name; }
 
+		void SetDuration(float d) { m_duration = d; }
+		float GetDuration() { return m_duration; }
+
 	private: 
 		std::string m_name;
+		float m_duration;
 
 	public:
 

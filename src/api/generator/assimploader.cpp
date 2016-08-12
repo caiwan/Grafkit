@@ -563,6 +563,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			for (j = 0; j < curr_anim->mNumChannels; j++) {
 				aiNodeAnim * curr_nodeAnim = curr_anim->mChannels[j];
+
+				LOGGER(Log::Logger().Trace("-- #%d : %s", j, curr_nodeAnim->mNodeName.C_Str()));
+
 				auto it = resourceRepo.actors.find(curr_nodeAnim->mNodeName.C_Str());
 				if (it != resourceRepo.actors.end()) {
 					NodeAnimation* anim = new NodeAnimation();
@@ -585,6 +588,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 						ASSIMP_V4D_F4(curr_nodeAnim->mRotationKeys[k].mValue, f4);
 						anim->AddRotationKey(curr_nodeAnim->mRotationKeys[k].mTime, f4);
 					}
+
+					anim->SetDuration(curr_anim->mDuration);
+					anim->SetName(curr_nodeAnim->mNodeName.C_Str());
 
 					outScene->AddAnimation(anim);
 				}
