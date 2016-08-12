@@ -167,6 +167,9 @@
     <ClCompile Include="generator\MusicBassLoader.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
+    <ClCompile Include="render\animation.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -330,6 +333,9 @@
     </ClInclude>
     <ClInclude Include="math\quaternion.h">
       <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="render\animation.h">
+      <Filter>Source Files\render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

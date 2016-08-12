@@ -24,6 +24,7 @@
 #include "../render/model.h"
 #include "../render/camera.h"
 #include "../render/light.h"
+#include "../render/animation.h"
 
 #include "assimploader.h"
 
@@ -35,41 +36,45 @@ using namespace FWdebugExceptions;
 // ================================================================================================================================================================
 
 // aiVector3D to float3
-#define assimp_v3d_f3(SRC, DST)\
+#define ASSIMP_V3D_F3(SRC, DST)\
 {\
 	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z;\
 }
 
-#define assimp_v3d_f3_set(SRC, DST)\
-(DST((SRC).x, (SRC).y, (SRC).z))
+#define ASSIMP_V3D_F3_SET(SRC, DST)\
+(DST(((float)(SRC).x), ((float)(SRC).y), ((float)(SRC).z)))
 
 
 // aiVector3D to float4
-#define assimp_v3d_f4(SRC, DST, W)\
+#define ASSIMP_V3D_F4(SRC, DST, W)\
 {\
 	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z, (DST).w = (W);\
 }
 
 // aiVector4D to float4
-#define assimp_vf4_f4(SRC, DST)\
+#define ASSIMP_V4D_F4(SRC, DST)\
 {\
 	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z, (DST).w = (SRC).w;\
 }
 
-#define assimp_color_f4(SRC, DST)\
+#define ASSIMP_V3D_F4_SET(SRC, DST)\
+(DST(((float)(SRC).x), ((float)(SRC).y), ((float)(SRC).z)))
+
+
+#define ASSIMP_COLOR_F4(SRC, DST)\
 {\
 	(DST).x = (SRC).r, (DST).y = (SRC).g, (DST).z = (SRC).b, (DST).z = 1.0f; \
 }
 
 // ezeket mashogy nem lehet megoldnai, mert a matkey is egy makro
-#define assimpMaterialKey_2_float4(SRC, _AI_ENUM, OUT)\
+#define ASSIMPMATERIALKEY_F4(SRC, _AI_ENUM, OUT)\
 {\
 	aiColor3D ac; float4& fv = (OUT); \
 	(SRC)->Get(_AI_ENUM, ac); \
 	fv.x = ac.r, fv.y = ac.g, fv.z = ac.b, fv.w = 1.0; \
 }
 
-#define assimpMaterialKey_2_float(SRC, _AI_ENUM, OUT) \
+#define ASSIMPMATERIALKEY_FLOAT(SRC, _AI_ENUM, OUT) \
 {\
 	float &scalar = (OUT);\
 	(SRC)->Get(_AI_ENUM, scalar);\
@@ -83,7 +88,7 @@ using namespace FWdebugExceptions;
 	(DST).x = (SRC).x, (DST).y = -(SRC).z, (DST).z = (SRC).y, (DST).w = (W);\
 }
 #else 
-#define assimp_vertices(SRC, DST, W) assimp_v3d_f4(SRC, DST, W)
+#define assimp_vertices(SRC, DST, W) ASSIMP_V3D_F4(SRC, DST, W)
 #endif
 
 Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
@@ -152,136 +157,6 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 	}
 
 	return texture;
-}
-
-// ================================================================================================================================================================
-// Assimp animation provider
-// ================================================================================================================================================================
-
-namespace {
-	class AssimpAnimation : public Animation {
-	public:
-
-		AssimpAnimation() {}
-		~AssimpAnimation() {}
-
-		void Initilaize(ActorRef actor, aiNodeAnim* nodeAnim) {
-			m_actor = actor; m_nodeAnim = nodeAnim;
-		}
-
-		void Shutdown();
-		void Update(double t);
-
-	private:
-		void findKey(aiVectorKey* keys, int count, double t, float3 &value);
-		void findKey(aiQuatKey* keys, int count, double t, Quaternion &value);
-		aiNodeAnim* m_nodeAnim;
-	};
-
-	// --------------------------------
-
-	void AssimpAnimation::Shutdown()
-	{
-	}
-
-	void AssimpAnimation::Update(double t)
-	{
-		float3 pos, scale;
-		Quaternion rotate;
-		Matrix matrix;
-
-		findKey(m_nodeAnim->mPositionKeys, m_nodeAnim->mNumPositionKeys, t, pos);
-		findKey(m_nodeAnim->mScalingKeys, m_nodeAnim->mNumScalingKeys, t, scale);
-		findKey(m_nodeAnim->mRotationKeys, m_nodeAnim->mNumRotationKeys, t, rotate);
-		
-		matrix.Identity();
-		matrix.Scale(scale);
-		matrix.Rotate(rotate);
-		matrix.Translate(pos);
-
-		m_actor->Matrix() = matrix;
-
-	}
-
-#define LERP(v1, v2, a)\
-	((v1)*(1-(a)) + (v2)*((a)))
-
-#define LERPv3(v1, v2, a)\
-	float3(\
-	LERP(v1.x, v2.x, a),\
-	LERP(v1.y, v2.y, a),\
-	LERP(v1.z, v2.z, a))
-
-	void AssimpAnimation::findKey(aiVectorKey * keys, int count, double t, float3 & value)
-	{
-		if (!count) {
-			value = float3(0, 0, 0);
-			return;
-		}
-		
-		if (count == 1 || keys[0].mTime > t) {
-			assimp_v3d_f3(keys[0].mValue, value);
-			return;
-		}
-
-		for (int i = 0; i < count - 1; i++) {
-			if (keys[i].mTime <= t && keys[i + 1].mTime >= t) {
-				float d = keys[i + 1].mTime - keys[i].mTime;
-				float f = (t - keys[i].mTime) / d;
-
-				value = LERPv3(keys[i].mValue, keys[i + 1].mValue, f);
-				return;
-			}
-		}
-		assimp_v3d_f3(keys[count-1].mValue, value);
-		return;
-	}
-
-	void AssimpAnimation::findKey(aiQuatKey * keys, int count, double t, Quaternion &value)
-	{
-		if (!count) {
-			value = Quaternion();
-			return;
-		}
-
-		if (count == 1 || keys[0].mTime > t) {
-			aiQuaternion &q = keys[0].mValue;
-			value.Set(q.x, q.y, q.z, q.w);
-			return;
-		}
-
-		for (int i = 0; i < count - 1; i++) {
-			if (keys[i].mTime <= t && keys[i + 1].mTime >= t) {
-				float d = keys[i + 1].mTime - keys[i].mTime;
-				float f = (t - keys[i].mTime) / d;
-
-				aiQuaternion &aq1 = keys[i].mValue;
-				aiQuaternion &aq2 = keys[i+1].mValue;
-				Quaternion q1(aq1.x, aq1.y, aq1.z, aq1.w);
-				Quaternion q2(aq2.x, aq2.y, aq2.z, aq2.w);
-
-				value.Slerp(q1, q2, f);
-				
-				return;
-			}
-		}
-		aiQuaternion &q = keys[count - 1].mValue;
-		value.Set(q.x, q.y, q.z, q.w);
-		return;
-	}
-
-	// --------------------------------
-	class AssimpScene : public Scene {
-	public:
-		AssimpScene(const aiScene* scene) : m_aiScene(scene){}
-		~AssimpScene() {
-			delete m_aiScene;
-		}
-
-	private:
-		const aiScene* m_aiScene;
-	};
-	
 }
 
 // ================================================================================================================================================================
@@ -407,7 +282,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		0
 	);
 
-	SceneRef outScene = new AssimpScene(scene);
+	SceneRef outScene = new Scene();
 
 	if (!scene)
 		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
@@ -454,12 +329,12 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 				}
 			}
 
-			assimpMaterialKey_2_float4(curr_mat, AI_MATKEY_COLOR_DIFFUSE, material->GetDiffuse());
-			assimpMaterialKey_2_float4(curr_mat, AI_MATKEY_COLOR_AMBIENT, material->GetAmbient());
-			assimpMaterialKey_2_float4(curr_mat, AI_MATKEY_COLOR_SPECULAR, material->GetSpecular());
+			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_DIFFUSE, material->GetDiffuse());
+			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_AMBIENT, material->GetAmbient());
+			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_SPECULAR, material->GetSpecular());
 			
-			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS, material->GetShininess());
-			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
+			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS, material->GetShininess());
+			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
 			materials.push_back(material);
 			///@todo itt a resource managert kellene hasznalni
@@ -570,9 +445,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			// camera <- assmimp camera
 			
-			assimp_v3d_f3_set(curr_camera->mPosition, camera->SetPosition);
-			assimp_v3d_f3_set(curr_camera->mLookAt, camera->SetLookTo); // aiLookat == lookTowardsVector
-			assimp_v3d_f3_set(curr_camera->mUp, camera->SetUp);
+			ASSIMP_V3D_F3_SET(curr_camera->mPosition, camera->SetPosition);
+			ASSIMP_V3D_F3_SET(curr_camera->mLookAt, camera->SetLookTo); // aiLookat == lookTowardsVector
+			ASSIMP_V3D_F3_SET(curr_camera->mUp, camera->SetUp);
 
 			// camera->SetUp(0, -1, 0);
 
@@ -597,18 +472,18 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			switch (curr_light->mType) {
 			case aiLightSource_DIRECTIONAL:
 				light = new DirectionalLight();
-				assimp_v3d_f4(curr_light->mDirection, light->GetDirection(), 0, 0f);
+				ASSIMP_V3D_F4(curr_light->mDirection, light->GetDirection(), 0, 0f);
 				break;
 
 			case aiLightSource_POINT:
 				light = new PointLight();
-				assimp_v3d_f4(curr_light->mPosition, light->GetPosition(), 0.0f);
+				ASSIMP_V3D_F4(curr_light->mPosition, light->GetPosition(), 0.0f);
 				break;
 
 			case aiLightSource_SPOT:
 				light = new SpotLight();
-				assimp_v3d_f4(curr_light->mPosition, light->GetPosition(), 1.0f);
-				assimp_v3d_f4(curr_light->mDirection, light->GetDirection(), 0.0f);
+				ASSIMP_V3D_F4(curr_light->mPosition, light->GetPosition(), 1.0f);
+				ASSIMP_V3D_F4(curr_light->mDirection, light->GetDirection(), 0.0f);
 				(light->GetAngle()) = curr_light->mAngleInnerCone;
 				(light->GetFalloff()) = curr_light->mAngleOuterCone - curr_light->mAngleInnerCone;
 				break;
@@ -622,9 +497,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			(light->GetLinearAttenuation()) = curr_light->mAttenuationLinear;
 			(light->GetQuardicAttenuation()) = curr_light->mAttenuationQuadratic;
 
-			assimp_color_f4(curr_light->mColorAmbient, light->GetAmbient());
-			assimp_color_f4(curr_light->mColorDiffuse, light->GetDiffuse());
-			assimp_color_f4(curr_light->mColorSpecular, light->GetSpecular());
+			ASSIMP_COLOR_F4(curr_light->mColorAmbient, light->GetAmbient());
+			ASSIMP_COLOR_F4(curr_light->mColorDiffuse, light->GetDiffuse());
+			ASSIMP_COLOR_F4(curr_light->mColorSpecular, light->GetSpecular());
 
 			///@todo ez kell-e majd?
 			light->SetName(light_name);
@@ -690,8 +565,28 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 				aiNodeAnim * curr_nodeAnim = curr_anim->mChannels[j];
 				auto it = resourceRepo.actors.find(curr_nodeAnim->mNodeName.C_Str());
 				if (it != resourceRepo.actors.end()) {
-					AssimpAnimation* anim = new AssimpAnimation();
-					anim->Initilaize(it->second, curr_nodeAnim);
+					NodeAnimation* anim = new NodeAnimation();
+					anim->Initialize(it->second);
+
+					float3 f3;
+					float4 f4;
+
+					for (k = 0; k < curr_nodeAnim->mNumPositionKeys; k++) {
+						ASSIMP_V3D_F3(curr_nodeAnim->mPositionKeys[k].mValue, f3);
+						anim->AddPositionKey(curr_nodeAnim->mPositionKeys[k].mTime, f3);
+					}
+
+					for (k = 0; k < curr_nodeAnim->mNumScalingKeys; k++) {
+						ASSIMP_V3D_F3(curr_nodeAnim->mScalingKeys[k].mValue, f3);
+						anim->AddScalingKey(curr_nodeAnim->mScalingKeys[k].mTime, f3);
+					}
+
+					for (k = 0; k < curr_nodeAnim->mNumRotationKeys; k++) {
+						ASSIMP_V4D_F4(curr_nodeAnim->mRotationKeys[k].mValue, f4);
+						anim->AddRotationKey(curr_nodeAnim->mRotationKeys[k].mTime, f4);
+					}
+
+					outScene->AddAnimation(anim);
 				}
 			}
 

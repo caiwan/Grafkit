@@ -8,7 +8,8 @@
 #include "Actor.h"
 #include "camera.h"
 #include "Light.h"
-#include "../core/archetype.h"
+#include "animation.h"
+// #include "../core/archetype.h"
 
 namespace Grafkit {
 
@@ -102,21 +103,5 @@ namespace Grafkit {
 	typedef Resource<Scene> SceneRes;
 	typedef Ref<SceneRes> SceneResRef;
 
-	/**
-	Animation layer / interface for scenes
-	*/
-	class Animation : virtual public Referencable {
-	public:
-		Animation(){}
-		~Animation(){}
-
-		virtual void Shutdown() = 0;
-		
-		virtual void Update(double time) = 0;
-
-	protected:
-		ActorRef m_actor;
-
-	};
 }
 

@@ -58,6 +58,10 @@ namespace Grafkit {
 		Actor(Ref<Entity3D> entity);
 		~Actor();
 
+		// kisse kulonos megoldas ... 
+		void Matrix(const Grafkit::Matrix &mat) { m_viewMatrix = mat; }
+		void Transform(const Grafkit::Matrix &mat) { m_transformMatrix = mat; }
+
 		Grafkit::Matrix& Matrix() { return m_viewMatrix; }
 		Grafkit::Matrix& Transform() { return m_transformMatrix; }
 

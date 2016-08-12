@@ -43,6 +43,7 @@
     <ClCompile Include="generator\ShaderLoader.cpp" />
     <ClCompile Include="generator\TextureLoader.cpp" />
     <ClCompile Include="render\Actor.cpp" />
+    <ClCompile Include="render\animation.cpp" />
     <ClCompile Include="render\camera.cpp" />
     <ClCompile Include="render\effect.cpp" />
     <ClCompile Include="render\Light.cpp" />
@@ -96,6 +97,7 @@
     <ClInclude Include="math\matrix.h" />
     <ClInclude Include="math\quaternion.h" />
     <ClInclude Include="render\Actor.h" />
+    <ClInclude Include="render\animation.h" />
     <ClInclude Include="render\camera.h" />
     <ClInclude Include="render\dxtypes.h" />
     <ClInclude Include="render\effect.h" />

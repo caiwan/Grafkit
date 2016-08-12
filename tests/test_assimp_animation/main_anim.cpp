@@ -100,6 +100,7 @@ protected:
 		{
 			m_t += .01;
 
+			(*this->m_scene)->UpdateAnimation(fmod(m_t, 5));
 			(*this->m_scene)->PreRender(render);
 			(*this->m_scene)->Render(render);
 

@@ -63,35 +63,6 @@ void Grafkit::Scene::Shutdown()
 //#endif
 }
 
-void Grafkit::Scene::Render(Grafkit::Renderer & render)
-{
-	m_currentWorldMatrix.Identity();
-	
-	// ezt a semat ki kell baszni innen 
-	struct {
-		matrix worldMatrix;
-		matrix viewMatrix;
-		matrix projectionMatrix;
-	} viewMatrices;
-
-	// CameraRef &camera = GetActiveCamera();
-	// camera->Calculate(render);
-
-	viewMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
-	
-	viewMatrices.viewMatrix = XMMatrixTranspose(m_cameraViewMatrix.Get());
-	viewMatrices.projectionMatrix = XMMatrixTranspose(m_cameraProjectionMatrix.Get());
-
-	m_vertexShader->GetParam("MatrixBuffer").SetP(&viewMatrices);
-
-	//ez itt elviekben jo kell, hogy legyen
-	m_vertexShader->Render(render);
-	m_fragmentShader->Render(render);
-
-	// render scenegraph
-	RenderNode(render, m_pScenegraph);
-}
-
 void Grafkit::Scene::AddCameraNode(ActorRef camera)
 {
 	m_cameraNodes.push_back(camera);
@@ -141,8 +112,19 @@ void Grafkit::Scene::AddAnimation(AnimationRef anim)
 	m_animations.push_back(anim);
 }
 
+/******************************************************************************
+ * RENDER
+ *****************************************************************************/
+
 void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
+	// --- animation
+
+	for (int i = 0; i < m_animations.size(); i++) {
+		if (m_animations[i].Valid())
+			m_animations[i]->Update(m_animation_time);
+	}
+
 	// --- kamera
 	ActorRef &cameraActor = GetActiveCamera();
 	if (cameraActor.Valid() && (!cameraActor->GetEntities().empty() && cameraActor->GetEntities()[0].Valid())) {
@@ -177,6 +159,35 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 	// minden nodeot prerendererel, ha kell;
 	// ... 
+}
+
+void Grafkit::Scene::Render(Grafkit::Renderer & render)
+{
+	m_currentWorldMatrix.Identity();
+
+	// ezt a semat ki kell baszni innen 
+	struct {
+		matrix worldMatrix;
+		matrix viewMatrix;
+		matrix projectionMatrix;
+	} viewMatrices;
+
+	// CameraRef &camera = GetActiveCamera();
+	// camera->Calculate(render);
+
+	viewMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
+
+	viewMatrices.viewMatrix = XMMatrixTranspose(m_cameraViewMatrix.Get());
+	viewMatrices.projectionMatrix = XMMatrixTranspose(m_cameraProjectionMatrix.Get());
+
+	m_vertexShader->GetParam("MatrixBuffer").SetP(&viewMatrices);
+
+	//ez itt elviekben jo kell, hogy legyen
+	m_vertexShader->Render(render);
+	m_fragmentShader->Render(render);
+
+	// render scenegraph
+	RenderNode(render, m_pScenegraph);
 }
 
 void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)
