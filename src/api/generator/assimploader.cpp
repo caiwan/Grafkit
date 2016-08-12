@@ -12,6 +12,9 @@
 
 #include "../stdafx.h"
 
+#include "../math/matrix.h"
+#include "../math/quaternion.h"
+
 #include "../utils/resource.h"
 #include "../utils/ResourceManager.h"
 
@@ -39,6 +42,7 @@ using namespace FWdebugExceptions;
 
 #define assimp_v3d_f3_set(SRC, DST)\
 (DST((SRC).x, (SRC).y, (SRC).z))
+
 
 // aiVector3D to float4
 #define assimp_v3d_f4(SRC, DST, W)\
@@ -169,6 +173,8 @@ namespace {
 		void Update(double t);
 
 	private:
+		void findKey(aiVectorKey* keys, int count, double t, float3 &value);
+		void findKey(aiQuatKey* keys, int count, double t, Quaternion &value);
 		aiNodeAnim* m_nodeAnim;
 	};
 
@@ -180,7 +186,88 @@ namespace {
 
 	void AssimpAnimation::Update(double t)
 	{
-		//m_nodeAnim->mNumPositionKeys
+		float3 pos, scale;
+		Quaternion rotate;
+		Matrix matrix;
+
+		findKey(m_nodeAnim->mPositionKeys, m_nodeAnim->mNumPositionKeys, t, pos);
+		findKey(m_nodeAnim->mScalingKeys, m_nodeAnim->mNumScalingKeys, t, scale);
+		findKey(m_nodeAnim->mRotationKeys, m_nodeAnim->mNumRotationKeys, t, rotate);
+		
+		matrix.Identity();
+		matrix.Scale(scale);
+		matrix.Rotate(rotate);
+		matrix.Translate(pos);
+
+		m_actor->Matrix() = matrix;
+
+	}
+
+#define LERP(v1, v2, a)\
+	((v1)*(1-(a)) + (v2)*((a)))
+
+#define LERPv3(v1, v2, a)\
+	float3(\
+	LERP(v1.x, v2.x, a),\
+	LERP(v1.y, v2.y, a),\
+	LERP(v1.z, v2.z, a))
+
+	void AssimpAnimation::findKey(aiVectorKey * keys, int count, double t, float3 & value)
+	{
+		if (!count) {
+			value = float3(0, 0, 0);
+			return;
+		}
+		
+		if (count == 1 || keys[0].mTime > t) {
+			assimp_v3d_f3(keys[0].mValue, value);
+			return;
+		}
+
+		for (int i = 0; i < count - 1; i++) {
+			if (keys[i].mTime <= t && keys[i + 1].mTime >= t) {
+				float d = keys[i + 1].mTime - keys[i].mTime;
+				float f = (t - keys[i].mTime) / d;
+
+				value = LERPv3(keys[i].mValue, keys[i + 1].mValue, f);
+				return;
+			}
+		}
+		assimp_v3d_f3(keys[count-1].mValue, value);
+		return;
+	}
+
+	void AssimpAnimation::findKey(aiQuatKey * keys, int count, double t, Quaternion &value)
+	{
+		if (!count) {
+			value = Quaternion();
+			return;
+		}
+
+		if (count == 1 || keys[0].mTime > t) {
+			aiQuaternion &q = keys[0].mValue;
+			value.Set(q.x, q.y, q.z, q.w);
+			return;
+		}
+
+		for (int i = 0; i < count - 1; i++) {
+			if (keys[i].mTime <= t && keys[i + 1].mTime >= t) {
+				float d = keys[i + 1].mTime - keys[i].mTime;
+				float f = (t - keys[i].mTime) / d;
+
+				aiQuaternion &aq1 = keys[i].mValue;
+				aiQuaternion &aq2 = keys[i+1].mValue;
+				Quaternion q1(aq1.x, aq1.y, aq1.z, aq1.w);
+				Quaternion q2(aq2.x, aq2.y, aq2.z, aq2.w);
+
+				value.Slerp(q1, q2, f);
+				
+				return;
+			}
+		}
+		aiQuaternion &q = keys[count - 1].mValue;
+		value.Set(q.x, q.y, q.z, q.w);
+		return;
 	}
 
 	// --------------------------------
