@@ -328,5 +328,8 @@
     <ClInclude Include="generator\MusicBassLoader.h">
       <Filter>Source Files\generator</Filter>
     </ClInclude>
+    <ClInclude Include="math\quaternion.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

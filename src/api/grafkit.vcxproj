@@ -94,6 +94,7 @@
     <ClInclude Include="generator\ShaderLoader.h" />
     <ClInclude Include="generator\TextureLoader.h" />
     <ClInclude Include="math\matrix.h" />
+    <ClInclude Include="math\quaternion.h" />
     <ClInclude Include="render\Actor.h" />
     <ClInclude Include="render\camera.h" />
     <ClInclude Include="render\dxtypes.h" />
