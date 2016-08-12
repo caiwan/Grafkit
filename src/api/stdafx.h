@@ -1,7 +1,5 @@
 #pragma once
 
-#include "math/matrix.h"
-
 // dx datatypes
 #include "render/dxtypes.h"
 
