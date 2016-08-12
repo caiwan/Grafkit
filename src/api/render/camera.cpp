@@ -83,11 +83,11 @@ void Camera::Calculate(Renderer& renderer)
 	float3 center = m_look;
 	float3 up = m_up;
 
-	XMVECTOR v0, v1, v2;
-	XMVECTOR s, u, f;
-	XMVECTOR E = XMLoadFloat3(&pos);
-	XMVECTOR C = XMLoadFloat3(&center);
-	XMVECTOR U = XMLoadFloat3(&up);
+	dxvector v0, v1, v2;
+	dxvector s, u, f;
+	dxvector E = XMLoadFloat3(&pos);
+	dxvector C = XMLoadFloat3(&center);
+	dxvector U = XMLoadFloat3(&up);
 
 	// look at a reference point 
 	if (m_mode == LOOK_AT) {
