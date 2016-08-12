@@ -1,5 +1,6 @@
 #pragma once
 #include "../render/dxtypes.h"
+#include "quaternion.h"
 #include "../utils/memory.h"
 
 namespace Grafkit {
@@ -39,6 +40,12 @@ namespace Grafkit {
 			);
 		}
 
+		Matrix(const matrix &m) : mat(m){
+		}
+
+		Matrix(const Matrix &m) : mat(m.mat) {
+		}
+
 		// identity
 		void Identity() {
 			 this->mat = DirectX::XMMatrixIdentity();
@@ -46,12 +53,12 @@ namespace Grafkit {
 
 		///@{
 		/// Multiply
-		void Multiply(matrix &m)
+		void Multiply(const matrix &m)
 		{
 			this->mat = DirectX::XMMatrixMultiply(m, this->mat);
 		}
 
-		void Multiply(Matrix &m)
+		void Multiply(const Matrix &m)
 		{
 			this->mat = DirectX::XMMatrixMultiply(m.mat, this->mat);
 		}
@@ -59,7 +66,7 @@ namespace Grafkit {
 
 		///@{
 		///translation
-		void Translate(float3 &v)
+		void Translate(const float3 &v)
 		{
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixTranslation(v.x, v.y, v.z));
 		}
@@ -71,7 +78,7 @@ namespace Grafkit {
 		///@}
 
 		/// banana for
-		void Scale(float3 &v)
+		void Scale(const float3 &v)
 		{
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(v.x, v.y, v.z));
 		}
@@ -81,20 +88,18 @@ namespace Grafkit {
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(x, y, z));
 		}
 
-		/// Mixed scale and translate operation
-		void ScaleAndTranslate(float3 s, float3 t)
-		{
-			///@todo TBD
-		}
-
 		/** Rotate around a given axis
 			@param v given axis
 			@param phi angle, rad */
-		void Rotate(float3 v, float phi)
+		void Rotate(const float3 &v, float phi)
 		{
 			dxvector vv;
 			vv = DirectX::XMLoadFloat3(&v);
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationNormal(vv, phi));
+		}
+
+		void Rotate(const Quaternion& q) {
+			Multiply((matrix)q);
 		}
 
 		/// @todo https://en.wikipedia.org/wiki/Euler_angles
@@ -130,13 +135,13 @@ namespace Grafkit {
 			return *this;
 		}
 
-		Matrix& operator= (const matrix& m)
+		Matrix& operator= (const matrix &m)
 		{
 			mat = m;
 			return *this;
 		}
 
-		matrix& Get() {
+		const matrix& Get() const {
 			return mat;
 		}
 
