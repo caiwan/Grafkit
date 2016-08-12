@@ -9,12 +9,12 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
+#include "../stdafx.h"
 
 #include "../utils/reference.h"
 #include "../utils/exceptions.h"
 #include "../utils/memory.h"
 
-#include "dxtypes.h"
 
 #define RENDER_TARGET_MAX 8
 
