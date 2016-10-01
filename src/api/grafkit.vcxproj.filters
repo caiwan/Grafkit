@@ -33,7 +33,7 @@
     <Filter Include="Source Files\valtracker\rocket">
       <UniqueIdentifier>{6bde4260-a312-485f-8b2b-974887b0f80f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\utils\persistent">
+    <Filter Include="Source Files\utils\persistence">
       <UniqueIdentifier>{cc3b1e06-d364-4b29-8df7-bc0c025448b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -155,12 +155,6 @@
     <ClCompile Include="core\thread_win32.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="utils\archive.cpp">
-      <Filter>Source Files\utils\persistent</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\persistent.cpp">
-      <Filter>Source Files\utils\persistent</Filter>
-    </ClCompile>
     <ClCompile Include="utils\memory.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
@@ -169,6 +163,15 @@
     </ClCompile>
     <ClCompile Include="render\animation.cpp">
       <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\persistence\archive.cpp">
+      <Filter>Source Files\utils\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\persistence\persistence.cpp">
+      <Filter>Source Files\utils\persistence</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\persistence\tlv_format.cpp">
+      <Filter>Source Files\utils\persistence</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -316,15 +319,6 @@
     <ClInclude Include="core\archetype.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="utils\archive.h">
-      <Filter>Source Files\utils\persistent</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\dynamics.h">
-      <Filter>Source Files\utils\persistent</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\persistent.h">
-      <Filter>Source Files\utils\persistent</Filter>
-    </ClInclude>
     <ClInclude Include="utils\memory.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
@@ -336,6 +330,18 @@
     </ClInclude>
     <ClInclude Include="render\animation.h">
       <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\persistence\archive.h">
+      <Filter>Source Files\utils\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\persistence\dynamics.h">
+      <Filter>Source Files\utils\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\persistence\persistence.h">
+      <Filter>Source Files\utils\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\persistence\tlv_format.h">
+      <Filter>Source Files\utils\persistence</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

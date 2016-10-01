@@ -1,12 +1,13 @@
-#include "../stdafx.h"
-
 #define USE_STD_ARRAY
 #include <vector>
 
-#include "persistent.h"
+#include "../../stdafx.h"
+#include "../exceptions.h"
+
+#include "persistence.h"
 #include "dynamics.h"
 
-#include "exceptions.h"
+
 
 /**
 	Persistent

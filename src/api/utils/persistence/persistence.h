@@ -2,7 +2,7 @@
 
 // #include <vector>
 
-#include "exceptions.h"
+#include "../exceptions.h"
 #include "dynamics.h"
 
 // http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus

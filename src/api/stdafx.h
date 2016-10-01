@@ -4,8 +4,8 @@
 #include "render/dxtypes.h"
 
 // serilaizer
-#include "utils/dynamics.h"
-#include "utils/persistent.h"
+#include "utils/persistence/dynamics.h"
+#include "utils/persistence/persistence.h"
 
 // logger
 #include "utils/logger.h"

@@ -159,8 +159,15 @@ template<typename TDerived> struct AlignedNew
 #ifndef LIVE_RELEASE
 /* override new */
 #ifndef NO_NEW_OVERRIDE
-//#define DEBUG_NEW new(__FILE__, __FUNCTION__, __LINE__)
-#define DEBUG_NEW new(__FILE__, "", __LINE__)
+
+#ifdef __FUNCTION__
+#define DEBUG_FUNCTION__ __FUNCTION__
+#else //__FUNCTION__
+#define DEBUG_FUNCTION__ ""
+#endif //__FUNCTION__
+
+#define DEBUG_NEW new(__FILE__, __FUNCTION__, __LINE__)
+
 #define new DEBUG_NEW
 #endif /*NO_NEW_OVERRIDE*/
 #endif /*LIVE_RELEASE*/

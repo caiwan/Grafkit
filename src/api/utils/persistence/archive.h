@@ -2,7 +2,7 @@
 #define __ARCHIVE_H_
 
 #include "dynamics.h"
-#include "persistent.h"
+#include "persistence.h"
 
 namespace Grafkit{ 
 
