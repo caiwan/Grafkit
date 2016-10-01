@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "TestArchiver.h"
 
 using namespace Grafkit;

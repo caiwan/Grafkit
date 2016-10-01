@@ -1,6 +1,6 @@
 #pragma once
 #include "utils/exceptions.h"
-#include "utils/persistent.h"
+#include "utils/persistence/persistence.h"
 
 // ----------------------------------------
 class TestArchiver : public Grafkit::Archive

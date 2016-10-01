@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "utils/dynamics.h"
+#include "utils/persistence/dynamics.h"
 
 class ArchiveClonableTestClass : public Grafkit::Clonable {
 public:

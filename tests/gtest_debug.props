@@ -4,16 +4,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
   <ItemDefinitionGroup>
-    <Link />
-    <Lib>
-      <AdditionalLibraryDirectories>
-		$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\
-		</AdditionalLibraryDirectories>
-      <AdditionalDependencies>
-	  gtest.lib
-	  </AdditionalDependencies>
-      <LinkTimeCodeGeneration />
-    </Lib>
     <ClCompile>
       <AdditionalIncludeDirectories>
 	  $(solutiondir)src\api;
@@ -24,7 +14,8 @@
 	  </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>e:\prog\grafkit2\externals\lib\Debug_x64\gtest_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

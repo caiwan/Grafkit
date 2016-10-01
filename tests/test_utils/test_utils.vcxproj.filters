@@ -58,6 +58,9 @@
     <ClInclude Include="testClass_dynamics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="persistent_test_data_0.inc">

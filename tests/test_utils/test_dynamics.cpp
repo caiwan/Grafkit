@@ -1,6 +1,8 @@
+#include "stdafx.h"
+
 #include "gtest/gtest.h"
 
-#include "utils/dynamics.h"
+#include "utils/persistence/dynamics.h"
 
 #include "testClass_dynamics.h"
 

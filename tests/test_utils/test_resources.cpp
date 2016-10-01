@@ -2,6 +2,8 @@
 	Unittest for resource management system 
 */
 
+#include "stdafx.h"
+
 #include <gtest/gtest.h>
 
 #include "testClass_resource.h"

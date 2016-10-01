@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
+#include "stdafx.h"
 
+#include <gtest/gtest.h>
 
 #include "utils/struct_pack.h"
 #include "utils/exceptions.h"

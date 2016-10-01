@@ -1,9 +1,11 @@
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "stdafx.h"
+
 #include <gtest/gtest.h>
 
-#include "utils/dynamics.h"
-#include "utils/persistent.h"
+#include "utils/persistence/dynamics.h"
+#include "utils/persistence/persistence.h"
 
 #include "TestArchiver.h"
 #include "testClass_persistent.h"
@@ -141,7 +143,7 @@ TEST(Persistent, Load_Class_NameMismatch)
 {
 	td0_t in_data = *((td0_t*)test_data_0);
 
-	strcpy(in_data.clazz.classname, "__nonexistent_data__");
+	strcpy_s(in_data.clazz.classname, "__nonexistent_data__");
 
 	TestArchiver archive(&in_data, size_test_data_0);
 	ASSERT_THROW(Persistent* object = Persistent::load(archive), PersistentCreateObjectExcpetion);
