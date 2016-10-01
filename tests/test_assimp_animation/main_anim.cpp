@@ -74,7 +74,8 @@ protected:
 
 		// -- model 
 		//m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_test1.assbin", m_vs));
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_complex.assbin", m_vs));
+		// m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_complex.bin", m_vs));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_complex_baked.bin", m_vs));
 
 		DoPrecalc();
 
