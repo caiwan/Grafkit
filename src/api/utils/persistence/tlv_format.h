@@ -1,6 +1,8 @@
 /**
 Type-length-value format descriptor
 
+out-of-scope
+
 @author caiwan
 
 */
@@ -9,42 +11,39 @@ Type-length-value format descriptor
 
 enum TLVFieldType {
 	TLVF_INVALID = 0,
-	TLVF_char,
-	TLVF_short,
-	TLVF_int,
-	TLVF_long,
-	TLVF_longlong,
-	TLVF_float,
-	TLVF_double,
+	TVLF_primitive,
+	TVLF_array,
 	TLVF_string,
 	TLVF_object,
 	TLVF_map,
+	TLVF_COUNT
 };
 
-class TLVRecord;
-/** Describes one TLV record
-*/
-class TLVRecord {
-private:
-	unsigned int type;	///< primitive type
-	unsigned char nComponents; ///< number of vector and matrix field components (1,2,3,4,9,16)
-	//unsigned char isKeyValue;	///< is data represented as 
-	char * szField; ///< field name
-	char * szClazz; ///< class name
-	
+struct TLVRecord;
+/** Describes one TLV record */
+struct TLVRecord {
+	enum TLVFieldType type;	///< primitive type
+
 	unsigned int nElemLen;
 	unsigned int nElemCount;
 
+	char *szClazz; ///< class name
+	char *szField; ///< field name
+
 	void* pData;
 
-	unsigned int nSubTLVCount;
-	TLVRecord *pSubTLVs;
-
-	// get+set
+	TLVRecord() {
+		this->type = TLVF_INVALID;
+		this->szClazz = nullptr;
+		this->szField = nullptr;
+		this->nElemLen = 0;
+		this->nElemCount = 0;
+		this->pData = nullptr;
+	}
 };
 
-/** Parses and buiold a TLV tree
-*/
-class TLVParser {
-
+class TLVParser{
+public:
+	static void fromByte(void* in_data, TLVRecord& out_tlv);
+	static void toByte(TLVRecord& in_tlv, void* out_data, unsigned int& out_length);
 };

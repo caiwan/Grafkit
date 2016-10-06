@@ -12,7 +12,6 @@ ArchiveFile::ArchiveFile(FILE* stream, bool isStoring) :
 	_stream(stream)
 {
 	if(!_stream) throw new EX(NullPointerException);
-	this->initCheck();
 }
 
 ArchiveFile::~ArchiveFile() {

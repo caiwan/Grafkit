@@ -21,14 +21,14 @@ ArchivePersistentTestClass::ArchivePersistentTestClass(ArchivePersistentTestClas
 
 void ArchivePersistentTestClass::serialize(Grafkit::Archive &stream)
 {
-	if (stream.isStoring()) {
-		stream << m_data.m_int;
-		stream << m_data.m_float;
-	}
-	else {
-		stream >> m_data.m_int;
-		stream >> m_data.m_float;
-	}
+	//if (stream.isStoring()) {
+	//	stream << m_data.m_int;
+	//	stream << m_data.m_float;
+	//}
+	//else {
+	//	stream >> m_data.m_int;
+	//	stream >> m_data.m_float;
+	//}
 }
 
 // =========================================================================================== 

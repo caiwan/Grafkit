@@ -4,14 +4,15 @@
 
 #include "../exceptions.h"
 #include "dynamics.h"
+#include "tlv_format.h"
 
 // http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
 
 //#define NOT_USING_RTTI
 
-#define PERSISTENT_SIGNATURE "DB0"
+#define PERSISTENT_SIGNATURE "CAI"
 #define PERSISTENT_MAJOR_VER 0
-#define PERSISTENT_MINOR_VER 1
+#define PERSISTENT_MINOR_VER 2
 
 namespace Grafkit{
 	class Archive;
@@ -31,96 +32,106 @@ namespace Grafkit{
 			virtual int version() const { return 0; }
 	};
 
+	class PersistElem;
+	template <typename T> class PersistField;
+	
+	class PersistElem {
+		friend class Archive;
+	protected:
+		virtual void load(Archive &ar) = 0;
+		virtual void store(Archive & ar) = 0;
+	};
+
 	class Archive
 	{
+		friend class PersistElem;
+		template <typename T> friend class PersistField;
+
 		public:
 			explicit Archive(int isStoring = 0);
-			virtual ~Archive();// {}
+			virtual ~Archive();
 
 		protected:
-			/// minden leszarmazott konstruktoraban meg kell hivni
-			/// kiirja/beolvassa a headert, es verzio ellenorzest vegez, ha kell
-			void initCheck();
-			
 			/// I/O stuff
 			virtual void write(const void* buffer, size_t length) = 0;
 			virtual void read(void* buffer, size_t length) = 0;
 	
 		public:
-			///@todo: ArrayPool<T> store/load support
-			
-			///@todo: BinaryTree<T> store/load  support
-			///@todo: ChainTree<T> store/load support
-			///@todo: ListTree<T> store/load support
 
-			Archive& operator<< (const std::string& str);
-			Archive& operator>> (std::string& str);
+			Archive& operator& (PersistElem *field) {
+				if (isStoring()) {
+					field->store(*this);
+				}
+				else {
+					field->load(*this);
+				}
 
-			Archive& operator<< (const char*& str);
-			Archive& operator>> (char*& str);
+				delete field;
 
-
-			// ezzel megkonnyitem most a copypastet.
-
-			///@todo: itt, az olvasasnal csekkolni kene a size erteket, es exceptiont dobalni igeny eseten
-			///@todo std::vector-t is kezeljen
-#define DECL_IO_ARRAY_OPERATION(type) \
-	inline Archive& operator<< (const std::vector<type> &_array) { \
-		*this<<_array.size(); \
-		write(_array.get(), _array.realsize()); \
-		return *this; \
-	} \
-	\
-	inline Archive& operator>> (std::vector<type>& _array){ \
-		int size = -1; *this>>size; \
-		_array.rewind(), _array.insert(size); \
-		read(_array.get(), _array.realsize()); \
-		return *this;\
-	}\
-
-#define DECL_IO_OPERATION(type) \
-	inline Archive& operator<< (const type &val)  {write(&val, sizeof(type)); return *this;} \
-	inline Archive& operator>> (type& val) {read (&val, sizeof(type)); return *this;} \
-	// DECL_IO_ARRAY_OPERATION(type) 
-
-
-			DECL_IO_OPERATION(char);
-			DECL_IO_OPERATION(short);
-			DECL_IO_OPERATION(int);
-			DECL_IO_OPERATION(long);
-
-			DECL_IO_OPERATION(unsigned char);
-			DECL_IO_OPERATION(unsigned short);
-			DECL_IO_OPERATION(unsigned int);
-			DECL_IO_OPERATION(unsigned long);
-
-			DECL_IO_OPERATION(double);
-			DECL_IO_OPERATION(float);
-
-			// vector support, mert miret ne
-			//DECL_IO_OPERATION(vector2d<char>);
-			//DECL_IO_OPERATION(vector3d<char>);
-			//DECL_IO_OPERATION(vector4d<char>);
-
-			//DECL_IO_OPERATION(vector2d<int>);
-			//DECL_IO_OPERATION(vector3d<int>);
-			//DECL_IO_OPERATION(vector4d<int>); // tobb nem kell ebbol
-
-			//DECL_IO_OPERATION(vec2float);
-			//DECL_IO_OPERATION(vec3float);
-			//DECL_IO_OPERATION(vec4float);
-
-			//DECL_IO_OPERATION(vec2double);
-			//DECL_IO_OPERATION(vec3double);
-			//DECL_IO_OPERATION(vec4double);
+				return *this;
+			}
 
 			int isStoring() const { return _isStoring; }
 			void setDirection(bool isStoring) { _isStoring = isStoring; }
 
 		private: 
-			int _isStoring;		// fix'd
+			int _isStoring; // fix'd
 			short _major;
 			short _minor;
+	};
+
+	template <typename T> class PersistField : public PersistElem {
+
+	private:
+		T* m_pT;
+
+	public:
+		PersistField(const char* name, T* ptr) {
+			this->m_pT = ptr;
+		}
+
+		~PersistField() {
+		}
+
+	protected:
+		virtual void load(Archive &ar) {
+			ar.read(m_pT, sizeof(T));
+		}
+		
+		virtual void store(Archive & ar) {
+			ar.write(m_pT, sizeof(T));
+		}
+
+	};
+
+	template <typename T> class PersistVector : public PersistElem {
+		friend class Archive;
+
+	private:
+		unsigned int m_count;
+		T** m_pT;
+
+	public:
+		PersistVector(const char* name, T** ptr, unsigned int * pcount) {
+			this->m_pT = ptr;
+			this->m_count = pcount;
+		}
+
+		~PersistVector() {
+		}
+
+	protected:
+		virtual void load(Archive &ar) {
+			unsigned int count = 0;
+			ar.read(m_count, sizeof(m_count[0]));
+			ar.read(*m_pT, sizeof(T) * (*m_count));
+		}
+
+		virtual void store(Archive & ar) {
+			ar.write(m_count, sizeof(m_count[0]));
+			ar.write(*m_pT, sizeof(T) * (*m_count));
+		}
+
 	};
 }
 
@@ -144,7 +155,12 @@ private: \
 	static Grafkit::AddClonable _addClonable;
 
 #define PERSISTENT_IMPL(className) \
-	Grafkit::AddClonable className::_addClonable(#className, new className##::Factory());
+	CLONEABLE_FACTORY_IMPL(className)
+
+// --- 
+
+#define PERSIST_FIELD(FIELD)
+#define PERSIST_VECTOR(FIELD, COUNT)
 
 
 // --- define exceptions 

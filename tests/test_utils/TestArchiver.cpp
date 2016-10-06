@@ -13,7 +13,6 @@ TestArchiver::TestArchiver(size_t initsize, bool isStoring) : Archive(isStoring)
 {
 	this->size = initsize;
 	this->data = new unsigned char[this->size];
-	this->initCheck();
 }
 
 TestArchiver::TestArchiver(const void * in_data, size_t in_size): Archive(false),
@@ -22,7 +21,6 @@ TestArchiver::TestArchiver(const void * in_data, size_t in_size): Archive(false)
 	crsr(0),
 	no_delete(1)
 {
-	this->initCheck();
 }
 
 
@@ -54,4 +52,16 @@ void TestArchiver::read(void* buffer, size_t length)
 		dst[i] = src[i];
 	}
 	this->crsr += length;
+}
+
+void TestArchiver::hexdump()
+{
+	printf_s("Dump data:\n");
+	for (size_t i = 0; i < this->size; ++i) {
+		printf_s("%02x ", this->data[i]);
+		if (i && i % 15 == 0) {
+			printf_s("\n");
+		}
+	}
+	printf_s("\n");
 }

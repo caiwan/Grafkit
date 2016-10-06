@@ -23,5 +23,7 @@ public:
 	size_t getCrsr() { return this->crsr; }
 
 	void resetCrsr() { this->crsr = 0; }
+
+	void hexdump();
 };
 
