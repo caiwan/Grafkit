@@ -34,6 +34,7 @@ namespace Grafkit{
 
 	class PersistElem;
 	template <typename T> class PersistField;
+	template <typename T> class PersistVector;
 	
 	class PersistElem {
 		friend class Archive;
@@ -46,6 +47,7 @@ namespace Grafkit{
 	{
 		friend class PersistElem;
 		template <typename T> friend class PersistField;
+		template <typename T> friend class PersistVector;
 
 		public:
 			explicit Archive(int isStoring = 0);
@@ -56,6 +58,9 @@ namespace Grafkit{
 			virtual void write(const void* buffer, size_t length) = 0;
 			virtual void read(void* buffer, size_t length) = 0;
 	
+			void stringWrire();
+			void sringRead();
+
 		public:
 
 			Archive& operator& (PersistElem *field) {
@@ -83,11 +88,10 @@ namespace Grafkit{
 	template <typename T> class PersistField : public PersistElem {
 
 	private:
-		T* m_pT;
+		T& m_pT;
 
 	public:
-		PersistField(const char* name, T* ptr) {
-			this->m_pT = ptr;
+		PersistField(const char* name, T& t) : m_pT(t){
 		}
 
 		~PersistField() {
@@ -95,11 +99,11 @@ namespace Grafkit{
 
 	protected:
 		virtual void load(Archive &ar) {
-			ar.read(m_pT, sizeof(T));
+			ar.read(&m_pT, sizeof(T));
 		}
 		
 		virtual void store(Archive & ar) {
-			ar.write(m_pT, sizeof(T));
+			ar.write(&m_pT, sizeof(T));
 		}
 
 	};
@@ -108,13 +112,14 @@ namespace Grafkit{
 		friend class Archive;
 
 	private:
-		unsigned int m_count;
-		T** m_pT;
+		size_t & m_count;
+		T*& m_pT;
 
 	public:
-		PersistVector(const char* name, T** ptr, unsigned int * pcount) {
-			this->m_pT = ptr;
-			this->m_count = pcount;
+		/// Only works with size_t from now on
+		PersistVector(const char* name, T*& pt, size_t & len) :  
+			m_pT(pt), m_count(len)
+		{
 		}
 
 		~PersistVector() {
@@ -123,13 +128,16 @@ namespace Grafkit{
 	protected:
 		virtual void load(Archive &ar) {
 			unsigned int count = 0;
-			ar.read(m_count, sizeof(m_count[0]));
-			ar.read(*m_pT, sizeof(T) * (*m_count));
+			ar.read(&count, sizeof(count));
+			m_pT = new T[count];
+			ar.read(m_pT, sizeof(T) * (count));
+			m_count = count;
 		}
 
 		virtual void store(Archive & ar) {
-			ar.write(m_count, sizeof(m_count[0]));
-			ar.write(*m_pT, sizeof(T) * (*m_count));
+			unsigned int count = m_count;
+			ar.write(&count, sizeof(count));
+			ar.write(m_pT, sizeof(T) * count);
 		}
 
 	};
@@ -158,9 +166,17 @@ private: \
 	CLONEABLE_FACTORY_IMPL(className)
 
 // --- 
+namespace Grafkit {
+	// quick-and-dirty workaround - due to remove pointer trick
+	template <typename T> PersistElem* newPersistVector(const char* name, T &in, size_t &len) {
+		typedef std::remove_pointer<T>::type TT;
+		return new PersistVector<TT>(name, in, len);
+	}
+}
 
-#define PERSIST_FIELD(FIELD)
-#define PERSIST_VECTOR(FIELD, COUNT)
+#define PERSIST_FIELD(FIELD) (new Grafkit::PersistField<decltype(FIELD)>(#FIELD, FIELD))
+//#define PERSIST_VECTOR(FIELD, COUNT) (Grafkit::newPersistVector<decltype(FIELD)>(#FIELD, FIELD, COUNT))
+#define PERSIST_VECTOR(FIELD, COUNT) (new Grafkit::PersistVector<std::remove_pointer<decltype(FIELD)>::type>(#FIELD, FIELD, COUNT))
 
 
 // --- define exceptions 

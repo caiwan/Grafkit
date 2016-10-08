@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
+
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
 
@@ -15,12 +17,91 @@ using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 TEST(Persistent, Persistence_Field) {
-	TestArchiver archive(18, true);
+	TestArchiver archive(6, true);
 	
 	int test = 0xfacababa;
-	archive & new PersistField<int>("test", &test);
+	archive & new PersistField<decltype(test)>("test", test);
 
-	archive.hexdump();
+	//archive.hexdump();
+
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	int test_read = 0;
+	archive & new PersistField<decltype(test)>("test", test_read);
+
+	ASSERT_EQ(test, test_read);
+}
+
+TEST(Persistent, Persistence_FieldMacro) {
+	TestArchiver archive(6, true);
+
+	int test = 0xfacababa;
+	archive & PERSIST_FIELD(test);
+
+	//archive.hexdump();
+
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	int test_orig = test;
+	archive & PERSIST_FIELD(test);
+
+	ASSERT_EQ(test_orig, test);
+}
+
+TEST(Persistent, Persistence_Vector) {
+	TestArchiver archive(4096, true);
+
+	size_t len = rand() % 1024;
+
+	int *test = new int[len];
+
+	for (size_t i = 0; i < len; i++) {
+		test[i] = rand();
+	}
+
+	archive & new PersistVector<std::remove_pointer<decltype(test)>::type>("test", test, len);
+
+	//archive.hexdump();
+
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	int *test_read = nullptr;
+	size_t len_read = 0;
+	archive & new PersistVector<std::remove_pointer<decltype(test)>::type>("test", test_read, len_read);
+
+	ASSERT_EQ(len, len_read);
+	for (size_t i=0; i<len; i++)
+		ASSERT_EQ(test[i], test_read[i]);
+}
+
+TEST(Persistent, Persistence_VectorMacro) {
+	TestArchiver archive(4096, true);
+
+	size_t len = rand() % 1024;
+	int *test = new int[len];
+
+	for (size_t i = 0; i < len; i++) {
+		test[i] = rand();
+	}
+
+	archive & PERSIST_VECTOR(test, len);
+
+	//archive.hexdump();
+
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	size_t len_orig = len;
+	int *test_orig = test;
+
+	archive & PERSIST_VECTOR(test, len);
+
+	ASSERT_EQ(len_orig, len);
+	for (size_t i = 0; i<len; i++)
+		ASSERT_EQ(test_orig[i], test[i]);
 }
 
 //TEST(Persistent, Persistence_Field) {
