@@ -31,10 +31,12 @@ TEST(Persistent, Persistence_Field) {
 	ASSERT_EQ(test, test_read);
 }
 
+/// @TODO test with more tzpes to see if it works 
 TEST(Persistent, Persistence_FieldMacro) {
 	TestArchiver archive(6, true);
 
 	int test = 0xfacababa;
+	// @todo float2,3,4, quaternion, matrix
 	archive & PERSIST_FIELD(test);
 
 	archive.resetCrsr();
@@ -74,11 +76,14 @@ TEST(Persistent, Persistence_Vector) {
 	delete[] test;
 }
 
+/// @TODO test with more tzpes to see if it works 
 TEST(Persistent, Persistence_VectorMacro) {
 	TestArchiver archive(4096, true);
 
 	size_t len = rand() % 1024;
 	int *test = new int[len];
+
+	// @todo float2,3,4, quaternion, matrix
 
 	for (size_t i = 0; i < len; i++) {
 		test[i] = rand();

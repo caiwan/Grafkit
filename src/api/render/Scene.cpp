@@ -244,4 +244,3 @@ Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor)
 
 	return result;
 }
-
