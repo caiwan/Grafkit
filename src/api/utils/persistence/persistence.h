@@ -58,8 +58,8 @@ namespace Grafkit{
 			virtual void write(const void* buffer, size_t length) = 0;
 			virtual void read(void* buffer, size_t length) = 0;
 	
-			void stringWrire();
-			void sringRead();
+			size_t stringWrire(const char* input);
+			size_t sringRead(char* output);
 
 		public:
 
@@ -141,6 +141,26 @@ namespace Grafkit{
 		}
 
 	};
+
+	class PersistString {
+	private:
+		std::string *m_pString;
+		const char **m_pszString;
+
+	public:
+		PersistString(const char * name, const char **pszString) {
+			m_pszString = pszString;
+			m_pString = nullptr;
+		}
+
+		PersistString(const char * name, std::string *pString) {
+			m_pszString = nullptr;
+			m_pString = pString;
+		}
+
+		virtual void load(Archive &ar);
+		virtual void store(Archive & ar);
+	};
 }
 
 
@@ -166,16 +186,8 @@ private: \
 	CLONEABLE_FACTORY_IMPL(className)
 
 // --- 
-namespace Grafkit {
-	// quick-and-dirty workaround - due to remove pointer trick
-	template <typename T> PersistElem* newPersistVector(const char* name, T &in, size_t &len) {
-		typedef std::remove_pointer<T>::type TT;
-		return new PersistVector<TT>(name, in, len);
-	}
-}
 
 #define PERSIST_FIELD(FIELD) (new Grafkit::PersistField<decltype(FIELD)>(#FIELD, FIELD))
-//#define PERSIST_VECTOR(FIELD, COUNT) (Grafkit::newPersistVector<decltype(FIELD)>(#FIELD, FIELD, COUNT))
 #define PERSIST_VECTOR(FIELD, COUNT) (new Grafkit::PersistVector<std::remove_pointer<decltype(FIELD)>::type>(#FIELD, FIELD, COUNT))
 
 
