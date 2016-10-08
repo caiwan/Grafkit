@@ -87,3 +87,56 @@ Archive::~Archive()
 {
 
 }
+
+size_t Grafkit::Archive::writeString(const char * input)
+{
+	unsigned int slen = strlen(input);
+
+	this->write(&slen, sizeof(slen));
+	this->write(input, slen+1);
+
+	return slen;
+}
+
+size_t Grafkit::Archive::readString(char*& output)
+{
+	unsigned int slen = 0;
+
+	this->read(&slen, sizeof(slen));
+
+	output = new char[slen+1];
+
+	this->read(output, slen + 1);
+
+	return slen;
+}
+
+/**
+	Persistent helpers
+*/
+
+
+void Grafkit::PersistString::store(Archive & ar)
+{
+	const char *out = nullptr;
+	if (m_pString) {
+		out = m_pString->c_str();
+	}
+	else {
+		out = *m_pszString;
+	}
+	ar.writeString(out);
+}
+
+void Grafkit::PersistString::load(Archive & ar)
+{
+	char *in = nullptr;
+	ar.readString(in);
+	if (m_pString) {
+		m_pString->clear();
+		m_pString->assign(in);
+	}
+	else {
+		*m_pszString = in;
+	}
+}

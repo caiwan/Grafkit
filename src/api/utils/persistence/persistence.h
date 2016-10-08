@@ -35,7 +35,10 @@ namespace Grafkit{
 	class PersistElem;
 	template <typename T> class PersistField;
 	template <typename T> class PersistVector;
-	
+	class PersistString;
+	template <typename K, typename V> class PersistMap;
+	class PersistObject;
+
 	class PersistElem {
 		friend class Archive;
 	protected:
@@ -48,6 +51,10 @@ namespace Grafkit{
 		friend class PersistElem;
 		template <typename T> friend class PersistField;
 		template <typename T> friend class PersistVector;
+		friend class PersistString;
+		template <typename K, typename V> friend class PersistMap;
+		friend class PersistObject;
+
 
 		public:
 			explicit Archive(int isStoring = 0);
@@ -58,8 +65,8 @@ namespace Grafkit{
 			virtual void write(const void* buffer, size_t length) = 0;
 			virtual void read(void* buffer, size_t length) = 0;
 	
-			size_t stringWrire(const char* input);
-			size_t sringRead(char* output);
+			size_t writeString(const char* input); ///< @return length of written bytes of string
+			size_t readString(char*& output);	///< @return length of read bytes of string
 
 		public:
 
@@ -85,6 +92,10 @@ namespace Grafkit{
 			short _minor;
 	};
 
+	/**
+	Persistent helpers
+	*/
+
 	template <typename T> class PersistField : public PersistElem {
 
 	private:
@@ -108,6 +119,7 @@ namespace Grafkit{
 
 	};
 
+	/** Persists privitive vector or any other collection*/
 	template <typename T> class PersistVector : public PersistElem {
 		friend class Archive;
 
@@ -142,7 +154,7 @@ namespace Grafkit{
 
 	};
 
-	class PersistString {
+	class PersistString : public PersistElem {
 	private:
 		std::string *m_pString;
 		const char **m_pszString;
@@ -161,6 +173,17 @@ namespace Grafkit{
 		virtual void load(Archive &ar);
 		virtual void store(Archive & ar);
 	};
+
+	/** Persist std maps */
+	template <typename K, typename V> class PersistMap : public PersistElem {
+
+	};
+
+	/** Persists serializable objects*/
+	class PersistObject {
+
+	};
+
 }
 
 
@@ -189,6 +212,7 @@ private: \
 
 #define PERSIST_FIELD(FIELD) (new Grafkit::PersistField<decltype(FIELD)>(#FIELD, FIELD))
 #define PERSIST_VECTOR(FIELD, COUNT) (new Grafkit::PersistVector<std::remove_pointer<decltype(FIELD)>::type>(#FIELD, FIELD, COUNT))
+#define PERSIST_STRING(FIELD) (new Grafkit::PersistString(#FIELD, FIELD))
 
 
 // --- define exceptions 
