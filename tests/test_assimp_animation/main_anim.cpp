@@ -44,7 +44,7 @@ public:
 		int result = 0;
 
 		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
-		this->m_file_loader = new Grafkit::FileAssetFactory("./../assets/");
+		this->m_file_loader = new Grafkit::FileAssetFactory("./");
 	}
 
 	~Application() {
@@ -73,9 +73,7 @@ protected:
 		m_fs = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixel", ST_Pixel));
 
 		// -- model 
-		//m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_test1.assbin", m_vs));
-		// m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_complex.bin", m_vs));
-		m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_complex_baked.bin", m_vs));
+		m_scene = this->Load<SceneRes>(new AssimpLoader("models/anim_complex.assbin", m_vs));
 
 		DoPrecalc();
 
