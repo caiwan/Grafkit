@@ -6,6 +6,11 @@
 
 #include <cmath>
 
+#include "math/vector.h"
+#include "math/matrix.h"
+#include "math/quaternion.h"
+
+
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
 
@@ -49,16 +54,102 @@ TEST(Persistence, given_Field_when_PersistWithMacro_then_Load) {
 }
 
 TEST(Persistence, given_FieldFloat234_when_PersistWithMacro_then_Load) {
-	FAIL();
+	TestArchiver archive(256, true);
+	
+	// given
+	float2 f2;
+	f2.x = 1.0; f2.y = 2.16;
+
+	float3 f3;
+	f3.x = 1.0; f3.y = 2.16; f3.z = 3.14159;
+
+	float4 f4;
+	f4.x = 1.0; f4.y = 2.16; f4.z = 3.14159; f4.w = 4.0;
+
+	//when
+	archive & PERSIST_FIELD(f2);
+	archive & PERSIST_FIELD(f3);
+	archive & PERSIST_FIELD(f4);
+
+
+	//then
+	archive.setDirection(false);
+	archive.resetCrsr();
+
+	float2 ft2 = f2;
+	float3 ft3 = f3;
+	float4 ft4 = f4;
+	
+	archive & PERSIST_FIELD(f2);
+	archive & PERSIST_FIELD(f3);
+	archive & PERSIST_FIELD(f4);
+
+	ASSERT_LT(abs(f2.x - ft2.x), 000001);
+	ASSERT_LT(abs(f2.y - ft2.y), 000001);
+	
+	ASSERT_LT(abs(f3.x - ft3.x), 000001);
+	ASSERT_LT(abs(f3.y - ft3.y), 000001);
+	ASSERT_LT(abs(f3.z - ft3.z), 000001);
+	
+	ASSERT_LT(abs(f4.x - ft4.x), 000001);
+	ASSERT_LT(abs(f4.y - ft4.y), 000001);
+	ASSERT_LT(abs(f4.z - ft4.z), 000001);
+	ASSERT_LT(abs(f4.w - ft4.w), 000001);
 }
 
 TEST(Persistence, given_FieldQuaternion_when_PersistWithMacro_then_Load) {
-	FAIL();
+	TestArchiver archive(256, true);
+	
+	// given
+	float4 f4;
+	f4.x = 1.0; f4.y = 2.16; f4.z = 3.14159; f4.w = 4.0;
+	Quaternion q = f4;
+	
+	//when
+	archive & PERSIST_FIELD(q);
+	
+	//then
+	archive.setDirection(false);
+	archive.resetCrsr();
+
+	Quaternion q2 = q;
+	archive & PERSIST_FIELD(q);
+	float4 ft4 = q2;
+
+	ASSERT_LT(abs(f4.x - ft4.x), 000001);
+	ASSERT_LT(abs(f4.y - ft4.y), 000001);
+	ASSERT_LT(abs(f4.z - ft4.z), 000001);
+	ASSERT_LT(abs(f4.w - ft4.w), 000001);
 }
 
 
 TEST(Persistence, given_FieldMatrix_when_PersistWithMacro_then_Load) {
-	FAIL();
+	TestArchiver archive(256, true);
+
+	//given
+	Matrix m(
+		11, 12, 13, 14,
+		21, 22, 23, 24,
+		31, 32, 33, 34,
+		41, 42, 43, 44
+	);
+
+	//when
+	archive & PERSIST_FIELD(m);
+
+	//then
+	archive.setDirection(false);
+	archive.resetCrsr();
+
+	Matrix m2 = m;
+
+	archive & PERSIST_FIELD(m);
+
+	for (size_t row = 0; row < 4; row++) {
+		for (size_t col = 0; col < 4; col++) {
+			ASSERT_LT(abs(m.Get(row,col) - m2.Get(row, col)), 000001);
+		}
+	}
 }
 
 TEST(Persistence, given_Vector_when_Persist_then_Load) {
