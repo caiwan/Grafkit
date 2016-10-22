@@ -35,21 +35,18 @@
     <ClCompile Include="testClass_dynamics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="testClass_persistent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="testClass_resource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="test_persistence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="testClass_persistence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestArchiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="testClass_persistent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="testClass_resource.h">
@@ -60,6 +57,9 @@
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="testClass_persistence.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

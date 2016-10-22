@@ -16,7 +16,7 @@ struct test_0_t {
 };
 
 /// Basic packing/formatting test
-TEST(Struct, Pack)
+TEST(Struct, given_Vectors_when_Pack_then_CheckPack)
 {
 	const int test_0_0[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 	const float test_0_1[] = { 0.1, 1.2, 2.3, 3.4, 4.5, 5.6, 6.7, 7.8 };
@@ -43,7 +43,7 @@ TEST(Struct, Pack)
 }
 
 // Test struct with an undefined field
-TEST(Struct, PackUndefinedPtr)
+TEST(Struct, given_Vectors_when_UnspecifedPointers_then_UnspecifiedFieldsNulled)
 {
 	const int test_0_0[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 	const float test_0_1[] = { 0.1, 1.2, 2.3, 3.4, 4.5, 5.6, 6.7, 7.8 };
@@ -89,7 +89,7 @@ TEST(Struct, PackUndefinedPtr)
 
 // ============================================================
 /// Formatting with larger stride on the input side
-TEST(Struct, Stride)
+TEST(Struct, given_VectorWithStride_when_Pack_then_Check)
 {
 	const int test_1_0[] = { 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7 };
 	const float test_1_1[] = { 0.1, 0, 1.2, 0, 2.3, 0, 3.4, 0, 4.5, 0, 5.6, 0, 6.7, 0, 7.8 };
@@ -118,7 +118,7 @@ TEST(Struct, Stride)
 // ============================================================
 
 /// Formatting with larger stride and byte offset on the input side
-TEST(Struct, Offset)
+TEST(Struct, given_VectorWithStrideAndOffset_when_Pack_then_Check)
 {
 	const int test_2_0[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7 };
 	const float test_2_1[] = { 0, 0.1, 0, 1.2, 0, 2.3, 0, 3.4, 0, 4.5, 0, 5.6, 0, 6.7, 0, 7.8 };
@@ -149,17 +149,17 @@ TEST(Struct, Offset)
 #pragma pack(push, 1)
 struct test_padding_t {
 	union {
-		int v;
-		char p[16];
-	} m_int;
+		int m_int;
+		char _[16];
+	};
 	union {
-		float v;
-		char p[16];
-	} m_float;
+		float m_float;
+		char _1[16];
+	};
 };
 
 
-TEST(Struct, Padding)
+TEST(Struct, given_VectorWithStrideAndOffset_when_PackWithPadding_then_check)
 {
 	const int test_3_0[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7 };
 	const float test_3_1[] = { 0, 0.1, 0, 1.2, 0, 2.3, 0, 3.4, 0, 4.5, 0, 5.6, 0, 6.7, 0, 7.8 };
@@ -182,13 +182,13 @@ TEST(Struct, Padding)
 
 	for (size_t i = 0; i < 7; i++)
 	{
-		ASSERT_EQ(test_3_0[2 * i + 1], result_data[i].m_int.v);
-		ASSERT_TRUE(result_data[i].m_float.v - test_3_1[2 * i + 1] < 0.00001);
+		ASSERT_EQ(test_3_0[2 * i + 1], result_data[i].m_int);
+		ASSERT_TRUE(result_data[i].m_float- test_3_1[2 * i + 1] < 0.00001);
 
 		// test zeroes
 		for (size_t j = 4; j < 16; j++) {
-			ASSERT_EQ(0, result_data[i].m_float.p[j]);
-			ASSERT_EQ(0, result_data[i].m_int.p[j]);
+			ASSERT_EQ(0, result_data[i]._[j]);
+			ASSERT_EQ(0, result_data[i]._1[j]);
 		}
 	}
 }
@@ -197,7 +197,7 @@ TEST(Struct, Padding)
 /// Test with padded/pack alignment output for the struct field
 #pragma pack(push, 1)
 
-TEST(Struct, PackAlignment)
+TEST(Struct, given_SingleVector_when_PackAligned_then_check)
 {
 	unsigned char in_data[256];
 	for (size_t i = 0; i < 256; i++) {
@@ -223,11 +223,6 @@ TEST(Struct, PackAlignment)
 
 // ============================================================
 /// Test width padding overlaps a larger field
-TEST(Struct, Padding_Overlap)
-{
-	/// @todo implement
-	FAIL();
-}
 
 static const float _cube_normals[] = {
 
@@ -271,7 +266,7 @@ struct test_vertex_p16_t {
 	};
 };
 
-TEST(Struct, PackVertices_FieldPadding) {
+TEST(Struct, given_Vertices_when_Pack_then_Check) {
 	StructPack packer;
 
 	int id0 = packer.addField(3*4);
@@ -305,7 +300,7 @@ struct test_vertex_uv_p16_t {
 	};
 };
 
-TEST(Struct, PackVertices_FieldPadding_Undefined_Ptr) {
+TEST(Struct, given_Vertices_when_PackWithUndefinedPtr_then_UndefinedFieldsZeroed) {
 	StructPack packer;
 
 	int id0 = packer.addField(3 * 4);
@@ -331,14 +326,14 @@ TEST(Struct, PackVertices_FieldPadding_Undefined_Ptr) {
 
 // ============================================================
 /// Test for error
-TEST(Struct, AddZeroWidth_Field)
+TEST(Struct, given_ZeroWidthField_then_ZeroOffsetException)
 {
 	StructPack packer;
 	ASSERT_THROW(packer.addField(0), ZeroOffsetException);
 }
 
 /// Test for error
-TEST(Struct, AddNullptr)
+TEST(Struct, given_NullPointer_then_NullPointerException)
 {
 	StructPack packer;
 	int id0 = packer.addField(4);
@@ -347,7 +342,7 @@ TEST(Struct, AddNullptr)
 }
 
 /// Test for error
-TEST(Struct, AddZeroStride)
+TEST(Struct, given_ZeroStride_then_ZeroOffsetException)
 {
 	StructPack packer;
 	int id0 = packer.addField(4);
@@ -356,7 +351,7 @@ TEST(Struct, AddZeroStride)
 
 
 /// Test for error
-TEST(Struct, AddInvalidID)
+TEST(Struct, given_InvalidID_then_InvalidIDException)
 {
 	StructPack packer;
 	int id0 = packer.addField(4);
@@ -364,7 +359,7 @@ TEST(Struct, AddInvalidID)
 }
 
 /// Test for error
-TEST(Struct, IdMismatch)
+TEST(Struct, given_TwoIDs_then_IDsAreNotIdentical)
 {
 	StructPack packer;
 	int id0 = packer.addField(4);

@@ -10,7 +10,7 @@
 #include "utils/persistence/persistence.h"
 
 #include "TestArchiver.h"
-//#include "testClass_Persistence.h"
+#include "testClass_persistence.h"
 
 
 using namespace Grafkit;
@@ -36,7 +36,7 @@ TEST(Persistence, given_Field_when_PersistWithMacro_then_Load) {
 	TestArchiver archive(6, true);
 
 	int test = 0xfacababa;
-	// @todo float2,3,4, quaternion, matrix
+	
 	archive & PERSIST_FIELD(test);
 
 	archive.resetCrsr();
@@ -46,6 +46,19 @@ TEST(Persistence, given_Field_when_PersistWithMacro_then_Load) {
 	archive & PERSIST_FIELD(test);
 
 	ASSERT_EQ(test_orig, test);
+}
+
+TEST(Persistence, given_FieldFloat234_when_PersistWithMacro_then_Load) {
+	FAIL();
+}
+
+TEST(Persistence, given_FieldQuaternion_when_PersistWithMacro_then_Load) {
+	FAIL();
+}
+
+
+TEST(Persistence, given_FieldMatrix_when_PersistWithMacro_then_Load) {
+	FAIL();
 }
 
 TEST(Persistence, given_Vector_when_Persist_then_Load) {
@@ -76,7 +89,6 @@ TEST(Persistence, given_Vector_when_Persist_then_Load) {
 	delete[] test;
 }
 
-/// @TODO test with more tzpes to see if it works 
 TEST(Persistence, given_Vector_when_PersistWithMacro_then_Load) {
 	TestArchiver archive(4096, true);
 
@@ -109,6 +121,13 @@ TEST(Persistence, given_Vector_when_PersistWithMacro_then_Load) {
 	delete[] test;
 }
 
+TEST(Persistence, given_PVoidVector_when_Persist_then_Load) {
+	FAIL();
+}
+
+TEST(Persistence, given_PVoidVector_when_PersistWithMacro_then_Load) {
+	FAIL();
+}
 
 TEST(Persistence, given_String_when_Persist_then_Load) {
 	const char *szTest = "The quick brown fox jumps over the lazy dog.";
@@ -172,17 +191,26 @@ TEST(Persistence, given_StdString_when_Persist_then_LoadToConstChar) {
 }
 
 TEST(Persistence, given_Object_when_Persist_then_Load) {
+	TestArchiver archive(256, true);
+
 	FAIL();
+
 }
 
 TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
+	TestArchiver archive(256, true);
+
 	FAIL();
 }
 
 TEST(Persistence, given_ObjectCascadeObjects_when_Persist_then_Load) {
+	TestArchiver archive(256, true);
+
 	FAIL();
 }
 
 TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
+	TestArchiver archive(256, true);
+
 	FAIL();
 }

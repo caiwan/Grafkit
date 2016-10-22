@@ -176,7 +176,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="TestArchiver.cpp" />
     <ClCompile Include="testClass_dynamics.cpp" />
-    <ClCompile Include="testClass_persistent.cpp" />
+    <ClCompile Include="testClass_persistence.cpp" />
     <ClCompile Include="testClass_resource.cpp" />
     <ClCompile Include="test_dynamics.cpp" />
     <ClCompile Include="test_exception.cpp" />
@@ -188,7 +188,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TestArchiver.h" />
     <ClInclude Include="testClass_dynamics.h" />
-    <ClInclude Include="testClass_persistent.h" />
+    <ClInclude Include="testClass_persistence.h" />
     <ClInclude Include="testClass_resource.h" />
   </ItemGroup>
   <ItemGroup>
