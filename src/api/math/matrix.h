@@ -145,11 +145,20 @@ namespace Grafkit {
 			return *this;
 		}
 
+		// --- getters
 		const matrix& Get() const {
 			return mat;
 		}
 
-		// --- getters
+		const float Get(size_t row, size_t col) const {
+#ifdef _XM_NO_INTRINSICS_
+			return mat.r[row][col];
+#else
+			return DirectX::XMVectorGetByIndex(mat.r[row], col);
+#endif 
+		}
+
+
 
 	};
 }
