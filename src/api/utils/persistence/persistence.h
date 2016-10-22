@@ -178,16 +178,16 @@ namespace Grafkit{
 	class PersistObject : public PersistElem {
 	
 	private:
-		Persistent *&m_pObject;
+		Persistent **m_pObject;
 	
 	public:
-		PersistObject(const char* name, Persistent*& pObject) : m_pObject(pObject){}
+		PersistObject(const char* name, Persistent** pObject) : m_pObject(pObject){}
 		
 		virtual void load(Archive &ar) {
-			m_pObject = Persistent::load(ar);
+			*m_pObject = Persistent::load(ar);
 		}
 		virtual void store(Archive & ar){
-			m_pObject->store(ar);
+			(*m_pObject)->store(ar);
 		}
 	};
 
@@ -220,6 +220,7 @@ private: \
 #define PERSIST_FIELD(FIELD) (new Grafkit::PersistField<decltype(FIELD)>(#FIELD, FIELD))
 #define PERSIST_VECTOR(FIELD, COUNT) (new Grafkit::PersistVector<std::remove_pointer<decltype(FIELD)>::type>(#FIELD, FIELD, COUNT))
 #define PERSIST_STRING(FIELD) (new Grafkit::PersistString(#FIELD, FIELD))
+// #define PERSIST_STRING(FIELD) (new Grafkit::PersistString(#FIELD, FIELD))
 
 
 // --- define exceptions 

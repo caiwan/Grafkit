@@ -284,8 +284,24 @@ TEST(Persistence, given_StdString_when_Persist_then_LoadToConstChar) {
 TEST(Persistence, given_Object_when_Persist_then_Load) {
 	TestArchiver archive(256, true);
 
-	FAIL();
+	//given
+	ArchivePersistentTestEmptyClass *object = new ArchivePersistentTestEmptyClass();
+	
+	//when
+	archive & new PersistObject("test", (Persistent**)&object);
 
+	//then
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	ArchivePersistentTestEmptyClass *object_test = nullptr;
+
+	archive & new PersistObject("test", (Persistent**)&object_test);
+
+	ASSERT_TRUE(object != nullptr);
+	ASSERT_TRUE(object != object_test);
+
+	delete object;
 }
 
 TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
