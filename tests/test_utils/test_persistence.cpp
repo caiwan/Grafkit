@@ -10,13 +10,13 @@
 #include "utils/persistence/persistence.h"
 
 #include "TestArchiver.h"
-//#include "testClass_persistent.h"
+//#include "testClass_Persistence.h"
 
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-TEST(Persistent, Persistence_Field) {
+TEST(Persistence, given_Field_when_Persist_then_Load) {
 	TestArchiver archive(6, true);
 	
 	int test = 0xfacababa;
@@ -32,7 +32,7 @@ TEST(Persistent, Persistence_Field) {
 }
 
 /// @TODO test with more tzpes to see if it works 
-TEST(Persistent, Persistence_FieldMacro) {
+TEST(Persistence, given_Field_when_PersistWithMacro_then_Load) {
 	TestArchiver archive(6, true);
 
 	int test = 0xfacababa;
@@ -48,7 +48,7 @@ TEST(Persistent, Persistence_FieldMacro) {
 	ASSERT_EQ(test_orig, test);
 }
 
-TEST(Persistent, Persistence_Vector) {
+TEST(Persistence, given_Vector_when_Persist_then_Load) {
 	TestArchiver archive(4096, true);
 
 	size_t len = rand() % 1024;
@@ -77,7 +77,7 @@ TEST(Persistent, Persistence_Vector) {
 }
 
 /// @TODO test with more tzpes to see if it works 
-TEST(Persistent, Persistence_VectorMacro) {
+TEST(Persistence, given_Vector_when_PersistWithMacro_then_Load) {
 	TestArchiver archive(4096, true);
 
 	size_t len = rand() % 1024;
@@ -110,7 +110,7 @@ TEST(Persistent, Persistence_VectorMacro) {
 }
 
 
-TEST(Persistent, Persistence_String) {
+TEST(Persistence, given_String_when_Persist_then_Load) {
 	const char *szTest = "The quick brown fox jumps over the lazy dog.";
 	//const size_t nTest = strlen(szTest);
 
@@ -131,7 +131,7 @@ TEST(Persistent, Persistence_String) {
 	delete[] szRead;
 }
 
-TEST(Persistent, Persistence_StringSTD) {
+TEST(Persistence, given_STDString_when_Persist_then_Load) {
 	std::string test = "The quick brown fox jumps over the lazy dog.";
 
 	TestArchiver archive(256, true);
@@ -149,7 +149,7 @@ TEST(Persistent, Persistence_StringSTD) {
 	ASSERT_STREQ(test.c_str(), read.c_str());
 }
 
-TEST(Persistent, Persistence_StringSTD2ConstChar) {
+TEST(Persistence, given_StdString_when_Persist_then_LoadToConstChar) {
 	std::string test = "The quick brown fox jumps over the lazy dog.";
 	const size_t nTest = test.length();
 
@@ -171,22 +171,18 @@ TEST(Persistent, Persistence_StringSTD2ConstChar) {
 	delete[] szRead;
 }
 
-TEST(Persistent, Persistence_Object) {
+TEST(Persistence, given_Object_when_Persist_then_Load) {
 	FAIL();
 }
 
-TEST(Persistent, Persistence_ObjectCascade) {
+TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
 	FAIL();
 }
 
-TEST(Persistent, Persistence_LoadBinary) {
+TEST(Persistence, given_ObjectCascadeObjects_when_Persist_then_Load) {
 	FAIL();
 }
 
-TEST(Persistent, Persistence_LoadBinary2) {
-	FAIL();
-}
-
-TEST(Persistent, Persistence_Map) {
+TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
 	FAIL();
 }

@@ -11,7 +11,7 @@ void throw_nullpointer_exception() {
 	throw EX(NullPointerException);
 }
 
-TEST(Exception, Throw)
+TEST(Exception, given_ThrownException)
 {
 	EXPECT_THROW(throw_nullpointer_exception(), NullPointerException);
 }
@@ -20,7 +20,7 @@ void throw_nullpointer_exception_details(const char *what) {
 	throw EX_DETAILS(NullPointerException, what);
 }
 
-TEST(Exception, ThrowDetails)
+TEST(Exception, given_ThrownExceptionWithDetails)
 {
 	const char *message = "test message";
 	try {

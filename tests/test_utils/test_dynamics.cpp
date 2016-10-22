@@ -12,7 +12,7 @@ using namespace Grafkit;
 #define CLONEABLE_TestClassName "_dummy_test_clazz"
 
 /* Obsolete; we're using bean factories from now on */
-TEST(Dynamics, NotFind_Add_Find) {
+TEST(Dynamics, given_NoClonable_when_Add_then_Getclonable) {
 	
 	// item is not added yet 
 	const Clonable *item0 = Clonables::Instance().find(CLONEABLE_TestClassName);
@@ -53,7 +53,7 @@ template <typename T> inline void TEST_genclass(const char* name) {
 static Grafkit::AddClonable _addClonable_1(CLONEABLE_TestCloneableName, new ArchiveClonableTestClass());
 
 /* Obsolete; we're using bean factories from now on */
-TEST(Dynamics, StaticAddCloneable) {
+TEST(Dynamics, given_NoClonable_when_CallStaticAddCloneable_then_GetClonable) {
 	TEST_genclass<ArchiveClonableTestClass>(CLONEABLE_TestCloneableName);
 }
 
@@ -61,17 +61,17 @@ TEST(Dynamics, StaticAddCloneable) {
 #define CLONEABLE_TestCloneableFactoryName "_dummy_test_clazz_factory_clonable"
 static Grafkit::AddClonable _addClonable_2(CLONEABLE_TestCloneableFactoryName, new ArchiveFactoryTestClass::Factory());
 
-TEST(Dynamics, Factory) {
+TEST(Dynamics, given_NoCloable_when_AddFactory_then_GetFactory) {
 	TEST_genclass<ArchiveFactoryTestClass>(CLONEABLE_TestCloneableFactoryName);
 }
 
 /*
 	Test if clonables could be added within the module
 */
-TEST(Dynamics, ModuleLevelAddClonable) {
+TEST(Dynamics, given_NoClonable_when_ModuleLevelAddClonable_then_GetClonable) {
 	TEST_genclass<ArchiveClonableTestClass>("ArchiveClonableTestClass");
 }
 
-TEST(Dynamics, ModuleLevelAddClonableFactory) {
+TEST(Dynamics, given_NoFactory_when_ModuleLevelAddClonableFactory_thenGetFactory) {
 	TEST_genclass<ArchiveFactoryTestClass>("ArchiveFactoryTestClass");
 }

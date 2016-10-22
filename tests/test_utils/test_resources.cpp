@@ -20,7 +20,7 @@ public:
 };
 
 
-TEST_F(ResourceManagerTest, Assignment) {
+TEST_F(ResourceManagerTest, given_EmptyRes_when_Assign_then_Assigned) {
 	ThingResourceRef resource = new ThingResource();
 
 	resource->AssingnRef(new Thing());
@@ -28,7 +28,7 @@ TEST_F(ResourceManagerTest, Assignment) {
 	ASSERT_TRUE(resource.Valid() && resource->Valid());
 }
 
-TEST_F(ResourceManagerTest, Add) {
+TEST_F(ResourceManagerTest, given_ResourceManager_when_AddResource_then_GetResource) {
 	MyResourceManager *resman = new MyResourceManager();
 
 	ThingResourceRef resource = new ThingResource();
@@ -50,7 +50,7 @@ TEST_F(ResourceManagerTest, Add) {
 	delete resman;
 }
 
-TEST_F(ResourceManagerTest, Replace) {
+TEST_F(ResourceManagerTest, given_Resource_when_ReplaceInManager_then_GetResource) {
 	MyResourceManager *resman = new MyResourceManager();
 
 	ThingResourceRef resource = new ThingResource();
@@ -73,7 +73,7 @@ TEST_F(ResourceManagerTest, Replace) {
 }
 
 
-TEST_F(ResourceManagerTest, Remove ) {
+TEST_F(ResourceManagerTest, given_Resource_when_RemoveFromManager_then_GetNull ) {
 	MyResourceManager *resman = new MyResourceManager();
 
 	ThingResourceRef resource = new ThingResource();
@@ -98,7 +98,7 @@ TEST_F(ResourceManagerTest, Remove ) {
 	delete resman;
 }
 
-TEST_F(ResourceManagerTest, Builder) {
+TEST_F(ResourceManagerTest, given_ResourceBuilder_when_LoadResource_then_GetResource) {
 	ThingResourceRef resource;
 	MyResourceManager *resman = new MyResourceManager();
 
