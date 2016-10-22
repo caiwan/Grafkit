@@ -17,10 +17,19 @@
 namespace Grafkit{
 	class Archive;
 
+	class PersistElem;
+	template <typename T> class PersistField;
+	template <typename T> class PersistVector;
+	class PersistString;
+	template <typename K, typename V> class PersistMap;
+	class PersistObject;
+
 	class Persistent : public Clonable
 	{
+		friend class PersistObject;
 		public:
 			virtual ~Persistent() {}
+			
 			static Persistent* load(Archive& stream);
 			void store(Archive& stream) const;
 
@@ -31,13 +40,6 @@ namespace Grafkit{
 			virtual const char* getClassName() const = 0;
 			virtual int version() const { return 0; }
 	};
-
-	class PersistElem;
-	template <typename T> class PersistField;
-	template <typename T> class PersistVector;
-	class PersistString;
-	template <typename K, typename V> class PersistMap;
-	class PersistObject;
 
 	class PersistElem {
 		friend class Archive;
@@ -92,10 +94,7 @@ namespace Grafkit{
 			short _minor;
 	};
 
-	/**
-	Persistent helpers
-	*/
-
+	/** */
 	template <typename T> class PersistField : public PersistElem {
 
 	private:
@@ -119,7 +118,7 @@ namespace Grafkit{
 
 	};
 
-	/** Persists privitive vector or any other collection*/
+	/** */
 	template <typename T> class PersistVector : public PersistElem {
 		friend class Archive;
 
@@ -154,6 +153,7 @@ namespace Grafkit{
 
 	};
 
+	/** */
 	class PersistString : public PersistElem {
 	private:
 		std::string *m_pString;
@@ -174,14 +174,21 @@ namespace Grafkit{
 		virtual void store(Archive & ar);
 	};
 
-	/** Persist std maps */
-	template <typename K, typename V> class PersistMap : public PersistElem {
-
-	};
-
-	/** Persists serializable objects*/
-	class PersistObject {
-
+	/** */
+	class PersistObject : public PersistElem {
+	
+	private:
+		Persistent *&m_pObject;
+	
+	public:
+		PersistObject(const char* name, Persistent*& pObject) : m_pObject(pObject){}
+		
+		virtual void load(Archive &ar) {
+			m_pObject = Persistent::load(ar);
+		}
+		virtual void store(Archive & ar){
+			m_pObject->store(ar);
+		}
 	};
 
 }

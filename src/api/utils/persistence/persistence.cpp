@@ -7,8 +7,6 @@
 #include "persistence.h"
 #include "dynamics.h"
 
-
-
 /**
 	Persistent
 */
@@ -17,35 +15,25 @@ using namespace FWdebugExceptions;
 using namespace Grafkit;
 using namespace std;
 
-void Persistent::store(Archive& stream) const 
+void Persistent::store(Archive& ar) const 
 {
-#if 0 // ha nincs RTTI, akkor ez nem jo valasztas
-	string className = typeid(*this).name();
-	className = className.substr(className.find(' ') + 1);
-#else
 	string className(this->getClassName());
-#endif
+	int ver = this->version();
 	
-	//stream << className;
-	
-	int ver = version();
-	//stream << ver;
-	
-	stream.setDirection(true);
-	
-	const_cast<Persistent *>(this)->serialize(stream);
-	
+	ar & PERSIST_STRING(&className);
+	ar & PERSIST_FIELD(ver);
+
+	this->store(ar);
 }
 
 void Grafkit::Persistent::serialize(Archive & stream)
 {
 }
 
-Persistent* Persistent::load(Archive& stream)
-{           
+Persistent* Persistent::load(Archive& ar)
+{
 	string className;
-	
-	//stream >> className;
+	ar & PERSIST_STRING(&className);
 
 	Clonable* clone = Clonables::Instance().create(className.c_str());
 	if (clone == NULL) {
@@ -54,21 +42,21 @@ Persistent* Persistent::load(Archive& stream)
 	auto_ptr<Clonable> delitor(clone);
 
 	Persistent * obj = dynamic_cast<Persistent *>(clone);
-	if(obj == NULL) {
-		/// @todo
+	if (obj == NULL) {
 		throw EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
 	}
 
 	int ver = -1;
+	ar & PERSIST_FIELD(ver);
 
-	//stream >> ver;
-
+	//
 	if (ver != obj->version()) {
 		throw EX(PersistentVersionMismatch);
 	}
-	stream.setDirection(false);
 
-	obj->serialize(stream);
+	ar.setDirection(false);
+
+	obj->serialize(ar);
 	delitor.release();
 
 	return obj;
@@ -114,7 +102,6 @@ size_t Grafkit::Archive::readString(char*& output)
 /**
 	Persistent helpers
 */
-
 
 void Grafkit::PersistString::store(Archive & ar)
 {
