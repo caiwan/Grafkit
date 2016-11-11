@@ -34,7 +34,7 @@ namespace Grafkit{
 			void store(Archive& stream) const;
 
 		protected:
-			virtual void serialize(Archive& stream);
+			virtual void serialize(Archive& stream) = 0;
 
 			///@todo use typeid(T).name() instead, and do the lookup by that;
 			virtual const char* getClassName() const = 0;
@@ -220,7 +220,7 @@ private: \
 #define PERSIST_FIELD(FIELD) (new Grafkit::PersistField<decltype(FIELD)>(#FIELD, FIELD))
 #define PERSIST_VECTOR(FIELD, COUNT) (new Grafkit::PersistVector<std::remove_pointer<decltype(FIELD)>::type>(#FIELD, FIELD, COUNT))
 #define PERSIST_STRING(FIELD) (new Grafkit::PersistString(#FIELD, FIELD))
-// #define PERSIST_STRING(FIELD) (new Grafkit::PersistString(#FIELD, FIELD))
+#define PERSIST_OBJECT(FIELD) (new Grafkit::PersistObject(#FIELD, (Persistent**)&(FIELD)))
 
 
 // --- define exceptions 

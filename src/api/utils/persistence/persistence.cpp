@@ -26,9 +26,9 @@ void Persistent::store(Archive& ar) const
 	this->store(ar);
 }
 
-void Grafkit::Persistent::serialize(Archive & stream)
-{
-}
+//void Grafkit::Persistent::serialize(Archive & stream)
+//{
+//}
 
 Persistent* Persistent::load(Archive& ar)
 {

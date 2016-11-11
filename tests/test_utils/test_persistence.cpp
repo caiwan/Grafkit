@@ -304,8 +304,62 @@ TEST(Persistence, given_Object_when_Persist_then_Load) {
 	delete object;
 }
 
+TEST(Persistence, given_Object_when_PersistRefernce_then_Load) {
+	TestArchiver archive(256, true);
+
+	//given
+	Ref<ArchivePersistentTestEmptyClass> object = new ArchivePersistentTestEmptyClass();
+
+	//when
+	archive & new PersistObject("test", (Persistent**)&object);
+
+	//then
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	Ref<ArchivePersistentTestEmptyClass> object_test = nullptr;
+
+	archive & new PersistObject("test", (Persistent**)&object_test);
+
+	ASSERT_TRUE(object_test.Valid());
+	ASSERT_TRUE(object_test != object);
+}
+
+TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
+	TestArchiver archive(256, true);
+
+	//given
+	ArchivePersistentTestEmptyClass *object = new ArchivePersistentTestEmptyClass();
+
+	//when
+	archive & PERSIST_OBJECT(object);
+
+	//then
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	ArchivePersistentTestEmptyClass *object_original = object;
+
+	object = nullptr;
+	archive & PERSIST_OBJECT(object);
+	
+
+	ASSERT_TRUE(object != nullptr);
+	ASSERT_TRUE(object != object_original);
+
+	delete object;
+}
+
 TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
 	TestArchiver archive(256, true);
+
+	// given
+	ArchivePersistentTestFieldClass *object = new ArchivePersistentTestFieldClass();
+
+	// when
+
+	// then
+	ArchivePersistentTestFieldClass *object_original = object;
 
 	FAIL();
 }
