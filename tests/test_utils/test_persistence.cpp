@@ -20,6 +20,7 @@
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
+using namespace ArchivePersistent;
 
 TEST(Persistence, given_Field_when_Persist_then_Load) {
 	TestArchiver archive(6, true);
@@ -285,7 +286,7 @@ TEST(Persistence, given_Object_when_Persist_then_Load) {
 	TestArchiver archive(256, true);
 
 	//given
-	ArchivePersistentTestEmptyClass *object = new ArchivePersistentTestEmptyClass();
+	EmptyClass *object = new EmptyClass();
 	
 	//when
 	archive & new PersistObject("test", (Persistent**)&object);
@@ -294,12 +295,13 @@ TEST(Persistence, given_Object_when_Persist_then_Load) {
 	archive.resetCrsr();
 	archive.setDirection(false);
 
-	ArchivePersistentTestEmptyClass *object_test = nullptr;
+	EmptyClass *object_test = nullptr;
 
 	archive & new PersistObject("test", (Persistent**)&object_test);
 
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_test);
+	ASSERT_STREQ(object->getClassName(), object_test->getClassName());
 
 	delete object;
 }
@@ -308,7 +310,7 @@ TEST(Persistence, given_Object_when_PersistRefernce_then_Load) {
 	TestArchiver archive(256, true);
 
 	//given
-	Ref<ArchivePersistentTestEmptyClass> object = new ArchivePersistentTestEmptyClass();
+	Ref<EmptyClass> object = new EmptyClass();
 
 	//when
 	archive & new PersistObject("test", (Persistent**)&object);
@@ -317,19 +319,20 @@ TEST(Persistence, given_Object_when_PersistRefernce_then_Load) {
 	archive.resetCrsr();
 	archive.setDirection(false);
 
-	Ref<ArchivePersistentTestEmptyClass> object_test = nullptr;
+	Ref<EmptyClass> object_test = nullptr;
 
 	archive & new PersistObject("test", (Persistent**)&object_test);
 
 	ASSERT_TRUE(object_test.Valid());
 	ASSERT_TRUE(object_test != object);
+	ASSERT_STREQ(object->getClassName(), object_test->getClassName());
 }
 
 TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
 	TestArchiver archive(256, true);
 
 	//given
-	ArchivePersistentTestEmptyClass *object = new ArchivePersistentTestEmptyClass();
+	EmptyClass *object = new EmptyClass();
 
 	//when
 	archive & PERSIST_OBJECT(object);
@@ -338,14 +341,15 @@ TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
 	archive.resetCrsr();
 	archive.setDirection(false);
 
-	ArchivePersistentTestEmptyClass *object_original = object;
+	EmptyClass *object_original = object;
 
 	object = nullptr;
 	archive & PERSIST_OBJECT(object);
-	
+
 
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_original);
+	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
 
 	delete object;
 }
@@ -354,24 +358,58 @@ TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
 	TestArchiver archive(256, true);
 
 	// given
-	ArchivePersistentTestFieldClass *object = new ArchivePersistentTestFieldClass();
+	FieldClass *object = new FieldClass();
+	object->buildup(0xfafababa, 2.16);
 
 	// when
+	archive & PERSIST_OBJECT(object);
 
 	// then
-	ArchivePersistentTestFieldClass *object_original = object;
+	FieldClass *object_original = object;
 
-	FAIL();
-}
+	archive.resetCrsr();
+	archive.setDirection(false);
 
-TEST(Persistence, given_ObjectCascadeObjects_when_Persist_then_Load) {
-	TestArchiver archive(256, true);
+	object = nullptr;
+	archive & PERSIST_OBJECT(object);
 
-	FAIL();
+
+	ASSERT_TRUE(object != nullptr);
+	ASSERT_TRUE(object != object_original);
+	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
+	ASSERT_TRUE((*object) == (*object_original));
 }
 
 TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
 	TestArchiver archive(256, true);
 
-	FAIL();
+	// given
+	NestedClass *object = new NestedClass();
+	object->buildup(0xfacababa, 2.16, 0x012345678, 3.141592);
+
+	// when
+	archive & PERSIST_OBJECT(object);
+
+	FILE * fp = nullptr;
+	fopen_s(&fp, "dump.obj", "wb");
+	if (fp) {
+		fwrite(archive.getBuffer(), archive.getCrsr(), 1, fp);
+		fflush(fp);
+		fclose(fp);
+	}
+
+	// then
+	NestedClass *object_original = object;
+
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	object = nullptr;
+	archive & PERSIST_OBJECT(object);
+
+
+	ASSERT_TRUE(object != nullptr);
+	ASSERT_TRUE(object != object_original);
+	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
+	ASSERT_TRUE((*object) == (*object_original));
 }

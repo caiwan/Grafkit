@@ -31,7 +31,7 @@ namespace Grafkit{
 			virtual ~Persistent() {}
 			
 			static Persistent* load(Archive& stream);
-			void store(Archive& stream) const;
+			void store(Archive& stream);
 
 		protected:
 			virtual void serialize(Archive& stream) = 0;

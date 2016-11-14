@@ -2,5 +2,10 @@
 #include <cstring>
 #include "testClass_persistence.h"
 
-PERSISTENT_IMPL(ArchivePersistentTestEmptyClass)
+using namespace ArchivePersistent;
 
+PERSISTENT_IMPL(EmptyClass);
+
+PERSISTENT_IMPL(FieldClass);
+
+PERSISTENT_IMPL(NestedClass);

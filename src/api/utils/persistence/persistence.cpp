@@ -15,7 +15,7 @@ using namespace FWdebugExceptions;
 using namespace Grafkit;
 using namespace std;
 
-void Persistent::store(Archive& ar) const 
+void Persistent::store(Archive& ar) 
 {
 	string className(this->getClassName());
 	int ver = this->version();
@@ -23,7 +23,7 @@ void Persistent::store(Archive& ar) const
 	ar & PERSIST_STRING(&className);
 	ar & PERSIST_FIELD(ver);
 
-	this->store(ar);
+	this->serialize(ar);
 }
 
 //void Grafkit::Persistent::serialize(Archive & stream)
@@ -54,7 +54,7 @@ Persistent* Persistent::load(Archive& ar)
 		throw EX(PersistentVersionMismatch);
 	}
 
-	ar.setDirection(false);
+	//ar.setDirection(false);
 
 	obj->serialize(ar);
 	delitor.release();
