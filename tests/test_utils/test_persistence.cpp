@@ -390,6 +390,31 @@ TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
 	// when
 	archive & PERSIST_OBJECT(object);
 
+	// then
+	NestedClass *object_original = object;
+
+	archive.resetCrsr();
+	archive.setDirection(false);
+
+	object = nullptr;
+	archive & PERSIST_OBJECT(object);
+
+
+	ASSERT_TRUE(object != nullptr);
+	ASSERT_TRUE(object != object_original);
+	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
+	ASSERT_TRUE((*object) == (*object_original));
+}
+
+TEST(Persistence, given_NullPointer_when_Persist_then_Load) {
+	TestArchiver archive(256, true);
+
+	// given
+	NestedClass *object = nullptr;
+
+	// when
+	archive & PERSIST_OBJECT(object);
+
 	FILE * fp = nullptr;
 	fopen_s(&fp, "dump.obj", "wb");
 	if (fp) {
@@ -408,8 +433,5 @@ TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
 	archive & PERSIST_OBJECT(object);
 
 
-	ASSERT_TRUE(object != nullptr);
-	ASSERT_TRUE(object != object_original);
-	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
-	ASSERT_TRUE((*object) == (*object_original));
+	ASSERT_TRUE(object == nullptr);
 }
