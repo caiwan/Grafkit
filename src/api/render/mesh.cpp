@@ -10,7 +10,7 @@ using namespace FWdebugExceptions;
 
 
 // ==================================================================
-Grafkit::Mesh::Mesh() : 
+Grafkit::Mesh::Mesh() :
 	m_buffer()
 {
 	//m_vertexBuffer = 0;
@@ -37,79 +37,59 @@ void Grafkit::Mesh::RenderMesh(ID3D11DeviceContext * dev)
 	dev->DrawIndexed(this->m_indexCount, 0, 0);
 }
 
-void Grafkit::Mesh::Shutdown()
+void Grafkit::Mesh::AddPointer(std::string inputName, size_t length, const void * pointer)
 {
-	RELEASE(m_indexBuffer);
-	RELEASE(m_buffer.buffer);
+	// create and copy ptr
+	vertex_pointer_t vertexPointer;
+	vertexPointer.name = inputName;
+	vertexPointer.length = length;
+	vertexPointer.data = new UCHAR[length];
+
+	memcpy_s(vertexPointer.data, vertexPointer.length, pointer, length); //ez itt el van szarodva
+
+	this->m_vertexPointers.push_back(vertexPointer);
+	this->m_mapPtr[inputName] = vertexPointer.data; 
 }
 
-void Grafkit::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
+void Grafkit::Mesh::SetIndices(size_t vertexCount, size_t indexCount, const int * const indices)
 {
-	BufferStateDescriptor elem;
-	elem.buffer = pBuffer;
-	elem.stride = stride;
-	elem.offset = offset;
-	// this->m_buffers.push_back(elem);
-	this->m_buffer = elem;
+	m_indexCount = indexCount;
+	m_vertexCount = vertexCount;
+	m_indices = new UINT[indexCount]; 
+	for (size_t i = 0; i < indexCount; i++) 
+		m_indices[i] = indices[i];
 }
 
-// ================================================================================================================================================
-Grafkit::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * const & device, ShaderRef &shader)
-	: m_device(device), m_shader(shader)
-{
-}
-
-/// ~~~ez lesz a fix scemantic, amivel dolgozni fog, ha nincs shader, puszi.~~~ Bassza meg a csincs az otot
-namespace {
-	///@todo ezeknek a nevit tarolni kell majd valahol
-	D3D11_INPUT_ELEMENT_DESC positionLayout[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    2, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT,    3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT,    4, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-}
-
-MeshRef Grafkit::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* const indices, MeshRef mesh_input)
+void Grafkit::Mesh::Build(ShaderRef & shader, ID3D11Device * const & device)
 {
 	HRESULT result = 0;
 
-	// obtain input layout elements, and collect pointers that were set before
-	size_t elem_count = this->m_shader->GetILayoutElemCount();
+	if (m_mapPtr.empty())
+		return;
+
+	size_t elem_count = shader->GetILayoutElemCount();
 
 	Grafkit::StructPack packer;
 
-	if (this->m_shader.Invalid()) {
-		/**
-		A B-terv itt az lett volna, ha nincs eppen shader input, akkor letrehoz magatol egy input layoutot.
-		Egyetlen szopo dolog van ezzel: ha nincs sahder, akkor input layout sem hozhato letre. Szopo.
-		*/
+	if (shader.Invalid()) {
 		throw EX_DETAILS(NullPointerException, "Nincs shader betoltve");
 	}
-	else {
-		for (size_t i = 0; i < elem_count; ++i)
-		{
-			Shader::InputElementRecord &record = this->m_shader->getILayoutElem(i);
-			int field_id = packer.addField(record.width);
 
-			mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
-			if (it != this->m_mapPtr.end())
-			{
-				packer.addPointer(field_id, it->second, 0, record.width);
-			}
+	for (size_t i = 0; i < elem_count; ++i)
+	{
+		Shader::InputElementRecord &record = shader->getILayoutElem(i);
+		int field_id = packer.addField(record.width);
+
+		auto it = this->m_mapPtr.find(record.desc.SemanticName);
+		if (it != this->m_mapPtr.end())
+		{
+			packer.addPointer(field_id, it->second, 0, record.width);
 		}
 	}
-	MeshRef mesh;
-	if (mesh_input.Valid()) 
-		mesh = mesh_input; 
-	else 
-		mesh = new Mesh();
 
-	void *vertex_buffer_data = packer(vertexCount);
+	void *vertex_buffer_data = packer(m_vertexCount);
 
-	// create buffer + index
+	// --- Create vertex buffer
 	ID3D11Buffer *vertexBuffer = NULL;
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
@@ -131,79 +111,57 @@ MeshRef Grafkit::SimpleMeshGenerator::operator()(size_t vertexCount, size_t inde
 	vertexData.SysMemSlicePitch = 0;
 
 	// Now create the vertex buffer.
-	result = this->m_device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
+	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
 	if (FAILED(result)) {
 		throw EX(CreateIndevBufferException);
 	}
 
-	// delete[] vertex_data; //vertex_data = 0;
 	packer.dealloc(vertex_buffer_data);
 
-	this->createIndexBuffer(mesh, indexCount, indices);
-	mesh->addElement(vertexBuffer, packer.getRecordWidth(), 0);
+	// set vertex buffer
+	this->m_buffer.buffer = vertexBuffer;
+	this->m_buffer.stride = packer.getRecordWidth();
+	this->m_buffer.offset = 0;
 
-	return mesh;
-}
-
-void Grafkit::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCount, const int * pIndices)
-{
+	// --- Create index buffer
 	ID3D11Buffer *indexBuffer = NULL;
-
-	HRESULT result = 0;
 
 	D3D11_BUFFER_DESC 	indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA 	indexData;
 
 	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
 	ZeroMemory(&indexData, sizeof(indexData));
-
-	// check inputs
-	if (mesh.Invalid() || !indexCount || !pIndices)
-		throw EX(NullPointerException);
-
-	// --- 
-
-	// -- indices buffer + copy 
-	ULONG* indices = nullptr;
-	indices = new ULONG[indexCount];	// zero nem kell?
-	// ZeroMemory(indices, indexCount * sizeof(indexCount[0]));
-										// !copy
-	for (size_t i = 0; i < indexCount; i++)
-	{
-		indices[i] = pIndices[i];
-	}
-
-	// --- create static index buffer
+	
+	// static index buffer
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(unsigned long) * indexCount;
+	indexBufferDesc.ByteWidth = sizeof(UINT) * m_indexCount;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
 	indexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the index data.
-	indexData.pSysMem = indices;
+	indexData.pSysMem = m_indices;
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
 
 	// Create the index buffer.
-	result = this->m_device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
+	result = device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
 	if (FAILED(result)) {
 		throw EX(CreateIndevBufferException);
 	}
 
-	delete[] indices; indices = nullptr;
-
-	mesh->addIndices(indexBuffer, indexCount);
+	this->m_indexBuffer = indexBuffer;
 }
 
-// ================================================================================================================================================
-
-#include "../builtin_data/cube.h"
-
-MeshRef Grafkit::QuadGenerator::operator()(MeshRef input)
+void Grafkit::Mesh::Shutdown()
 {
-	m_meshGen["POSITION"] = GrafkitData::quad;
-	m_meshGen["TEXCOORD"] = GrafkitData::quad_texcoord;
-	return m_meshGen(4, 6, GrafkitData::quadIndices, input);
+	RELEASE(m_indexBuffer);
+	RELEASE(m_buffer.buffer);
+
+	for (auto it = this->m_vertexPointers.begin(); it != m_vertexPointers.end(); ++it) {
+		delete[] it->data;
+	}
+
+	delete[] m_indices;
 }

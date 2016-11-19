@@ -5,6 +5,7 @@
 #define _Mesh_H_
 
 #include <vector>
+#include <list>
 #include <map>
 
 #include "../utils/reference.h"
@@ -29,11 +30,9 @@ namespace Grafkit
 
 			void RenderMesh(ID3D11DeviceContext* deviceContext);
 			
-			/// @todo erre jobb megoldast kell talalni
-			void setVertexCount(int count) { this->m_vertexCount = count; }
-			
-			void addElement(ID3D11Buffer * pBuffer, UINT stride, UINT offset = 0);
-			void addIndices(ID3D11Buffer * pBuffer, UINT count) { this->m_indexBuffer = pBuffer; this->m_indexCount = count;}
+			void AddPointer(std::string inputName, size_t length, const void* pointer);
+			void SetIndices(size_t vertexCount, size_t indexCount, const int* const indices);
+			void Build(ShaderRef &shader, ID3D11Device *const& device);
 
 			int GetIndexCount() { return m_indexCount; }
 
@@ -51,77 +50,23 @@ namespace Grafkit
 
 		private:
 			ID3D11Buffer *m_indexBuffer;
-			// std::vector<BufferStateDescriptor> m_buffers;
 			BufferStateDescriptor m_buffer;
 			int m_vertexCount, m_indexCount;
+			UINT *m_indices;
+
+			std::map<std::string, const void*> m_mapPtr;
+
+			struct vertex_pointer_t {
+				std::string name;
+				int length;
+				void * data;
+			};
+
+			std::list<vertex_pointer_t> m_vertexPointers;
 	};
 
 	typedef Ref<Mesh> MeshRef;
 
-
-	///@todo legyen kepes ne csak meglevo shader input layoutjabol letreehozni dolgokat
-	/**
-	Simple mesh generator. Automatically creates the vertex buffers from vectors 
-	*/
-	class SimpleMeshGenerator 
-	{
-		friend class MeshAttribSetter;
-		public:
-			SimpleMeshGenerator(ID3D11Device *const& device, ShaderRef &shader);
-
-			void SetPtr(std::string name, const void* const ptr) { this->m_mapPtr[name] = ptr; }
-
-		// --- 
-		public:
-			// --- 
-			/// @todo ezt elrendezni kicsit
-			/// param setter class
-			class MeshAttribSetter {
-				friend class SimpleMeshGenerator;
-				protected:
-					MeshAttribSetter(const char *& name, SimpleMeshGenerator& parent) : m_parent(parent), m_name(name) {}
-				public:
-					void operator =(const void* const ptr) { this->m_parent.SetPtr(m_name, ptr); }
-
-				private:
-					SimpleMeshGenerator& m_parent;
-					// const char *&m_name;
-					std::string m_name;
-
-					MeshAttribSetter(MeshAttribSetter& other) : m_parent(other.m_parent), m_name(other.m_name) {}
-					void operator = (MeshAttribSetter&) {}
-			};
-
-			MeshAttribSetter operator[](const char*name) { return MeshAttribSetter(name, *this); }
-
-			/**
-			Layout assembler
-			*/
-			MeshRef operator() (size_t vertexCount, size_t indexCount, const int* const indices, MeshRef input = nullptr);
-
-		private:
-			void createIndexBuffer(MeshRef in_mesh, int indexCount, const int* indices);
-
-		private:
-			ID3D11Device * const & m_device;
-			ShaderRef &m_shader;
-
-			typedef std::map<std::string, const void* > mapPtr_t;
-			mapPtr_t m_mapPtr;
-	};
-
-	// ================================================================================================================================================
-	///@tod ezt a jovoben kicsit szebben ki kellene vitelezni
-	class QuadGenerator {
-	public:
-		QuadGenerator(ID3D11Device *const& device, ShaderRef &shader) : m_meshGen(device, shader) {}
-		~QuadGenerator() {}
-
-		MeshRef operator() (MeshRef input = nullptr);
-
-	private:
-		SimpleMeshGenerator m_meshGen;
-	};
 }
 
 // --- excpetions 

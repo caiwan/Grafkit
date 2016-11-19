@@ -19,7 +19,7 @@ namespace Grafkit {
 	class Animation;
 	typedef Ref<Animation> AnimationRef;
 
-	__declspec(align(16)) class Scene : virtual public Referencable, /*public Grafkit::Object, */ public AlignedNew<Scene>
+	__declspec(align(16)) class Scene : virtual public Referencable, public AlignedNew<Scene>
 	{
 	public:
 		Scene();

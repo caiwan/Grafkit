@@ -107,13 +107,10 @@ protected:
 
 			// -- model 
 			this->m_model = new Model;
-
-			// -- generator
-			SimpleMeshGenerator generator(render, m_vertexShader);
-			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-			
-			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, this->m_model);
+			this->m_model->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
+			this->m_model->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
+			this->m_model->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
+			this->m_model->Build(m_vertexShader, render);
 
 			// --- 
 
@@ -147,7 +144,7 @@ protected:
 
 				viewMatrices.worldMatrix = XMMatrixTranspose(worldMatrix.Get());
 				viewMatrices.viewMatrix = XMMatrixTranspose(m_camera->GetViewMatrix().Get());
-				viewMatrices.projectionMatrix = XMMatrixTranspose(m_camera->GetProjectionMatrix().Get());
+				viewMatrices.projectionMatrix = XMMatrixTranspose(m_camera->GetPerspectiveMatrix().Get());
 
 				m_vertexShader->GetParam("MatrixBuffer").SetP(&viewMatrices);
 

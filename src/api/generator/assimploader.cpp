@@ -361,7 +361,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			LOGGER(Log::Logger().Trace("- #%d %s", i, mesh_name));
 			mesh->SetName(mesh_name);
 
-			SimpleMeshGenerator generator(resman->GetDeviceContext(), inputSchema);
+			// SimpleMeshGenerator generator();
 			
 			std::vector<float4> vertices;
 			std::vector<float2> texuvs;
@@ -384,13 +384,14 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			}
 
 			/**/
-			generator["POSITION"] = &vertices[0];
-			generator["NORMAL"] = &normals[0];
+
+			mesh->AddPointer("POSITION", vertices.size() * sizeof(vertices), &vertices[0]);
+			mesh->AddPointer("NORMAL", normals.size() * sizeof(normals), &normals[0]);
 
 			if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
-				generator["TEXCOORD"] = &texuvs[0];
+				mesh->AddPointer("TEXCOORD", texuvs.size() * sizeof(texuvs), &texuvs[0]);
 				if (curr_mesh->mTangents)
-					generator["TANGENT"] = &tangents[0];
+					mesh->AddPointer("TANGENT", tangents.size() * sizeof(tangents), &tangents[0]);
 			}
 
 			// -- faces
@@ -407,7 +408,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 					}
 				}
 
-				generator(curr_mesh->mNumVertices, indices.size(), &indices[0], mesh);
+				mesh->SetIndices(curr_mesh->mNumVertices, indices.size(), &indices[0]);
+				mesh->Build(inputSchema, resman->GetDeviceContext());
 			}
 			else {
 				///@todo arra az esetre is kell valamit kitalalni, amikor nincsenek facek, csak vertexek.

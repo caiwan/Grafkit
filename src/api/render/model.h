@@ -27,7 +27,6 @@ namespace Grafkit
 	class Entity3D;
 
 	__declspec(align(16)) class Model : public Grafkit::Mesh, public Grafkit::Entity3D, public AlignedNew<Model>
-	// class Model : public Grafkit::Mesh, public Grafkit::Entity3D
 	{
 	public:
 		Model();

@@ -77,11 +77,11 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), ST_Pixel, "CopyScreen");
 
 	// --- 
-	SimpleMeshGenerator meshGen(render, m_shaderFullscreenQuad);
-
-	meshGen["POSITION"] = GrafkitData::quad;
-	meshGen["TEXCOORD"] = GrafkitData::quad_texcoord;
-	m_fullscreenquad = meshGen(4, 6, GrafkitData::quadIndices);
+	m_fullscreenquad = new Mesh();
+	m_fullscreenquad->AddPointer("POSITION", sizeof(GrafkitData::quad), GrafkitData::quad);
+	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord), GrafkitData::quad_texcoord);
+	m_fullscreenquad->SetIndices(4, 6, GrafkitData::quadIndices);
+	m_fullscreenquad->Build(m_shaderFullscreenQuad, render);
 
 	// -- 
 	m_textureSampler = new TextureSampler();
