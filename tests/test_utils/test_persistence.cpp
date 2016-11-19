@@ -415,14 +415,6 @@ TEST(Persistence, given_NullPointer_when_Persist_then_Load) {
 	// when
 	archive & PERSIST_OBJECT(object);
 
-	FILE * fp = nullptr;
-	fopen_s(&fp, "dump.obj", "wb");
-	if (fp) {
-		fwrite(archive.getBuffer(), archive.getCrsr(), 1, fp);
-		fflush(fp);
-		fclose(fp);
-	}
-
 	// then
 	NestedClass *object_original = object;
 

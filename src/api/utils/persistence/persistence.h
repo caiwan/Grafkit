@@ -184,10 +184,18 @@ namespace Grafkit{
 		PersistObject(const char* name, Persistent** pObject) : m_pObject(pObject){}
 		
 		virtual void load(Archive &ar) {
-			*m_pObject = Persistent::load(ar);
+			unsigned char isNull = 0;
+			ar & (new PersistField<unsigned char>("null", isNull));
+			if (isNull)
+				*m_pObject = nullptr;
+			else
+				*m_pObject = Persistent::load(ar);
 		}
 		virtual void store(Archive & ar){
-			(*m_pObject)->store(ar);
+			unsigned char isNull = (*m_pObject) == nullptr;
+			ar & (new PersistField<unsigned char>("null", isNull));
+			if (!isNull)
+				(*m_pObject)->store(ar);
 		}
 	};
 
