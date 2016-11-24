@@ -2,16 +2,6 @@
 
 #include "utils/persistence/dynamics.h"
 
-//class ArchiveClonableTestClass : public Grafkit::Clonable {
-//public:
-//	ArchiveClonableTestClass() {}
-//
-//public:
-//	CLONEABLE_DECL(ArchiveClonableTestClass);
-//};
-
-// ================================================================================================
-
 class ArchiveFactoryTestClass : public Grafkit::Clonable {
 public:
 	ArchiveFactoryTestClass() {}

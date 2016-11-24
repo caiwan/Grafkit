@@ -200,7 +200,6 @@ namespace Grafkit{
 
 #define PERSISTENT_DECL(className, VERSION_NO) \
 public: \
-	CLONEABLE_DECL(className)\
 	CLONEABLE_FACTORY_DECL(className)\
 public:\
 	virtual const char* getClassName() const\

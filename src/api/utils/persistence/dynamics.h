@@ -80,13 +80,13 @@ namespace Grafkit {
 				return NULL;
 		}
 
-		#ifdef DEBUG
+#ifdef DEBUG
 		void dumpClonables() {
 			for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
 				Log::Logger().Debug("- Has Clonable factory of %s", it->first.c_str());
 			}
 		}
-		#endif //DEBUG
+#endif //DEBUG
 	};
 
 	/**
@@ -101,31 +101,28 @@ namespace Grafkit {
 }
 
 
-/**
-Right at the begining of zour module code propagate factories / or cloneables right to the dynamics lib like so:
-~~~~{.cpp}
-	CLONEABLE_FACTORY_IMPL(clazz)
-~~~~
-*/
+/// Another solution is create factories inside the object as 'clonable' , and feed them into the clonables collenction
+/// This should prevent unnesesarry construction calling and memory usage, and crashes due to the uninitialized framework
 
 #define CLONEABLE_DECL(className)\
+public: \
 virtual Grafkit::Clonable* createObj() const \
 	{ \
 		return new className(); \
-	}\
-private: \
-	static Grafkit::AddClonable _addClonableFactory;
+	}
 
-/// Another solution is create factories inside the object as 'clonable' , and feed them into the clonables collenction
-/// This should prevent unnesesarry construction calling and memory usage, and crashes due to the uninitialized framework
 #define CLONEABLE_FACTORY_DECL(className)\
+	CLONEABLE_DECL(className) \
+public: \
 class Factory : public Grafkit::Clonable { \
 public: \
 	virtual Grafkit::Clonable* createObj() const \
 	{ \
 		return new className(); \
 	} \
-};
+}; \
+private: \
+	static Grafkit::AddClonable _addClonableFactory;
 
 
 #define CLONEABLE_FACTORY_IMPL(className) \
