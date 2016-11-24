@@ -5,6 +5,12 @@
 
 using namespace Grafkit;
 
+void Grafkit::Entity3D::_serialize(Archive & ar)
+{
+	this->IResource::_serialize(ar);
+
+}
+
 Grafkit::Entity3D::Entity3D() //: Grafkit::IResource()
 {
 }

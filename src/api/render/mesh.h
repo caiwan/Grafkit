@@ -11,6 +11,8 @@
 #include "../utils/reference.h"
 #include "../utils/exceptions.h"
 
+#include "../utils/persistence/persistence.h"
+
 #include "renderer.h"
 #include "dxtypes.h"
 
@@ -21,48 +23,53 @@ namespace Grafkit
 	/**
 	Stores basic data for a piece of mesh
 	*/
-	class Mesh : public virtual Referencable
+	class Mesh : public virtual Referencable, public Persistent
 	{
-		public:
-			Mesh();
-			Mesh(const Mesh& mesh);
-			virtual ~Mesh();
+		PERSISTENT_DECL(Grafkit::Mesh, 1);
+	protected:
+		virtual void serialize(Archive& ar) { _serialize(ar); }
+		void _serialize(Archive& ar);
 
-			void RenderMesh(ID3D11DeviceContext* deviceContext);
+	public:
+		Mesh();
+		Mesh(const Mesh& mesh);
+		virtual ~Mesh();
+
+		virtual void UpdateMesh(double time);
+		void RenderMesh(ID3D11DeviceContext* deviceContext);
 			
-			void AddPointer(std::string inputName, size_t length, const void* pointer);
-			void SetIndices(size_t vertexCount, size_t indexCount, const int* const indices);
-			void Build(ShaderRef &shader, ID3D11Device *const& device);
+		void AddPointer(std::string inputName, size_t length, const void* pointer);
+		void SetIndices(size_t vertexCount, size_t indexCount, const int* const indices);
+		void Build(ShaderRef &shader, ID3D11Device *const& device);
 
-			int GetIndexCount() { return m_indexCount; }
+		int GetIndexCount() { return m_indexCount; }
 
-		protected:
-			void Shutdown();
+	protected:
+		void Shutdown();
 
-		protected:
-			struct BufferStateDescriptor {
-				ID3D11Buffer *buffer;
-				UINT stride, offset;
+	protected:
+		struct BufferStateDescriptor {
+			ID3D11Buffer *buffer;
+			UINT stride, offset;
+			BufferStateDescriptor() : buffer(nullptr), stride(0), offset(0) {
+			}
+		};
 
-				BufferStateDescriptor() : buffer(nullptr), stride(0), offset(0) {
-				}
-			};
+	private:
+		ID3D11Buffer *m_indexBuffer;
+		BufferStateDescriptor m_buffer;
+		size_t m_vertexCount, m_indexCount;
+		UINT *m_indices;
 
-		private:
-			ID3D11Buffer *m_indexBuffer;
-			BufferStateDescriptor m_buffer;
-			int m_vertexCount, m_indexCount;
-			UINT *m_indices;
+		std::map<std::string, const void*> m_mapPtr;
 
-			std::map<std::string, const void*> m_mapPtr;
+		struct vertex_pointer_t {
+			std::string name;
+			INT length;
+			void * data;
+		};
 
-			struct vertex_pointer_t {
-				std::string name;
-				int length;
-				void * data;
-			};
-
-			std::list<vertex_pointer_t> m_vertexPointers;
+		std::list<vertex_pointer_t> m_vertexPointers;
 	};
 
 	typedef Ref<Mesh> MeshRef;

@@ -213,14 +213,6 @@ TEST(Persistence, given_Vector_when_PersistWithMacro_then_Load) {
 	delete[] test;
 }
 
-TEST(Persistence, given_PVoidVector_when_Persist_then_Load) {
-	FAIL();
-}
-
-TEST(Persistence, given_PVoidVector_when_PersistWithMacro_then_Load) {
-	FAIL();
-}
-
 TEST(Persistence, given_String_when_Persist_then_Load) {
 	const char *szTest = "The quick brown fox jumps over the lazy dog.";
 	//const size_t nTest = strlen(szTest);

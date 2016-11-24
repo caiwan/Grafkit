@@ -26,11 +26,20 @@ namespace Grafkit
 
 	class Entity3D;
 
-	__declspec(align(16)) class Model : public Grafkit::Mesh, public Grafkit::Entity3D, public AlignedNew<Model>
+	__declspec(align(16)) class Model : public Grafkit::Entity3D, public AlignedNew<Model>, public Persistent
 	{
+		PERSISTENT_DECL(Grafkit::Model, 1)
+	protected:
+		virtual void serialize(Archive& ar) { _serialize(ar); }
+		void _serialize(Archive& ar);
+
+
 	public:
-		Model();
+		Model(MeshRef mesh = nullptr, MaterialRef material = nullptr);
 		~Model();
+
+		MeshRef GetMesh() const { return this->m_mesh; }
+		void SetMesh(MeshRef model) { this->m_mesh = model; }
 
 		MaterialRef GetMaterial() const { return this->m_material; }
 		void SetMaterial(MaterialRef material) { this->m_material = material; }
@@ -39,6 +48,7 @@ namespace Grafkit
 
 	private:
 		MaterialRef m_material;
+		MeshRef m_mesh;
 	};
 
 	typedef Ref<Model> ModelRef;

@@ -354,12 +354,12 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		for (i = 0; i<scene->mNumMeshes; i++) 
 		{
 			// -- meshes
-			ModelRef mesh = new Model();
+			ModelRef model = new Model(new Mesh());
 			aiMesh* curr_mesh = scene->mMeshes[i];
 			
 			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
 			LOGGER(Log::Logger().Trace("- #%d %s", i, mesh_name));
-			mesh->SetName(mesh_name);
+			model->SetName(mesh_name);
 
 			// SimpleMeshGenerator generator();
 			
@@ -385,13 +385,13 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 			/**/
 
-			mesh->AddPointer("POSITION", vertices.size() * sizeof(vertices), &vertices[0]);
-			mesh->AddPointer("NORMAL", normals.size() * sizeof(normals), &normals[0]);
+			model->GetMesh()->AddPointer("POSITION", vertices.size() * sizeof(vertices), &vertices[0]);
+			model->GetMesh()->AddPointer("NORMAL", normals.size() * sizeof(normals), &normals[0]);
 
 			if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
-				mesh->AddPointer("TEXCOORD", texuvs.size() * sizeof(texuvs), &texuvs[0]);
+				model->GetMesh()->AddPointer("TEXCOORD", texuvs.size() * sizeof(texuvs), &texuvs[0]);
 				if (curr_mesh->mTangents)
-					mesh->AddPointer("TANGENT", tangents.size() * sizeof(tangents), &tangents[0]);
+					model->GetMesh()->AddPointer("TANGENT", tangents.size() * sizeof(tangents), &tangents[0]);
 			}
 
 			// -- faces
@@ -408,8 +408,8 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 					}
 				}
 
-				mesh->SetIndices(curr_mesh->mNumVertices, indices.size(), &indices[0]);
-				mesh->Build(inputSchema, resman->GetDeviceContext());
+				model->GetMesh()->SetIndices(curr_mesh->mNumVertices, indices.size(), &indices[0]);
+				model->GetMesh()->Build(inputSchema, resman->GetDeviceContext());
 			}
 			else {
 				///@todo arra az esetre is kell valamit kitalalni, amikor nincsenek facek, csak vertexek.
@@ -419,10 +419,10 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			int mat_index = curr_mesh->mMaterialIndex;
 			if (materials.size()>mat_index)
 			{
-				mesh->SetMaterial(materials[mat_index]);
+				model->SetMaterial(materials[mat_index]);
 			}
 
-			models.push_back(mesh);
+			models.push_back(model);
 			///@todo itt a resource managert kellene hasznalni
 		}
 	}

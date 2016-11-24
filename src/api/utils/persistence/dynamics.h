@@ -4,94 +4,98 @@
 #include <map>
 #include <string>
 
-/// @todo docstring 
-/**
-*/
+#ifdef DEBUG
+#include "../logger.h"
+#endif
 
-//
 /// http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
 
-namespace Grafkit{
+namespace Grafkit {
 	class Clonables;
 
+	/**
+	*/
 	class Clonable
 	{
 		friend class Clonables;
-		public:
-			virtual Clonable* createObj() const = 0;
+	public:
+		virtual Clonable* createObj() const = 0;
 	};
 
-	/* We don't need this ATM */
-	/*
-	template <class T> class ClonableFactory : public Clonable {
-		virtual Cloneable* createObj() const {
-			return new T;
-		};
-	};
+	/**
 	*/
-
 	class Clonables {
-		private:        
-			typedef std::map<std::string, const Clonable*> NameToClonable;
-			NameToClonable __clonables;
+	private:
+		std::map<std::string, const Clonable*> m_clonables;
 
-		private:
-			Clonables(){}
+	private:
+		Clonables() {}
 
-			Clonables(const Clonables&);                 // Prevent copy-construction
-			Clonables& operator=(const Clonables&);      // Prevent assignment
-			~Clonables()
-			{
-				for(NameToClonable::const_iterator it = __clonables.begin(); it != __clonables.end(); ++it){
-					const Clonable* clone = it->second;
-					delete clone;
-				}
-				__clonables.clear();
-			}
+		Clonables(const Clonables&) = delete;
+		Clonables& operator=(const Clonables&) = delete;
 
-		public:
-			static Clonables& Instance()
-			{
-				static Clonables instance;   // Guaranteed to be destroyed.                              
-				return instance;    // Instantiated on first use.
-			}
-
-		public:
-			void addClonable(const char* className, Clonable* clone)
-			{
-				std::string name = className;
-				
-				auto it = __clonables.find(name);
-				if(it == __clonables.end()) {
-					__clonables[name] = clone;
-				}
-			}
-
-			const Clonable* find(const char *className)
-			{
-				std::string name = className;
-				auto it = __clonables.find(name);
-				if (it == __clonables.end()) 
-					return NULL;
+		virtual ~Clonables()
+		{
+			for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
 				const Clonable* clone = it->second;
-				return clone;
+				delete clone;
 			}
+			m_clonables.clear();
+		}
 
-			Clonable* create(const char *className)
-			{       
-				const Clonable* clone = find(className);
-				if (clone)
-					return clone->createObj();
-				else 
-					return NULL;
-			}   
+	public:
+		static Clonables& Instance()
+		{
+			static Clonables instance;   // Guaranteed to be destroyed.                              
+			return instance;    // Instantiated on first use.
+		}
+
+	public:
+		void addClonable(const char* className, Clonable* clone)
+		{
+			std::string name = className;
+
+			auto it = m_clonables.find(name);
+			if (it == m_clonables.end()) {
+				m_clonables[name] = clone;
+			}
+		}
+
+		const Clonable* find(const char *className)
+		{
+			std::string name = className;
+			auto it = m_clonables.find(name);
+			if (it == m_clonables.end())
+				return NULL;
+			const Clonable* clone = it->second;
+			return clone;
+		}
+
+		Clonable* create(const char *className)
+		{
+			const Clonable* clone = find(className);
+			if (clone)
+				return clone->createObj();
+			else
+				return NULL;
+		}
+
+		#ifdef DEBUG
+		void dumpClonables() {
+			for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
+				Log::Logger().Debug("- Has Clonable factory of %s", it->first.c_str());
+			}
+		}
+		#endif //DEBUG
 	};
 
+	/**
+	*/
 	class AddClonable {
-		public:
-			AddClonable(const char* className, Clonable* clone){
-				Clonables::Instance().addClonable(className, clone);
-			}
+	public:
+		AddClonable(const char* className, Clonable* clone) {
+			Clonables::Instance().addClonable(className, clone);
+		}
 	};
 
 }
@@ -108,13 +112,12 @@ Right at the begining of zour module code propagate factories / or cloneables ri
 virtual Grafkit::Clonable* createObj() const \
 	{ \
 		return new className(); \
-	}
+	}\
+private: \
+	static Grafkit::AddClonable _addClonableFactory;
 
-#define CLONEABLE_IMPL(className) \
-	static Grafkit::AddClonable className##_addClonable(#className, new className());
-
-	/// Another solution is create factories inside the object as 'clonable' , and feed them into the clonables collenction
-	/// This should prevent unnesesarry construction calling and memory usage, and crashes due to the uninitialized framework
+/// Another solution is create factories inside the object as 'clonable' , and feed them into the clonables collenction
+/// This should prevent unnesesarry construction calling and memory usage, and crashes due to the uninitialized framework
 #define CLONEABLE_FACTORY_DECL(className)\
 class Factory : public Grafkit::Clonable { \
 public: \
@@ -126,6 +129,6 @@ public: \
 
 
 #define CLONEABLE_FACTORY_IMPL(className) \
-	static Grafkit::AddClonable className##_addClonableFactory(#className, new className##::Factory());
+	Grafkit::AddClonable className##::_addClonableFactory(#className, new className##::Factory());
 
 #endif //__DYNAMICS_H__

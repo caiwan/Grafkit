@@ -6,11 +6,20 @@
 using namespace Grafkit;
 
 // ==================================================================
+PERSISTENT_IMPL(Grafkit::Model);
 
-Model::Model() : Mesh()
+void Grafkit::Model::_serialize(Archive & ar)
 {
+	this->Entity3D::_serialize(ar);
+	// ar & PERSIST_OBJECT(m_material);
+	ar & PERSIST_OBJECT(m_mesh);
 }
 
+Grafkit::Model::Model(MeshRef mesh, MaterialRef material) :
+	m_mesh(mesh),	
+	m_material(material)
+{
+}
 
 Model::~Model()
 {
@@ -23,5 +32,7 @@ void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* scene)
 	if (m_material) 
 		this->m_material->Render(render, scene->GetFShader());
 
-	this->RenderMesh(render);
+	if (m_mesh)
+		this->m_mesh->RenderMesh(render);
 }
+

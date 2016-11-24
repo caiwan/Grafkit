@@ -4,18 +4,54 @@
 #include "texture.h"
 
 #include "../utils/struct_pack.h"
+#include "../utils/persistence/persistence.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+PERSISTENT_IMPL(Grafkit::Mesh);
+
+void Grafkit::Mesh::_serialize(Archive & ar)
+{
+	ar & PERSIST_FIELD(m_vertexCount);
+	ar & PERSIST_VECTOR(m_indices, m_indexCount);
+
+	unsigned int ptr_count = this->m_vertexPointers.size();
+
+	ar & PERSIST_FIELD(ptr_count);
+
+	// store pointer table
+	if (ar.isStoring()) {
+		for (auto it = m_vertexPointers.begin(); it != m_vertexPointers.end(); ++it) {
+			const UCHAR* ptr = (UCHAR*)it->data;
+			size_t size = it->length;
+			std::string name = it->name.c_str();
+			ar & PERSIST_STRING(&name);
+			ar & PERSIST_VECTOR(ptr, size);
+		}
+	}
+	// load pointer table
+	else {
+		for (size_t i = 0; i < ptr_count; i++) {
+			UCHAR* ptr = nullptr;
+			size_t size = 0; 
+			std::string name;
+			ar & PERSIST_STRING(&name);
+			ar & PERSIST_VECTOR(ptr, size);
+			
+			this->AddPointer(name, size, ptr);
+			delete[] ptr;	///TODO: ez itt felesleges, eleg lenne egyszer torolni csak
+		}
+	}
+}
 
 // ==================================================================
 Grafkit::Mesh::Mesh() :
-	m_buffer()
+	m_buffer(),
+	m_indexBuffer(nullptr),
+	m_indexCount(0),
+	m_vertexCount(0)
 {
-	//m_vertexBuffer = 0;
-	m_indexBuffer = 0;
-
 }
 
 Grafkit::Mesh::Mesh(const Mesh & mesh)
@@ -26,6 +62,10 @@ Grafkit::Mesh::Mesh(const Mesh & mesh)
 Grafkit::Mesh::~Mesh()
 {
 	this->Shutdown();
+}
+
+void Grafkit::Mesh::UpdateMesh(double time)
+{
 }
 
 void Grafkit::Mesh::RenderMesh(ID3D11DeviceContext * dev)
@@ -45,18 +85,18 @@ void Grafkit::Mesh::AddPointer(std::string inputName, size_t length, const void 
 	vertexPointer.length = length;
 	vertexPointer.data = new UCHAR[length];
 
-	memcpy_s(vertexPointer.data, vertexPointer.length, pointer, length); //ez itt el van szarodva
+	memcpy_s(vertexPointer.data, vertexPointer.length, pointer, length);
 
 	this->m_vertexPointers.push_back(vertexPointer);
-	this->m_mapPtr[inputName] = vertexPointer.data; 
+	this->m_mapPtr[inputName] = vertexPointer.data;
 }
 
 void Grafkit::Mesh::SetIndices(size_t vertexCount, size_t indexCount, const int * const indices)
 {
 	m_indexCount = indexCount;
 	m_vertexCount = vertexCount;
-	m_indices = new UINT[indexCount]; 
-	for (size_t i = 0; i < indexCount; i++) 
+	m_indices = new UINT[indexCount];
+	for (size_t i = 0; i < indexCount; i++)
 		m_indices[i] = indices[i];
 }
 
@@ -131,7 +171,7 @@ void Grafkit::Mesh::Build(ShaderRef & shader, ID3D11Device * const & device)
 
 	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
 	ZeroMemory(&indexData, sizeof(indexData));
-	
+
 	// static index buffer
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(UINT) * m_indexCount;

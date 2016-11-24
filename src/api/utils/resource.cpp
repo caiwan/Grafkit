@@ -3,20 +3,6 @@
 
 using namespace Grafkit;
 
-IResource::IResource() 
-{
+void IResource::_serialize(Archive& ar) {
+	ar & PERSIST_STRING(&m_name);
 }
-
-IResource::~IResource()
-{
-	/**
-	@todo a destruktora ennek nem fasza, a virtualis fuggvenyeket a leszarmazott deletekor viszi magaval. 
-	Valami koser megoldas kellene a torlesre, ami megkeruli ezt 
-	*/
-}
-
-void IResource::SetName(std::string name) : m_name(name)
-{
-}
-
-

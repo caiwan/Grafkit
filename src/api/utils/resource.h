@@ -7,6 +7,7 @@ A generator interface for assets
 #include <map>
 #include <string>
 
+#include "../utils/persistence/persistence.h"
 
 #include "reference.h"
 #include "exceptions.h"
@@ -25,6 +26,9 @@ namespace Grafkit{
 	class IResource : virtual public Referencable
 	{
 		friend class IResourceManager;
+	protected:
+
+		void _serialize(Archive& ar);
 
 	public:
 		IResource() {}

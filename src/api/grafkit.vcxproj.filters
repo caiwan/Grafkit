@@ -173,6 +173,9 @@
     <ClCompile Include="utils\persistence\tlv_format.cpp">
       <Filter>Source Files\utils\persistence</Filter>
     </ClCompile>
+    <ClCompile Include="utils\resource.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">

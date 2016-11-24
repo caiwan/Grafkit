@@ -8,12 +8,6 @@
 
 // http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
 
-//#define NOT_USING_RTTI
-
-#define PERSISTENT_SIGNATURE "CAI"
-#define PERSISTENT_MAJOR_VER 0
-#define PERSISTENT_MINOR_VER 2
-
 namespace Grafkit{
 	class Archive;
 
@@ -30,11 +24,11 @@ namespace Grafkit{
 		public:
 			virtual ~Persistent() {}
 			
-			static Persistent* load(Archive& stream);
-			void store(Archive& stream);
+			static Persistent* load(Archive& ar);
+			void store(Archive& ar);
 
 		protected:
-			virtual void serialize(Archive& stream) = 0;
+			virtual void serialize(Archive& ar) = 0;
 
 			///@todo use typeid(T).name() instead, and do the lookup by that;
 			virtual const char* getClassName() const = 0;
@@ -141,7 +135,7 @@ namespace Grafkit{
 			unsigned int count = 0;
 			ar.read(&count, sizeof(count));
 			m_pT = new T[count];
-			ar.read(m_pT, sizeof(T) * (count));
+			ar.read((void*)m_pT, sizeof(T) * (count));
 			m_count = count;
 		}
 
@@ -216,9 +210,7 @@ public:\
 	virtual int version() const \
 	{ \
 		return VERSION_NO;\
-	}\
-private: \
-	static Grafkit::AddClonable _addClonable;
+	}
 
 #define PERSISTENT_IMPL(className) \
 	CLONEABLE_FACTORY_IMPL(className)

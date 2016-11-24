@@ -12,6 +12,7 @@
 #include "shader.h"
 #include "Material.h"
 
+#include "../utils/persistence/persistence.h"
 
 namespace Grafkit {
 
@@ -20,12 +21,11 @@ namespace Grafkit {
 	class Entity3DEvents;
 	class Actor;
 
-
-
-#define ENTITY3D_BUCKET "empty"
-
 	class Entity3D : public Grafkit::IResource
 	{
+	protected:
+		void _serialize(Archive& ar);
+
 	friend class Actor;
 	public:
 		Entity3D();

@@ -160,13 +160,13 @@ template<typename TDerived> struct AlignedNew
 /* override new */
 #ifndef NO_NEW_OVERRIDE
 
-#ifndef GTEST_FIX
-#define DEBUG_FUNCTION__ __FUNCTION__
-#else // GTEST_FIX
-#define DEBUG_FUNCTION__ ""
-#endif // GTEST_FIX
+#if 0
+#define __DEBUG_FUNCTION__ __FUNCTION__
+#else // 
+#define __DEBUG_FUNCTION__ ""
+#endif // 
 
-#define DEBUG_NEW new(__FILE__, DEBUG_FUNCTION__, __LINE__)
+#define DEBUG_NEW new(__FILE__, __DEBUG_FUNCTION__, __LINE__)
 
 #define new DEBUG_NEW
 #endif /*NO_NEW_OVERRIDE*/

@@ -19,6 +19,8 @@
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
+#include "utils/persistence/archive.h"
+
 using namespace Grafkit;
 
 #include "builtin_data/cube.h"
@@ -106,11 +108,30 @@ protected:
 			delete pShaderLoader;
 
 			// -- model 
-			this->m_model = new Model;
-			this->m_model->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
-			this->m_model->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
-			this->m_model->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
-			this->m_model->Build(m_vertexShader, render);
+			this->m_model = new Model(new Mesh());
+			this->m_model->SetName("cube");
+			this->m_model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
+			this->m_model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
+			this->m_model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
+			this->m_model->GetMesh()->Build(m_vertexShader, render);
+
+			// export as test
+			FILE* fp = nullptr; fopen_s(&fp, "cube.gkobj", "wb");
+			ArchiveFile store(fp, true);
+			
+			this->m_model->store(store);
+
+			fflush(fp); fclose(fp);
+
+			// import it again
+			fopen_s(&fp, "cube.gkobj", "rb");
+			ArchiveFile load(fp, false);
+
+			this->m_model->load(load);
+			this->m_model->GetMesh()->Build(m_vertexShader, render);
+
+			fclose(fp);
+
 
 			// --- 
 
@@ -154,7 +175,7 @@ protected:
 				m_vertexShader->Render(this->render);
 				m_fragmentShader->Render(this->render);
 
-				m_model->RenderMesh(this->render);
+				m_model->Render(this->render, nullptr);
 
 				this->t += 0.01;
 			}
