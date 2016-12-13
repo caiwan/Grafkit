@@ -15,7 +15,7 @@ namespace Grafkit {
 
 	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
 	///@todo aligned new-t mindenre
-	__declspec(align(16)) class BaseMaterial : public Grafkit::IResource , public AlignedNew<BaseMaterial>
+	__declspec(align(16)) class BaseMaterial : public Grafkit::IResource, public AlignedNew<BaseMaterial>, public Persistent
 	//class BaseMaterial : public Grafkit::IResource 
 	{
 	public:

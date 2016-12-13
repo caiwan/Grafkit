@@ -7,6 +7,5 @@ public:
 	ArchiveFactoryTestClass() {}
 
 public:
-	//CLONEABLE_DECL(ArchiveFactoryTestClass);
 	CLONEABLE_FACTORY_DECL(ArchiveFactoryTestClass);
 };
