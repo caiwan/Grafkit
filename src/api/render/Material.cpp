@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 
 #include "Material.h"
 
@@ -12,8 +12,10 @@ using namespace FWdebugExceptions;
 
 using std::vector;
 
+PERSISTENT_IMPL(Grafkit::Material);
+
 namespace {
-	const char *texture_map_names[BaseMaterial::TT_COUNT] =
+	const char *texture_map_names[Material::TT_COUNT] =
 	{
 		"t_diffuse",
 		"t_alpha",
@@ -32,7 +34,7 @@ namespace {
 
 // ====================================
 
-Grafkit::BaseMaterial::BaseMaterial(enum BaseMaterial::material_type_e t) : IResource()
+Grafkit::Material::Material(enum Material::material_type_e t) : IResource()
 {
 	ZeroMemory(&m_material, sizeof(m_material));
 	m_material.diffuse = float4(1, 1, 1, 0);
@@ -40,7 +42,7 @@ Grafkit::BaseMaterial::BaseMaterial(enum BaseMaterial::material_type_e t) : IRes
 	m_material.type = t;
 }
 
-TextureResRef Grafkit::BaseMaterial::GetTexture(std::string bindName)
+TextureResRef Grafkit::Material::GetTexture(std::string bindName)
 {
 	auto it = this->m_textures.find(bindName);
 	if (it != m_textures.end()) {
@@ -49,7 +51,7 @@ TextureResRef Grafkit::BaseMaterial::GetTexture(std::string bindName)
 	return TextureResRef();
 }
 
-void Grafkit::BaseMaterial::SetTexture(TextureResRef texture, std::string bindName)
+void Grafkit::Material::SetTexture(TextureResRef texture, std::string bindName)
 {
 	auto it = this->m_textures.find(bindName);
 	if (it != m_textures.end()) {
@@ -60,12 +62,12 @@ void Grafkit::BaseMaterial::SetTexture(TextureResRef texture, std::string bindNa
 	}
 }
 
-void Grafkit::BaseMaterial::AddTexture(TextureResRef texture, std::string bindName)
+void Grafkit::Material::AddTexture(TextureResRef texture, std::string bindName)
 {
 	m_textures[bindName] = texture;
 }
 
-void Grafkit::BaseMaterial::RemoveTexture(TextureResRef texture, std::string bindName)
+void Grafkit::Material::RemoveTexture(TextureResRef texture, std::string bindName)
 {
 	auto it = this->m_textures.find(bindName);
 	if (it != m_textures.end()) {
@@ -73,19 +75,19 @@ void Grafkit::BaseMaterial::RemoveTexture(TextureResRef texture, std::string bin
 	}
 }
 
-void Grafkit::BaseMaterial::SetTexture(TextureResRef texture, texture_type_e slot)
+void Grafkit::Material::SetTexture(TextureResRef texture, texture_type_e slot)
 {
 	this->SetTexture(texture, texture_map_names[slot]);
 	this->m_material.has_texture[slot] = 1;
 }
 
-void Grafkit::BaseMaterial::AddTexture(TextureResRef texture, texture_type_e slot)
+void Grafkit::Material::AddTexture(TextureResRef texture, texture_type_e slot)
 {
 	this->AddTexture(texture, texture_map_names[slot]);
 	this->m_material.has_texture[slot] = 1;
 }
 
-void Grafkit::BaseMaterial::RemoveTexture(TextureResRef texture, texture_type_e slot)
+void Grafkit::Material::RemoveTexture(TextureResRef texture, texture_type_e slot)
 {
 	this->RemoveTexture(texture, texture_map_names[slot]);
 	this->m_material.has_texture[slot] = 0;
@@ -93,7 +95,7 @@ void Grafkit::BaseMaterial::RemoveTexture(TextureResRef texture, texture_type_e 
 
 // ====================================
 
-void Grafkit::BaseMaterial::Render(Renderer& render, ShaderRef &_shader)
+void Grafkit::Material::Render(Renderer& render, ShaderRef &_shader)
 {
 	ShaderRef shader = _shader; 
 
@@ -105,3 +107,14 @@ void Grafkit::BaseMaterial::Render(Renderer& render, ShaderRef &_shader)
 	}
 }
 
+// ====================================
+void Grafkit::Material::serialize(Archive & ar)
+{
+	this->IResource::_serialize(ar);
+
+	// ...
+	PERSIST_FIELD(m_material);
+	
+	/// @todo override shader + 
+	/// @todo textures 
+}

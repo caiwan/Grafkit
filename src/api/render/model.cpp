@@ -35,4 +35,3 @@ void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* scene)
 	if (m_mesh)
 		this->m_mesh->RenderMesh(render);
 }
-

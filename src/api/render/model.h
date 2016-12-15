@@ -28,12 +28,6 @@ namespace Grafkit
 
 	__declspec(align(16)) class Model : public Grafkit::Entity3D, public AlignedNew<Model>, public Persistent
 	{
-		PERSISTENT_DECL(Grafkit::Model, 1)
-	protected:
-		virtual void serialize(Archive& ar) { _serialize(ar); }
-		void _serialize(Archive& ar);
-
-
 	public:
 		Model(MeshRef mesh = nullptr, MaterialRef material = nullptr);
 		~Model();
@@ -49,6 +43,13 @@ namespace Grafkit
 	private:
 		MaterialRef m_material;
 		MeshRef m_mesh;
+
+
+		PERSISTENT_DECL(Grafkit::Model, 1)
+	protected:
+		virtual void serialize(Archive& ar) { _serialize(ar); }
+		void _serialize(Archive& ar);
+
 	};
 
 	typedef Ref<Model> ModelRef;

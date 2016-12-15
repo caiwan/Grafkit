@@ -3,6 +3,8 @@
 #include <vector>
 #include <map>
 
+#include "../utils/persistence/persistence.h"
+
 #include "../utils/resource.h"
 #include "../utils/memory.h"
 
@@ -12,11 +14,7 @@
 #include "shader.h"
 
 namespace Grafkit {
-
-	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
-	///@todo aligned new-t mindenre
-	__declspec(align(16)) class BaseMaterial : public Grafkit::IResource, public AlignedNew<BaseMaterial>, public Persistent
-	//class BaseMaterial : public Grafkit::IResource 
+	__declspec(align(16)) class Material : public Grafkit::IResource, public AlignedNew<Material>, public Persistent
 	{
 	public:
 		enum material_type_e {
@@ -44,10 +42,10 @@ namespace Grafkit {
 
 			TT_COUNT	// count
 		};
-	
+
 	public:
-		BaseMaterial(enum BaseMaterial::material_type_e t = MT_phong_blinn);
-		~BaseMaterial() {}
+		Material(enum Material::material_type_e t = MT_phong_blinn);
+		~Material() {}
 
 		/// @todo ez nem ilyen lesz a jovoben
 		// operator material_t& () { return this->m_material; }
@@ -82,10 +80,10 @@ namespace Grafkit {
 
 	protected:
 		struct material_t {
-			
+
 			// erre valamiert sikit
-			material_t(){}
-			
+			material_t() {}
+
 			union {
 				int type;	/* Material tipusa */
 				char ___0[16]; // az integert paddolni kell 16-ra
@@ -95,7 +93,7 @@ namespace Grafkit {
 				struct {
 					float4 ambient, diffuse, specular, emission;
 				};
-				char ___1[4*16]; // a float4 eleve 16-ra van paddolva
+				char ___1[4 * 16]; // a float4 eleve 16-ra van paddolva
 			};
 
 			union {
@@ -114,7 +112,7 @@ namespace Grafkit {
 				// ezt mire kell paddolni
 				char ___4[TT_COUNT * 16];
 			};
-			
+
 		};
 
 		struct material_t m_material;
@@ -123,8 +121,13 @@ namespace Grafkit {
 
 		ShaderRef m_override_fshader;
 
+
+	protected:
+		void serialize(Archive& ar);
+		PERSISTENT_DECL(Grafkit::Material, 1)
+
 	};
 
-	typedef Ref<BaseMaterial> MaterialRef;
+	typedef Ref<Material> MaterialRef;
 
 }

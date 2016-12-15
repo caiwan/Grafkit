@@ -114,22 +114,22 @@ namespace {
 	// AI texture -- internal texture type mapping 
 	const struct {
 		enum aiTextureType ai;
-		enum BaseMaterial::texture_type_e tt;
+		enum Material::texture_type_e tt;
 	}
 	texture_load_map[] = {
-		aiTextureType_NONE,		    BaseMaterial::TT_aux0,
-		aiTextureType_DIFFUSE,      BaseMaterial::TT_diffuse,
-		aiTextureType_SPECULAR,     BaseMaterial::TT_specular,
-		aiTextureType_AMBIENT,      BaseMaterial::TT_aux0,
-		aiTextureType_EMISSIVE,     BaseMaterial::TT_aux0,
-		aiTextureType_HEIGHT,       BaseMaterial::TT_aux0,
-		aiTextureType_NORMALS,      BaseMaterial::TT_normal,
-		aiTextureType_SHININESS,    BaseMaterial::TT_shiniess,
-		aiTextureType_OPACITY,      BaseMaterial::TT_alpha,
-		aiTextureType_DISPLACEMENT, BaseMaterial::TT_bump,
-		aiTextureType_LIGHTMAP,		BaseMaterial::TT_aux0,
-		aiTextureType_REFLECTION,	BaseMaterial::TT_reflect,
-		aiTextureType_UNKNOWN,		BaseMaterial::TT_aux0,
+		aiTextureType_NONE,		    Material::TT_aux0,
+		aiTextureType_DIFFUSE,      Material::TT_diffuse,
+		aiTextureType_SPECULAR,     Material::TT_specular,
+		aiTextureType_AMBIENT,      Material::TT_aux0,
+		aiTextureType_EMISSIVE,     Material::TT_aux0,
+		aiTextureType_HEIGHT,       Material::TT_aux0,
+		aiTextureType_NORMALS,      Material::TT_normal,
+		aiTextureType_SHININESS,    Material::TT_shiniess,
+		aiTextureType_OPACITY,      Material::TT_alpha,
+		aiTextureType_DISPLACEMENT, Material::TT_bump,
+		aiTextureType_LIGHTMAP,		Material::TT_aux0,
+		aiTextureType_REFLECTION,	Material::TT_reflect,
+		aiTextureType_UNKNOWN,		Material::TT_aux0,
 	};
 }
 
@@ -302,7 +302,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			aiString path, name;
 
 			/// @todo milyen material kell 
-			MaterialRef material = new BaseMaterial();
+			MaterialRef material = new Material();
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
 			///@todo nevekre szuksegunk ven-e?
