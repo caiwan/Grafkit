@@ -131,7 +131,7 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 	// duck through the resources
 	//if (this->m_bResourceCount) 
 	{
-		for (size_t i = 0; i < this->GetBResCount(); i++) {
+		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
 			BResRecord &brRecord = this->m_bResources[i];
 			if (brRecord.m_boundSource != nullptr) {
 				
@@ -253,6 +253,19 @@ void Shader::UnMapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id)
 
 
 // ============================================================================================================================================
+
+void Grafkit::Shader::SetBoundedResourcePointer(std::string name, void * ptr)
+{
+	auto it = this->m_mapBResources.find(name);
+	if (it != this->m_mapBResources.end())
+		SetBoundedResourcePointer(it->second, ptr);
+}
+
+void Grafkit::Shader::SetBoundedResourcePointer(size_t id, void * ptr)
+{
+	if (id < GetBoundedResourceCount())
+		this->m_bResources[id].m_boundSource = ptr;
+}
 
 void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
 {
@@ -571,6 +584,12 @@ void Grafkit::VertexShader::SetSamplerPtr(ID3D11DeviceContext* device, UINT bind
 }
 
 
+void Grafkit::VertexShader::SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+{
+	deviceContext->VSSetShaderResources(bindPoint, bindCount, &pResView);
+}
+
+
 void Grafkit::VertexShader::SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
 	deviceContext->VSSetConstantBuffers(slot, numBuffers, &buffer); 
@@ -625,6 +644,11 @@ void Grafkit::PixelShader::CreateShader(ID3D11Device * device, ID3D10Blob * shad
 void Grafkit::PixelShader::SetSamplerPtr(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
 {
 	device->PSSetSamplers(bindPoint, bindCount, &pSampler);
+}
+
+void Grafkit::PixelShader::SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+{
+	deviceContext->PSSetShaderResources(bindPoint, bindCount, &pResView);
 }
 
 

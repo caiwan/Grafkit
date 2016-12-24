@@ -24,7 +24,7 @@ namespace Grafkit {
 	class ComputeShader;
 
 	// ================================================================================================================================
-	__declspec(align(16)) class Shader : virtual public Referencable, public AlignedNew<Shader>
+	__declspec(align(16)) class Shader : virtual public Referencable
 	{
 
 	public:
@@ -99,31 +99,23 @@ namespace Grafkit {
 		}
 
 		// ----
-		// access bounded resources
-		///@todo bounds check
-		size_t GetBResCount() { return this->m_bResources.size(); }
+		// set bounded resources
+		size_t GetBoundedResourceCount() { return this->m_bResources.size(); }
+		D3D11_SHADER_INPUT_BIND_DESC GetBoundedResourceDesc(size_t id) { return m_bResources[id].m_desc; }
 		
-		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, std::string name);
-		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, size_t id);
+		void SetSamplerSatate(std::string name, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(name, pSampler); }
+		void SetSamplerSatate(size_t id, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(id, pSampler); }
 
-		void SetShdaerResourceView(ID3D11DeviceContext * deviceContext, std::string name);
-		void SetShdaerResourceView(ID3D11DeviceContext * deviceContext, size_t id);
+		void SetShaderResourceView(std::string name, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(name, pResView); }
+		void SetShaderResourceView(size_t id, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(id, pResView); }
 
-		D3D11_SHADER_INPUT_BIND_DESC GetBoundedResDesc(size_t id);
-
-		void SetBResPointer(size_t id, void* ptr);
+		void SetBoundedResourcePointer(std::string name, void* ptr);
+		void SetBoundedResourcePointer(size_t id, void* ptr);
 
 		// ----
 		// access input layout 
 		size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
 		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
-
-		// set input layout
-		// void SetInputLayout(ID3D11InputLayout* pLayout) { this->m_layout = pLayout; }
-		
-		// set shader resource
-
-		// set out sampler 
 
 	private:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
@@ -158,10 +150,7 @@ namespace Grafkit {
 			std::vector<CBVar> m_cbVars;
 		};
 
-		typedef std::map<std::string, size_t> CBMap_t;
-		typedef CBMap_t::iterator CBMap_it_t;
-
-		CBMap_t m_mapCBuffers;
+		std::map<std::string, size_t> m_mapCBuffers;
 		std::vector<CBRecord> m_cBuffers;
 
 		// -- input layout 
@@ -176,9 +165,7 @@ namespace Grafkit {
 			void *m_boundSource;
 		};
 
-		typedef std::map<std::string, size_t> BResMap_t;
-		typedef BResMap_t::iterator BResMap_it_t;
-		BResMap_t m_mapBResources;
+		std::map<std::string, size_t> m_mapBResources;
 		
 		std::vector<BResRecord> m_bResources;
 
@@ -187,6 +174,7 @@ namespace Grafkit {
 
 		// ================================================================================================================================
 
+		// pure virtuals for shader type specific stuff (vs, fs, etc..)
 		protected:
 			virtual void ShutdownChild() = 0;
 			
@@ -200,79 +188,6 @@ namespace Grafkit {
 			virtual void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) = 0;
 
 			virtual void BindShader(ID3D11DeviceContext * deviceContext) = 0;
-			
-
-		public:
-
-			//class ShaderParamManager {
-			//public:
-			//	ShaderParamManager(Shader* shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype = 0)
-			//		: m_pShader(shader), m_id(id), m_vid(vid), m_is_subtype(is_subtype)
-			//	{}
-
-			//	~ShaderParamManager() {}
-			//	
-			//	inline ShaderParamManager Get(const char* name) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, name) : ShaderParamManager(); }
-			//	inline ShaderParamManager Get(size_t id) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, id) : ShaderParamManager(); }
-
-			//	inline size_t GetVarCount() { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParamCount() : 0; }
-
-			//	inline void SetP(const void * const pData, size_t width = 0, size_t offset = 0) { 
-			//		if (this->IsValid()) 
-			//			this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); 
-			//	}
-
-			//	void SetF(const float v0);
-			//	void SetF(const float v0, const float v1);
-			//	void SetF(const float v0, const float v1, const float v2);
-			//	void SetF(const float v0, const float v1, const float v2, const float v3);
-
-			//	
-			//	inline D3D11_SHADER_BUFFER_DESC GetBufferDesc() { return (this->IsValid()) ? this->m_pShader->GetCBDescription(m_id) : D3D11_SHADER_BUFFER_DESC(); }
-			//	
-			//	inline D3D11_SHADER_VARIABLE_DESC GetVarDesc() { return (this->IsValid()) ? this->m_pShader->GetCBVariableDescriptor(m_id, m_vid) : D3D11_SHADER_VARIABLE_DESC(); }
-			//	inline D3D11_SHADER_TYPE_DESC  GetTypeDesc() { return (this->IsValid()) ? this->m_pShader->GetCBTypeDescriptor(m_id, m_vid) : D3D11_SHADER_TYPE_DESC(); }
-			//	
-
-			//	operator D3D11_SHADER_BUFFER_DESC () { this->GetBufferDesc(); }
-			//	
-			//	operator D3D11_SHADER_VARIABLE_DESC  () { this->GetVarDesc(); }
-			//	operator D3D11_SHADER_TYPE_DESC   () { this->GetTypeDesc(); }
-			//	
-
-			//	inline int IsValid() { return (m_pShader != nullptr); }
-			//	inline int IsSubtype() { return m_is_subtype; }
-
-			//private:
-			//	Shader * m_pShader;
-
-			//	int m_is_subtype;
-			//	size_t m_id, m_vid;
-
-			//};
-
-			//class ShaderResourceManager {
-			//public:
-			//	ShaderResourceManager(Shader* shader = nullptr, size_t id = 0) : 
-			//		m_pShader(shader), m_id(id)
-			//	{}
-
-			//	~ShaderResourceManager() {}
-
-			//	void Set(ID3D11ShaderResourceView* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
-			//	void Set(ID3D11SamplerState* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
-
-			//	inline D3D11_SHADER_INPUT_BIND_DESC GetDescriptor() { if (IsValid()) m_pShader->GetBResDesc(m_id); }
-
-			//	int IsValid() { return (m_pShader != nullptr); }
-
-			//private:
-
-			//	void Set(void* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
-
-			//	Shader * m_pShader;
-			//	size_t m_id;
-			//};
 	};
 
 	// ================================================================================================================================
@@ -310,6 +225,7 @@ namespace Grafkit {
 		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
 		
 		void SetSamplerPtr(ID3D11DeviceContext* device,UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
 		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
 		void BindShader(ID3D11DeviceContext * deviceContext);
@@ -337,6 +253,7 @@ namespace Grafkit {
 		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
 
 		void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
 		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
 		void BindShader(ID3D11DeviceContext * deviceContext);
@@ -344,25 +261,7 @@ namespace Grafkit {
 		ID3D11PixelShader* m_pxShader;
 	};
 
-	/*
-	* Geometry shader
-	*/
-	//__declspec(align(16))
-	//	class GeometryShader : public AlignedNew<GeometryShader> {
-	//	protected:
-	//		void ShutdownChild();
-	//		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-	//		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-	//		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
-
-	//		void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
-	//		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
-
-	//		void BindShader(ID3D11DeviceContext * deviceContext);
-
-	//	private:
-	//		ID3D11GeometryShader* m_gmShader;
-	//};
+//@Todo geometry + compute shader
 
 }
 
