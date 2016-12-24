@@ -1,10 +1,7 @@
 #pragma once
 
-// #include <vector>
-
 #include "../exceptions.h"
 #include "dynamics.h"
-#include "tlv_format.h"
 
 // http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
 
