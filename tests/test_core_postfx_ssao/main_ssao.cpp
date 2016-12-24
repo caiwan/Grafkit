@@ -83,7 +83,7 @@ protected:
 
 			// -- model 
 			ModelRef model = new Model;
-			model->SetMaterial(new MaterialBase);
+			model->SetMaterial(new Material);
 
 
 			SimpleMeshGenerator generator(render, m_vertexShader);

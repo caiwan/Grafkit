@@ -70,11 +70,11 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 	m_texOut[2] = new Texture(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[2];
 
 	// --- 
-	m_shaderFullscreenQuad = new Shader();
-	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), ST_Vertex, "FullscreenQuad");
+	m_shaderFullscreenQuad = new VertexShader();
+	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), "FullscreenQuad");
 
-	m_shaderCopyScreen = new Shader();
-	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), ST_Pixel, "CopyScreen");
+	m_shaderCopyScreen = new PixelShader();
+	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), "CopyScreen");
 
 	// --- 
 	m_fullscreenquad = new Mesh();

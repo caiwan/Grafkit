@@ -1,8 +1,9 @@
-#include "stdafx.h"
-
 #define NO_NEW_OVERRIDE
+#include "stdafx.h"
 #include "memory.h"
 #undef NO_NEW_OVERRIDE
+
+#include <cstdlib>
 
 #ifndef LIVE_RELEASE
 
@@ -23,9 +24,7 @@ track_printer::~track_printer()
 }
 
 
-/**/
 track_type * get_map() {
-	// don't use normal new to avoid infinite recursion.
 	static track_type * track = new (std::malloc(sizeof *track)) track_type;
 	static track_printer printer(track);
 	return track;
@@ -45,7 +44,7 @@ void remove_alloc(void * mem)
 }
 
 /**/
-void * __cdecl operator new(std::size_t size, const char* file, const char* function, unsigned int line) throw(std::bad_alloc) {
+void * __cdecl operator new(size_t size, const char* file, const char* function, unsigned int line) throw(std::bad_alloc) {
 	// we are required to return non-null
 	void * mem = std::malloc(size == 0 ? 1 : size);
 	if (mem == 0) {

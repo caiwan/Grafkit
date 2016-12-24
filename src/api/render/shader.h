@@ -18,31 +18,22 @@
 namespace Grafkit {
 
 	class Shader;
-	
-	enum ShaderType_e {
-		ST_NONE = 0,
-		ST_Vertex,
-		ST_Pixel,
-		ST_Geometry,
-		ST_Compute,
-		
-		ST_COUNT
-	};
-
-	///opt out operator overlaoding (= and [])
-#define SHADER_NO_OPERATOR_ENHANCEMENT
+	class Vertexshader;
+	class PixelShader;
+	class GemoetryShader;
+	class ComputeShader;
 
 	// ================================================================================================================================
 	__declspec(align(16)) class Shader : virtual public Referencable, public AlignedNew<Shader>
 	{
 
 	public:
-		class ShaderParamManager;
-		class ShaderResourceManager;
+		//class ShaderParamManager;
+		//class ShaderResourceManager;
 
 	public:
 		Shader();
-		virtual ~Shader();
+		~Shader();
 
 		/**
 			@param device device context
@@ -50,13 +41,13 @@ namespace Grafkit {
 			@param file source file of vertex shader
 			@param type type of shader @see Grafkit::ShaderType_e
 		*/
-		void LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type, ID3DInclude* pInclude = nullptr, D3D_SHADER_MACRO* pDefines = nullptr);
-		void LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type, LPCSTR name, ID3DInclude* pInclude = nullptr, D3D_SHADER_MACRO* pDefines = nullptr);
+		void LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ID3DInclude* pInclude = nullptr, D3D_SHADER_MACRO* pDefines = nullptr);
+		void LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size, LPCSTR name, ID3DInclude* pInclude = nullptr, D3D_SHADER_MACRO* pDefines = nullptr);
 
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
 
-		enum ShaderType_e GetShaderType() { return this->m_type; }
+		virtual enum ShaderType_e GetShaderType() = 0;
 
 		//virtual enum RA_type_e GetBucketID() { return Grafkit::IResource::RA_TYPE_Shader; }
 
@@ -86,24 +77,14 @@ namespace Grafkit {
 		size_t GetParamCount() { return this->m_cBuffers.size(); }
 		size_t GetParamCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
 
-		ShaderParamManager GetParam(const char* name) { return GetParam(std::string(name)); }
-		ShaderParamManager GetParam(std::string name);
-		ShaderParamManager GetParam(size_t id);
-							
-		ShaderParamManager GetParam(const char* name, const char* varname) { return GetParam(std::string(name), std::string(name)); }
-		ShaderParamManager GetParam(std::string name, std::string varname);
-		ShaderParamManager GetParam(size_t id, const char* varname) { return GetParam(id, std::string(varname)); }
-		ShaderParamManager GetParam(size_t id, std::string varname);
-		ShaderParamManager GetParam(size_t id, size_t vid);
-
-		void SetParamPtr(size_t id, const void * const pData, size_t size = 0, size_t offset = 0);
-		void SetParamPtr(size_t id, size_t vid, const void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, const void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, size_t vid, const void * const pData, size_t size = 0, size_t offset = 0);
 
 	protected:
-		void* MapParamBuffer(size_t id, int isDiscard = 1);
+		void* MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int isDiscard = 1);
 		void* GetMappedPtr(size_t id);
-		void UnMapParamBuffer(size_t id);
-		
+		void UnMapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id);
+
 	public:
 
 		D3D11_SHADER_BUFFER_DESC GetCBDescription(size_t id) {
@@ -121,10 +102,14 @@ namespace Grafkit {
 		// access bounded resources
 		///@todo bounds check
 		size_t GetBResCount() { return this->m_bResources.size(); }
-		ShaderResourceManager GetBRes(const char * name) { return GetBRes(std::string(name)); }
-		ShaderResourceManager GetBRes(std::string name);
-		ShaderResourceManager GetBRes(size_t id);
-		D3D11_SHADER_INPUT_BIND_DESC GetBResDesc(size_t id);
+		
+		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, std::string name);
+		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, size_t id);
+
+		void SetShdaerResourceView(ID3D11DeviceContext * deviceContext, std::string name);
+		void SetShdaerResourceView(ID3D11DeviceContext * deviceContext, size_t id);
+
+		D3D11_SHADER_INPUT_BIND_DESC GetBoundedResDesc(size_t id);
 
 		void SetBResPointer(size_t id, void* ptr);
 
@@ -134,7 +119,7 @@ namespace Grafkit {
 		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
 
 		// set input layout
-		void setInputLayout(ID3D11InputLayout* pLayout) { this->m_layout = pLayout; }
+		// void SetInputLayout(ID3D11InputLayout* pLayout) { this->m_layout = pLayout; }
 		
 		// set shader resource
 
@@ -144,13 +129,6 @@ namespace Grafkit {
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
 		void GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth);
 		void BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer);
-
-	private:
-		ShaderType_e m_type;
-		ID3D11VertexShader* m_vxShader;
-		ID3D11PixelShader* m_pxShader;
-
-		ID3D11DeviceContext* m_pDC;
 
 	protected:
 		ID3D11ShaderReflection *m_pReflector;
@@ -209,82 +187,182 @@ namespace Grafkit {
 
 		// ================================================================================================================================
 
+		protected:
+			virtual void ShutdownChild() = 0;
+			
+			virtual HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) = 0;
+			virtual HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) = 0;
+			
+			virtual void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr) = 0;
+
+			virtual void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer) = 0;
+			virtual void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView) = 0;
+			virtual void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) = 0;
+
+			virtual void BindShader(ID3D11DeviceContext * deviceContext) = 0;
+			
+
 		public:
 
-			class ShaderParamManager {
-			public:
-				ShaderParamManager(Shader* shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype = 0)
-					: m_pShader(shader), m_id(id), m_vid(vid), m_is_subtype(is_subtype)
-				{}
+			//class ShaderParamManager {
+			//public:
+			//	ShaderParamManager(Shader* shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype = 0)
+			//		: m_pShader(shader), m_id(id), m_vid(vid), m_is_subtype(is_subtype)
+			//	{}
 
-				~ShaderParamManager() {}
-				
-				inline ShaderParamManager Get(const char* name) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, name) : ShaderParamManager(); }
-				inline ShaderParamManager Get(size_t id) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, id) : ShaderParamManager(); }
+			//	~ShaderParamManager() {}
+			//	
+			//	inline ShaderParamManager Get(const char* name) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, name) : ShaderParamManager(); }
+			//	inline ShaderParamManager Get(size_t id) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, id) : ShaderParamManager(); }
 
-				inline size_t GetVarCount() { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParamCount() : 0; }
+			//	inline size_t GetVarCount() { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParamCount() : 0; }
 
-				inline void SetP(const void * const pData, size_t width = 0, size_t offset = 0) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); }
+			//	inline void SetP(const void * const pData, size_t width = 0, size_t offset = 0) { 
+			//		if (this->IsValid()) 
+			//			this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); 
+			//	}
 
-				void SetF(const float v0);
-				void SetF(const float v0, const float v1);
-				void SetF(const float v0, const float v1, const float v2);
-				void SetF(const float v0, const float v1, const float v2, const float v3);
+			//	void SetF(const float v0);
+			//	void SetF(const float v0, const float v1);
+			//	void SetF(const float v0, const float v1, const float v2);
+			//	void SetF(const float v0, const float v1, const float v2, const float v3);
 
-				
-				inline D3D11_SHADER_BUFFER_DESC GetBufferDesc() { return (this->IsValid()) ? this->m_pShader->GetCBDescription(m_id) : D3D11_SHADER_BUFFER_DESC(); }
-				
-				inline D3D11_SHADER_VARIABLE_DESC GetVarDesc() { return (this->IsValid()) ? this->m_pShader->GetCBVariableDescriptor(m_id, m_vid) : D3D11_SHADER_VARIABLE_DESC(); }
-				inline D3D11_SHADER_TYPE_DESC  GetTypeDesc() { return (this->IsValid()) ? this->m_pShader->GetCBTypeDescriptor(m_id, m_vid) : D3D11_SHADER_TYPE_DESC(); }
-				
+			//	
+			//	inline D3D11_SHADER_BUFFER_DESC GetBufferDesc() { return (this->IsValid()) ? this->m_pShader->GetCBDescription(m_id) : D3D11_SHADER_BUFFER_DESC(); }
+			//	
+			//	inline D3D11_SHADER_VARIABLE_DESC GetVarDesc() { return (this->IsValid()) ? this->m_pShader->GetCBVariableDescriptor(m_id, m_vid) : D3D11_SHADER_VARIABLE_DESC(); }
+			//	inline D3D11_SHADER_TYPE_DESC  GetTypeDesc() { return (this->IsValid()) ? this->m_pShader->GetCBTypeDescriptor(m_id, m_vid) : D3D11_SHADER_TYPE_DESC(); }
+			//	
 
-				operator D3D11_SHADER_BUFFER_DESC () { this->GetBufferDesc(); }
-				
-				operator D3D11_SHADER_VARIABLE_DESC  () { this->GetVarDesc(); }
-				operator D3D11_SHADER_TYPE_DESC   () { this->GetTypeDesc(); }
-				
+			//	operator D3D11_SHADER_BUFFER_DESC () { this->GetBufferDesc(); }
+			//	
+			//	operator D3D11_SHADER_VARIABLE_DESC  () { this->GetVarDesc(); }
+			//	operator D3D11_SHADER_TYPE_DESC   () { this->GetTypeDesc(); }
+			//	
 
-				inline int IsValid() { return (m_pShader != nullptr); }
-				inline int IsSubtype() { return m_is_subtype; }
+			//	inline int IsValid() { return (m_pShader != nullptr); }
+			//	inline int IsSubtype() { return m_is_subtype; }
 
-			private:
-				Shader * m_pShader;
+			//private:
+			//	Shader * m_pShader;
 
-				int m_is_subtype;
-				size_t m_id, m_vid;
+			//	int m_is_subtype;
+			//	size_t m_id, m_vid;
 
-			};
+			//};
 
-			class ShaderResourceManager {
-			public:
-				ShaderResourceManager(Shader* shader = nullptr, size_t id = 0) : 
-					m_pShader(shader), m_id(id)
-				{}
+			//class ShaderResourceManager {
+			//public:
+			//	ShaderResourceManager(Shader* shader = nullptr, size_t id = 0) : 
+			//		m_pShader(shader), m_id(id)
+			//	{}
 
-				~ShaderResourceManager() {}
+			//	~ShaderResourceManager() {}
 
-				void Set(ID3D11ShaderResourceView* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
-				void Set(ID3D11SamplerState* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
+			//	void Set(ID3D11ShaderResourceView* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
+			//	void Set(ID3D11SamplerState* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
 
-				inline D3D11_SHADER_INPUT_BIND_DESC GetDescriptor() { if (IsValid()) m_pShader->GetBResDesc(m_id); }
+			//	inline D3D11_SHADER_INPUT_BIND_DESC GetDescriptor() { if (IsValid()) m_pShader->GetBResDesc(m_id); }
 
-				int IsValid() { return (m_pShader != nullptr); }
+			//	int IsValid() { return (m_pShader != nullptr); }
 
-			private:
+			//private:
 
-				void Set(void* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
+			//	void Set(void* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
 
-				Shader * m_pShader;
-				size_t m_id;
-			};
+			//	Shader * m_pShader;
+			//	size_t m_id;
+			//};
 	};
-
 
 	// ================================================================================================================================
 
 	typedef Ref<Shader> ShaderRef;
 	typedef Grafkit::Resource<Shader> ShaderRes;
 	typedef Ref<ShaderRes> ShaderResRef;
+
+	enum ShaderType_e {
+		SHADER_NONE = 0,
+
+		SHADER_VERTEX,
+		SHADER_PIXEL,
+		SHADER_GEOMETRY,
+		SHADER_COMPUTE,
+
+		SHADER_TYPE_COUNT
+	};
+
+	/*
+	* VertexShader
+	*/
+	__declspec(align(16)) 
+	class VertexShader : public Shader, public AlignedNew<VertexShader> {
+	public:
+		VertexShader();
+		~VertexShader();
+
+		enum ShaderType_e GetShaderType() { return SHADER_VERTEX; }
+
+	protected:
+		void ShutdownChild();
+		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+		
+		void SetSamplerPtr(ID3D11DeviceContext* device,UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+
+		void BindShader(ID3D11DeviceContext * deviceContext);
+		
+
+	private:
+		ID3D11VertexShader* m_vxShader;
+	};
+
+	/*
+	* Pixel shader
+	*/
+	__declspec(align(16))
+	class PixelShader : public Shader, public AlignedNew<PixelShader> {
+	public:
+		PixelShader();
+		~PixelShader();
+
+		enum ShaderType_e GetShaderType() { return SHADER_PIXEL; }
+
+	protected:
+		void ShutdownChild();
+		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+
+		void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+
+		void BindShader(ID3D11DeviceContext * deviceContext);
+	private:
+		ID3D11PixelShader* m_pxShader;
+	};
+
+	/*
+	* Geometry shader
+	*/
+	//__declspec(align(16))
+	//	class GeometryShader : public AlignedNew<GeometryShader> {
+	//	protected:
+	//		void ShutdownChild();
+	//		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+	//		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+	//		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+
+	//		void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+	//		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+
+	//		void BindShader(ID3D11DeviceContext * deviceContext);
+
+	//	private:
+	//		ID3D11GeometryShader* m_gmShader;
+	//};
 
 }
 
@@ -296,7 +374,7 @@ DEFINE_EXCEPTION(MissingShaderException, EX_ERROR_SHADER + 0, "Missing shader fi
 
 ///@todo ezeket at kell pakolni a shader exceptionbe majd
 DEFINE_EXCEPTION(VSCrerateException, EX_ERROR_SHADER + 1, "Could not create vertex shader")
-DEFINE_EXCEPTION(FSCrerateException, EX_ERROR_SHADER + 2, "Could not create framgent shader")
+DEFINE_EXCEPTION(PSCrerateException, EX_ERROR_SHADER + 2, "Could not create pixel shader")
 
 DEFINE_EXCEPTION(InputLayoutCreateException, EX_ERROR_SHADER + 3, "Could not create input layout")
 DEFINE_EXCEPTION(ConstantBufferCreateException, EX_ERROR_SHADER + 4, "Could not create constant buffer")

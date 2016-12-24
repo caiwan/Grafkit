@@ -17,12 +17,9 @@ using namespace FWdebugExceptions;
 
 // =============================================================================================================================
 
-Shader::Shader() : //IResource(),
-	m_pxShader(nullptr),
-	m_vxShader(nullptr),
+Shader::Shader() :
 	m_pReflector(nullptr),
-	m_layout(nullptr),
-	m_type(ST_NONE)
+	m_layout(nullptr)
 {
 }
 
@@ -32,44 +29,27 @@ Shader::~Shader()
 	this->Shutdown();
 }
 
-void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type, ID3DInclude* pInclude, D3D_SHADER_MACRO* pDefines)
+
+void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ID3DInclude* pInclude, D3D_SHADER_MACRO* pDefines)
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = nullptr;
 	ID3D10Blob* shaderBuffer = nullptr;
-
-//	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 	unsigned int numElements = 0;
 	
-	// D3D11_BUFFER_DESC matrixBufferDesc;
-
 	// input checking
-	if (!entry) throw EX(NullPointerException);
-	if (!file) throw EX(NullPointerException);
+	if (!entry) throw EX(NullPointerException);	if (!file) throw EX(NullPointerException);
 
-	this->m_type = type;
-
-
-	// Compile the vertex shader code.
-	if (type == ST_Vertex) {
-		result = D3DCompileFromFile(file, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
-	}
-	else if (type == ST_Pixel) {
-		result = D3DCompileFromFile(file, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
-	}
+	result = CompileShaderFromFile(file, pDefines, pInclude, entry, shaderBuffer, errorMessage);
 
 	if (FAILED(result))
 	{
 		// If the shader failed to compile it should have writen something to the error message.
 		if (errorMessage)
-		{
 			DispatchShaderErrorMessage(errorMessage, file, entry);
-		}
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
-		{
-			throw EX(MissingShaderException);
-		}
+			throw EX_HRESULT(MissingShaderException, result);
 	}
 
 	this->CompileShader(device, shaderBuffer);
@@ -80,7 +60,7 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, Shader
 }
 
 
-void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type, LPCSTR name, ID3DInclude* pInclude, D3D_SHADER_MACRO* pDefines)
+void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size, LPCSTR name, ID3DInclude* pInclude, D3D_SHADER_MACRO* pDefines)
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = nullptr;
@@ -90,19 +70,7 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 	if (!entry) throw EX(NullPointerException);
 	if (!source) throw EX(NullPointerException);
 
-	this->m_type = type;
-
-	// Compile the vertex shader code.
-	if (type == ST_Vertex) {
-		result = D3DCompile(source, size, nullptr, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
-	}
-	else if (type == ST_Pixel) {
-		result = D3DCompile(source, size, nullptr, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
-	}
-	else {
-		throw EX_DETAILS(MissingShaderException, "Attempting to load an unknown type of shader");
-		return;
-	}
+	result = CompileShaderFromSource(source, size, name, pDefines, pInclude, entry, shaderBuffer, errorMessage);
 
 	if (FAILED(result))
 	{
@@ -130,59 +98,33 @@ void Shader::Shutdown()
 {
 	RELEASE(this->m_pReflector);
 	RELEASE(this->m_layout);
-	RELEASE(this->m_pxShader);
-	RELEASE(this->m_vxShader);
 
 	for (size_t i = 0; i < GetParamCount(); i++) {
-
-		/*for (size_t j = 0; j < GetParamCount(i); j++) {
-			m_cBuffers[i].m_cbVars[j]
-		}*/
-
 		RELEASE(m_cBuffers[i].m_buffer);
 		delete[] m_cBuffers[i].m_cpuBuffer; m_cBuffers[i].m_cpuBuffer = nullptr;
 	}
-
-	/*for (size_t i = 0; i < GetBResCount(); i++) {
-	}*/
 
 	///@todo delete input layout elements
 	///@todo delete constant buffer variables + buffer
 	///@todo delete constant buffers
 	///@todo delete bounded resources
+
+	this->ShutdownChild();
 }
 
 
 void Shader::Render(ID3D11DeviceContext * deviceContext)
 {
-	m_pDC = deviceContext;
-	
-	/// @todo use switch-case as flow control
-	// go the duck off 
-	if (this->m_type == ST_Vertex) {
-		// duck off the layout
-		deviceContext->IASetInputLayout(m_layout);
-		deviceContext->VSSetShader(m_vxShader, nullptr, 0);
-	}
-	else if (this->m_type == ST_Pixel) {
-		deviceContext->PSSetShader(m_pxShader, nullptr, 0);
-	}
+	BindShader(deviceContext);
 
 	// duck the constant buffers around
 	if (this->GetParamCount()) 
 	{
-
 		for (size_t i = 0; i < this->GetParamCount(); i++){
 			ID3D11Buffer* buffer = this->m_cBuffers[i].m_buffer;
 			UINT slot = this->m_cBuffers[i].m_slot;
 
-			if (this->m_type == ST_Vertex) {
-				deviceContext->VSSetConstantBuffers(slot, 1, &buffer); ///@todo itt valami memoryleak van; 
-
-			}
-			else if (this->m_type == ST_Pixel) {
-				deviceContext->PSSetConstantBuffers(slot, 1, &buffer);
-			}
+			SetConstantBuffer(deviceContext, slot, 1, buffer);
 		}
 	}
 
@@ -203,26 +145,14 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 					///@todo ezzel kell meg valamit kezdeni 
 					ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
 
-					if (m_type == ST_Vertex) {
-						deviceContext->VSSetShaderResources(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &ppResV);
-					}
-					else if (m_type == ST_Pixel) {
-						deviceContext->PSSetShaderResources(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &ppResV);
-					}
+					SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
 
 				} break;
 
 				case D3D_SIT_SAMPLER:
 				{
 					ID3D11SamplerState * pSampler = (ID3D11SamplerState*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
-
-					///@todo ezzel kell meg valamit kezdeni 
-					if (m_type == ST_Vertex) {
-						deviceContext->VSSetSamplers(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &pSampler);
-					}
-					else if (m_type == ST_Pixel) {
-						deviceContext->PSSetSamplers(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &pSampler);
-					}
+					SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
 				}break;
 				
 				}
@@ -234,31 +164,10 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 	}
 }
 
-
 void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 {
-	m_pDC = device.GetDeviceContext();
-
 	LOGGER(Log::Logger().Info("- Compiling shader"));
-
-	HRESULT result = 0;
-	if (this->m_type == ST_Vertex) {
-		// Create the vertex shader from the buffer.
-		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &m_vxShader);
-		if (FAILED(result))
-		{
-			throw EX(VSCrerateException);
-		}
-	}
-	else if (this->m_type == ST_Pixel) {
-		// Create the pixel shader from the buffer.
-		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &m_pxShader);
-		if (FAILED(result))
-		{
-			throw EX(FSCrerateException);
-		}
-	}
-
+	CreateShader(device.GetDevice(), shaderBuffer);
 	LOGGER(Log::Logger().Info("- Compiling shader OK"));
 
 	this->BuildReflection(device, shaderBuffer);
@@ -266,50 +175,7 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 
 // ============================================================================================================================================
 
-Shader::ShaderParamManager Shader::GetParam(std::string name)
-{
-	CBMap_it_t it = this->m_mapCBuffers.find(name);
-	if (it != this->m_mapCBuffers.end()) {
-		return GetParam(it->second);
-	}
-	return ShaderParamManager();
-}
-
-///@todo safe get
-Shader::ShaderParamManager Shader::GetParam(size_t id)
-{
-	return ShaderParamManager(this, id);
-}
-
-Shader::ShaderParamManager Shader::GetParam(std::string name, std::string varname)
-{
-	CBMap_it_t it = this->m_mapCBuffers.find(name);
-	if (it != this->m_mapCBuffers.end()) {
-		return GetParam(it->second, varname);
-	}
-	
-	return ShaderParamManager();
-}
-
-Shader::ShaderParamManager Shader::GetParam(size_t id, std::string varname)
-{
-	cb_variableMap_it it = m_cBuffers[id].m_cbVarMap.find(varname);
-	if (it != this->m_cBuffers[id].m_cbVarMap.end()) {
-		return GetParam(id, it->second);
-	}
-
-	return ShaderParamManager();
-}
-
-///@todo safe get
-Shader::ShaderParamManager Shader::GetParam(size_t id, size_t vid)
-{
-	return ShaderParamManager(this, id, vid, 1);
-}
-
-// ============================================================================================================================================
-
-void Shader::SetParamPtr(size_t id, const void  * const pData, size_t size, size_t offset)
+void Shader::SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, const void  * const pData, size_t size, size_t offset)
 {
 	if (id < GetParamCount()) 
 	{
@@ -325,14 +191,14 @@ void Shader::SetParamPtr(size_t id, const void  * const pData, size_t size, size
 			DebugBreak();
 
 
-		CopyMemory((BYTE*)this->MapParamBuffer(id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
-		this->UnMapParamBuffer(id);
+		CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+		this->UnMapParamBuffer(deviceContext, id);
 	}
 
 }
 
 ///@todo ez egyelore nem mukodik 
-void Shader::SetParamPtr(size_t id, size_t vid, const void  * const pData, size_t size, size_t offset)
+void Shader::SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, size_t vid, const void  * const pData, size_t size, size_t offset)
 {
 	if (id < GetParamCount() && vid < GetParamCount(id))
 	{
@@ -349,22 +215,22 @@ void Shader::SetParamPtr(size_t id, size_t vid, const void  * const pData, size_
 		else
 			DebugBreak();
 
-		CopyMemory((BYTE*)this->MapParamBuffer(id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
-		this->UnMapParamBuffer(id);
+		CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+		this->UnMapParamBuffer(deviceContext, id);
 	}
 }
 
-void* Shader::MapParamBuffer(size_t id, int isDiscard)
+void* Shader::MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int isDiscard)
 {
 	//if (id < m_cBufferCount) 
 	{
 		HRESULT result = 0;
 
 		CBRecord & cbRecord = m_cBuffers[id];
-		result = m_pDC->Map(cbRecord.m_buffer, 0, 	D3D11_MAP_WRITE_DISCARD, 0, &cbRecord.m_mappedResource);
-		if (FAILED(result)) {
-			throw EX_DETAILS(ConstantBufferMapException, "Cannot map buffer to a resource");
-		}
+		result = deviceContext->Map(cbRecord.m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbRecord.m_mappedResource);
+		if (FAILED(result))
+			throw EX_HRESULT(ConstantBufferMapException, result);
+
 		return cbRecord.m_mappedResource.pData;
 	}  
 	// else 	
@@ -373,50 +239,18 @@ void* Shader::MapParamBuffer(size_t id, int isDiscard)
 
 void * Shader::GetMappedPtr(size_t id)
 {
-	// return (id < m_cBufferCount) ? m_cBuffers[id].m_mappedResource.pData : nullptr;
 	return m_cBuffers[id].m_mappedResource.pData;
 }
 
-void Shader::UnMapParamBuffer(size_t id)
+void Shader::UnMapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id)
 {
 	//if (id < m_cBufferCount)
 	{
 		CBRecord & cbRecord = m_cBuffers[id];
-		m_pDC->Unmap(cbRecord.m_buffer, 0);
+		deviceContext->Unmap(cbRecord.m_buffer, 0);
 	}
 }
 
-
-// ============================================================================================================================================
-
-Shader::ShaderResourceManager Shader::GetBRes(std::string name)
-{
-	if (!this->m_mapBResources.empty()) {
-		BResMap_it_t it = m_mapBResources.find(name);
-		if (it != this->m_mapBResources.end()) {
-			return GetBRes(it->second);
-		}
-	}
-	return ShaderResourceManager();
-}
-
-///@todo safe get
-Shader::ShaderResourceManager Shader::GetBRes(size_t id)
-{
-	return ShaderResourceManager(this, id);
-}
-
-///@todo safe get
-D3D11_SHADER_INPUT_BIND_DESC Shader::GetBResDesc(size_t id)
-{
-	return m_bResources[id].m_desc;
-}
-
-void Shader::SetBResPointer(size_t id, void * ptr)
-{
-	if (id < GetBResCount())
-		this->m_bResources[id].m_boundSource = ptr;
-}
 
 // ============================================================================================================================================
 
@@ -432,15 +266,6 @@ void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file,
 
 	compileErrors = (char*)(errorMessage->GetBufferPointer());
 	bufferSize = errorMessage->GetBufferSize();
-
-#if 0
-	fopen_s(&fp, "shader-error.txt", "w");
-
-	fputs(compileErrors, fp); fputs("\r\n", fp);
-
-	fflush(fp);
-	fclose(fp);
-#endif 
 
 	// LOGGER(LOG(ERROR) << compileErrors);
 	LOGGER(Log::Logger().Error(compileErrors));
@@ -589,16 +414,13 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		this->m_mapInputElems.push_back(elem);
 	}
 
-	if (this->m_type == ST_Vertex) {
+	// IL csak V-shaderhez kell
+	if (this->GetShaderType() == SHADER_VERTEX) {
 		result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
 
-		if (FAILED(result)) {
-			/// @todo throw exceptions 
-			DebugBreak();
-		}
-
+		if (FAILED(result))
+			throw new EX_HRESULT(InputLayoutCreateException, result);
 	}
-
 
 	// fetch output desctiptor
 	for (UINT i = 0; i < desc.OutputParameters; i++)
@@ -705,47 +527,116 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 // =============================================================================================================================
 
-void Shader::ShaderParamManager::SetF(const float v0)
+Grafkit::VertexShader::VertexShader() : Shader(),
+m_vxShader(nullptr)
 {
-	if (this->IsValid() && this->IsSubtype()) {
-		float v[1];
-		v[0] = v0;
-		SetP(v);
-	}
 }
 
-void Shader::ShaderParamManager::SetF(const float v0, const float v1)
+
+Grafkit::VertexShader::~VertexShader()
 {
-	if (this->IsValid() && this->IsSubtype()) {
-		float v[2];
-		v[0] = v0;
-		v[1] = v1;
-		SetP(v);
-	}
+	Shutdown();
 }
 
-void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2)
+
+void Grafkit::VertexShader::ShutdownChild()
 {
-	if (this->IsValid() && this->IsSubtype()) {
-		float v[3];
-		v[0] = v0;
-		v[1] = v1;
-		v[2] = v2;
-		SetP(v);
-	}
+	RELEASE(m_vxShader);
 }
 
-void Shader::ShaderParamManager::SetF(const float v0, const float v1, const float v2, const float v3)
+
+HRESULT Grafkit::VertexShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	if (this->IsValid() && this->IsSubtype()) {
-		float v[4];
-		v[0] = v0;
-		v[1] = v1;
-		v[2] = v2;
-		v[3] = v3;
-		SetP(v);
-	}
+	return D3DCompileFromFile(file, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 }
 
+
+HRESULT Grafkit::VertexShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
+{
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+}
+
+
+void Grafkit::VertexShader::CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
+{
+	HRESULT result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_vxShader);
+	if (FAILED(result))
+		throw EX_HRESULT(VSCrerateException, result);
+}
+
+
+void Grafkit::VertexShader::SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
+{
+	device->VSSetSamplers(bindPoint, bindCount, &pSampler);
+}
+
+
+void Grafkit::VertexShader::SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+{
+	deviceContext->VSSetConstantBuffers(slot, numBuffers, &buffer); 
+}
+
+
+void Grafkit::VertexShader::BindShader(ID3D11DeviceContext * deviceContext)
+{
+	deviceContext->IASetInputLayout(m_layout);
+	deviceContext->VSSetShader(m_vxShader, nullptr, 0);
+}
+
+// =============================================================================================================================
+
+Grafkit::PixelShader::PixelShader() : Shader(),
+m_pxShader(nullptr)
+{
+}
+
+Grafkit::PixelShader::~PixelShader()
+{
+	Shutdown();
+}
+
+
+void Grafkit::PixelShader::ShutdownChild()
+{
+	RELEASE(m_pxShader);
+}
+
+
+HRESULT Grafkit::PixelShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
+{
+	return D3DCompileFromFile(file, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+}
+
+
+HRESULT Grafkit::PixelShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
+{
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+}
+
+
+void Grafkit::PixelShader::CreateShader(ID3D11Device * device, ID3D10Blob * shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
+{
+	HRESULT result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_pxShader);
+	if (FAILED(result))
+		throw EX_HRESULT(PSCrerateException, result);
+}
+
+
+void Grafkit::PixelShader::SetSamplerPtr(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
+{
+	device->PSSetSamplers(bindPoint, bindCount, &pSampler);
+}
+
+
+void Grafkit::PixelShader::SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+{
+	deviceContext->VSSetConstantBuffers(slot, numBuffers, &buffer);
+}
+
+
+void Grafkit::PixelShader::BindShader(ID3D11DeviceContext * deviceContext)
+{
+	deviceContext->PSSetShader(m_pxShader, nullptr, 0);
+}
 
 // =============================================================================================================================

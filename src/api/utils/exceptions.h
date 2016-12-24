@@ -25,6 +25,7 @@ namespace FWdebug {
 		
 	public:
 		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const char* deatils=NULL);
+		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const HRESULT hresult);
 		~Exception();
 
 		inline int getErrorCode() { return this->m_code; }
@@ -56,6 +57,7 @@ namespace FWdebug {
 // wrapper for exception
 #define EX(x) x(EX_WHERE)
 #define EX_DETAILS(x, details) x(EX_WHERE, details)
+#define EX_HRESULT(x, hresult) x(EX_WHERE, hresult)
 
 # endif // temporaly takeout 
 
@@ -71,7 +73,8 @@ namespace FWdebugExceptions {
 namespace FWdebugExceptions {\
 	class _class_ : public FWdebug::Exception{\
 		public:\
-			_class_ (const char* file, const char* function, int line, const char* details=NULL) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line, details) {} \
+			_class_ (const char* file, const char* function, int line, const char* details = nullptr) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line, details) {} \
+			_class_ (const char* file, const char* function, int line, const HRESULT hresult) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line, hresult) {} \
 	};\
 }
 

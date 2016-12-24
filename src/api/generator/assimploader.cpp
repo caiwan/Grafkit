@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <stack>
@@ -11,6 +9,8 @@
 #include "assimp/material.h"
 #include "assimp/mesh.h"
 #include "assimp/matrix4x4.h"
+
+#include "stdafx.h" // az assimp sajat memoria basztatoja miatt kell lerakni ide 
 
 #include "../math/matrix.h"
 #include "../math/quaternion.h"
