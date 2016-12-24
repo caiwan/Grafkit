@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "cube.h" 
 
 static const float _triangle[]= { 

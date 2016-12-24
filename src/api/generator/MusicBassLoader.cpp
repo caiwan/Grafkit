@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "MusicBassLoader.h"
 
 #include "../core/Music.h"

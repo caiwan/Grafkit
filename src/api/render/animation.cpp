@@ -1,5 +1,6 @@
-#include "animation.h"
+#include "stdafx.h"
 
+#include "animation.h"
 
 void Grafkit::NodeAnimation::Initialize(ActorRef actor)
 {

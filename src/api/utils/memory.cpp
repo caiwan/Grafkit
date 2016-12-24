@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #define NO_NEW_OVERRIDE
 #include "memory.h"
 #undef NO_NEW_OVERRIDE

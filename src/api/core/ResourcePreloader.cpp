@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 
 #include "ResourcePreloader.h"
 #include "../utils/ResourceBuilder.h"

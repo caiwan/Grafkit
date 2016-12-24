@@ -1,7 +1,6 @@
-#include "archive.h"
-#include "../exceptions.h"
+#include "stdafx.h"
 
-#include "../logger.h"
+#include "archive.h"
 
 /**
 	ArchiveFile

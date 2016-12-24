@@ -1,4 +1,5 @@
-#include "../stdafx.h"
+#include "stdafx.h"
+
 #include "AssetFile.h"
 #include "ResourceManager.h"
 #include "dirent.h"

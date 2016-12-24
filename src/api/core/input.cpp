@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "Input.h"
 
 using namespace Grafkit;
@@ -6,6 +6,7 @@ using namespace Grafkit;
 Input::Input()
 {
 }
+
 
 Input::~Input()
 {

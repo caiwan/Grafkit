@@ -1,10 +1,10 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 
+#include <vector>
 #include <Windows.h>
 #include <tchar.h>
-#include "window.h"
-#include <vector>
 
+#include "window.h"
 
 //============================================================================================================
 // Window handler and callback

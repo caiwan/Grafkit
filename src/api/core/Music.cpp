@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "Music.h"
 
 Grafkit::Music::Music() :
@@ -7,6 +9,7 @@ Grafkit::Music::Music() :
 	m_samplePerSec(0)
 {
 }
+
 
 Grafkit::Music::~Music()
 {

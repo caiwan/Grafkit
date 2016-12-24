@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "valtracker.h"
 
 #include <cstring>

@@ -65,12 +65,6 @@
     <ClCompile Include="render\texture.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="builtin_data\c64palette.cpp">
-      <Filter>BuiltInData</Filter>
-    </ClCompile>
-    <ClCompile Include="builtin_data\cbm64font.cpp">
-      <Filter>BuiltInData</Filter>
-    </ClCompile>
     <ClCompile Include="builtin_data\cube.cpp">
       <Filter>BuiltInData</Filter>
     </ClCompile>
@@ -170,20 +164,11 @@
     <ClCompile Include="utils\persistence\persistence.cpp">
       <Filter>Source Files\utils\persistence</Filter>
     </ClCompile>
-    <ClCompile Include="utils\persistence\tlv_format.cpp">
-      <Filter>Source Files\utils\persistence</Filter>
-    </ClCompile>
     <ClCompile Include="utils\resource.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="builtin_data\c64palette.h">
-      <Filter>BuiltInData</Filter>
-    </ClInclude>
-    <ClInclude Include="builtin_data\cbm64Font.h">
-      <Filter>BuiltInData</Filter>
-    </ClInclude>
     <ClInclude Include="builtin_data\cube.h">
       <Filter>BuiltInData</Filter>
     </ClInclude>
@@ -341,9 +326,6 @@
       <Filter>Source Files\utils\persistence</Filter>
     </ClInclude>
     <ClInclude Include="utils\persistence\persistence.h">
-      <Filter>Source Files\utils\persistence</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\persistence\tlv_format.h">
       <Filter>Source Files\utils\persistence</Filter>
     </ClInclude>
   </ItemGroup>

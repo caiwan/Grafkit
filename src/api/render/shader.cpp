@@ -1,6 +1,4 @@
-#include "../stdafx.h"
-
-#include "shader.h"
+#include "stdafx.h"
 
 #include <string>
 #include <fstream>
@@ -8,6 +6,8 @@
 #include <iostream>
 
 #include <cstdio>
+
+#include "shader.h"
 
 using namespace std;
 using namespace Grafkit;
