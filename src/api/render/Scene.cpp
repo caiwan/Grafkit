@@ -180,7 +180,7 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	viewMatrices.viewMatrix = XMMatrixTranspose(m_cameraViewMatrix.Get());
 	viewMatrices.projectionMatrix = XMMatrixTranspose(m_cameraProjectionMatrix.Get());
 
-	m_vertexShader->GetParam("MatrixBuffer").SetP(&viewMatrices);
+	m_vertexShader->SetParam(render, "MatrixBuffer", &viewMatrices);
 
 	//ez itt elviekben jo kell, hogy legyen
 	m_vertexShader->Render(render);
@@ -200,7 +200,7 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 	m_currentWorldMatrix.Multiply(actor->Matrix());
 	m_currentWorldMatrix.Multiply(actor->Transform());
 	matrix worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
-	m_vertexShader->GetParam("MatrixBuffer").Get("worldMatrix").SetP(&worldMatrix);
+	m_vertexShader->SetParamValue(render, "MatrixBuffer", "worldMatrix", &worldMatrix);
 
 	if (!actor->IsHidden())
 		actor->Render(render, this);

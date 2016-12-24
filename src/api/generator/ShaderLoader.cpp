@@ -11,7 +11,7 @@ using namespace FWdebugExceptions;
 // =============================================================================================================================
 
 namespace {
-	const char *default_entry_point_names[ShaderType_e::ST_COUNT] = {
+	const char *default_entry_point_names[ShaderType_e::SHADER_TYPE_COUNT] = {
 		"main",
 		"mainVertex",
 		"mainPixel",

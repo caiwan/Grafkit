@@ -75,10 +75,13 @@ namespace Grafkit {
 		// access constant buffers and variables 
 		///@todo bounds check
 		size_t GetParamCount() { return this->m_cBuffers.size(); }
-		size_t GetParamCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
+		size_t GetParamValueCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
 
-		void SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, const void * const pData, size_t size = 0, size_t offset = 0);
-		void SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, size_t vid, const void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParam(ID3D11DeviceContext * deviceContext, std::string name, const void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParam(ID3D11DeviceContext * deviceContext, size_t id, const void * const pData, size_t size = 0, size_t offset = 0);
+
+		void SetParamValue(ID3D11DeviceContext * deviceContext, std::string name, std::string valueName, void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParamValue(ID3D11DeviceContext * deviceContext, size_t id, size_t valueid, const void * const pData, size_t size = 0, size_t offset = 0);
 
 	protected:
 		void* MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int isDiscard = 1);

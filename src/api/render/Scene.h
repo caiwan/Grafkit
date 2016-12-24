@@ -58,10 +58,10 @@ namespace Grafkit {
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
-		ShaderRef &GetFShader() { return this->m_fragmentShader; }
+		ShaderRef &GetPShader() { return this->m_fragmentShader; }
 
 		void SetVShader(ShaderRef &VS) {this->m_vertexShader = VS; }
-		void SetFShader(ShaderRef &FS) {this->m_fragmentShader = FS; }
+		void SetPShader(ShaderRef &FS) {this->m_fragmentShader = FS; }
 
 	protected:
 		ActorRef m_pScenegraph;

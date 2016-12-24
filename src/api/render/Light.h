@@ -40,7 +40,7 @@ namespace Grafkit{
 		float& GetFalloff() { return m_light.falloff; }
 
 		/// Setup the corresponding constant buffer inside the shader
-		void SetShaderCB(ShaderRef &rPShader);
+		//void SetShaderCB(ShaderRef &rPShader);
 
 		void Render(Grafkit::Renderer& deviceContext, Scene* scene);
 

@@ -99,11 +99,11 @@ void Grafkit::Material::Render(Renderer& render, ShaderRef &_shader)
 {
 	ShaderRef shader = _shader; 
 
-	shader->GetParam("material").SetP(&m_material);
+	shader->SetParam(render, "material", &m_material);
 
 	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
 		if (it->second.Valid() && it->second->Valid())
-			shader->GetBRes(it->first).Set((*it->second)->GetTextureResource());
+			shader->SetBoundedResourcePointer(it->first, (*it->second)->GetTextureResource());
 	}
 }
 

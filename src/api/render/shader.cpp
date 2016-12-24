@@ -129,7 +129,7 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 	}
 
 	// duck through the resources
-	//if (this->m_bResourceCount) 
+	if (this->GetBoundedResourceCount()) 
 	{
 		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
 			BResRecord &brRecord = this->m_bResources[i];
@@ -174,49 +174,66 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 }
 
 // ============================================================================================================================================
-
-void Shader::SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, const void  * const pData, size_t size, size_t offset)
+// set param
+void Grafkit::Shader::SetParam(ID3D11DeviceContext * deviceContext, std::string name, const void * const pData, size_t size, size_t offset)
 {
-	if (id < GetParamCount()) 
+	auto it = this->m_mapCBuffers.find(name);
+	if (it != m_mapCBuffers.end()) {
+		SetParam(deviceContext, it->second, pData, size, offset);
+	}
+}
+
+void Grafkit::Shader::SetParam(ID3D11DeviceContext * deviceContext, size_t id, const void * const pData, size_t size, size_t offset)
+{
+	if (id < GetParamCount())
 	{
 		if (size == 0) {
 			size = m_cBuffers[id].m_description.Size;
 			offset = 0;
 		}
 
-		if (size + offset <= m_cBuffers[id].m_description.Size) 
-		{
+		if (size + offset <= m_cBuffers[id].m_description.Size)
 			CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
-		} else 
-			DebugBreak();
-
-
-		CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
-		this->UnMapParamBuffer(deviceContext, id);
-	}
-
-}
-
-///@todo ez egyelore nem mukodik 
-void Shader::SetParamPtr(ID3D11DeviceContext * deviceContext, size_t id, size_t vid, const void  * const pData, size_t size, size_t offset)
-{
-	if (id < GetParamCount() && vid < GetParamCount(id))
-	{
-		offset += m_cBuffers[id].m_cbVars[vid].m_var_desc.StartOffset;
-		
-		if (size == 0) {
-			size = m_cBuffers[id].m_cbVars[vid].m_var_desc.Size;
-		}
-
-		if (size + offset <= m_cBuffers[id].m_cbVars[vid].m_var_desc.Size) 
-		{
-			CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
-		}
 		else
 			DebugBreak();
 
 		CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
 		this->UnMapParamBuffer(deviceContext, id);
+	}
+	else {
+		DebugBreak();
+	}
+}
+
+// set value inside a value 
+void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, std::string name, std::string valueName, void * const pData, size_t size, size_t offset)
+{
+	auto it = this->m_mapCBuffers.find(name);
+	if (it != m_mapCBuffers.end()) {
+		auto vit = this->m_cBuffers[it->second].m_cbVarMap.find(valueName);
+		SetParamValue(deviceContext, it->second, vit->second, pData, size, offset);
+	}
+}
+
+void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, size_t id, size_t valueid, const void * const pData, size_t size, size_t offset)
+{
+	if (id < GetParamCount() && valueid < GetParamValueCount(id))
+	{
+		offset += m_cBuffers[id].m_cbVars[valueid].m_var_desc.StartOffset;
+
+		if (size == 0)
+			size = m_cBuffers[id].m_cbVars[valueid].m_var_desc.Size;
+
+		if (size + offset <= m_cBuffers[id].m_cbVars[valueid].m_var_desc.Size)
+			CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
+		else
+			DebugBreak();
+
+		CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+		this->UnMapParamBuffer(deviceContext, id);
+	}
+	else {
+		DebugBreak();
 	}
 }
 

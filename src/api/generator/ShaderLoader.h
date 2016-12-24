@@ -20,8 +20,16 @@ namespace Grafkit {
 		virtual IResource* NewResource();
 
 	protected:
-		ShaderType_e m_type;
+		virtual ShaderRef NewShader();
 		std::string m_entrypoint;
+	};
+
+	class VertexShaderLoader {
+
+	};
+
+	class PixelShaderLoader {
+
 	};
 
 }

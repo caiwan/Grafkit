@@ -17,17 +17,18 @@ BaseLight::~BaseLight()
 {
 }
 
-void BaseLight::SetShaderCB(ShaderRef &rPShader)
-{
-	m_light.type = this->GetLightType();
-
-	//((Shader)(*rPShader))["light"] = &m_light;
-	rPShader->GetParam("light").SetP(&m_light);
-}
+//void BaseLight::SetShaderCB(ShaderRef &rPShader)
+//{
+//	m_light.type = this->GetLightType();
+//
+//	//((Shader)(*rPShader))["light"] = &m_light;
+//	rPShader->SetParam("light").SetP(&m_light);
+//}
 
 void Grafkit::BaseLight::Render(Grafkit::Renderer & deviceContext, Scene * scene)
 {
-	// pass; nothing to do here 
+	//scene->GetPShader()->
+	// TODO 
 }
 
 // ============================================================================================================

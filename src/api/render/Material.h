@@ -119,7 +119,7 @@ namespace Grafkit {
 
 		std::map<std::string, TextureResRef> m_textures;
 
-		ShaderRef m_override_fshader;
+		// ShaderRef m_override_fshader;
 
 
 	protected:
@@ -129,5 +129,4 @@ namespace Grafkit {
 	};
 
 	typedef Ref<Material> MaterialRef;
-
 }
