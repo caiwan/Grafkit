@@ -91,7 +91,7 @@ protected:
 
 			// -- load shader
 			
-			ShaderLoader *vShaderLoader = new ShaderLoader("vshader", "texture.hlsl", "TextureVertexShader", ST_Vertex);
+			ShaderLoader *vShaderLoader = new VertexShaderLoader("vshader", "texture.hlsl", "TextureVertexShader");
 			ShaderResRef vShaderRef = (ShaderRes*)(vShaderLoader->NewResource());
 			vShaderLoader->Load(this, vShaderRef);
 			
@@ -99,7 +99,7 @@ protected:
 
 			delete vShaderLoader;
 
-			ShaderLoader *pShaderLoader = new ShaderLoader("pshader", "texture.hlsl", "TexturePixelShader", ST_Pixel);
+			ShaderLoader *pShaderLoader = new PixelShaderLoader("pshader", "texture.hlsl", "TexturePixelShader");
 			ShaderResRef pShaderRef = (ShaderRes*)(pShaderLoader->NewResource());
 			pShaderLoader->Load(this, pShaderRef);
 
@@ -167,10 +167,10 @@ protected:
 				viewMatrices.viewMatrix = XMMatrixTranspose(m_camera->GetViewMatrix().Get());
 				viewMatrices.projectionMatrix = XMMatrixTranspose(m_camera->GetPerspectiveMatrix().Get());
 
-				m_vertexShader->GetParam("MatrixBuffer").SetP(&viewMatrices);
+				m_vertexShader->SetParam(render, "MatrixBuffer", &viewMatrices);
 
-				m_fragmentShader->GetBRes("diffuse").Set(m_texture->GetTextureResource());
-				m_fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+				m_fragmentShader->SetShaderResourceView("diffuse", m_texture->GetTextureResource());
+				m_fragmentShader->SetSamplerSatate("SampleType", m_textureSampler->GetSamplerState());
 
 				m_vertexShader->Render(this->render);
 				m_fragmentShader->Render(this->render);

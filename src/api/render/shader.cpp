@@ -15,6 +15,12 @@ using namespace Grafkit;
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
 
+#define PS_VERSION "ps_4_0"
+#define VS_VERSION "vs_4_0"
+
+
+// TODO http://stackoverflow.com/questions/24323281/the-pixel-shader-unit-expects-a-sampler
+
 // =============================================================================================================================
 
 Shader::Shader() :
@@ -96,20 +102,23 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 
 void Shader::Shutdown()
 {
-	RELEASE(this->m_pReflector);
-	RELEASE(this->m_layout);
+	LOGGER(Log::Logger().Info("Shader destructor"));
 
+	// this->ShutdownChild();
+
+	// RELEASE(this->m_pReflector);
+	// RELEASE(this->m_layout);
+	/*
 	for (size_t i = 0; i < GetParamCount(); i++) {
 		RELEASE(m_cBuffers[i].m_buffer);
 		delete[] m_cBuffers[i].m_cpuBuffer; m_cBuffers[i].m_cpuBuffer = nullptr;
 	}
+	*/
 
 	///@todo delete input layout elements
 	///@todo delete constant buffer variables + buffer
 	///@todo delete constant buffers
 	///@todo delete bounded resources
-
-	this->ShutdownChild();
 }
 
 
@@ -565,7 +574,6 @@ m_vxShader(nullptr)
 
 Grafkit::VertexShader::~VertexShader()
 {
-	Shutdown();
 }
 
 
@@ -577,13 +585,13 @@ void Grafkit::VertexShader::ShutdownChild()
 
 HRESULT Grafkit::VertexShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return D3DCompileFromFile(file, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return D3DCompileFromFile(file, pDefines, pInclude, entry, VS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 }
 
 
 HRESULT Grafkit::VertexShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, VS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 }
 
 
@@ -628,7 +636,6 @@ m_pxShader(nullptr)
 
 Grafkit::PixelShader::~PixelShader()
 {
-	Shutdown();
 }
 
 
@@ -640,13 +647,13 @@ void Grafkit::PixelShader::ShutdownChild()
 
 HRESULT Grafkit::PixelShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return D3DCompileFromFile(file, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return D3DCompileFromFile(file, pDefines, pInclude, entry, PS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 }
 
 
 HRESULT Grafkit::PixelShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, PS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 }
 
 

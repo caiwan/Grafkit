@@ -86,23 +86,23 @@ protected:
 			m_textureSampler->Initialize(render);
 
 			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "", ST_Vertex));
-			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "", ST_Pixel));
+			m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
+			m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
 
 			// -- precalc
 			this->DoPrecalc();
 
 			// -- model 
 			ModelRef model = new Model;
-			model->SetMaterial(new BaseMaterial(BaseMaterial::MT_flat));
-			model->GetMaterial()->AddTexture(texture, BaseMaterial::TT_diffuse);
+			model->SetMaterial(new Material(Material::MT_flat));
+			model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 
-
-			SimpleMeshGenerator generator(render, m_vertexShader);
-			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-			
-			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
+			model = new Model(new Mesh());
+			model->SetName("cube");
+			model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
+			model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
+			model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
+			model->GetMesh()->Build(m_vertexShader, render);
 
 			// -- setup scene 
 			scene = new Scene();
@@ -155,7 +155,7 @@ protected:
 			// scene->AddLightNode(lightActor);
 
 			scene->SetVShader(m_vertexShader);
-			scene->SetFShader(m_fragmentShader);
+			scene->SetPShader(m_fragmentShader);
 
 			m_cameraActor->Matrix().Identity();
 			m_cameraActor->Matrix().Translate(0,0,-10);

@@ -12,7 +12,7 @@ namespace Grafkit {
 	class ShaderLoader : public Grafkit::IResourceBuilder
 	{
 	public:
-		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type);
+		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint);
 		~ShaderLoader();
 
 		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
