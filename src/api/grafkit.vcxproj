@@ -29,7 +29,6 @@
     <ClCompile Include="core\system.cpp" />
     <ClCompile Include="core\thread_win32.cpp" />
     <ClCompile Include="core\window.cpp" />
-    <ClCompile Include="generator\assimploader.cpp" />
     <ClCompile Include="generator\FontmapLoader.cpp" />
     <ClCompile Include="generator\MusicBassLoader.cpp" />
     <ClCompile Include="generator\ShaderLoader.cpp" />
@@ -74,7 +73,6 @@
     <ClInclude Include="core\system.h" />
     <ClInclude Include="core\thread.h" />
     <ClInclude Include="core\window.h" />
-    <ClInclude Include="generator\assimploader.h" />
     <ClInclude Include="generator\FontmapLoader.h" />
     <ClInclude Include="generator\MusicBassLoader.h" />
     <ClInclude Include="generator\ShaderLoader.h" />

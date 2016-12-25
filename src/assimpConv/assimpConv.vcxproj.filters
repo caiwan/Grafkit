@@ -21,9 +21,15 @@
     <ClCompile Include="Arguments.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="assimploader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arguments.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="assimploader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
