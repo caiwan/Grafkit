@@ -9,8 +9,7 @@
 
 namespace Grafkit {
 
-	class ShaderLoader : public Grafkit::IResourceBuilder
-	{
+	class ShaderLoader : public Grafkit::IResourceBuilder{
 	public:
 		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint);
 		~ShaderLoader();
@@ -20,16 +19,32 @@ namespace Grafkit {
 		virtual IResource* NewResource();
 
 	protected:
-		virtual ShaderRef NewShader();
+		virtual ShaderRef NewShader() = 0;
+		virtual std::string DefaultEntryPointName() = 0;
 		std::string m_entrypoint;
 	};
 
-	class VertexShaderLoader {
 
+	class VertexShaderLoader : public ShaderLoader {
+	public:
+		VertexShaderLoader(std::string name, std::string sourcename, std::string entrypoint)
+			: ShaderLoader(name, sourcename, entrypoint){}
+		~VertexShaderLoader(){}
+
+	protected:
+		virtual ShaderRef NewShader() { return new VertexShader(); }
+		virtual std::string DefaultEntryPointName() { return "mainVertex"; }
 	};
 
-	class PixelShaderLoader {
 
+	class PixelShaderLoader : public ShaderLoader {
+	public:
+		PixelShaderLoader(std::string name, std::string sourcename, std::string entrypoint)
+			: ShaderLoader(name, sourcename, entrypoint) {}
+		~PixelShaderLoader(){}
+	protected:
+		virtual ShaderRef NewShader() { return new PixelShader(); }
+		virtual std::string DefaultEntryPointName() { return "mainPixel"; }
 	};
 
 }

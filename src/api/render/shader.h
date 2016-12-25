@@ -18,29 +18,19 @@
 namespace Grafkit {
 
 	class Shader;
+
 	class Vertexshader;
 	class PixelShader;
 	class GemoetryShader;
 	class ComputeShader;
 
 	// ================================================================================================================================
-	__declspec(align(16)) class Shader : virtual public Referencable
+	class Shader : virtual public Referencable
 	{
-
-	public:
-		//class ShaderParamManager;
-		//class ShaderResourceManager;
-
 	public:
 		Shader();
 		~Shader();
 
-		/**
-			@param device device context
-			@param entry entry point of vertex shader
-			@param file source file of vertex shader
-			@param type type of shader @see Grafkit::ShaderType_e
-		*/
 		void LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ID3DInclude* pInclude = nullptr, D3D_SHADER_MACRO* pDefines = nullptr);
 		void LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size, LPCSTR name, ID3DInclude* pInclude = nullptr, D3D_SHADER_MACRO* pDefines = nullptr);
 
@@ -48,8 +38,6 @@ namespace Grafkit {
 		void Render(ID3D11DeviceContext* deviceContext);
 
 		virtual enum ShaderType_e GetShaderType() = 0;
-
-		//virtual enum RA_type_e GetBucketID() { return Grafkit::IResource::RA_TYPE_Shader; }
 
 	private:
 		void CompileShader(Renderer & device, ID3D10Blob* shaderBuffer);
@@ -213,8 +201,7 @@ namespace Grafkit {
 	/*
 	* VertexShader
 	*/
-	__declspec(align(16)) 
-	class VertexShader : public Shader, public AlignedNew<VertexShader> {
+	class VertexShader : public Shader {
 	public:
 		VertexShader();
 		~VertexShader();
@@ -241,8 +228,7 @@ namespace Grafkit {
 	/*
 	* Pixel shader
 	*/
-	__declspec(align(16))
-	class PixelShader : public Shader, public AlignedNew<PixelShader> {
+	class PixelShader : public Shader {
 	public:
 		PixelShader();
 		~PixelShader();

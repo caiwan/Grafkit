@@ -10,18 +10,6 @@ using namespace FWdebugExceptions;
 
 // =============================================================================================================================
 
-namespace {
-	const char *default_entry_point_names[ShaderType_e::SHADER_TYPE_COUNT] = {
-		"main",
-		"mainVertex",
-		"mainPixel",
-		"mainCompute",
-		"mainGeometry"
-	};
-}
-
-// =============================================================================================================================
-
 typedef Resource<IAsset> IAssetRes;
 typedef Ref<IAssetRes> IAssetResRef;
 
@@ -82,13 +70,9 @@ private:
 
 // =============================================================================================================================
 
-Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type) : Grafkit::IResourceBuilder(name, sourcename),
-	m_type(type)
+Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) : Grafkit::IResourceBuilder(name, sourcename),
+m_entrypoint(entrypoint)
 {
-	if (entrypoint.empty())
-		m_entrypoint = default_entry_point_names[type];
-	else
-		m_entrypoint = entrypoint;
 }
 
 Grafkit::ShaderLoader::~ShaderLoader()
@@ -97,19 +81,21 @@ Grafkit::ShaderLoader::~ShaderLoader()
 
 void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
 {
-
+	if (m_entrypoint.empty())
+		m_entrypoint = DefaultEntryPointName();
+	
 	ShaderResRef dstSahder = dynamic_cast<ShaderRes*>(source);
 	if (dstSahder.Invalid()) {
 		return;
 	}
 	
 	Grafkit::IAssetRef asset = this->GetSourceAsset(resman);
-	ShaderRef shader = new Shader();
+	ShaderRef shader = NewShader();
 	// load from asset
 	if (asset.Valid()) {
 		// LOGGER(LOG(TRACE) << "Lading shader from resource" << m_type << m_name << "@" << m_entrypoint;);
 		ID3DInclude * pInclude= new IncludeProvider(resman);
-		shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_type, m_name.c_str(), pInclude, nullptr);
+		shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
 		delete pInclude;
 	}
 	else {
