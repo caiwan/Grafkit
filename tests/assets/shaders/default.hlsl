@@ -12,11 +12,29 @@ cbuffer MatrixBuffer
 *
 */
 
-struct Material {
-	int type;
-	float4 ambient, diffuse, specular, emission;
-	float specularLevel;
-	float shininess;
+
+// struct Light
+// {
+// 	int type;
+// 	float4 position;
+// 	float4 direction;
+
+// 	float4 ambient;
+// 	float4 diffuse;
+// 	float4 specular;
+
+// 	float ca, la, qa;
+
+// 	float angle, falloff;
+// };
+
+cbuffer material
+{
+	// struct Material
+	int material_type;
+	float4 material_ambient, material_diffuse, material_specular, material_emission;
+	float material_specularLevel;
+	float material_shininess;
 
 	int has_t_diffuse;		///< 1st map
 	int has_t_alpha;		///< alpha map
@@ -32,31 +50,11 @@ struct Material {
 	int has_t_aux3;		///< aux texture, used for pretty much everything else
 };
 
-struct Light
-{
-	int type;
-	float4 position;
-	float4 direction;
-
-	float4 ambient;
-	float4 diffuse;
-	float4 specular;
-
-	float ca, la, qa;
-
-	float angle, falloff;
-};
-
-cbuffer material
-{
-	struct Material material;
-};
-
-cbuffer light
-{
-	int is_lightOn[4];
-	struct Light lights[16];
-}
+// cbuffer light
+// {
+// 	int is_lightOn[4];
+// 	struct Light lights[16];
+// }
 
 struct VertexInputType
 {
@@ -200,16 +198,17 @@ PixelInputType mainVertex(VertexInputType input)
 
 float4 mainPixel(PixelInputType input) : SV_TARGET
 {
-	float4 color = float4(0,0,0,1);
+	float4 color = float4(1,0,0,1);
 	
+	// return color;
 
-	if (material.has_t_diffuse == 1)
+	if (has_t_diffuse == 1)
 		color = t_diffuse.Sample(SampleType, input.tex);
 	else
-		color = material.diffuse;
+		color = material_diffuse;
 
 	// phong light
-	if (material.type == 1) {
+	if (material_type == 1) {
 		float3 lp = float3(10, 10, 10);
 
 		// proto

@@ -19,7 +19,6 @@
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
-
 using namespace Grafkit;
 
 #include "builtin_data/cube.h"
@@ -73,7 +72,7 @@ protected:
 			/* Itt letrhozzuk a kamerat, hozzaadjuk a scenehez, de nem kapcsoljuk hozza a scenegraphoz. */
 
 			// -- camera
-			/* Az alap kamera origoban van, +z iranzba nez, es +y felfele irany */
+			/* Az alap kamera origoban van, +z iranyba nez, es +y felfele irany */
 			CameraRef camera = new Camera;
 
 			// -- texture
@@ -93,9 +92,9 @@ protected:
 			this->DoPrecalc();
 
 			// -- model 
-			ModelRef model = new Model;
-			model->SetMaterial(new Material(Material::MT_flat));
-			model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
+			ModelRef model = new Model();
+			// model->SetMaterial(new Material(Material::MT_flat));
+			// model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 
 			model = new Model(new Mesh());
 			model->SetName("cube");
@@ -124,7 +123,7 @@ protected:
 				{ 0, 0, -1}, /* elol */ {  0, 0, 1 }, /* hatul */
 			};
 
-			// size_t i = 5; // egyesevel itt lehet hozzaadni/elvenni
+			//size_t i = 0; // egyesevel itt lehet hozzaadni/elvenni
 			for (size_t i = 0; i < 6; i++)
 			{
 				ActorRef actor = new Actor();
@@ -182,10 +181,7 @@ protected:
 
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
-
-				// scene->GetActiveCamera()->Transform().Identity();
-				// scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
-				
+		
 				float f = abs(sin(t));
 				m_cameraActor->Transform().Identity();
 				m_cameraActor->Transform().Translate(0,0,f);

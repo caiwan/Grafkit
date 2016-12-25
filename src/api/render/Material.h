@@ -80,8 +80,6 @@ namespace Grafkit {
 
 	protected:
 		struct material_t {
-
-			// erre valamiert sikit
 			material_t() {}
 
 			union {

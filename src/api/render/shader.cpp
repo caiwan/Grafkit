@@ -1,3 +1,5 @@
+#define INITGUID 
+
 #include "stdafx.h"
 
 #include <string>
@@ -476,7 +478,6 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	}
 
 	// fetch constant buffers
-
 	for (UINT i = 0; i < desc.ConstantBuffers; i++)
 	{
 		CBRecord cbRecord; // = m_cBuffers[i];
@@ -486,29 +487,27 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		ID3D11ShaderReflectionConstantBuffer* pConstBuffer = this->m_pReflector->GetConstantBufferByIndex(i);
 		result = pConstBuffer->GetDesc(&cbRecord.m_description);
 
-		if (FAILED(result)) {
-			throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain description");
-		}
+		if (FAILED(result))
+			throw EX_HRESULT(ConstantBufferLocateException, result);
 
 		// --- create buffer
-		// ezt lehet ki kellene venni innen, nem?
 		D3D11_BUFFER_DESC bufferDesc;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC; // D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = ((cbRecord.m_description.Size/16)+1)*16; 
+		bufferDesc.ByteWidth = (ceil(cbRecord.m_description.Size/16)+1)*16; 
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		bufferDesc.MiscFlags = 0;
 		bufferDesc.StructureByteStride = 0;
 
 		result = device->CreateBuffer(&bufferDesc, nullptr, &cbRecord.m_buffer);
-		if (FAILED(result)) {
-			throw EX(ConstantBufferCreateException);
-		}
+		if (FAILED(result))
+			throw EX_HRESULT(ConstantBufferCreateException, result);
 
 		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
 		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
 
-		LOGGER(Log::Logger().Trace("--- Constant Buffer: %s [%d], Format = {%d, %d}", cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size));
+		LOGGER(Log::Logger().Trace("--- Constant Buffer: %s [%d], Format = {t: %d, s: %d}", 
+			cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size));
 
 		// build up cbuffer variables
 
@@ -519,18 +518,17 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 			// feltolt 
 			result = shader_variable->GetDesc(&cbVar.m_var_desc);
 
-			if (FAILED(result)) {
-				throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain description for a cb variable");
-			}
+			if (FAILED(result))
+				throw EX_HRESULT(ConstantBufferLocateException, result);
 
 			ID3D11ShaderReflectionType* sr_type = shader_variable->GetType();
 			result = sr_type->GetDesc(&cbVar.m_type_desc);
 
-			if (FAILED(result)) {
-				throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain shader reflection type description");
-			}
+			if (FAILED(result))
+				throw EX_HRESULT(ConstantBufferLocateException, result);
 
-			LOGGER(Log::Logger().Trace("---- Variable: %s [%d], Format = {%s, %d, %d}", cbVar.m_var_desc.Name, j, cbVar.m_type_desc.Name, cbVar.m_var_desc.Size, cbVar.m_var_desc.StartOffset));
+			LOGGER(Log::Logger().Trace("---- Variable: %s [%d], Format = {t:%s, s: %d, o: %d}", 
+				cbVar.m_var_desc.Name, j, cbVar.m_type_desc.Name, cbVar.m_var_desc.Size, cbVar.m_var_desc.StartOffset));
 
 			cbRecord.m_cbVars.push_back(cbVar);
 			cbRecord.m_cbVarMap[cbVar.m_var_desc.Name] = j;
@@ -546,16 +544,16 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		D3D11_SHADER_INPUT_BIND_DESC brDesc;
 		result = this->m_pReflector->GetResourceBindingDesc(i, &brDesc);
 
-		if (FAILED(result)) {
-			throw EX(BoundResourceLocateException);
-		}
+		if (FAILED(result))
+			throw EX_HRESULT(BoundResourceLocateException, result);
 
 		BResRecord brRecord;
 
 		brRecord.m_boundSource = nullptr;
 		brRecord.m_desc = brDesc;
 
-		LOGGER(Log::Logger().Trace("--- Bounded Resource: %s [%d], Format = {%d}", brRecord.m_desc.Name, i, brRecord.m_desc.Type));
+		LOGGER(Log::Logger().Trace("--- Bounded Resource: %s [%d], Format = {%d}", 
+brRecord.m_desc.Name, i, brRecord.m_desc.Type));
 
 		m_bResources.push_back(brRecord);
 		m_mapBResources[brDesc.Name] = i;
