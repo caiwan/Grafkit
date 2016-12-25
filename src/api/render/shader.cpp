@@ -250,19 +250,14 @@ void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, size_t 
 
 void* Shader::MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int isDiscard)
 {
-	//if (id < m_cBufferCount) 
-	{
-		HRESULT result = 0;
+	HRESULT result = 0;
 
-		CBRecord & cbRecord = m_cBuffers[id];
-		result = deviceContext->Map(cbRecord.m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbRecord.m_mappedResource);
-		if (FAILED(result))
-			throw EX_HRESULT(ConstantBufferMapException, result);
+	CBRecord & cbRecord = m_cBuffers[id];
+	result = deviceContext->Map(cbRecord.m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbRecord.m_mappedResource);
+	if (FAILED(result))
+		throw EX_HRESULT(ConstantBufferMapException, result);
 
-		return cbRecord.m_mappedResource.pData;
-	}  
-	// else 	
-	//	return nullptr;
+	return cbRecord.m_mappedResource.pData; 
 }
 
 void * Shader::GetMappedPtr(size_t id)
@@ -676,7 +671,7 @@ void Grafkit::PixelShader::SetShaderResources(ID3D11DeviceContext * deviceContex
 
 void Grafkit::PixelShader::SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
-	deviceContext->VSSetConstantBuffers(slot, numBuffers, &buffer);
+	deviceContext->PSSetConstantBuffers(slot, numBuffers, &buffer);
 }
 
 

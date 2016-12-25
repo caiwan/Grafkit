@@ -92,11 +92,10 @@ protected:
 			this->DoPrecalc();
 
 			// -- model 
-			ModelRef model = new Model();
-			// model->SetMaterial(new Material(Material::MT_flat));
-			// model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
+			ModelRef model = new Model(new Mesh());
+			model->SetMaterial(new Material(Material::MT_flat));
+			model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 
-			model = new Model(new Mesh());
 			model->SetName("cube");
 			model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
 			model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
