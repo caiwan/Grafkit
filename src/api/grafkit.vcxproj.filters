@@ -143,9 +143,6 @@
     <ClCompile Include="core\Music.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="generator\MusicFmodLoader.cpp">
-      <Filter>Source Files\generator</Filter>
-    </ClCompile>
     <ClCompile Include="core\thread_win32.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
@@ -294,9 +291,6 @@
     </ClInclude>
     <ClInclude Include="core\Music.h">
       <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="generator\MusicFmodLoader.h">
-      <Filter>Source Files\generator</Filter>
     </ClInclude>
     <ClInclude Include="core\thread.h">
       <Filter>Source Files\core</Filter>

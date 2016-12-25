@@ -32,12 +32,6 @@
     <ClCompile Include="generator\assimploader.cpp" />
     <ClCompile Include="generator\FontmapLoader.cpp" />
     <ClCompile Include="generator\MusicBassLoader.cpp" />
-    <ClCompile Include="generator\MusicFmodLoader.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="generator\ShaderLoader.cpp" />
     <ClCompile Include="generator\TextureLoader.cpp" />
     <ClCompile Include="render\Actor.cpp" />
@@ -83,12 +77,6 @@
     <ClInclude Include="generator\assimploader.h" />
     <ClInclude Include="generator\FontmapLoader.h" />
     <ClInclude Include="generator\MusicBassLoader.h" />
-    <ClInclude Include="generator\MusicFmodLoader.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="generator\ShaderLoader.h" />
     <ClInclude Include="generator\TextureLoader.h" />
     <ClInclude Include="math\matrix.h" />
