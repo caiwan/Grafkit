@@ -86,23 +86,22 @@ protected:
 		m_textureSampler->Initialize(render);
 
 		// -- load shader
-		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "", ST_Vertex));
-		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "", ST_Pixel));
+		m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
+		m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
 
 		// -- precalc
 		this->DoPrecalc();
 
 		// -- model 
-		ModelRef model = new Model;
-		model->SetMaterial(new BaseMaterial);
+		ModelRef model = new Model(new Mesh());
+		model->SetMaterial(new Material);
 		model->GetMaterial()->AddTexture(texture, "t_diffuse");
 
-
-		SimpleMeshGenerator generator(render, m_vertexShader);
-		generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-		generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-
-		generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
+		model->SetName("cube");
+		model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
+		model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
+		model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
+		model->GetMesh()->Build(m_vertexShader, render);
 
 		// -- setup scene 
 		scene = new Scene();
@@ -150,12 +149,12 @@ protected:
 		m_rootActor->AddChild(m_cameraActor);
 		m_rootActor->AddChild(modelActor);
 
-		scene->SetRootNode(m_rootActor);
+		scene->Initialize(m_rootActor);
 		scene->AddCameraNode(m_cameraActor);
 		// scene->AddLightNode(lightActor);
 
 		scene->SetVShader(m_vertexShader);
-		scene->SetFShader(m_fragmentShader);
+		scene->SetPShader(m_fragmentShader);
 
 		m_cameraActor->Matrix().Identity();
 		m_cameraActor->Matrix().Translate(0, 0, -10);
@@ -182,9 +181,6 @@ protected:
 
 			m_rootActor->Matrix().Identity();
 			m_rootActor->Matrix().RotateRPY(t, 0, 0);
-
-			// scene->GetActiveCamera()->Transform().Identity();
-			// scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
 
 			float f = abs(sin(t));
 			m_cameraActor->Transform().Identity();
