@@ -9,10 +9,6 @@
 
 #include "Arguments.hpp"
 
-#include "utils/exceptions.h"
-
-#include "assimploader.h"
-
 #include "assimp/Importer.hpp"
 #include "assimp/Exporter.hpp"
 #include "assimp/scene.h"
@@ -20,6 +16,10 @@
 #include "assimp/material.h"
 #include "assimp/mesh.h"
 #include "assimp/matrix4x4.h"
+
+#include "utils/exceptions.h"
+
+#include "assimploader.h"
 
 
 using namespace std;
@@ -62,6 +62,7 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 class Application {
 private:
 	Arguments args;
+	Grafkit::AssimpLoader * loader;
 
 public:
 	Application() {
@@ -73,11 +74,15 @@ public:
 		args.add("flip", 'p').description("Flips the camera 180 deg around one given axis.");
 		args.add("lh").description("convert to left handed").flag(true);
 		args.add("textures", 't').description("Strip path from texture filenames").flag(true);
+
+		loader = new Grafkit::AssimpLoader();
 	}
 
 	~Application() {
-
+		delete loader;
 	}
+
+public:
 
 	int run(int argc, char* argv[]) {
 		if (!args.evaluate(argc, argv)) {
@@ -93,6 +98,6 @@ public:
 /* ================================================================================================ */
 
 int main(int argc, char* argv[]) {
-	Application app();
+	Application app;
 	return app.run(argc, argv);
 }

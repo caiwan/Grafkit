@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grafkit", "src\api\grafkit.vcxproj", "{BFF1AD5F-469C-4EBE-8C53-698DAE473A13}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderEditor", "src\ShaderEditor\ShaderEditor.vcxproj", "{3E0423E5-A27E-4102-BBCC-AB720F01D7F4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "assimpConv", "src\assimpConv\assimpConv.vcxproj", "{1C844C42-6262-4984-8CAA-9139F73F4A06}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BFF1AD5F-469C-4EBE-8C53-698DAE473A13} = {BFF1AD5F-469C-4EBE-8C53-698DAE473A13}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

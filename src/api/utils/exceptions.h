@@ -1,14 +1,14 @@
 #ifndef __EXCEPTIONS_H__
 #define __EXCEPTIONS_H__
 
-//#ifdef _WIN32
-//#define WIN32_LEAN_AND_MEAN
-//#include <Windows.h>
-//#endif // _WIN32
+#include <exception>
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#endif // _WIN32
 
 #define HAVE_EXCEPTIONS
-
-#include <exception>
 
 namespace FWdebug {
 

@@ -12,19 +12,19 @@
 
 #include "stdafx.h" // az assimp sajat memoria basztatoja miatt kell lerakni ide 
 
-#include "../math/matrix.h"
-#include "../math/quaternion.h"
+#include "math/matrix.h"
+#include "math/quaternion.h"
 
-#include "../utils/resource.h"
-#include "../utils/ResourceManager.h"
+#include "utils/resource.h"
+#include "utils/ResourceManager.h"
 
-#include "../render/renderer.h"
-#include "../render/texture.h"
-#include "../render/Material.h"
-#include "../render/model.h"
-#include "../render/camera.h"
-#include "../render/light.h"
-#include "../render/animation.h"
+#include "render/renderer.h"
+#include "render/texture.h"
+#include "render/Material.h"
+#include "render/model.h"
+#include "render/camera.h"
+#include "render/light.h"
+#include "render/animation.h"
 
 #include "assimploader.h"
 
@@ -244,8 +244,8 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 // ================================================================================================================================================================
 // Head
 // ================================================================================================================================================================
-Grafkit::AssimpLoader::AssimpLoader(std::string source_name, ShaderResRef schemanticSource) : IResourceBuilder(source_name, source_name),
-m_schSrc(schemanticSource)
+
+Grafkit::AssimpLoader::AssimpLoader() : IResourceBuilder("", "")
 {
 }
 
@@ -346,11 +346,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	if (scene->HasMeshes()) 
 	{
 		LOGGER(Log::Logger().Trace("Meshes"));
-		// forras sema
-		ShaderRef inputSchema = m_schSrc->Get();
-		if (inputSchema.Invalid())
-			throw EX_DETAILS(NullPointerException, "Nincs meg a shader input sema. Rendezd ugy a loader stacket, hogy a shader elobb legyen, mint a model betolto.");
-
+		
 		for (i = 0; i<scene->mNumMeshes; i++) 
 		{
 			// -- meshes
@@ -409,7 +405,6 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 				}
 
 				model->GetMesh()->SetIndices(curr_mesh->mNumVertices, indices.size(), &indices[0]);
-				model->GetMesh()->Build(inputSchema, resman->GetDeviceContext());
 			}
 			else {
 				///@todo arra az esetre is kell valamit kitalalni, amikor nincsenek facek, csak vertexek.
