@@ -17,13 +17,29 @@
 #include "assimp/mesh.h"
 #include "assimp/matrix4x4.h"
 
+#include "render/renderer.h"
+#include "render/Scene.h"
+#include "render/camera.h"
+#include "render/model.h"
+#include "render/texture.h"
+#include "render/Material.h"
+#include "render/shader.h"
+
 #include "utils/exceptions.h"
+
+#include "utils/asset.h"
+#include "utils/AssetFactory.h"
+#include "utils/AssetFile.h"
+
+#include "utils/ResourceManager.h"
 
 #include "assimploader.h"
 
 
 using namespace std;
 using namespace ideup;
+
+using namespace Grafkit;
 
 typedef unsigned int uint;
 
@@ -59,11 +75,11 @@ inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
 
 /* ================================================================================================ */
 
-class Application {
+class Application{
 private:
 	Arguments args;
-	Grafkit::AssimpLoader * loader;
-
+	AssimpLoader * loader;
+	
 public:
 	Application() {
 		args.add("help", 'h').description("Shows this help message.").flag(true);
@@ -93,6 +109,7 @@ public:
 
 		return 0;
 	}
+
 };
 
 /* ================================================================================================ */

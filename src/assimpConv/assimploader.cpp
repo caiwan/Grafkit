@@ -3,12 +3,7 @@
 #include <stack>
 #include <vector>
 
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-#include "assimp/material.h"
-#include "assimp/mesh.h"
-#include "assimp/matrix4x4.h"
+#include "assimploader.h"
 
 #include "stdafx.h" // az assimp sajat memoria basztatoja miatt kell lerakni ide 
 
@@ -25,8 +20,6 @@
 #include "render/camera.h"
 #include "render/light.h"
 #include "render/animation.h"
-
-#include "assimploader.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -245,47 +238,41 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 // Head
 // ================================================================================================================================================================
 
-Grafkit::AssimpLoader::AssimpLoader() : IResourceBuilder("", "")
+Grafkit::AssimpLoader::AssimpLoader(void * src_data, size_t src_length)
 {
+	if (!src_data)
+		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
+
+	Assimp::Importer importer;
+	/// @todo genNormals szar. Miert?
+	this->aiscene = importer.ReadFileFromMemory(src_data, src_length,
+		// aiProcess_ConvertToLeftHanded |
+		0
+	);
+
+	if (!this->aiscene)
+		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
+
 }
+
 
 Grafkit::AssimpLoader::~AssimpLoader()
 {
-}
-
-IResource * Grafkit::AssimpLoader::NewResource()
-{
-	return new SceneRes();
 }
 
 
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * source)
+SceneRef Grafkit::AssimpLoader::Load()
 {
-	SceneResRef dstScene = dynamic_cast<SceneRes*>(source);
+	SceneRef dstScene = new Scene();
 	if (dstScene.Invalid()) {
 		/// @todo thorw exception, de szerintem nem kell 
 		return;
 	}
 
-	IAssetRef srcAsset = this->GetSourceAsset(resman);
-
-	if (!srcAsset || !srcAsset->GetData())
-		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
-
-	Assimp::Importer importer;
-	/// @todo genNormals szar. Miert?
-	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
-		// aiProcess_ConvertToLeftHanded |
-		0
-	);
-
 	SceneRef outScene = new Scene();
-
-	if (!scene)
-		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
 
 	size_t i = 0, j = 0, k = 0, l = 0;
 	resourceRepo_t resourceRepo;
@@ -296,14 +283,14 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 	// -- load materials
 
-	if (scene->HasMaterials()) {
+	if (aiscene->HasMaterials()) {
 		LOGGER(Log::Logger().Trace("Materials"));
-		for (i = 0; i<scene->mNumMaterials; i++) {
+		for (i = 0; i<aiscene->mNumMaterials; i++) {
 			aiString path, name;
 
 			/// @todo milyen material kell 
 			MaterialRef material = new Material();
-			aiMaterial *curr_mat = scene->mMaterials[i];
+			aiMaterial *curr_mat = aiscene->mMaterials[i];
 
 			///@todo nevekre szuksegunk ven-e?
 			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) {
@@ -325,7 +312,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
 					LOGGER(Log::Logger().Trace("-- texture #%s #%d", texture_load_map[k].tt, j));
-					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, resman), texture_load_map[k].tt);
+					// material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, resman), texture_load_map[k].tt);
 				}
 			}
 
@@ -343,15 +330,15 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	
 	// ----------------------------------------
 	// scene loading
-	if (scene->HasMeshes()) 
+	if (aiscene->HasMeshes()) 
 	{
 		LOGGER(Log::Logger().Trace("Meshes"));
 		
-		for (i = 0; i<scene->mNumMeshes; i++) 
+		for (i = 0; i<aiscene->mNumMeshes; i++) 
 		{
 			// -- meshes
 			ModelRef model = new Model(new Mesh());
-			aiMesh* curr_mesh = scene->mMeshes[i];
+			aiMesh* curr_mesh = aiscene->mMeshes[i];
 			
 			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
 			LOGGER(Log::Logger().Trace("- #%d %s", i, mesh_name));
@@ -423,11 +410,11 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	}
 
 	// load cameras
-	if (scene->HasCameras()) {
+	if (aiscene->HasCameras()) {
 		LOGGER(Log::Logger().Trace("Cameras"));
-		for (i = 0; i < scene->mNumCameras; i++) {
+		for (i = 0; i < aiscene->mNumCameras; i++) {
 			
-			aiCamera *curr_camera = scene->mCameras[i];
+			aiCamera *curr_camera = aiscene->mCameras[i];
 			
 			/// TODO az assimp nem kezeli kulon a perspektiv kamerat
 			CameraRef camera = new PerspectiveCamera();
@@ -455,11 +442,11 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	}
 #if 1
 	// load lights
-	if (scene->HasLights()) {
+	if (aiscene->HasLights()) {
 		LOGGER(Log::Logger().Trace("Lights"));
-		for (i = 0; i < scene->mNumLights; i++) {
+		for (i = 0; i < aiscene->mNumLights; i++) {
 			LightRef light; 
-			aiLight *curr_light = scene->mLights[i];
+			aiLight *curr_light = aiscene->mLights[i];
 
 			const char *light_name = curr_light->mName.C_Str();
 			LOGGER(Log::Logger().Trace("- #%d %s %d", i, light_name, curr_light->mType));
@@ -510,7 +497,7 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 
 	ActorRef root_node = new Actor;
 	LOGGER(Log::Logger().Trace("Building scenegraph"));
-	assimp_parseScenegraph(resourceRepo, scene->mRootNode, root_node);
+	assimp_parseScenegraph(resourceRepo, aiscene->mRootNode, root_node);
 	outScene->Initialize(root_node);
 
 	/* Workaround: 
@@ -520,9 +507,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	// root_node->Matrix().Identity();
 
 	// --- kamera helyenek kiszedese a scenegraphbol
-	if (scene->HasCameras()) {
-		for (i = 0; i < scene->mNumCameras; i++) {
-			aiCamera *curr_camera = scene->mCameras[i];
+	if (aiscene->HasCameras()) {
+		for (i = 0; i < aiscene->mNumCameras; i++) {
+			aiCamera *curr_camera = aiscene->mCameras[i];
 			std::string name = curr_camera->mName.C_Str();
 
 			auto it = resourceRepo.actors.find(name);
@@ -535,9 +522,9 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	}
 	
 	// fenyek helyenek kiszedese a scenegraphbol
-	if (scene->HasLights()) {
-		for (i = 0; i < scene->mNumLights; i++) {
-			aiLight * curr_light = scene->mLights[i];
+	if (aiscene->HasLights()) {
+		for (i = 0; i < aiscene->mNumLights; i++) {
+			aiLight * curr_light = aiscene->mLights[i];
 
 			std::string name = curr_light->mName.C_Str();
 
@@ -550,10 +537,10 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 	}
 
 	// --- Animacio kiszedese
-	if (scene->HasAnimations()) {
+	if (aiscene->HasAnimations()) {
 		LOGGER(Log::Logger().Trace("Animation"));
-		for (i = 0; i < scene->mNumAnimations; i++) {
-			aiAnimation *curr_anim = scene->mAnimations[i];
+		for (i = 0; i < aiscene->mNumAnimations; i++) {
+			aiAnimation *curr_anim = aiscene->mAnimations[i];
 			aiString name = curr_anim->mName;
 
 			LOGGER(Log::Logger().Trace("- #%d : %s", i, name.C_Str()));
@@ -597,9 +584,5 @@ void Grafkit::AssimpLoader::Load(IResourceManager * const & resman, IResource * 
 		}
 	}
 
-	// 3.
-	if (dstScene->Valid()) {
-		dstScene->Release();
-	}
-	dstScene->AssingnRef(outScene);
+	return outScene;
 }

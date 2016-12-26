@@ -1,5 +1,12 @@
 #pragma once
 
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+#include "assimp/material.h"
+#include "assimp/mesh.h"
+#include "assimp/matrix4x4.h"
+
 #include "utils/exceptions.h"
 
 #include "utils/asset.h"
@@ -12,19 +19,18 @@
 
 namespace Grafkit {
 
-	class AssimpLoader : public Grafkit::IResourceBuilder
+	class AssimpLoader
 	{
 	public:
-		/**
-		@param source_name a forras file neve
-		@param schemanticSource a forras vertex shader, amibol az input layout jon
-		*/
-		AssimpLoader();
+		AssimpLoader(void* data, size_t length);
 		~AssimpLoader();
 
-		virtual void Load(IResourceManager * const & resman, IResource * source);
+		SceneRef Load();
 
-		virtual IResource* NewResource();
+	private:
+		void* data;
+		size_t length;
+		const aiScene *aiscene;
 	};
 
 }
