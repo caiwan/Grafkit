@@ -1,8 +1,54 @@
 #include "stdafx.h"
+
+#include <algorithm>
+#include <cstdlib>
+#include <chrono>
+
 #include "resource.h"
 
 using namespace Grafkit;
+using namespace std::chrono;
 
 void IResource::_serialize(Archive& ar) {
+	ar & PERSIST_FIELD(m_id);
 	ar & PERSIST_STRING(&m_name);
+}
+
+Grafkit::IResource::IResource()
+{
+	GenerateID();
+}
+
+Grafkit::IResource::~IResource()
+{
+}
+
+// Quick and dirty crap
+// to clamp down values to create seed and random
+template <typename T, typename U> inline U crawl(T in) {
+	const int sIn = sizeof(in), sOut = sizeof(out);
+	
+	U out = 0;
+	
+	const U *pOut = &out;
+	const T *pIn = &in;
+
+	for (int i = 0; i < std::max(sIn, sOut); ++i) {
+		pOut[i % sOut] ^= pIn[i % sIn];
+	}
+
+	return out;
+}
+
+// generates a totallz random tihng
+ULONG Grafkit::IResource::GenerateID()
+{
+	srand(crawl<milliseconds, UINT>(duration_cast<milliseconds>(system_clock::now().time_since_epoch())));
+	
+	m_id = 0;
+	BYTE * const pId = (BYTE*)&m_id;
+	for (int i = 0; i < sizeof(m_id); i++) {
+		pId[i] = crawl<int, BYTE>(rand());
+	}
+	return m_id;
 }

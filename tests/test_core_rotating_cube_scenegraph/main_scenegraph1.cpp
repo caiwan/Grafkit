@@ -116,7 +116,7 @@ protected:
 			Alap right-handed koordinatarendszer szerint osszerakunk egy keresztet
 			Ezeket adjuk hozza a belso kockahoz
 			*/
-			float3 cica[] = {
+			float3 cube_translation_coords[] = {
 				{ 1, 0, 0 }, /* Jobb */ { -1, 0, 0 }, /* Bal */
 				{ 0, 1, 0 }, /* fent */ {  0,-1, 0 }, /* lent */
 				{ 0, 0, -1}, /* elol */ {  0, 0, 1 }, /* hatul */
@@ -129,7 +129,7 @@ protected:
 				actor->AddEntity(model);
 				modelActor->AddChild(actor);
 
-				float3 v = cica[i];
+				float3 v = cube_translation_coords[i];
 				v.x *= 3;
 				v.y *= 3;
 				v.z *= 3;
