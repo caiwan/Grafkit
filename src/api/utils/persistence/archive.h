@@ -6,27 +6,39 @@
 
 namespace Grafkit{ 
 
-	/*
-		A base Archive a persistent.h-ban van
-	*/
-
 	/**
 		Fileba ment/filebol tolt.
 	*/
 	class ArchiveFile: public Archive
 	{
-		private:
-			FILE * _stream;
-
 		public:
 			ArchiveFile(FILE* stream, bool isStoring = false);
 			virtual ~ArchiveFile();
 
 			virtual void write(const void *buffer, size_t length);  
 			virtual void read (void* buffer, size_t length);
+	private:
+		FILE * _stream;
 	};
 
-	// tovabbi IO stuff goez here
+	/*
+		Memoriabol tolt be. Csak olvashato.
+	*/
+	class ArchiveMemory : public Archive
+	{
+
+	public:
+		ArchiveMemory(BYTE* data, size_t length, bool isStoring = false);
+		virtual ~ArchiveMemory();
+
+		virtual void write(const void *buffer, size_t length) {}	
+		virtual void read(void* buffer, size_t length);
+
+	private:
+		BYTE* m_data;
+		size_t m_length, m_cursor;
+	};
+
 
 };
 

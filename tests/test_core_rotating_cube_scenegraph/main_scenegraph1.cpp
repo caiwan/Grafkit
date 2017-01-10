@@ -16,6 +16,8 @@
 		  
 #include "utils/ResourceManager.h"
 
+#include "generator/SceneLoader.h"
+
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
@@ -149,9 +151,13 @@ protected:
 			m_rootActor->AddChild(modelActor);
 
 			scene->Initialize(m_rootActor);
-			scene->AddCameraNode(m_cameraActor);
-			// scene->AddLightNode(lightActor);
 
+			scene->SetActiveCamera(0);
+
+			/* Export and import stuff to file, then buiild it */
+			SceneLoader::Save(scene, "hello");
+
+			// add shaders
 			scene->SetVShader(m_vertexShader);
 			scene->SetPShader(m_fragmentShader);
 

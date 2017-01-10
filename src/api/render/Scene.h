@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stack>
+#include <list>
+#include <vector>
 
 #include "../stdafx.h"
 
@@ -19,7 +21,8 @@ namespace Grafkit {
 	class Animation;
 	typedef Ref<Animation> AnimationRef;
 
-	__declspec(align(16)) class Scene : virtual public Referencable, public AlignedNew<Scene>
+	__declspec(align(16)) 
+	class Scene : virtual public Referencable, public AlignedNew<Scene>, public Persistent
 	{
 	public:
 		Scene();
@@ -34,8 +37,6 @@ namespace Grafkit {
 		ActorRef& GetRootNode() { return m_pScenegraph; }
 
 		// --- 
-		
-		void AddCameraNode(ActorRef camera);
 		void SetActiveCamera(std::string name);
 		void SetActiveCamera(size_t id = 0) { m_activeCamera = m_cameraNodes[id]; }
 		ActorRef GetActiveCamera() { return m_activeCamera; }
@@ -44,14 +45,12 @@ namespace Grafkit {
 		ActorRef GetCamera(size_t id) { return m_cameraNodes[id]; }
 		ActorRef GetCamera(std::string name);
 
-		void AddLightNode(ActorRef light);
-
 		size_t GetLightCount() { return this->m_lightNodes.size(); }
 		ActorRef GetLight(int n) { return this->m_lightNodes[n]; }
 		ActorRef GetLight(std::string name);
 
 		MaterialRef GetMaterial(std::string name);
-
+		
 		void AddAnimation(AnimationRef anim);
 		void UpdateAnimation(double t) { m_animation_time = t; }
 
@@ -63,7 +62,7 @@ namespace Grafkit {
 		void SetVShader(ShaderRef &VS) {this->m_vertexShader = VS; }
 		void SetPShader(ShaderRef &FS) {this->m_fragmentShader = FS; }
 
-	protected:
+	private:
 		ActorRef m_pScenegraph;
 
 		ActorRef m_activeCamera;
@@ -85,6 +84,7 @@ namespace Grafkit {
 		std::map<std::string, ActorRef> m_cameraMap;
 		std::map<std::string, ActorRef> m_lightMap;
 		std::map<std::string, ActorRef> m_nodeMap;
+
 		std::map<std::string, MaterialRef> m_materialMap;
 
 		Grafkit::Matrix m_cameraMatrix;
@@ -97,6 +97,11 @@ namespace Grafkit {
 
 	private:
 		Grafkit::Matrix CalcNodeTransformTree(ActorRef &actor);
+	
+	// -- persistent
+		PERSISTENT_DECL(Grafkit::Scene, 1);
+	protected:
+		virtual void serialize(Archive& ar);
 	};
 
 	typedef Ref<Scene> SceneRef;

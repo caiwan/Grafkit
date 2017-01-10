@@ -37,3 +37,24 @@ void ArchiveFile::read(void* buffer, size_t length)
 
 	fread(buffer, length, 1, this->_stream);
 }
+
+/* 
+
+*/
+
+Grafkit::ArchiveMemory::ArchiveMemory(BYTE * data, size_t length, bool isStoring) :
+	m_data(data), m_length(length)
+{
+}
+
+Grafkit::ArchiveMemory::~ArchiveMemory()
+{
+}
+
+void Grafkit::ArchiveMemory::read(void * buffer, size_t length)
+{
+	if (length + m_cursor > m_length)
+		throw EX(OutOfBoundsException);
+	memcpy_s(buffer, length, &m_data[m_cursor], m_length);
+	m_cursor += length;
+}

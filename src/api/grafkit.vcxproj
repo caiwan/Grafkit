@@ -31,6 +31,7 @@
     <ClCompile Include="core\window.cpp" />
     <ClCompile Include="generator\FontmapLoader.cpp" />
     <ClCompile Include="generator\MusicBassLoader.cpp" />
+    <ClCompile Include="generator\SceneLoader.cpp" />
     <ClCompile Include="generator\ShaderLoader.cpp" />
     <ClCompile Include="generator\TextureLoader.cpp" />
     <ClCompile Include="render\Actor.cpp" />
@@ -75,6 +76,7 @@
     <ClInclude Include="core\window.h" />
     <ClInclude Include="generator\FontmapLoader.h" />
     <ClInclude Include="generator\MusicBassLoader.h" />
+    <ClInclude Include="generator\SceneLoader.h" />
     <ClInclude Include="generator\ShaderLoader.h" />
     <ClInclude Include="generator\TextureLoader.h" />
     <ClInclude Include="math\matrix.h" />

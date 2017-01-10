@@ -4,12 +4,12 @@
 #include "Actor.h"
 #include "model.h"
 #include "camera.h"
+#include "Light.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 Grafkit::Scene::Scene():
-	// Object(),
 	m_pScenegraph(nullptr)
 {
 }
@@ -22,8 +22,6 @@ Grafkit::Scene::~Scene()
 void Grafkit::Scene::Initialize(ActorRef root)
 {
 	m_pScenegraph = root;
-	
-	/// @Todo itt lehetne cachelni a scenegraphot, jol.
 
 	std::stack<ActorRef> stack;
 	stack.push(root);
@@ -31,43 +29,45 @@ void Grafkit::Scene::Initialize(ActorRef root)
 	while (!stack.empty()) {
 		ActorRef node = stack.top(); stack.pop();
 		
-		// yield node
+		// <yield>
 		m_nodeMap[node->GetName()] = node;
 		
 		// collect material for models
 		for (auto entity = node->GetEntities().begin(); entity != node->GetEntities().end(); entity++) {
+			
 			const Model * model = dynamic_cast<Model*>((*entity).Get());
 			if (model) {
 				MaterialRef material = model->GetMaterial();
 				if (material.Valid())
 					m_materialMap[material->GetName()] = material;
 			}
-		}
 
-		// push next
+			const Light * light = dynamic_cast<Light*>((*entity).Get());
+			if (light){
+				m_lightNodes.push_back(node);
+				m_lightMap[node->GetName()] = node;
+				break; // assume if we have only one light uder a node
+			}
+
+			const Camera * camera = dynamic_cast<Camera*>((*entity).Get());;
+			if (camera) {
+				m_cameraNodes.push_back(node);
+				m_cameraMap[node->GetName()] = node;
+				break; // assume if we have only one camera uder a node
+			}
+		}
+		// </yield>
+
 		for(auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
 			stack.push(*it);
 	}
-	
-//#ifndef LIVE_RELEASE
-//	_m_init++;
-//#endif
+
 }
 
 void Grafkit::Scene::Shutdown()
 {
 	/// TODO: ... 
 
-//#ifndef LIVE_RELEASE
-//	_m_init--;
-//#endif
-}
-
-void Grafkit::Scene::AddCameraNode(ActorRef camera)
-{
-	m_cameraNodes.push_back(camera);
-	m_cameraMap[camera->GetName()] = camera;
-	SetActiveCamera();
 }
 
 void Grafkit::Scene::SetActiveCamera(std::string name)
@@ -83,12 +83,6 @@ ActorRef Grafkit::Scene::GetCamera(std::string name)
 	if (it != m_cameraMap.end())
 		return it->second;
 	return ActorRef();
-}
-
-void Grafkit::Scene::AddLightNode(ActorRef light)
-{
-	m_lightNodes.push_back(light);
-	m_lightMap[light->GetName()] = light;
 }
 
 ActorRef Grafkit::Scene::GetLight(std::string name)
@@ -243,4 +237,9 @@ Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor)
 	} while (node.Valid());
 
 	return result;
+}
+
+void Grafkit::Scene::serialize(Archive & ar)
+{
+	// a tobbit a loder vegzi majd 
 }

@@ -12,14 +12,14 @@
 ///@todo aligned new-t mindenre
 namespace Grafkit{
 
-	class BaseLight;
-	typedef Ref<BaseLight> LightRef; 
+	class Light;
+	typedef Ref<Light> LightRef; 
 
-	class BaseLight : virtual public Referencable, public Entity3D
+	class Light : virtual public Referencable, public Entity3D
 	{
 	public:
-		BaseLight();
-		~BaseLight();
+		Light();
+		~Light();
 
 		/// @todo ez csak egy QnD Hack, ki kell majd javitani a jovoben
 		float4 &GetPosition() { return m_light.position; }
@@ -76,11 +76,11 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	__declspec(align(16)) class PointLight : public BaseLight, public AlignedNew<PointLight>
-	// class PointLight : public BaseLight 
+	__declspec(align(16)) class PointLight : public Light, public AlignedNew<PointLight>
+	// class PointLight : public Light 
 	{
 	public:
-		PointLight() : BaseLight () {}
+		PointLight() : Light () {}
 		~PointLight() {}
 
 	private:
@@ -88,11 +88,11 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	__declspec(align(16)) class DirectionalLight : public BaseLight, public AlignedNew<DirectionalLight>
-	// class DirectionalLight : public BaseLight
+	__declspec(align(16)) class DirectionalLight : public Light, public AlignedNew<DirectionalLight>
+	// class DirectionalLight : public Light
 	{
 		public:
-		DirectionalLight() : BaseLight() {}
+		DirectionalLight() : Light() {}
 		~DirectionalLight() {}
 
 	private:
@@ -101,11 +101,11 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	__declspec(align(16)) class SpotLight : public BaseLight, public AlignedNew<SpotLight>
-	// class SpotLight : public BaseLight
+	__declspec(align(16)) class SpotLight : public Light, public AlignedNew<SpotLight>
+	// class SpotLight : public Light
 	{
 	public:
-		SpotLight() : BaseLight() {}
+		SpotLight() : Light() {}
 		~SpotLight() {}
 
 	private:
@@ -113,11 +113,11 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	__declspec(align(16)) class AmbientLight : public BaseLight, public AlignedNew<AmbientLight>
-	// class AmbientLight : public BaseLight
+	__declspec(align(16)) class AmbientLight : public Light, public AlignedNew<AmbientLight>
+	// class AmbientLight : public Light
 	{
 	public:
-		AmbientLight() : BaseLight() {}
+		AmbientLight() : Light() {}
 		~AmbientLight() {}
 
 	private:

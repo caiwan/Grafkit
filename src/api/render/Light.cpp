@@ -4,7 +4,7 @@
 
 using namespace Grafkit;
 
-BaseLight::BaseLight() : Entity3D()
+Light::Light() : Entity3D()
 {
 	ZeroMemory(&m_light, sizeof(m_light));
 	m_light.la = 1.0;
@@ -13,11 +13,11 @@ BaseLight::BaseLight() : Entity3D()
 	ZeroMemory(&m_direction, sizeof(m_direction));
 }
 
-BaseLight::~BaseLight()
+Light::~Light()
 {
 }
 
-//void BaseLight::SetShaderCB(ShaderRef &rPShader)
+//void Light::SetShaderCB(ShaderRef &rPShader)
 //{
 //	m_light.type = this->GetLightType();
 //
@@ -25,7 +25,7 @@ BaseLight::~BaseLight()
 //	rPShader->SetParam("light").SetP(&m_light);
 //}
 
-void Grafkit::BaseLight::Render(Grafkit::Renderer & deviceContext, Scene * scene)
+void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, Scene * scene)
 {
 	//scene->GetPShader()->
 	// TODO 

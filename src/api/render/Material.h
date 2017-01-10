@@ -14,7 +14,8 @@
 #include "shader.h"
 
 namespace Grafkit {
-	__declspec(align(16)) class Material : public Grafkit::IResource, public AlignedNew<Material>, public Persistent
+	__declspec(align(16)) 
+	class Material : public Grafkit::IResource, public AlignedNew<Material>, public Persistent
 	{
 	public:
 		enum material_type_e {

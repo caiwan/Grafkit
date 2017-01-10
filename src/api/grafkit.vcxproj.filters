@@ -161,6 +161,9 @@
     <ClCompile Include="utils\resource.cpp">
       <Filter>Source Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="generator\SceneLoader.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\cube.h">
@@ -315,6 +318,9 @@
     </ClInclude>
     <ClInclude Include="utils\persistence\persistence.h">
       <Filter>Source Files\utils\persistence</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\SceneLoader.h">
+      <Filter>Source Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
