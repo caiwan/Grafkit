@@ -181,6 +181,7 @@
     <ClCompile Include="test_dynamics.cpp" />
     <ClCompile Include="test_exception.cpp" />
     <ClCompile Include="test_persistence.cpp" />
+    <ClCompile Include="test_persistence_internal_classes.cpp" />
     <ClCompile Include="test_resources.cpp" />
     <ClCompile Include="test_struct_pack.cpp" />
   </ItemGroup>

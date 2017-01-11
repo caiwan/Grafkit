@@ -44,6 +44,9 @@
     <ClCompile Include="testClass_persistence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test_persistence_internal_classes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestArchiver.h">

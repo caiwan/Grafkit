@@ -50,7 +50,8 @@ namespace Grafkit {
 	/**
 	An actor node - ez a scenegraph es a nodeja
 	*/
-	__declspec(align(16)) class Actor : public Grafkit::IResource, public AlignedNew<Actor>
+	__declspec(align(16)) 
+	class Actor : public AlignedNew<Actor>, public Grafkit::IResource, public Persistent
 	{
 	friend class Scene;
 	public:
@@ -100,7 +101,7 @@ namespace Grafkit {
 		//ActorEvents* m_events;
 
 		Grafkit::Matrix m_viewMatrix;			///< Node transyformacioja
-		Grafkit::Matrix m_transformMatrix;		///< Kulon transyformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
+		Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
 
 		int m_is_nodeHidden;
 		int m_is_childrenHidden;
@@ -108,6 +109,10 @@ namespace Grafkit {
 		Ref<Actor> m_pParent;
 		std::vector<Ref<Actor>> m_pChildren;
 		std::vector<Ref<Entity3D>> m_pEntities;
+
+	protected:
+		virtual void serialize(Archive& ar);
+		PERSISTENT_DECL(Grafkit::Actor, 1);
 	};
 
 }

@@ -19,8 +19,6 @@ namespace Grafkit{
 	{
 		friend class PersistObject;
 		public:
-			virtual ~Persistent() {}
-			
 			static Persistent* load(Archive& ar);
 			void store(Archive& ar);
 
@@ -28,15 +26,24 @@ namespace Grafkit{
 			virtual void serialize(Archive& ar) = 0;
 
 			///@todo use typeid(T).name() instead, and do the lookup by that;
-			virtual const char* getClassName() const = 0;
+			virtual std::string getClassName() const = 0;
 			virtual int version() const { return 0; }
 	};
 
 	class PersistElem {
 		friend class Archive;
+
+	public:
+		PersistElem() {
+		}
+
+		virtual ~PersistElem() {
+		}
+
 	protected:
 		virtual void load(Archive &ar) = 0;
 		virtual void store(Archive & ar) = 0;
+
 	};
 
 	class Archive
@@ -80,9 +87,7 @@ namespace Grafkit{
 			void setDirection(bool isStoring) { _isStoring = isStoring; }
 
 		private: 
-			int _isStoring; // fix'd
-			short _major;
-			short _minor;
+			int _isStoring;
 	};
 
 	/** */
@@ -93,9 +98,6 @@ namespace Grafkit{
 
 	public:
 		PersistField(const char* name, T& t) : m_pT(t){
-		}
-
-		~PersistField() {
 		}
 
 	protected:
@@ -124,8 +126,6 @@ namespace Grafkit{
 		{
 		}
 
-		~PersistVector() {
-		}
 
 	protected:
 		virtual void load(Archive &ar) {
@@ -169,7 +169,7 @@ namespace Grafkit{
 	class PersistObject : public PersistElem {
 	
 	private:
-		Persistent **m_pObject;
+		Persistent ** m_pObject;
 	
 	public:
 		PersistObject(const char* name, Persistent** pObject) : m_pObject(pObject){}
@@ -183,10 +183,15 @@ namespace Grafkit{
 				*m_pObject = Persistent::load(ar);
 		}
 		virtual void store(Archive & ar){
-			unsigned char isNull = (*m_pObject) == nullptr;
+			Persistent * pobj = dynamic_cast<Persistent*>(*m_pObject);
+			if (*m_pObject != nullptr && pobj == nullptr)
+				DebugBreak();
+			unsigned char isNull = pobj == nullptr;
 			ar & (new PersistField<unsigned char>("null", isNull));
-			if (!isNull)
-				(*m_pObject)->store(ar);
+			if (!isNull) {
+				pobj->store(ar);
+			}
+				
 		}
 	};
 
@@ -199,7 +204,7 @@ namespace Grafkit{
 public: \
 	CLONEABLE_FACTORY_DECL(className)\
 public:\
-	virtual const char* getClassName() const\
+	virtual std::string getClassName() const\
 	{ \
 		return #className; \
 	} \

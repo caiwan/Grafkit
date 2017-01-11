@@ -65,8 +65,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 
 	ArchiveFile ar(fp, true);
 
-	// ... 
-	scene->store(ar);
+	ar & PERSIST_OBJECT(scene);
 
 	// collect data
 	ActorRef scenegraph = scene->GetRootNode();
@@ -97,7 +96,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 			actors.push_back(actor); 
 			actor_map[actor] = i;
 
-			for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().begin(); ++entity_it) {
+			for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().end(); ++entity_it) {
 				Ref<Entity3D> entity = (*entity_it).Get();
 				if (entity.Valid() && entity_set.find(entity) == entity_set.end()) {
 					entity_set.insert(entity);
@@ -139,7 +138,8 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	size_t materialCount = materials.size();
 	ar & PERSIST_FIELD(materialCount);
 	for (size_t i = 0; i < materialCount; ++i) {
-		ar & PERSIST_OBJECT(materials[i]);
+		Material *& material = materials[i];
+		ar & PERSIST_OBJECT(material);
 	}
 
 	// 2. entity

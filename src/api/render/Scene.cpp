@@ -9,6 +9,9 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+
+PERSISTENT_IMPL(Grafkit::Scene);
+
 Grafkit::Scene::Scene():
 	m_pScenegraph(nullptr)
 {

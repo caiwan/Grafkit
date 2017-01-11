@@ -21,14 +21,16 @@ Grafkit::Entity3D::~Entity3D()
 
 // =================================================================
 
-Grafkit::Actor::Actor() : 
+PERSISTENT_IMPL(Grafkit::Actor)
+
+Grafkit::Actor::Actor() : Persistent(),
 	m_viewMatrix(), m_transformMatrix(),
 	m_is_childrenHidden(0),
 	m_is_nodeHidden(0)
 {
 }
 
-Grafkit::Actor::Actor(Ref<Entity3D> entity) : 
+Grafkit::Actor::Actor(Ref<Entity3D> entity) : Persistent(),
 	m_viewMatrix(), m_transformMatrix(),
 	m_is_childrenHidden(0),
 	m_is_nodeHidden(0)
@@ -51,5 +53,10 @@ void Grafkit::Actor::AddChild(Actor* child)
 {
 	m_pChildren.push_back(child);
 	child->m_pParent = this;
+}
+
+void Grafkit::Actor::serialize(Archive & ar)
+{
+	IResource::_serialize(ar);
 }
 

@@ -1,4 +1,3 @@
-#define USE_STD_ARRAY
 #include <vector>
 
 #include "stdafx.h"
@@ -16,7 +15,7 @@ using namespace std;
 
 void Persistent::store(Archive& ar)
 {
-	string className(this->getClassName());
+	string className = this->getClassName();
 	int ver = this->version();
 
 	Log::Logger().Info("Storing object %s %d", className.c_str(), ver);

@@ -123,7 +123,7 @@ namespace Grafkit {
 
 	protected:
 		void serialize(Archive& ar);
-		PERSISTENT_DECL(Grafkit::Material, 1)
+		PERSISTENT_DECL(Grafkit::Material, 1);
 
 	};
 

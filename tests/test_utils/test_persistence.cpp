@@ -293,7 +293,7 @@ TEST(Persistence, given_Object_when_Persist_then_Load) {
 
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_test);
-	ASSERT_STREQ(object->getClassName(), object_test->getClassName());
+	ASSERT_STREQ(object->getClassName().c_str(), object_test->getClassName().c_str());
 
 	delete object;
 }
@@ -317,7 +317,7 @@ TEST(Persistence, given_Object_when_PersistRefernce_then_Load) {
 
 	ASSERT_TRUE(object_test.Valid());
 	ASSERT_TRUE(object_test != object);
-	ASSERT_STREQ(object->getClassName(), object_test->getClassName());
+	ASSERT_STREQ(object->getClassName().c_str(), object_test->getClassName().c_str());
 }
 
 TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
@@ -341,7 +341,7 @@ TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
 
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_original);
-	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
+	ASSERT_STREQ(object->getClassName().c_str(), object_original->getClassName().c_str());
 
 	delete object;
 }
@@ -368,7 +368,7 @@ TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
 
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_original);
-	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
+	ASSERT_STREQ(object->getClassName().c_str(), object_original->getClassName().c_str());
 	ASSERT_TRUE((*object) == (*object_original));
 }
 
@@ -394,7 +394,7 @@ TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
 
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_original);
-	ASSERT_STREQ(object->getClassName(), object_original->getClassName());
+	ASSERT_STREQ(object->getClassName().c_str(), object_original->getClassName().c_str());
 	ASSERT_TRUE((*object) == (*object_original));
 }
 

@@ -99,9 +99,9 @@ namespace Grafkit {
 		Grafkit::Matrix CalcNodeTransformTree(ActorRef &actor);
 	
 	// -- persistent
-		PERSISTENT_DECL(Grafkit::Scene, 1);
 	protected:
 		virtual void serialize(Archive& ar);
+		PERSISTENT_DECL(Grafkit::Scene, 1);
 	};
 
 	typedef Ref<Scene> SceneRef;
