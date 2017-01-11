@@ -44,7 +44,6 @@ Persistent* Persistent::load(Archive& ar)
 #endif
 		throw EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
 	}
-	//auto_ptr<Clonable> delitor(clone);
 
 	Persistent * obj = dynamic_cast<Persistent *>(clone);
 	if (obj == NULL) {
@@ -60,7 +59,6 @@ Persistent* Persistent::load(Archive& ar)
 	}
 
 	obj->serialize(ar);
-	//delitor.release();
 
 	return obj;
 }

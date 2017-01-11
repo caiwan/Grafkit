@@ -182,6 +182,7 @@ namespace Grafkit{
 			else
 				*m_pObject = Persistent::load(ar);
 		}
+
 		virtual void store(Archive & ar){
 			Persistent * pobj = dynamic_cast<Persistent*>(*m_pObject);
 			if (*m_pObject != nullptr && pobj == nullptr)
