@@ -15,15 +15,15 @@ public:
 	TestArchiver(const void* in_data, size_t size);
 	~TestArchiver();
 
-	virtual void write(const void* buffer, size_t length);
-	virtual void read(void* buffer, size_t length);
+	virtual void Write(const void* buffer, size_t length);
+	virtual void Read(void* buffer, size_t length);
 
-	unsigned char*& getBuffer() { return this->data; }
-	size_t getSize() { return this->size; }
-	size_t getCrsr() { return this->crsr; }
+	unsigned char*& GetBuffer() { return this->data; }
+	size_t GetSize() { return this->size; }
+	size_t GetCrsr() { return this->crsr; }
 
-	void resetCrsr() { this->crsr = 0; }
+	void ResetCrsr() { this->crsr = 0; }
 
-	void hexdump();
+	void Hexdump();
 };
 

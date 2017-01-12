@@ -26,13 +26,13 @@ TEST(Persistence, given_Field_when_Persist_then_Load) {
 	TestArchiver archive(6, true);
 	
 	int test = 0xfacababa;
-	archive & new PersistField<decltype(test)>("test", test);
+	archive.PersistField<decltype(test)>(test);
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	int test_read = 0;
-	archive & new PersistField<decltype(test)>("test", test_read);
+	archive.PersistField<decltype(test)>(test);
 
 	ASSERT_EQ(test, test_read);
 }
@@ -43,13 +43,13 @@ TEST(Persistence, given_Field_when_PersistWithMacro_then_Load) {
 
 	int test = 0xfacababa;
 	
-	archive & PERSIST_FIELD(test);
+	PERSIST_FIELD(archive, test);
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	int test_orig = test;
-	archive & PERSIST_FIELD(test);
+	PERSIST_FIELD(archive, test);
 
 	ASSERT_EQ(test_orig, test);
 }
@@ -68,22 +68,22 @@ TEST(Persistence, given_FieldFloat234_when_PersistWithMacro_then_Load) {
 	f4.x = 1.0; f4.y = 2.16; f4.z = 3.14159; f4.w = 4.0;
 
 	//when
-	archive & PERSIST_FIELD(f2);
-	archive & PERSIST_FIELD(f3);
-	archive & PERSIST_FIELD(f4);
+	PERSIST_FIELD(archive, f2);
+	PERSIST_FIELD(archive, f3);
+	PERSIST_FIELD(archive, f4);
 
 
 	//then
-	archive.setDirection(false);
-	archive.resetCrsr();
+	archive.SetDirection(false);
+	archive.ResetCrsr();
 
 	float2 ft2 = f2;
 	float3 ft3 = f3;
 	float4 ft4 = f4;
 	
-	archive & PERSIST_FIELD(f2);
-	archive & PERSIST_FIELD(f3);
-	archive & PERSIST_FIELD(f4);
+	PERSIST_FIELD(archive, f2);
+	PERSIST_FIELD(archive, f3);
+	PERSIST_FIELD(archive, f4);
 
 	ASSERT_LT(abs(f2.x - ft2.x), 000001);
 	ASSERT_LT(abs(f2.y - ft2.y), 000001);
@@ -107,14 +107,14 @@ TEST(Persistence, given_FieldQuaternion_when_PersistWithMacro_then_Load) {
 	Quaternion q = f4;
 	
 	//when
-	archive & PERSIST_FIELD(q);
+	PERSIST_FIELD(archive, q);
 	
 	//then
-	archive.setDirection(false);
-	archive.resetCrsr();
+	archive.SetDirection(false);
+	archive.ResetCrsr();
 
 	Quaternion q2 = q;
-	archive & PERSIST_FIELD(q);
+	PERSIST_FIELD(archive, q);
 	float4 ft4 = q2;
 
 	ASSERT_LT(abs(f4.x - ft4.x), 000001);
@@ -136,15 +136,15 @@ TEST(Persistence, given_FieldMatrix_when_PersistWithMacro_then_Load) {
 	);
 
 	//when
-	archive & PERSIST_FIELD(m);
+	PERSIST_FIELD(archive, m);
 
 	//then
-	archive.setDirection(false);
-	archive.resetCrsr();
+	archive.SetDirection(false);
+	archive.ResetCrsr();
 
 	Matrix m2 = m;
 
-	archive & PERSIST_FIELD(m);
+	PERSIST_FIELD(archive, m);
 
 	for (size_t row = 0; row < 4; row++) {
 		for (size_t col = 0; col < 4; col++) {
@@ -164,14 +164,14 @@ TEST(Persistence, given_Vector_when_Persist_then_Load) {
 		test[i] = rand();
 	}
 
-	archive & new PersistVector<std::remove_pointer<decltype(test)>::type>("test", test, len);
+	archive.PersistVector<std::remove_pointer<decltype(test)>::type>(test, len);
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	int *test_read = nullptr;
 	size_t len_read = 0;
-	archive & new PersistVector<std::remove_pointer<decltype(test)>::type>("test", test_read, len_read);
+	archive.PersistVector<std::remove_pointer<decltype(test_read)>::type>(test_read, len);
 
 	ASSERT_EQ(len, len_read);
 	for (size_t i=0; i<len; i++)
@@ -193,15 +193,15 @@ TEST(Persistence, given_Vector_when_PersistWithMacro_then_Load) {
 		test[i] = rand();
 	}
 
-	archive & PERSIST_VECTOR(test, len);
+	PERSIST_VECTOR(archive, test, len);
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	size_t len_orig = len;
 	int *test_orig = test;
 
-	archive & PERSIST_VECTOR(test, len);
+	PERSIST_VECTOR(archive, test, len);
 
 	ASSERT_FALSE(nullptr == test);
 
@@ -219,14 +219,14 @@ TEST(Persistence, given_String_when_Persist_then_Load) {
 
 	TestArchiver archive(256, true);
 
-	archive & new PersistString("test", &szTest);
+	archive.PersistString(szTest);
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	const char * szRead = nullptr;
 
-	archive & new PersistString("test", &szRead);
+	archive.PersistString(szRead);
 
 	ASSERT_FALSE(nullptr == szRead);
 	ASSERT_STREQ(szTest, szRead);
@@ -239,14 +239,14 @@ TEST(Persistence, given_STDString_when_Persist_then_Load) {
 
 	TestArchiver archive(256, true);
 
-	archive & new PersistString("test", &test);
+	archive.PersistString(test);
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	std::string read;
 
-	archive & new PersistString("test", &read);
+	archive.PersistString(read);
 
 	ASSERT_FALSE(read.empty());
 	ASSERT_STREQ(test.c_str(), read.c_str());
@@ -258,14 +258,14 @@ TEST(Persistence, given_StdString_when_Persist_then_LoadToConstChar) {
 
 	TestArchiver archive(256, true);
 
-	archive & new PersistString("test", &test);
+	archive.PersistString(test);
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	const char * szRead = nullptr;
 
-	archive & new PersistString("test", &szRead);
+	archive.PersistString(szRead);
 
 	ASSERT_FALSE(nullptr == szRead);
 	ASSERT_EQ(nTest, strlen(szRead));
@@ -281,15 +281,15 @@ TEST(Persistence, given_Object_when_Persist_then_Load) {
 	EmptyClass *object = new EmptyClass();
 	
 	//when
-	archive & new PersistObject("test", (Persistent**)&object);
+	archive.PersistObject((Persistent**)&object);
 
 	//then
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	EmptyClass *object_test = nullptr;
 
-	archive & new PersistObject("test", (Persistent**)&object_test);
+	archive.PersistObject(object_test);
 
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_test);
@@ -305,15 +305,15 @@ TEST(Persistence, given_Object_when_PersistRefernce_then_Load) {
 	Ref<EmptyClass> object = new EmptyClass();
 
 	//when
-	archive & new PersistObject("test", (Persistent**)&object);
+	archive.PersistObject(object);
 
 	//then
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	Ref<EmptyClass> object_test = nullptr;
 
-	archive & new PersistObject("test", (Persistent**)&object_test);
+	archive.PersistObject(object_test);
 
 	ASSERT_TRUE(object_test.Valid());
 	ASSERT_TRUE(object_test != object);
@@ -330,8 +330,8 @@ TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
 	archive & PERSIST_OBJECT(object);
 
 	//then
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	EmptyClass *object_original = object;
 
@@ -359,8 +359,8 @@ TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
 	// then
 	FieldClass *object_original = object;
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	object = nullptr;
 	archive & PERSIST_OBJECT(object);
@@ -380,16 +380,16 @@ TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
 	object->buildup(0xfacababa, 2.16, 0x012345678, 3.141592);
 
 	// when
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object);
 
 	// then
 	NestedClass *object_original = object;
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	object = nullptr;
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object);
 
 
 	ASSERT_TRUE(object != nullptr);
@@ -405,16 +405,16 @@ TEST(Persistence, given_NullPointer_when_Persist_then_Load) {
 	NestedClass *object = nullptr;
 
 	// when
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object);
 
 	// then
 	NestedClass *object_original = object;
 
-	archive.resetCrsr();
-	archive.setDirection(false);
+	archive.ResetCrsr();
+	archive.SetDirection(false);
 
 	object = nullptr;
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object);
 
 
 	ASSERT_TRUE(object == nullptr);

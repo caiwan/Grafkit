@@ -27,10 +27,10 @@ TestArchiver::TestArchiver(const void * in_data, size_t in_size): Archive(false)
 TestArchiver::~TestArchiver()
 {
 	if (!no_delete)
-		delete[]this->data;
+		delete[] this->data;
 }
 
-void TestArchiver::write(const void* buffer, size_t length)
+void TestArchiver::Write(const void* buffer, size_t length)
 {
 	if (this->crsr + length >= this->size) throw new EX(OutOfBoundsException);
 	unsigned char *dst = &this->data[this->crsr];
@@ -42,7 +42,7 @@ void TestArchiver::write(const void* buffer, size_t length)
 	this->crsr += length;
 }
 
-void TestArchiver::read(void* buffer, size_t length)
+void TestArchiver::Read(void* buffer, size_t length)
 {
 	if (this->crsr + length >= this->size) throw new EX(OutOfBoundsException);
 	unsigned char *src = &this->data[this->crsr];
@@ -54,7 +54,7 @@ void TestArchiver::read(void* buffer, size_t length)
 	this->crsr += length;
 }
 
-void TestArchiver::hexdump()
+void TestArchiver::Hexdump()
 {
 	printf_s("Dump data:\n");
 	for (size_t i = 0; i < this->size; ++i) {

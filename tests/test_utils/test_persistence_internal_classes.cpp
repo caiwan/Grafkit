@@ -27,13 +27,13 @@ using namespace ArchivePersistent;
 		TestArchiver archive(16 * 4096, true);\
 \
 		Ref<CLASS> object = new CLASS();\
-		archive & PERSIST_OBJECT(object);\
+		PERSIST_OBJECT(archive, object);\
 \
-		archive.resetCrsr();\
+		archive.ResetCrsr();\
 		archive.setDirection(false);\
 \
 		Ref<CLASS> object_read;\
-		archive & PERSIST_OBJECT(object_read);\
+		PERSIST_OBJECT(archive, object_read);\
 \
 		ASSERT_TRUE(object_read.Valid());\
 		ASSERT_TRUE(object.Get() != object_read.Get());\

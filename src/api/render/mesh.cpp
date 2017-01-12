@@ -13,21 +13,21 @@ PERSISTENT_IMPL(Grafkit::Mesh);
 
 void Grafkit::Mesh::_serialize(Archive & ar)
 {
-	ar & PERSIST_FIELD(m_vertexCount);
-	ar & PERSIST_VECTOR(m_indices, m_indexCount);
+	PERSIST_FIELD(ar, m_vertexCount);
+	PERSIST_VECTOR(ar, m_indices, m_indexCount);
 
 	unsigned int ptr_count = this->m_vertexPointers.size();
 
-	ar & PERSIST_FIELD(ptr_count);
+	PERSIST_FIELD(ar, ptr_count);
 
 	// store pointer table
-	if (ar.isStoring()) {
+	if (ar.IsStoring()) {
 		for (auto it = m_vertexPointers.begin(); it != m_vertexPointers.end(); ++it) {
 			const UCHAR* ptr = (UCHAR*)it->data;
 			size_t size = it->length;
 			std::string name = it->name.c_str();
-			ar & PERSIST_STRING(&name);
-			ar & PERSIST_VECTOR(ptr, size);
+			PERSIST_STRING(ar, name);
+			PERSIST_VECTOR(ar, ptr, size);
 		}
 	}
 	// load pointer table
@@ -36,8 +36,8 @@ void Grafkit::Mesh::_serialize(Archive & ar)
 			UCHAR* ptr = nullptr;
 			size_t size = 0; 
 			std::string name;
-			ar & PERSIST_STRING(&name);
-			ar & PERSIST_VECTOR(ptr, size);
+			PERSIST_STRING(ar, name);
+			PERSIST_VECTOR(ar, ptr, size);
 			
 			this->AddPointer(name, size, ptr);
 			delete[] ptr;	///TODO: ez itt felesleges, eleg lenne egyszer torolni csak

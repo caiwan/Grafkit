@@ -20,8 +20,8 @@ void Persistent::store(Archive& ar)
 
 	Log::Logger().Info("Storing object %s %d", className.c_str(), ver);
 
-	ar & PERSIST_STRING(&className);
-	ar & PERSIST_FIELD(ver);
+	PERSIST_STRING(ar, className);
+	PERSIST_FIELD(ar, ver);
 
 	this->serialize(ar);
 }
@@ -33,7 +33,7 @@ void Persistent::store(Archive& ar)
 Persistent* Persistent::load(Archive& ar)
 {
 	string className;
-	ar & PERSIST_STRING(&className);
+	PERSIST_STRING(ar, className);
 
 	Log::Logger().Info("Loading object %s %d", className.c_str());
 
@@ -51,7 +51,7 @@ Persistent* Persistent::load(Archive& ar)
 	}
 
 	int ver = -1;
-	ar & PERSIST_FIELD(ver);
+	PERSIST_FIELD(ar, ver);
 
 	//
 	if (ver != obj->version()) {
@@ -67,8 +67,8 @@ Persistent* Persistent::load(Archive& ar)
 	Archive
 */
 
-Archive::Archive(int isStoring) :
-	_isStoring(isStoring)
+Archive::Archive(int IsStoring) :
+	m_isStoring(IsStoring)
 {
 }
 
@@ -77,48 +77,60 @@ Archive::~Archive()
 
 }
 
-size_t Grafkit::Archive::writeString(const char * input)
+size_t Grafkit::Archive::WriteString(const char * input)
 {
 	unsigned int slen = strlen(input);
-	this->write(&slen, sizeof(slen));
-	this->write(input, slen + 1);
+	this->Write(&slen, sizeof(slen));
+	this->Write(input, slen + 1);
 	return slen;
 }
 
-size_t Grafkit::Archive::readString(char*& output)
+size_t Grafkit::Archive::ReadString(char*& output)
 {
 	unsigned int slen = 0;
-	this->read(&slen, sizeof(slen));
+	this->Read(&slen, sizeof(slen));
 	output = new char[slen + 1];
-	this->read(output, slen + 1);
+	this->Read(output, slen + 1);
 	return slen;
 }
 
-/**
-	Persistent helpers
-*/
-
-void Grafkit::PersistString::store(Archive & ar)
+void Grafkit::Archive::PersistString(const char *& str)
 {
-	const char *out = nullptr;
-	if (m_pString) {
-		out = m_pString->c_str();
+	if (m_isStoring) {
+		WriteString(str);
 	}
 	else {
-		out = *m_pszString;
+		char *in = nullptr;
+		ReadString(in);
+		str = in;
 	}
-	ar.writeString(out);
 }
 
-void Grafkit::PersistString::load(Archive & ar)
+void Grafkit::Archive::PersistString(std::string &str)
 {
-	char *in = nullptr;
-	ar.readString(in);
-	if (m_pString) {
-		m_pString->clear();
-		m_pString->assign(in);
+	if (m_isStoring) {
+		WriteString(str.c_str());
 	}
 	else {
-		*m_pszString = in;
+		char *in = nullptr;
+		ReadString(in);
+		str = in;
+		delete[] in;
 	}
 }
+
+void Grafkit::Archive::PersistObject(Persistent *& object)
+{
+	UCHAR isNull = object == nullptr;
+	PersistField(isNull);
+
+	if (!isNull) {
+		if (m_isStoring) {
+			object->store(*this);
+		}
+		else {
+			Persistent::load(*this);
+		}
+	}
+}
+

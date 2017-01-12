@@ -8,13 +8,6 @@
 namespace Grafkit{
 	class Archive;
 
-	class PersistElem;
-	template <typename T> class PersistField;
-	template <typename T> class PersistVector;
-	class PersistString;
-	template <typename K, typename V> class PersistMap;
-	class PersistObject;
-
 	class Persistent : public Clonable
 	{
 		friend class PersistObject;
@@ -30,171 +23,60 @@ namespace Grafkit{
 			virtual int version() const { return 0; }
 	};
 
-	class PersistElem {
-		friend class Archive;
-
-	public:
-		PersistElem() {
-		}
-
-		virtual ~PersistElem() {
-		}
-
-	protected:
-		virtual void load(Archive &ar) = 0;
-		virtual void store(Archive & ar) = 0;
-
-	};
-
 	class Archive
 	{
-		friend class PersistElem;
-		template <typename T> friend class PersistField;
-		template <typename T> friend class PersistVector;
-		friend class PersistString;
-		template <typename K, typename V> friend class PersistMap;
-		friend class PersistObject;
-
-
 		public:
-			explicit Archive(int isStoring = 0);
+			explicit Archive(int IsStoring = 0);
 			virtual ~Archive();
 
+			/* IO API */
 		protected:
-			/// I/O stuff
-			virtual void write(const void* buffer, size_t length) = 0;
-			virtual void read(void* buffer, size_t length) = 0;
+			virtual void Write(const void* buffer, size_t length) = 0;
+			virtual void Read(void* buffer, size_t length) = 0;
 	
-			size_t writeString(const char* input); ///< @return length of written bytes of string
-			size_t readString(char*& output);	///< @return length of read bytes of string
+			size_t WriteString(const char* input); ///< @return length of written bytes of string
+			size_t ReadString(char*& output);	///< @return length of read bytes of string
 
 		public:
 
-			Archive& operator& (PersistElem *field) {
-				if (isStoring()) {
-					field->store(*this);
+			template <typename T> void PersistField(T& t) {
+				if (m_isStoring) {
+					Write(&t, sizeof(T));
 				}
 				else {
-					field->load(*this);
+					Read(&t, sizeof(T));
 				}
-
-				delete field;
-
-				return *this;
 			}
 
-			int isStoring() const { return _isStoring; }
-			void setDirection(bool isStoring) { _isStoring = isStoring; }
+			template <typename T> void PersistVector(T *& v, size_t &count) {
+				UINT u32count = count; //clamp it down to 32 bit
+				if (m_isStoring) {
+					Write(&u32count, sizeof(u32count))
+					Write(&t, sizeof(T));
+				}
+				else {
+					u32count = 0;
+					Read(&u32count, sizeof(u32count));
+
+					v = new T[u32count];
+					Read(&v, sizeof(T) * u32count);
+					count = u32count;
+				}
+			}
+			
+
+			void PersistString(const char*& str);
+			void PersistString(std::string & str);
+
+			void PersistObject(Persistent *& object);
+
+			int IsStoring() const { return m_isStoring; }
+			void SetDirection(bool IsStoring) { m_isStoring = IsStoring; }
 
 		private: 
-			int _isStoring;
+			int m_isStoring;
 	};
 
-	/** */
-	template <typename T> class PersistField : public PersistElem {
-
-	private:
-		T& m_pT;
-
-	public:
-		PersistField(const char* name, T& t) : m_pT(t){
-		}
-
-	protected:
-		virtual void load(Archive &ar) {
-			ar.read(&m_pT, sizeof(T));
-		}
-		
-		virtual void store(Archive & ar) {
-			ar.write(&m_pT, sizeof(T));
-		}
-
-	};
-
-	/** */
-	template <typename T> class PersistVector : public PersistElem {
-		friend class Archive;
-
-	private:
-		size_t & m_count;
-		T*& m_pT;
-
-	public:
-		/// Only works with size_t from now on
-		PersistVector(const char* name, T*& pt, size_t & len) :  
-			m_pT(pt), m_count(len)
-		{
-		}
-
-
-	protected:
-		virtual void load(Archive &ar) {
-			unsigned int count = 0;
-			ar.read(&count, sizeof(count));
-			m_pT = new T[count];
-			ar.read((void*)m_pT, sizeof(T) * (count));
-			m_count = count;
-		}
-
-		virtual void store(Archive & ar) {
-			unsigned int count = m_count;
-			ar.write(&count, sizeof(count));
-			ar.write(m_pT, sizeof(T) * count);
-		}
-
-	};
-
-	/** */
-	class PersistString : public PersistElem {
-	private:
-		std::string *m_pString;
-		const char **m_pszString;
-
-	public:
-		PersistString(const char * name, const char **pszString) {
-			m_pszString = pszString;
-			m_pString = nullptr;
-		}
-
-		PersistString(const char * name, std::string *pString) {
-			m_pszString = nullptr;
-			m_pString = pString;
-		}
-
-		virtual void load(Archive &ar);
-		virtual void store(Archive & ar);
-	};
-
-	/** */
-	class PersistObject : public PersistElem {
-	
-	private:
-		Persistent ** m_pObject;
-	
-	public:
-		PersistObject(const char* name, Persistent** pObject) : m_pObject(pObject){}
-		
-		virtual void load(Archive &ar) {
-			unsigned char isNull = 0;
-			ar & (new PersistField<unsigned char>("null", isNull));
-			if (isNull)
-				*m_pObject = nullptr;
-			else
-				*m_pObject = Persistent::load(ar);
-		}
-
-		virtual void store(Archive & ar){
-			Persistent * pobj = dynamic_cast<Persistent*>(*m_pObject);
-			if (*m_pObject != nullptr && pobj == nullptr)
-				DebugBreak();
-			unsigned char isNull = pobj == nullptr;
-			ar & (new PersistField<unsigned char>("null", isNull));
-			if (!isNull) {
-				pobj->store(ar);
-			}
-				
-		}
-	};
 
 }
 
@@ -219,10 +101,10 @@ public:\
 
 // --- 
 
-#define PERSIST_FIELD(FIELD) (new Grafkit::PersistField<decltype(FIELD)>(#FIELD, FIELD))
-#define PERSIST_VECTOR(FIELD, COUNT) (new Grafkit::PersistVector<std::remove_pointer<decltype(FIELD)>::type>(#FIELD, FIELD, COUNT))
-#define PERSIST_STRING(FIELD) (new Grafkit::PersistString(#FIELD, FIELD))
-#define PERSIST_OBJECT(FIELD) (new Grafkit::PersistObject(#FIELD, (Persistent**)&(FIELD)))
+#define PERSIST_FIELD(AR, FIELD) (AR.PersistField<decltype((FIELD))>((FIELD)))
+#define PERSIST_VECTOR(AR, FIELD, COUNT) (AR.PersistVector<std::remove_pointer<decltype((FIELD))>::type>((FIELD), (COUNT)))
+#define PERSIST_STRING(AR, FIELD) (AR.PersistString((FIELD)))
+#define PERSIST_OBJECT(AR, FIELD) (AR.PersistObject((FIELD)))
 
 
 // --- define exceptions 

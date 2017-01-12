@@ -12,11 +12,11 @@ namespace Grafkit{
 	class ArchiveFile: public Archive
 	{
 		public:
-			ArchiveFile(FILE* stream, bool isStoring = false);
+			ArchiveFile(FILE* stream, bool IsStoring = false);
 			virtual ~ArchiveFile();
 
-			virtual void write(const void *buffer, size_t length);  
-			virtual void read (void* buffer, size_t length);
+			virtual void Write(const void *buffer, size_t length);  
+			virtual void Read (void* buffer, size_t length);
 	private:
 		FILE * _stream;
 	};
@@ -28,11 +28,11 @@ namespace Grafkit{
 	{
 
 	public:
-		ArchiveMemory(BYTE* data, size_t length, bool isStoring = false);
+		ArchiveMemory(BYTE* data, size_t length, bool IsStoring = false);
 		virtual ~ArchiveMemory();
 
-		virtual void write(const void *buffer, size_t length) {}	
-		virtual void read(void* buffer, size_t length);
+		virtual void Write(const void *buffer, size_t length) {}	
+		virtual void Read(void* buffer, size_t length);
 
 	private:
 		BYTE* m_data;

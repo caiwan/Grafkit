@@ -10,8 +10,8 @@ using namespace Grafkit;
 using namespace std::chrono;
 
 void IResource::_serialize(Archive& ar) {
-	ar & PERSIST_FIELD(m_id);
-	ar & PERSIST_STRING(&m_name);
+	PERSIST_FIELD(ar, m_id);
+	PERSIST_STRING(ar, m_name);
 }
 
 Grafkit::IResource::IResource()

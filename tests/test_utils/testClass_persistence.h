@@ -41,8 +41,8 @@ namespace ArchivePersistent {
 		PERSISTENT_DECL(FieldClass, 1);
 	protected:
 		virtual void serialize(Grafkit::Archive& stream) {
-			stream & PERSIST_FIELD(m_int);
-			stream & PERSIST_FIELD(m_float);
+			PERSIST_FIELD(steam, m_int);
+			PERSIST_FIELD(steam, m_float);
 		};
 
 	};
@@ -77,8 +77,8 @@ namespace ArchivePersistent {
 		PERSISTENT_DECL(NestedClass, 1);
 
 		virtual void serialize(Grafkit::Archive& stream) {
-			stream & PERSIST_OBJECT(m_cl1);
-			stream & PERSIST_OBJECT(m_cl2);
+			PERSIST_OBJECT(stream, m_cl1);
+			PERSIST_OBJECT(stream, m_cl2);
 		};
 
 	};

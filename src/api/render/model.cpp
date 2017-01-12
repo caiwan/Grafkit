@@ -11,7 +11,7 @@ PERSISTENT_IMPL(Grafkit::Model);
 void Grafkit::Model::_serialize(Archive & ar)
 {
 	this->Entity3D::_serialize(ar);
-	ar & PERSIST_OBJECT(m_mesh);
+	PERSIST_OBJECT(ar, m_mesh);
 }
 
 Grafkit::Model::Model(MeshRef mesh, MaterialRef material) :

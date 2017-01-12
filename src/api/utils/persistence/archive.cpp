@@ -9,8 +9,8 @@
 using namespace FWdebugExceptions;
 using namespace Grafkit;
 
-ArchiveFile::ArchiveFile(FILE* stream, bool isStoring) : 
-	Archive(isStoring), 
+ArchiveFile::ArchiveFile(FILE* stream, bool IsStoring) : 
+	Archive(IsStoring), 
 	_stream(stream)
 {
 	if(!_stream) throw new EX(NullPointerException);
@@ -20,7 +20,7 @@ ArchiveFile::~ArchiveFile() {
 
 }
 
-void ArchiveFile::write(const void* buffer, size_t length)
+void ArchiveFile::Write(const void* buffer, size_t length)
 {
 	if(!_stream) throw new EX(NullPointerException);
 	
@@ -29,7 +29,7 @@ void ArchiveFile::write(const void* buffer, size_t length)
 	fwrite(buffer, length, 1, this->_stream);
 }
 
-void ArchiveFile::read(void* buffer, size_t length)
+void ArchiveFile::Read(void* buffer, size_t length)
 {
 	if(!_stream) throw new EX(NullPointerException);
 
@@ -42,7 +42,7 @@ void ArchiveFile::read(void* buffer, size_t length)
 
 */
 
-Grafkit::ArchiveMemory::ArchiveMemory(BYTE * data, size_t length, bool isStoring) :
+Grafkit::ArchiveMemory::ArchiveMemory(BYTE * data, size_t length, bool IsStoring) :
 	m_data(data), m_length(length)
 {
 }
@@ -51,7 +51,7 @@ Grafkit::ArchiveMemory::~ArchiveMemory()
 {
 }
 
-void Grafkit::ArchiveMemory::read(void * buffer, size_t length)
+void Grafkit::ArchiveMemory::Read(void * buffer, size_t length)
 {
 	if (length + m_cursor > m_length)
 		throw EX(OutOfBoundsException);
