@@ -102,7 +102,7 @@ public:\
 // --- 
 
 #define PERSIST_FIELD(AR, FIELD) (AR.PersistField<decltype((FIELD))>((FIELD)))
-#define PERSIST_VECTOR(AR, FIELD, COUNT) (AR.PersistVector<std::remove_pointer<decltype((FIELD))>::type>((FIELD), (COUNT)))
+#define PERSIST_VECTOR(AR, FIELD, COUNT) (AR.PersistVector<std::remove_pointer<decltype(FIELD)>::type>(FIELD, COUNT))
 #define PERSIST_STRING(AR, FIELD) (AR.PersistString((FIELD)))
 #define PERSIST_OBJECT(AR, FIELD) (AR.PersistObject((FIELD)))
 
