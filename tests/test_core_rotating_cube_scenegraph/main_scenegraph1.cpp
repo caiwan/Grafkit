@@ -155,7 +155,9 @@ protected:
 			scene->SetActiveCamera(0);
 
 			/* Export and import stuff to file, then buiild it */
-			SceneLoader::Save(scene, "hello");
+			SceneLoader::Save(scene, "./../assets/hello.scene");
+			scene = this->Load<Scene>(new SceneLoader("scene", "hello.scene"));
+			this->DoPrecalc();
 
 			// add shaders
 			scene->SetVShader(m_vertexShader);
