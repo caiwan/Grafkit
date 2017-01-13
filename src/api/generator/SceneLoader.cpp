@@ -33,7 +33,8 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 
 	ArchiveMemory ar((BYTE*)asset->GetData(), asset->GetSize());
 
-	SceneRef scene = dynamic_cast<Scene*>(Scene::load(ar));
+	SceneRef scene;
+	PERSIST_REFOBJECT(ar, scene);
 
 	if (scene.Invalid())
 		throw EX(SceneLoadException);

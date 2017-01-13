@@ -16,7 +16,7 @@ using namespace std;
 void Persistent::store(Archive& ar)
 {
 	string className = this->getClassName();
-	int ver = this->version();
+	UCHAR ver = this->version();
 
 	Log::Logger().Info("Storing object %s %d", className.c_str(), ver);
 
@@ -33,9 +33,8 @@ void Persistent::store(Archive& ar)
 Persistent* Persistent::load(Archive& ar)
 {
 	string className;
+	UCHAR ver = 0;
 	PERSIST_STRING(ar, className);
-
-	Log::Logger().Info("Loading object %s %d", className.c_str());
 
 	Clonable* clone = Clonables::Instance().create(className.c_str());
 	if (clone == NULL) {
@@ -50,8 +49,9 @@ Persistent* Persistent::load(Archive& ar)
 		throw EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
 	}
 
-	int ver = -1;
 	PERSIST_FIELD(ar, ver);
+
+	Log::Logger().Info("Loading object %s %d", className.c_str(), ver);
 
 	//
 	if (ver != obj->version()) {
@@ -79,7 +79,7 @@ Archive::~Archive()
 
 size_t Grafkit::Archive::WriteString(const char * input)
 {
-	unsigned int slen = strlen(input);
+	USHORT slen = strlen(input);
 	this->Write(&slen, sizeof(slen));
 	this->Write(input, slen + 1);
 	return slen;
@@ -87,7 +87,7 @@ size_t Grafkit::Archive::WriteString(const char * input)
 
 size_t Grafkit::Archive::ReadString(char*& output)
 {
-	unsigned int slen = 0;
+	USHORT slen = 0;
 	this->Read(&slen, sizeof(slen));
 	output = new char[slen + 1];
 	this->Read(output, slen + 1);
