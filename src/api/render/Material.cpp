@@ -113,7 +113,7 @@ void Grafkit::Material::serialize(Archive & ar)
 	this->IResource::_serialize(ar);
 
 	// ...
-	PERSIST_FIELD(m_material);
+	PERSIST_FIELD(ar, m_material);
 	
 	/// @todo override shader + 
 	/// @todo textures 

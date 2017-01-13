@@ -162,6 +162,9 @@ Note that type T must inherit from class Referencable!
 template <typename T> class Ref
 {
 public:
+
+	typedef T* clazz;
+
 	/**
 	 Default constructor. Creates an empty reference.
 	*/

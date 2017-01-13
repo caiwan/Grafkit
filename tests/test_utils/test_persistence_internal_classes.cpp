@@ -11,6 +11,7 @@ TCs for internal classes such as scene and so on
 #include <cmath>
 
 #include "render/Scene.h"
+#include "render/Model.h"
 
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
@@ -27,13 +28,13 @@ using namespace ArchivePersistent;
 		TestArchiver archive(16 * 4096, true);\
 \
 		Ref<CLASS> object = new CLASS();\
-		PERSIST_OBJECT(archive, object);\
+		PERSIST_REFOBJECT(archive, object);\
 \
 		archive.ResetCrsr();\
-		archive.setDirection(false);\
+		archive.SetDirection(false);\
 \
 		Ref<CLASS> object_read;\
-		PERSIST_OBJECT(archive, object_read);\
+		PERSIST_REFOBJECT(archive, object_read);\
 \
 		ASSERT_TRUE(object_read.Valid());\
 		ASSERT_TRUE(object.Get() != object_read.Get());\
@@ -42,3 +43,5 @@ using namespace ArchivePersistent;
 DEFINE_PREGNANCY_TEST(Scene)
 DEFINE_PREGNANCY_TEST(Actor)
 DEFINE_PREGNANCY_TEST(Material)
+DEFINE_PREGNANCY_TEST(Mesh)
+DEFINE_PREGNANCY_TEST(Model)

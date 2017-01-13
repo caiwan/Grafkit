@@ -65,7 +65,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 
 	ArchiveFile ar(fp, true);
 
-	PERSIST_OBJECT(ar, scene);
+	PERSIST_REFOBJECT(ar, scene);
 
 	// collect data
 	ActorRef scenegraph = scene->GetRootNode();
@@ -138,22 +138,24 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	size_t materialCount = materials.size();
 	PERSIST_FIELD(ar, materialCount);
 	for (size_t i = 0; i < materialCount; ++i) {
-		Material *& material = materials[i];
+		Material *material = materials[i];
 		PERSIST_OBJECT(ar, material);
 	}
 
 	// 2. entity
 	size_t entityCount = entities.size();
-	ar & PERSIST_FIELD(entityCount);
+	PERSIST_FIELD(ar, entityCount);
 	for (size_t i = 0; i < entityCount; ++i) {
-		ar & PERSIST_OBJECT(ar, entities[i]);
+		Entity3D* entity = entities[i];
+		PERSIST_OBJECT(ar, entity);
 	}
 
 	// 3. actors
 	size_t actorCount = actors.size();
 	PERSIST_FIELD(ar, actorCount);
 	for (size_t i = 0; i < actorCount; ++i) {
-		PERSIST_OBJECT(ar, actors[i]);
+		Actor* actor = actors[i];
+		PERSIST_OBJECT(ar, actor);
 	}
 
 	// 4. animations

@@ -119,18 +119,21 @@ void Grafkit::Archive::PersistString(std::string &str)
 	}
 }
 
-void Grafkit::Archive::PersistObject(Persistent *& object)
+void Grafkit::Archive::StoreObject(Persistent * object)
 {
-	UCHAR isNull = object == nullptr;
-	PersistField(isNull);
+	UCHAR isNotNull = object != nullptr;
+	PersistField(isNotNull);
 
-	if (!isNull) {
-		if (m_isStoring) {
-			object->store(*this);
-		}
-		else {
-			Persistent::load(*this);
-		}
-	}
+	if (isNotNull)
+		object->store(*this);
+}
+
+Persistent * Grafkit::Archive::LoadObject()
+{
+	UCHAR isNotNull = 0;
+	PersistField(isNotNull);
+
+	if (isNotNull)
+		return Persistent::load(*this);
 }
 

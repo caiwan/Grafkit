@@ -51,15 +51,15 @@ namespace Grafkit{
 			template <typename T> void PersistVector(T *& v, size_t &count) {
 				UINT u32count = count; //clamp it down to 32 bit
 				if (m_isStoring) {
-					Write(&u32count, sizeof(u32count))
-					Write(&t, sizeof(T));
+					Write(&u32count, sizeof(u32count));
+					Write(v, sizeof(T) * u32count);
 				}
 				else {
 					u32count = 0;
 					Read(&u32count, sizeof(u32count));
 
 					v = new T[u32count];
-					Read(&v, sizeof(T) * u32count);
+					Read((void*)v, sizeof(T) * u32count);
 					count = u32count;
 				}
 			}
@@ -68,7 +68,10 @@ namespace Grafkit{
 			void PersistString(const char*& str);
 			void PersistString(std::string & str);
 
-			void PersistObject(Persistent *& object);
+			void StoreObject(Persistent * object);
+			Persistent* LoadObject();
+
+			//Persistent * PersistObject(Persistent * object);
 
 			int IsStoring() const { return m_isStoring; }
 			void SetDirection(bool IsStoring) { m_isStoring = IsStoring; }
@@ -101,10 +104,22 @@ public:\
 
 // --- 
 
-#define PERSIST_FIELD(AR, FIELD) (AR.PersistField<decltype((FIELD))>((FIELD)))
+#define PERSIST_FIELD(AR, FIELD) (AR.PersistField<decltype(FIELD)>((FIELD)))
 #define PERSIST_VECTOR(AR, FIELD, COUNT) (AR.PersistVector<std::remove_pointer<decltype(FIELD)>::type>(FIELD, COUNT))
 #define PERSIST_STRING(AR, FIELD) (AR.PersistString((FIELD)))
-#define PERSIST_OBJECT(AR, FIELD) (AR.PersistObject((FIELD)))
+
+#define _PERSIST_OBJECT(AR, TYPE, IN_FIELD, OUT_FIELD)\
+{\
+	if (AR.IsStoring()) {\
+		AR.StoreObject(dynamic_cast<Persistent*>((IN_FIELD)));\
+	}\
+	else {\
+		(OUT_FIELD) = dynamic_cast<TYPE>(AR.LoadObject());\
+	}\
+}
+
+#define PERSIST_OBJECT(AR, FIELD) _PERSIST_OBJECT(AR, decltype(FIELD), FIELD, FIELD)
+#define PERSIST_REFOBJECT(AR, FIELD) _PERSIST_OBJECT(AR, decltype(FIELD.Get()), FIELD.Get(), FIELD)
 
 
 // --- define exceptions 

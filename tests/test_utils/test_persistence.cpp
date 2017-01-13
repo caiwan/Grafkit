@@ -32,7 +32,7 @@ TEST(Persistence, given_Field_when_Persist_then_Load) {
 	archive.SetDirection(false);
 
 	int test_read = 0;
-	archive.PersistField<decltype(test)>(test);
+	archive.PersistField<decltype(test)>(test_read);
 
 	ASSERT_EQ(test, test_read);
 }
@@ -171,7 +171,7 @@ TEST(Persistence, given_Vector_when_Persist_then_Load) {
 
 	int *test_read = nullptr;
 	size_t len_read = 0;
-	archive.PersistVector<std::remove_pointer<decltype(test_read)>::type>(test_read, len);
+	archive.PersistVector<std::remove_pointer<decltype(test_read)>::type>(test_read, len_read);
 
 	ASSERT_EQ(len, len_read);
 	for (size_t i=0; i<len; i++)
@@ -281,7 +281,7 @@ TEST(Persistence, given_Object_when_Persist_then_Load) {
 	EmptyClass *object = new EmptyClass();
 	
 	//when
-	archive.PersistObject((Persistent**)&object);
+	archive.StoreObject(object);
 
 	//then
 	archive.ResetCrsr();
@@ -289,9 +289,9 @@ TEST(Persistence, given_Object_when_Persist_then_Load) {
 
 	EmptyClass *object_test = nullptr;
 
-	archive.PersistObject(object_test);
+	object_test = dynamic_cast<decltype(object_test)>(archive.LoadObject());
 
-	ASSERT_TRUE(object != nullptr);
+	ASSERT_TRUE(object_test != nullptr);
 	ASSERT_TRUE(object != object_test);
 	ASSERT_STREQ(object->getClassName().c_str(), object_test->getClassName().c_str());
 
@@ -305,20 +305,41 @@ TEST(Persistence, given_Object_when_PersistRefernce_then_Load) {
 	Ref<EmptyClass> object = new EmptyClass();
 
 	//when
-	archive.PersistObject(object);
+	archive.StoreObject(object);
 
 	//then
 	archive.ResetCrsr();
 	archive.SetDirection(false);
 
 	Ref<EmptyClass> object_test = nullptr;
-
-	archive.PersistObject(object_test);
+	object_test = dynamic_cast<decltype(object_test.Get())>(archive.LoadObject());
 
 	ASSERT_TRUE(object_test.Valid());
 	ASSERT_TRUE(object_test != object);
 	ASSERT_STREQ(object->getClassName().c_str(), object_test->getClassName().c_str());
 }
+
+TEST(Persistence, given_Object_when_PersistRefernceWithMacro_then_Load) {
+	TestArchiver archive(256, true);
+
+	//given
+	Ref<EmptyClass> object = new EmptyClass();
+
+	//when
+	PERSIST_REFOBJECT(archive, object);
+
+	//then
+	archive.ResetCrsr();
+	archive.SetDirection(false);
+
+	Ref<EmptyClass> object_read = nullptr;
+	PERSIST_REFOBJECT(archive, object_read);
+
+	ASSERT_TRUE(object_read.Valid());
+	ASSERT_TRUE(object_read != object);
+	ASSERT_STREQ(object->getClassName().c_str(), object_read->getClassName().c_str());
+}
+
 
 TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
 	TestArchiver archive(256, true);
@@ -327,21 +348,20 @@ TEST(Persistence, given_Object_when_PersistWithMacro_then_Load) {
 	EmptyClass *object = new EmptyClass();
 
 	//when
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object);
 
 	//then
 	archive.ResetCrsr();
 	archive.SetDirection(false);
 
-	EmptyClass *object_original = object;
+	EmptyClass *object_read = nullptr;
 
-	object = nullptr;
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object_read);
 
 
-	ASSERT_TRUE(object != nullptr);
-	ASSERT_TRUE(object != object_original);
-	ASSERT_STREQ(object->getClassName().c_str(), object_original->getClassName().c_str());
+	ASSERT_TRUE(object_read != nullptr);
+	ASSERT_TRUE(object_read != object);
+	ASSERT_STREQ(object_read->getClassName().c_str(), object->getClassName().c_str());
 
 	delete object;
 }
@@ -354,7 +374,7 @@ TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
 	object->buildup(0xfafababa, 2.16);
 
 	// when
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object);
 
 	// then
 	FieldClass *object_original = object;
@@ -363,7 +383,7 @@ TEST(Persistence, given_ObjectWithFields_when_Persist_then_Load) {
 	archive.SetDirection(false);
 
 	object = nullptr;
-	archive & PERSIST_OBJECT(object);
+	PERSIST_OBJECT(archive, object);
 
 
 	ASSERT_TRUE(object != nullptr);
@@ -391,7 +411,6 @@ TEST(Persistence, given_ObjectCascadeObjectsAndFields_when_Persist_then_Load) {
 	object = nullptr;
 	PERSIST_OBJECT(archive, object);
 
-
 	ASSERT_TRUE(object != nullptr);
 	ASSERT_TRUE(object != object_original);
 	ASSERT_STREQ(object->getClassName().c_str(), object_original->getClassName().c_str());
@@ -415,7 +434,6 @@ TEST(Persistence, given_NullPointer_when_Persist_then_Load) {
 
 	object = nullptr;
 	PERSIST_OBJECT(archive, object);
-
 
 	ASSERT_TRUE(object == nullptr);
 }
