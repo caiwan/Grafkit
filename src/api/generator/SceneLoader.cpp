@@ -17,7 +17,10 @@ Grafkit::SceneLoader::~SceneLoader()
 }
 
 // assoc. tabla
-typedef  std::map<int, std::list<int>> assoc_t;
+typedef  std::map<USHORT, std::vector<USHORT>> assoc_t;
+
+void LoadKeymap(Archive &ar, assoc_t &keymap);
+void StoreKeymap(Archive &ar, assoc_t &keymap);
 
 void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Grafkit::IResource * source)
 {
@@ -36,23 +39,91 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 		throw EX(SceneLoadException);
 	
 	// --- 
-	std::map<int, Material*> materials;
-	std::map<int, Entity3D*> entities;
-	std::map<int, Actor*> actors;
-	std::map<int, Animation*> animations;
+	std::vector<Material*> materials;
+	std::vector<Entity3D*> entities;
+	std::vector<Actor*> actors;
+	std::vector<Animation*> animations;
+
+	// 1. materials
+	UINT materialCount = materials.size();
+	PERSIST_FIELD(ar, materialCount);
+	for (UINT i = 0; i < materialCount; ++i) {
+		Material *material = nullptr;
+		PERSIST_OBJECT(ar, material);
+		materials.push_back(material);
+	}
+
+	// 2. entities
+	UINT entityCount = entities.size();
+	PERSIST_FIELD(ar, entityCount);
+	for (UINT i = 0; i < entityCount; ++i) {
+		Entity3D* entity = nullptr;
+		PERSIST_OBJECT(ar, entity);
+		entities.push_back(entity);
+	}
+
+	// 3. actors
+	UINT actorCount = actors.size();
+	PERSIST_FIELD(ar, actorCount);
+	for (UINT i = 0; i < actorCount; ++i) {
+		Actor* actor = nullptr;
+		PERSIST_OBJECT(ar, actor);
+		actors.push_back(actor);
+	}
+
+	// 4. animations
+	// TODO
 
 	assoc_t materials_to_meshes;
 	assoc_t entities_to_actors;
-	assoc_t scenegraph;
-
-	// 1. material_map
-	// 2. entity_map
-	// 3. actors
-	// 4. animations
+	assoc_t actor_to_actor;
 
 	// 5. material -> mesh relation
+	LoadKeymap(ar, materials_to_meshes);
+	for (auto key_it = materials_to_meshes.begin(); key_it != materials_to_meshes.end(); ++key_it) 
+	{
+		USHORT key = key_it->first;
+		Material * material = materials[key];
+		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
+		{
+			USHORT val = *value_it;
+			Model *model = dynamic_cast<Model *>(entities[val]);
+			if (model) {
+				model->SetMaterial(material);
+			}
+		}
+	}
+	// ... 
+
 	// 6. entitiy -> actor relation
+	LoadKeymap(ar, entities_to_actors);
+	for (auto key_it = entities_to_actors.begin(); key_it != entities_to_actors.end(); ++key_it) 
+	{
+		USHORT key = key_it->first;
+		Entity3D *entity = entities[key];
+		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
+		{
+			USHORT val = *value_it;
+			Actor *actor = actors[val];
+			actor->AddEntity(entity);
+		}
+	}
+
+	// ...
+
 	// 7. actor -> actor relation - scenegraph
+	LoadKeymap(ar, actor_to_actor);
+	for (auto key_it = actor_to_actor.begin(); key_it != actor_to_actor.end(); ++key_it) 
+	{
+		USHORT key = key_it->first;
+		Actor *child = actors[key];
+		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
+		{
+			USHORT val = *value_it;
+			Actor *parent = actors[val];
+			parent->AddChild(child);
+		}
+	}
 
 	dstScene->AssingnRef(scene);
 }
@@ -135,25 +206,25 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	// --- persist scene 
 
 	// 1. materials
-	size_t materialCount = materials.size();
+	UINT materialCount = materials.size();
 	PERSIST_FIELD(ar, materialCount);
-	for (size_t i = 0; i < materialCount; ++i) {
+	for (UINT i = 0; i < materialCount; ++i) {
 		Material *material = materials[i];
 		PERSIST_OBJECT(ar, material);
 	}
 
 	// 2. entity
-	size_t entityCount = entities.size();
+	UINT entityCount = entities.size();
 	PERSIST_FIELD(ar, entityCount);
-	for (size_t i = 0; i < entityCount; ++i) {
+	for (UINT i = 0; i < entityCount; ++i) {
 		Entity3D* entity = entities[i];
 		PERSIST_OBJECT(ar, entity);
 	}
 
 	// 3. actors
-	size_t actorCount = actors.size();
+	UINT actorCount = actors.size();
 	PERSIST_FIELD(ar, actorCount);
-	for (size_t i = 0; i < actorCount; ++i) {
+	for (UINT i = 0; i < actorCount; ++i) {
 		Actor* actor = actors[i];
 		PERSIST_OBJECT(ar, actor);
 	}
@@ -163,15 +234,50 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	// TODO
 
 	// 5. material -> mesh relation
+	StoreKeymap(ar, materials_to_meshes);
 	
-	/*size_t materialMapCount = materials_to_meshes.size()
-	for (auto it )*/
-
 	// 6. entitiy -> actor relation
+	StoreKeymap(ar, entities_to_actors);
 	
 	// 7. actor -> actor relation - scenegraph
+	StoreKeymap(ar, actor_to_actor);
 
 	fflush(fp);
 	fclose(fp);
 
+}
+
+void LoadKeymap(Archive &ar, assoc_t &keymap){
+	keymap.clear();
+	USHORT keyMapCount = 0;
+	PERSIST_FIELD(ar, keyMapCount);
+	for (size_t i=0; i<keyMapCount; ++i)
+	{
+		USHORT key = 0, valuelen = 0;
+		PERSIST_FIELD(ar, key);
+		PERSIST_FIELD(ar, valuelen);
+		std::vector<USHORT> &values = keymap[i];
+		for (size_t j = 0; j<valuelen; ++j)
+		{
+			USHORT value = 0;
+			PERSIST_FIELD(ar, value);
+			values.push_back(value);
+		}
+	}
+}
+
+void StoreKeymap(Archive &ar, assoc_t &keymap){
+	USHORT keyMapCount = keymap.size();
+	PERSIST_FIELD(ar, keyMapCount);
+	for (auto key_it = keymap.begin(); key_it != keymap.end(); ++key_it) {
+		USHORT key = key_it->first, valuelen = key_it->second.size();
+		PERSIST_FIELD(ar, key);
+		PERSIST_FIELD(ar, valuelen);
+		std::vector<USHORT> &values = key_it->second;
+		for (size_t j = 0; j<valuelen; ++j)
+		{
+			USHORT value = values[j];
+			PERSIST_FIELD(ar, value);
+		}
+	}
 }
