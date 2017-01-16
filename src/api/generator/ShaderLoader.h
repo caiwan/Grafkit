@@ -19,7 +19,7 @@ namespace Grafkit {
 		virtual IResource* NewResource();
 
 	protected:
-		virtual ShaderRef NewShader() = 0;
+		virtual Shader* NewShader() = 0;
 		virtual std::string DefaultEntryPointName() = 0;
 		std::string m_entrypoint;
 	};
@@ -32,7 +32,7 @@ namespace Grafkit {
 		~VertexShaderLoader(){}
 
 	protected:
-		virtual ShaderRef NewShader() { return new VertexShader(); }
+		virtual Shader* NewShader() { return new VertexShader(); }
 		virtual std::string DefaultEntryPointName() { return "mainVertex"; }
 	};
 
@@ -43,7 +43,7 @@ namespace Grafkit {
 			: ShaderLoader(name, sourcename, entrypoint) {}
 		~PixelShaderLoader(){}
 	protected:
-		virtual ShaderRef NewShader() { return new PixelShader(); }
+		virtual Shader* NewShader() { return new PixelShader(); }
 		virtual std::string DefaultEntryPointName() { return "mainPixel"; }
 	};
 

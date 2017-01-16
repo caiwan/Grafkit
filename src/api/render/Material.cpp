@@ -95,10 +95,8 @@ void Grafkit::Material::RemoveTexture(TextureResRef texture, texture_type_e slot
 
 // ====================================
 
-void Grafkit::Material::Render(Renderer& render, ShaderRef &_shader)
+void Grafkit::Material::Render(Renderer& render, ShaderRef &shader)
 {
-	ShaderRef shader = _shader; 
-
 	shader->SetParam(render, "material", &m_material);
 
 	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {

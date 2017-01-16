@@ -39,6 +39,8 @@ namespace Grafkit
 		void SetMaterial(MaterialRef material) { this->m_material = material; }
 
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene);
+		virtual void Build(Grafkit::Renderer& deviceContext, Scene* scene);
+
 
 	private:
 		MaterialRef m_material;

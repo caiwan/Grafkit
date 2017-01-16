@@ -70,7 +70,8 @@ namespace Grafkit {
 	
 	template<class T> inline Ref<T> IResourceManager::Load(IResourceBuilder* builder) {
 		Load(builder);
-		return Get<T>(builder->GetName());
+		T* res = Get<T>(builder->GetName());
+		return res;
 	}
 
 }

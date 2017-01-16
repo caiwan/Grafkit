@@ -58,6 +58,8 @@ void Grafkit::Scene::Initialize(ActorRef root)
 				m_cameraMap[node->GetName()] = node;
 				break; // assume if we have only one camera uder a node
 			}
+
+			m_Entities.insert(*entity);
 		}
 		// </yield>
 
@@ -108,6 +110,22 @@ void Grafkit::Scene::AddAnimation(AnimationRef anim)
 {
 	m_animations.push_back(anim);
 }
+
+void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps)
+{
+	if(vs.Valid()) 
+		m_vertexShader = vs;
+
+	if (ps.Valid()) 
+		m_pixelShader = ps;
+
+	for (auto it = m_Entities.begin(); it != m_Entities.end(); ++it) {
+		(*it)->Build(deviceContext, this);
+
+	}
+}
+
+
 
 /******************************************************************************
  * RENDER
@@ -181,7 +199,7 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 
 	//ez itt elviekben jo kell, hogy legyen
 	m_vertexShader->Render(render);
-	m_fragmentShader->Render(render);
+	m_pixelShader->Render(render);
 
 	// render scenegraph
 	RenderNode(render, m_pScenegraph);

@@ -100,7 +100,7 @@ void Grafkit::Mesh::SetIndices(size_t vertexCount, size_t indexCount, const int 
 		m_indices[i] = indices[i];
 }
 
-void Grafkit::Mesh::Build(ShaderRef & shader, ID3D11Device * const & device)
+void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 {
 	HRESULT result = 0;
 

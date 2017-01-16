@@ -31,6 +31,7 @@ namespace Grafkit {
 		Entity3D();
 		virtual ~Entity3D();
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene) = 0;
+		virtual void Build(Grafkit::Renderer& deviceContext, Scene* scene) = 0;
 		
 	};
 

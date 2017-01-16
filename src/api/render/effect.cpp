@@ -81,7 +81,7 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 	m_fullscreenquad->AddPointer("POSITION", sizeof(GrafkitData::quad), GrafkitData::quad);
 	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord), GrafkitData::quad_texcoord);
 	m_fullscreenquad->SetIndices(4, 6, GrafkitData::quadIndices);
-	m_fullscreenquad->Build(m_shaderFullscreenQuad, render);
+	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
 
 	// -- 
 	m_textureSampler = new TextureSampler();

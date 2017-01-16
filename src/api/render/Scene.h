@@ -57,24 +57,29 @@ namespace Grafkit {
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
-		ShaderRef &GetPShader() { return this->m_fragmentShader; }
+		ShaderRef &GetPShader() { return this->m_pixelShader; }
 
 		void SetVShader(ShaderRef &VS) {this->m_vertexShader = VS; }
-		void SetPShader(ShaderRef &FS) {this->m_fragmentShader = FS; }
+		void SetPShader(ShaderRef &FS) {this->m_pixelShader = FS; }
+
+		void BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps);
 
 	private:
 		ActorRef m_pScenegraph;
 
 		ActorRef m_activeCamera;
+
 		std::vector<ActorRef> m_cameraNodes;
 		std::vector<ActorRef> m_lightNodes;
+
+		std::set<Entity3D*> m_Entities;
 
 		std::vector<AnimationRef> m_animations;
 
 		double m_animation_time;
 
 		ShaderRef m_vertexShader;
-		ShaderRef m_fragmentShader;
+		ShaderRef m_pixelShader;
 
 	private:
 		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);

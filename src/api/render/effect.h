@@ -70,7 +70,8 @@ namespace Grafkit {
 		TextureSamplerRef m_textureSampler;
 
 		MeshRef m_fullscreenquad;
-		ShaderRef m_shaderFullscreenQuad, m_shaderCopyScreen;
+		ShaderRef m_shaderFullscreenQuad;
+		ShaderRef m_shaderCopyScreen;
 
 		std::vector<EffectPassRef> m_effectChain;
 		typedef std::vector<EffectPassRef>::iterator fx_chain_it_t;

@@ -40,9 +40,9 @@ namespace Grafkit
 			
 		void AddPointer(std::string inputName, size_t length, const void* pointer);
 		void SetIndices(size_t vertexCount, size_t indexCount, const int* const indices);
-		void Build(ShaderRef &shader, ID3D11Device *const& device);
+		void Build(ID3D11Device *const& device, ShaderRef &vertexShader);
 
-		int GetIndexCount() { return m_indexCount; }
+		size_t GetIndexCount() { return m_indexCount; }
 
 	protected:
 		void Shutdown();

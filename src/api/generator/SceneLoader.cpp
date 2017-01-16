@@ -126,6 +126,8 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 		}
 	}
 
+	scene->Initialize(actors[0]);
+
 	dstScene->AssingnRef(scene);
 }
 

@@ -225,6 +225,10 @@ namespace Grafkit {
 		ID3D11VertexShader* m_vxShader;
 	};
 
+	//typedef Ref<VertexShader> VertexShaderRef;
+	//typedef Grafkit::Resource<VertexShader> VertexShaderRes;
+	//typedef Ref<VertexShaderRes> VertexShaderResRef;
+
 	/*
 	* Pixel shader
 	*/
@@ -249,6 +253,10 @@ namespace Grafkit {
 	private:
 		ID3D11PixelShader* m_pxShader;
 	};
+
+	//typedef Ref<PixelShader> PixelShaderRef;
+	//typedef Grafkit::Resource<PixelShader> PixelShaderRes;
+	//typedef Ref<PixelShaderRes> PixelShaderResRef;
 
 //@Todo geometry + compute shader
 

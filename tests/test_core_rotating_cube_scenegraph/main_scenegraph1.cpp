@@ -102,7 +102,7 @@ protected:
 			model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
 			model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
 			model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
-			model->GetMesh()->Build(m_vertexShader, render);
+			model->GetMesh()->Build(render, m_vertexShader);
 
 			// -- setup scene 
 			scene = new Scene();
@@ -159,6 +159,8 @@ protected:
 			scene = this->Load<Scene>(new SceneLoader("scene", "hello.scene"));
 			this->DoPrecalc();
 
+			scene->BuildScene(render, m_vertexShader, m_fragmentShader);
+
 			// add shaders
 			scene->SetVShader(m_vertexShader);
 			scene->SetPShader(m_fragmentShader);
@@ -196,7 +198,7 @@ protected:
 				scene->PreRender(render);
 				scene->Render(render);
 
-				this->t += 0.1;
+				this->t += 0.1f;
 			}
 
 			this->render.EndScene();

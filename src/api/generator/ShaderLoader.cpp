@@ -84,7 +84,7 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 	if (m_entrypoint.empty())
 		m_entrypoint = DefaultEntryPointName();
 	
-	ShaderResRef dstSahder = dynamic_cast<ShaderRes*>(source);
+	ShaderResRef dstSahder = (ShaderRes*)source;
 	if (dstSahder.Invalid()) {
 		return;
 	}

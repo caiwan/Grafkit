@@ -77,7 +77,7 @@ namespace Grafkit {
 		void AddTexture(TextureResRef texture, texture_type_e slot);
 		void RemoveTexture(TextureResRef texture, texture_type_e slot);
 
-		virtual void Render(Renderer& render, ShaderRef &shader);
+		virtual void Render(Renderer& render, ShaderRef &pixelShader);
 
 	protected:
 		struct material_t {

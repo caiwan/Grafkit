@@ -62,6 +62,7 @@ namespace Grafkit {
 
 		//skip render, nothing to do with it. 
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene) {}
+		virtual void Build(Grafkit::Renderer& deviceContext, Scene* scene){}
 
 		Matrix& GetViewMatrix() { return m_viewMatrix; }
 		Matrix& GetPerspectiveMatrix() { return m_perspectiveMatrix; }
