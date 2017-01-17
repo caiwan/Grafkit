@@ -100,7 +100,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 	// ... 
 
 	// 6. entitiy -> actor relation
-	//LOGGER(Log::Logger().Info("Entities:"));
+	LOGGER(Log::Logger().Info("Entities:"));
 	LoadKeymap(ar, entities_to_actors);
 	for (auto key_it = entities_to_actors.begin(); key_it != entities_to_actors.end(); ++key_it) 
 	{
@@ -112,14 +112,14 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 			Actor *actor = actors[val];
 			actor->AddEntity(entity);
 
-			//LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
+			LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
 		}
 	}
 
 	// ...
 
 	// 7. actor -> actor relation - scenegraph
-	//LOGGER(Log::Logger().Info("Actors:"));
+	LOGGER(Log::Logger().Info("Actors:"));
 	LoadKeymap(ar, actor_to_actor);
 	for (auto key_it = actor_to_actor.begin(); key_it != actor_to_actor.end(); ++key_it) 
 	{
@@ -133,7 +133,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 			if (parent && child)
 				parent->AddChild(child);
 			
-			//LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
+			LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
 		}
 	}
 
@@ -160,7 +160,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	std::vector<Entity3D*> entities;
 	std::vector<Material*> materials;
 
-	std::set<Entity3D*> entity_set;
+	std::map<Entity3D*, int> entity_map;
 	std::set<Material*> material_set;
 	std::map<Actor*, int> actor_map;
 
@@ -184,10 +184,11 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 
 			for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().end(); ++entity_it) {
 				Ref<Entity3D> entity = (*entity_it).Get();
-				if (entity.Valid() && entity_set.find(entity) == entity_set.end()) {
-					entity_set.insert(entity);
-					entities_to_actors[j].push_back(i);
+				if (entity.Valid() && entity_map.find(entity) == entity_map.end()) {
+					//entity_set.insert(entity); // ide map kell majd 
+					entity_map[entity] = j;
 					entities.push_back(entity);
+					entities_to_actors[j].push_back(i);
 
 					const Model * model = dynamic_cast<Model*>((*entity_it).Get());
 					if (model) {
@@ -201,6 +202,9 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 					} // is model
 					++j; // entity count
 				} // is entity
+				else {
+					entities_to_actors[entity_map[entity]].push_back(i);
+				}
 			} // fetch entity
 			++i; // actor count
 		}
