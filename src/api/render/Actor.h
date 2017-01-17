@@ -96,16 +96,11 @@ namespace Grafkit {
 
 	protected:
 
-		///@todo ezek kellenek-e?
-		//void updateShader();	
-		//void callDraw();		
-		//ActorEvents* m_events;
-
 		Grafkit::Matrix m_viewMatrix;			///< Node transyformacioja
 		Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
 
-		int m_is_nodeHidden;
-		int m_is_childrenHidden;
+		BYTE m_is_nodeHidden;
+		BYTE m_is_childrenHidden;
 
 		Ref<Actor> m_pParent;
 		std::vector<Ref<Actor>> m_pChildren;

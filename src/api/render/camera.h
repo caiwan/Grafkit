@@ -17,11 +17,8 @@ namespace Grafkit {
 	{
 	public:
 		Camera();
-		virtual ~Camera();
+		~Camera();
 
-	/*	void* operator new(size_t);
-		void  operator delete(void*);
-*/
 		void SetPosition(float x, float y, float z);
 		float3 &GetPosition() { return this->m_position; }
 		
@@ -76,12 +73,13 @@ namespace Grafkit {
 		}
 
 		enum camera_mode { LOOK_TO, LOOK_AT };
+
 		enum camera_mode getMode() {
 			return m_mode;
 		}
 		
-		/** van sajnos olyan eset, amikor a kamera tipusant nem tudjuk elore */
 		enum camera_type { PERSPECTIVE, ORTHOGRAPHIC };
+		
 		virtual void setType(enum camera_type t) {
 			m_type = t;
 		}
@@ -112,31 +110,4 @@ namespace Grafkit {
 	protected:
 		virtual void serialize(Archive& ar);
 	};
-
-	///** Perspective camera */
-	///*__declspec(align(16))*/ class PerspectiveCamera : /*public AlignedNew<PerspectiveCamera>,*/ public Camera
-	//{
-	//public:
-	//	PerspectiveCamera() : Camera() {
-	//	}
-
-	//	virtual Matrix& getProjrctionjMatrix() { return m_perspectiveMatrix; }
-
-	//	virtual void setType(enum camera_type t) { }
-	//	virtual enum camera_type getType() { return PERSPECTIVE; }
-	//};
-
-	///** Orthographic camera */
-	///*__declspec(align(16))*/ class OrthoCamera : /*public AlignedNew<OrthoCamera>, */ public Camera
-	//{
-	//public:
-	//	OrthoCamera() : Camera() {
-	//	}
-
-	//	virtual Matrix& getProjrctionjMatrix() { return m_orthoMatrix; }
-	//	
-	//	virtual void setType(enum camera_type t) { }
-	//	virtual enum camera_type getType() { return ORTHOGRAPHIC; }
-	//};
-
 }

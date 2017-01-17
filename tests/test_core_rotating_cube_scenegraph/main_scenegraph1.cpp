@@ -172,7 +172,11 @@ protected:
 			scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);
 
 			scene->Get()->SetActiveCamera(0);
+			
 			// --- 
+
+			m_rootActor = scene->Get()->GetRootNode();
+			m_cameraActor = scene->Get()->GetActiveCamera();
 
 			this->t = 0;
 
@@ -189,7 +193,7 @@ protected:
 		int mainloop() {
 			this->render.BeginScene();
 			{				
-				ShaderRef fragmentShader = this->m_fragmentShader->Get();
+				//ShaderRef fragmentShader = this->m_fragmentShader->Get();
 
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);

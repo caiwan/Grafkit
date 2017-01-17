@@ -157,5 +157,17 @@ void Camera::Calculate(Renderer& renderer)
 void Grafkit::Camera::serialize(Archive & ar)
 {
 	this->Entity3D::_serialize(ar);
-	// TBD ... 
+
+	PERSIST_FIELD(ar, m_id);
+	PERSIST_FIELD(ar, m_type);
+	PERSIST_FIELD(ar, m_mode);
+
+	PERSIST_FIELD(ar, m_position);
+	PERSIST_FIELD(ar, m_look);
+	PERSIST_FIELD(ar, m_up);
+	PERSIST_FIELD(ar, m_rotation);
+
+	PERSIST_FIELD(ar, m_znear);
+	PERSIST_FIELD(ar, m_zfar);
+	PERSIST_FIELD(ar, m_hFov);
 }

@@ -59,6 +59,10 @@ void Grafkit::Actor::serialize(Archive & ar)
 {
 	IResource::_serialize(ar);
 
-	/// ... TBD
-}
+	PERSIST_FIELD(ar, m_is_nodeHidden);
+	PERSIST_FIELD(ar, m_is_childrenHidden);
 
+	PERSIST_FIELD(ar, m_viewMatrix);
+	PERSIST_FIELD(ar, m_transformMatrix);
+
+}
