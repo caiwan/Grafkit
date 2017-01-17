@@ -52,7 +52,7 @@ void Grafkit::Scene::Initialize(ActorRef root)
 				break; // assume if we have only one light uder a node
 			}
 
-			const Camera * camera = dynamic_cast<Camera*>((*entity).Get());;
+			const Camera * camera = dynamic_cast<Camera*>((*entity).Get());
 			if (camera) {
 				m_cameraNodes.push_back(node);
 				m_cameraMap[node->GetName()] = node;

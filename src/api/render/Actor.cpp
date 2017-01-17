@@ -58,5 +58,7 @@ void Grafkit::Actor::AddChild(Actor* child)
 void Grafkit::Actor::serialize(Archive & ar)
 {
 	IResource::_serialize(ar);
+
+	/// ... TBD
 }
 

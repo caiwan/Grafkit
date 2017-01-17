@@ -40,10 +40,10 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 		throw EX(SceneLoadException);
 	
 	// --- 
-	std::vector<Material*> materials;
-	std::vector<Entity3D*> entities;
-	std::vector<Actor*> actors;
-	std::vector<Animation*> animations;
+	std::vector<MaterialRef> materials;
+	std::vector<Ref<Entity3D>> entities;
+	std::vector<ActorRef> actors;
+	std::vector<AnimationRef> animations;
 
 	// 1. materials
 	UINT materialCount = materials.size();
@@ -80,6 +80,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 	assoc_t actor_to_actor;
 
 	// 5. material -> mesh relation
+	//LOGGER(Log::Logger().Info("Materials:"));
 	LoadKeymap(ar, materials_to_meshes);
 	for (auto key_it = materials_to_meshes.begin(); key_it != materials_to_meshes.end(); ++key_it) 
 	{
@@ -88,15 +89,18 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
 		{
 			USHORT val = *value_it;
-			Model *model = dynamic_cast<Model *>(entities[val]);
+			Model *model = dynamic_cast<Model *>(entities[val].Get());
 			if (model) {
 				model->SetMaterial(material);
+
+				//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
 			}
 		}
 	}
 	// ... 
 
 	// 6. entitiy -> actor relation
+	//LOGGER(Log::Logger().Info("Entities:"));
 	LoadKeymap(ar, entities_to_actors);
 	for (auto key_it = entities_to_actors.begin(); key_it != entities_to_actors.end(); ++key_it) 
 	{
@@ -107,26 +111,34 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 			USHORT val = *value_it;
 			Actor *actor = actors[val];
 			actor->AddEntity(entity);
+
+			//LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
 		}
 	}
 
 	// ...
 
 	// 7. actor -> actor relation - scenegraph
+	//LOGGER(Log::Logger().Info("Actors:"));
 	LoadKeymap(ar, actor_to_actor);
 	for (auto key_it = actor_to_actor.begin(); key_it != actor_to_actor.end(); ++key_it) 
 	{
 		USHORT key = key_it->first;
-		Actor *child = actors[key];
+		
 		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
 		{
 			USHORT val = *value_it;
-			Actor *parent = actors[val];
-			parent->AddChild(child);
+			Actor *child = actors[val];
+			Actor *parent = actors[key];
+			if (parent && child)
+				parent->AddChild(child);
+			
+			//LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
 		}
 	}
 
-	scene->Initialize(actors[0]);
+	Actor * root = actors[0];
+	scene->Initialize(root);
 
 	dstScene->AssingnRef(scene);
 }
@@ -187,11 +199,10 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 							++k;
 						} // has material
 					} // is model
-
 					++j; // entity count
-				}
-				++i; // actor count
-			}
+				} // is entity
+			} // fetch entity
+			++i; // actor count
 		}
 		// </yield>
 		
@@ -199,10 +210,20 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 			stack.push(*it);
 	}
 
-	for (size_t i = 0; i < actors.size(); ++i) {
-		auto parent = actor_map.find(actors[i]);
-		if (parent != actor_map.end()) {
-			actor_to_actor[i].push_back(parent->second);
+	//for (auto actor_it = actorsbegin(); actor_it != actors.end(); ++actor_it) {
+	for (size_t i = 0; i<actors.size(); ++i)
+	{
+		Actor *actor = actors[i];
+		if (actor) {
+			Actor *parent = actor->GetParent();
+			if (parent) {
+				auto it = actor_map.find(parent);
+				if (it != actor_map.end()) {
+					UINT key = (it->second), val = i;
+					actor_to_actor[key].push_back(val);
+					//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
+				}
+			}
 		}
 	}
 	
@@ -221,6 +242,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	PERSIST_FIELD(ar, entityCount);
 	for (UINT i = 0; i < entityCount; ++i) {
 		Entity3D* entity = entities[i];
+		//LOGGER(Log::Logger().Info("Entity: %s", entity->GetName().c_str()));
 		PERSIST_OBJECT(ar, entity);
 	}
 

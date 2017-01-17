@@ -47,7 +47,7 @@ public:
 
 protected:
 		Renderer render;
-		Ref<Scene> scene;
+		SceneResRef scene;
 
 		TextureSamplerRef m_textureSampler;
 
@@ -76,6 +76,7 @@ protected:
 			// -- camera
 			/* Az alap kamera origoban van, +z iranyba nez, es +y felfele irany */
 			CameraRef camera = new Camera;
+			camera->SetName("kiscica");
 
 			// -- texture
 			TextureResRef texture = new TextureRes();
@@ -105,7 +106,7 @@ protected:
 			model->GetMesh()->Build(render, m_vertexShader);
 
 			// -- setup scene 
-			scene = new Scene();
+			scene = new SceneRes(new Scene());
 			
 			m_cameraActor = new Actor(); 
 			m_cameraActor->AddEntity(camera);
@@ -150,25 +151,27 @@ protected:
 			m_rootActor->AddChild(m_cameraActor);
 			m_rootActor->AddChild(modelActor);
 
-			scene->Initialize(m_rootActor);
+			scene->Get()->Initialize(m_rootActor);
 
-			scene->SetActiveCamera(0);
-
-			/* Export and import stuff to file, then buiild it */
-			SceneLoader::Save(scene, "./../assets/hello.scene");
-			scene = this->Load<Scene>(new SceneLoader("scene", "hello.scene"));
-			this->DoPrecalc();
-
-			scene->BuildScene(render, m_vertexShader, m_fragmentShader);
+			scene->Get()->SetActiveCamera(0);
 
 			// add shaders
-			scene->SetVShader(m_vertexShader);
-			scene->SetPShader(m_fragmentShader);
+			scene->Get()->SetVShader(m_vertexShader);
+			scene->Get()->SetPShader(m_fragmentShader);
 
 			m_cameraActor->Matrix().Identity();
-			m_cameraActor->Matrix().Translate(0,0,-10);
+			m_cameraActor->Matrix().Translate(0, 0, -10);
 
+			/* ------------------------------------------------------------ */
 
+			/* Export and import stuff to file, then buiild it */
+			SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
+			scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
+			this->DoPrecalc();
+
+			scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);
+
+			scene->Get()->SetActiveCamera(0);
 			// --- 
 
 			this->t = 0;
@@ -195,8 +198,8 @@ protected:
 				m_cameraActor->Transform().Identity();
 				m_cameraActor->Transform().Translate(0,0,f);
 
-				scene->PreRender(render);
-				scene->Render(render);
+				scene->Get()->PreRender(render);
+				scene->Get()->Render(render);
 
 				this->t += 0.1f;
 			}

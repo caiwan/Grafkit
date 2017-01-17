@@ -93,7 +93,7 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 	ShaderRef shader = NewShader();
 	// load from asset
 	if (asset.Valid()) {
-		// LOGGER(LOG(TRACE) << "Lading shader from resource" << m_type << m_name << "@" << m_entrypoint;);
+		LOGGER(Log::Logger().Info("Lading shader from resource %d %s@%s", shader->GetShaderType(), m_name.c_str(), m_entrypoint.c_str()));
 		ID3DInclude * pInclude= new IncludeProvider(resman);
 		shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
 		delete pInclude;

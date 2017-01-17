@@ -7,6 +7,8 @@
 
 using namespace Grafkit;
 
+PERSISTENT_IMPL(Grafkit::Camera)
+
 Camera::Camera() : Entity3D()
 {
 	m_mode = LOOK_TO;
@@ -150,3 +152,10 @@ void Camera::Calculate(Renderer& renderer)
 
 
 	}
+
+
+void Grafkit::Camera::serialize(Archive & ar)
+{
+	this->Entity3D::_serialize(ar);
+	// TBD ... 
+}

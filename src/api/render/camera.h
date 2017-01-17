@@ -10,13 +10,10 @@
 namespace Grafkit {
 
 	class Camera;
-	class PerspectiveCamera;		///@todo implement this, see trello notes
-	class OrthoCamera;			///@todo implement this, see trello notes
 	// 
 
 	/** Basic camera class */
-	/*__declspec(align(16)) class Camera : public AlignedNew<Camera>, public Grafkit::Entity3D*/
-	__declspec(align(16)) class Camera : public Entity3D, public AlignedNew<Camera>
+	__declspec(align(16)) class Camera : public Entity3D, public AlignedNew<Camera>, public Persistent
 	{
 	public:
 		Camera();
@@ -110,32 +107,36 @@ namespace Grafkit {
 		Grafkit::Matrix m_viewMatrix;
 		Grafkit::Matrix m_perspectiveMatrix;
 		Grafkit::Matrix m_orthoMatrix;
+
+		PERSISTENT_DECL(Grafkit::Camera, 1);
+	protected:
+		virtual void serialize(Archive& ar);
 	};
 
-	/** Perspective camera */
-	/*__declspec(align(16))*/ class PerspectiveCamera : /*public AlignedNew<PerspectiveCamera>,*/ public Camera
-	{
-	public:
-		PerspectiveCamera() : Camera() {
-		}
+	///** Perspective camera */
+	///*__declspec(align(16))*/ class PerspectiveCamera : /*public AlignedNew<PerspectiveCamera>,*/ public Camera
+	//{
+	//public:
+	//	PerspectiveCamera() : Camera() {
+	//	}
 
-		virtual Matrix& getProjrctionjMatrix() { return m_perspectiveMatrix; }
+	//	virtual Matrix& getProjrctionjMatrix() { return m_perspectiveMatrix; }
 
-		virtual void setType(enum camera_type t) { }
-		virtual enum camera_type getType() { return PERSPECTIVE; }
-	};
+	//	virtual void setType(enum camera_type t) { }
+	//	virtual enum camera_type getType() { return PERSPECTIVE; }
+	//};
 
-	/** Orthographic camera */
-	/*__declspec(align(16))*/ class OrthoCamera : /*public AlignedNew<OrthoCamera>, */ public Camera
-	{
-	public:
-		OrthoCamera() : Camera() {
-		}
+	///** Orthographic camera */
+	///*__declspec(align(16))*/ class OrthoCamera : /*public AlignedNew<OrthoCamera>, */ public Camera
+	//{
+	//public:
+	//	OrthoCamera() : Camera() {
+	//	}
 
-		virtual Matrix& getProjrctionjMatrix() { return m_orthoMatrix; }
-		
-		virtual void setType(enum camera_type t) { }
-		virtual enum camera_type getType() { return ORTHOGRAPHIC; }
-	};
+	//	virtual Matrix& getProjrctionjMatrix() { return m_orthoMatrix; }
+	//	
+	//	virtual void setType(enum camera_type t) { }
+	//	virtual enum camera_type getType() { return ORTHOGRAPHIC; }
+	//};
 
 }

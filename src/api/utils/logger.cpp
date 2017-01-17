@@ -69,7 +69,7 @@ Grafkit::Logger::~Logger()
  void Grafkit::Logger::Info(const char * const message, ...)
 {
 	char buffer[65536];
-	EXTRACT_VA(message, buffer);
+             	EXTRACT_VA(message, buffer);
 	Write(LOG_INFO, buffer);
 }
 
