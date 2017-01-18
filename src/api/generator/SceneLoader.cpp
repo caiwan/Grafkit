@@ -7,10 +7,13 @@
 
 #include "../utils/ResourceManager.h"
 
-
-
 using namespace Grafkit;
 using namespace FWdebugExceptions;
+
+class SceneLoaderHelper {
+
+};
+
 
 Grafkit::SceneLoader::SceneLoader(std::string name, std::string source_name) : IResourceBuilder(name, source_name)
 {
@@ -20,18 +23,8 @@ Grafkit::SceneLoader::~SceneLoader()
 {
 }
 
-// assoc. tabla
-typedef std::map<USHORT, std::vector<USHORT>> assoc_t;
 
-typedef struct {
-	std::string name;
-	std::string bind;
-} texture_bind_t;
 
-typedef std::map<UINT, std::vector<texture_bind_t>> texture_assoc_t;
-
-void LoadKeymap(Archive &ar, assoc_t &keymap);
-void StoreKeymap(Archive &ar, assoc_t &keymap);
 
 void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Grafkit::IResource * source)
 {
@@ -50,6 +43,9 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 	if (scene.Invalid())
 		throw EX(SceneLoadException);
 	
+	SceneLoader::SceneLoaderHelper loader(ar, scene);
+	loader.Load();
+
 	// --- 
 	std::vector<MaterialRef> materials;
 	texture_assoc_t textures_to_materials;
@@ -176,155 +172,6 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 
 	ArchiveFile ar(fp, true);
 
-	PERSIST_REFOBJECT(ar, scene);
-
-	// collect data
-	ActorRef scenegraph = scene->GetRootNode();
-
-	std::vector<Actor*> actors;
-	std::vector<Entity3D*> entities;
-	std::vector<Material*> materials;
-	
-
-	std::map<Entity3D*, int> entity_map;
-	std::set<Material*> material_set;
-	std::map<Actor*, int> actor_map;
-
-	texture_assoc_t textures_to_materials;
-	assoc_t materials_to_meshes;
-	assoc_t entities_to_actors;
-	assoc_t actor_to_actor;
-
-	std::stack<Actor*> stack;
-	stack.push(scenegraph);
-
-	// --- collect assoc. map and tree for serialization 
-	int i = 0, j = 0, k = 0, l = 0;
-	while (!stack.empty()) {
-		ActorRef node = stack.top(); stack.pop();
-		
-		// <yield>
-		if (node) {
-			ActorRef actor = node.Get();
-			actors.push_back(actor); 
-			actor_map[actor] = i;
-
-			for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().end(); ++entity_it) {
-				Ref<Entity3D> entity = (*entity_it).Get();
-				if (entity.Valid() && entity_map.find(entity) == entity_map.end()) {
-					//entity_set.insert(entity); // ide map kell majd 
-					entity_map[entity] = j;
-					entities.push_back(entity);
-					entities_to_actors[j].push_back(i);
-
-					const Model * model = dynamic_cast<Model*>((*entity_it).Get());
-					if (model) {
-						// save material
-						MaterialRef material = model->GetMaterial();
-						if (material.Valid() && material_set.find(material) == material_set.end()) {
-							material_set.insert(material);
-							materials_to_meshes[k].push_back(j);
-							materials.push_back(material);
-
-							// save textures
-							auto tx_begin = material->_GetTextureMapIterator_Begin();
-							auto tx_end = material->_GetTextureMapIterator_End();
-							if (tx_begin != tx_end) {
-								for (auto tx_it = tx_begin; tx_it != tx_end; ++tx_it) {
-									
-									TextureResRef texture = tx_it->second;
-									if (texture.Valid() && texture->Valid()) {
-										texture_bind_t bind;
-										bind.name = texture->GetName();
-										bind.bind = tx_it->first;
-										textures_to_materials[j].push_back(bind);
-									}
-								}
-							}
-							
-
-							++k;
-						} // has material
-					} // is model
-					++j; // entity count
-				} // is entity
-				else {
-					entities_to_actors[entity_map[entity]].push_back(i);
-				}
-			} // fetch entity
-			++i; // actor count
-		}
-		// </yield>
-		
-		for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
-			stack.push(*it);
-	}
-
-	//for (auto actor_it = actorsbegin(); actor_it != actors.end(); ++actor_it) {
-	for (size_t i = 0; i<actors.size(); ++i)
-	{
-		Actor *actor = actors[i];
-		if (actor) {
-			Actor *parent = actor->GetParent();
-			if (parent) {
-				auto it = actor_map.find(parent);
-				if (it != actor_map.end()) {
-					UINT key = (it->second), val = i;
-					actor_to_actor[key].push_back(val);
-					//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
-				}
-			}
-		}
-	}
-	
-	// --- persist scene 
-
-	// 1. materials
-	UINT materialCount = materials.size();
-	PERSIST_FIELD(ar, materialCount);
-	for (UINT i = 0; i < materialCount; ++i) {
-		Material *material = materials[i];
-		PERSIST_OBJECT(ar, material);
-
-		// materials_to_textures
-		std::vector<texture_bind_t> bind = textures_to_materials[i];
-		UINT textureCount = bind.size();
-		PERSIST_FIELD(ar, textureCount);
-		for (UINT j = 0; j < textureCount; ++j) {
-			PERSIST_STRING(ar, bind[j].bind);
-			PERSIST_STRING(ar, bind[j].name);
-		}
-	}
-
-	// 2. entity
-	UINT entityCount = entities.size();
-	PERSIST_FIELD(ar, entityCount);
-	for (UINT i = 0; i < entityCount; ++i) {
-		Entity3D* entity = entities[i];
-		//LOGGER(Log::Logger().Info("Entity: %s", entity->GetName().c_str()));
-		PERSIST_OBJECT(ar, entity);
-	}
-
-	// 3. actors
-	UINT actorCount = actors.size();
-	PERSIST_FIELD(ar, actorCount);
-	for (UINT i = 0; i < actorCount; ++i) {
-		Actor* actor = actors[i];
-		PERSIST_OBJECT(ar, actor);
-	}
-
-	// 4. animations
-
-	// TODO
-
-	// 5. material -> mesh relation
-	StoreKeymap(ar, materials_to_meshes);
-	
-	// 6. entitiy -> actor relation
-	StoreKeymap(ar, entities_to_actors);
-	
-	// 7. actor -> actor relation - scenegraph
-	StoreKeymap(ar, actor_to_actor);
 
 	fflush(fp);
 	fclose(fp);
@@ -350,7 +197,213 @@ void LoadKeymap(Archive &ar, assoc_t &keymap){
 	}
 }
 
-void StoreKeymap(Archive &ar, assoc_t &keymap){
+/************************************************************************************************************************
+* Scene persist helper
+*************************************************************************************************************************/
+
+Grafkit::SceneLoader::SceneLoaderHelper::SceneLoaderHelper(Archive &ar, SceneRef & scene) : m_scene(scene)
+{
+	if (ar.IsStoring()) {
+		BuildObjectMaps();
+	}
+}
+
+Grafkit::SceneLoader::SceneLoaderHelper::~SceneLoaderHelper()
+{
+}
+
+
+// ======================================================================================================================
+// Load
+
+// ======================================================================================================================
+// Store
+
+// Builds map of object relations
+void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
+{
+	m_cTexID = 0;
+	m_cMatID = 0;
+	m_cEntityID = 0;
+	m_cActorID = 0;
+
+	// collect data
+	ActorRef scenegraph = m_scene->GetRootNode();
+
+	std::stack<Actor*> stack;
+	stack.push(scenegraph);
+
+	// --- collect assoc. map and tree for serialization 
+	int i = 0, j = 0, k = 0, l = 0;
+	while (!stack.empty()) {
+		ActorRef node = stack.top(); stack.pop();
+
+		if (node.Valid()) {
+			m_actors.push_back(node);
+			m_actor_map[node] = m_cActorID;
+
+			BuildEntityMap(node);
+
+			++m_cActorID;
+		}
+
+		for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
+			stack.push(*it);
+	}
+
+	BuildActorMap();
+}
+
+// Which texture belong to this exact material, and which shader slot bound to
+void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef & material)
+{
+	auto tx_begin = material->_GetTextureMapIterator_Begin();
+	auto tx_end = material->_GetTextureMapIterator_End();
+
+	if (tx_begin != tx_end) {
+		for (auto tx_it = tx_begin; tx_it != tx_end; ++tx_it) {
+
+			TextureResRef texture = tx_it->second;
+			if (texture.Valid() && texture->Valid()) {
+				texture_bind_t bind;
+				bind.name = texture->GetName();
+				bind.bind = tx_it->first;
+				m_textures_to_materials[m_cMatID].push_back(bind);
+			
+				// .. ami kell meg ide johet
+
+				++m_cTexID;
+			}
+		}
+	}
+}
+
+// Which material belongs to which entity if its a model
+void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &model)
+{
+	MaterialRef material = model->GetMaterial();
+	if (material.Valid() && m_material_set.find(material) == m_material_set.end()) {
+		m_material_set.insert(material);
+		m_materials_to_meshes[m_cMatID].push_back(m_cEntityID);
+		m_materials.push_back(material);
+
+		BuildTextureMap(material);
+
+		++m_cMatID;
+	} // has material
+}
+
+// which entity belongs to which actor
+void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &actor)
+{
+	for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().end(); ++entity_it) {
+		Ref<Entity3D> entity = (*entity_it).Get();
+		if (entity.Valid() && m_entity_map.find(entity) == m_entity_map.end()) {
+			m_entity_map[entity] = m_cEntityID;
+			m_entities.push_back(entity);
+			m_entities_to_actors[m_cEntityID].push_back(m_cActorID);
+
+			// model 
+			const ModelRef model = dynamic_cast<Model*>((*entity_it).Get());
+			if (model.Valid()) {
+				BuildMaterialMap(model);
+				// ... ide jon, ami kell meg
+			} 
+
+			// ... ide jon, ami kell meg 
+
+			++m_cEntityID;
+		}
+		else {
+			m_entities_to_actors[m_entity_map[entity]].push_back(m_cActorID);
+		}
+	} 
+}
+
+// which actor whose child of
+void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
+{
+	for (size_t i = 0; i<m_actors.size(); ++i)
+	{
+		Actor *actor = m_actors[i];
+		if (actor) {
+			Actor *parent = actor->GetParent();
+			if (parent) {
+				auto it = m_actor_map.find(parent);
+				if (it != m_actor_map.end()) {
+					UINT key = (it->second), val = i;
+					m_actor_to_actor[key].push_back(val);
+					//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
+				}
+			}
+		}
+	}
+}
+
+
+
+void Grafkit::SceneLoader::SceneLoaderHelper::Store(Archive &ar)
+{
+	// --- persist scene 
+	PERSIST_REFOBJECT(ar , m_scene);
+
+	StoreMaterials(ar);
+	StoreEntities(ar);
+	StoreActors(ar);
+	StoreAnimations(ar);
+
+	StoreKeymap(ar, m_materials_to_meshes);
+	StoreKeymap(ar, m_entities_to_actors);
+	StoreKeymap(ar, m_actor_to_actor);
+}
+
+void Grafkit::SceneLoader::SceneLoaderHelper::StoreMaterials(Archive &ar)
+{
+	UINT materialCount = m_materials.size();
+	PERSIST_FIELD(ar , materialCount);
+	for (UINT i = 0; i < materialCount; ++i) {
+		Material *material = m_materials[i];
+		PERSIST_OBJECT(ar , material);
+
+		// materials_to_textures
+		std::vector<texture_bind_t> bind = m_textures_to_materials[i];
+		UINT textureCount = bind.size();
+		PERSIST_FIELD(ar , textureCount);
+		for (UINT j = 0; j < textureCount; ++j) {
+			PERSIST_STRING(ar , bind[j].bind);
+			PERSIST_STRING(ar , bind[j].name);
+		}
+	}
+}
+
+void Grafkit::SceneLoader::SceneLoaderHelper::StoreEntities(Archive &ar)
+{
+	UINT entityCount = m_entities.size();
+	PERSIST_FIELD(ar, entityCount);
+	for (UINT i = 0; i < entityCount; ++i) {
+		Entity3D* entity = m_entities[i];
+		//LOGGER(Log::Logger().Info("Entity: %s", entity->GetName().c_str()));
+		PERSIST_OBJECT(ar, entity);
+	}
+}
+
+void Grafkit::SceneLoader::SceneLoaderHelper::StoreActors(Archive &ar)
+{
+	UINT actorCount = m_actors.size();
+	PERSIST_FIELD(ar, actorCount);
+	for (UINT i = 0; i < actorCount; ++i) {
+		Actor* actor = m_actors[i];
+		PERSIST_OBJECT(ar , actor);
+	}
+}
+
+void Grafkit::SceneLoader::SceneLoaderHelper::StoreAnimations(Archive &ar)
+{
+	// TODO
+}
+
+void Grafkit::SceneLoader::SceneLoaderHelper::StoreKeymap(Archive & ar, SceneLoader::SceneLoaderHelper::assoc_t & keymap)
+{
 	USHORT keyMapCount = keymap.size();
 	PERSIST_FIELD(ar, keyMapCount);
 	for (auto key_it = keymap.begin(); key_it != keymap.end(); ++key_it) {
