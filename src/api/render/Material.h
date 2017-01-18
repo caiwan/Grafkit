@@ -77,6 +77,10 @@ namespace Grafkit {
 		void AddTexture(TextureResRef texture, texture_type_e slot);
 		void RemoveTexture(TextureResRef texture, texture_type_e slot);
 
+		// persisthez kell
+		std::map<std::string, TextureResRef>::const_iterator _GetTextureMapIterator_Begin() { return m_textures.cbegin(); }
+		std::map<std::string, TextureResRef>::const_iterator _GetTextureMapIterator_End() { return m_textures.cend(); }
+
 		virtual void Render(Renderer& render, ShaderRef &pixelShader);
 
 	protected:

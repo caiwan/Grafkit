@@ -5,6 +5,10 @@
 #include "../utils/asset.h"
 #include "../utils/persistence/archive.h"
 
+#include "../utils/ResourceManager.h"
+
+
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
@@ -17,7 +21,14 @@ Grafkit::SceneLoader::~SceneLoader()
 }
 
 // assoc. tabla
-typedef  std::map<USHORT, std::vector<USHORT>> assoc_t;
+typedef std::map<USHORT, std::vector<USHORT>> assoc_t;
+
+typedef struct {
+	std::string name;
+	std::string bind;
+} texture_bind_t;
+
+typedef std::map<UINT, std::vector<texture_bind_t>> texture_assoc_t;
 
 void LoadKeymap(Archive &ar, assoc_t &keymap);
 void StoreKeymap(Archive &ar, assoc_t &keymap);
@@ -41,6 +52,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 	
 	// --- 
 	std::vector<MaterialRef> materials;
+	texture_assoc_t textures_to_materials;
 	std::vector<Ref<Entity3D>> entities;
 	std::vector<ActorRef> actors;
 	std::vector<AnimationRef> animations;
@@ -52,6 +64,19 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 		Material *material = nullptr;
 		PERSIST_OBJECT(ar, material);
 		materials.push_back(material);
+
+		// materials to textures
+		UINT textureCount = 0;
+		PERSIST_FIELD(ar, textureCount);
+		for (UINT j = 0; j < textureCount; ++j) {
+			texture_bind_t tx;
+			PERSIST_STRING(ar, tx.bind);
+			PERSIST_STRING(ar, tx.name);
+
+			TextureResRef texture = assman->Get<TextureRes>(tx.name);
+			material->AddTexture(texture, tx.bind);
+			//LOGGER(Log::Logger().Info("Texture: %s" , tx.name.c_str()));
+		}
 	}
 
 	// 2. entities
@@ -100,7 +125,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 	// ... 
 
 	// 6. entitiy -> actor relation
-	LOGGER(Log::Logger().Info("Entities:"));
+	//LOGGER(Log::Logger().Info("Entities:"));
 	LoadKeymap(ar, entities_to_actors);
 	for (auto key_it = entities_to_actors.begin(); key_it != entities_to_actors.end(); ++key_it) 
 	{
@@ -112,14 +137,14 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 			Actor *actor = actors[val];
 			actor->AddEntity(entity);
 
-			LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
+			//LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
 		}
 	}
 
 	// ...
 
 	// 7. actor -> actor relation - scenegraph
-	LOGGER(Log::Logger().Info("Actors:"));
+	//LOGGER(Log::Logger().Info("Actors:"));
 	LoadKeymap(ar, actor_to_actor);
 	for (auto key_it = actor_to_actor.begin(); key_it != actor_to_actor.end(); ++key_it) 
 	{
@@ -133,7 +158,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Graf
 			if (parent && child)
 				parent->AddChild(child);
 			
-			LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
+			//LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
 		}
 	}
 
@@ -159,11 +184,13 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	std::vector<Actor*> actors;
 	std::vector<Entity3D*> entities;
 	std::vector<Material*> materials;
+	
 
 	std::map<Entity3D*, int> entity_map;
 	std::set<Material*> material_set;
 	std::map<Actor*, int> actor_map;
 
+	texture_assoc_t textures_to_materials;
 	assoc_t materials_to_meshes;
 	assoc_t entities_to_actors;
 	assoc_t actor_to_actor;
@@ -192,11 +219,30 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 
 					const Model * model = dynamic_cast<Model*>((*entity_it).Get());
 					if (model) {
+						// save material
 						MaterialRef material = model->GetMaterial();
 						if (material.Valid() && material_set.find(material) == material_set.end()) {
 							material_set.insert(material);
 							materials_to_meshes[k].push_back(j);
 							materials.push_back(material);
+
+							// save textures
+							auto tx_begin = material->_GetTextureMapIterator_Begin();
+							auto tx_end = material->_GetTextureMapIterator_End();
+							if (tx_begin != tx_end) {
+								for (auto tx_it = tx_begin; tx_it != tx_end; ++tx_it) {
+									
+									TextureResRef texture = tx_it->second;
+									if (texture.Valid() && texture->Valid()) {
+										texture_bind_t bind;
+										bind.name = texture->GetName();
+										bind.bind = tx_it->first;
+										textures_to_materials[j].push_back(bind);
+									}
+								}
+							}
+							
+
 							++k;
 						} // has material
 					} // is model
@@ -239,6 +285,15 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	for (UINT i = 0; i < materialCount; ++i) {
 		Material *material = materials[i];
 		PERSIST_OBJECT(ar, material);
+
+		// materials_to_textures
+		std::vector<texture_bind_t> bind = textures_to_materials[i];
+		UINT textureCount = bind.size();
+		PERSIST_FIELD(ar, textureCount);
+		for (UINT j = 0; j < textureCount; ++j) {
+			PERSIST_STRING(ar, bind[j].bind);
+			PERSIST_STRING(ar, bind[j].name);
+		}
 	}
 
 	// 2. entity
