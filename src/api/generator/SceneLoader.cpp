@@ -10,11 +10,6 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-class SceneLoaderHelper {
-
-};
-
-
 Grafkit::SceneLoader::SceneLoader(std::string name, std::string source_name) : IResourceBuilder(name, source_name)
 {
 }
@@ -23,143 +18,21 @@ Grafkit::SceneLoader::~SceneLoader()
 {
 }
 
-
-
-
-void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & assman, Grafkit::IResource * source)
+void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
 {
 	SceneResRef dstScene = dynamic_cast<SceneRes*>(source);
 	if (dstScene.Invalid()) {
 		throw EX(NullPointerException);
 	}
 
-	IAssetRef asset = this->GetSourceAsset(assman);
+	IAssetRef asset = this->GetSourceAsset(resman);
 
 	ArchiveMemory ar((BYTE*)asset->GetData(), asset->GetSize());
 
 	SceneRef scene;
-	PERSIST_REFOBJECT(ar, scene);
 
-	if (scene.Invalid())
-		throw EX(SceneLoadException);
-	
 	SceneLoader::SceneLoaderHelper loader(ar, scene);
-	loader.Load();
-
-	// --- 
-	std::vector<MaterialRef> materials;
-	texture_assoc_t textures_to_materials;
-	std::vector<Ref<Entity3D>> entities;
-	std::vector<ActorRef> actors;
-	std::vector<AnimationRef> animations;
-
-	// 1. materials
-	UINT materialCount = materials.size();
-	PERSIST_FIELD(ar, materialCount);
-	for (UINT i = 0; i < materialCount; ++i) {
-		Material *material = nullptr;
-		PERSIST_OBJECT(ar, material);
-		materials.push_back(material);
-
-		// materials to textures
-		UINT textureCount = 0;
-		PERSIST_FIELD(ar, textureCount);
-		for (UINT j = 0; j < textureCount; ++j) {
-			texture_bind_t tx;
-			PERSIST_STRING(ar, tx.bind);
-			PERSIST_STRING(ar, tx.name);
-
-			TextureResRef texture = assman->Get<TextureRes>(tx.name);
-			material->AddTexture(texture, tx.bind);
-			//LOGGER(Log::Logger().Info("Texture: %s" , tx.name.c_str()));
-		}
-	}
-
-	// 2. entities
-	UINT entityCount = entities.size();
-	PERSIST_FIELD(ar, entityCount);
-	for (UINT i = 0; i < entityCount; ++i) {
-		Entity3D* entity = nullptr;
-		PERSIST_OBJECT(ar, entity);
-		entities.push_back(entity);
-	}
-
-	// 3. actors
-	UINT actorCount = actors.size();
-	PERSIST_FIELD(ar, actorCount);
-	for (UINT i = 0; i < actorCount; ++i) {
-		Actor* actor = nullptr;
-		PERSIST_OBJECT(ar, actor);
-		actors.push_back(actor);
-	}
-
-	// 4. animations
-	// TODO
-
-	assoc_t materials_to_meshes;
-	assoc_t entities_to_actors;
-	assoc_t actor_to_actor;
-
-	// 5. material -> mesh relation
-	//LOGGER(Log::Logger().Info("Materials:"));
-	LoadKeymap(ar, materials_to_meshes);
-	for (auto key_it = materials_to_meshes.begin(); key_it != materials_to_meshes.end(); ++key_it) 
-	{
-		USHORT key = key_it->first;
-		Material * material = materials[key];
-		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
-		{
-			USHORT val = *value_it;
-			Model *model = dynamic_cast<Model *>(entities[val].Get());
-			if (model) {
-				model->SetMaterial(material);
-
-				//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
-			}
-		}
-	}
-	// ... 
-
-	// 6. entitiy -> actor relation
-	//LOGGER(Log::Logger().Info("Entities:"));
-	LoadKeymap(ar, entities_to_actors);
-	for (auto key_it = entities_to_actors.begin(); key_it != entities_to_actors.end(); ++key_it) 
-	{
-		USHORT key = key_it->first;
-		Entity3D *entity = entities[key];
-		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
-		{
-			USHORT val = *value_it;
-			Actor *actor = actors[val];
-			actor->AddEntity(entity);
-
-			//LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
-		}
-	}
-
-	// ...
-
-	// 7. actor -> actor relation - scenegraph
-	//LOGGER(Log::Logger().Info("Actors:"));
-	LoadKeymap(ar, actor_to_actor);
-	for (auto key_it = actor_to_actor.begin(); key_it != actor_to_actor.end(); ++key_it) 
-	{
-		USHORT key = key_it->first;
-		
-		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it) 
-		{
-			USHORT val = *value_it;
-			Actor *child = actors[val];
-			Actor *parent = actors[key];
-			if (parent && child)
-				parent->AddChild(child);
-			
-			//LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
-		}
-	}
-
-	Actor * root = actors[0];
-	scene->Initialize(root);
+	loader.Load(ar, resman);
 
 	dstScene->AssingnRef(scene);
 }
@@ -172,29 +45,12 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 
 	ArchiveFile ar(fp, true);
 
+	SceneLoader::SceneLoaderHelper loader(ar, scene);
+	loader.Save(ar);
 
 	fflush(fp);
 	fclose(fp);
 
-}
-
-void LoadKeymap(Archive &ar, assoc_t &keymap){
-	keymap.clear();
-	USHORT keyMapCount = 0;
-	PERSIST_FIELD(ar, keyMapCount);
-	for (size_t i=0; i<keyMapCount; ++i)
-	{
-		USHORT key = 0, valuelen = 0;
-		PERSIST_FIELD(ar, key);
-		PERSIST_FIELD(ar, valuelen);
-		std::vector<USHORT> &values = keymap[i];
-		for (size_t j = 0; j<valuelen; ++j)
-		{
-			USHORT value = 0;
-			PERSIST_FIELD(ar, value);
-			values.push_back(value);
-		}
-	}
 }
 
 /************************************************************************************************************************
@@ -215,6 +71,81 @@ Grafkit::SceneLoader::SceneLoaderHelper::~SceneLoaderHelper()
 
 // ======================================================================================================================
 // Load
+
+void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager * const & resman)
+{
+	PERSIST_REFOBJECT(ar, m_scene);
+
+	if (m_scene.Invalid())
+		throw EX(SceneLoadException);
+
+	PersistMaterials(ar, resman);
+	PersistEntities(ar, resman);
+	PersistActors(ar, resman);
+	PersistAnimations(ar, resman);
+
+	// 5. material -> mesh relation
+	//LOGGER(Log::Logger().Info("Materials:"));
+	PersistKeymap(ar, m_materials_to_meshes);
+	for (auto key_it = m_materials_to_meshes.begin(); key_it != m_materials_to_meshes.end(); ++key_it)
+	{
+		USHORT key = key_it->first;
+		Material * material = m_materials[key];
+		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it)
+		{
+			USHORT val = *value_it;
+			Model *model = dynamic_cast<Model *>(m_entities[val]);
+
+			if (model) {
+				model->SetMaterial(material);
+
+				//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
+			}
+		}
+	}
+	// ... 
+
+	// 6. entitiy -> actor relation
+	//LOGGER(Log::Logger().Info("Entities:"));
+	PersistKeymap(ar, m_entities_to_actors);
+	for (auto key_it = m_entities_to_actors.begin(); key_it != m_entities_to_actors.end(); ++key_it)
+	{
+		USHORT key = key_it->first;
+		Entity3D *entity = m_entities[key];
+		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it)
+		{
+			USHORT val = *value_it;
+			Actor *actor = m_actors[val];
+			actor->AddEntity(entity);
+
+			//LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
+		}
+	}
+
+	// ...
+
+	// 7. actor -> actor relation - scenegraph
+	//LOGGER(Log::Logger().Info("Actors:"));
+	PersistKeymap(ar, m_actor_to_actor);
+	for (auto key_it = m_actor_to_actor.begin(); key_it != m_actor_to_actor.end(); ++key_it)
+	{
+		USHORT key = key_it->first;
+
+		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it)
+		{
+			USHORT val = *value_it;
+			Actor *child = m_actors[val];
+			Actor *parent = m_actors[key];
+			if (parent && child)
+				parent->AddChild(child);
+
+			//LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
+		}
+	}
+
+	Actor * root = m_actors[0];
+	m_scene->Initialize(root);
+}
 
 // ======================================================================================================================
 // Store
@@ -341,80 +272,167 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 }
 
 
+// ======================================================================================================================
+// Store
 
-void Grafkit::SceneLoader::SceneLoaderHelper::Store(Archive &ar)
+void Grafkit::SceneLoader::SceneLoaderHelper::Save(Archive &ar)
 {
 	// --- persist scene 
 	PERSIST_REFOBJECT(ar , m_scene);
 
-	StoreMaterials(ar);
-	StoreEntities(ar);
-	StoreActors(ar);
-	StoreAnimations(ar);
+	IResourceManager * const resman = nullptr;
 
-	StoreKeymap(ar, m_materials_to_meshes);
-	StoreKeymap(ar, m_entities_to_actors);
-	StoreKeymap(ar, m_actor_to_actor);
+	PersistMaterials(ar, resman);
+	PersistEntities(ar, resman);
+	PersistActors(ar, resman);
+	PersistAnimations(ar, resman);
+
+	PersistKeymap(ar, m_materials_to_meshes);
+	PersistKeymap(ar, m_entities_to_actors);
+	PersistKeymap(ar, m_actor_to_actor);
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::StoreMaterials(Archive &ar)
+void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IResourceManager * const & resman)
 {
-	UINT materialCount = m_materials.size();
+	UINT materialCount = 0;
+	if (ar.IsStoring())
+		materialCount = m_materials.size();
+
 	PERSIST_FIELD(ar , materialCount);
 	for (UINT i = 0; i < materialCount; ++i) {
-		Material *material = m_materials[i];
+		
+		Material *material = nullptr; 
+		if (ar.IsStoring()) 
+			material = m_materials[i];
+
 		PERSIST_OBJECT(ar , material);
 
+		if (!ar.IsStoring())
+			m_materials.push_back(material);
+
 		// materials_to_textures
-		std::vector<texture_bind_t> bind = m_textures_to_materials[i];
-		UINT textureCount = bind.size();
+		std::vector<texture_bind_t> tx_bind;
+		UINT textureCount = 0;
+
+		if (ar.IsStoring()) {
+			tx_bind = m_textures_to_materials[i];
+			textureCount = tx_bind.size();
+		}
+
 		PERSIST_FIELD(ar , textureCount);
+		
 		for (UINT j = 0; j < textureCount; ++j) {
-			PERSIST_STRING(ar , bind[j].bind);
-			PERSIST_STRING(ar , bind[j].name);
+			texture_bind_t tx;
+			if (ar.IsStoring())
+				tx = tx_bind[j];
+
+			PERSIST_STRING(ar , tx.bind);
+			PERSIST_STRING(ar , tx.name);
+
+			if (!ar.IsStoring()) {
+				TextureResRef texture = resman->Get<TextureRes>(tx.name);
+				material->AddTexture(texture, tx.bind);
+			}
 		}
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::StoreEntities(Archive &ar)
+void Grafkit::SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IResourceManager * const & resman)
 {
-	UINT entityCount = m_entities.size();
+	UINT entityCount = 0;
+	if (ar.IsStoring())
+		entityCount = m_entities.size();
+	
 	PERSIST_FIELD(ar, entityCount);
 	for (UINT i = 0; i < entityCount; ++i) {
-		Entity3D* entity = m_entities[i];
-		//LOGGER(Log::Logger().Info("Entity: %s", entity->GetName().c_str()));
+		Entity3D* entity = nullptr;
+		if (ar.IsStoring())
+			entity = m_entities[i];
+
 		PERSIST_OBJECT(ar, entity);
+		
+		if (!ar.IsStoring()) {
+			m_entities.push_back(entity);
+		}
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::StoreActors(Archive &ar)
+void Grafkit::SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResourceManager * const & resman)
 {
-	UINT actorCount = m_actors.size();
+	UINT actorCount = 0;
+	if (ar.IsStoring())
+		actorCount = m_actors.size();
+
 	PERSIST_FIELD(ar, actorCount);
 	for (UINT i = 0; i < actorCount; ++i) {
-		Actor* actor = m_actors[i];
+		Actor* actor = nullptr;
+		if (ar.IsStoring())
+			Actor* actor = m_actors[i];
+
 		PERSIST_OBJECT(ar , actor);
+
+		if (!ar.IsStoring())
+			m_actors.push_back(actor);
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::StoreAnimations(Archive &ar)
+void Grafkit::SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IResourceManager * const & resman)
 {
 	// TODO
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::StoreKeymap(Archive & ar, SceneLoader::SceneLoaderHelper::assoc_t & keymap)
+void Grafkit::SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, SceneLoader::SceneLoaderHelper::assoc_t & keymap)
 {
+	if (!ar.IsStoring())
+		keymap.clear();
+
 	USHORT keyMapCount = keymap.size();
 	PERSIST_FIELD(ar, keyMapCount);
-	for (auto key_it = keymap.begin(); key_it != keymap.end(); ++key_it) {
-		USHORT key = key_it->first, valuelen = key_it->second.size();
+	
+	auto key_it = keymap.cbegin();
+	auto key_end = keymap.cend();
+	int loop = 1;
+
+	USHORT i = 0;
+	while (loop)
+	{
+		USHORT key = 0, valuelen = 0;
+		
+		if (ar.IsStoring())
+			key = key_it->first, valuelen = key_it->second.size();
+
 		PERSIST_FIELD(ar, key);
 		PERSIST_FIELD(ar, valuelen);
-		std::vector<USHORT> &values = key_it->second;
+
+		std::vector<USHORT> values;
+		if (ar.IsStoring())
+			values = key_it->second;
+
 		for (size_t j = 0; j<valuelen; ++j)
 		{
-			USHORT value = values[j];
+			USHORT value = 0;
+			if (ar.IsStoring())
+				value = values[j];
+
 			PERSIST_FIELD(ar, value);
+
+			if (!ar.IsStoring())
+				values.push_back(value);
 		}
+		
+		if (!ar.IsStoring()) {
+			keymap[i] = values;
+		}
+
+		if (ar.IsStoring()) {
+			if (loop) ++key_it;
+			loop = key_it != key_end;
+		}
+		else {
+			loop = i < keyMapCount;
+		}
+
+		++i;
+
 	}
 }

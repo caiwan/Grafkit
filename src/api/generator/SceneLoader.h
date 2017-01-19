@@ -20,7 +20,7 @@ namespace Grafkit {
 		SceneLoader(std::string name, std::string source_name);
 		~SceneLoader();
 
-		void Load(Grafkit::IResourceManager * const & assman, Grafkit::IResource * source);
+		void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
 
 		static void Save(SceneRes scene, std::string dst_name);
 
@@ -35,8 +35,8 @@ namespace Grafkit {
 			SceneLoaderHelper(Archive &ar, SceneRef &scene);
 			~SceneLoaderHelper();
 
-			void Load(Archive &ar);
-			void Store(Archive &ar);
+			void Load(Archive &ar, IResourceManager * const & resman);
+			void Save(Archive &ar);
 
 		public:
 			typedef std::map<USHORT, std::vector<USHORT>> assoc_t;
@@ -51,8 +51,7 @@ namespace Grafkit {
 		private:
 			// --- Load stuff 
 
-			void LoadKeymap(Archive &ar, SceneLoader::SceneLoaderHelper::assoc_t &keymap);
-
+		
 			// --- Store stuff
 			void BuildObjectMaps();
 			void BuildTextureMap(const MaterialRef & material);
@@ -60,12 +59,14 @@ namespace Grafkit {
 			void BuildEntityMap(const ActorRef &actor);
 			void BuildActorMap();
 
-			void StoreMaterials(Archive &ar);
-			void StoreEntities(Archive &ar);
-			void StoreActors(Archive &ar);
-			void StoreAnimations(Archive &ar);
+			// --- common stuff
+			void PersistMaterials(Archive &ar, IResourceManager * const & resman);
+			void PersistTextures(Archive &ar, MaterialRef &material, IResourceManager * const & resman);
+			void PersistEntities(Archive &ar, IResourceManager * const & resman);
+			void PersistActors(Archive &ar, IResourceManager * const & resman);
+			void PersistAnimations(Archive &ar, IResourceManager * const & resman);
 
-			void StoreKeymap(Archive &ar, SceneLoader::SceneLoaderHelper::assoc_t &keymap);
+			void PersistKeymap(Archive &ar, SceneLoader::SceneLoaderHelper::assoc_t &keymap);
 
 		private:
 			SceneRef &m_scene;
