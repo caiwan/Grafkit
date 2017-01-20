@@ -74,19 +74,10 @@ Grafkit::SceneLoader::SceneLoaderHelper::~SceneLoaderHelper()
 
 void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager * const & resman)
 {
-	PERSIST_REFOBJECT(ar, m_scene);
-
-	if (m_scene.Invalid())
-		throw EX(SceneLoadException);
-
-	PersistMaterials(ar, resman);
-	PersistEntities(ar, resman);
-	PersistActors(ar, resman);
-	PersistAnimations(ar, resman);
+	Persist(ar, resman);
 
 	// 5. material -> mesh relation
-	//LOGGER(Log::Logger().Info("Materials:"));
-	PersistKeymap(ar, m_materials_to_meshes);
+	LOGGER(Log::Logger().Info("Materials: %d", m_materials_to_meshes.size()));
 	for (auto key_it = m_materials_to_meshes.begin(); key_it != m_materials_to_meshes.end(); ++key_it)
 	{
 		USHORT key = key_it->first;
@@ -99,15 +90,14 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 			if (model) {
 				model->SetMaterial(material);
 
-				//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
+				LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
 			}
 		}
 	}
 	// ... 
 
 	// 6. entitiy -> actor relation
-	//LOGGER(Log::Logger().Info("Entities:"));
-	PersistKeymap(ar, m_entities_to_actors);
+	LOGGER(Log::Logger().Info("Entities: %d", m_entities_to_actors.size()));
 	for (auto key_it = m_entities_to_actors.begin(); key_it != m_entities_to_actors.end(); ++key_it)
 	{
 		USHORT key = key_it->first;
@@ -118,15 +108,14 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 			Actor *actor = m_actors[val];
 			actor->AddEntity(entity);
 
-			//LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
+			LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
 		}
 	}
 
 	// ...
 
 	// 7. actor -> actor relation - scenegraph
-	//LOGGER(Log::Logger().Info("Actors:"));
-	PersistKeymap(ar, m_actor_to_actor);
+	LOGGER(Log::Logger().Info("Actors: %d", m_actor_to_actor.size()));
 	for (auto key_it = m_actor_to_actor.begin(); key_it != m_actor_to_actor.end(); ++key_it)
 	{
 		USHORT key = key_it->first;
@@ -139,7 +128,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 			if (parent && child)
 				parent->AddChild(child);
 
-			//LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
+			LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
 		}
 	}
 
@@ -264,7 +253,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 				if (it != m_actor_map.end()) {
 					UINT key = (it->second), val = i;
 					m_actor_to_actor[key].push_back(val);
-					//LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
+					//
 				}
 			}
 		}
@@ -277,18 +266,32 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 
 void Grafkit::SceneLoader::SceneLoaderHelper::Save(Archive &ar)
 {
-	// --- persist scene 
-	PERSIST_REFOBJECT(ar , m_scene);
-
 	IResourceManager * const resman = nullptr;
+
+	Persist(ar, resman);
+
+}
+
+void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceManager * const & resman)
+{
+	// --- persist scene 
+	PERSIST_REFOBJECT(ar, m_scene);
+
+	if (!ar.IsStoring() && m_scene.Invalid())
+		throw EX(SceneLoadException);
 
 	PersistMaterials(ar, resman);
 	PersistEntities(ar, resman);
 	PersistActors(ar, resman);
 	PersistAnimations(ar, resman);
 
+	LOGGER(Log::Logger().Info("Materials to meshes:"));
 	PersistKeymap(ar, m_materials_to_meshes);
+
+	LOGGER(Log::Logger().Info("Entities to actors:"));
 	PersistKeymap(ar, m_entities_to_actors);
+
+	LOGGER(Log::Logger().Info("Scenegraph:"));
 	PersistKeymap(ar, m_actor_to_actor);
 }
 
@@ -364,10 +367,12 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResour
 		actorCount = m_actors.size();
 
 	PERSIST_FIELD(ar, actorCount);
+
 	for (UINT i = 0; i < actorCount; ++i) {
 		Actor* actor = nullptr;
+	
 		if (ar.IsStoring())
-			Actor* actor = m_actors[i];
+			actor = m_actors[i];
 
 		PERSIST_OBJECT(ar , actor);
 
@@ -383,56 +388,55 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IRe
 
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, SceneLoader::SceneLoaderHelper::assoc_t & keymap)
 {
-	if (!ar.IsStoring())
-		keymap.clear();
+	typedef std::vector<USHORT> values_t;
 
-	USHORT keyMapCount = keymap.size();
-	PERSIST_FIELD(ar, keyMapCount);
-	
-	auto key_it = keymap.cbegin();
-	auto key_end = keymap.cend();
-	int loop = 1;
+	USHORT keyMapCount = 0;
+	USHORT key = 0, valuelen = 0;
+	USHORT value = 0;
 
-	USHORT i = 0;
-	while (loop)
-	{
-		USHORT key = 0, valuelen = 0;
-		
-		if (ar.IsStoring())
+	if (ar.IsStoring()) {
+		keyMapCount = keymap.size();
+		PERSIST_FIELD(ar, keyMapCount);
+
+		for (auto key_it = keymap.cbegin(); key_it != keymap.cend(); key_it++) {
 			key = key_it->first, valuelen = key_it->second.size();
+			PERSIST_FIELD(ar, key);
+			PERSIST_FIELD(ar, valuelen);
 
-		PERSIST_FIELD(ar, key);
-		PERSIST_FIELD(ar, valuelen);
+			const values_t & values = key_it->second;
 
-		std::vector<USHORT> values;
-		if (ar.IsStoring())
-			values = key_it->second;
-
-		for (size_t j = 0; j<valuelen; ++j)
-		{
-			USHORT value = 0;
-			if (ar.IsStoring())
+			for (size_t j = 0; j < valuelen; ++j)
+			{
 				value = values[j];
+				PERSIST_FIELD(ar, value);
 
-			PERSIST_FIELD(ar, value);
+				LOGGER(Log::Logger().Info("%hu -> %hu", key, value));
+			}
 
-			if (!ar.IsStoring())
+		}
+	}
+	else {
+		keymap.clear();
+		keyMapCount = 0;
+		PERSIST_FIELD(ar, keyMapCount);
+
+		for (int i = 0; i < keyMapCount; ++i) {
+			key = 0, valuelen = 0;
+			PERSIST_FIELD(ar, key);
+			PERSIST_FIELD(ar, valuelen);
+
+			values_t & values = keymap[i];
+
+			for (size_t j = 0; j < valuelen; ++j)
+			{
+				value = 0;
+				PERSIST_FIELD(ar, value);
+
+				LOGGER(Log::Logger().Info("%hu -> %hu", key, value));
+
 				values.push_back(value);
-		}
-		
-		if (!ar.IsStoring()) {
-			keymap[i] = values;
-		}
+			}
 
-		if (ar.IsStoring()) {
-			if (loop) ++key_it;
-			loop = key_it != key_end;
 		}
-		else {
-			loop = i < keyMapCount;
-		}
-
-		++i;
-
 	}
 }

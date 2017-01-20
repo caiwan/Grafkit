@@ -60,6 +60,7 @@ namespace Grafkit {
 			void BuildActorMap();
 
 			// --- common stuff
+			void Persist(Archive &ar, IResourceManager * const & resman);
 			void PersistMaterials(Archive &ar, IResourceManager * const & resman);
 			void PersistTextures(Archive &ar, MaterialRef &material, IResourceManager * const & resman);
 			void PersistEntities(Archive &ar, IResourceManager * const & resman);
