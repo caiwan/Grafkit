@@ -4,9 +4,18 @@
 
 
 
-TextureLoader::TextureLoader()
-{
-}
+
+using namespace Grafkit;
+using namespace FWdebugExceptions;
+
+
+// ========================================================================================================================
+// Texture from bitmap loader
+// ========================================================================================================================
+//Grafkit::TextureFromBitmap::TextureFromBitmap(std::string source_name) : ITextureBuilder(source_name, source_name),
+//	m_w(0), m_h(0)
+//{
+//}
 
 Grafkit::TextureFromBitmap::TextureFromBitmap(std::string name, std::string source_name) : ITextureBuilder(name, source_name),
 	m_w(0), m_h(0)

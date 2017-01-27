@@ -81,7 +81,7 @@ protected:
 			// -- texture
 			TextureResRef texture = new TextureRes();
 
-			texture = this->Load<TextureRes>(new TextureFromBitmap("textures/Untitled.png"));
+			texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
@@ -164,7 +164,7 @@ protected:
 
 			/* ------------------------------------------------------------ */
 
-			/* Export and import stuff to file, then buiild it */
+			/* Export and import stuff to file, then build it */
 			SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
 			scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 			this->DoPrecalc();

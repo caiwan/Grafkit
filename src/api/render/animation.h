@@ -43,19 +43,17 @@ namespace Grafkit {
 			KI_linear,
 			KI_ramp,
 			KI_smooth,
-			KI_catmullRom
+			KI_catmullRom,
+			KI_COUNT
 		};
 
 		/** Tamplate for anim keys */
-		template <typename V> class Key {
-		public:
-			Key() : m_t(0), m_value(), m_type(KI_linear) {}
-			Key(float t, V value) : m_t(t), m_value(value), m_type(KI_linear) {}
+		template <typename V> struct Key {
+		
+			Key() : m_key(0), m_value(), m_type(KI_linear) {}
+			Key(float t, V value) : m_key(t), m_value(value), m_type(KI_linear) {}
 
-			// mas nem kell egyelore igaz?
-
-		public:
-			float m_t;
+			float m_key;
 			V m_value;
 			enum KeyInterpolation_e m_type;
 		};
@@ -63,8 +61,12 @@ namespace Grafkit {
 		/** 
 			Template for animation track
 		*/
-		template <typename V> class Track {
+		template <typename V> struct Track {
+			friend class Animation;
 		public:
+
+			typedef V value_t;
+
 			Track(){}
 
 			void AddKey(Key<V> key) { 
@@ -72,7 +74,7 @@ namespace Grafkit {
 			}
 
 			/** Finds a key inside the track
-			@return 1 if propert key found
+			@return 1 if key found
 			*/
 			int findKey(float t, V& v0, V& v1, float &f) const {
 				size_t count = m_track.size();
@@ -81,15 +83,15 @@ namespace Grafkit {
 					return 0;
 				}
 						
-				if (count == 1 || m_track[0].m_t > t) {
+				if (count == 1 || m_track[0].m_key > t) {
 					v1 = v0 = m_track[0].m_value;
 					return 1;
 				}
 				
 				for (size_t i = 0; i < count - 1; i++) {
-					if (m_track[i].m_t <= t && m_track[i + 1].m_t>= t) {
-						float d = m_track[i + 1].m_t - m_track[i].m_t;
-						f = (t - m_track[i].m_t) / d;
+					if (m_track[i].m_key <= t && m_track[i + 1].m_key>= t) {
+						float d = m_track[i + 1].m_key - m_track[i].m_key;
+						f = (t - m_track[i].m_key) / d;
 			
 						v0 = m_track[i].m_value;
 						v1 = m_track[i + 1].m_value;
@@ -101,52 +103,92 @@ namespace Grafkit {
 				return 1;
 			}
 
+		protected:
+			void _serialize(Archive &ar) {
+				BYTE *data = nullptr;
+				UINT len = 0;
+				if (ar.IsStoring()) {
+					data = m_track.data;
+					len = m_track.size * sizeof(m_track[0]);
+				}
+				PERSIST_VECTOR(ar, data, len);
+				if (!ar.IsStoring()) {
+					m_track.assign(data, data.len);
+				}
+
+			}
+
 		public:
 			std::vector<Key<V>> m_track;
 		};
 
+		/* Predefs */
+		typedef Animation::Key<float3> Vector3Key;
+		typedef Animation::Key<float4> Vector4Key;
+		typedef Animation::Key<Quaternion> QuaternionKey;
+
+		typedef Animation::Track<float3> Vector3Track;
+		typedef Animation::Track<float4> Vector4Track;
+		typedef Animation::Track<Quaternion> QuaternionTrack;
+
+		static void FindKey(Vector3Track track, double &time, float3 &value);
+		static void FindKey(QuaternionTrack track, double &time, Quaternion &value);
+
 	};
 
-	/* Predefs */
-	typedef Animation::Key<float3> Vector3Key;
-	typedef Animation::Key<float4> Vector4Key;
-	typedef Animation::Key<Quaternion> QuaternionKey;
 
-	
-	typedef Animation::Track<float3> Vector3Track; 
-	typedef Animation::Track<float4> Vector4Track;
-	typedef Animation::Track<Quaternion> QuaternionTrack;
 
 	/* ============================================================================================== */
 
 	/** 
 	Animation for scenegraph nodes 
 	*/
-	class NodeAnimation : public virtual Animation {
+	class ActorAnimation : public Animation {
 	public:
-		NodeAnimation() : Animation() {}
-		
-		~NodeAnimation() { 
-			//Shutdown();
-		}
+		ActorAnimation() : Animation() {}
+		~ActorAnimation() { }
 
-		void Initialize(ActorRef actor);
+		//void Initialize(ActorRef actor);
+
+		void SetActor(ActorRef &actor) { m_actor = actor; }
+		ActorRef GetActor() { return m_actor; }
 
 		void AddPositionKey(float key, float3 value) { m_positionTrack.AddKey(Vector3Key(key, value)); }
 		void AddScalingKey(float key, float3 value) { m_scalingTrack.AddKey(Vector3Key(key, value)); }
 		void AddRotationKey(float key, float4 value) { m_rotationTrack.AddKey(QuaternionKey(key, value)); }
+		void AddRotationKey(float key, Quaternion value) { m_rotationTrack.AddKey(QuaternionKey(key, value)); }
 
-		//virtual void Shutdown(){}
 		virtual void Update(double time);
 	
 	protected:
 		ActorRef m_actor;
 
-		void findKey(Vector3Track track, double &time, float3 &value);
-		void findKey(QuaternionTrack track, double &time, Quaternion &value);
-
 		Vector3Track m_positionTrack;
 		Vector3Track m_scalingTrack;
 		QuaternionTrack m_rotationTrack;
 	};
+
+	/* ============================================================================================== */
+
+	/** 
+	Animation for entities inside the scenegraph nodes
+	*/
+
+	class EntityAnimation : public Animation {
+		// .. 
+	public:
+		EntityAnimation(){}
+		~EntityAnimation() {}
+
+		void SetEntity(Ref<Entity3D> & entity) { m_entity = entity; }
+		Ref<Entity3D> GetEntity() {return m_entity;}
+
+		virtual void Update(double time) = 0;
+
+	protected:
+		Ref<Entity3D> m_entity;
+
+	};
+
 }
+

@@ -32,7 +32,7 @@ namespace Grafkit{
 	class TextureFromBitmap : public ITextureBuilder
 	{
 	public:
-		TextureFromBitmap(std::string source_name);
+		//TextureFromBitmap(std::string source_name);
 		TextureFromBitmap(std::string name, std::string source_name);
 		~TextureFromBitmap();
 

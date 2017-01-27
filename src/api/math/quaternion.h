@@ -64,5 +64,9 @@ namespace Grafkit {
 			q = DirectX::XMLoadFloat4(&in);
 			return *this;
 		}
+
+		static Quaternion fromEuler(float r, float p, float y) {
+			return Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(r, p, y));
+		}
 	};
 }
