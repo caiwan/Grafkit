@@ -64,6 +64,9 @@
     <ClInclude Include="testClass_persistence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="persistent_test_data_0.inc">

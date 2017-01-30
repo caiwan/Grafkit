@@ -53,6 +53,7 @@ namespace Grafkit {
 		
 		void AddAnimation(AnimationRef anim);
 		void GetAnimations(std::vector<AnimationRef> &animations) { animations.clear(); animations.assign(m_animations.cbegin(), m_animations.cend()); }
+		AnimationRef GetAnimation(int i) { return m_animations[i]; }
 		void UpdateAnimation(double t) { m_animation_time = t; }
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }

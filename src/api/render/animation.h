@@ -107,32 +107,9 @@ namespace Grafkit {
 			}
 
 		protected:
-			void serialize(Archive &ar) {
-				size_t len = 0;
-				
-				if (ar.IsStoring()) {
-					len = m_track.size();
-				}
-				else {
-					m_track.clear();
-				}
-				
-				PERSIST_FIELD(ar, len);
-				
-				for (size_t i = 0; i < len; ++i) {
-					Key<value_t> key;
-					
-					if (ar.IsStoring()) {
-						key = m_track[i];
-					}
+			void serialize(Archive &ar);
+			
 
-					PERSIST_FIELD(ar, key);
-					
-					if (!ar.IsStoring()) {
-						m_track.push_back(key);
-					}
-				}
-			}
 
 		public:
 			std::vector<Key<V>> m_track;

@@ -108,6 +108,9 @@ protected:
 		m_scene->Get()->BuildScene(render, m_vs, m_fs);
 
 		m_scene->Get()->SetActiveCamera(0);
+		m_scene->Get()->GetActiveCamera()->SetName("puncsostal");
+
+		((ActorAnimation*)(m_scene->Get()->GetAnimation(0).Get()))->SetActor(m_scene->Get()->GetActiveCamera());
 
 		m_t = 0;
 

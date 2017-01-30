@@ -186,6 +186,7 @@
     <ClCompile Include="test_struct_pack.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Assert.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TestArchiver.h" />
     <ClInclude Include="testClass_dynamics.h" />
