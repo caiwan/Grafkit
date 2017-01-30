@@ -101,6 +101,7 @@ protected:
 
 		// -- save and reload
 		SceneLoader::Save(m_scene->Get(), "./../assets/animation.scene");
+		m_scene->Get()->Shutdown();
 		m_scene = this->Load<SceneRes>(new SceneLoader("AnimatedScene", "animation.scene"));
 		DoPrecalc();
 

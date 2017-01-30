@@ -71,7 +71,20 @@ void Grafkit::Scene::Initialize(ActorRef root)
 
 void Grafkit::Scene::Shutdown()
 {
-	/// TODO: ... 
+	m_cameraMap.clear();
+	m_lightMap.clear();
+	m_nodeMap.clear();
+
+	m_animations.clear();
+	
+	m_activeCamera = nullptr;
+	m_cameraNodes.clear();
+	m_Entities.clear();
+	
+	m_pScenegraph = nullptr;
+
+	m_pixelShader = nullptr;
+	m_vertexShader = nullptr;
 
 }
 

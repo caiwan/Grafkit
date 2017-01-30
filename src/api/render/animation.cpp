@@ -2,6 +2,25 @@
 
 #include "animation.h"
 
+using namespace Grafkit;
+
+PERSISTENT_IMPL(ActorAnimation, 1);
+
+/* ============================================================================================== */
+
+void Grafkit::Animation::_serialize(Archive & ar)
+{
+	PERSIST_STRING(ar, m_name);
+}
+
+template<typename T>
+inline void Animation::persistTrack(Archive & ar, Animation::Track<T>& track)
+{
+	track.serialize(ar); 
+}
+
+/* ============================================================================================== */
+
 /// quick and dirty hack 
 #define LERP(v0, v1, a)\
 	((v0)*(1-(a)) + (v1)*((a)))
@@ -48,5 +67,13 @@ void Grafkit::ActorAnimation::Update(double time)
 	m_actor->Matrix(matrix);
 }
 
+void Grafkit::ActorAnimation::serialize(Archive & ar)
+{
+	this->Animation::_serialize(ar);
+
+	Animation::persistTrack<float3>(ar, m_positionTrack);
+	Animation::persistTrack<float3>(ar, m_scalingTrack);
+	Animation::persistTrack<Quaternion>(ar, m_rotationTrack);
+}
 
 /* ============================================================================================== */

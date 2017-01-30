@@ -22,8 +22,6 @@ namespace Grafkit {
 		Animation() {}
 		virtual ~Animation() {}
 
-		//virtual void Shutdown() = 0;
-
 		virtual void Update(double time) = 0;
 
 		void SetName(std::string name) { m_name = name; }
@@ -31,6 +29,11 @@ namespace Grafkit {
 
 		void SetDuration(float d) { m_duration = d; }
 		float GetDuration() { return m_duration; }
+
+		void CalcDuration(bool isMin = false);
+
+	protected:
+		void _serialize(Archive &ar);
 
 	private: 
 		std::string m_name;
@@ -61,7 +64,7 @@ namespace Grafkit {
 		/** 
 			Template for animation track
 		*/
-		template <typename V> struct Track {
+		template <typename V> class Track {
 			friend class Animation;
 		public:
 
@@ -104,18 +107,31 @@ namespace Grafkit {
 			}
 
 		protected:
-			void _serialize(Archive &ar) {
-				BYTE *data = nullptr;
-				UINT len = 0;
+			void serialize(Archive &ar) {
+				size_t len = 0;
+				
 				if (ar.IsStoring()) {
-					data = m_track.data;
-					len = m_track.size * sizeof(m_track[0]);
+					len = m_track.size();
 				}
-				PERSIST_VECTOR(ar, data, len);
-				if (!ar.IsStoring()) {
-					m_track.assign(data, data.len);
+				else {
+					m_track.clear();
 				}
+				
+				PERSIST_FIELD(ar, len);
+				
+				for (size_t i = 0; i < len; ++i) {
+					Key<value_t> key;
+					
+					if (ar.IsStoring()) {
+						key = m_track[i];
+					}
 
+					PERSIST_FIELD(ar, key);
+					
+					if (!ar.IsStoring()) {
+						m_track.push_back(key);
+					}
+				}
 			}
 
 		public:
@@ -134,6 +150,7 @@ namespace Grafkit {
 		static void FindKey(Vector3Track track, double &time, float3 &value);
 		static void FindKey(QuaternionTrack track, double &time, Quaternion &value);
 
+		template<typename T> static void persistTrack(Archive& ar, Track<T> &track);
 	};
 
 
@@ -143,7 +160,7 @@ namespace Grafkit {
 	/** 
 	Animation for scenegraph nodes 
 	*/
-	class ActorAnimation : public Animation {
+	class ActorAnimation : public Animation, public Persistent{
 	public:
 		ActorAnimation() : Animation() {}
 		~ActorAnimation() { }
@@ -166,6 +183,10 @@ namespace Grafkit {
 		Vector3Track m_positionTrack;
 		Vector3Track m_scalingTrack;
 		QuaternionTrack m_rotationTrack;
+
+	protected:
+		virtual void serialize(Archive& ar);
+		PERSISTENT_DECL(ActorAnimation, 1);
 	};
 
 	/* ============================================================================================== */
@@ -174,7 +195,7 @@ namespace Grafkit {
 	Animation for entities inside the scenegraph nodes
 	*/
 
-	class EntityAnimation : public Animation {
+	class EntityAnimation : public Animation, public Persistent {
 		// .. 
 	public:
 		EntityAnimation(){}

@@ -58,7 +58,7 @@ namespace Grafkit {
 			void BuildMaterialMap(const ModelRef &model);
 			void BuildEntityMap(const ActorRef &actor);
 			void BuildActorMap();
-			void BuildNodeAnimationMap();
+			void BuildAnimationMap();
 
 			// --- common stuff
 			void Persist(Archive &ar, IResourceManager * const & resman);

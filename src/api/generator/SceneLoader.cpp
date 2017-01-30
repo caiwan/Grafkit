@@ -134,27 +134,38 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		}
 	}
 
-	// 8, 9 animation -> actor, entity
-	LOGGER(Log::Logger().Info("Animations: %d", m_actor_to_actor.size()));
+	 //8, 9 animation -> actor, entity
+	LOGGER(Log::Logger().Info("Animations: %d", m_animation_to_actor.size() + m_animation_to_entity.size()));
 	for (auto key_it = m_animation_to_actor.cbegin(); key_it != m_animation_to_actor.cend(); ++key_it)
 	{
 		USHORT key = key_it->first;
 		if (!key_it->second.empty())
 		{
 			USHORT value = key_it->second[0];
-			// ... 
+			ActorAnimation *animation = dynamic_cast<ActorAnimation *>(m_Animations[key]);
+			if (animation) {
+				ActorRef actorRef = m_actors[value];
+				animation->SetActor(actorRef);
+				m_scene->AddAnimation(animation);
+			}
+			LOGGER(Log::Logger().Info("Actor %hu -> %hu", key, value));
+			
 		}
 	}
 
 	for (auto key_it = m_animation_to_entity.cbegin(); key_it != m_animation_to_entity.cend(); ++key_it)
 	{
 		USHORT key = key_it->first;
-
-		USHORT key = key_it->first;
 		if (!key_it->second.empty())
 		{
 			USHORT value = key_it->second[0];
-			// ... 
+			EntityAnimation *animation = dynamic_cast<EntityAnimation*>(m_Animations[key]);
+			if (animation) {
+				Ref<Entity3D> entityRef = m_entities[value];
+				animation->SetEntity(entityRef);
+				m_scene->AddAnimation(animation);
+			}
+			LOGGER(Log::Logger().Info("Entity %hu -> %hu", key, value));
 		}
 	}
 
@@ -198,7 +209,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 	}
 
 	BuildActorMap();
-	BuildNodeAnimationMap();
+	BuildAnimationMap();
 }
 
 // Which texture belong to this exact material, and which shader slot bound to
@@ -240,7 +251,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &m
 	} // has material
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::BuildNodeAnimationMap()
+void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 {
 	std::vector<AnimationRef> animations;
 	m_scene->GetAnimations(animations);
@@ -248,23 +259,24 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildNodeAnimationMap()
 	UINT i = 0;
 
 	for (auto it = animations.cbegin(); it != animations.cend(); ++it) {
-		ActorAnimation *actor_animation = dynamic_cast<ActorAnimation*>(it->Get()); //qnd rtty
-		EntityAnimation *entity_animation = dynamic_cast<EntityAnimation*>(it->Get());
-		if (actor_animation) {
-			auto actor_it = m_actor_map.find(actor_animation->GetActor());
-			if (actor_it != m_actor_map.end()) {
-				m_animation_to_actor[actor_it->second].push_back(i);
-				m_Animations.push_back(actor_animation);
-				++i;
+		Animation *animation = dynamic_cast<ActorAnimation*>(it->Get());
+		if (animation) {
+			ActorAnimation *actor_animation = dynamic_cast<ActorAnimation*>(animation); //qnd rtty
+			EntityAnimation *entity_animation = dynamic_cast<EntityAnimation*>(animation);
+			if (actor_animation) {
+				auto actor_it = m_actor_map.find(actor_animation->GetActor());
+				if (actor_it != m_actor_map.end()) {
+					m_animation_to_actor[i].push_back(actor_it->second);
+				}
 			}
-		}
-		else if (entity_animation) {
-			auto entity_it = m_entity_map.find(entity_animation->GetEntity());
-			if (entity_it != m_entity_map.end()) {
-				m_animation_to_entity[entity_it->second].push_back(i);
-				m_Animations.push_back(entity_animation);
-				++i;
+			else if (entity_animation) {
+				auto entity_it = m_entity_map.find(entity_animation->GetEntity());
+				if (entity_it != m_entity_map.end()) {
+					m_animation_to_entity[i].push_back(entity_it->second);
+				}
 			}
+			m_Animations.push_back(it->Get());
+			++i;
 		}
 	}
 }
@@ -452,7 +464,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IRe
 {
 	UINT animationCount = 0;
 	if (ar.IsStoring())
-		animationCount = m_actors.size();
+		animationCount = m_Animations.size();
 
 	PERSIST_FIELD(ar, animationCount);
 
