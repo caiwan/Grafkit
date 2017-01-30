@@ -2,6 +2,8 @@
 
 #include "SceneLoader.h"
 
+#include "../render/animation.h"
+
 #include "../utils/asset.h"
 #include "../utils/persistence/archive.h"
 
@@ -132,6 +134,30 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		}
 	}
 
+	// 8, 9 animation -> actor, entity
+	LOGGER(Log::Logger().Info("Animations: %d", m_actor_to_actor.size()));
+	for (auto key_it = m_animation_to_actor.cbegin(); key_it != m_animation_to_actor.cend(); ++key_it)
+	{
+		USHORT key = key_it->first;
+		if (!key_it->second.empty())
+		{
+			USHORT value = key_it->second[0];
+			// ... 
+		}
+	}
+
+	for (auto key_it = m_animation_to_entity.cbegin(); key_it != m_animation_to_entity.cend(); ++key_it)
+	{
+		USHORT key = key_it->first;
+
+		USHORT key = key_it->first;
+		if (!key_it->second.empty())
+		{
+			USHORT value = key_it->second[0];
+			// ... 
+		}
+	}
+
 	Actor * root = m_actors[0];
 	m_scene->Initialize(root);
 }
@@ -172,6 +198,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 	}
 
 	BuildActorMap();
+	BuildNodeAnimationMap();
 }
 
 // Which texture belong to this exact material, and which shader slot bound to
@@ -211,6 +238,35 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &m
 
 		++m_cMatID;
 	} // has material
+}
+
+void Grafkit::SceneLoader::SceneLoaderHelper::BuildNodeAnimationMap()
+{
+	std::vector<AnimationRef> animations;
+	m_scene->GetAnimations(animations);
+
+	UINT i = 0;
+
+	for (auto it = animations.cbegin(); it != animations.cend(); ++it) {
+		ActorAnimation *actor_animation = dynamic_cast<ActorAnimation*>(it->Get()); //qnd rtty
+		EntityAnimation *entity_animation = dynamic_cast<EntityAnimation*>(it->Get());
+		if (actor_animation) {
+			auto actor_it = m_actor_map.find(actor_animation->GetActor());
+			if (actor_it != m_actor_map.end()) {
+				m_animation_to_actor[actor_it->second].push_back(i);
+				m_Animations.push_back(actor_animation);
+				++i;
+			}
+		}
+		else if (entity_animation) {
+			auto entity_it = m_entity_map.find(entity_animation->GetEntity());
+			if (entity_it != m_entity_map.end()) {
+				m_animation_to_entity[entity_it->second].push_back(i);
+				m_Animations.push_back(entity_animation);
+				++i;
+			}
+		}
+	}
 }
 
 // which entity belongs to which actor
@@ -293,6 +349,12 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceMan
 
 	LOGGER(Log::Logger().Info("Scenegraph:"));
 	PersistKeymap(ar, m_actor_to_actor);
+
+	LOGGER(Log::Logger().Info("Actor animations:"));
+	PersistKeymap(ar, m_animation_to_actor);
+
+	LOGGER(Log::Logger().Info("Entity animations:"));
+	PersistKeymap(ar, m_animation_to_entity);
 }
 
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IResourceManager * const & resman)
@@ -340,6 +402,11 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IRes
 	}
 }
 
+void Grafkit::SceneLoader::SceneLoaderHelper::PersistTextures(Archive & ar, MaterialRef & material, IResourceManager * const & resman)
+{
+	// ... 
+}
+
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IResourceManager * const & resman)
 {
 	UINT entityCount = 0;
@@ -383,7 +450,23 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResour
 
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IResourceManager * const & resman)
 {
-	// TODO
+	UINT animationCount = 0;
+	if (ar.IsStoring())
+		animationCount = m_actors.size();
+
+	PERSIST_FIELD(ar, animationCount);
+
+	for (UINT i = 0; i < animationCount; ++i) {
+		Animation* animation = nullptr;
+
+		if (ar.IsStoring())
+			animation = m_Animations[i];
+
+		PERSIST_OBJECT(ar, animation);
+
+		if (!ar.IsStoring())
+			m_Animations.push_back(animation);
+	}
 }
 
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, SceneLoader::SceneLoaderHelper::assoc_t & keymap)

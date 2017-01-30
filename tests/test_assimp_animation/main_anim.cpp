@@ -89,6 +89,7 @@ protected:
 		cameraAnimation->AddRotationKey(0.0, Quaternion::fromEuler(0, 0, 0));
 		cameraAnimation->AddRotationKey(1.0, Quaternion::fromEuler(a, 0, 0));
 		cameraAnimation->AddRotationKey(2.0, Quaternion::fromEuler(a, a, 0));
+
 		cameraAnimation->AddRotationKey(3.0, Quaternion::fromEuler(a, a, a));
 		cameraAnimation->AddRotationKey(4.0, Quaternion::fromEuler(0, a, a));
 		cameraAnimation->AddRotationKey(5.0, Quaternion::fromEuler(0, 0, a));

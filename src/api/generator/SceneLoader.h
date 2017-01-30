@@ -58,6 +58,7 @@ namespace Grafkit {
 			void BuildMaterialMap(const ModelRef &model);
 			void BuildEntityMap(const ActorRef &actor);
 			void BuildActorMap();
+			void BuildNodeAnimationMap();
 
 			// --- common stuff
 			void Persist(Archive &ar, IResourceManager * const & resman);
@@ -75,6 +76,7 @@ namespace Grafkit {
 			std::vector<Actor*> m_actors;
 			std::vector<Entity3D*> m_entities;
 			std::vector<Material*> m_materials;
+			std::vector<Animation*> m_Animations;
 
 			std::map<Entity3D*, int> m_entity_map;
 			std::set<Material*> m_material_set;
@@ -84,6 +86,8 @@ namespace Grafkit {
 			assoc_t m_materials_to_meshes;
 			assoc_t m_entities_to_actors;
 			assoc_t m_actor_to_actor;
+			assoc_t m_animation_to_actor;
+			assoc_t m_animation_to_entity;
 			
 			// used for crsr of the fetch loops
 			int m_cTexID;
