@@ -13,43 +13,6 @@ void Grafkit::Animation::_serialize(Archive & ar)
 	PERSIST_STRING(ar, m_name);
 }
 
-template<typename T>
-inline void Animation::persistTrack(Archive & ar, Animation::Track<T>& track)
-{
-	track.serialize(ar); 
-}
-
-template<typename V>
-inline void Animation::Track<V>::serialize(Archive & ar)
-{
-	size_t len = 0;
-
-	if (ar.IsStoring()) {
-		len = m_track.size();
-	}
-	else {
-		m_track.clear();
-	}
-
-	PERSIST_FIELD(ar, len);
-
-	for (size_t i = 0; i < len; ++i) {
-		Key<value_t> key;
-
-		if (ar.IsStoring()) {
-			key = m_track[i];
-		}
-
-		PERSIST_FIELD(ar, key.m_key);
-		PERSIST_FIELD(ar, key.m_type);
-		PERSIST_FIELD(ar, key.m_value);
-
-		if (!ar.IsStoring()) {
-			m_track.push_back(key);
-		}
-	}
-}
-
 /* ============================================================================================== */
 
 /// quick and dirty hack 
@@ -70,12 +33,14 @@ void Grafkit::Animation::FindKey(Vector3Track track, double &time, float3 &value
 		value = LERPv3(v0, v1, f);
 }
 
-void Grafkit::Animation::FindKey(QuaternionTrack track, double &time, Quaternion &value)
+void Grafkit::Animation::FindKey(Vector4Track track, double &time, Quaternion &value)
 {
 	float t = (float)time, f = 0.f;
-	Quaternion q0, q1;
-	if (track.findKey(t, q0, q1, f))
+	float4 v0, v1;
+	if (track.findKey(t, v0, v1, f)) {
+		Quaternion q0(v0), q1(v1);
 		value.Slerp(q0, q1, f);
+	}
 }
 
 /* ============================================================================================== */
@@ -102,9 +67,9 @@ void Grafkit::ActorAnimation::serialize(Archive & ar)
 {
 	this->Animation::_serialize(ar);
 
-	Animation::persistTrack<float3>(ar, m_positionTrack);
-	Animation::persistTrack<float3>(ar, m_scalingTrack);
-	Animation::persistTrack<Quaternion>(ar, m_rotationTrack);
+	m_positionTrack.serialize(ar);
+	m_scalingTrack .serialize(ar);
+	m_rotationTrack.serialize(ar);
 }
 
 /* ============================================================================================== */

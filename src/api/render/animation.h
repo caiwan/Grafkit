@@ -76,6 +76,14 @@ namespace Grafkit {
 				m_track.push_back(key); 
 			}
 
+			Key<V> GetKey(size_t i) {
+				return m_track[i];
+			}
+
+			size_t GetKeyCount() {
+				return m_track.size();
+			}
+
 			/** Finds a key inside the track
 			@return 1 if key found
 			*/
@@ -106,28 +114,30 @@ namespace Grafkit {
 				return 1;
 			}
 
-		protected:
+		public:
 			void serialize(Archive &ar);
-			
-
 
 		public:
 			std::vector<Key<V>> m_track;
 		};
 
 		/* Predefs */
+	public:
+		typedef Animation::Key<float> FloatKey;
+		typedef Animation::Key<float2> Vector2Key;
 		typedef Animation::Key<float3> Vector3Key;
 		typedef Animation::Key<float4> Vector4Key;
-		typedef Animation::Key<Quaternion> QuaternionKey;
 
+		typedef Animation::Track<float> FloatTrack;
+		typedef Animation::Track<float2> Vector2Track;
 		typedef Animation::Track<float3> Vector3Track;
 		typedef Animation::Track<float4> Vector4Track;
-		typedef Animation::Track<Quaternion> QuaternionTrack;
-
+	
+	protected:
 		static void FindKey(Vector3Track track, double &time, float3 &value);
-		static void FindKey(QuaternionTrack track, double &time, Quaternion &value);
+		static void FindKey(Vector4Track, double &time, Quaternion &value);
 
-		template<typename T> static void persistTrack(Archive& ar, Track<T> &track);
+		//template<typename T> static void persistTrack(Archive& ar, Track<T> &track);
 	};
 
 
@@ -149,8 +159,8 @@ namespace Grafkit {
 
 		void AddPositionKey(float key, float3 value) { m_positionTrack.AddKey(Vector3Key(key, value)); }
 		void AddScalingKey(float key, float3 value) { m_scalingTrack.AddKey(Vector3Key(key, value)); }
-		void AddRotationKey(float key, float4 value) { m_rotationTrack.AddKey(QuaternionKey(key, value)); }
-		void AddRotationKey(float key, Quaternion value) { m_rotationTrack.AddKey(QuaternionKey(key, value)); }
+		void AddRotationKey(float key, float4 value) { m_rotationTrack.AddKey(Vector4Key(key, value)); }
+		void AddRotationKey(float key, Quaternion value) { m_rotationTrack.AddKey(Vector4Key(key, (float4)value)); }
 
 		virtual void Update(double time);
 	
@@ -159,7 +169,7 @@ namespace Grafkit {
 
 		Vector3Track m_positionTrack;
 		Vector3Track m_scalingTrack;
-		QuaternionTrack m_rotationTrack;
+		Vector4Track m_rotationTrack;
 
 	protected:
 		virtual void serialize(Archive& ar);
@@ -187,6 +197,39 @@ namespace Grafkit {
 		Ref<Entity3D> m_entity;
 
 	};
+
+	/* ============================================================================================== */
+
+	template<typename V>
+	inline void Animation::Track<V>::serialize(Archive & ar)
+	{
+		size_t len = 0;
+
+		if (ar.IsStoring()) {
+			len = m_track.size();
+		}
+		else {
+			m_track.clear();
+		}
+
+		PERSIST_FIELD(ar, len);
+
+		for (size_t i = 0; i < len; ++i) {
+			Key<value_t> key;
+
+			if (ar.IsStoring()) {
+				key = m_track[i];
+			}
+
+			PERSIST_FIELD(ar, key.m_key);
+			PERSIST_FIELD(ar, key.m_type);
+			PERSIST_FIELD(ar, key.m_value);
+
+			if (!ar.IsStoring()) {
+				m_track.push_back(key);
+			}
+		}
+	}
 
 }
 
