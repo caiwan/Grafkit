@@ -33,6 +33,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & resman, Graf
 
 	SceneRef scene;
 
+	LOGGER(Log::Logger().Info("-- LOAD --"));
 	SceneLoader::SceneLoaderHelper loader(ar, scene);
 	loader.Load(ar, resman);
 
@@ -47,6 +48,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 
 	ArchiveFile ar(fp, true);
 
+	LOGGER(Log::Logger().Info("-- STORE --"));
 	SceneLoader::SceneLoaderHelper loader(ar, scene);
 	loader.Save(ar);
 
@@ -144,11 +146,11 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 			USHORT value = key_it->second[0];
 			ActorAnimation *animation = dynamic_cast<ActorAnimation *>(m_Animations[key]);
 			if (animation) {
-				ActorRef actorRef = m_actors[value];
-				animation->SetActor(actorRef);
+				Actor* actor = m_actors[value];
+				animation->SetActor(ActorRef(actor));
 				m_scene->AddAnimation(animation);
+				LOGGER(Log::Logger().Info("Actor %hu -> %hu %s", key, value, actor->GetName().c_str()));
 			}
-			LOGGER(Log::Logger().Info("Actor %hu -> %hu", key, value));
 			
 		}
 	}
@@ -174,7 +176,8 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 }
 
 // ======================================================================================================================
-// Store
+// Association Map building
+// ======================================================================================================================
 
 // Builds map of object relations
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
@@ -251,6 +254,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &m
 	} // has material
 }
 
+// which animation affects which entity or actor
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 {
 	std::vector<AnimationRef> animations;
@@ -258,25 +262,28 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 
 	UINT i = 0;
 
-	for (auto it = animations.cbegin(); it != animations.cend(); ++it) {
+	for (auto it = animations.cbegin(); it != animations.cend(); ++it, ++i) {
 		Animation *animation = dynamic_cast<ActorAnimation*>(it->Get());
 		if (animation) {
-			ActorAnimation *actor_animation = dynamic_cast<ActorAnimation*>(animation); //qnd rtty
+			//qnd rtty
+			ActorAnimation *actor_animation = dynamic_cast<ActorAnimation*>(animation); 
 			EntityAnimation *entity_animation = dynamic_cast<EntityAnimation*>(animation);
+			
 			if (actor_animation) {
 				auto actor_it = m_actor_map.find(actor_animation->GetActor());
 				if (actor_it != m_actor_map.end()) {
 					m_animation_to_actor[i].push_back(actor_it->second);
 				}
 			}
+			
 			else if (entity_animation) {
 				auto entity_it = m_entity_map.find(entity_animation->GetEntity());
 				if (entity_it != m_entity_map.end()) {
 					m_animation_to_entity[i].push_back(entity_it->second);
 				}
 			}
+			
 			m_Animations.push_back(it->Get());
-			++i;
 		}
 	}
 }
@@ -330,14 +337,13 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 
 
 // ======================================================================================================================
-// Store
+// Persist 
+// ======================================================================================================================
 
 void Grafkit::SceneLoader::SceneLoaderHelper::Save(Archive &ar)
 {
 	IResourceManager * const resman = nullptr;
-
 	Persist(ar, resman);
-
 }
 
 void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceManager * const & resman)

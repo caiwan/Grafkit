@@ -99,6 +99,8 @@ protected:
 
 		m_scene->Get()->AddAnimation(cameraAnimation);
 
+		m_scene->Get()->GetActiveCamera()->SetName("puncsostal");
+
 		// -- save and reload
 		SceneLoader::Save(m_scene->Get(), "./../assets/animation.scene");
 		m_scene->Get()->Shutdown();
@@ -108,9 +110,8 @@ protected:
 		m_scene->Get()->BuildScene(render, m_vs, m_fs);
 
 		m_scene->Get()->SetActiveCamera(0);
-		m_scene->Get()->GetActiveCamera()->SetName("puncsostal");
-
-		((ActorAnimation*)(m_scene->Get()->GetAnimation(0).Get()))->SetActor(m_scene->Get()->GetActiveCamera());
+		m_scene->Get()->GetActiveCamera()->SetName("cicavirag");
+		// ((ActorAnimation*)(m_scene->Get()->GetAnimation(0).Get()))->SetActor(m_scene->Get()->GetActiveCamera());
 
 		m_t = 0;
 
