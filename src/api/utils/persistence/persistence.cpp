@@ -26,10 +26,6 @@ void Persistent::store(Archive& ar)
 	this->serialize(ar);
 }
 
-//void Grafkit::Persistent::serialize(Archive & stream)
-//{
-//}
-
 Persistent* Persistent::load(Archive& ar)
 {
 	string className;

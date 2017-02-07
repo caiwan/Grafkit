@@ -39,12 +39,9 @@ namespace Grafkit {
 			void Save(Archive &ar);
 
 		public:
-			typedef std::map<USHORT, std::vector<USHORT>> assoc_t;
-
-			typedef struct {
-				std::string name;
-				std::string bind;
-			} texture_bind_t;
+			
+			typedef std::pair<USHORT, USHORT> assoc_t;
+			typedef std::pair<std::string, std::string> texture_bind_t;
 
 			typedef std::map<UINT, std::vector<texture_bind_t>> texture_assoc_t;
 
@@ -68,7 +65,7 @@ namespace Grafkit {
 			void PersistActors(Archive &ar, IResourceManager * const & resman);
 			void PersistAnimations(Archive &ar, IResourceManager * const & resman);
 
-			void PersistKeymap(Archive &ar, SceneLoader::SceneLoaderHelper::assoc_t &keymap);
+			void PersistKeymap(Archive &ar, std::vector<assoc_t> &keymap);
 
 		private:
 			SceneRef &m_scene;
@@ -78,16 +75,16 @@ namespace Grafkit {
 			std::vector<Material*> m_materials;
 			std::vector<Animation*> m_Animations;
 
-			std::map<Entity3D*, int> m_entity_map;
+			std::map<Entity3D*, USHORT> m_entity_map;
 			std::set<Material*> m_material_set;
 			std::map<Actor*, int> m_actor_map;
 
 			texture_assoc_t m_textures_to_materials;
-			assoc_t m_materials_to_meshes;
-			assoc_t m_entities_to_actors;
-			assoc_t m_actor_to_actor;
-			assoc_t m_animation_to_actor;
-			assoc_t m_animation_to_entity;
+			std::vector<assoc_t> m_materials_to_meshes;
+			std::vector<assoc_t> m_entities_to_actors;
+			std::vector<assoc_t> m_actor_to_actor;
+			std::vector<assoc_t> m_animation_to_actor;
+			std::vector<assoc_t> m_animation_to_entity;
 			
 			// used for crsr of the fetch loops
 			int m_cTexID;

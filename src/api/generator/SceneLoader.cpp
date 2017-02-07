@@ -80,39 +80,40 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 {
 	Persist(ar, resman);
 
+	LOGGER(Log::Logger().Info("-ASSIGN-"));
+
 	// 5. material -> mesh relation
 	LOGGER(Log::Logger().Info("Materials: %d", m_materials_to_meshes.size()));
-	for (auto key_it = m_materials_to_meshes.begin(); key_it != m_materials_to_meshes.end(); ++key_it)
+	for (auto it = m_materials_to_meshes.begin(); it != m_materials_to_meshes.end(); ++it)
 	{
-		USHORT key = key_it->first;
-		Material * material = m_materials[key];
-		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it)
-		{
-			USHORT val = *value_it;
-			Model *model = dynamic_cast<Model *>(m_entities[val]);
+		USHORT key = it->first;
+		USHORT val = it->second;
 
-			if (model) {
-				model->SetMaterial(material);
+		Material * material = m_materials[key];	
+		Model *model = dynamic_cast<Model *>(m_entities[val]);
 
-				LOGGER(Log::Logger().Info("%hu -> %hu", key, val));
-			}
+		if (model && material) {
+			model->SetMaterial(material);
+
+			LOGGER(Log::Logger().Info("%hu (\"%s\") -> %hu (\"%s\")", key, material->GetName().c_str(), val, model->GetName().c_str()));
 		}
 	}
 	// ... 
 
 	// 6. entitiy -> actor relation
 	LOGGER(Log::Logger().Info("Entities: %d", m_entities_to_actors.size()));
-	for (auto key_it = m_entities_to_actors.begin(); key_it != m_entities_to_actors.end(); ++key_it)
+	for (auto it = m_entities_to_actors.begin(); it != m_entities_to_actors.end(); ++it)
 	{
-		USHORT key = key_it->first;
+		USHORT key = it->first;
+		USHORT val = it->second;
+		
 		Entity3D *entity = m_entities[key];
-		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it)
-		{
-			USHORT val = *value_it;
-			Actor *actor = m_actors[val];
+		Actor *actor = m_actors[val];
+
+		if (actor && entity) {
 			actor->AddEntity(entity);
 
-			LOGGER(Log::Logger().Info("%hu -> %hu %s", key, val, entity->GetName().c_str()));
+			LOGGER(Log::Logger().Info("%hu (\"%s\") -> %hu (\"%s\")", key, entity->GetName().c_str()), val, actor->GetName().c_str());
 		}
 	}
 
@@ -120,55 +121,55 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 
 	// 7. actor -> actor relation - scenegraph
 	LOGGER(Log::Logger().Info("Actors: %d", m_actor_to_actor.size()));
-	for (auto key_it = m_actor_to_actor.begin(); key_it != m_actor_to_actor.end(); ++key_it)
+	for (auto it = m_actor_to_actor.begin(); it != m_actor_to_actor.end(); ++it)
 	{
-		USHORT key = key_it->first;
+		USHORT key = it->first;		
+		USHORT val = it->second;
 
-		for (auto value_it = key_it->second.begin(); value_it != key_it->second.end(); ++value_it)
-		{
-			USHORT val = *value_it;
-			Actor *child = m_actors[val];
-			Actor *parent = m_actors[key];
-			if (parent && child)
-				parent->AddChild(child);
+		Actor *child = m_actors[val];
+		Actor *parent = m_actors[key];
 
-			LOGGER(Log::Logger().Info("%hu -> %hu %d", key, val, parent != nullptr));
+		if (parent && child) {
+			parent->AddChild(child);
+
+			LOGGER(Log::Logger().Info("%hu (\"%s\") -> %hu (\"%s\")", key, parent->GetName().c_str(), val, child->GetName().c_str()));
 		}
 	}
 
 	 //8, 9 animation -> actor, entity
 	LOGGER(Log::Logger().Info("Animations: %d", m_animation_to_actor.size() + m_animation_to_entity.size()));
-	for (auto key_it = m_animation_to_actor.cbegin(); key_it != m_animation_to_actor.cend(); ++key_it)
+	for (auto it = m_animation_to_actor.cbegin(); it != m_animation_to_actor.cend(); ++it)
 	{
-		USHORT key = key_it->first;
-		if (!key_it->second.empty())
-		{
-			USHORT value = key_it->second[0];
-			ActorAnimation *animation = dynamic_cast<ActorAnimation *>(m_Animations[key]);
-			if (animation) {
-				Actor* actor = m_actors[value];
-				animation->SetActor(ActorRef(actor));
-				m_scene->AddAnimation(animation);
-				LOGGER(Log::Logger().Info("Actor %hu -> %hu %s", key, value, actor->GetName().c_str()));
+		USHORT key = it->first;
+		USHORT value = it->second;
+		ActorAnimation *actor_animation = dynamic_cast<ActorAnimation *>(m_Animations[key]);
+		if (actor_animation) {
+			Actor* actor = m_actors[value];
+			if (actor) {
+				actor_animation->SetActor(ActorRef(actor));
+				m_scene->AddAnimation(actor_animation);
+				LOGGER(Log::Logger().Info("Actor %hu (\"%s\") -> %hu (\"%s\")", key, actor->GetName().c_str(), value, actor_animation->GetName().c_str()));
 			}
-			
 		}
+
 	}
 
-	for (auto key_it = m_animation_to_entity.cbegin(); key_it != m_animation_to_entity.cend(); ++key_it)
+	for (auto it = m_animation_to_entity.cbegin(); it != m_animation_to_entity.cend(); ++it)
 	{
-		USHORT key = key_it->first;
-		if (!key_it->second.empty())
-		{
-			USHORT value = key_it->second[0];
-			EntityAnimation *animation = dynamic_cast<EntityAnimation*>(m_Animations[key]);
-			if (animation) {
-				Ref<Entity3D> entityRef = m_entities[value];
-				animation->SetEntity(entityRef);
-				m_scene->AddAnimation(animation);
+		USHORT key = it->first;
+		USHORT value = it->second;
+
+		EntityAnimation *entity_animation = dynamic_cast<EntityAnimation*>(m_Animations[key]);
+		if (entity_animation) {
+			Entity3D* entity = m_entities[value];
+			if (entity) {
+				entity_animation->SetEntity(Ref<Entity3D>(entity));
+				m_scene->AddAnimation(entity_animation);
+				LOGGER(Log::Logger().Info("Entity %hu -> %hu", key, value));
 			}
-			LOGGER(Log::Logger().Info("Entity %hu -> %hu", key, value));
 		}
+		
+		
 	}
 
 	Actor * root = m_actors[0];
@@ -227,8 +228,8 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 			TextureResRef texture = tx_it->second;
 			if (texture.Valid() && texture->Valid()) {
 				texture_bind_t bind;
-				bind.name = texture->GetName();
-				bind.bind = tx_it->first;
+				bind.first = texture->GetName();
+				bind.second = tx_it->first;
 				m_textures_to_materials[m_cMatID].push_back(bind);
 			
 				// .. ami kell meg ide johet
@@ -245,7 +246,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &m
 	MaterialRef material = model->GetMaterial();
 	if (material.Valid() && m_material_set.find(material) == m_material_set.end()) {
 		m_material_set.insert(material);
-		m_materials_to_meshes[m_cMatID].push_back(m_cEntityID);
+		m_materials_to_meshes.push_back(assoc_t(m_cMatID, m_cEntityID));
 		m_materials.push_back(material);
 
 		BuildTextureMap(material);
@@ -272,14 +273,14 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 			if (actor_animation) {
 				auto actor_it = m_actor_map.find(actor_animation->GetActor());
 				if (actor_it != m_actor_map.end()) {
-					m_animation_to_actor[i].push_back(actor_it->second);
+					m_animation_to_actor.push_back(assoc_t(i, actor_it->second)); //[i].push_back(actor_it->second);
 				}
 			}
 			
 			else if (entity_animation) {
 				auto entity_it = m_entity_map.find(entity_animation->GetEntity());
 				if (entity_it != m_entity_map.end()) {
-					m_animation_to_entity[i].push_back(entity_it->second);
+					m_animation_to_entity.push_back(assoc_t(i, entity_it->second)); //[i].push_back(entity_it->second);
 				}
 			}
 			
@@ -292,25 +293,27 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &actor)
 {
 	for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().end(); ++entity_it) {
-		Ref<Entity3D> entity = (*entity_it).Get();
-		if (entity.Valid() && m_entity_map.find(entity) == m_entity_map.end()) {
-			m_entity_map[entity] = m_cEntityID;
-			m_entities.push_back(entity);
-			m_entities_to_actors[m_cEntityID].push_back(m_cActorID);
+		if (entity_it->Valid()) {
+			Entity3D *entity = (*entity_it).Get();
+			if (m_entity_map.find(entity) == m_entity_map.end()) {
+				m_entity_map[entity] = m_cEntityID;
+				m_entities.push_back(entity);
+				m_entities_to_actors.push_back(assoc_t(m_cEntityID, m_cActorID)); // [m_cEntityID].push_back(m_cActorID);
 
-			// model 
-			const ModelRef model = dynamic_cast<Model*>((*entity_it).Get());
-			if (model.Valid()) {
-				BuildMaterialMap(model);
-				// ... ide jon, ami kell meg
-			} 
+				// model 
+				const ModelRef model = dynamic_cast<Model*>((*entity_it).Get());
+				if (model.Valid()) {
+					BuildMaterialMap(model);
+					// ... ide jon, ami kell meg
+				}
 
-			// ... ide jon, ami kell meg 
+				// ... ide jon, ami kell meg 
 
-			++m_cEntityID;
-		}
-		else {
-			m_entities_to_actors[m_entity_map[entity]].push_back(m_cActorID);
+				++m_cEntityID;
+			}
+			else {
+				m_entities_to_actors.push_back(assoc_t(m_entity_map[entity], m_cActorID));
+			}
 		}
 	} 
 }
@@ -327,8 +330,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 				auto it = m_actor_map.find(parent);
 				if (it != m_actor_map.end()) {
 					UINT key = (it->second), val = i;
-					m_actor_to_actor[key].push_back(val);
-					//
+					m_actor_to_actor.push_back(assoc_t(key, val)); 
 				}
 			}
 		}
@@ -359,19 +361,10 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceMan
 	PersistActors(ar, resman);
 	PersistAnimations(ar, resman);
 
-	LOGGER(Log::Logger().Info("Materials to meshes:"));
 	PersistKeymap(ar, m_materials_to_meshes);
-
-	LOGGER(Log::Logger().Info("Entities to actors:"));
 	PersistKeymap(ar, m_entities_to_actors);
-
-	LOGGER(Log::Logger().Info("Scenegraph:"));
 	PersistKeymap(ar, m_actor_to_actor);
-
-	LOGGER(Log::Logger().Info("Actor animations:"));
 	PersistKeymap(ar, m_animation_to_actor);
-
-	LOGGER(Log::Logger().Info("Entity animations:"));
 	PersistKeymap(ar, m_animation_to_entity);
 }
 
@@ -409,12 +402,12 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IRes
 			if (ar.IsStoring())
 				tx = tx_bind[j];
 
-			PERSIST_STRING(ar , tx.bind);
-			PERSIST_STRING(ar , tx.name);
+			PERSIST_STRING(ar, tx.first);
+			PERSIST_STRING(ar, tx.second);
 
 			if (!ar.IsStoring()) {
-				TextureResRef texture = resman->Get<TextureRes>(tx.name);
-				material->AddTexture(texture, tx.bind);
+				TextureResRef texture = resman->Get<TextureRes>(tx.first);
+				material->AddTexture(texture, tx.second);
 			}
 		}
 	}
@@ -459,7 +452,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResour
 		if (ar.IsStoring())
 			actor = m_actors[i];
 
-		PERSIST_OBJECT(ar , actor);
+		PERSIST_OBJECT(ar, actor);
 
 		if (!ar.IsStoring())
 			m_actors.push_back(actor);
@@ -487,57 +480,27 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IRe
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, SceneLoader::SceneLoaderHelper::assoc_t & keymap)
+void Grafkit::SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, std::vector<assoc_t>& keymap)
 {
-	typedef std::vector<USHORT> values_t;
+	UINT size = 0;
+	assoc_t pair;
 
-	USHORT keyMapCount = 0;
-	USHORT key = 0, valuelen = 0;
-	USHORT value = 0;
-
-	if (ar.IsStoring()) {
-		keyMapCount = keymap.size();
-		PERSIST_FIELD(ar, keyMapCount);
-
-		for (auto key_it = keymap.cbegin(); key_it != keymap.cend(); key_it++) {
-			key = key_it->first, valuelen = key_it->second.size();
-			PERSIST_FIELD(ar, key);
-			PERSIST_FIELD(ar, valuelen);
-
-			const values_t & values = key_it->second;
-
-			for (size_t j = 0; j < valuelen; ++j)
-			{
-				value = values[j];
-				PERSIST_FIELD(ar, value);
-
-				LOGGER(Log::Logger().Info("%hu -> %hu", key, value));
-			}
-
-		}
-	}
-	else {
+	if (ar.IsStoring())
+		size = keymap.size();
+	else
 		keymap.clear();
-		keyMapCount = 0;
-		PERSIST_FIELD(ar, keyMapCount);
 
-		for (int i = 0; i < keyMapCount; ++i) {
-			key = 0, valuelen = 0;
-			PERSIST_FIELD(ar, key);
-			PERSIST_FIELD(ar, valuelen);
+	PERSIST_FIELD(ar, size);
 
-			values_t & values = keymap[i];
+	for (size_t i = 0; i < size; ++i) {
+	
+		if (ar.IsStoring())
+			pair = keymap[i];
 
-			for (size_t j = 0; j < valuelen; ++j)
-			{
-				value = 0;
-				PERSIST_FIELD(ar, value);
+		PERSIST_FIELD(ar, pair.first);
+		PERSIST_FIELD(ar, pair.second);
 
-				LOGGER(Log::Logger().Info("%hu -> %hu", key, value));
-
-				values.push_back(value);
-			}
-
-		}
+		if (!ar.IsStoring())
+			keymap.push_back(pair);
 	}
 }

@@ -76,7 +76,7 @@ protected:
 			// -- camera
 			/* Az alap kamera origoban van, +z iranyba nez, es +y felfele irany */
 			CameraRef camera = new Camera;
-			camera->SetName("kiscica");
+			camera->SetName("camera");
 
 			// -- texture
 			TextureResRef texture = new TextureRes();
@@ -98,6 +98,7 @@ protected:
 			ModelRef model = new Model(new Mesh());
 			model->SetMaterial(new Material(Material::MT_flat));
 			model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
+			model->GetMaterial()->SetName("GridMaterial");
 
 			model->SetName("cube");
 			model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
@@ -109,20 +110,25 @@ protected:
 			scene = new SceneRes(new Scene());
 			
 			m_cameraActor = new Actor(); 
+			m_cameraActor->SetName("cameraNode");
 			m_cameraActor->AddEntity(camera);
 			
 			/* Kocka kozepen */
 			ActorRef modelActor = new Actor(); 
+			modelActor->SetName("kozepen");
 			modelActor->AddEntity(model);
 			
 			/*
 			Alap right-handed koordinatarendszer szerint osszerakunk egy keresztet
 			Ezeket adjuk hozza a belso kockahoz
 			*/
-			float3 cube_translation_coords[] = {
-				{ 1, 0, 0 }, /* Jobb */ { -1, 0, 0 }, /* Bal */
-				{ 0, 1, 0 }, /* fent */ {  0,-1, 0 }, /* lent */
-				{ 0, 0, -1}, /* elol */ {  0, 0, 1 }, /* hatul */
+			struct {
+				float3 coord;
+				std::string name;
+			} cubes [] = {
+				{{ 1, 0, 0 }, "Jobb", }, {{ -1, 0, 0 }, "Bal",  },
+				{{ 0, 1, 0 }, "fent", }, {{  0,-1, 0 }, "lent", },
+				{{ 0, 0, -1}, "elol", }, {{  0, 0, 1 }, "hatul",},
 			};
 
 			//size_t i = 0; // egyesevel itt lehet hozzaadni/elvenni
@@ -132,13 +138,14 @@ protected:
 				actor->AddEntity(model);
 				modelActor->AddChild(actor);
 
-				float3 v = cube_translation_coords[i];
+				float3 v = cubes[i].coord;
 				v.x *= 3;
 				v.y *= 3;
 				v.z *= 3;
 				
 				actor->Matrix().Translate(v);
-				
+
+				actor->SetName(cubes[i].name);
 			}
 
 			// kozepso kockat elrejtjuk
@@ -148,6 +155,7 @@ protected:
 			Kockak felfuzese a rootba
 			*/
 			m_rootActor = new Actor();
+			m_rootActor->SetName("root");
 			m_rootActor->AddChild(m_cameraActor);
 			m_rootActor->AddChild(modelActor);
 
