@@ -79,7 +79,7 @@ protected:
 		// -- texture
 		TextureResRef texture = new TextureRes();
 
-		texture = this->Load<TextureRes>(new TextureFromBitmap("textures/Untitled.png"));
+		texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 		// -- texture sampler
 		m_textureSampler = new TextureSampler();
@@ -101,7 +101,7 @@ protected:
 		model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
 		model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
 		model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
-		model->GetMesh()->Build(m_vertexShader, render);
+		model->GetMesh()->Build(render, m_vertexShader);
 
 		// -- setup scene 
 		scene = new Scene();
@@ -150,8 +150,9 @@ protected:
 		m_rootActor->AddChild(modelActor);
 
 		scene->Initialize(m_rootActor);
-		scene->AddCameraNode(m_cameraActor);
+		// scene->AddCameraNode(m_cameraActor);
 		// scene->AddLightNode(lightActor);
+		scene->SetActiveCamera(0);
 
 		scene->SetVShader(m_vertexShader);
 		scene->SetPShader(m_fragmentShader);
