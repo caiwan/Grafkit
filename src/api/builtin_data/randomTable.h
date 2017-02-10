@@ -4,6 +4,6 @@
  */
  
 namespace GrafkitData {
-	extern const unsigned int * const 
+	extern const unsigned char * const randmomTable;
 }
  

@@ -18,6 +18,8 @@
 		  
 #include "utils/ResourceManager.h"
 
+#include "generator/SceneLoader.h"
+
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
@@ -42,6 +44,13 @@ public:
 
 			// initwindowot is ertelmesebb helyre kell rakni
 			InitializeWindows(screenWidth, screenHeight);
+
+			screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
+			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
+
+			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+
+			this->m_file_loader = new FileAssetFactory("./../assets/");
 		}
 		
 		~Application() {
@@ -49,7 +58,7 @@ public:
 
 protected:
 		Renderer render;
-		Ref<Scene> scene;
+		SceneResRef m_scene;
 
 		TextureSamplerRef m_textureSampler;
 		ActorRef m_rootActor;
@@ -62,90 +71,26 @@ protected:
 
 		float t;
 
-		ShaderResRef m_vertexShader;
-		ShaderResRef m_fragmentShader;
+		ShaderResRef m_vs;
+		ShaderResRef m_fs;
 		
 		int init() {
-			// --- ezeket kell osszeszedni egy initwindowban
-			const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
-			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
+			m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
+			m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
 
-			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+			m_fxFXAA = Load<ShaderRes>(new PixelShaderLoader("xFXAA", "shaders/fxaa.hlsl", "FXAA"));
+			m_fxFishEye = Load<ShaderRes>(new PixelShaderLoader("xFishEye", "shaders/fisheye.hlsl", "fisheyeProc"));
 
-			// init file loader
-			this->m_file_loader = new FileAssetFactory("./../../assets/postfx/");
+			m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 
-			// --------------------------------------------------
+			DoPrecalc();
 
-			// -- camera
-			CameraRef camera = new Camera;
-			camera->SetPosition(0.0f, 0.0f, -10.0f);
-
-			// -- texture
-			TextureResRef texture = new TextureRes();
-
-			texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
-
-			// -- texture sampler
-			m_textureSampler = new TextureSampler();
-			m_textureSampler->Initialize(render);
-
-			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
-			m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
-
-			m_fxFXAA = Load<ShaderRes>(new ShaderLoader("xFXAA", "fxaa.hlsl", "FXAA", ST_Pixel));
-			m_fxFishEye = Load<ShaderRes>(new ShaderLoader("xFishEye", "fisheye.hlsl", "fisheyeProc", ST_Pixel));
-			// m_fxVhs = Load<ShaderRes>(new ShaderLoader("xVhs", "vhstape.hlsl", "TextureVertexShader", ST_Pixel));
-
-			// 
-			this->DoPrecalc();
-
-			// -- model 
-			ModelRef model = new Model;
-			model->SetMaterial(new MaterialBase);
-			model->GetMaterial()->AddTexture(texture, "diffuse");
-
-
-			SimpleMeshGenerator generator(render, m_vertexShader);
-			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-			
-			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
-
-			// -- setup scene 
-			scene = new Scene();
-			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
-			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
-			
-			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
-			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
-
-			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
-			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
-
-			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
-			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
-			
-
-			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
-
-			ActorRef rootActor = new Actor();
-			rootActor->AddChild(cameraActor);
-			rootActor->AddChild(modelActor);
-
-			m_rootActor = rootActor;
-
-			scene->SetRootNode(rootActor);
-			scene->SetCameraNode(cameraActor);
-			// scene->AddLightNode(lightActor);
-
-			scene->SetVShader(m_vertexShader);
-			scene->SetFShader(m_fragmentShader);
+			m_scene->Get()->BuildScene(render, m_vs, m_fs);
 
 			// -- setup postfx 
 			size_t k = 0;
-			m_postfx = new EffectComposer(); m_postfx->Initialize(render);
+			m_postfx = new EffectComposer(); 
+			m_postfx->Initialize(render);
 			
 			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFXAA);
 			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFishEye);
@@ -173,23 +118,19 @@ protected:
 			// pre fx-pass
 			this->render.BeginScene();
 			{
-				ShaderRef fragmentShader = this->m_fragmentShader->Get();
-				ShaderRef fxaaShader = this->m_fxFXAA->Get();
-				ShaderRef fishEyeShader = this->m_fxFishEye->Get();
-
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 
-				fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+				//fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 				
 				float2 res = float2();
 				render.GetScreenSizef(res.x, res.y);
-				fxaaShader->GetParam("FXAA").Get("resolution").SetF(res.x, res.y);
 
-				fishEyeShader->GetParam("Fisheye").Get("theta").SetF(0.5);
+				m_fxFXAA->Get()->SetParamValueT<float2>(render, "FXAA", "resolution", res);
+				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .5);
 
-				scene->PreRender(render);
-				scene->Render(render);
+				m_scene->Get()->PreRender(render);
+				m_scene->Get()->Render(render);
 
 				this->t += 0.01;
 			}

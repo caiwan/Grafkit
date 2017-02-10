@@ -46,7 +46,6 @@ namespace Grafkit
 		MaterialRef m_material;
 		MeshRef m_mesh;
 
-
 		PERSISTENT_DECL(Grafkit::Model, 1)
 	protected:
 		virtual void serialize(Archive& ar) { _serialize(ar); }

@@ -1,3 +1,6 @@
+#include "stdafx.h"
+#include "randomTable.h"
+
 /*
 Random data lookup table
 4096 bytes of natural noise from random.org
@@ -348,4 +351,4 @@ unsigned char _randmomTable[4096] = {
 	0xAF, 0xE0, 0xC1, 0x43
 };
 
-const unsigned int * const GrafkitData::randmomTable = _randmomTable;
+const unsigned char * const GrafkitData::randmomTable = _randmomTable;

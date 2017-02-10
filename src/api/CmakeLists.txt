@@ -1,0 +1,15 @@
+# Grafkit 2 library
+Project(Grafkit2API)
+
+file(GLOB_RECURSE SOURCE_FILES *.cpp)
+file(GLOB_RECURSE HEADER_FILES *.h)
+
+include_directories("${CMAKE_SOURCE_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}")
+
+msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
+
+add_library(Grafkit2 STATIC ${SOURCE_FILES} ${HEADER_FILES})
+target_include_directories(Grafkit2 PUBLIC "${CMAKE_SOURCE_DIR}")
+
+assign_source_group("${SOURCE_FILES} ${HEADER_FILES}")

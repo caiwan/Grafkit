@@ -68,8 +68,13 @@ namespace Grafkit {
 		void SetParam(ID3D11DeviceContext * deviceContext, std::string name, const void * const pData, size_t size = 0, size_t offset = 0);
 		void SetParam(ID3D11DeviceContext * deviceContext, size_t id, const void * const pData, size_t size = 0, size_t offset = 0);
 
+		template <typename T > void SetParamT(ID3D11DeviceContext * deviceContext, std::string name, T v) { SetParam(deviceContext, name, &v); }
+
 		void SetParamValue(ID3D11DeviceContext * deviceContext, std::string name, std::string valueName, void * const pData, size_t size = 0, size_t offset = 0);
 		void SetParamValue(ID3D11DeviceContext * deviceContext, size_t id, size_t valueid, const void * const pData, size_t size = 0, size_t offset = 0);
+
+		template <typename T > void SetParamValueT(ID3D11DeviceContext * deviceContext, std::string name, std::string valueName, T v) { SetParamValue(deviceContext, name, valueName, &v, sizeof(T)); }
+
 
 	protected:
 		void* MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int isDiscard = 1);

@@ -67,7 +67,7 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetFactory("./../../assets/rotating_cube/");
+			this->m_file_loader = new FileAssetFactory("./../assets/");
 
 			// --------------------------------------------------
 
@@ -77,7 +77,7 @@ protected:
 
 			// -- texture
 			
-			TextureFromBitmap *textureLoader = new TextureFromBitmap("normap.jpg");
+			TextureFromBitmap *textureLoader = new TextureFromBitmap("normap", "textures/normap.jpg");
 			TextureResRef textureRes = (TextureRes*)textureLoader->NewResource();
 			textureLoader->Load(this, textureRes);
 
@@ -91,7 +91,7 @@ protected:
 
 			// -- load shader
 			
-			ShaderLoader *vShaderLoader = new VertexShaderLoader("vshader", "texture.hlsl", "TextureVertexShader");
+			ShaderLoader *vShaderLoader = new VertexShaderLoader("vshader", "shaders/flat.hlsl", "TextureVertexShader");
 			ShaderResRef vShaderRef = (ShaderRes*)(vShaderLoader->NewResource());
 			vShaderLoader->Load(this, vShaderRef);
 			
@@ -99,7 +99,7 @@ protected:
 
 			delete vShaderLoader;
 
-			ShaderLoader *pShaderLoader = new PixelShaderLoader("pshader", "texture.hlsl", "TexturePixelShader");
+			ShaderLoader *pShaderLoader = new PixelShaderLoader("pshader", "shaders/flat.hlsl", "TexturePixelShader");
 			ShaderResRef pShaderRef = (ShaderRes*)(pShaderLoader->NewResource());
 			pShaderLoader->Load(this, pShaderRef);
 
@@ -113,10 +113,10 @@ protected:
 			this->m_model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
 			this->m_model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
 			this->m_model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
-			this->m_model->GetMesh()->Build(m_vertexShader, render);
+			this->m_model->GetMesh()->Build(render, m_vertexShader);
 
 			// export as test
-			FILE* fp = nullptr; fopen_s(&fp, "cube.gkobj", "wb");
+			FILE* fp = nullptr; fopen_s(&fp, "cube.mesh", "wb");
 			ArchiveFile store(fp, true);
 			
 			this->m_model->store(store);
@@ -124,14 +124,13 @@ protected:
 			fflush(fp); fclose(fp);
 
 			// import it again
-			fopen_s(&fp, "cube.gkobj", "rb");
+			fopen_s(&fp, "cube.mesh", "rb");
 			ArchiveFile load(fp, false);
 
 			this->m_model->load(load);
-			this->m_model->GetMesh()->Build(m_vertexShader, render);
+			this->m_model->GetMesh()->Build(render, m_vertexShader);
 
 			fclose(fp);
-
 
 			// --- 
 

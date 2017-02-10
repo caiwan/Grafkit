@@ -173,13 +173,13 @@ protected:
 			/* ------------------------------------------------------------ */
 
 			/* Export and import stuff to file, then build it */
-			SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
+			/*SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
 			scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 			this->DoPrecalc();
 
 			scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);
 
-			scene->Get()->SetActiveCamera(0);
+			scene->Get()->SetActiveCamera(0);*/
 			
 			// --- 
 
@@ -201,8 +201,6 @@ protected:
 		int mainloop() {
 			this->render.BeginScene();
 			{				
-				//ShaderRef fragmentShader = this->m_fragmentShader->Get();
-
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 		
