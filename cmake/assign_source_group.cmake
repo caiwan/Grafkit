@@ -8,7 +8,9 @@ function(assign_source_group)
 		else()
 			set(source_rel "${_source}")
 		endif()
+		
 		get_filename_component(_source_path "${_source_rel}" PATH)
+		
 		string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
 
 		if ("${_source}" MATCHES ".*\\.cpp")

@@ -7,6 +7,7 @@
 file(GLOB_RECURSE SHADER_FILES *.hlsl)
 
 add_custom_target(shaders SOURCES ${SHADER_FILES})
+set_target_properties(${_application} PROPERTIES FOLDER tests)
 
 assign_source_group("${SHADER_FILES}")
 

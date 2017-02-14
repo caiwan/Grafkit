@@ -19,7 +19,7 @@ function(create_testapp _application)
 	assign_source_group("${SOURCE_FILES}")
 	assign_source_group("${HEADER_FILES}")
 	
-	add_dependencies(assets)
-	add_dependencies(shaders)
+	add_dependencies(${_application} assets)
+	add_dependencies(${_application} shaders)
 
 endfunction(create_testapp)
