@@ -1,0 +1,1 @@
+create_testapp(test_core_rotating_cube_scenegraph)

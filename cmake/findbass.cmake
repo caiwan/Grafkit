@@ -1,0 +1,21 @@
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(BASS_ARCHITECTURE "x64")
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+	set(BASS_ARCHITECTURE "")
+endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+
+set(BASS_ROOT_DIR CACHE PATH "BASS root directory")
+
+find_path(BASS_INCLUDE_DIR NAMES bass.h   HINTS ${BASS_ROOT_DIR}/c/)
+find_path(BASS_LIBRARY_DIR NAMES bass.lib HINTS ${BASS_ROOT_DIR}/c/${BASS_ARCHITECTURE}/)
+find_path(BASS_DLL_DIR     NAMES bass.dll HINTS ${BASS_ROOT_DIR}/${BASS_ARCHITECTURE}/)
+
+find_library(BASS_LIBRARY_RELEASE bass.lib  PATHS ${BASS_LIBRARY_DIR})
+
+# FUNCTION(BASS_COPY_BINARIES TargetDirectory)
+# 	ADD_CUSTOM_TARGET(BassCopyBinaries
+# 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_ROOT_DIR}/bin${ASSIMP_ARCHITECTURE}/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll 	${TargetDirectory}/Debug/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll
+# 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_ROOT_DIR}/bin${ASSIMP_ARCHITECTURE}/assimp-${ASSIMP_MSVC_VERSION}-mt.dll 		${TargetDirectory}/Release/assimp-${ASSIMP_MSVC_VERSION}-mt.dll
+# 	COMMENT "Copying Assimp binaries to '${TargetDirectory}'"
+# 	VERBATIM)
+# ENDFUNCTION(BASS_COPY_BINARIES)

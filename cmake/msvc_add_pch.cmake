@@ -1,4 +1,4 @@
-macro(msvc_add_pch PrecompiledHeader PrecompiledSource SourcesVar)
+function(msvc_add_pch PrecompiledHeader PrecompiledSource SourcesVar)
   if(MSVC)
     get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
     set(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
@@ -8,4 +8,4 @@ macro(msvc_add_pch PrecompiledHeader PrecompiledSource SourcesVar)
     set_source_files_properties(${Sources} PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\"" OBJECT_DEPENDS "${PrecompiledBinary}")  
 	
   endif(MSVC)
-endmacro(msvc_add_pch)
+endfunction(msvc_add_pch)

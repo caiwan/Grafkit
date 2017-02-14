@@ -6,7 +6,8 @@
 
 file(GLOB_RECURSE SHADER_FILES *.hlsl)
 
-add_custom_target(shaders ${SHADER_FILES})
+add_custom_target(shaders SOURCES ${SHADER_FILES})
+
 assign_source_group("${SHADER_FILES}")
 
 # foreach(FILE foo.fx bar.fx baz.fx)

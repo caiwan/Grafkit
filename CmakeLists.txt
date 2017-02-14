@@ -3,10 +3,29 @@ project (Grafkit2)
  
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+SET(GK2_EXTERNALS "${CMAKE_CURRENT_SOURCE_DIR}/externals")
+
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/assign_source_group.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_add_pch.cmake)
- 
-subdirs(src)
-subdirs(tests)
-subdirs(demos)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_set_win32.cmake)
 
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/release" CACHE PATH "default install path" FORCE )
+endif()
+
+set(ASSIMP_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/Assimp" CACHE PATH "ASSIMP root directory")
+set(STB_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/stb" CACHE PATH "STB root directory")
+set(BASS_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/bass24" CACHE PATH "BASS root directory")
+
+find_package(Assimp)
+find_package(stb)
+find_package(Bass)
+# find_package(Bullet)
+
+set(GK2_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/api")
+set(GK2_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
+add_subdirectory(src)
+add_subdirectory(tests)
+add_subdirectory(demos)

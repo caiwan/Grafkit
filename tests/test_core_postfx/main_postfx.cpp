@@ -86,6 +86,8 @@ protected:
 			DoPrecalc();
 
 			m_scene->Get()->BuildScene(render, m_vs, m_fs);
+			m_rootActor = m_scene->Get()->GetRootNode();
+			m_scene->Get()->SetActiveCamera(0);
 
 			// -- setup postfx 
 			size_t k = 0;
@@ -113,7 +115,7 @@ protected:
 		// ==================================================================================================================
 		int mainloop() {
 
-			m_postfx->BindInput(render);
+			//m_postfx->BindInput(render);
 
 			// pre fx-pass
 			this->render.BeginScene();
@@ -136,7 +138,7 @@ protected:
 			}
 
 			// render fx chain 
-			m_postfx->Render(render);
+			//m_postfx->Render(render);
 			
 			this->render.EndScene();
 

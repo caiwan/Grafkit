@@ -235,12 +235,13 @@ void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, size_t 
 		if (size == 0)
 			size = m_cBuffers[id].m_cbVars[valueid].m_var_desc.Size;
 
-		if (size + offset <= m_cBuffers[id].m_cbVars[valueid].m_var_desc.Size)
+		if (size + offset <= m_cBuffers[id].m_description.Size)
 			CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
 		else
 			DebugBreak();
 
-		CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+		BYTE* p = (BYTE*)this->MapParamBuffer(deviceContext, id);
+		CopyMemory(p, m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
 		this->UnMapParamBuffer(deviceContext, id);
 	}
 	else {

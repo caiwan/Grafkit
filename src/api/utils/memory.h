@@ -11,7 +11,7 @@
 template<typename TDerived> struct AlignedNew
 {
 	// Allocate aligned memory.
-	static void* operator new (size_t size) throw(std::bad_alloc)
+	static void* operator new (size_t size) throw(/*std::bad_alloc*/)
 	{
 		const size_t alignment = __alignof(TDerived);
 		static_assert(alignment > 8, "AlignedNew is only useful for types with > 8 byte alignment. Did you forget a __declspec(align) on TDerived?");
