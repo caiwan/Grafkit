@@ -12,10 +12,14 @@ find_path(BASS_DLL_DIR     NAMES bass.dll HINTS ${BASS_ROOT_DIR}/${BASS_ARCHITEC
 
 find_library(BASS_LIBRARY_RELEASE bass.lib  PATHS ${BASS_LIBRARY_DIR})
 
+function(bass_copy_binaries TargetDir)
+	file(COPY "${BASS_DLL_DIR}/bass.dll" DESTINATION ${TargetDir})
+endfunction(bass_copy_binaries)
+
 # FUNCTION(BASS_COPY_BINARIES TargetDirectory)
 # 	ADD_CUSTOM_TARGET(BassCopyBinaries
-# 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_ROOT_DIR}/bin${ASSIMP_ARCHITECTURE}/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll 	${TargetDirectory}/Debug/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll
-# 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_ROOT_DIR}/bin${ASSIMP_ARCHITECTURE}/assimp-${ASSIMP_MSVC_VERSION}-mt.dll 		${TargetDirectory}/Release/assimp-${ASSIMP_MSVC_VERSION}-mt.dll
+# 		COMMAND ${CMAKE_COMMAND} -E copy honnan hova
+# 		COMMAND ${CMAKE_COMMAND} -E copy honnan hova
 # 	COMMENT "Copying Assimp binaries to '${TargetDirectory}'"
 # 	VERBATIM)
 # ENDFUNCTION(BASS_COPY_BINARIES)

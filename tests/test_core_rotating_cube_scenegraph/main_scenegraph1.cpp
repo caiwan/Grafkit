@@ -40,6 +40,15 @@ public:
 
 			// initwindowot is ertelmesebb helyre kell rakni
 			InitializeWindows(screenWidth, screenHeight);
+
+			// --- ezeket kell osszeszedni egy initwindowban
+			screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
+			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
+
+			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+
+			// init file loader
+			this->m_file_loader = new FileAssetFactory("./../assets/");
 		}
 		
 		~Application() {
@@ -60,14 +69,6 @@ protected:
 		ShaderResRef m_fragmentShader;
 		
 		int init() {
-			// --- ezeket kell osszeszedni egy initwindowban
-			const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
-			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
-
-			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
-
-			// init file loader
-			this->m_file_loader = new FileAssetFactory("./../assets/");
 
 			// --------------------------------------------------
 
@@ -173,13 +174,13 @@ protected:
 			/* ------------------------------------------------------------ */
 
 			/* Export and import stuff to file, then build it */
-			/*SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
+			SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
 			scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 			this->DoPrecalc();
 
 			scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);
 
-			scene->Get()->SetActiveCamera(0);*/
+			scene->Get()->SetActiveCamera(0);
 			
 			// --- 
 

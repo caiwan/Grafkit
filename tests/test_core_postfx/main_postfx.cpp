@@ -23,13 +23,12 @@
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
+#include "core/ResourcePreloader.h"
+
 
 using namespace Grafkit;
 
-// #include "textureShaderClass.h"
-#include "builtin_data/cube.h"
-
-class Application : public System, public IResourceManager
+class Application : public System, public ResourcePreloader
 {  
 public:
 	Application() : System(),

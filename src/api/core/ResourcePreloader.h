@@ -17,11 +17,11 @@ namespace Grafkit{
 	Dirty hack of mine
 	Ide fogom behackelni a livereload managert is 
 	*/
-	class AssetPreloader : public Grafkit::IResourceManager
+	class ResourcePreloader : public Grafkit::IResourceManager
 	{
 	public:
-		AssetPreloader(PreloadEvents* pPreloader = nullptr);
-		~AssetPreloader();
+		ResourcePreloader(PreloadEvents* pPreloader = nullptr);
+		~ResourcePreloader();
 
 		void LoadCache();
 		void SaveCache();

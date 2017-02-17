@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (Grafkit2)
- 
+
+if (NOT MSVC14 AND NOT MSVC12)
+	message(SEND_ERROR "Only MSVC12 and MSVC14 targets are supported")
+endif(NOT MSVC14 AND NOT MSVC12)
+	
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")

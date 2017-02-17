@@ -21,7 +21,7 @@
 
 using namespace Grafkit;
 
-class Application : public Grafkit::System, protected Grafkit::AssetPreloader
+class Application : public Grafkit::System, protected Grafkit::ResourcePreloader
 {
 public:
 	Application() : Grafkit::System(),

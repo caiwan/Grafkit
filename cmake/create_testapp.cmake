@@ -21,5 +21,7 @@ function(create_testapp _application)
 	
 	add_dependencies(${_application} assets)
 	add_dependencies(${_application} shaders)
+	
+	bass_copy_binaries(${CMAKE_CURRENT_BINARY_DIR})
 
 endfunction(create_testapp)

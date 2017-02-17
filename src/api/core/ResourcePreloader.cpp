@@ -26,7 +26,7 @@ namespace {
 
 /// @TODO init + shutdown
 
-AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IResourceManager()
+ResourcePreloader::ResourcePreloader(PreloadEvents * pPreloader) : Grafkit::IResourceManager()
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
 	for (size_t i = 0; i < sizeof(preloadFilters) / sizeof(preloadFilters[0]); i++) {
@@ -34,7 +34,7 @@ AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IResourceM
 	}
 }
 
-AssetPreloader::~AssetPreloader()
+ResourcePreloader::~ResourcePreloader()
 {
 	for (size_t i = 0; i < m_filters.size(); i++) {
 		delete m_filters[i];
@@ -43,7 +43,7 @@ AssetPreloader::~AssetPreloader()
 
 // ============================================================================================================
 
-void Grafkit::AssetPreloader::LoadCache()
+void Grafkit::ResourcePreloader::LoadCache()
 {
 	for (size_t i = 0; i < m_filters.size(); i++) 
 	{
@@ -76,7 +76,7 @@ void Grafkit::AssetPreloader::LoadCache()
 
 }
 
-void Grafkit::AssetPreloader::SaveCache()
+void Grafkit::ResourcePreloader::SaveCache()
 {
 	/// -- save cached files if any 
 }
