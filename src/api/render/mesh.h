@@ -25,11 +25,6 @@ namespace Grafkit
 	*/
 	class Mesh : public virtual Referencable, public Persistent
 	{
-		PERSISTENT_DECL(Grafkit::Mesh, 1);
-	protected:
-		virtual void serialize(Archive& ar) { _serialize(ar); }
-		void _serialize(Archive& ar);
-
 	public:
 		Mesh();
 		Mesh(const Mesh& mesh);
@@ -54,6 +49,11 @@ namespace Grafkit
 			BufferStateDescriptor() : buffer(nullptr), stride(0), offset(0) {
 			}
 		};
+
+		PERSISTENT_DECL(Grafkit::Mesh, 1);
+	protected:
+		virtual void serialize(Archive& ar) { _serialize(ar); }
+		void _serialize(Archive& ar);
 
 	private:
 		ID3D11Buffer *m_indexBuffer;

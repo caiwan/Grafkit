@@ -17,21 +17,23 @@
 #include "utils/AssetFile.h"
 		  
 #include "utils/ResourceManager.h"
+#include "utils/ResourcePreloader.h"
+#include "utils/InitializeSerializer.h"
 
 #include "generator/SceneLoader.h"
 
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
-#include "core/ResourcePreloader.h"
+
 
 
 using namespace Grafkit;
 
-class Application : public System, public ResourcePreloader
+class Application : public System, protected ResourcePreloader, protected ClonableInitializer
 {  
 public:
-	Application() : System(),
+	Application() : System(), ClonableInitializer(),
 		m_file_loader(nullptr)
 		{
 			int screenWidth, screenHeight;
@@ -82,6 +84,7 @@ protected:
 
 			m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 
+			LoadCache();
 			DoPrecalc();
 
 			m_scene->Get()->BuildScene(render, m_vs, m_fs);
@@ -114,7 +117,7 @@ protected:
 		// ==================================================================================================================
 		int mainloop() {
 
-			//m_postfx->BindInput(render);
+			m_postfx->BindInput(render);
 
 			// pre fx-pass
 			this->render.BeginScene();
@@ -137,7 +140,7 @@ protected:
 			}
 
 			// render fx chain 
-			//m_postfx->Render(render);
+			m_postfx->Render(render);
 			
 			this->render.EndScene();
 

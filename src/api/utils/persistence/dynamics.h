@@ -128,4 +128,7 @@ private: \
 #define CLONEABLE_FACTORY_IMPL(className) \
 	Grafkit::AddClonable className##::_addClonableFactory(#className, new className##::Factory());
 
+#define CLONEABLE_FACTORY_LOCAL_IMPL(className) \
+	Grafkit::AddClonable className##_addClonableFactory(#className, new className##::Factory());
+
 #endif //__DYNAMICS_H__
