@@ -43,7 +43,7 @@ void ArchiveFile::Read(void* buffer, size_t length)
 */
 
 Grafkit::ArchiveMemory::ArchiveMemory(BYTE * data, size_t length, bool IsStoring) :
-	m_data(data), m_length(length)
+	m_data(data), m_length(length), m_cursor(0)
 {
 }
 
