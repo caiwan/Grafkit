@@ -29,7 +29,7 @@ namespace Grafkit {
 		void Initialize(Renderer &render);
 		void Shutdown();
 
-		size_t AddPass(EffectPassRef in_fx) { m_effectChain.push_back(in_fx); return m_effectChain.size() - 1; }
+		void AddPass(EffectPassRef in_fx) { m_effectChain.push_back(in_fx);}
 
 		EffectPassRef GetEffect(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
 
@@ -99,16 +99,16 @@ namespace Grafkit {
 	{
 		friend class EffectComposer;
 	public :
-		EffectPass();
+		EffectPass(ShaderResRef shader);
 		~EffectPass();
 
-		void Initialize(Renderer &render, ShaderRef shader);
+		void Initialize(Renderer &render);
 		void Shutdown();
 
 		size_t BindOutputs(Renderer &render);
 		void Render(Renderer &render);
 
-		ShaderRef GetShader() { return m_shader; }
+		ShaderRef GetShader() { return m_shader->Get(); }
 
 		void SetOutput(size_t bind, TextureRef tex) {m_output_map[bind] = tex; }
 		void SetInput(std::string name, TextureRef tex) { m_input_map[name] = tex; }
@@ -120,7 +120,7 @@ namespace Grafkit {
 		TextureRef GetInput(std::string name);
 
 	private:
-		ShaderRef m_shader;
+		ShaderResRef m_shader;
 
 		typedef std::map<size_t, TextureRef> bind_map_t;
 		typedef bind_map_t::iterator bind_map_it_t;

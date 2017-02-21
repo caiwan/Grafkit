@@ -94,16 +94,11 @@ protected:
 			// -- setup postfx 
 			size_t k = 0;
 			m_postfx = new EffectComposer(); 
-			m_postfx->Initialize(render);
+		
+			m_postfx->AddPass(new EffectPass(m_fxFXAA));
+			m_postfx->AddPass(new EffectPass(m_fxFishEye));
 			
-			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFXAA);
-			k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxFishEye);
-			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, m_fxVhs);
-			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
-			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
-			// k = m_postfx->AddPass(new EffectPass()); m_postfx->GetEffect(k)->Initialize(render, sahder);
-
-			// --- 
+			m_postfx->Initialize(render);
 
 			return 0;
 		};

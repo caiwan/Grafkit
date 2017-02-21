@@ -87,6 +87,10 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 	m_textureSampler = new TextureSampler();
 	m_textureSampler->Initialize(render);
 
+	for (auto it = m_effectChain.begin(); it != m_effectChain.end(); ++it) {
+		(*it)->Initialize(render);
+	}
+
 	LOGGER(Log::Logger().Trace("FX Chain OK"));
 }
 
@@ -181,9 +185,8 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 
 // ===================================================================================================
 
-Grafkit::EffectPass::EffectPass()
+Grafkit::EffectPass::EffectPass(ShaderResRef shader)  : m_shader(shader)
 {
-	// nothing to do
 }
 
 Grafkit::EffectPass::~EffectPass()
@@ -193,9 +196,10 @@ Grafkit::EffectPass::~EffectPass()
 
 // ---------------------------------------------------------------------------------------------------
 
-void Grafkit::EffectPass::Initialize(Renderer &render, ShaderRef shader)
+void Grafkit::EffectPass::Initialize(Renderer & render)
 {
-	m_shader = shader;
+	// ... 
+	LOGGER(Log::Logger().Trace("FX Init pass %s", m_shader->GetName().c_str()));
 }
 
 void Grafkit::EffectPass::Shutdown()
@@ -220,9 +224,9 @@ size_t Grafkit::EffectPass::BindOutputs(Renderer &render)
 void Grafkit::EffectPass::Render(Renderer & render)
 {
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
-		m_shader->SetShaderResourceView(it->first, it->second->GetTextureResource());
+		m_shader->Get()->SetShaderResourceView(it->first, it->second->GetTextureResource());
 	}
-	m_shader->Render(render);
+	m_shader->Get()->Render(render);
 }
 
 TextureRef Grafkit::EffectPass::GetOutput(size_t bind)
