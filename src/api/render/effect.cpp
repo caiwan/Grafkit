@@ -78,8 +78,8 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 
 	// --- 
 	m_fullscreenquad = new Mesh();
-	m_fullscreenquad->AddPointer("POSITION", sizeof(GrafkitData::quad), GrafkitData::quad);
-	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord), GrafkitData::quad_texcoord);
+	m_fullscreenquad->AddPointer("POSITION", sizeof(GrafkitData::quad[0]) * 4 *4 , GrafkitData::quad);
+	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord[0]) * 4 *4, GrafkitData::quad_texcoord);
 	m_fullscreenquad->SetIndices(4, 6, GrafkitData::quadIndices);
 	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
 

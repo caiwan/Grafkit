@@ -126,7 +126,8 @@ protected:
 				render.GetScreenSizef(res.x, res.y);
 
 				m_fxFXAA->Get()->SetParamValueT<float2>(render, "FXAA", "resolution", res);
-				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .5);
+				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .1);
+				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "zoom", 3);
 
 				m_scene->Get()->PreRender(render);
 				m_scene->Get()->Render(render);

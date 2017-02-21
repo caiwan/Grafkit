@@ -37,7 +37,7 @@ float4 fisheyeProc(PixelInputType input) : SV_TARGET
 	 */
 	
 	// Gnomonical
-	// float a = 1.0 / (z * tan(theta));
+	float a = 1.0 / (z * tan(theta));
 
 	// Stereographic
 	// float a = 1.0 / (2 * z * tan(theta * 0.5));
@@ -49,10 +49,8 @@ float4 fisheyeProc(PixelInputType input) : SV_TARGET
 	// float a = 1.0 / (2 * z * sin(theta * 0.5));
 
 	// Orthographic
-	float a = 1.0 / sin(theta * 0.5);
+	// float a = 1.0 / sin(theta * 0.5);
 	
-	float2 uv2 =  frac((uv * a ) + 0.5);
+	float2 uv2 =  frac(uv * a);
 	return effectInput.Sample(SampleType, uv2);
-
-	return float4(uv2.x, uv2.y, 0, 1);
 }
