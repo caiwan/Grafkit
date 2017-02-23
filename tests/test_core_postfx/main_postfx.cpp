@@ -26,8 +26,6 @@
 #include "generator/ShaderLoader.h"
 
 
-
-
 using namespace Grafkit;
 
 class Application : public System, protected ResourcePreloader, protected ClonableInitializer
@@ -96,7 +94,7 @@ protected:
 			m_postfx = new EffectComposer(); 
 		
 			m_postfx->AddPass(new EffectPass(m_fxFXAA));
-			m_postfx->AddPass(new EffectPass(m_fxFishEye));
+			//m_postfx->AddPass(new EffectPass(m_fxFishEye));
 			
 			m_postfx->Initialize(render);
 

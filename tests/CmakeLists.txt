@@ -3,9 +3,11 @@ include (${GK2_ROOT_DIR}/cmake/create_testapp.cmake)
 include (${GK2_ROOT_DIR}/cmake/batch_configure_copy_file.cmake)
 
 subdirs(assets)
-subdirs(shaders)
+# subdirs(shaders)
+
 subdirs(test_animation)
 subdirs(test_core_camera)
+subdirs(test_core_geometry)
 subdirs(test_core_light_material)
 subdirs(test_core_postfx)
 subdirs(test_core_postfx_ssao)
