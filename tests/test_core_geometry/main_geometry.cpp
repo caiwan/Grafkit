@@ -91,10 +91,10 @@ protected:
 		m_textureSampler->Initialize(render);
 
 		// -- load shader
-		m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
-		m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
+		m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl"));
+		m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl"));
 
-		m_geometryShader = Load<ShaderRes>(new GeometryShaderLoader("gShader", "shaders/geometry.hlsl", ""));
+		m_geometryShader = Load<ShaderRes>(new GeometryShaderLoader("gShader", "shaders/geometry.hlsl"));
 
 		// -- precalc
 		this->DoPrecalc();

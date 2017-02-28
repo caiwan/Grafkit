@@ -19,7 +19,7 @@ using namespace FWdebugExceptions;
 
 #define PS_VERSION "ps_4_0"
 #define VS_VERSION "vs_4_0"
-#define GS_VERSION "vs_4_0"
+#define GS_VERSION "gs_4_0"
 
 
 // TODO http://stackoverflow.com/questions/24323281/the-pixel-shader-unit-expects-a-sampler
@@ -604,22 +604,22 @@ void Grafkit::VertexShader::SetSamplerPtr(ID3D11DeviceContext* device, UINT bind
 }
 
 
-void Grafkit::VertexShader::SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+void Grafkit::VertexShader::SetShaderResources(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
 {
-	deviceContext->VSSetShaderResources(bindPoint, bindCount, &pResView);
+	device->VSSetShaderResources(bindPoint, bindCount, &pResView);
 }
 
 
-void Grafkit::VertexShader::SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+void Grafkit::VertexShader::SetConstantBuffer(ID3D11DeviceContext * device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
-	deviceContext->VSSetConstantBuffers(slot, numBuffers, &buffer); 
+	device->VSSetConstantBuffers(slot, numBuffers, &buffer); 
 }
 
 
-void Grafkit::VertexShader::BindShader(ID3D11DeviceContext * deviceContext)
+void Grafkit::VertexShader::BindShader(ID3D11DeviceContext * device)
 {
-	deviceContext->IASetInputLayout(m_layout);
-	deviceContext->VSSetShader(m_vxShader, nullptr, 0);
+	device->IASetInputLayout(m_layout);
+	device->VSSetShader(m_vxShader, nullptr, 0);
 }
 
 // =============================================================================================================================

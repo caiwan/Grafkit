@@ -27,7 +27,7 @@ namespace Grafkit {
 
 	class VertexShaderLoader : public ShaderLoader {
 	public:
-		VertexShaderLoader(std::string name, std::string sourcename, std::string entrypoint)
+		VertexShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "")
 			: ShaderLoader(name, sourcename, entrypoint){}
 		~VertexShaderLoader(){}
 
@@ -39,7 +39,7 @@ namespace Grafkit {
 
 	class PixelShaderLoader : public ShaderLoader {
 	public:
-		PixelShaderLoader(std::string name, std::string sourcename, std::string entrypoint)
+		PixelShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "")
 			: ShaderLoader(name, sourcename, entrypoint) {}
 		~PixelShaderLoader(){}
 	protected:
@@ -49,7 +49,7 @@ namespace Grafkit {
 
 	class GeometryShaderLoader : public ShaderLoader {
 	public:
-		GeometryShaderLoader(std::string name, std::string sourcename, std::string entrypoint)
+		GeometryShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "")
 			: ShaderLoader(name, sourcename, entrypoint) {}
 		~GeometryShaderLoader() {}
 
