@@ -263,6 +263,36 @@ namespace Grafkit {
 	//typedef Grafkit::Resource<PixelShader> PixelShaderRes;
 	//typedef Ref<PixelShaderRes> PixelShaderResRef;
 
+
+	/*
+	* Pixel shader
+	*/
+	class GeometryShader : public Shader {
+	public:
+		GeometryShader();
+		~GeometryShader();
+
+		enum ShaderType_e GetShaderType() { return SHADER_GEOMETRY; }
+
+	protected:
+		void ShutdownChild();
+		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
+		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+
+		void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
+		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+
+		void BindShader(ID3D11DeviceContext * deviceContext);
+	private:
+		ID3D11GeometryShader* m_gmShader;
+	};
+
+	//typedef Ref<PixelShader> PixelShaderRef;
+	//typedef Grafkit::Resource<PixelShader> PixelShaderRes;
+	//typedef Ref<PixelShaderRes> PixelShaderResRef;
+
 //@Todo geometry + compute shader
 
 }
@@ -276,12 +306,13 @@ DEFINE_EXCEPTION(MissingShaderException, EX_ERROR_SHADER + 0, "Missing shader fi
 ///@todo ezeket at kell pakolni a shader exceptionbe majd
 DEFINE_EXCEPTION(VSCrerateException, EX_ERROR_SHADER + 1, "Could not create vertex shader")
 DEFINE_EXCEPTION(PSCrerateException, EX_ERROR_SHADER + 2, "Could not create pixel shader")
+DEFINE_EXCEPTION(GSCrerateException, EX_ERROR_SHADER + 3, "Could not create geometry shader")
 
-DEFINE_EXCEPTION(InputLayoutCreateException, EX_ERROR_SHADER + 3, "Could not create input layout")
-DEFINE_EXCEPTION(ConstantBufferCreateException, EX_ERROR_SHADER + 4, "Could not create constant buffer")
-DEFINE_EXCEPTION(ConstantBufferLocateException, EX_ERROR_SHADER + 5, "Could not locate constant buffer")
-DEFINE_EXCEPTION(ConstantBufferMapException, EX_ERROR_SHADER + 6, "Could not map constant buffer")
-DEFINE_EXCEPTION(BoundResourceLocateException, EX_ERROR_SHADER + 7, "Could not locate bound resouce")
+DEFINE_EXCEPTION(InputLayoutCreateException, EX_ERROR_SHADER + 10, "Could not create input layout")
+DEFINE_EXCEPTION(ConstantBufferCreateException, EX_ERROR_SHADER + 11, "Could not create constant buffer")
+DEFINE_EXCEPTION(ConstantBufferLocateException, EX_ERROR_SHADER + 12, "Could not locate constant buffer")
+DEFINE_EXCEPTION(ConstantBufferMapException, EX_ERROR_SHADER + 13, "Could not map constant buffer")
+DEFINE_EXCEPTION(BoundResourceLocateException, EX_ERROR_SHADER + 14, "Could not locate bound resouce")
 
 ///@Todo ennek teljesen sajat exceptiont kell definialni
 

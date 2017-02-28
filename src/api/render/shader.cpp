@@ -19,6 +19,7 @@ using namespace FWdebugExceptions;
 
 #define PS_VERSION "ps_4_0"
 #define VS_VERSION "vs_4_0"
+#define GS_VERSION "vs_4_0"
 
 
 // TODO http://stackoverflow.com/questions/24323281/the-pixel-shader-unit-expects-a-sampler
@@ -664,21 +665,72 @@ void Grafkit::PixelShader::SetSamplerPtr(ID3D11DeviceContext * device, UINT bind
 	device->PSSetSamplers(bindPoint, bindCount, &pSampler);
 }
 
-void Grafkit::PixelShader::SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+void Grafkit::PixelShader::SetShaderResources(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
 {
-	deviceContext->PSSetShaderResources(bindPoint, bindCount, &pResView);
+	device->PSSetShaderResources(bindPoint, bindCount, &pResView);
 }
 
 
-void Grafkit::PixelShader::SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+void Grafkit::PixelShader::SetConstantBuffer(ID3D11DeviceContext * device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
-	deviceContext->PSSetConstantBuffers(slot, numBuffers, &buffer);
+	device->PSSetConstantBuffers(slot, numBuffers, &buffer);
 }
 
 
-void Grafkit::PixelShader::BindShader(ID3D11DeviceContext * deviceContext)
+void Grafkit::PixelShader::BindShader(ID3D11DeviceContext * device)
 {
-	deviceContext->PSSetShader(m_pxShader, nullptr, 0);
+	device->PSSetShader(m_pxShader, nullptr, 0);
 }
 
 // =============================================================================================================================
+
+Grafkit::GeometryShader::GeometryShader() :
+	m_gmShader(NULL)
+{
+}
+
+Grafkit::GeometryShader::~GeometryShader()
+{
+}
+
+void Grafkit::GeometryShader::ShutdownChild()
+{
+	RELEASE(m_gmShader);
+}
+
+HRESULT Grafkit::GeometryShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
+{
+	return D3DCompileFromFile(file, pDefines, pInclude, entry, GS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+}
+
+HRESULT Grafkit::GeometryShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
+{
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, GS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+}
+
+void Grafkit::GeometryShader::CreateShader(ID3D11Device * device, ID3D10Blob * shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
+{
+	HRESULT result = device->CreateGeometryShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_gmShader);
+	if (FAILED(result))
+		throw EX_HRESULT(PSCrerateException, result);
+}
+
+void Grafkit::GeometryShader::SetSamplerPtr(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
+{
+	device->PSSetSamplers(bindPoint, bindCount, &pSampler);
+}
+
+void Grafkit::GeometryShader::SetShaderResources(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+{
+	device->PSSetShaderResources(bindPoint, bindCount, &pResView);
+}
+
+void Grafkit::GeometryShader::SetConstantBuffer(ID3D11DeviceContext * device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+{
+	device->GSSetConstantBuffers(slot, numBuffers, &buffer);
+}
+
+void Grafkit::GeometryShader::BindShader(ID3D11DeviceContext * device)
+{
+	device->GSSetShader(m_gmShader, nullptr, 0);
+}

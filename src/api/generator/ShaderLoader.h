@@ -47,4 +47,15 @@ namespace Grafkit {
 		virtual std::string DefaultEntryPointName() { return "mainPixel"; }
 	};
 
+	class GeometryShaderLoader : public ShaderLoader {
+	public:
+		GeometryShaderLoader(std::string name, std::string sourcename, std::string entrypoint)
+			: ShaderLoader(name, sourcename, entrypoint) {}
+		~GeometryShaderLoader() {}
+
+	protected:
+		virtual Shader* NewShader() { return new GeometryShader(); }
+		virtual std::string DefaultEntryPointName() { return "mainGeometry"; }
+	};
+
 }
