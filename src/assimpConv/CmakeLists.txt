@@ -1,0 +1,8 @@
+# Assimp converter
+
+include (${GK2_ROOT_DIR}/cmake/create_testapp.cmake)
+
+create_testapp(AssimpConverter)
+# settings
+
+set_target_properties(AssimpConverter PROPERTIES FOLDER tools)

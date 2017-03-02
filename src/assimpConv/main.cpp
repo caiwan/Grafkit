@@ -7,15 +7,19 @@
 
 #include<stack>
 
+#include <Windows.h>
+
+#include "core/system.h"
+
 #include "Arguments.hpp"
 
-#include "assimp/Importer.hpp"
-#include "assimp/Exporter.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-#include "assimp/material.h"
-#include "assimp/mesh.h"
-#include "assimp/matrix4x4.h"
+//#include "assimp/Importer.hpp"
+//#include "assimp/Exporter.hpp"
+//#include "assimp/scene.h"
+//#include "assimp/postprocess.h"
+//#include "assimp/material.h"
+//#include "assimp/mesh.h"
+//#include "assimp/matrix4x4.h"
 
 #include "render/renderer.h"
 #include "render/Scene.h"
@@ -41,37 +45,37 @@ using namespace ideup;
 
 using namespace Grafkit;
 
-typedef unsigned int uint;
+//typedef unsigned int uint;
 
-aiTextureType textureTypes[] = {
-	aiTextureType_DIFFUSE,
-	aiTextureType_SPECULAR,
-	aiTextureType_AMBIENT,
-	aiTextureType_EMISSIVE,
-	aiTextureType_HEIGHT,
-	aiTextureType_NORMALS,
-	aiTextureType_SHININESS,
-	aiTextureType_OPACITY,
-	aiTextureType_DISPLACEMENT,
-	aiTextureType_LIGHTMAP,
-	aiTextureType_REFLECTION
-};
-
-inline aiVector3D crossProduct(aiVector3D a, aiVector3D b) {
-	return aiVector3D(
-		(a.y*b.z - a.z*b.y),
-		(a.z*b.x - a.x*b.z),
-		(a.x*b.y - a.y*b.x)
-	);
-}
-
-inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
-	aiVector3D v;
-	v.x = (*vertices)[order[0]] * polarity[0];
-	v.y = (*vertices)[order[1]] * polarity[1];
-	v.z = (*vertices)[order[2]] * polarity[2];
-	*vertices = v;
-}
+//aiTextureType textureTypes[] = {
+//	aiTextureType_DIFFUSE,
+//	aiTextureType_SPECULAR,
+//	aiTextureType_AMBIENT,
+//	aiTextureType_EMISSIVE,
+//	aiTextureType_HEIGHT,
+//	aiTextureType_NORMALS,
+//	aiTextureType_SHININESS,
+//	aiTextureType_OPACITY,
+//	aiTextureType_DISPLACEMENT,
+//	aiTextureType_LIGHTMAP,
+//	aiTextureType_REFLECTION
+//};
+//
+//inline aiVector3D crossProduct(aiVector3D a, aiVector3D b) {
+//	return aiVector3D(
+//		(a.y*b.z - a.z*b.y),
+//		(a.z*b.x - a.x*b.z),
+//		(a.x*b.y - a.y*b.x)
+//	);
+//}
+//
+//inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
+//	aiVector3D v;
+//	v.x = (*vertices)[order[0]] * polarity[0];
+//	v.y = (*vertices)[order[1]] * polarity[1];
+//	v.z = (*vertices)[order[2]] * polarity[2];
+//	*vertices = v;
+//}
 
 /* ================================================================================================ */
 
@@ -100,7 +104,7 @@ public:
 
 public:
 
-	int run(int argc, char* argv[]) {
+	int execute(int argc, char* argv[]) {
 		if (!args.evaluate(argc, argv)) {
 			cout << args.getErrorMessage() << endl;
 			cout << args.getHelpMessage() << endl;
@@ -114,7 +118,19 @@ public:
 
 /* ================================================================================================ */
 
-int main(int argc, char* argv[]) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
+{
 	Application app;
-	return app.run(argc, argv);
+
+	int argc = 0;
+
+	// http://alter.org.ua/docs/win/args/
+	char** argv = CommandLineToArgvA(GetCommandLine(), &argc);
+
+	return app.execute(argc, argv);
 }
+
+//int main(int argc, char* argv[]) {
+//	Application app;
+//	return app.run(argc, argv);
+//}
