@@ -4,9 +4,11 @@
 #include "render/Scene.h"
 #include "render/camera.h"
 #include "render/model.h"
+#include "render/mesh.h"
 #include "render/texture.h"
 #include "render/Material.h"
 #include "render/shader.h"
+#include "render/animation.h"
 
 #include "math/matrix.h"
 
@@ -104,6 +106,8 @@ protected:
 		model->SetMaterial(new Material(Material::MT_flat));
 		model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 		model->GetMaterial()->SetName("GridMaterial");
+
+		model->SetGeometryShader(m_geometryShader);
 
 		model->SetName("cube");
 		model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);

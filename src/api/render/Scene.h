@@ -4,23 +4,13 @@
 #include <list>
 #include <vector>
 
-#include "../stdafx.h"
+#include "math/matrix.h"
 
 #include "renderer.h"
-#include "Actor.h"
-#include "camera.h"
-#include "Light.h"
 #include "animation.h"
-// #include "../core/archetype.h"
+#include "predefs.h"
 
 namespace Grafkit {
-
-	class Scene;
-	typedef Ref<Scene> SceneRef;
-
-	class Animation;
-	typedef Ref<Animation> AnimationRef;
-
 	__declspec(align(16)) 
 	class Scene : virtual public Referencable, public AlignedNew<Scene>, public Persistent
 	{
@@ -110,10 +100,5 @@ namespace Grafkit {
 		virtual void serialize(Archive& ar);
 		PERSISTENT_DECL(Grafkit::Scene, 1);
 	};
-
-	typedef Ref<Scene> SceneRef;
-	typedef Resource<Scene> SceneRes;
-	typedef Ref<SceneRes> SceneResRef;
-
 }
 

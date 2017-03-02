@@ -1,10 +1,11 @@
 #include "stdafx.h"
 
 #include "mesh.h"
+
 #include "texture.h"
 
-#include "../utils/struct_pack.h"
-#include "../utils/persistence/persistence.h"
+#include "utils/struct_pack.h"
+#include "utils/persistence/persistence.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;

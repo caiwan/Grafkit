@@ -5,6 +5,8 @@
 #include "model.h"
 #include "camera.h"
 #include "Light.h"
+#include "Material.h"
+#include "animation.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -211,8 +213,8 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	m_vertexShader->SetParam(render, "MatrixBuffer", &viewMatrices);
 
 	//ez itt elviekben jo kell, hogy legyen
-	m_vertexShader->Render(render);
-	m_pixelShader->Render(render);
+	m_vertexShader->Bind(render);
+	m_pixelShader->Bind(render);
 
 	// render scenegraph
 	RenderNode(render, m_pScenegraph);

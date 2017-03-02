@@ -143,7 +143,7 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 {
 	///@todo a kozbenso effektek inputjait is bindelje ossze
 
-	m_shaderFullscreenQuad->Render(render);
+	m_shaderFullscreenQuad->Bind(render);
 
 	for (size_t i = 0; i < m_effectChain.size(); i++)
 	{
@@ -173,10 +173,10 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 	render.SetRenderTargetView();
 	render.BeginScene();
 
-	m_shaderFullscreenQuad->Render(render);
+	m_shaderFullscreenQuad->Bind(render);
 
 	m_shaderCopyScreen->SetShaderResourceView("effectInput", m_pTexRead->GetTextureResource());
-	m_shaderCopyScreen->Render(render);
+	m_shaderCopyScreen->Bind(render);
 
 	m_fullscreenquad->RenderMesh(render);
 
@@ -226,7 +226,7 @@ void Grafkit::EffectPass::Render(Renderer & render)
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
 		m_shader->Get()->SetShaderResourceView(it->first, it->second->GetTextureResource());
 	}
-	m_shader->Get()->Render(render);
+	m_shader->Get()->Bind(render);
 }
 
 TextureRef Grafkit::EffectPass::GetOutput(size_t bind)

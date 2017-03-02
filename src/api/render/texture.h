@@ -5,6 +5,7 @@
 #include "../utils/resource.h"
 
 #include "renderer.h"
+#include "predefs.h"
 
 #define MULTITEXTURE_MAX 16
 
@@ -72,12 +73,6 @@ namespace Grafkit
 
 	// ========================================================================================================================
 
-	typedef Ref<Texture> TextureRef;
-	typedef Resource<Texture> TextureRes;
-	typedef Ref<TextureRes> TextureResRef;
-
-	// ========================================================================================================================
-
 	__declspec(align(16)) class TextureSampler : virtual public Referencable, public AlignedNew<Texture>
 	{
 	public:
@@ -93,13 +88,7 @@ namespace Grafkit
 		ID3D11SamplerState *m_pSamplerState;
 	};
 
-	// ========================================================================================================================
 
-	typedef Ref<TextureSampler> TextureSamplerRef;
-	typedef Grafkit::Resource<TextureSampler> TextureSamplerResource;
-	typedef Ref<TextureSamplerResource> TextureSamplerResourceRef;
-
-	// ========================================================================================================================
 }
 
 #define EX_ERROR_TEXTURE 1200

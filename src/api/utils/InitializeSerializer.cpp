@@ -4,8 +4,10 @@
 #include "persistence/persistence.h"
 #include "InitializeSerializer.h"
 
-#include "../render/mesh.h"
-#include "../render/model.h"
+#include "render/predefs.h"
+
+#include "render/mesh.h"
+#include "render/model.h"
 
 Grafkit::ClonableInitializer::ClonableInitializer()
 {

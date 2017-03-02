@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "model.h"
+
+#include "mesh.h"
+#include "Material.h"
 #include "Scene.h"
 
 using namespace Grafkit;
@@ -28,11 +31,17 @@ Model::~Model()
 
 void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* scene)
 {
+	if (m_geometryShader.Valid() && m_geometryShader->Valid())
+		m_geometryShader->Get()->Bind(render);
+
 	if (m_material) 
 		this->m_material->Render(render, scene->GetPShader());
 
 	if (m_mesh)
 		this->m_mesh->RenderMesh(render);
+
+	if (m_geometryShader.Valid() && m_geometryShader->Valid())
+		m_geometryShader->Get()->Bind(render);
 }
 
 void Grafkit::Model::Build(Grafkit::Renderer & deviceContext, Scene * scene)

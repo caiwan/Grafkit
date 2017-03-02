@@ -9,20 +9,11 @@
 #include "../utils/reference.h"
 #include "../utils/resource.h"
 
-
-
 #include "dxtypes.h"
 #include "renderer.h"
 
 
 namespace Grafkit {
-
-	class Shader;
-
-	class Vertexshader;
-	class PixelShader;
-	class GemoetryShader;
-	class ComputeShader;
 
 	// ================================================================================================================================
 	class Shader : virtual public Referencable
@@ -35,7 +26,9 @@ namespace Grafkit {
 		void LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size_t size, LPCSTR name, ID3DInclude* pInclude = nullptr, D3D_SHADER_MACRO* pDefines = nullptr);
 
 		void Shutdown();
-		void Render(ID3D11DeviceContext* deviceContext);
+
+		void Bind(ID3D11DeviceContext* deviceContext);
+		void Unbind(ID3D11DeviceContext* deviceContext);
 
 		virtual enum ShaderType_e GetShaderType() = 0;
 
@@ -184,6 +177,7 @@ namespace Grafkit {
 			virtual void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) = 0;
 
 			virtual void BindShader(ID3D11DeviceContext * deviceContext) = 0;
+			virtual void UnbindShader(ID3D11DeviceContext * deviceContext) = 0;
 	};
 
 	// ================================================================================================================================
@@ -224,15 +218,12 @@ namespace Grafkit {
 		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
 		void BindShader(ID3D11DeviceContext * deviceContext);
+		void UnbindShader(ID3D11DeviceContext * deviceContext);
 		
 
 	private:
 		ID3D11VertexShader* m_vxShader;
 	};
-
-	//typedef Ref<VertexShader> VertexShaderRef;
-	//typedef Grafkit::Resource<VertexShader> VertexShaderRes;
-	//typedef Ref<VertexShaderRes> VertexShaderResRef;
 
 	/*
 	* Pixel shader
@@ -255,14 +246,10 @@ namespace Grafkit {
 		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
 		void BindShader(ID3D11DeviceContext * deviceContext);
+		void UnbindShader(ID3D11DeviceContext * deviceContext);
 	private:
 		ID3D11PixelShader* m_pxShader;
 	};
-
-	//typedef Ref<PixelShader> PixelShaderRef;
-	//typedef Grafkit::Resource<PixelShader> PixelShaderRes;
-	//typedef Ref<PixelShaderRes> PixelShaderResRef;
-
 
 	/*
 	* Pixel shader
@@ -285,15 +272,13 @@ namespace Grafkit {
 		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
 		void BindShader(ID3D11DeviceContext * deviceContext);
+		void UnbindShader(ID3D11DeviceContext * deviceContext);
+
 	private:
 		ID3D11GeometryShader* m_gmShader;
 	};
 
-	//typedef Ref<PixelShader> PixelShaderRef;
-	//typedef Grafkit::Resource<PixelShader> PixelShaderRes;
-	//typedef Ref<PixelShaderRes> PixelShaderResRef;
-
-//@Todo geometry + compute shader
+//@Todo compute shader
 
 }
 

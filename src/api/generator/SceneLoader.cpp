@@ -2,12 +2,16 @@
 
 #include "SceneLoader.h"
 
-#include "../render/animation.h"
+#include "render/animation.h"
+#include "render/Scene.h"
+#include "render/model.h"
+#include "render/texture.h"
+#include "render/Material.h"
 
-#include "../utils/asset.h"
-#include "../utils/persistence/archive.h"
+#include "utils/asset.h"
+#include "utils/persistence/archive.h"
 
-#include "../utils/ResourceManager.h"
+#include "utils/ResourceManager.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;

@@ -1,6 +1,3 @@
-/**
-*/
-
 #ifndef _Mesh_H_
 #define _Mesh_H_
 

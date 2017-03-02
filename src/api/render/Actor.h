@@ -9,8 +9,7 @@
 #include "../math/matrix.h"
 
 #include "renderer.h"
-#include "shader.h"
-#include "Material.h"
+#include "predefs.h"
 
 #include "../utils/persistence/persistence.h"
 
@@ -18,7 +17,6 @@ namespace Grafkit {
 
 	class Scene;
 
-	class Entity3DEvents;
 	class Actor;
 
 	class Entity3D : public Grafkit::IResource
@@ -34,16 +32,6 @@ namespace Grafkit {
 		virtual void Build(Grafkit::Renderer& deviceContext, Scene* scene) = 0;
 		
 	};
-
-	// ez egyszer jol jon majd
-#if 0
-	class Entity3DEvents {
-		friend class Entity3D;
-		protected:
-			virtual void onUpdateShaderParams(ID3D11DeviceContext* deviceContext, Shader*& shader) {}
-			virtual void onRender(ID3D11DeviceContext* deviceContext, Actor*& actor) {}
-	};
-#endif 
 
 	class Actor;
 	typedef Ref<Actor> ActorRef;

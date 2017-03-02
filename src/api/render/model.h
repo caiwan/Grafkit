@@ -6,17 +6,19 @@
 #include <vector>
 #include <array>
 
-#include "../utils/memory.h"
-#include "../utils/reference.h"
+#include "utils/memory.h"
+#include "utils/reference.h"
 
 #include "renderer.h"
 #include "dxtypes.h"
 
-#include "mesh.h"
-#include "actor.h"
-#include "texture.h"
-#include "Material.h"
+#include "predefs.h"
 
+#include "mesh.h"
+#include "Material.h"
+#include "shader.h"
+
+#include "render/Actor.h"
 
 namespace Grafkit 
 {
@@ -24,27 +26,29 @@ namespace Grafkit
 	Stores extended data for a mesh, that makes it a model
 	*/
 
-	class Entity3D;
-
 	__declspec(align(16)) class Model : public Grafkit::Entity3D, public AlignedNew<Model>, public Persistent
 	{
 	public:
 		Model(MeshRef mesh = nullptr, MaterialRef material = nullptr);
 		~Model();
 
-		MeshRef GetMesh() const { return this->m_mesh; }
+		MeshRef GetMesh() const     { return this->m_mesh; }
 		void SetMesh(MeshRef model) { this->m_mesh = model; }
 
-		MaterialRef GetMaterial() const { return this->m_material; }
+		MaterialRef GetMaterial() const		{ return this->m_material; }
 		void SetMaterial(MaterialRef material) { this->m_material = material; }
 
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene);
 		virtual void Build(Grafkit::Renderer& deviceContext, Scene* scene);
 
+		void SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; }
+		ShaderResRef GetGeometryShader() { return m_geometryShader; }
 
 	private:
 		MaterialRef m_material;
 		MeshRef m_mesh;
+
+		ShaderResRef m_geometryShader;
 
 		PERSISTENT_DECL(Grafkit::Model, 1)
 	protected:
@@ -53,5 +57,4 @@ namespace Grafkit
 
 	};
 
-	typedef Ref<Model> ModelRef;
 }

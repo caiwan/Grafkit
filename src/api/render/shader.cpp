@@ -125,7 +125,7 @@ void Shader::Shutdown()
 }
 
 
-void Shader::Render(ID3D11DeviceContext * deviceContext)
+void Shader::Bind(ID3D11DeviceContext * deviceContext)
 {
 	BindShader(deviceContext);
 
@@ -174,6 +174,11 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 			}
 		}
 	}
+}
+
+void Grafkit::Shader::Unbind(ID3D11DeviceContext * deviceContext)
+{
+	UnbindShader(deviceContext);
 }
 
 void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
@@ -622,6 +627,11 @@ void Grafkit::VertexShader::BindShader(ID3D11DeviceContext * device)
 	device->VSSetShader(m_vxShader, nullptr, 0);
 }
 
+void Grafkit::VertexShader::UnbindShader(ID3D11DeviceContext * device)
+{
+	device->VSSetShader(nullptr, nullptr, 0);
+}
+
 // =============================================================================================================================
 
 Grafkit::PixelShader::PixelShader() : Shader(),
@@ -682,6 +692,11 @@ void Grafkit::PixelShader::BindShader(ID3D11DeviceContext * device)
 	device->PSSetShader(m_pxShader, nullptr, 0);
 }
 
+void Grafkit::PixelShader::UnbindShader(ID3D11DeviceContext * device)
+{
+	device->PSSetShader(nullptr, nullptr, 0);
+}
+
 // =============================================================================================================================
 
 Grafkit::GeometryShader::GeometryShader() :
@@ -733,4 +748,9 @@ void Grafkit::GeometryShader::SetConstantBuffer(ID3D11DeviceContext * device, UI
 void Grafkit::GeometryShader::BindShader(ID3D11DeviceContext * device)
 {
 	device->GSSetShader(m_gmShader, nullptr, 0);
+}
+
+void Grafkit::GeometryShader::UnbindShader(ID3D11DeviceContext * device)
+{
+	device->GSSetShader(nullptr, nullptr, 0);
 }

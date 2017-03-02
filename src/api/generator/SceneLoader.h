@@ -1,5 +1,8 @@
 #pragma once
 
+#include <map>
+#include <vector>
+
 #include "utils/exceptions.h"
 
 #include "utils/persistence/persistence.h"
@@ -8,9 +11,7 @@
 #include "utils/resource.h"
 #include "utils/ResourceBuilder.h"
 			
-#include "render/Scene.h"
-#include "render/model.h"
-#include "render/texture.h"
+#include "render/predefs.h"
 
 namespace Grafkit {
 
@@ -46,10 +47,8 @@ namespace Grafkit {
 			typedef std::map<UINT, std::vector<texture_bind_t>> texture_assoc_t;
 
 		private:
-			// --- Load stuff 
-
 		
-			// --- Store stuff
+			// --- 
 			void BuildObjectMaps();
 			void BuildTextureMap(const MaterialRef & material);
 			void BuildMaterialMap(const ModelRef &model);
@@ -57,7 +56,7 @@ namespace Grafkit {
 			void BuildActorMap();
 			void BuildAnimationMap();
 
-			// --- common stuff
+			// --- 
 			void Persist(Archive &ar, IResourceManager * const & resman);
 			void PersistMaterials(Archive &ar, IResourceManager * const & resman);
 			void PersistTextures(Archive &ar, MaterialRef &material, IResourceManager * const & resman);
