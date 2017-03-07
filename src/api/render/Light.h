@@ -43,6 +43,7 @@ namespace Grafkit{
 		//void SetShaderCB(ShaderRef &rPShader);
 
 		void Render(Grafkit::Renderer& deviceContext, Scene* scene);
+		void Build(Grafkit::Renderer& deviceContext, Scene* scene) {}
 
 	protected:
 

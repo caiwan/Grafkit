@@ -264,14 +264,8 @@ Grafkit::AssimpLoader::~AssimpLoader()
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-SceneRef Grafkit::AssimpLoader::Load()
+SceneResRef Grafkit::AssimpLoader::Load()
 {
-	SceneRef dstScene = new Scene();
-	if (dstScene.Invalid()) {
-		/// @todo thorw exception, de szerintem nem kell 
-		return;
-	}
-
 	SceneRef outScene = new Scene();
 
 	size_t i = 0, j = 0, k = 0, l = 0;
@@ -417,7 +411,7 @@ SceneRef Grafkit::AssimpLoader::Load()
 			aiCamera *curr_camera = aiscene->mCameras[i];
 			
 			/// TODO az assimp nem kezeli kulon a perspektiv kamerat
-			CameraRef camera = new PerspectiveCamera();
+			CameraRef camera = new Camera();
 
 			const char* camera_name = curr_camera->mName.C_Str();
 			LOGGER(Log::Logger().Trace("- #%d %s", i, camera_name));
@@ -515,7 +509,7 @@ SceneRef Grafkit::AssimpLoader::Load()
 			auto it = resourceRepo.actors.find(name);
 			if (it != resourceRepo.actors.end()) {
 				it->second->AddEntity(cameras[i]);
-				outScene->AddCameraNode(it->second);
+				//outScene->AddCameraNode(it->second);
 			}
 
 		}
@@ -531,7 +525,7 @@ SceneRef Grafkit::AssimpLoader::Load()
 			auto it = resourceRepo.actors.find(name);
 			if (it != resourceRepo.actors.end()) {
 				it->second->AddEntity(lights[i]);
-				outScene->AddLightNode(it->second);
+				//outScene->AddLightNode(it->second);
 			}
 		}
 	}
@@ -552,8 +546,8 @@ SceneRef Grafkit::AssimpLoader::Load()
 
 				auto it = resourceRepo.actors.find(curr_nodeAnim->mNodeName.C_Str());
 				if (it != resourceRepo.actors.end()) {
-					NodeAnimation* anim = new NodeAnimation();
-					anim->Initialize(it->second);
+					ActorAnimation* anim = new ActorAnimation();
+					anim->SetActor(it->second);
 
 					float3 f3;
 					float4 f4;
@@ -584,5 +578,5 @@ SceneRef Grafkit::AssimpLoader::Load()
 		}
 	}
 
-	return outScene;
+	return new Resource<Scene>(outScene);
 }

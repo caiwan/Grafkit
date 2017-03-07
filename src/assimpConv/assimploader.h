@@ -25,7 +25,7 @@ namespace Grafkit {
 		AssimpLoader(void* data, size_t length);
 		~AssimpLoader();
 
-		SceneRef Load();
+		SceneResRef Load();
 
 	private:
 		void* data;

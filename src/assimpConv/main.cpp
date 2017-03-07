@@ -21,24 +21,18 @@
 //#include "assimp/mesh.h"
 //#include "assimp/matrix4x4.h"
 
-#include "render/renderer.h"
-#include "render/Scene.h"
-#include "render/camera.h"
-#include "render/model.h"
-#include "render/texture.h"
-#include "render/Material.h"
-#include "render/shader.h"
-
-#include "utils/exceptions.h"
-
-#include "utils/asset.h"
-#include "utils/AssetFactory.h"
-#include "utils/AssetFile.h"
-
-#include "utils/ResourceManager.h"
+//#include "utils/exceptions.h"
+//
+//#include "utils/asset.h"
+//#include "utils/AssetFactory.h"
+//#include "utils/AssetFile.h"
+//
+//#include "utils/ResourceManager.h"
 
 #include "assimploader.h"
 
+
+#include "generator/SceneLoader.h"
 
 using namespace std;
 using namespace ideup;
@@ -47,35 +41,35 @@ using namespace Grafkit;
 
 typedef unsigned int uint;
 
-aiTextureType textureTypes[] = {
-	aiTextureType_DIFFUSE,
-	aiTextureType_SPECULAR,
-	aiTextureType_AMBIENT,
-	aiTextureType_EMISSIVE,
-	aiTextureType_HEIGHT,
-	aiTextureType_NORMALS,
-	aiTextureType_SHININESS,
-	aiTextureType_OPACITY,
-	aiTextureType_DISPLACEMENT,
-	aiTextureType_LIGHTMAP,
-	aiTextureType_REFLECTION
-};
-
-inline aiVector3D crossProduct(aiVector3D a, aiVector3D b) {
-	return aiVector3D(
-		(a.y*b.z - a.z*b.y),
-		(a.z*b.x - a.x*b.z),
-		(a.x*b.y - a.y*b.x)
-	);
-}
-
-inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
-	aiVector3D v;
-	v.x = (*vertices)[order[0]] * polarity[0];
-	v.y = (*vertices)[order[1]] * polarity[1];
-	v.z = (*vertices)[order[2]] * polarity[2];
-	*vertices = v;
-}
+//aiTextureType textureTypes[] = {
+//	aiTextureType_DIFFUSE,
+//	aiTextureType_SPECULAR,
+//	aiTextureType_AMBIENT,
+//	aiTextureType_EMISSIVE,
+//	aiTextureType_HEIGHT,
+//	aiTextureType_NORMALS,
+//	aiTextureType_SHININESS,
+//	aiTextureType_OPACITY,
+//	aiTextureType_DISPLACEMENT,
+//	aiTextureType_LIGHTMAP,
+//	aiTextureType_REFLECTION
+//};
+//
+//inline aiVector3D crossProduct(aiVector3D a, aiVector3D b) {
+//	return aiVector3D(
+//		(a.y*b.z - a.z*b.y),
+//		(a.z*b.x - a.x*b.z),
+//		(a.x*b.y - a.y*b.x)
+//	);
+//}
+//
+//inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
+//	aiVector3D v;
+//	v.x = (*vertices)[order[0]] * polarity[0];
+//	v.y = (*vertices)[order[1]] * polarity[1];
+//	v.z = (*vertices)[order[2]] * polarity[2];
+//	*vertices = v;
+//}
 
 /* ================================================================================================ */
 
@@ -107,27 +101,34 @@ public:
 			return 1;
 		}
 
-		AssimpLoader * loader;
 		void *data = nullptr;
 		size_t len = 0;
 
 		FILE* fp = nullptr;
-		if (!fopen_s(&fp, args.get("i").value().c_str(), "rw")) {
+		if (!fopen_s(&fp, args.get("input").value().c_str(), "rw")) {
 			fseek(fp, 0, SEEK_END);
 			len = ftell(fp);
 			fseek(fp, 0, SEEK_SET);
 			data = malloc(len);
 			fread_s(data, len, 1, len, fp);
 			fclose(fp);
+
+			try {
+				AssimpLoader loader(data, len);
+				SceneResRef scene = loader.Load();
+				SceneLoader::Save(scene->Get(), args.get("output").value());
+			}
+			catch (FWdebug::Exception *ex) {
+				cout << ex->what();
+				delete ex;
+			}
+
 		}
 		else {
 			cout << ("PENIS PENIS PENIS");
+			free(data);
 			return 1;
 		}
-
-		loader = new Grafkit::AssimpLoader(data, len);
-
-		loader->Load();
 
 		free(data);
 
