@@ -12,3 +12,5 @@ msvc_set_console(AssimpConverter)
 include_directories("${ASSIMP_INCLUDE_DIR}")
 target_link_libraries(AssimpConverter debug "${ASSIMP_LIBRARY_DEBUG}")
 target_link_libraries(AssimpConverter optimized "${ASSIMP_LIBRARY_RELEASE}")
+
+ASSIMP_COPY_BINARIES(AssimpConverter ${CMAKE_CURRENT_BINARY_DIR})
