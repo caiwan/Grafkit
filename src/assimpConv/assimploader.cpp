@@ -151,6 +151,23 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 
 	return texture;
 }
+/**
+*/
+inline aiVector3D crossProduct(aiVector3D a, aiVector3D b) {
+	return aiVector3D(
+		(a.y*b.z - a.z*b.y),
+		(a.z*b.x - a.x*b.z),
+		(a.x*b.y - a.y*b.x)
+	);
+}
+
+inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
+	aiVector3D v;
+	v.x = (*vertices)[order[0]] * polarity[0];
+	v.y = (*vertices)[order[1]] * polarity[1];
+	v.z = (*vertices)[order[2]] * polarity[2];
+	*vertices = v;
+}
 
 // ================================================================================================================================================================
 // Parse assimp scenegraph 
@@ -160,9 +177,9 @@ TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int
 
 typedef struct {
 	std::vector<MaterialRef> materials;
-	std::vector<ModelRef> models;
-	std::vector<CameraRef> cameras;
-	std::vector<LightRef> lights;
+	std::vector<ModelRef>    models;
+	std::vector<CameraRef>   cameras;
+	std::vector<LightRef>    lights;
 	std::map<std::string, ActorRef> actors;
 } resourceRepo_t;
 
@@ -238,21 +255,8 @@ void assimp_parseScenegraph(resourceRepo_t &repo,  aiNode* ai_node, ActorRef &ac
 // Head
 // ================================================================================================================================================================
 
-Grafkit::AssimpLoader::AssimpLoader(void * src_data, size_t src_length)
+Grafkit::AssimpLoader::AssimpLoader(void * src_data, size_t src_length) : m_data(src_data), m_length(src_length)
 {
-	if (!src_data)
-		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
-
-	Assimp::Importer importer;
-	/// @todo genNormals szar. Miert?
-	this->aiscene = importer.ReadFileFromMemory(src_data, src_length,
-		// aiProcess_ConvertToLeftHanded |
-		0
-	);
-
-	if (!this->aiscene)
-		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
-
 }
 
 
@@ -275,9 +279,26 @@ SceneResRef Grafkit::AssimpLoader::Load()
 	std::vector<CameraRef> &cameras = resourceRepo.cameras;
 	std::vector<LightRef> &lights = resourceRepo.lights;
 
-	// -- load materials
+	if (!m_data)
+		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
 
-	if (aiscene->HasMaterials()) {
+	// --- load
+
+	Assimp::Importer importer;
+
+	/// @todo genNormals szar. Miert?
+	const aiScene *aiscene = importer.ReadFileFromMemory(m_data, m_length,
+		// aiProcess_ConvertToLeftHanded |
+		0
+	);
+
+	if (!aiscene)
+		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
+
+
+	// -- load materials
+	if (aiscene->HasMaterials()) 
+	{
 		LOGGER(Log::Logger().Trace("Materials"));
 		for (i = 0; i<aiscene->mNumMaterials; i++) {
 			aiString path, name;

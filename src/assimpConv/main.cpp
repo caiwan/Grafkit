@@ -41,35 +41,7 @@ using namespace Grafkit;
 
 typedef unsigned int uint;
 
-//aiTextureType textureTypes[] = {
-//	aiTextureType_DIFFUSE,
-//	aiTextureType_SPECULAR,
-//	aiTextureType_AMBIENT,
-//	aiTextureType_EMISSIVE,
-//	aiTextureType_HEIGHT,
-//	aiTextureType_NORMALS,
-//	aiTextureType_SHININESS,
-//	aiTextureType_OPACITY,
-//	aiTextureType_DISPLACEMENT,
-//	aiTextureType_LIGHTMAP,
-//	aiTextureType_REFLECTION
-//};
-//
-//inline aiVector3D crossProduct(aiVector3D a, aiVector3D b) {
-//	return aiVector3D(
-//		(a.y*b.z - a.z*b.y),
-//		(a.z*b.x - a.x*b.z),
-//		(a.x*b.y - a.y*b.x)
-//	);
-//}
-//
-//inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]) {
-//	aiVector3D v;
-//	v.x = (*vertices)[order[0]] * polarity[0];
-//	v.y = (*vertices)[order[1]] * polarity[1];
-//	v.z = (*vertices)[order[2]] * polarity[2];
-//	*vertices = v;
-//}
+
 
 /* ================================================================================================ */
 
@@ -105,7 +77,8 @@ public:
 		size_t len = 0;
 
 		FILE* fp = nullptr;
-		if (!fopen_s(&fp, args.get("input").value().c_str(), "rw")) {
+		errno_t err = fopen_s(&fp, args.get("input").value().c_str(), "rb");
+		if (!err) {
 			fseek(fp, 0, SEEK_END);
 			len = ftell(fp);
 			fseek(fp, 0, SEEK_SET);
@@ -125,7 +98,7 @@ public:
 
 		}
 		else {
-			cout << ("PENIS PENIS PENIS");
+			cout << "ERROR " << strerror(err) << endl;
 			free(data);
 			return 1;
 		}
@@ -139,7 +112,22 @@ public:
 
 /* ================================================================================================ */
 
+#define TESTING
+
 int main(int argc, char* argv[]) {
 	Application app;
+
+#ifdef TESTING
+	char *dummyargv[] = {
+		argv[0],
+		"-i", "..\\..\\tests\\assets\\models\\anim_complex_baked.dae",
+		"-o", "anim_complex_baked.scene",
+	};
+	int k = app.execute(5, dummyargv);
+	system("pause");
+	return k;
+#else
 	return app.execute(argc, argv);
+#endif
+
 }

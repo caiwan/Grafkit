@@ -28,9 +28,8 @@ namespace Grafkit {
 		SceneResRef Load();
 
 	private:
-		void* data;
-		size_t length;
-		const aiScene *aiscene;
+		const void* m_data;
+		size_t m_length;
 	};
 
 }
