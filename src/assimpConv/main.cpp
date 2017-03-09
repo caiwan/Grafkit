@@ -10,29 +10,10 @@
 #include <Windows.h>
 
 #include "core/system.h"
+#include "generator/SceneLoader.h"
 
 #include "Arguments.hpp"
-
-//#include "assimp/Importer.hpp"
-//#include "assimp/Exporter.hpp"
-//#include "assimp/scene.h"
-//#include "assimp/postprocess.h"
-//#include "assimp/material.h"
-//#include "assimp/mesh.h"
-//#include "assimp/matrix4x4.h"
-
-//#include "utils/exceptions.h"
-//
-//#include "utils/asset.h"
-//#include "utils/AssetFactory.h"
-//#include "utils/AssetFile.h"
-//
-//#include "utils/ResourceManager.h"
-
 #include "assimploader.h"
-
-
-#include "generator/SceneLoader.h"
 
 using namespace std;
 using namespace ideup;
@@ -40,8 +21,6 @@ using namespace ideup;
 using namespace Grafkit;
 
 typedef unsigned int uint;
-
-
 
 /* ================================================================================================ */
 
@@ -54,11 +33,12 @@ public:
 		args.add("help", 'h').description("Shows this help message.").flag(true);
 		args.add("input", 'i').description("Input filename").required(true);
 		args.add("output", 'o').description("Output filename").required(true);
-		args.add("format", 'f').description("Output format. Overrides file extension.");
+		//args.add("format", 'f').description("Output format. Overrides file extension.");
 		args.add("axis", 'x').description("Change axis order of the vertex cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
 		args.add("flip", 'p').description("Flips the camera 180 deg around one given axis.");
 		args.add("lh").description("convert to left handed").flag(true);
 		args.add("textures", 't').description("Strip path from texture filenames").flag(true);
+		args.add("animation", 'a').description("Merge animations from an external json file").flag(true);
 	}
 
 	~Application() {
@@ -71,6 +51,9 @@ public:
 			cout << args.getErrorMessage() << endl;
 			cout << args.getHelpMessage() << endl;
 			return 1;
+		} else if (args.get("help").isFound()) {
+			cout << args.getHelpMessage() << endl;
+			return 0;
 		}
 
 		void *data = nullptr;
