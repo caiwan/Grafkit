@@ -80,41 +80,6 @@ protected:
 		m_scene->Get()->BuildScene(render, m_vs, m_fs);
 		m_scene->Get()->SetActiveCamera(0);
 
-		// -- add anim tracks
-		ActorAnimation *cameraAnimation = new ActorAnimation();
-		cameraAnimation->AddPositionKey(0, float3(0,0,-10));
-		
-		float a = M_1_PI / 2;
-
-		cameraAnimation->AddRotationKey(0.0, Quaternion::fromEuler(0, 0, 0));
-		cameraAnimation->AddRotationKey(1.0, Quaternion::fromEuler(a, 0, 0));
-		cameraAnimation->AddRotationKey(2.0, Quaternion::fromEuler(a, a, 0));
-
-		cameraAnimation->AddRotationKey(3.0, Quaternion::fromEuler(a, a, a));
-		cameraAnimation->AddRotationKey(4.0, Quaternion::fromEuler(0, a, a));
-		cameraAnimation->AddRotationKey(5.0, Quaternion::fromEuler(0, 0, a));
-		cameraAnimation->AddRotationKey(6.0, Quaternion::fromEuler(0, 0, 0));
-		
-		cameraAnimation->SetActor(m_scene->Get()->GetActiveCamera());
-
-		m_scene->Get()->AddAnimation(cameraAnimation);
-
-		//m_scene->Get()->GetActiveCamera()->SetName("puncsostal");
-
-		// -- save and reload
-		SceneLoader::Save(m_scene->Get(), "./../assets/animation.scene");
-		m_scene->Get()->Shutdown();
-		m_scene = this->Load<SceneRes>(new SceneLoader("AnimatedScene", "animation.scene"));
-		DoPrecalc();
-
-		m_scene->Get()->BuildScene(render, m_vs, m_fs);
-
-		m_scene->Get()->SetActiveCamera(0);
-		//m_scene->Get()->GetActiveCamera()->SetName("cicavirag");
-		// ((ActorAnimation*)(m_scene->Get()->GetAnimation(0).Get()))->SetActor(m_scene->Get()->GetActiveCamera());
-
-		SceneLoader::Save(m_scene->Get(), "./../assets/animation2.scene");
-
 		m_t = 0;
 
 		return 0;
