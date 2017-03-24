@@ -1,3 +1,5 @@
+# quinck and dirty was to fiund bass library
+
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(BASS_ARCHITECTURE "x64")
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)

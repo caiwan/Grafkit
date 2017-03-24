@@ -1,8 +1,6 @@
 #include "stdafx.h"
-#include "gtest/gtest.h"
 
-#include "src/gtest-all.cc"
-
+#include <gtest/gtest.h>
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;

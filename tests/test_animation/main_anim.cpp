@@ -19,12 +19,14 @@
 #include "utils/ResourceManager.h"
 #include "utils/ResourcePreloader.h"
 
+#include "utils/InitializeSerializer.h"
+
 using namespace Grafkit;
 
-class Application : public Grafkit::System, protected Grafkit::ResourcePreloader
+class Application : public Grafkit::System, protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 {
 public:
-	Application() : Grafkit::System(),
+	Application() : ClonableInitializer(), Grafkit::System(),  ResourcePreloader(),
 		m_file_loader(nullptr)
 	{
 		int screenWidth, screenHeight;

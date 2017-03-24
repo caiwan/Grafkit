@@ -1,3 +1,6 @@
+# Enables pch generation for the project on MSVC
+# caiwan/IR
+
 function(msvc_add_pch PrecompiledHeader PrecompiledSource SourcesVar)
   if(MSVC)
     get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)

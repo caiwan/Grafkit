@@ -1,4 +1,5 @@
 # Creates a quick and dierty test application with the engine
+# caiwan/IR
 
 function(create_testapp _application)
 	file(GLOB_RECURSE SOURCE_FILES *.cpp)

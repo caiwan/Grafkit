@@ -1,3 +1,6 @@
+# GK2 root project
+# caiwan/IR
+
 cmake_minimum_required (VERSION 2.6)
 project (Grafkit2)
 
@@ -21,11 +24,13 @@ endif()
 set(ASSIMP_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/Assimp" CACHE PATH "ASSIMP root directory")
 set(STB_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/stb" CACHE PATH "STB root directory")
 set(BASS_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/bass24" CACHE PATH "BASS root directory")
+set(GTEST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../tools/googletest" CACHE PATH "gTest root directory")
 
 find_package(Assimp)
 find_package(stb)
 find_package(Bass)
 # find_package(Bullet)
+find_package(GTest)
 
 set(GK2_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/api")
 set(GK2_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")

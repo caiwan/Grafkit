@@ -1,6 +1,6 @@
-# ------------------------------------------------------------------------------------------
-
 # Adds the files to the corresponding group bsed on their type and path, visual studio style
+# caiwan/IR
+
 function(assign_source_group)
 	foreach(_source IN ITEMS ${ARGN})
 		if (IS_ABSOLUTE "${_source}")
@@ -27,5 +27,3 @@ function(assign_source_group)
 
 	endforeach()
 endfunction(assign_source_group)
-
-# ------------------------------------------------------------------------------------------
