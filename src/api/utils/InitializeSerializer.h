@@ -5,7 +5,7 @@
 namespace Grafkit{
 	
 	class ClonableInitializer {
-	public:
+	protected:
 		ClonableInitializer();
 	};
 	
