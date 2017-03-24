@@ -12,21 +12,22 @@ def get_args():
   script_args = all_arguments[double_dash_index + 1: ]
  
   # add parser rules
-  parser.add_argument('-c', '--cube', help="number of cubes")
-  parser.add_argument('-m', '--save', help="output file")
+  parser.add_argument('-i', '--input', help="input file")
+  parser.add_argument('-o', '--output', help="output file")
   parsed_script_args, _ = parser.parse_known_args(script_args)
   return parsed_script_args
  
 if __name__ == "__main__": 
   args = get_args()
-  number_of_cubes = int(args.cube)
+  infile = str(args.input)
+  outfile= str(args.output)
   
   # open blendfile
-  # bpy.ops.wm.open_mainfile(filepath="file_path")
+  bpy.ops.wm.open_mainfile(filepath=infile)
   
-  if number_of_cubes > 1:
-    for x in range(0, number_of_cubes):
-      bpy.ops.mesh.primitive_cube_add(location=(x, 0, 0))
+  # if number_of_cubes > 1:
+  #   for x in range(0, number_of_cubes):
+  #     bpy.ops.mesh.primitive_cube_add(location=(x, 0, 0))
 
   # bake scene
   # https://docs.blender.org/api/blender_python_api_2_75_0/bpy.ops.nla.html
