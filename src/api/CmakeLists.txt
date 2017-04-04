@@ -14,4 +14,4 @@ msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 add_library(Grafkit2 STATIC ${SOURCE_FILES} ${HEADER_FILES})
 target_include_directories(Grafkit2 PUBLIC "${CMAKE_SOURCE_DIR}")
 
-assign_source_group("${SOURCE_FILES} ${HEADER_FILES}")
+assign_source_group(${SOURCE_FILES} ${HEADER_FILES})
