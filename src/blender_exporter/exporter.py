@@ -1,7 +1,14 @@
+import os, sys, inspect
 import argparse
 import bpy
 from subprocess import call
 
+# fix import paths for internal imports
+cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
+if cmd_folder not in sys.path:
+     sys.path.insert(0, cmd_folder)
+
+import dump
 
 def get_args():
   parser = argparse.ArgumentParser()
@@ -25,17 +32,27 @@ if __name__ == "__main__":
   # open blendfile
   bpy.ops.wm.open_mainfile(filepath=infile)
   
-  # if number_of_cubes > 1:
-  #   for x in range(0, number_of_cubes):
-  #     bpy.ops.mesh.primitive_cube_add(location=(x, 0, 0))
-
+  # https://docs.blender.org/api/blender_python_api_current/bpy.types.Scene.html#bpy.types.Scene
+  scene = bpy.data.scenes['Scene']
+  
   # bake scene
   # https://docs.blender.org/api/blender_python_api_2_75_0/bpy.ops.nla.html
+  bpy.ops.nla.bake(\
+    frame_start=scene.frame_start, \
+    frame_end=scene.frame_end, \
+    step=scene.frame_step, \
+    only_selected=False,\
+    visual_keying=False,\
+    clear_constraints=True,\
+    clear_parents=False,\
+    use_current_action=False, 
+    bake_types={'POSE', 'OBJECT'}\
+  )
   
   # export scene to tempfile
   # https://docs.blender.org/api/blender_python_api_current/bpy.ops.wm.html
   bpy.ops.wm.collada_export(\
-    filepath=args.save, \
+    filepath=args.output, \
     #apply_modifier=True, \
     triangulate=True, \
     use_texture_copies=True, \
@@ -45,6 +62,7 @@ if __name__ == "__main__":
 
   # export external stuff to tempfile
   # ... 
+  dump.hello(scene)
    
   # call converter tool
   call(["echo", "hello tool"])
