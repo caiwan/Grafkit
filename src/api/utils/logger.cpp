@@ -142,9 +142,10 @@ void Grafkit::LoggerHandler::FileLoggerHandler::Write(Grafkit::Logger::message_t
 // ==================================================================================================
 
 
-Grafkit::LoggerHandler::ConsoleLogger::ConsoleLogger()
+Grafkit::LoggerHandler::ConsoleLogger::ConsoleLogger() : m_haveConsole(0), m_stdout(stdout), m_stderr(stderr)
 {
-	AllocConsole();
+#if 0
+	AllocConsole(); m_haveConsole = 1;
 
 	HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
 	int hCrt = _open_osfhandle((long)handle_out, _O_TEXT);
@@ -152,11 +153,13 @@ Grafkit::LoggerHandler::ConsoleLogger::ConsoleLogger()
 	m_stdout = m_stderr = _fdopen(hCrt, "w");
 	setvbuf(m_stdout, NULL, _IONBF, 1);
 	// *stdout = *hf_out;
+#endif
 }
 
 Grafkit::LoggerHandler::ConsoleLogger::~ConsoleLogger()
 {
-	fclose(m_stdout);
+	if (m_haveConsole)
+		fclose(m_stdout);
 }
 
 void Grafkit::LoggerHandler::ConsoleLogger::Write(Grafkit::Logger::message_t * const & message)
@@ -164,12 +167,17 @@ void Grafkit::LoggerHandler::ConsoleLogger::Write(Grafkit::Logger::message_t * c
 	if (!message)
 		return;
 
-	if (message->type == Logger::LOG_ERROR || message->type == Logger::LOG_WARN) {
-		if (this->m_stderr)
-			fprintf_s(this->m_stderr, "%s\r\n", message->message);
-	}
+	if (m_haveConsole)
+		if (message->type == Logger::LOG_ERROR || message->type == Logger::LOG_WARN) {
+			if (this->m_stderr)
+				fprintf_s(this->m_stderr, "%s\r\n", message->message);
+		}
+		else {
+			if (this->m_stdout)
+				fprintf_s(this->m_stdout, "%s\r\n", message->message);
+		}
 	else {
-		if (this->m_stdout)
-			fprintf_s(this->m_stdout, "%s\r\n", message->message);
+		OutputDebugStringA(message->message);
+		OutputDebugStringA("\r\n");
 	}
 }

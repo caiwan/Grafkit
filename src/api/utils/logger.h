@@ -113,6 +113,8 @@ namespace Grafkit {
 		private:
 			FILE* m_stdout;
 			FILE* m_stderr;
+
+			BOOL m_haveConsole;
 		};
 	};
 }
