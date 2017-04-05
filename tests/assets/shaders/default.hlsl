@@ -13,20 +13,20 @@ cbuffer MatrixBuffer
 */
 
 
-// struct Light
-// {
-// 	int type;
-// 	float4 position;
-// 	float4 direction;
+ struct Light
+ {
+ 	int type;
+ 	float4 position;
+ 	float4 direction;
 
-// 	float4 ambient;
-// 	float4 diffuse;
-// 	float4 specular;
+ 	float4 ambient;
+ 	float4 diffuse;
+ 	float4 specular;
 
-// 	float ca, la, qa;
+ 	float ca, la, qa;
 
-// 	float angle, falloff;
-// };
+ 	float angle, falloff;
+ };
 
 cbuffer material
 {
@@ -50,11 +50,11 @@ cbuffer material
 	int has_t_aux3;		///< aux texture, used for pretty much everything else
 };
 
-// cbuffer light
-// {
-// 	int is_lightOn[4];
-// 	struct Light lights[16];
-// }
+ cbuffer light
+ {
+ 	int is_lightOn[16];
+ 	struct Light lights[16];
+ }
 
 struct VertexInputType
 {
