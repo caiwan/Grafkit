@@ -1,33 +1,36 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "core/system.h"
 
 #include "render/renderer.h"
-#include "render/Scene.h"
 #include "render/camera.h"
-#include "render/model.h"
-#include "render/texture.h"
 #include "render/Material.h"
 #include "render/shader.h"
 
+#include "generator/ShaderLoader.h"
+#include "generator/SceneLoader.h"
+
+#include "render/Scene.h"
+
 #include "math/matrix.h"
 
-#include "utils/asset.h"
-#include "utils/AssetFactory.h"
 #include "utils/AssetFile.h"
-
 #include "utils/ResourceManager.h"
+#include "utils/ResourcePreloader.h"
 
-#include "generator/TextureLoader.h"
-#include "generator/ShaderLoader.h"
+#include "utils/InitializeSerializer.h"
+
 
 
 using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-class Application : public System, public IResourceManager
+class Application : public Grafkit::System, protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 {
 public:
-	Application() : System(),
+	Application() : ClonableInitializer(), Grafkit::System(), ResourcePreloader(),
 		m_file_loader(nullptr)
 	{
 		int screenWidth, screenHeight;
@@ -39,14 +42,25 @@ public:
 
 		// initwindowot is ertelmesebb helyre kell rakni
 		InitializeWindows(screenWidth, screenHeight);
+
+		// --- ezeket kell osszeszedni egy initwindowban
+		screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
+		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
+
+		int result = 0;
+
+		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+		this->m_file_loader = new FileAssetFactory("./../assets/");
 	}
 
 	~Application() {
+		delete m_file_loader;	///TODO: shutdown elotte
+		this->render.Shutdown();
 	}
 
 protected:
 	Renderer render;
-	Ref<Scene> scene;
+	SceneResRef m_scene;
 
 	TextureSamplerRef m_textureSampler;
 
@@ -55,114 +69,27 @@ protected:
 
 	float t;
 
-	ShaderResRef m_vertexShader;
-	ShaderResRef m_fragmentShader;
+	ShaderResRef m_vs;
+	ShaderResRef m_fs;
 
 	int init() {
-		// --- ezeket kell osszeszedni egy initwindowban
-		const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
-		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
-
-		this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
-
-		// init file loader
-		this->m_file_loader = new FileAssetFactory("./../assets/");
-
-		// --------------------------------------------------
-
-		/* Itt letrhozzuk a kamerat, hozzaadjuk a scenehez, de nem kapcsoljuk hozza a scenegraphoz. */
-
-		// -- camera
-		/* Az alap kamera origoban van, +z iranzba nez, es +y felfele irany */
-		CameraRef camera = new Camera;
-
-		// -- texture
-		TextureResRef texture = new TextureRes();
-
-		texture = this->Load<TextureRes>(new TextureFromBitmap("textures/Untitled.png"));
-
-		// -- texture sampler
-		m_textureSampler = new TextureSampler();
-		m_textureSampler->Initialize(render);
+		LoadCache();
 
 		// -- load shader
-		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "shaders/default.hlsl", "", ST_Vertex));
-		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "shaders/default.hlsl", "mainPixelPhongNoTexture", ST_Pixel));
-
-		// -- precalc
-		this->DoPrecalc();
+		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
+		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
 
 		// -- model 
-		ModelRef model = new Model;
-		model->SetMaterial(new BaseMaterial);
-		model->GetMaterial()->AddTexture(texture, "t_diffuse");
+		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 
+		DoPrecalc();
 
-		SimpleMeshGenerator generator(render, m_vertexShader);
-		generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-		generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-		generator["NORMAL"] = (void*)GrafkitData::cubeNormals;
+		m_scene->Get()->BuildScene(render, m_vs, m_fs);
+		m_scene->Get()->SetActiveCamera(0);
 
-		generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
+		// -- add lights
 
-		// -- setup scene 
-		scene = new Scene();
-
-		m_cameraActor = new Actor();
-		m_cameraActor->AddEntity(camera);
-
-		/* Kocka kozepen */
-		ActorRef modelActor = new Actor();
-		modelActor->AddEntity(model);
-
-		/*
-		Alap right-handed koordinatarendszer szerint osszerakunk egy keresztet
-		Ezeket adjuk hozza a belso kockahoz
-		*/
-		float3 cica[] = {
-			{ 1, 0, 0 }, /* Jobb */{ -1, 0, 0 }, /* Bal */
-			{ 0, 1, 0 }, /* fent */{ 0,-1, 0 }, /* lent */
-			{ 0, 0, -1 }, /* elol */{ 0, 0, 1 }, /* hatul */
-		};
-
-		// size_t i = 5; // egyesevel itt lehet hozzaadni/elvenni
-		for (size_t i = 0; i < 6; i++)
-		{
-			ActorRef actor = new Actor();
-			actor->AddEntity(model);
-			modelActor->AddChild(actor);
-
-			float3 v = cica[i];
-			v.x *= 3;
-			v.y *= 3;
-			v.z *= 3;
-
-			actor->Matrix().Translate(v);
-
-		}
-
-		// kozepso kockat elrejtjuk
-		modelActor->Hide();
-
-		/*
-		Kockak felfuzese a rootba
-		*/
-		m_rootActor = new Actor();
-		m_rootActor->AddChild(m_cameraActor);
-		m_rootActor->AddChild(modelActor);
-
-		scene->Initialize(m_rootActor);
-		scene->AddCameraNode(m_cameraActor);
-		// scene->AddLightNode(lightActor);
-
-		scene->SetVShader(m_vertexShader);
-		scene->SetFShader(m_fragmentShader);
-
-		m_cameraActor->Matrix().Identity();
-		m_cameraActor->Matrix().Translate(0, 0, -10);
-
-
-		// --- 
+		// --- serialize && deserialize
 
 		this->t = 0;
 
@@ -179,27 +106,15 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
-			ShaderRef fragmentShader = this->m_fragmentShader->Get();
+			t += .01;
 
-			m_rootActor->Matrix().Identity();
-			m_rootActor->Matrix().RotateRPY(t, 0, 0);
+			this->m_scene->Get()->UpdateAnimation(fmod(t, 10.5));
+			this->m_scene->Get()->PreRender(render);
+			this->m_scene->Get()->Render(render);
 
-			// scene->GetActiveCamera()->Transform().Identity();
-			// scene->GetActiveCamera()->Transform().RotateRPY(t, t/2, t/4);
-
-			float f = abs(sin(t));
-			m_cameraActor->Transform().Identity();
-			m_cameraActor->Transform().Translate(0, 0, f);
-
-			scene->PreRender(render);
-			scene->Render(render);
-
-			this->t += 0.1;
 		}
 
 		this->render.EndScene();
-
-		/* this->m_file_loader->PollEvents(this); */
 
 		return 0;
 	};
