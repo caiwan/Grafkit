@@ -104,7 +104,7 @@ namespace Grafkit {
 		// ----
 		// access input layout 
 		size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
-		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
+		InputElementRecord GetILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
 
 	private:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);

@@ -2,6 +2,7 @@
 # caiwan/IR
 
 cmake_minimum_required (VERSION 2.6)
+
 project (Grafkit2)
 
 if (NOT MSVC14 AND NOT MSVC12)

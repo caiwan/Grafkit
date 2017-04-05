@@ -118,7 +118,7 @@ void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 
 	for (size_t i = 0; i < elem_count; ++i)
 	{
-		Shader::InputElementRecord &record = shader->getILayoutElem(i);
+		Shader::InputElementRecord &record = shader->GetILayoutElem(i);
 		int field_id = packer.addField(record.width);
 
 		auto it = this->m_mapPtr.find(record.desc.SemanticName);

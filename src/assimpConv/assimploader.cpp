@@ -297,20 +297,20 @@ void Grafkit::AssimpLoader::LoadLights(SceneRef &outScene)
 			switch (curr_light->mType) {
 			case aiLightSource_DIRECTIONAL:
 				light = new DirectionalLight();
-				ASSIMP_V3D_F4(curr_light->mDirection, light->GetDirection(), 0, 0f);
+				ASSIMP_V3D_F4(curr_light->mDirection, light->Direction(), 0, 0f);
 				break;
 
 			case aiLightSource_POINT:
 				light = new PointLight();
-				ASSIMP_V3D_F4(curr_light->mPosition, light->GetPosition(), 0.0f);
+				ASSIMP_V3D_F4(curr_light->mPosition, light->Position(), 0.0f);
 				break;
 
 			case aiLightSource_SPOT:
 				light = new SpotLight();
-				ASSIMP_V3D_F4(curr_light->mPosition, light->GetPosition(), 1.0f);
-				ASSIMP_V3D_F4(curr_light->mDirection, light->GetDirection(), 0.0f);
-				(light->GetAngle()) = curr_light->mAngleInnerCone;
-				(light->GetFalloff()) = curr_light->mAngleOuterCone - curr_light->mAngleInnerCone;
+				ASSIMP_V3D_F4(curr_light->mPosition, light->Position(), 1.0f);
+				ASSIMP_V3D_F4(curr_light->mDirection, light->Direction(), 0.0f);
+				(light->Angle()) = curr_light->mAngleInnerCone;
+				(light->Falloff()) = curr_light->mAngleOuterCone - curr_light->mAngleInnerCone;
 				break;
 
 			case aiLightSource_AMBIENT:
@@ -318,13 +318,13 @@ void Grafkit::AssimpLoader::LoadLights(SceneRef &outScene)
 				break;
 			}
 
-			(light->GetConstantAttenuation()) = curr_light->mAttenuationConstant;
-			(light->GetLinearAttenuation()) = curr_light->mAttenuationLinear;
-			(light->GetQuardicAttenuation()) = curr_light->mAttenuationQuadratic;
+			(light->ConstantAttenuation()) = curr_light->mAttenuationConstant;
+			(light->LinearAttenuation()) = curr_light->mAttenuationLinear;
+			(light->QuardicAttenuation()) = curr_light->mAttenuationQuadratic;
 
-			ASSIMP_COLOR_F4(curr_light->mColorAmbient, light->GetAmbient());
-			ASSIMP_COLOR_F4(curr_light->mColorDiffuse, light->GetDiffuse());
-			ASSIMP_COLOR_F4(curr_light->mColorSpecular, light->GetSpecular());
+			ASSIMP_COLOR_F4(curr_light->mColorAmbient, light->Ambient());
+			ASSIMP_COLOR_F4(curr_light->mColorDiffuse, light->Diffuse());
+			ASSIMP_COLOR_F4(curr_light->mColorSpecular, light->Specular());
 
 			///@todo ez kell-e majd?
 			light->SetName(light_name);

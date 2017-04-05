@@ -7,6 +7,7 @@
 #include "render/camera.h"
 #include "render/Material.h"
 #include "render/shader.h"
+#include "render/light.h"
 
 #include "generator/ShaderLoader.h"
 #include "generator/SceneLoader.h"
@@ -64,6 +65,8 @@ protected:
 
 	TextureSamplerRef m_textureSampler;
 
+	LightRef m_light;
+
 	ActorRef m_rootActor;
 	ActorRef m_cameraActor;
 
@@ -80,7 +83,7 @@ protected:
 		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
+		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "scenegraph.scene"));
 
 		DoPrecalc();
 
@@ -88,6 +91,8 @@ protected:
 		m_scene->Get()->SetActiveCamera(0);
 
 		// -- add lights
+		m_light = new PointLight();
+		m_light->Position(float4(10,10,10,1));
 
 		// --- serialize && deserialize
 

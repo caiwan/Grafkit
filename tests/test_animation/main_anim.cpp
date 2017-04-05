@@ -9,8 +9,8 @@
 #include "render/shader.h"
 
 #include "generator/ShaderLoader.h"
-
 #include "generator/SceneLoader.h"
+
 #include "render/Scene.h"
 
 #include "math/matrix.h"
