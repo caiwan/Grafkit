@@ -22,22 +22,21 @@ namespace Grafkit{
 		~Light();
 
 		/// @todo ez csak egy QnD Hack, ki kell majd javitani a jovoben
-		float4 &GetPosition() { return m_light.position; }
-		float4 &GetDirection() { return m_light.direction; }
+		float4 &Position() { return m_light.position; }
+		void Position(float4 p) {m_light.position = p; }
 
-		float4 &GetBasePosition() { return m_position; }
-		float4 &GetBaseDirection() { return m_direction; }
+		float4 &Direction() { return m_light.direction; }
 
-		float4 &GetAmbient() { return m_light.ambient; }
-		float4 &GetDiffuse() { return m_light.diffuse; }
-		float4 &GetSpecular() { return m_light.specular; }
+		float4 &Ambient() { return m_light.ambient; }
+		float4 &Diffuse() { return m_light.diffuse; }
+		float4 &Specular() { return m_light.specular; }
 
-		float &GetConstantAttenuation() { return m_light.ca; }
-		float &GetLinearAttenuation() { return m_light.la; }
-		float &GetQuardicAttenuation() { return m_light.qa; }
+		float &ConstantAttenuation() { return m_light.ca; }
+		float &LinearAttenuation() { return m_light.la; }
+		float &QuardicAttenuation() { return m_light.qa; }
 
-		float& GetAngle() { return m_light.angle; }
-		float& GetFalloff() { return m_light.falloff; }
+		float& Angle() { return m_light.angle; }
+		float& Falloff() { return m_light.falloff; }
 
 		/// Setup the corresponding constant buffer inside the shader
 		//void SetShaderCB(ShaderRef &rPShader);
@@ -69,10 +68,6 @@ namespace Grafkit{
 		};
 
 		struct light_t m_light;
-
-		// ez amit tarolunk a ndoeban
-		float4 m_position;
-		float4 m_direction;
 
 	};
 

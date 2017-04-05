@@ -2,15 +2,14 @@
 
 #include "Light.h"
 
+#include "Scene.h"
+
 using namespace Grafkit;
 
 Light::Light() : Entity3D()
 {
 	ZeroMemory(&m_light, sizeof(m_light));
 	m_light.la = 1.0;
-
-	ZeroMemory(&m_position, sizeof(m_position));
-	ZeroMemory(&m_direction, sizeof(m_direction));
 }
 
 Light::~Light()
@@ -27,8 +26,7 @@ Light::~Light()
 
 void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, Scene * scene)
 {
-	//scene->GetPShader()->
-	// TODO 
+	scene->GetPShader()->SetParamT<light_t>(deviceContext, "light", m_light);
 }
 
 // ============================================================================================================
