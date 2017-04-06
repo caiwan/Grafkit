@@ -104,6 +104,7 @@ protected:
 			model->SetName("cube");
 			model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
 			model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
+			model->GetMesh()->AddPointer("NORMAL", sizeof(GrafkitData::cubeNormals[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
 			model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
 			model->GetMesh()->Build(render, m_vertexShader);
 

@@ -12,7 +12,6 @@ cbuffer MatrixBuffer
 *
 */
 
-
  struct Light
  {
  	int type;
@@ -52,8 +51,8 @@ cbuffer material
 
  cbuffer light
  {
- 	int is_lightOn[16];
- 	struct Light lights[16];
+ 	int is_lightOn[4];
+ 	struct Light lights[4];
  }
 
 struct VertexInputType
@@ -83,8 +82,10 @@ SamplerState SampleType {
 };
 
 Texture2D t_diffuse;
+Texture2D t_alpha;
 Texture2D t_normal;
 Texture2D t_specular;
+Texture2D t_shininess;
 
 PixelInputType mainVertex(VertexInputType input)
 {
@@ -202,13 +203,34 @@ float4 mainPixel(PixelInputType input) : SV_TARGET
 	
 	// return color;
 
-	if (has_t_diffuse == 1)
+	/*if (has_t_diffuse == 1)
 		color = t_diffuse.Sample(SampleType, input.tex);
-	else
-		color = material_diffuse;
+	else*/
+		//color = material_diffuse;
+
+
+	// --- 
+	//for (int i = 0; i < 4; i++) {
+	//	if (is_lightOn[i] == 1) {
+	//		// pointlight
+	//		if (lights[i].type == 1 || lights[i].type == 4) {
+	//			float4 lightDir = output.worldPosition - lights[0].position;
+	//			output.lightDir[0] = lightDir;
+	//		}
+	//		// directional light
+	//		else if (lights[i].type == 2) {
+	//			float4 lightDir = lights[0].direction;
+	//			output.lightDir[0] = lightDir;
+	//		}
+
+	//		// ... 
+	//	}
+	//}
 
 	// phong light
-	if (material_type == 1) {
+	// if (material_type == 1) 
+	if (true)
+	{
 		float3 lp = float3(10, 10, 10);
 
 		// proto
@@ -223,8 +245,8 @@ float4 mainPixel(PixelInputType input) : SV_TARGET
 		// float theta = dot(R, E);
 
 		// color = calcPointLight(input, material, lights[0]);
-		color.xyz = color * float3(lambda, lambda, lambda);
-		// color.xyz = .5 + N.xyz * .5; // normal szar, puszi
+		// color.xyz = color * float3(lambda, lambda, lambda);
+		 color.xyz = .5 + N.xyz * .5; // normal szar, puszi
 	}
 
 	return color;

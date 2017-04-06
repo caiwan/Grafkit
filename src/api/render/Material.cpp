@@ -37,7 +37,7 @@ namespace {
 Grafkit::Material::Material(enum Material::material_type_e t) : IResource() , Persistent()
 {
 	ZeroMemory(&m_material, sizeof(m_material));
-	m_material.diffuse = float4(1, 1, 1, 0);
+	m_material.diffuse = float4(1, 1, 1, 1);
 	
 	m_material.type = t;
 }

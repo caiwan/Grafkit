@@ -48,7 +48,7 @@ namespace Grafkit{
 
 		///@todo ez egy kurvaszar megoldas, es nem kene hasznalni a feny tipusanak meghatarozasara; helyette virtualis fuggvennyekkel kellene~
 		enum type_t {
-			INVALID = 0, T_point, T_directional, T_spot, T_ambient, COUNT
+			INVALID = 0, T_point=1, T_directional=2, T_spot=3, T_ambient=4, COUNT
 		};
 
 		virtual enum type_t GetLightType() = 0;
