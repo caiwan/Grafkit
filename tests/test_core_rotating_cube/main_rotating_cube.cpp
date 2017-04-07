@@ -108,6 +108,7 @@ protected:
 			delete pShaderLoader;
 
 			// -- model 
+			GrafkitData::CalcCube();
 			this->m_model = new Model(new Mesh());
 			this->m_model->SetName("cube");
 			this->m_model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
@@ -171,8 +172,8 @@ protected:
 				m_fragmentShader->SetShaderResourceView("diffuse", m_texture->GetTextureResource());
 				m_fragmentShader->SetSamplerSatate("SampleType", m_textureSampler->GetSamplerState());
 
-				m_vertexShader->Render(this->render);
-				m_fragmentShader->Render(this->render);
+				m_vertexShader->Bind(this->render);
+				m_fragmentShader->Bind(this->render);
 
 				m_model->Render(this->render, nullptr);
 
