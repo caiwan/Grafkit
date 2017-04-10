@@ -128,21 +128,23 @@ namespace {
 
 	struct Mesh { VertexData v; uintlist indices; };
 
-	static void ParseFloats(const std::string &in, floatlist &out) {
-		std::stringstream ss(in);
-		std::string tok;
-		do {
-			bool neg = false;
-			std::getline(ss, tok, ' ');
-			if (tok.empty())
-				continue;
-			if (tok[0] == '-') {
-				neg = true;
-				std::getline(ss, tok, ' ');
-			}
-			float f = std::stof(tok) * (neg ? -1. : 1.);
-			out.push_back(f);
-		} while (ss.eof());
+	static void ParseFloats(const std::string &in, floatlist &out, int n = 4) {
+		std::string s = in, token;
+		size_t pos = 0, m = n; bool neg = false;
+		while ((pos = s.find(" ")) != std::string::npos && m > 0) {
+			token = s.substr(0, pos); s.erase(0, pos + 1);
+			
+			if (token.empty()) continue;
+			if (token[0] == '-') { neg = true; continue; }
+			
+			out.push_back(std::stof(token) * (neg ? -1 : 1) );
+
+			neg = false;
+			m--;
+		}
+		// fill reramining 
+		if (m > 0) while (m--) out.push_back(0.);
+
 	}
 
 	static void ParseFace(const std::string &in, uintlist &out) {
