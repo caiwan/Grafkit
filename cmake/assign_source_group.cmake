@@ -13,14 +13,24 @@ function(assign_source_group)
 		
 		string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
 
-		if ("${_source}" MATCHES ".*\\.cpp")
+		if ("${_source}" MATCHES ".*\\.(c(p|x)*|inc)\\s?")
 			set(_source_path_msvc "Source Files\\${_source_path_msvc}")
-		elseif("${_source}" MATCHES ".*\\.hlsl")
+			
+		elseif("${_source}" MATCHES ".*\\.(js|qs|lua)\\s?")
+			set(_source_path_msvc "Script Files\\${_source_path_msvc}")
+			
+		elseif("${_source}" MATCHES ".*\\.(hlsl|fx)\\s?")
 			set(_source_path_msvc "Shader Files\\${_source_path_msvc}")
-		elseif("${_source}" MATCHES ".*\\.h")
+			
+		elseif("${_source}" MATCHES ".*\\.(h(p|x)*|inl)\\s?")
 			set(_source_path_msvc "Header Files\\${_source_path_msvc}")
+			
+		elseif("${_source}" MATCHES ".*\\.(ui)\\s?")
+			set(_source_path_msvc "UI Files\\${_source_path_msvc}")			
+			
 		else()
 			set(_source_path_msvc "Resource Files\\${_source_path_msvc}")
+			
 		endif()
 
 		source_group("${_source_path_msvc}" FILES "${_source}")
