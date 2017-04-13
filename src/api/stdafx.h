@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __cplusplus
+
 // dx datatypes
 #include "render/dxtypes.h"
 
@@ -19,3 +21,4 @@
 //exceptions 
 #include "utils/exceptions.h"
 
+#endif //__cplusplus
