@@ -19,6 +19,4 @@ namespace GrafkitData {
 
 	extern const unsigned int cubeVertexLength;             ///< Number of vertices of a cube
 	extern const unsigned int cubeIndicesLength;            ///< Number of indices of a cube
-
-	extern void CalcCube(); ///< Parse obj that contains the cube data 
 }

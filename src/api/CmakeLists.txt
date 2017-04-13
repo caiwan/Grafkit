@@ -1,8 +1,8 @@
 # Grafkit 2 library
 Project(Grafkit2API)
 
-file(GLOB_RECURSE SOURCE_FILES *.cpp)
-file(GLOB_RECURSE HEADER_FILES *.h)
+file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inc)
+file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inl)
 
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
