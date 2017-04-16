@@ -1,5 +1,3 @@
-*.txt
 *.log
 *.dump
-*.bin
 *.dll
