@@ -56,8 +56,9 @@ void Grafkit::Scene::Initialize(ActorRef root)
 
 			const Camera * camera = dynamic_cast<Camera*>((*entity).Get());
 			if (camera) {
-				m_cameraNodes.push_back(node);
-				m_cameraMap[node->GetName()] = node;
+				//m_cameraNodes.push_back(node);
+				//m_cameraMap[node->GetName()] = node;
+				AddCamera(node);
 				break; // assume if we have only one camera uder a node
 			}
 
@@ -103,6 +104,14 @@ ActorRef Grafkit::Scene::GetCamera(std::string name)
 	if (it != m_cameraMap.end())
 		return it->second;
 	return ActorRef();
+}
+
+void Grafkit::Scene::AddCamera(ActorRef camera)
+{
+	m_cameraNodes.push_back(camera);
+	m_cameraMap[camera->GetName()] = camera;
+	if (camera->GetParent().Invalid())
+		m_pScenegraph->AddChild(camera);
 }
 
 ActorRef Grafkit::Scene::GetLight(std::string name)
