@@ -7,6 +7,17 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
+SamplerState SampleType {
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = Wrap;
+	AddressV = Wrap;
+};
+
+Texture2D t_diffuse;
+Texture2D t_alpha;
+Texture2D t_normal;
+Texture2D t_specular;
+Texture2D t_shininess;
 
 
 // TYPEDEFS //
@@ -35,7 +46,7 @@ struct PixelOutType {
 
 // VertexShader
 //------------------------------------------------------------------------------------
-PixelInputType TextureVertexShader(VertexInputType input)
+PixelInputType mainVertex(VertexInputType input)
 {
 	PixelInputType output;
 
@@ -60,11 +71,11 @@ PixelInputType TextureVertexShader(VertexInputType input)
 
 // PixelShader
 //------------------------------------------------------------------------------------
-PixelOutType TexturePixelShader(PixelInputType input)
+PixelOutType mainPixel(PixelInputType input)
 {
 	PixelOutType output;
-	output.diff = float4(0.5,0.5,0.5,1);
 	output.normal = input.normal;
 	output.view = input.view;
+	output.diff = t_diffuse.Sample(SampleType, input.tex);
 	return output;
 }
