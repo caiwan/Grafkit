@@ -13,12 +13,17 @@ Yet another *demoscene engine/framework/spacechip firmware* or also refferrd by 
 It finally uses Cmake to create its projects. For sample codes see tests folder and its subprojects. Cmake assumes to have your libraries in `../tools` folder relative to your cmake dir. It also uses small one-file libraries spread around the code.
 
 # Depends on
-- Bass 
-- STB 
+- (Bass)[https://www.un4seen.com/] - Core audio
+- (STB)[https://github.com/nothings/stb] - Core standard library
 
 ## Optional
-- Assimp 
-- GoogleTest
+- (Assimp)[https://github.com/assimp/assimp] - For native model import module
+- (Bullet)[https://github.com/bulletphysics/bullet3] - for future usage 
+- Lua - for future scripting engine
+- Scintilla - for editor ui
+
+## Tests
+- (GoogleTest)[https://github.com/google/googletest]
 
 # Future plans
 
