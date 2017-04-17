@@ -89,8 +89,8 @@ protected:
 			m_textureSampler->Initialize(render);
 
 			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
-			m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
+			m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/textured.hlsl", ""));
+			m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/textured.hlsl", ""));
 
 			// -- precalc
 			this->DoPrecalc();
@@ -102,10 +102,10 @@ protected:
 			model->GetMaterial()->SetName("GridMaterial");
 
 			model->SetName("cube");
-			model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
-			model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
-			model->GetMesh()->AddPointer("NORMAL", sizeof(GrafkitData::cubeNormals[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
-			model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
+			model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
+			model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
+			model->GetMesh()->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
+			model->GetMesh()->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
 			model->GetMesh()->Build(render, m_vertexShader);
 
 			// -- setup scene 

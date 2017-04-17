@@ -61,38 +61,42 @@ public:
 
 protected:
 	Renderer render;
-	SceneResRef m_scene;
+	SceneResRef scene;
 
-	TextureSamplerRef m_textureSampler;
+	TextureSamplerRef texSampler;
 
-	LightRef m_light;
+	LightRef light;
 
 	ActorRef m_rootActor;
 	ActorRef m_cameraActor;
 
+	ActorRef camera;
+
 	float t;
 
-	ShaderResRef m_vs;
-	ShaderResRef m_fs;
+	ShaderResRef vs;
+	ShaderResRef fs;
 
 	int init() {
 		LoadCache();
 
 		// -- load shader
-		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
-		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
+		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/lightmaterial.hlsl", ""));
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", ""));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "scenegraph.scene"));
+		scene = this->Load<SceneRes>(new SceneLoader("scene", "scenegraph.scene"));
 
 		DoPrecalc();
 
-		m_scene->Get()->BuildScene(render, m_vs, m_fs);
-		m_scene->Get()->SetActiveCamera(0);
+		scene->Get()->BuildScene(render, vs, fs);
+		scene->Get()->SetActiveCamera(0);
+
+		camera = scene->Get()->GetActiveCamera();
 
 		// -- add lights
-		m_light = new PointLight();
-		m_light->Position(float4(10,10,10,1));
+		light = new PointLight();
+		light->Position(float4(10,10,10,1));
 
 		// --- serialize && deserialize
 
@@ -113,9 +117,13 @@ protected:
 		{
 			t += .01;
 
-			this->m_scene->Get()->UpdateAnimation(fmod(t, 10.5));
-			this->m_scene->Get()->PreRender(render);
-			this->m_scene->Get()->Render(render);
+			camera->Matrix().Identity();
+			camera->Matrix().Translate(0, 0, -10);
+			camera->Matrix().RotateRPY(t, .23847*t, .392847*t);
+
+			this->scene->Get()->UpdateAnimation(fmod(t, 10.5));
+			this->scene->Get()->PreRender(render);
+			this->scene->Get()->Render(render);
 
 		}
 

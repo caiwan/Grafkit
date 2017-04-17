@@ -48,16 +48,16 @@ public:
 protected:
 		Renderer render;
 
-		CameraRef m_camera;
+		CameraRef camera;
 
-		TextureSamplerRef m_textureSampler;
-		TextureRef m_texture;
-		ModelRef m_model;
+		TextureSamplerRef texSampler;
+		TextureRef texture;
+		ModelRef model;
 
 		float t;
 
-		ShaderRef m_vertexShader;
-		ShaderRef m_fragmentShader;
+		ShaderRef vs;
+		ShaderRef fs;
 		
 		int init() {
 			// --- ezeket kell osszeszedni egy initwindowban
@@ -72,8 +72,8 @@ protected:
 			// --------------------------------------------------
 
 			// -- camera
-			m_camera = new Camera;
-			m_camera->SetPosition(0.0f, 0.0f, -10.0f);
+			camera = new Camera;
+			camera->SetPosition(0.0f, 0.0f, -10.0f);
 
 			// -- texture
 			
@@ -81,13 +81,13 @@ protected:
 			TextureResRef textureRes = (TextureRes*)textureLoader->NewResource();
 			textureLoader->Load(this, textureRes);
 
-			this->m_texture = textureRes->Get();
+			this->texture = textureRes->Get();
 
 			delete textureLoader;
 
 			// -- texture sampler
-			m_textureSampler = new TextureSampler();
-			m_textureSampler->Initialize(render);
+			texSampler = new TextureSampler();
+			texSampler->Initialize(render);
 
 			// -- load shader
 			
@@ -95,7 +95,7 @@ protected:
 			ShaderResRef vShaderRef = (ShaderRes*)(vShaderLoader->NewResource());
 			vShaderLoader->Load(this, vShaderRef);
 			
-			m_vertexShader = vShaderRef->Get();
+			vs = vShaderRef->Get();
 
 			delete vShaderLoader;
 
@@ -103,24 +103,24 @@ protected:
 			ShaderResRef pShaderRef = (ShaderRes*)(pShaderLoader->NewResource());
 			pShaderLoader->Load(this, pShaderRef);
 
-			m_fragmentShader = pShaderRef->Get();
+			fs = pShaderRef->Get();
 
 			delete pShaderLoader;
 
 			// -- model 
-			GrafkitData::CalcCube();
-			this->m_model = new Model(new Mesh());
-			this->m_model->SetName("cube");
-			this->m_model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
-			this->m_model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
-			this->m_model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
-			this->m_model->GetMesh()->Build(render, m_vertexShader);
+			model = new Model(new Mesh());
+			model->SetName("cube");
+			model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
+			model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeTextureUVsSize, GrafkitData::cubeTextureUVs);
+			model->GetMesh()->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
+			model->GetMesh()->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
+			model->GetMesh()->Build(render, vs);
 
 			// export as test
 			FILE* fp = nullptr; fopen_s(&fp, "cube.mesh", "wb");
 			ArchiveFile store(fp, true);
 			
-			this->m_model->store(store);
+			this->model->store(store);
 
 			fflush(fp); fclose(fp);
 
@@ -128,8 +128,8 @@ protected:
 			fopen_s(&fp, "cube.mesh", "rb");
 			ArchiveFile load(fp, false);
 
-			this->m_model->load(load);
-			this->m_model->GetMesh()->Build(render, m_vertexShader);
+			this->model->load(load);
+			this->model->GetMesh()->Build(render, vs);
 
 			fclose(fp);
 
@@ -161,21 +161,21 @@ protected:
 					matrix projectionMatrix;
 				} viewMatrices;
 
-				m_camera->Calculate(render);
+				camera->Calculate(render);
 
 				viewMatrices.worldMatrix = XMMatrixTranspose(worldMatrix.Get());
-				viewMatrices.viewMatrix = XMMatrixTranspose(m_camera->GetViewMatrix().Get());
-				viewMatrices.projectionMatrix = XMMatrixTranspose(m_camera->GetPerspectiveMatrix().Get());
+				viewMatrices.viewMatrix = XMMatrixTranspose(camera->GetViewMatrix().Get());
+				viewMatrices.projectionMatrix = XMMatrixTranspose(camera->GetPerspectiveMatrix().Get());
 
-				m_vertexShader->SetParam(render, "MatrixBuffer", &viewMatrices);
+				vs->SetParam(render, "MatrixBuffer", &viewMatrices);
 
-				m_fragmentShader->SetShaderResourceView("diffuse", m_texture->GetTextureResource());
-				m_fragmentShader->SetSamplerSatate("SampleType", m_textureSampler->GetSamplerState());
+				fs->SetShaderResourceView("diffuse", texture->GetTextureResource());
+				fs->SetSamplerSatate("SampleType", texSampler->GetSamplerState());
 
-				m_vertexShader->Bind(this->render);
-				m_fragmentShader->Bind(this->render);
+				vs->Bind(this->render);
+				fs->Bind(this->render);
 
-				m_model->Render(this->render, nullptr);
+				model->Render(this->render, nullptr);
 
 				this->t += 0.01;
 			}
