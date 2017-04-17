@@ -1,7 +1,4 @@
 #include "stdafx.h"
-
-#include "objloader.inc"
-
 #include "cube.h" 
 
 static const float _triangle[]= { 
@@ -55,74 +52,7 @@ const float * const GrafkitData::quad2 = _quad_vertices2;
 const float * const GrafkitData::quad_texcoord = _quad_texcoord;
 const int * const GrafkitData::quadIndices = _quad_mesh;
 
-// Cube 
-
-/**/
-
-const float cube_normals [] = {
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-	0.0f, 0.0f, 1.0f, 0.0f,
-
-	0.0f, 1.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f, 0.0f,
-	0.0f, 1.0f, 0.0f, 0.0f,
-
-	0.0f, -1.0f, 0.0, 0.0f,
-	0.0f, -1.0f, 0.0, 0.0f,
-	0.0f, -1.0f, 0.0, 0.0f,
-	0.0f, -1.0f, 0.0, 0.0f,
-
-	1.0f, 0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f, 0.0f,
-
-	1.0f, 0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f, 0.0f,
-};
-
-const float cube_texcoords[] = {
-	0.0f, 0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 1.0f,	0.0f, 0.0f,
-				
-	1.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 0.0f,	0.0f, 0.0f,
-				
-	0.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 1.0f,	0.0f, 0.0f,
-				
-	1.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 0.0f,	0.0f, 0.0f,
-				
-	1.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 0.0f,	0.0f, 0.0f,
-				
-	0.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 0.0f,	0.0f, 0.0f,
-	1.0f, 1.0f,	0.0f, 0.0f,
-	0.0f, 1.0f,	0.0f, 0.0f,
-
-};
+// --- Cube 
 
 // Front Face
 // Back Face
@@ -131,7 +61,74 @@ const float cube_texcoords[] = {
 // Right face
 // Left Face
 
-const float cube_vertices = {
+
+static const float _cube_normals [] = {
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f, 0.0f,
+
+	0.0f, 1.0f, 0.0f, 0.0f,
+	0.0f, 1.0f, 0.0f, 0.0f,
+	0.0f, 1.0f, 0.0f, 0.0f,
+	0.0f, 1.0f, 0.0f, 0.0f,
+
+	0.0f, -1.0f, 0.0, 0.0f,
+	0.0f, -1.0f, 0.0, 0.0f,
+	0.0f, -1.0f, 0.0, 0.0f,
+	0.0f, -1.0f, 0.0, 0.0f,
+
+	1.0f, 0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f,
+
+	1.0f, 0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f,
+};
+
+static const float _cube_texcoords[] = {
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+	1.0f, 1.0f,
+	0.0f, 1.0f,
+			
+	1.0f, 0.0f,
+	1.0f, 1.0f,
+	0.0f, 1.0f,
+	0.0f, 0.0f,
+			
+	0.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+	1.0f, 1.0f,
+			
+	1.0f, 1.0f,
+	0.0f, 1.0f,
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+			
+	1.0f, 0.0f,
+	1.0f, 1.0f,
+	0.0f, 1.0f,
+	0.0f, 0.0f,
+			
+	0.0f, 0.0f,
+	1.0f, 0.0f,
+	1.0f, 1.0f,
+	0.0f, 1.0f,
+};
+
+
+
+static const float _cube_vertices []= {
 	-1.0f, -1.0f, 1.0f ,0.0f,    // Point 1 (Front)
 	1.0f, -1.0f, 1.0f  ,0.0f,    // Point 2 (Front)
 	1.0f, 1.0f, 1.0f   ,0.0f,    // Point 3 (Front)
@@ -161,18 +158,28 @@ const float cube_vertices = {
 	-1.0f, -1.0f, 1.0f ,0.0f,    // Point 2 (Left)
 	-1.0f, 1.0f, 1.0f  ,0.0f,   // Point 3 (Left)
 	-1.0f, 1.0f, -1.0f ,0.0f,    // Point 4 (Left)
+};
 
+static const int _cube_indices[] = {
+	0,   1,  2,     2,  3,  0,		// 0
+	4,   5,  6,     6,  7,  4,		// 1
+	8,   9, 10,    10, 11,  8,		// 2
+	12, 13, 14,    14, 15, 12,		// 3
+	16, 17, 18,    18, 19, 16,      // 4
+	20, 21, 22,    22, 23, 20       // 5
 };
 
 /**/
-const float * const GrafkitData::cubeVertices = NULL;
-const float * const GrafkitData::cubeNormals = NULL;
+const float * const GrafkitData::cubeVertices = _cube_vertices;
+const float * const GrafkitData::cubeNormals = _cube_normals;
 ///@todo add tangents also
-const float * const GrafkitData::cubeTextureUVs = NULL;
-const   int * const GrafkitData::cubeIndices = NULL;
+const float * const GrafkitData::cubeTextureUVs = _cube_texcoords;
+const   int * const GrafkitData::cubeIndices = _cube_indices;
 
-static const unsigned int _cube_vertex_length = 0;
-static const unsigned int _cube_indices_length = 0;
+const unsigned int GrafkitData::cubeVertexCount = 6 * 4;
+const unsigned int GrafkitData::cubeIndicesCount = 6 * 6;
 
-const unsigned int GrafkitData::cubeVertexLength = 0;
-const unsigned int GrafkitData::cubeIndicesLength = 0;
+const size_t GrafkitData::cubeVertexSize     = sizeof(_cube_vertices);
+const size_t GrafkitData::cubeNormalSize 	 = sizeof(_cube_normals);
+const size_t GrafkitData::cubeTextureUVsSize = sizeof(_cube_texcoords);
+const size_t GrafkitData::cubeIndicesSize	 = sizeof(_cube_indices);

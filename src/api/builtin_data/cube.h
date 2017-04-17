@@ -17,6 +17,11 @@ namespace GrafkitData {
 	extern const float * const cubeTextureUVs;              ///< Textire coordinates of a cube
 	extern const   int * const cubeIndices;                 ///< Indices of a cube
 
-	extern const unsigned int cubeVertexLength;             ///< Number of vertices of a cube
-	extern const unsigned int cubeIndicesLength;            ///< Number of indices of a cube
+	extern const unsigned int cubeVertexCount;             ///< Number of vertices of a cube
+	extern const unsigned int cubeIndicesCount;            ///< Number of indices of a cube
+
+	extern const size_t cubeVertexSize;
+	extern const size_t	cubeNormalSize;
+	extern const size_t cubeTextureUVsSize;
+	extern const size_t	cubeIndicesSize;
 }
