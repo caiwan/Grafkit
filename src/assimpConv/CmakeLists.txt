@@ -14,3 +14,9 @@ target_link_libraries(AssimpConverter debug "${ASSIMP_LIBRARY_DEBUG}")
 target_link_libraries(AssimpConverter optimized "${ASSIMP_LIBRARY_RELEASE}")
 
 ASSIMP_COPY_BINARIES(AssimpConverter ${CMAKE_CURRENT_BINARY_DIR})
+
+install(TARGETS AssimpConverter DESTINATION bin/tools)
+install(FILES AssimpConverter CONFIGURATIONS optimised ${ASSIMP_DLL_RELEASE} DESTINATION bin/tools)
+install(FILES AssimpConverter CONFIGURATIONS debug ${ASSIMP_DLL_RELEASE} DESTINATION bin/tools)
+
+
