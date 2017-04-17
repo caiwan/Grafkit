@@ -95,7 +95,7 @@ public:
 
 /* ================================================================================================ */
 
-#define TESTING
+//#define TESTING
 
 int main(int argc, char* argv[]) {
 	Application app;
