@@ -27,6 +27,9 @@ function(assign_source_group)
 			
 		elseif("${_source}" MATCHES ".*\\.(ui)\\s?")
 			set(_source_path_msvc "UI Files\\${_source_path_msvc}")			
+
+		elseif("${_source}" MATCHES ".*\\.(py)\\s?")
+			set(_source_path_msvc "Source Files\\${_source_path_msvc}")		
 			
 		else()
 			set(_source_path_msvc "Resource Files\\${_source_path_msvc}")
