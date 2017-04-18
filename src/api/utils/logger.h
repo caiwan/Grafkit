@@ -114,7 +114,7 @@ namespace Grafkit {
 			FILE* m_stdout;
 			FILE* m_stderr;
 
-			BOOL m_haveConsole;
+			int m_haveConsole;
 		};
 	};
 }
