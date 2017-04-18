@@ -1,5 +1,8 @@
-# Assimp converter
+# assimp dll bins
+set(_ASSIMP_DLL_REL ${ASSIMP_BASEDIR}/bin/assimp-${ASSIMP_MSVC_VERSION}-mt.dll)
+set(_ASSIMP_DLL_DEB ${ASSIMP_BASEDIR}/bin/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll)
 
+# Assimp converter
 include (${GK2_ROOT_DIR}/cmake/create_testapp.cmake)
 
 create_testapp(AssimpConverter)
@@ -10,13 +13,11 @@ msvc_set_console(AssimpConverter)
 
 # Additional deps
 include_directories("${ASSIMP_INCLUDE_DIR}")
-target_link_libraries(AssimpConverter debug "${ASSIMP_LIBRARY_DEBUG}")
 target_link_libraries(AssimpConverter optimized "${ASSIMP_LIBRARY_RELEASE}")
+target_link_libraries(AssimpConverter debug "${ASSIMP_LIBRARY_DEBUG}")
 
 ASSIMP_COPY_BINARIES(AssimpConverter ${CMAKE_CURRENT_BINARY_DIR})
 
 install(TARGETS AssimpConverter DESTINATION bin/tools)
-install(FILES AssimpConverter CONFIGURATIONS optimised ${ASSIMP_DLL_RELEASE} DESTINATION bin/tools)
-install(FILES AssimpConverter CONFIGURATIONS debug ${ASSIMP_DLL_RELEASE} DESTINATION bin/tools)
-
-
+install(FILES AssimpConverter CONFIGURATIONS optimized ${_ASSIMP_DLL_REL} DESTINATION bin/tools)
+install(FILES AssimpConverter CONFIGURATIONS debug ${_ASSIMP_DLL_DEB} DESTINATION bin/tools)
