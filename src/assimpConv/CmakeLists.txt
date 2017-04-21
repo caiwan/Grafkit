@@ -1,7 +1,3 @@
-# assimp dll bins
-set(_ASSIMP_DLL_REL ${ASSIMP_BASEDIR}/bin/assimp-${ASSIMP_MSVC_VERSION}-mt.dll)
-set(_ASSIMP_DLL_DEB ${ASSIMP_BASEDIR}/bin/assimp-${ASSIMP_MSVC_VERSION}-mtd.dll)
-
 # Assimp converter
 include (${GK2_ROOT_DIR}/cmake/create_testapp.cmake)
 
@@ -18,6 +14,8 @@ target_link_libraries(AssimpConverter debug "${ASSIMP_LIBRARY_DEBUG}")
 
 ASSIMP_COPY_BINARIES(AssimpConverter ${CMAKE_CURRENT_BINARY_DIR})
 
-install(TARGETS AssimpConverter DESTINATION bin/tools)
-install(FILES AssimpConverter CONFIGURATIONS optimized ${_ASSIMP_DLL_REL} DESTINATION bin/tools)
-install(FILES AssimpConverter CONFIGURATIONS debug ${_ASSIMP_DLL_DEB} DESTINATION bin/tools)
+MESSAGE("${CMAKE_CURRENT_BINARY_DIR}\\${_ASSIMP_DLL_REL}")
+
+install(TARGETS AssimpConverter DESTINATION tools)
+install(FILES AssimpConverter CONFIGURATIONS optimized "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_REL}" DESTINATION tools)
+install(FILES AssimpConverter CONFIGURATIONS debug "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_DEB}" DESTINATION tools)

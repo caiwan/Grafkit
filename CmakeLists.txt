@@ -19,7 +19,7 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_add_pch.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_set_win32.cmake)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/release" CACHE PATH "default install path" FORCE )
+    set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/deploy" CACHE PATH "default install path" FORCE )
 endif()
 
 set(ASSIMP_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/Assimp" CACHE PATH "ASSIMP root directory")

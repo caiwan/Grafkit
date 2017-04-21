@@ -6,6 +6,9 @@ set_target_properties(assets PROPERTIES FOLDER tests)
 # copy static sources 
 foreach(_source IN ITEMS ${FILES})
 
+	# this does not work for sme reason
+	set_source_files_properties(${_source} PROPERTIES HEADER_FILE_ONLY TRUE)
+
 	if (IS_ABSOLUTE "${_source}")
 		file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
 	else()
@@ -35,3 +38,4 @@ foreach(_source IN ITEMS ${FILES})
 endforeach()
 
 assign_source_group("${FILES}")
+

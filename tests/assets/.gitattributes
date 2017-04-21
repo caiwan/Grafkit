@@ -1,10 +1,18 @@
+*.hlsl text eol=crlf
+*.fx text eol=crlf
+
+*.dae text eol=lf
+
 *.jpg binary
 *.png binary
+*.tga binary
+
 *.ogg binary
 *.mp3 binary
 *.zip binary
+
 *.blend binary
-*.hlsl text eol=crlf
-*.dae text eol=lf
+*.scene binary
+
 *.fbx binary
 *.3ds binary

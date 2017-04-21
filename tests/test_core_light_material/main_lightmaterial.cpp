@@ -85,7 +85,7 @@ protected:
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", ""));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new SceneLoader("scene", "scenegraph.scene"));
+		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere.scene"));
 
 		DoPrecalc();
 

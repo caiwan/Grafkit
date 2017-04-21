@@ -25,13 +25,26 @@ if(WIN32)
 	
 		find_path(ASSIMP_LIBRARY_DIR
 			NAMES
-				assimp-${ASSIMP_MSVC_VERSION}-mt.lib
+				assimp-${ASSIMP_MSVC_VERSION}-mt.lib assimp-${ASSIMP_MSVC_VERSION}-mtd.lib
 			HINTS
 				${ASSIMP_ROOT_DIR}/lib
 		)
 		
+		find_path(ASSIMP_DLL_DIR
+			NAMES
+				assimp-${ASSIMP_MSVC_VERSION}-mt.dll assimp-${ASSIMP_MSVC_VERSION}-mt.dll 
+			HINTS
+				${ASSIMP_ROOT_DIR}/bin
+		)
+		
+		# assimp dll bins
+		set(_ASSIMP_DLL_REL assimp-${ASSIMP_MSVC_VERSION}-mt.dll)
+		set(_ASSIMP_DLL_DEB assimp-${ASSIMP_MSVC_VERSION}-mtd.dll)
+		
 		find_library(ASSIMP_LIBRARY_RELEASE	 assimp-${ASSIMP_MSVC_VERSION}-mt.lib 	PATHS ${ASSIMP_LIBRARY_DIR})
 		find_library(ASSIMP_LIBRARY_DEBUG	 assimp-${ASSIMP_MSVC_VERSION}-mtd.lib	PATHS ${ASSIMP_LIBRARY_DIR})
+		
+		# set(ASSIMP_DLL_BASEDIR "${ASSIMP_ROOT_DIR}/bin")
 		
 		FUNCTION(ASSIMP_COPY_BINARIES TargetProject TargetDirectory)		
 			string(REPLACE "/" "\\" ASSIMP_DLL_BASEDIR "${ASSIMP_ROOT_DIR}/bin")
