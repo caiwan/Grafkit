@@ -74,6 +74,7 @@ public:
 				SceneResRef scene = loader.Load();
 				SceneLoader::Save(scene->Get(), args.get("output").value());
 			}
+
 			catch (FWdebug::Exception *ex) {
 				cout << ex->what();
 				delete ex;

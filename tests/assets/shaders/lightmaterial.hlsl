@@ -245,8 +245,8 @@ float4 mainPixel(PixelInputType input) : SV_TARGET
 		// float theta = dot(R, E);
 
 		// color = calcPointLight(input, material, lights[0]);
-		color.xyz = color * float3(lambda, lambda, lambda);
-		//  color.xyz = .5 + N.xyz * .5; 
+		//color.xyz = color * float3(lambda, lambda, lambda);
+		  color.xyz = .5 + N.xyz * .5; 
 	}
 
 	return color;
