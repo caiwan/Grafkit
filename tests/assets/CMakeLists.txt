@@ -30,7 +30,7 @@ foreach(_source IN ITEMS ${FILES})
 	endif(WIN32)
 	
 	add_custom_command(
-		TARGET assets
+		TARGET assets PRE_BUILD 
 		COMMAND copy ${_source} ${_dest}
 		DEPENDS ${_source}
 	)
