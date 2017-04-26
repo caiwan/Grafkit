@@ -2,15 +2,10 @@
 # blender --debug-memory -b -P exporter.py -- --input testdata/untitled.blend --output output/untitled.scene 
 
 file(GLOB_RECURSE FILES *.*)
-file(GLOB_RECURSE PY_FILES *.py)
 
 add_custom_target(BlenderExport SOURCES ${FILES})
 set_target_properties(BlenderExport PROPERTIES FOLDER tools)
 
-foreach(py_file arg1 arg2 ...)
-  
-endforeach(loop_var)
-
-#install(FILES BlenderExport "${PY_FILES}" DESTINATION tools)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" DESTINATION tools FILES_MATCHING PATTERN "*.py")
 
 assign_source_group("${FILES}")
