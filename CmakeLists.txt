@@ -17,6 +17,7 @@ SET(GK2_EXTERNALS "${CMAKE_CURRENT_SOURCE_DIR}/externals")
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/assign_source_group.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_add_pch.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_set_win32.cmake)
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy_static_files.cmake)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/deploy" CACHE PATH "default install path" FORCE )
