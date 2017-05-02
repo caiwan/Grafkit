@@ -28,13 +28,8 @@ function(copy_static_files TARGET INSTALL_DEST FILES)
 			DEPENDS ${_file}
 		)
 		
-		message ("/{$_file_rel}")
-		message ("${INSTALL_DEST}/{$_file_rel}")
-		#install(
-		#	FILES 
-		#	"/{$_file_rel}"
-		#	DESTINATION "${INSTALL_DEST}/{$_file_rel}"
-		#)
+		# message("/${_file_rel} -> ${INSTALL_DEST}/${_file_rel}")
+		install( FILES  "${_file_rel}" DESTINATION "${INSTALL_DEST}/${_file_path}" )
 
 	endforeach(_file)
 endfunction(copy_static_files)

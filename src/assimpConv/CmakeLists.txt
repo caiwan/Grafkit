@@ -3,6 +3,12 @@ include (${GK2_ROOT_DIR}/cmake/create_testapp.cmake)
 
 create_testapp(AssimpConverter)
 
+# Add blender py scripts as well
+file(GLOB_RECURSE BLENDER_SCRIPTS py/*.py)
+TARGET_SOURCES(AssimpConverter PUBLIC ${BLENDER_SCRIPTS})
+
+assign_source_group("${BLENDER_SCRIPTS}")
+
 # settings
 set_target_properties(AssimpConverter PROPERTIES FOLDER tools)
 msvc_set_console(AssimpConverter)
@@ -14,7 +20,8 @@ target_link_libraries(AssimpConverter debug "${ASSIMP_LIBRARY_DEBUG}")
 
 ASSIMP_COPY_BINARIES(AssimpConverter ${CMAKE_CURRENT_BINARY_DIR})
 
+copy_static_files(AssimpConverter "tools/" "${BLENDER_SCRIPTS}")
+
 install(TARGETS AssimpConverter DESTINATION tools)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_REL}" CONFIGURATIONS optimized  DESTINATION tools)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_DEB}" CONFIGURATIONS debug DESTINATION tools)
-

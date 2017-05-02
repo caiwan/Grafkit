@@ -38,7 +38,7 @@ namespace Grafkit {
 		void SetTimems(double t) { SetTimeSample((unsigned long)(t*(double)m_samplePerSec / 1000.)); } ///< kurzort allitja
 		void SetTimeBeat(double t) { SetTimeSample((unsigned long)(t*(double)m_beatLenSample)); } ///< kurzort allitja
 
-		float GetBPM() { return m_bpm; }
+		double GetBPM() { return m_bpm; }
 		void SetBPM(double f) { m_bpm = f; this->m_beatLenSample = (unsigned int)((m_bpm / 60.) * (double)m_samplePerSec); }
 
 		double GetLength() { return (double)this->m_length / (double)this->m_samplePerSec; }

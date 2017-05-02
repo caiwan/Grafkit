@@ -2,8 +2,8 @@
 # caiwan/IR
 
 function(create_testapp _application)
-	file(GLOB_RECURSE SOURCE_FILES *.cpp)
-	file(GLOB_RECURSE HEADER_FILES *.h)
+	file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inl)
+	file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inc)
 
 	include_directories("${CMAKE_SOURCE_DIR}")
 	include_directories("${GK2_INCLUDE_DIR}")
