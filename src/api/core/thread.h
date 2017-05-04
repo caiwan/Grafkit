@@ -43,9 +43,6 @@ namespace Grafkit{
 		void Stop();
 		void Join();
 
-		///@todo ez helyett valami mas megoldas kell 
-		// void Recreate();
-
 		static int GetCPUCount();
 
 	protected:
@@ -71,18 +68,18 @@ namespace Grafkit{
 	/**
 		threadsafe sorszam huzass
 	*/
-	class Semaphore{
-	public:
-		Semaphore();
-		~Semaphore();
+	//class Mutex{
+	//public:
+	//	Mutex();
+	//	~Mutex();
 
-		UINT GetNext();
-		void Reset();
+	//	UINT GetNext();
+	//	void Reset();
 
-	private:
-		UINT m_count;
-		HANDLE m_hMutex;
-	};
+	//private:
+	//	UINT m_count;
+	//	HANDLE m_hMutex;
+	//};
 
 }
 

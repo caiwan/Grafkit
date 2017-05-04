@@ -5,7 +5,8 @@
 	@author Caiwan
 */
 
-#include<stack>
+#include <stack>
+#include <stdio.h>
 
 #include <Windows.h>
 
@@ -14,6 +15,7 @@
 
 #include "Arguments.hpp"
 #include "assimploader.h"
+#include "BlenderExportServer.h"
 
 using namespace std;
 using namespace ideup;
@@ -22,7 +24,17 @@ using namespace Grafkit;
 
 typedef unsigned int uint;
 
+
 /* ================================================================================================ */
+
+
+//#ifdef _WIN32
+//#define POPEN(a, b) _popen(" ", "w");
+//#define PCLOSE _pclose
+//#else
+//#define POPEN(a, b) popen(" ", "w");
+//#define PCLOSE pclose
+//#endif
 
 class Application{
 private:
@@ -30,15 +42,16 @@ private:
 
 public:
 	Application() {
+		args.add("blender", 'b').description("Run exporter script in blender").flag(true);
 		args.add("help", 'h').description("Shows this help message.").flag(true);
 		args.add("input", 'i').description("Input filename").required(true);
 		args.add("output", 'o').description("Output filename").required(true);
 		//args.add("format", 'f').description("Output format. Overrides file extension.");
-		args.add("axis", 'x').description("Change axis order of the vertex cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
-		args.add("flip", 'p').description("Flips the camera 180 deg around one given axis.");
-		args.add("lh").description("convert to left handed").flag(true);
-		args.add("textures", 't').description("Strip path from texture filenames").flag(true);
-		args.add("animation", 'a').description("Merge animations from an external json file").flag(true);
+		//args.add("axis", 'x').description("Change axis order of the vertex cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
+		//args.add("flip", 'p').description("Flips the camera 180 deg around one given axis.");
+		//args.add("lh").description("convert to left handed").flag(true);
+		//args.add("textures", 't').description("Strip path from texture filenames").flag(true);
+		//args.add("animation", 'a').description("Merge animations from an external json file").flag(true);
 	}
 
 	~Application() {
@@ -46,7 +59,7 @@ public:
 
 public:
 
-	int execute(int argc, char* argv[]) {
+	int Execute(int argc, char* argv[]) {
 		if (!args.evaluate(argc, argv)) {
 			cout << args.getErrorMessage() << endl;
 			cout << args.getHelpMessage() << endl;
@@ -56,6 +69,44 @@ public:
 			return 0;
 		}
 
+		if (args.get("blender").isFound())
+			return ExecuteBlender();
+		
+		return ExecuteAssimp();
+	}
+
+	int ExecuteBlender() {
+		
+		BlenderExportServer server;
+		server.Start();
+
+		std::string cmd = "blender -b -P py/exporter.py --";
+		cmd += " -i " + args.get("input").value();
+		std::string host; server.GetHost(host);
+		cmd += " -p " + host;
+		std::array<char, 1024> buffer;
+		std::string result;
+		
+		//cmd = "{" + cmd + "} 
+		cmd += " 2>&1";
+
+		std::shared_ptr<FILE> pipe(_popen(cmd.c_str(), "r"), _pclose);	// http://stackoverflow.com/questions/35297970
+		if (!pipe) {
+			cout << "Could not start Blender. Args: " << cmd;
+			return 1;
+		}
+		// pump 
+		while (!feof(pipe.get())) {
+			if (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL)
+				Log::Logger().Trace(buffer.data());
+		}
+
+		//server.Stop();
+
+		return 0;
+	}
+
+	int ExecuteAssimp() {
 		void *data = nullptr;
 		size_t len = 0;
 
@@ -79,7 +130,6 @@ public:
 				cout << ex->what();
 				delete ex;
 			}
-
 		}
 		else {
 			cout << "ERROR " << strerror(err) << endl;
@@ -98,20 +148,11 @@ public:
 
 //#define TESTING
 
+// "-i ..\\..\\tests\\assets\\models\\test.blend -b -o test.scene"
+
 int main(int argc, char* argv[]) {
 	Application app;
-
-#ifdef TESTING
-	char *dummyargv[] = {
-		argv[0],
-		"-i", "..\\..\\tests\\assets\\models\\anim_complex_baked.dae",
-		"-o", "anim_complex_baked.scene",
-	};
-	int k = app.execute(5, dummyargv);
-	system("pause");
-	return k;
-#else
-	return app.execute(argc, argv);
-#endif
-
+	int ret = app.Execute(argc, argv);
+	//system("pause");
+	return ret;
 }

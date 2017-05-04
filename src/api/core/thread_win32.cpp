@@ -98,27 +98,27 @@ int Thread::GetCPUCount(){
 
 /////////////////////////////////////////////////////////
 
-Semaphore::Semaphore() : m_count(0)
-{
-	m_hMutex = CreateMutex(nullptr, FALSE, nullptr);
-}
+//Mutex::Mutex() : m_count(0)
+//{
+//	m_hMutex = CreateMutex(nullptr, FALSE, nullptr);
+//}
+//
+//Grafkit::Mutex::~Mutex()
+//{
+//	if (m_hMutex)
+//		CloseHandle(m_hMutex);
+//}
+//
+//void Mutex::Reset(){
+//	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
+//	//m_count = 0;
+//	ReleaseMutex(m_hMutex); ///@todo handle error 
+//}
 
-Grafkit::Semaphore::~Semaphore()
-{
-	if (m_hMutex)
-		CloseHandle(m_hMutex);
-}
-
-void Semaphore::Reset(){
-	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
-	m_count = 0;
-	ReleaseMutex(m_hMutex); ///@todo handle error 
-}
-
-UINT Semaphore::GetNext(){
-	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
-	UINT res = m_count++;
-	ReleaseMutex(m_hMutex); ///@todo handle error 
-
-	return res;
-}
+//UINT Mutex::GetNext(){
+//	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
+//	UINT res = m_count++;
+//	ReleaseMutex(m_hMutex); ///@todo handle error 
+//
+//	return res;
+//}
