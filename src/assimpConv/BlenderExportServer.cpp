@@ -9,149 +9,192 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "json.hpp"
+
 #include "BlenderExportServer.h"
 #include "core/thread.h"
+#include "utils/logger.h"
 
 using namespace FWdebugExceptions;
+using namespace FWdebug;
+using namespace Grafkit;
+using json = nlohmann::json;
 
 /*
 https://msdn.microsoft.com/en-us/library/windows/desktop/ms737593(v=vs.85).aspx
 */
 
-#define DEFAULT_BUFLEN 4096
+#define DEFAULT_BUFLEN 16 * 4096
 
 /* Sever thread */
 class ServerThread : public Grafkit::Thread {
 public:
 
-	ServerThread(int port) : port(port), terminate(false){
+	ServerThread(BlenderExportServer* server) : terminate(false), server(server),
+		ListenSocket(INVALID_SOCKET),
+		ClientSocket(INVALID_SOCKET),
+		recvbuflen(DEFAULT_BUFLEN)
+		
+	{
+		recvbuf = new char[DEFAULT_BUFLEN];
 	}
 
-	int Run() {
-		WSADATA wsaData;
-		int iResult;
+	~ServerThread() {
+		delete[] recvbuf;
+	}
 
-		SOCKET ListenSocket = INVALID_SOCKET;
-		SOCKET ClientSocket = INVALID_SOCKET;
+private:
 
-		struct addrinfo *result = NULL;
+	void Connect() {
+		int res = 0;
+		char b[256];
+
+		struct addrinfo *adinfo = NULL;
 		struct addrinfo hints;
 
-		int iSendResult;
-		char recvbuf[DEFAULT_BUFLEN];
-		int recvbuflen = DEFAULT_BUFLEN;
+		try {
+			// Initialize Winsock
+			res = WSAStartup(MAKEWORD(2, 2), &wsaData);
+			if (res != 0) {
+				sprintf(b, "WSAStartup failed with error: %d\n", res);
+				throw new EX_DETAILS(ServerCreateException, b);
+			}
 
-		// Initialize Winsock
-		iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-		if (iResult != 0) {
-			printf("WSAStartup failed with error: %d\n", iResult);
-			return 1;
+			ZeroMemory(&hints, sizeof(hints));
+			hints.ai_family = AF_INET;
+			hints.ai_socktype = SOCK_STREAM;
+			hints.ai_protocol = IPPROTO_TCP;
+			hints.ai_flags = AI_PASSIVE;
+
+			// Resolve the server address and port
+			res = getaddrinfo(NULL, std::to_string(server->GetPort()).c_str(), &hints, &adinfo);
+			if (res != 0) {
+				sprintf(b, "getaddrinfo failed with error: %d\n", res);
+				throw new EX_DETAILS(ServerCreateException, b);
+			}
+
+			// Create a SOCKET for connecting to server
+			ListenSocket = socket(adinfo->ai_family, adinfo->ai_socktype, adinfo->ai_protocol);
+			if (ListenSocket == INVALID_SOCKET) {
+				printf("socket failed with error: %ld\n", WSAGetLastError());
+			}
+
+			// Setup the TCP listening socket
+			res = bind(ListenSocket, adinfo->ai_addr, (int)adinfo->ai_addrlen);
+			if (res == SOCKET_ERROR) {
+				sprintf(b, "bind failed with error: %d\n", WSAGetLastError());
+				throw new EX_DETAILS(ServerCreateException, b);
+			}
+
+		}
+		catch (Exception *e) {
+			if (adinfo) freeaddrinfo(adinfo);
+			throw e;
 		}
 
-		ZeroMemory(&hints, sizeof(hints));
-		hints.ai_family = AF_INET;
-		hints.ai_socktype = SOCK_STREAM;
-		hints.ai_protocol = IPPROTO_TCP;
-		hints.ai_flags = AI_PASSIVE;
+		if (adinfo) freeaddrinfo(adinfo);
 
-		// Resolve the server address and port
-		iResult = getaddrinfo(NULL, std::to_string(port).c_str(), &hints, &result);
-		if (iResult != 0) {
-			printf("getaddrinfo failed with error: %d\n", iResult);
-			WSACleanup();
-			return 1;
-		}
+	}
 
-		// Create a SOCKET for connecting to server
-		ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-		if (ListenSocket == INVALID_SOCKET) {
-			printf("socket failed with error: %ld\n", WSAGetLastError());
-			freeaddrinfo(result);
-			WSACleanup();
-			return 1;
-		}
-
-		// Setup the TCP listening socket
-		iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-		if (iResult == SOCKET_ERROR) {
-			printf("bind failed with error: %d\n", WSAGetLastError());
-			freeaddrinfo(result);
-			closesocket(ListenSocket);
-			WSACleanup();
-			return 1;
-		}
-
-		freeaddrinfo(result);
-
-		iResult = listen(ListenSocket, SOMAXCONN);
-		if (iResult == SOCKET_ERROR) {
-			printf("listen failed with error: %d\n", WSAGetLastError());
-			closesocket(ListenSocket);
-			WSACleanup();
-			return 1;
+	void Accept() {
+		int res = 0;
+		char b[256];
+		res = listen(ListenSocket, SOMAXCONN);
+		if (res == SOCKET_ERROR) {
+			sprintf(b, "listen failed with error: %d\n", WSAGetLastError());
+			throw new EX_DETAILS(ServerCreateException, b);
 		}
 
 		// Accept a client socket
 		ClientSocket = accept(ListenSocket, NULL, NULL);
 		if (ClientSocket == INVALID_SOCKET) {
-			printf("accept failed with error: %d\n", WSAGetLastError());
-			closesocket(ListenSocket);
-			WSACleanup();
-			return 1;
+			sprintf(b, "accept failed with error: %d\n", WSAGetLastError());
+			throw new EX_DETAILS(ServerCreateException, b);
 		}
+	}
 
-		// No longer need server socket
-		closesocket(ListenSocket);
+	int Listen() {
+		int res = 0;
+		int respLen = 0;
+		res = recv(ClientSocket, (char*)&respLen, 4, 0);
 
-		// Receive until the peer shuts down the connection
-		do {
+		if (res > 0) {
+			// recv packet
+			std::stringstream ss;
+			json j;
 
-			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-			if (iResult > 0) {
-				printf("Bytes received: %d\n", iResult);
+			int bytesLeft = respLen;
 
-				// Echo the buffer back to the sender
-				iSendResult = send(ClientSocket, recvbuf, iResult, 0);
-				if (iSendResult == SOCKET_ERROR) {
-					printf("send failed with error: %d\n", WSAGetLastError());
-					closesocket(ClientSocket);
-					WSACleanup();
+			do {
+				int bytesRead = respLen > recvbuflen ? recvbuflen : respLen;
+
+				res = recv(ClientSocket, recvbuf, recvbuflen, 0);
+				if (res > 0) {
+					ss.write(recvbuf, bytesRead);
+					ss >> j;
+				}
+				else {
 					return 1;
 				}
-				printf("Bytes sent: %d\n", iSendResult);
-			}
-			else if (iResult == 0)
-				printf("Connection closing...\n");
-			else {
-				printf("recv failed with error: %d\n", WSAGetLastError());
-				closesocket(ClientSocket);
-				WSACleanup();
-				return 1;
-			}
 
-		} while (iResult > 0);
+				bytesLeft -= bytesRead;
+			} while (bytesLeft > 0);
 
-		// shutdown the connection since we're done
-		iResult = shutdown(ClientSocket, SD_SEND);
-		if (iResult == SOCKET_ERROR) {
-			printf("shutdown failed with error: %d\n", WSAGetLastError());
-			closesocket(ClientSocket);
-			WSACleanup();
+			server->PostData(&j);
+		}
+		else {
 			return 1;
 		}
 
-		// cleanup
-		closesocket(ClientSocket);
-		WSACleanup();
-
 		return 0;
+	}
+
+	void TearDown() {
+		if (ListenSocket != INVALID_SOCKET) closesocket(ListenSocket);
+		if (ClientSocket != INVALID_SOCKET) closesocket(ClientSocket);
+		WSACleanup();
+	}
+
+private:
+	int Run() {
+		int res = 0;
+
+		try {
+			Connect();
+			Accept();
+			int isDone = 0;
+			do {
+				isDone = Listen() != 0;
+				// wait for goodbye packet
+			} while (!isDone);
+		}
+		catch (Exception *e) {
+			TearDown();
+			Log::Logger().Error(e->what());
+			delete e;
+			res = 1;
+		}
+
+		TearDown();
+
+		return res;
 	}
 
 	void Terminate() { terminate = true; }
 
 private:
 	bool terminate;
-	int port;
+	BlenderExportServer *const server;
+
+	WSADATA wsaData;
+
+	SOCKET ListenSocket;
+	SOCKET ClientSocket;
+
+	char *recvbuf;
+	int recvbuflen;
+
+
 };
 
 /**
@@ -166,20 +209,20 @@ BlenderExportServer::BlenderExportServer()
 
 BlenderExportServer::~BlenderExportServer()
 {
-	if(m_serverThread)
+	if (m_serverThread)
 		m_serverThread->Stop();
 	delete m_serverThread;
 }
 
 void BlenderExportServer::Start()
 {
-	m_serverThread = new ServerThread(m_port);
+	m_serverThread = new ServerThread(this);
 	m_serverThread->Start();
 }
 
 void BlenderExportServer::Stop()
 {
-	if (!m_serverThread) 
+	if (!m_serverThread)
 		return;
 	m_serverThread->Join();
 	delete m_serverThread;
@@ -191,4 +234,15 @@ void BlenderExportServer::GetHost(std::string & str)
 	char buf[256];
 	sprintf_s(buf, "127.0.0.1:%d", m_port);
 	str = buf;
+}
+
+
+/*
+	Parse data that was recieved from Blender
+*/
+
+void BlenderExportServer::PostData(void * pj) {
+	json *j = (json*)pj;
+
+	// ... 
 }
