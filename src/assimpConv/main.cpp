@@ -101,7 +101,7 @@ public:
 				Log::Logger().Trace(buffer.data());
 		}
 
-		//server.Stop();
+		server.Stop();
 
 		return 0;
 	}

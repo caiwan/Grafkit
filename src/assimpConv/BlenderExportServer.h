@@ -24,9 +24,10 @@ private:
 	ServerThread *m_serverThread;
 	int m_port;
 
-	void PostData(void* j);
+	void PostData(std::stringstream &ss);
 
 	//std::list<>
 };
 
 DEFINE_EXCEPTION(ServerCreateException, 1, "Could not create server")
+DEFINE_EXCEPTION(ExportMessageException, 2, "Could not parse json repsonse from server")

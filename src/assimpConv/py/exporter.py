@@ -9,6 +9,7 @@ if cmd_folder not in sys.path:
      sys.path.insert(0, cmd_folder)
 
 import client
+import dump
 
 def get_args():
   parser = argparse.ArgumentParser()
@@ -51,20 +52,6 @@ if __name__ == "__main__":
       bake_types={'POSE', 'OBJECT'}\
     )
     
-    # export scene to tempfile
-    # https://docs.blender.org/api/blender_python_api_current/bpy.ops.wm.html
-    bpy.ops.wm.collada_export(\
-      filepath=args.output, \
-      #apply_modifier=True, \
-      triangulate=True, \
-      use_texture_copies=True, \
-      include_material_textures=True, \
-      include_uv_textures=True \
-     )
-  
-    # export external stuff to tempfile
-    # ... 
-    dump.hello(scene)
-     
-    # call converter tool
-    # call(["echo", "hello tool"])
+    with dump.Collada(conn) as d:
+      d.save_collada()
+

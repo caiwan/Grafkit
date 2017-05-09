@@ -26,7 +26,11 @@ https://msdn.microsoft.com/en-us/library/windows/desktop/ms737593(v=vs.85).aspx
 
 #define DEFAULT_BUFLEN 16 * 4096
 
-/* Sever thread */
+
+/************************************************************************************************************
+	Sever thread 
+*************************************************************************************************************/
+
 class ServerThread : public Grafkit::Thread {
 public:
 
@@ -115,36 +119,37 @@ private:
 
 	int Listen() {
 		int res = 0;
-		int respLen = 0;
+		unsigned int respLen = 0;
 		res = recv(ClientSocket, (char*)&respLen, 4, 0);
 
 		if (res > 0) {
 			// recv packet
 			std::stringstream ss;
-			json j;
 
-			int bytesLeft = respLen;
+			unsigned int bytesLeft = respLen;
 
 			do {
 				int bytesRead = respLen > recvbuflen ? recvbuflen : respLen;
 
-				res = recv(ClientSocket, recvbuf, recvbuflen, 0);
+				res = recv(ClientSocket, recvbuf, bytesRead, 0);
 				if (res > 0) {
 					ss.write(recvbuf, bytesRead);
-					ss >> j;
 				}
 				else {
-					return 1;
+					break;
 				}
 
 				bytesLeft -= bytesRead;
 			} while (bytesLeft > 0);
-
-			server->PostData(&j);
+			
+			ss.put(0);
+			ss.seekp(0);
+			server->PostData(ss);
+			ss.clear();
 		}
-		else {
+		/*else {
 			return 1;
-		}
+		}*/
 
 		return 0;
 	}
@@ -197,9 +202,9 @@ private:
 
 };
 
-/**
+/************************************************************************************************************
 
-*/
+*************************************************************************************************************/
 
 BlenderExportServer::BlenderExportServer()
 {
@@ -237,12 +242,22 @@ void BlenderExportServer::GetHost(std::string & str)
 }
 
 
-/*
+/************************************************************************************************************
 	Parse data that was recieved from Blender
-*/
+*************************************************************************************************************/
 
-void BlenderExportServer::PostData(void * pj) {
-	json *j = (json*)pj;
-
-	// ... 
+void BlenderExportServer::PostData(std::stringstream &ss) {
+	
+	try 
+	{
+		json j = json::parse(ss);
+		std::string cmd = j["cmd"];
+		Log::Logger().Info((std::string("Json cmd = ") + cmd).c_str());
+		
+	}
+	catch (std::exception &e) {
+		//throw new EX_DETAILS(ServerCreateException, e.what());
+		Log::Logger().Error(e.what());
+	}
 }
+

@@ -1,7 +1,7 @@
 # Add blender py scripts as well
 file(GLOB_RECURSE BLENDER_SCRIPTS *.py)
 
-add_custom_target(AssimpConverterPy ${BLENDER_SCRIPTS})
+add_custom_target(AssimpConverterPy SOURCES ${BLENDER_SCRIPTS})
 
 assign_source_group("${BLENDER_SCRIPTS}")
 copy_static_files(AssimpConverterPy "tools/py" "${BLENDER_SCRIPTS}")
