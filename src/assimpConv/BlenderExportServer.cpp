@@ -126,26 +126,35 @@ private:
 			// recv packet
 			std::stringstream ss;
 
+			FILE* fp = NULL;
+			if (fopen_s(&fp, "debug.json", "wb") != 0)
+				fp = NULL;
+
 			unsigned int bytesLeft = respLen;
 
-			do {
-				int bytesRead = respLen > recvbuflen ? recvbuflen : respLen;
-
+			while (bytesLeft > 0){
+				int bytesRead = bytesLeft > recvbuflen ? recvbuflen : bytesLeft;
+				
 				res = recv(ClientSocket, recvbuf, bytesRead, 0);
 				if (res > 0) {
 					ss.write(recvbuf, bytesRead);
-				}
-				else {
-					break;
+					if (fp) fwrite(recvbuf, 1, bytesRead, fp);
+					bytesLeft -= bytesRead;	
 				}
 
-				bytesLeft -= bytesRead;
-			} while (bytesLeft > 0);
+				Log::Logger().Info("Read chunk %d %d", bytesRead, bytesLeft);
+			}
 			
 			ss.put(0);
 			ss.seekp(0);
+
 			server->PostData(ss);
 			ss.clear();
+
+			if (fp) {
+				fflush(fp); 
+				fclose(fp);
+			}
 		}
 		/*else {
 			return 1;
@@ -248,16 +257,16 @@ void BlenderExportServer::GetHost(std::string & str)
 
 void BlenderExportServer::PostData(std::stringstream &ss) {
 	
-	try 
+	//try 
 	{
 		json j = json::parse(ss);
 		std::string cmd = j["cmd"];
 		Log::Logger().Info((std::string("Json cmd = ") + cmd).c_str());
 		
 	}
-	catch (std::exception &e) {
-		//throw new EX_DETAILS(ServerCreateException, e.what());
-		Log::Logger().Error(e.what());
-	}
+	//catch (std::exception &e) {
+	//	//throw new EX_DETAILS(ServerCreateException, e.what());
+	//	Log::Logger().Error(e.what());
+	//}
 }
 
