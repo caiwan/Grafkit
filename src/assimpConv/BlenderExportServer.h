@@ -24,7 +24,7 @@ private:
 	ServerThread *m_serverThread;
 	int m_port;
 
-	void PostData(std::stringstream &ss);
+	bool PostData(std::stringstream &ss);
 
 	//std::list<>
 };

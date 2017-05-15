@@ -11,7 +11,6 @@ from struct import pack
 class Connection:
   _cmd_initconn = "hello"
   _cmd_closeconn = "goodbye"
-  _cmd_data = "data"
   
   class Package:
     def __init__(self, cmd, data):

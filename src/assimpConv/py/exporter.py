@@ -52,6 +52,10 @@ if __name__ == "__main__":
       bake_types={'POSE', 'OBJECT'}\
     )
     
-    with dump.Collada(conn) as d:
-      d.save_collada()
+    # with dump.Collada(conn) as d:
+    #   d.save_collada()
 
+    node = bpy.data
+    for d in dir(node):
+      a = getattr(node, d)
+      print(d, a, type(a).__name__)

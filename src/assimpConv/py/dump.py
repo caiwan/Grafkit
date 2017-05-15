@@ -2,16 +2,29 @@ import bpy
 import tempfile
 import os
 
-"""
-Helps to bake the animation data before export
-"""
+
 class Bake:
+  """
+  Helps to bake the animation data before export
+  """
   pass
 
-"""
-Export scene to a tempfile as collada, then push the data to the server
-"""
+  
+  
+class Dump:
+  """
+  Export everyhting out of blender
+  """
+  _cmd_dump = "collada"
+  
+  pass
+  
+  
+
 class Collada:
+  """
+  Export scene to a tempfile as collada, then push the data to the server
+  """
 
   _cmd_dae = "collada"
 
@@ -25,7 +38,7 @@ class Collada:
     
     pass
   
-  def save_collada(self):
+  def _save_collada(self):
     # https://docs.blender.org/api/blender_python_api_current/bpy.ops.wm.html
     bpy.ops.wm.collada_export(\
       filepath=self.tmp.name, \
@@ -41,6 +54,9 @@ class Collada:
     self.tmp = tempfile.NamedTemporaryFile(delete=False)
     self.tmp.close()
     os.unlink(self.tmp.name)
+    
+    _save_collada()
+    
     return self
     
   def __exit__(self, type, value, traceback):

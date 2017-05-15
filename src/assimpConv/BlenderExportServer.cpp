@@ -3,6 +3,8 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#include <fstream>
+
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -14,6 +16,12 @@
 #include "BlenderExportServer.h"
 #include "core/thread.h"
 #include "utils/logger.h"
+
+#define _cmd_initconn "hello"
+#define _cmd_closeconn "goodbye"
+#define _cmd_dae "collada"
+#define _cmd_dump "bpydump"
+
 
 using namespace FWdebugExceptions;
 using namespace FWdebug;
@@ -119,6 +127,7 @@ private:
 
 	int Listen() {
 		int res = 0;
+		int recvRes = 0;
 		unsigned int respLen = 0;
 		res = recv(ClientSocket, (char*)&respLen, 4, 0);
 
@@ -148,17 +157,12 @@ private:
 			ss.put(0);
 			ss.seekp(0);
 
-			server->PostData(ss);
+			recvRes = server->PostData(ss);
 			ss.clear();
 
-			if (fp) {
-				fflush(fp); 
-				fclose(fp);
-			}
+			if (recvRes)
+				return 1;
 		}
-		/*else {
-			return 1;
-		}*/
 
 		return 0;
 	}
@@ -179,7 +183,6 @@ private:
 			int isDone = 0;
 			do {
 				isDone = Listen() != 0;
-				// wait for goodbye packet
 			} while (!isDone);
 		}
 		catch (Exception *e) {
@@ -255,18 +258,35 @@ void BlenderExportServer::GetHost(std::string & str)
 	Parse data that was recieved from Blender
 *************************************************************************************************************/
 
-void BlenderExportServer::PostData(std::stringstream &ss) {
-	
-	//try 
+bool BlenderExportServer::PostData(std::stringstream &ss) 
+{
+	try 
 	{
 		json j = json::parse(ss);
 		std::string cmd = j["cmd"];
 		Log::Logger().Info((std::string("Json cmd = ") + cmd).c_str());
 		
+		if (cmd.compare(_cmd_initconn) == 0) {
+
+		} else if (cmd.compare(_cmd_dae) == 0) {
+			/// ... 
+		}
+		else if (cmd.compare(_cmd_dump) == 0) {
+			/// ... 
+			std::ofstream fs("hello.json", std::ofstream::out);
+			fs << j["data"];
+		}
+
+		if (cmd.compare(_cmd_closeconn) == 0) {
+			return true;
+		}
+
 	}
-	//catch (std::exception &e) {
-	//	//throw new EX_DETAILS(ServerCreateException, e.what());
-	//	Log::Logger().Error(e.what());
-	//}
+	catch (std::exception &e) {
+		throw new EX_DETAILS(ServerCreateException, e.what());
+		// Log::Logger().Error(e.what());
+	}
+
+	return false;
 }
 
