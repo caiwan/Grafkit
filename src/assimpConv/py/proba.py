@@ -2,67 +2,113 @@ import bpy
 import unittest
 
 
-def _walk(self, object):
-    stack = []
-    stack.append(object)
-    nameStack = []
-    nameStack.append("data")
+class Dump:
 
-    result = {}
-    outnode = result
+    def __init__(self):
+        pass
+        
+    #
+    _skip_data_types = ["bl_rna", "rna_type", "translation_context", "use_autopack", "is_dirty", "is_saved", "is_updated", "window_managers", "cache_files"]
+    _base_types = ["bool", "int", "str", "tuple", "list", "dict", "float"]
+        
+    #
+    def __enter__(self):        
+        return self
 
-    while stack:
-        node = stack.pop()
-        name = nameStack.pop()
+    def __exit__(self, type, value, traceback):
+        pass
 
-        if name in ["bl_rna", "rna_type", "translation_context", "is_dirty", "is_saved", "is_updated", "window_managers"]:
-            continue
+    #    
+    def dump(self, object):
+        return self._walk_object(object)
+        pass
 
-        clazz = node.__class__.__name__
+        
+    #    
+    def _walk_vector(self, object):
+        pass
+        
+    def _walk_bpy_collection(self, object):
+        pass
+        
+    def _walk_object(self, object):
+        stack = []
+        name_stack = []
+    
+        stack.append(object)
+        name_stack.append("data")
+        
+        result = {}
+        outnode = result
 
-        if clazz in ["bool", "int", "str", "tuple", "list", "dict", "float"]:
-            if isinstance(outnode, dict):
-                outnode[name] = node
-            elif isinstance(outnode, list):
-                outnode.append(node)
-            continue
-        elif clazz in ["Vector"]:
-            continue
-        elif clazz in ["bpy_prop_collection"]:
-            newnode = []
-            if isinstance(outnode, dict):
-                outnode[name] = newnode
-            elif isinstance(outnode, list):
-                outnode.append(newnode)
-            outnode = newnode
+        while stack:
+            node = stack.pop()
+            name = name_stack.pop()
+            
+            #
+            if name in self._skip_data_types:
+                continue
 
-            for k in node:
-                stack.append(k)
-                nameStack.append(None)
+            clazz = node.__class__.__name__
+            
+            print(name, clazz, node)
 
-            pass
-        else:
-            newnode = {}
-            if isinstance(outnode, dict):
-                outnode[name] = newnode
-            elif isinstance(outnode, list):
-                outnode.append(newnode)
-            outnode = newnode
-            pass
+            #
+            if clazz in self._base_types:
+                if isinstance(outnode, dict):
+                    outnode[name] = node
+                elif isinstance(outnode, list):
+                    outnode.append(node)
+                continue
+                
+            elif clazz in ["Vector"]:
+                continue
+                
+            elif clazz in ["bpy_prop_collection"] and False:
+                newnode = []
+                if isinstance(outnode, dict):
+                    outnode[name] = newnode
+                elif isinstance(outnode, list):
+                    outnode.append(newnode)
+                outnode = newnode
 
-        for d in dir(node):
-            if not d.startswith("_"):
-                try:
-                    a = getattr(node, d)
-                    if not callable(a):
-                        stack.append(a)
-                        nameStack.append(d)
-                except AttributeError as e :
-                    pass
+                for k in node:
+                    stack.append(k)
+                    name_stack.append(None)
 
-    # print(result)
-    return result
+                pass #elif
+                
+            else:
+                newnode = {}
+                if isinstance(outnode, dict):
+                    outnode[name] = newnode
+                elif isinstance(outnode, list):
+                    outnode.append(newnode)
+                outnode = newnode
+                
+                pass #else
+
+            for d in dir(node):
+                if not d.startswith("_"):
+                    try:
+                        a = getattr(node, d)
+                        if not callable(a):
+                            stack.append(a)
+                            name_stack.append(d)
+                    except AttributeError as e :
+                        pass
+                        
+                    pass #if
+                pass #for
+                
+            pass #while
+
+        # print(result)
+        return result
 
 
 if __name__ == "__main__":
-    _walk(None, bpy.data)
+    with Dump() as d:
+        data = d.dump(bpy.data)
+        print(data)
+    input()
