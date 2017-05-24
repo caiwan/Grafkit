@@ -1,6 +1,10 @@
 import bpy
+import json
 import unittest
 
+"""
+blender -b -P $(FULL_CURRENT_PATH)
+"""
 
 class Dump:
 
@@ -26,10 +30,14 @@ class Dump:
         
     #    
     def _walk_vector(self, object):
-        pass
+        return { 'x':0, 'y':0, 'z':0, 'w':0 }
+
         
     def _walk_bpy_collection(self, object):
-        pass
+        res = []
+        for k in object:
+            res.append(self._walk_object(k))
+        return res
         
     def _walk_object(self, object):
         stack = []
@@ -51,32 +59,20 @@ class Dump:
 
             clazz = node.__class__.__name__
             
-            print(name, clazz, node)
+            # print(name, clazz, node)
 
             #
             if clazz in self._base_types:
-                if isinstance(outnode, dict):
-                    outnode[name] = node
-                elif isinstance(outnode, list):
-                    outnode.append(node)
+                outnode[name] = node
                 continue
                 
             elif clazz in ["Vector"]:
+                outnode[name] = self._walk_vector(node)
                 continue
                 
-            elif clazz in ["bpy_prop_collection"] and False:
-                newnode = []
-                if isinstance(outnode, dict):
-                    outnode[name] = newnode
-                elif isinstance(outnode, list):
-                    outnode.append(newnode)
-                outnode = newnode
-
-                for k in node:
-                    stack.append(k)
-                    name_stack.append(None)
-
-                pass #elif
+            elif clazz in ["bpy_prop_collection"] :
+                outnode[name] = self._walk_bpy_collection(node)
+                continue
                 
             else:
                 newnode = {}
@@ -103,12 +99,13 @@ class Dump:
                 
             pass #while
 
-        # print(result)
-        return result
+        return result["data"]
 
 
 if __name__ == "__main__":
     with Dump() as d:
         data = d.dump(bpy.data)
+        with open("out.json", "w") as f:
+            json.dump(data, f)
         print(data)
     input()
