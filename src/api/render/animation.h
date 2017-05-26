@@ -160,7 +160,7 @@ namespace Grafkit {
 		void AddPositionKey(float key, float3 value) { m_positionTrack.AddKey(Vector3Key(key, value)); }
 		void AddScalingKey(float key, float3 value) { m_scalingTrack.AddKey(Vector3Key(key, value)); }
 		void AddRotationKey(float key, float4 value) { m_rotationTrack.AddKey(Vector4Key(key, value)); }
-		void AddRotationKey(float key, Quaternion value) { m_rotationTrack.AddKey(Vector4Key(key, (float4)value)); }
+		//void AddRotationKey(float key,  Quaternion value) { m_rotationTrack.AddKey(Vector4Key(key, (float4)value)); }
 
 		virtual void Update(double time);
 	

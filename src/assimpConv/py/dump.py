@@ -2,7 +2,6 @@ import bpy
 import tempfile
 import os
 
-
 class Bake:
     """
     Helps to bake the animation data before export
@@ -10,67 +9,85 @@ class Bake:
     pass
 
 
+    
 class Dump:
-    """
-    Export everyhting out of blender
-    """
-    _cmd_dump = "dump"
 
-    def __init__(self, connection):
+    def __init__(self):
+        self._obj_set = set()
         pass
+        
+    #
+    _skip_data_types = ["bl_rna", "rna_type", "translation_context", "use_autopack", "is_dirty", "is_saved", "is_updated", "window_managers", "cache_files"]
+    _base_types = ["bool", "int", "str", "float"]
+    _iter_types = ["tuple", "list", "bpy_prop_collection"]
+    _map_types = ["dict"]
+        
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        pass
-
+    #    
     def dump(self, object):
-        self._walk(object)
+        return self._walk_object(object)
         pass
+        
+    #  
+    
+    def _walk_vector(self, object):
+        return { 'x':0, 'y':0, 'z':0, 'w':0 }
 
-    def _walk(self, object):
+       
+    def _walk_collection(self, object):
+        res = []
+        for k in object:
+            res.append(self._walk_object(k))
+        return res
+        
+    def _walk_object(self, object):
         stack = []
+        name_stack = []
+    
         stack.append(object)
-        nameStack = []
-        nameStack.append("data")
-
+        name_stack.append("data")
+        
         result = {}
         outnode = result
 
         while stack:
             node = stack.pop()
-            name = nameStack.pop()
+            name = name_stack.pop()
+            
 
-            if name in ["bl_rna", "rna_type", "translation_context", "is_dirty", "is_saved", "is_updated", "window_managers"]:
+            
+            #
+            if name in self._skip_data_types:
                 continue
 
             clazz = node.__class__.__name__
 
-            if clazz in ["bool", "int", "str", "tuple", "list", "dict", "float"]:
-                if isinstance(outnode, dict):
-                    outnode[name] = node
-                elif isinstance(outnode, list):
-                    outnode.append(node)
+            
+            # ez vicceskedik itten
+            # ki kellene szurni a fabol a rekurziot
+            try:
+                if id(node) in self._obj_set:
+                    print("skipping", name, clazz, node)
+                    continue
+                else:
+                    self._obj_set.add(id(node))
+            except TypeError:
+                pass
+            
+            #
+            if clazz in self._base_types:
+                outnode[name] = node
                 continue
                 
             elif clazz in ["Vector"]:
+                nnode = self._walk_vector(node)
+                outnode[name] = nnode
                 continue
                 
-            elif clazz in ["bpy_prop_collection"] and False:
-                newnode = []
-                if isinstance(outnode, dict):
-                    outnode[name] = newnode
-                    
-                elif isinstance(outnode, list):
-                    outnode.append(newnode)
-                    
-                outnode = newnode
-
-                for k in node:
-                    stack.append(k)
-                    nameStack.append(None)
-                pass
+            elif clazz in self._iter_types :
+                nnode = self._walk_collection(node)
+                outnode[name] = nnode
+                continue
                 
             else:
                 newnode = {}
@@ -79,7 +96,8 @@ class Dump:
                 elif isinstance(outnode, list):
                     outnode.append(newnode)
                 outnode = newnode
-                pass
+                
+                pass #else
 
             for d in dir(node):
                 if not d.startswith("_"):
@@ -87,12 +105,16 @@ class Dump:
                         a = getattr(node, d)
                         if not callable(a):
                             stack.append(a)
-                            nameStack.append(d)
+                            name_stack.append(d)
                     except AttributeError as e :
                         pass
+                        
+                    pass #if
+                pass #for
+                
+            pass #while
 
-        # print(result)
-        return result
+        return result["data"]
 
 
 class Collada:
