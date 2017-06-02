@@ -54,26 +54,13 @@ class Dump:
             node = stack.pop()
             name = name_stack.pop()
             
-
-            
             #
             if name in self._skip_data_types:
                 continue
 
             clazz = node.__class__.__name__
+            print(name, clazz, node, id(node))
 
-            
-            # ez vicceskedik itten
-            # ki kellene szurni a fabol a rekurziot
-            try:
-                if id(node) in self._obj_set:
-                    print("skipping", name, clazz, node)
-                    continue
-                else:
-                    self._obj_set.add(id(node))
-            except TypeError:
-                pass
-            
             #
             if clazz in self._base_types:
                 outnode[name] = node
@@ -104,8 +91,20 @@ class Dump:
                     try:
                         a = getattr(node, d)
                         if not callable(a):
+                            # ez vicceskedik itten
+                            # ki kellene szurni a fabol a rekurziot
+                            
+                            try:
+                                if id(a) in self._obj_set:
+                                    continue
+                                else:
+                                    self._obj_set.add(id(a))
+                            except TypeError:
+                                pass
+            
                             stack.append(a)
                             name_stack.append(d)
+                            
                     except AttributeError as e :
                         pass
                         

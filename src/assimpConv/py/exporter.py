@@ -57,5 +57,7 @@ if __name__ == "__main__":
             bake_types={'POSE', 'OBJECT'}
         )
 
-    with dump.Dump(conn) as d:
-        d.dump(bpy.data)
+    # d = dump.Dump(conn)
+    # d.walk
+    #with dump.Dump(conn) as d:
+    #    d.dump(bpy.data)
