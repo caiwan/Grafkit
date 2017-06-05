@@ -4,10 +4,6 @@
 cmake_minimum_required (VERSION 2.6)
 
 project (Grafkit2)
-
-if (NOT MSVC14 AND NOT MSVC12)
-	message(SEND_ERROR "Only MSVC12 and MSVC14 targets are supported")
-endif(NOT MSVC14 AND NOT MSVC12)
 	
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -23,6 +19,8 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/deploy" CACHE PATH "default install path" FORCE )
 endif()
 
+# default search dirs
+# todo: add and use cmake_prefix_path
 set(ASSIMP_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/Assimp" CACHE PATH "ASSIMP root directory")
 set(STB_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/stb" CACHE PATH "STB root directory")
 set(BASS_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tools/bass24" CACHE PATH "BASS root directory")
