@@ -24,7 +24,7 @@ namespace Grafkit {
 		void PreRender(Grafkit::Renderer & render);
 		void Render(Grafkit::Renderer & render);
 
-		ActorRef& GetRootNode() { return m_pScenegraph; }
+		ActorRef& GetRootNode() { return m_root; }
 
 		// --- 
 		void SetActiveCamera(std::string name);
@@ -60,7 +60,7 @@ namespace Grafkit {
 		void BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps);
 
 	private:
-		ActorRef m_pScenegraph;
+		ActorRef m_root;
 
 		ActorRef m_activeCamera;
 
@@ -84,6 +84,8 @@ namespace Grafkit {
 		std::map<std::string, ActorRef> m_cameraMap;
 		std::map<std::string, ActorRef> m_lightMap;
 		std::map<std::string, ActorRef> m_nodeMap;
+
+		std::vector<ActorRef> m_nodes;
 
 		std::map<std::string, MaterialRef> m_materialMap;
 

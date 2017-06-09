@@ -51,7 +51,8 @@ Grafkit::Mesh::Mesh() :
 	m_buffer(),
 	m_indexBuffer(nullptr),
 	m_indexCount(0),
-	m_vertexCount(0)
+	m_vertexCount(0),
+	m_indices(nullptr)
 {
 }
 

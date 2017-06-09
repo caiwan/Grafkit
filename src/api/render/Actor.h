@@ -83,9 +83,12 @@ namespace Grafkit {
 		int IsChildrenHidden() { return m_is_childrenHidden; }
 
 	protected:
+		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
+		Grafkit::Matrix & WorldMatrix() { return m_worldMatrix; }
 
 		Grafkit::Matrix m_viewMatrix;			///< Node transyformacioja
 		Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
+		Grafkit::Matrix m_worldMatrix;		///< Szarmaztatott matrix
 
 		BYTE m_is_nodeHidden;
 		BYTE m_is_childrenHidden;

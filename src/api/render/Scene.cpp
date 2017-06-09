@@ -15,7 +15,7 @@ using namespace FWdebugExceptions;
 PERSISTENT_IMPL(Grafkit::Scene);
 
 Grafkit::Scene::Scene():
-	m_pScenegraph(nullptr)
+	m_root(nullptr)
 {
 }
 
@@ -26,15 +26,24 @@ Grafkit::Scene::~Scene()
 
 void Grafkit::Scene::Initialize(ActorRef root)
 {
-	m_pScenegraph = root;
+	m_root = root;
+	
+	std::stack<int> parentIdStack;
+	parentIdStack.push(-1);
 
 	std::stack<ActorRef> stack;
 	stack.push(root);
 
 	while (!stack.empty()) {
 		ActorRef node = stack.top(); stack.pop();
-		
+		int id = (int)m_nodes.size();
+		int parentId = parentIdStack.top(); parentIdStack.pop();
+
 		// <yield>
+		m_nodes.push_back(node);
+		m_nodeParents.push_back(parentId);
+		m_matrices.push_back(Grafkit::Matrix());
+
 		m_nodeMap[node->GetName()] = node;
 		
 		// collect material for models
@@ -66,8 +75,10 @@ void Grafkit::Scene::Initialize(ActorRef root)
 		}
 		// </yield>
 
-		for(auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
+		for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++) {
+			parentIdStack.push(id);
 			stack.push(*it);
+		}
 	}
 
 }
@@ -84,7 +95,7 @@ void Grafkit::Scene::Shutdown()
 	m_cameraNodes.clear();
 	m_Entities.clear();
 	
-	m_pScenegraph = nullptr;
+	m_root = nullptr;
 
 	m_pixelShader = nullptr;
 	m_vertexShader = nullptr;
@@ -111,7 +122,7 @@ void Grafkit::Scene::AddCamera(ActorRef camera)
 	m_cameraNodes.push_back(camera);
 	m_cameraMap[camera->GetName()] = camera;
 	if (camera->GetParent().Invalid())
-		m_pScenegraph->AddChild(camera);
+		m_root->AddChild(camera);
 }
 
 ActorRef Grafkit::Scene::GetLight(std::string name)
@@ -145,8 +156,8 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs,
 
 	for (auto it = m_Entities.begin(); it != m_Entities.end(); ++it) {
 		(*it)->Build(deviceContext, this);
-
 	}
+
 }
 
 
@@ -164,6 +175,18 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 			m_animations[i]->Update(m_animation_time);
 	}
 
+	// update matrices here 
+
+	for (size_t i = 0; i < m_nodes.size(); i++) {
+		ActorRef &node = m_nodes[i]; 
+		Grafkit::Matrix mat = this->CalcNodeTransformTree(node);
+		// ... 
+	}
+
+
+
+#if 0
+	// ez nem fog kelleni majd:
 	// --- kamera
 	ActorRef &cameraActor = GetActiveCamera();
 	if (cameraActor.Valid() && (!cameraActor->GetEntities().empty() && cameraActor->GetEntities()[0].Valid())) {
@@ -198,6 +221,8 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 	// minden nodeot prerendererel, ha kell;
 	// ... 
+
+#endif
 }
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
@@ -226,7 +251,7 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	m_pixelShader->Bind(render);
 
 	// render scenegraph
-	RenderNode(render, m_pScenegraph);
+	RenderNode(render, m_root);
 }
 
 void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)
@@ -263,6 +288,7 @@ void Grafkit::Scene::Pop()
 	this->m_worldMatrixStack.pop();
 }
 
+#if 0
 Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor)
 {
 	ActorRef & node = actor;
@@ -283,8 +309,9 @@ Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor)
 
 	return result;
 }
+#endif
 
 void Grafkit::Scene::serialize(Archive & ar)
 {
-	// a tobbit a loder vegzi majd 
+	// a tobbit a loader vegzi majd 
 }
