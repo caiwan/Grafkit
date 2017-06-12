@@ -62,7 +62,7 @@ namespace Grafkit {
 		Matrix& GetPerspectiveMatrix() { return m_perspectiveMatrix; }
 		Matrix& GetOrthoMatrix() { return m_orthoMatrix; }
 
-		virtual Matrix& getProjrctionjMatrix() {
+		virtual Matrix& ProjectionMatrix() {
 			switch(m_type){
 			case ORTHOGRAPHIC:
 				return m_orthoMatrix;

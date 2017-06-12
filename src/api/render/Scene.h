@@ -77,7 +77,8 @@ namespace Grafkit {
 		ShaderRef m_pixelShader;
 
 	private:
-		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
+		//void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
+		void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
 		void Push();
 		void Pop();
 
@@ -85,7 +86,7 @@ namespace Grafkit {
 		std::map<std::string, ActorRef> m_lightMap;
 		std::map<std::string, ActorRef> m_nodeMap;
 
-		std::vector<ActorRef> m_nodes;
+		std::list<ActorRef> m_nodes;
 
 		std::map<std::string, MaterialRef> m_materialMap;
 
