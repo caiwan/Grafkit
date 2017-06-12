@@ -69,7 +69,7 @@ void Grafkit::Scene::Initialize(ActorRef root)
 				break; // assume if we have only one camera uder a node
 			}
 
-			m_Entities.insert(*entity);
+			m_entities.insert(*entity);
 		}
 		// </yield>
 
@@ -91,7 +91,7 @@ void Grafkit::Scene::Shutdown()
 	
 	m_activeCamera = nullptr;
 	m_cameraNodes.clear();
-	m_Entities.clear();
+	m_entities.clear();
 	
 	m_root = nullptr;
 
@@ -152,7 +152,7 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs,
 	if (ps.Valid()) 
 		m_pixelShader = ps;
 
-	for (auto it = m_Entities.begin(); it != m_Entities.end(); ++it) {
+	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
 		(*it)->Build(deviceContext, this);
 	}
 
@@ -266,29 +266,6 @@ void Grafkit::Scene::Pop()
 	m_currentWorldMatrix = this->m_worldMatrixStack.top();
 	this->m_worldMatrixStack.pop();
 }
-
-#if 0
-Grafkit::Matrix Grafkit::Scene::CalcNodeTransformTree(ActorRef & actor)
-{
-	ActorRef & node = actor;
-
-	Matrix result;
-
-	do {
-		Matrix matTM = actor->Matrix();
-		matTM.Multiply(actor->Transform());
-
-		Matrix mat = matTM;
-		mat.Multiply(result);
-
-		result = mat;
-
-		node = node->GetParent();
-	} while (node.Valid());
-
-	return result;
-}
-#endif
 
 void Grafkit::Scene::serialize(Archive & ar)
 {

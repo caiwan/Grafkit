@@ -78,19 +78,16 @@ void Grafkit::Material::RemoveTexture(TextureResRef texture, std::string bindNam
 void Grafkit::Material::SetTexture(TextureResRef texture, texture_type_e slot)
 {
 	this->SetTexture(texture, texture_map_names[slot]);
-	this->m_material.has_texture[slot] = 1;
 }
 
 void Grafkit::Material::AddTexture(TextureResRef texture, texture_type_e slot)
 {
 	this->AddTexture(texture, texture_map_names[slot]);
-	this->m_material.has_texture[slot] = 1;
 }
 
 void Grafkit::Material::RemoveTexture(TextureResRef texture, texture_type_e slot)
 {
 	this->RemoveTexture(texture, texture_map_names[slot]);
-	this->m_material.has_texture[slot] = 0;
 }
 
 // ====================================

@@ -176,6 +176,9 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		
 	}
 
+	if (m_actors.empty())
+		throw new EX_DETAILS(SceneLoadException, "Actors are empty for some reason");
+
 	Actor * root = m_actors[0];
 	m_scene->Initialize(root);
 }

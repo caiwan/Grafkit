@@ -34,19 +34,6 @@ cbuffer material
 	float4 material_ambient, material_diffuse, material_specular, material_emission;
 	float material_specularLevel;
 	float material_shininess;
-
-	int has_t_diffuse;		///< 1st map
-	int has_t_alpha;		///< alpha map
-	int has_t_normal;		///< bump map
-	int has_t_shiniess; 	///< shininess map
-	int has_t_specular;	///< specular map
-	int has_t_selfillum;	///< self illumination map
-	int has_t_reflect;		///< reflection map
-	int has_t_bump;		///< bump map
-	int has_t_aux0;		///< aux texture, used for pretty much everything else
-	int has_t_aux1;		///< aux texture, used for pretty much everything else
-	int has_t_aux2;		///< aux texture, used for pretty much everything else
-	int has_t_aux3;		///< aux texture, used for pretty much everything else
 };
 
  cbuffer light
@@ -245,8 +232,8 @@ float4 mainPixel(PixelInputType input) : SV_TARGET
 		// float theta = dot(R, E);
 
 		// color = calcPointLight(input, material, lights[0]);
-		//color.xyz = color * float3(lambda, lambda, lambda);
-		  color.xyz = .5 + N.xyz * .5; 
+		color.xyz = color * float3(lambda, lambda, lambda);
+		// color.xyz = .5 + N.xyz * .5; 
 	}
 
 	return color;

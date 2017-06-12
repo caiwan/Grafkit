@@ -110,6 +110,7 @@ namespace Grafkit {
 			};
 
 			// miserable hack
+			// has to have this thing for a while for padding in serializer
 			union {
 				int has_texture[TT_COUNT];
 				// ezt mire kell paddolni

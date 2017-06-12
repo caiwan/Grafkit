@@ -64,10 +64,12 @@ namespace Grafkit {
 
 		ActorRef m_activeCamera;
 
+		// Todo: these neeeds to be optimiyed and tied up a bit
 		std::vector<ActorRef> m_cameraNodes;
 		std::vector<ActorRef> m_lightNodes;
 
-		std::set<Entity3D*> m_Entities;
+		// This one as well
+		std::set<Entity3D*> m_entities;
 
 		std::vector<AnimationRef> m_animations;
 
@@ -77,7 +79,6 @@ namespace Grafkit {
 		ShaderRef m_pixelShader;
 
 	private:
-		//void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
 		void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
 		void Push();
 		void Pop();
@@ -97,9 +98,6 @@ namespace Grafkit {
 		
 		Grafkit::Matrix m_cameraViewMatrix;
 		Grafkit::Matrix m_cameraProjectionMatrix;
-
-	private:
-		Grafkit::Matrix CalcNodeTransformTree(ActorRef &actor);
 	
 	// -- persistent
 	protected:
