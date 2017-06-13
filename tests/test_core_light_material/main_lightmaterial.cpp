@@ -82,7 +82,7 @@ protected:
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/lightmaterial.hlsl", ""));
-		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", ""));
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "mainPixel_DiffuseColor"));
 
 		// -- model 
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere.scene"));

@@ -182,61 +182,55 @@ PixelInputType mainVertex(VertexInputType input)
 //	), 1);
 //}
 
+struct phongBlinn_t {
+	float lambda;
+	float theta;
+	float d;
+};
+
+/*
+	Calc lambda and theta for Phong
+	p: fragment coordiante
+	lp: lightsource coordinate
+	N: normal
+*/
+phongBlinn_t calcPhongBlinn(float4 p, float4 lp, float4 N, float f) {
+	phongBlinn_t res;
+
+	float w = lp.w;
+
+	float3 mp = lp.xyz - p.xyz;
+	float3 E = normalize(-p.xyz);	// Eye vector
+	float3 L = normalize(mp);		// light vector
+	float3 R = reflect(-mp, N.xyz);	// reflected vector (double half vector)
+	
+	res.d = length(mp);
+	res.lambda = dot(N, L);
+	res.theta = pow(saturate(dot(R, E)), f);
+
+	return res;
+}
+
 //------------------------------------------------------------------------------------
 
-float4 mainPixel(PixelInputType input) : SV_TARGET
+float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
 {
-	float4 color = float4(1,0,0,1);
+	float4 color = material_ambient;
+		
+	float4 lp = float4(10, 10, 10, 1);
+
+	phongBlinn_t phong = calcPhongBlinn(input.worldPosition, lp, input.normal, 10);
+	color.xyz = color.xyz + material_diffuse.xyz * float3(phong.theta, phong.theta, phong.theta);
+	// color.xyz = .5 + N.xyz * .5; 
 	
-	// return color;
-
-	/*if (has_t_diffuse == 1)
-		color = t_diffuse.Sample(SampleType, input.tex);
-	else*/
-		//color = material_diffuse;
-
-
-	// --- 
-	//for (int i = 0; i < 4; i++) {
-	//	if (is_lightOn[i] == 1) {
-	//		// pointlight
-	//		if (lights[i].type == 1 || lights[i].type == 4) {
-	//			float4 lightDir = output.worldPosition - lights[0].position;
-	//			output.lightDir[0] = lightDir;
-	//		}
-	//		// directional light
-	//		else if (lights[i].type == 2) {
-	//			float4 lightDir = lights[0].direction;
-	//			output.lightDir[0] = lightDir;
-	//		}
-
-	//		// ... 
-	//	}
-	//}
-
-	// phong light
-	// if (material_type == 1) 
-	if (true)
-	{
-		float3 lp = float3(10, 10, 10);
-
-		// proto
-		float3 p = input.worldPosition.xyz;
-		float3 mp = lp - p;
-		float3 E = normalize(-p);
-		float3 N = input.normal.xyz;
-		float3 L = normalize(mp); float d = length(mp);
-		// flaot3 
-
-		float lambda = dot(N, L);
-		// float theta = dot(R, E);
-
-		// color = calcPointLight(input, material, lights[0]);
-		color.xyz = color * float3(lambda, lambda, lambda);
-		// color.xyz = .5 + N.xyz * .5; 
-	}
-
 	return color;
 }
 
 //------------------------------------------------------------------------------------
+
+float4 mainPixel_DiffuseTexture(PixelInputType input) : SV_TARGET
+{
+	float4 color = material_ambient;
+
+	return color;
+}
