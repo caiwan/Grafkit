@@ -220,7 +220,10 @@ float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
 	float4 lp = float4(10, 10, 10, 1);
 
 	phongBlinn_t phong = calcPhongBlinn(input.worldPosition, lp, input.normal, 10);
-	color.xyz = color.xyz + material_diffuse.xyz * float3(phong.theta, phong.theta, phong.theta);
+	float l = phong.lambda;
+	float p = phong.theta;
+	color.xyz = color.xyz + material_diffuse.xyz * float3(l,l,l);
+	color.xyz = color.xyz + material_specular.xyz * float3(p,p,p);
 	// color.xyz = .5 + N.xyz * .5; 
 	
 	return color;
