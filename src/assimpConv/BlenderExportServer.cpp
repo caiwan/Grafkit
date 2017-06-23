@@ -136,8 +136,7 @@ private:
 			std::stringstream ss;
 
 			FILE* fp = NULL;
-			if (fopen_s(&fp, "debug.json", "wb") != 0)
-				fp = NULL;
+			// if (fopen_s(&fp, "debug.json", "ab") != 0) fp = NULL;
 
 			unsigned int bytesLeft = respLen;
 
@@ -147,7 +146,10 @@ private:
 				res = recv(ClientSocket, recvbuf, bytesRead, 0);
 				if (res > 0) {
 					ss.write(recvbuf, bytesRead);
-					if (fp) fwrite(recvbuf, 1, bytesRead, fp);
+					
+					if (fp) 
+						fwrite(recvbuf, 1, bytesRead, fp);
+
 					bytesLeft -= bytesRead;	
 				}
 
@@ -159,6 +161,11 @@ private:
 
 			recvRes = server->PostData(ss);
 			ss.clear();
+
+			if (fp) {
+				fflush(fp);
+				fclose(fp);
+			}
 
 			if (recvRes)
 				return 1;
@@ -269,7 +276,9 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 		if (cmd.compare(_cmd_initconn) == 0) {
 
 		} else if (cmd.compare(_cmd_dae) == 0) {
-			/// ... 
+			std::ofstream fs("hello.dae", std::ofstream::out);
+			std::string xml = j["data"];
+			fs << xml;
 		}
 		else if (cmd.compare(_cmd_dump) == 0) {
 			/// ... 

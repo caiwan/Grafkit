@@ -10,9 +10,10 @@ cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(insp
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
-import client
-import dump
-
+# there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
+from helpers.client import Connection
+from helpers.dump import Dump
+from helpers.collada import Collada
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -36,27 +37,15 @@ if __name__ == "__main__":
     infile = str(args.input)
     hostaddr = str(args.host)
 
-    with client.Connection(hostaddr) as conn:
+    with Connection(hostaddr) as conn:
         # open blendfile
         bpy.ops.wm.open_mainfile(filepath=infile)
-
-        # https://docs.blender.org/api/blender_python_api_current/bpy.types.Scene.html#bpy.types.Scene
-        scene = bpy.data.scenes['Scene']
-
-        # bake scene
-        # https://docs.blender.org/api/blender_python_api_2_75_0/bpy.ops.nla.html
-        bpy.ops.nla.bake(
-            frame_start=scene.frame_start,
-            frame_end=scene.frame_end,
-            step=scene.frame_step,
-            only_selected=False,
-            visual_keying=False,
-            clear_constraints=True,
-            clear_parents=False,
-            use_current_action=False,
-            bake_types={'POSE', 'OBJECT'}
-        )
-
+        
+        c = Collada(conn)
+        c.dump()
+    
+        pass
+        
     # d = dump.Dump(conn)
     # d.walk
     #with dump.Dump(conn) as d:

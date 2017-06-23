@@ -7,3 +7,4 @@ assign_source_group("${BLENDER_SCRIPTS}")
 copy_static_files(AssimpConverterPy "tools/py" "${BLENDER_SCRIPTS}")
 
 set_target_properties(AssimpConverterPy PROPERTIES FOLDER tools)
+
