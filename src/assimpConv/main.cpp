@@ -84,8 +84,8 @@ public:
 		cmd += " -i " + args.get("input").value();
 		std::string host; server.GetHost(host);
 		cmd += " -p " + host;
+
 		std::array<char, 1024> buffer;
-		std::string result;
 		
 		//cmd = "{" + cmd + "} 
 		cmd += " 2>&1";
@@ -95,6 +95,7 @@ public:
 			cout << "Could not start Blender. Args: " << cmd;
 			return 1;
 		}
+
 		// pump 
 		while (!feof(pipe.get())) {
 			if (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL)
@@ -102,6 +103,9 @@ public:
 		}
 
 		server.Stop();
+
+		SceneResRef scene = server.GetScene(); 
+		SceneLoader::Save(scene->Get(), args.get("output").value());
 
 		return 0;
 	}

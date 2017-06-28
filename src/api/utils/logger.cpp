@@ -176,7 +176,8 @@ void Grafkit::LoggerHandler::ConsoleLogger::Write(Grafkit::Logger::message_t * c
 			if (this->m_stdout)
 				fprintf_s(this->m_stdout, "%s\r\n", message->message);
 		}
-	else {
+	//else 
+	{
 		OutputDebugStringA(message->message);
 		OutputDebugStringA("\r\n");
 	}

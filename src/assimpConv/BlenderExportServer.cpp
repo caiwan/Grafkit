@@ -280,19 +280,30 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 		std::string cmd = j["cmd"];
 		Log::Logger().Info((std::string("Json cmd = ") + cmd).c_str());
 		
+		// --- 
 		if (cmd.compare(_cmd_initconn) == 0) {
-
-		} else if (cmd.compare(_cmd_dae) == 0) {
+			// do nothing
+		} 
+		
+		// --- load standard collada and append it to the scene
+		else if (cmd.compare(_cmd_dae) == 0) {
 			std::string daefile = j["data"];
-			//Append
+			
+			char * data = new char[daefile.size()+1];
+			daefile.copy(data, daefile.size() + 1);
+
+			AppendAssimp(data, daefile.size()+1, m_scene);
 		}
+
+		// --- handle raw data daumped form the script
 		else if (cmd.compare(_cmd_dump) == 0) {
 			/// ... 
 			std::ofstream fs("hello.json", std::ofstream::out);
 			fs << j["data"];
 		}
-
-		if (cmd.compare(_cmd_closeconn) == 0) {
+		
+		// --- 
+		else if (cmd.compare(_cmd_closeconn) == 0) {
 			return true;
 		}
 

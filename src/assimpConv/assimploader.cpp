@@ -93,7 +93,7 @@ SceneResRef Grafkit::AssimpLoader::Load()
 void Grafkit::AssimpLoader::AppendAssimp(const void * data, size_t length, SceneRef inScene)
 {
 	/// @todo genNormals szar. Miert?
-	aiscene = importer.ReadFileFromMemory(m_data, m_length,
+	aiscene = importer.ReadFileFromMemory(data, length,
 		// aiProcess_ConvertToLeftHanded |
 		0
 	);
