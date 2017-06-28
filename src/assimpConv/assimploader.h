@@ -29,12 +29,14 @@ namespace Grafkit {
 	class AssimpLoader
 	{
 	public:
+		AssimpLoader();
 		AssimpLoader(void* data, size_t length);
 		~AssimpLoader();
 
 		SceneResRef Load();
+		void AppendAssimp(const void* data, size_t length, SceneRef inscene);
 
-	private:
+	protected:
 		struct {
 			std::vector<MaterialRef>		materials;
 			std::vector<ModelRef>			models;
@@ -43,16 +45,16 @@ namespace Grafkit {
 			std::map<std::string, ActorRef> actors;
 		} m_resources;
 
-		// static helper fxs
-	private:
-		void LoadMaterials(SceneRef &outScene);
-		void LoadMeshes(SceneRef &outScene);
-		void LoadCameras(SceneRef &outScene);
-		void LoadLights(SceneRef &outScene);
-		void BuildScenegraph(SceneRef &outScene);
-		void LoadAnimations(SceneRef &outScene);
 
-		void ParseScenegraphNode(aiNode* ai_node, ActorRef &actor_node, int maxdepth = 1024);
+	private:		
+		void AssimpLoadMaterials(SceneRef &outScene);
+		void AssimpLoadMeshes(SceneRef &outScene);
+		void AssimpLoadCameras(SceneRef &outScene);
+		void AssimpLoadLights(SceneRef &outScene);
+		void AssimpBuildScenegraph(SceneRef &outScene);
+		void AssimpLoadAnimations(SceneRef &outScene);
+
+		void AssimpParseScenegraphNode(aiNode* ai_node, ActorRef &actor_node, int maxdepth = 1024);
 
 	private:
 		static Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m);

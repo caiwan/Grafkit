@@ -61,6 +61,10 @@ namespace {
 // Head
 // ================================================================================================================================================================
 
+Grafkit::AssimpLoader::AssimpLoader() : m_data(nullptr), m_length(0)
+{
+}
+
 Grafkit::AssimpLoader::AssimpLoader(void * src_data, size_t src_length) : m_data(src_data), m_length(src_length)
 {
 }
@@ -81,6 +85,13 @@ SceneResRef Grafkit::AssimpLoader::Load()
 
 	SceneRef outScene = new Scene();
 
+	AppendAssimp(m_data, m_length, outScene);
+
+	return new Resource<Scene>(outScene);
+}
+
+void Grafkit::AssimpLoader::AppendAssimp(const void * data, size_t length, SceneRef inScene)
+{
 	/// @todo genNormals szar. Miert?
 	aiscene = importer.ReadFileFromMemory(m_data, m_length,
 		// aiProcess_ConvertToLeftHanded |
@@ -90,19 +101,17 @@ SceneResRef Grafkit::AssimpLoader::Load()
 	if (!aiscene)
 		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
 
-	LoadMaterials(outScene);
-	LoadMeshes(outScene);
-	LoadCameras(outScene);
-	LoadLights(outScene);
-	
-	BuildScenegraph(outScene);
-	
-	LoadAnimations(outScene);
+	AssimpLoadMaterials(inScene);
+	AssimpLoadMeshes(inScene);
+	AssimpLoadCameras(inScene);
+	AssimpLoadLights(inScene);
 
-	return new Resource<Scene>(outScene);
+	AssimpBuildScenegraph(inScene);
+
+	AssimpLoadAnimations(inScene);
 }
 
-void Grafkit::AssimpLoader::LoadMaterials(SceneRef &outScene)
+void Grafkit::AssimpLoader::AssimpLoadMaterials(SceneRef &outScene)
 {
 	size_t i = 0, j = 0, k = 0, l = 0;
 	std::vector<MaterialRef> &materials = m_resources.materials;
@@ -154,7 +163,7 @@ void Grafkit::AssimpLoader::LoadMaterials(SceneRef &outScene)
 	}
 }
 
-void Grafkit::AssimpLoader::LoadMeshes(SceneRef &outScene)
+void Grafkit::AssimpLoader::AssimpLoadMeshes(SceneRef &outScene)
 {
 	size_t i = 0, j = 0, k = 0, l = 0;
 	
@@ -241,7 +250,7 @@ void Grafkit::AssimpLoader::LoadMeshes(SceneRef &outScene)
 	}
 }
 
-void Grafkit::AssimpLoader::LoadCameras(SceneRef &outScene)
+void Grafkit::AssimpLoader::AssimpLoadCameras(SceneRef &outScene)
 {
 	size_t i = 0, j = 0, k = 0, l = 0;
 	std::vector<CameraRef> &cameras = m_resources.cameras;
@@ -277,7 +286,7 @@ void Grafkit::AssimpLoader::LoadCameras(SceneRef &outScene)
 	}
 }
 
-void Grafkit::AssimpLoader::LoadLights(SceneRef &outScene)
+void Grafkit::AssimpLoader::AssimpLoadLights(SceneRef &outScene)
 {
 	size_t i = 0, j = 0, k = 0, l = 0;
 	std::vector<LightRef> &lights = m_resources.lights;
@@ -336,14 +345,14 @@ void Grafkit::AssimpLoader::LoadLights(SceneRef &outScene)
 #endif
 }
 
-void Grafkit::AssimpLoader::BuildScenegraph(SceneRef &outScene)
+void Grafkit::AssimpLoader::AssimpBuildScenegraph(SceneRef &outScene)
 {
 	size_t i = 0, j = 0, k = 0, l = 0;
 	// build up scenegraph
 
 	ActorRef root_node = new Actor;
 	LOGGER(Log::Logger().Trace("Building scenegraph"));
-	ParseScenegraphNode(aiscene->mRootNode, root_node);
+	AssimpParseScenegraphNode(aiscene->mRootNode, root_node);
 	outScene->Initialize(root_node);
 
 	/* Workaround:
@@ -383,7 +392,7 @@ void Grafkit::AssimpLoader::BuildScenegraph(SceneRef &outScene)
 	}
 }
 
-void Grafkit::AssimpLoader::LoadAnimations(SceneRef &outScene)
+void Grafkit::AssimpLoader::AssimpLoadAnimations(SceneRef &outScene)
 {
 	size_t i = 0, j = 0, k = 0, l = 0;
 	// --- Animacio kiszedese
@@ -446,7 +455,7 @@ void Grafkit::AssimpLoader::LoadAnimations(SceneRef &outScene)
 * @param actor_node az a scenegraph node, mai epp feltoltunk
 * @param maxdepth stack overflow ellen
 */
-void Grafkit::AssimpLoader::ParseScenegraphNode(aiNode * ai_node, ActorRef & actor_node, int maxdepth)
+void Grafkit::AssimpLoader::AssimpParseScenegraphNode(aiNode * ai_node, ActorRef & actor_node, int maxdepth)
 {
 	size_t i = 0, j = 0, k = 0;
 
@@ -500,7 +509,7 @@ void Grafkit::AssimpLoader::ParseScenegraphNode(aiNode * ai_node, ActorRef & act
 	// next nodes
 	for (i = 0; i < ai_node->mNumChildren; i++) {
 		ActorRef child = nullptr;
-		ParseScenegraphNode(ai_node->mChildren[i], child, maxdepth - 1);
+		AssimpParseScenegraphNode(ai_node->mChildren[i], child, maxdepth - 1);
 		actor->AddChild(child);
 	}
 

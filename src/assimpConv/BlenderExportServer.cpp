@@ -14,6 +14,9 @@
 #include "json.hpp"
 
 #include "BlenderExportServer.h"
+
+#include "render/Scene.h"
+
 #include "core/thread.h"
 #include "utils/logger.h"
 
@@ -267,6 +270,10 @@ void BlenderExportServer::GetHost(std::string & str)
 
 bool BlenderExportServer::PostData(std::stringstream &ss) 
 {
+	if (m_scene.Invalid()) {
+		m_scene = new Resource<Scene>(new Scene());
+	}
+
 	try 
 	{
 		json j = json::parse(ss);
@@ -276,9 +283,8 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 		if (cmd.compare(_cmd_initconn) == 0) {
 
 		} else if (cmd.compare(_cmd_dae) == 0) {
-			std::ofstream fs("hello.dae", std::ofstream::out);
-			std::string xml = j["data"];
-			fs << xml;
+			std::string daefile = j["data"];
+			//Append
 		}
 		else if (cmd.compare(_cmd_dump) == 0) {
 			/// ... 

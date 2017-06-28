@@ -5,9 +5,14 @@
 #include "core/thread.h"
 #include "utils/exceptions.h"
 
+#include "common.h"
+
+#include "assimploader.h"
+
 class ServerThread;
 
-class BlenderExportServer {
+class BlenderExportServer : public Grafkit::AssimpLoader
+{
 	friend class ServerThread;
 public:
 	BlenderExportServer();
@@ -20,13 +25,15 @@ public:
 	void Start();
 	void Stop();	
 
+	Grafkit::SceneResRef GetScene() {return m_scene; }
+
 private:
 	ServerThread *m_serverThread;
 	int m_port;
 
 	bool PostData(std::stringstream &ss);
 
-	//std::list<>
+	Grafkit::SceneResRef m_scene;
 };
 
 DEFINE_EXCEPTION(ServerCreateException, 1, "Could not create server")
