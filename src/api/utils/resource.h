@@ -65,7 +65,6 @@ namespace Grafkit{
 		operator Ref<T> () { return Ref<T>(dynamic_cast<T*>(this->Get())); }
 		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
 		operator T& () { return *(this->Get()); }
-
 	};
 
 }
