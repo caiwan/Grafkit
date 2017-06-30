@@ -59,16 +59,17 @@ protected:
 
 	int init() 
 	{
-		m_music = Load<MusicRes>(new MusicBassLoader("music.ogg"));
-		m_fxFFTVisu = Load<ShaderRes>(new PixelShaderLoader("fxFFTvisual", "shaders/FFTVisual.hlsl", ""));
+		m_music = Load<MusicRes>(new MusicBassLoader("alpha_c_-_euh.ogg"));
+		m_fxFFTVisu = Load<ShaderRes>(new PixelShaderLoader("fxFFTvisual", "shaders/FFTVisual.hlsl", "fftVisual"));
 
 		LoadCache();
 		DoPrecalc();
 
 		m_postfx = new EffectComposer();
 		m_postfx->AddPass(new EffectPass(m_fxFFTVisu));
+		m_postfx->Initialize(render);
 
-		m_fftData = new float[64];
+		m_fftData = new float[256];
 
 		(*m_music)->Play();
 
@@ -96,7 +97,7 @@ protected:
 
 		// render fx chain 
 
-		(*m_fxFFTVisu)->SetParamValue(render, "FFT", "fftData", m_fftData);
+		//(*m_fxFFTVisu)->SetParamValue(render, "FFT", "fftData", m_fftData);
 
 		m_postfx->Render(render);
 

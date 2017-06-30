@@ -32,6 +32,8 @@ namespace {
 		virtual void SetLoop(bool e);
 		virtual int IsPlaying();
 
+		virtual bool GetFFT(float* ptr, int segcount);
+
 	protected:
 		HSTREAM m_stream;
 
@@ -71,7 +73,7 @@ namespace {
 		);
 
 		if (!m_stream) {
-			// int errcode = BASS_ErrorGetCode();
+			//int errcode = BASS_ErrorGetCode();
 			throw EX(MusicDeviceInitException);
 		}
 
@@ -89,7 +91,6 @@ namespace {
 		m_samplePerSec = info.freq * sstride * info.chans;
 	
 		
-		Play();
 	}
 
 	void MusicBass::Shutdown()
@@ -145,6 +146,50 @@ namespace {
 	int MusicBass::IsPlaying()
 	{
 		return BASS_ChannelIsActive(m_stream) == BASS_ACTIVE_PLAYING;
+	}
+
+	// taken from Gargaj 
+	// https://github.com/Gargaj/Bonzomatic/blob/e1aa90ba5c47a6aa61bcf754a634d09e2ef23f81/src/platform_common/FFT.cpp#L28
+	bool MusicBass::GetFFT(float* ptr, int segcount) 
+	{
+		unsigned int len = 0;
+
+		if (!IsPlaying())
+			return false;
+
+		switch (segcount * 2) // for 256 fft, only 128 values will contain DC in our case
+		{
+		case 256:
+			len = BASS_DATA_FFT256;
+			break;
+		case 512:
+			len = BASS_DATA_FFT512;
+			break;
+		case 1024:
+			len = BASS_DATA_FFT1024;
+			break;
+		case 2048:
+			len = BASS_DATA_FFT2048;
+			break;
+		case 4096:
+			len = BASS_DATA_FFT4096;
+			break;
+		case 8192:
+			len = BASS_DATA_FFT8192;
+			break;
+		case 16384:
+			len = BASS_DATA_FFT16384;
+			break;
+		default:
+			return false;
+		}
+
+		const int numBytes = BASS_ChannelGetData(m_stream, ptr, len | BASS_DATA_FFT_REMOVEDC);
+		if (numBytes <= 0)
+			return false;
+
+		return true;
+
 	}
 
 }

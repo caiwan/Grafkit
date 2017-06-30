@@ -29,6 +29,8 @@ namespace Grafkit {
 		virtual void SetLoop(bool e) = 0;	//< loop ki/be
 		virtual int IsPlaying() = 0;	///< @return 1: playing 0:stopped/paused
 
+		virtual bool GetFFT(float* ptr, int segcount) = 0;
+
 		/* --- */
 		double GetTime() { return (double)GetTimeSample() / (double)this->m_samplePerSec; }	///< idot visszaadja sec-ban
 		double GetTimems() { return 1000.*GetTime(); }										///< idot visszaadja msec-ban
