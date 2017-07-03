@@ -65,9 +65,9 @@ void Grafkit::EffectComposer::Initialize(Renderer & render)
 	
 	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
 
-	m_texOut[0] = new Texture(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[0];
-	m_texOut[1] = new Texture(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[1];
-	m_texOut[2] = new Texture(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[2];
+	m_texOut[0] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[0];
+	m_texOut[1] = new Texture2D(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[1];
+	m_texOut[2] = new Texture2D(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[2];
 
 	// --- 
 	m_shaderFullscreenQuad = new VertexShader();
@@ -127,14 +127,14 @@ void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::SwapBuffers()
 {
-	Texture* tmp = m_pTexWrite;
+	Texture2D* tmp = m_pTexWrite;
 	m_pTexWrite = m_pTexRead;
 	m_pTexRead = tmp;
 }
 
 void Grafkit::EffectComposer::FlushBuffers()
 {
-	Texture* tmp = m_pTexBack;
+	Texture2D* tmp = m_pTexBack;
 	m_pTexBack = m_pTexWrite;
 	m_pTexWrite = tmp;
 }

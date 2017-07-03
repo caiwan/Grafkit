@@ -25,7 +25,7 @@ namespace Grafkit {
 	class Camera;
 	class Model;
 	class Shader;
-	class Texture;
+	class Texture2D;
 
 	// typedefs for reference counting
 	typedef Ref<Camera> CameraRef;

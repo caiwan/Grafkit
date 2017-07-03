@@ -13,7 +13,7 @@ using namespace FWdebugExceptions;
 using namespace DirectX;
 using namespace Grafkit;
 
-Texture::Texture() //: IResource(),
+Texture2D::Texture2D() //: IResource(),
 	:
 	m_pTex(nullptr),
 	m_pResourceView(nullptr),
@@ -21,14 +21,14 @@ Texture::Texture() //: IResource(),
 {
 }
 
-Texture::~Texture()
+Texture2D::~Texture2D()
 {
 	this->Shutdown();
 }
 
 /// @todo a kozos struct kitoltos reszeket ki kell tenni valami kozos helyre 
 
-void Grafkit::Texture::Initialize(Renderer & device, BitmapResourceRef bitmap)
+void Grafkit::Texture2D::Initialize(Renderer & device, BitmapResourceRef bitmap)
 {
 	UINT x = bitmap->GetX(), y = bitmap->GetY(), ch = bitmap->GetCh();
 
@@ -130,7 +130,7 @@ void Grafkit::Texture::Initialize(Renderer & device, BitmapResourceRef bitmap)
 	}
 }
 
-void Grafkit::Texture::Initialize(Renderer & device, size_t w, size_t h)
+void Grafkit::Texture2D::Initialize(Renderer & device, size_t w, size_t h/*, const char * data*/)
 {
 	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
@@ -187,7 +187,7 @@ void Grafkit::Texture::Initialize(Renderer & device, size_t w, size_t h)
 	}
 }
 
-void Texture::Shutdown()
+void Texture2D::Shutdown()
 {
 	if (m_pResourceView) 
 	{
@@ -210,7 +210,7 @@ void Texture::Shutdown()
 
 }
 
-void Grafkit::Texture::SetRenderTargetView(Renderer & device, size_t id)
+void Grafkit::Texture2D::SetRenderTargetView(Renderer & device, size_t id)
 {
 	if (!m_pRenderTargetView) {
 		throw EX(NoRenderTargetViewException);

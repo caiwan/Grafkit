@@ -17,11 +17,11 @@ namespace Grafkit
 #define TEXTURE_BUCKET "texture"
 
 	// ========================================================================================================================
-
+	
 	/**
-	A bitmap resource that contains a raw bitmap. This ig enerated by the generated, and loaded into the texture object.
+	A bitmap resource that contains a raw bitmap. 
 	*/
-	class Bitmap : public Referencable {
+	class Bitmap :  public Referencable {
 	public:
 		Bitmap() : m_bmsize(0), m_ch(0), m_x(0), m_y(0), m_data(nullptr), m_stride(0) {}
 		Bitmap(void* data, UINT x, UINT y, UINT ch) : m_bmsize(0), m_ch(ch), m_x(x), m_y(y), m_data(data) { m_bmsize = x*y*ch; m_stride = x*ch; }
@@ -45,18 +45,54 @@ namespace Grafkit
 	typedef Ref<Bitmap> BitmapResourceRef;
 
 	// ========================================================================================================================
-
 	/**
-	Texture class
+	1DTextureClass
+	with 32 bit float values
 	*/
-	__declspec(align(16)) class Texture : virtual public Referencable, public AlignedNew<Texture>
+	__declspec(align(16)) class Texture1D : virtual public Referencable, public AlignedNew<Texture2D>
 	{
 	public:
-		Texture();
-		~Texture();
+		Texture1D();
+		~Texture1D();
+		
+		/// inits with 32 bit float 1D texture (array) 
+		void Initialize(Renderer & device, size_t w = 0, const float* data = nullptr);
 
+		/// texture <- data
+		void Update(Renderer & device, const float* data = nullptr);
+
+		void Shutdown();
+
+		ID3D11Texture1D* GetTexture2D() { return this->m_pTex; }
+		ID3D11ShaderResourceView* GetTextureResource() { return this->m_pResourceView; }
+		ID3D11RenderTargetView* GetRenderTargetView() { return this->m_pRenderTargetView; }
+
+		void SetRenderTargetView(Renderer & device, size_t id = 0);
+
+	private:
+		ID3D11Texture1D * m_pTex;
+		ID3D11ShaderResourceView* m_pResourceView;
+		ID3D11RenderTargetView* m_pRenderTargetView;
+	};
+
+	/**
+	2D Texture class
+	*/
+	__declspec(align(16)) class Texture2D : virtual public Referencable, public AlignedNew<Texture2D>
+	{
+	public:
+		Texture2D();
+		~Texture2D();
+		
+		/// Inits an RGBA texture with unisned 8 bit per channel each
 		void Initialize(Renderer & device, BitmapResourceRef bitmap);
-		void Initialize(Renderer & device, size_t w = 0, size_t h = 0);
+		
+		/// Inits an RGBA texture with 32 bit float per channel each
+		void Initialize(Renderer & device, size_t w = 0, size_t h = 0/*, const char* data = nullptr*/);
+
+		/// Refresh bitmap 
+		void Update(Renderer & device, BitmapResourceRef bitmap);
+
 		void Shutdown();
 
 		ID3D11Texture2D* GetTexture2D() { return this->m_pTex; }
@@ -73,7 +109,7 @@ namespace Grafkit
 
 	// ========================================================================================================================
 
-	__declspec(align(16)) class TextureSampler : virtual public Referencable, public AlignedNew<Texture>
+	__declspec(align(16)) class TextureSampler : virtual public Referencable, public AlignedNew<Texture2D>
 	{
 	public:
 		TextureSampler();

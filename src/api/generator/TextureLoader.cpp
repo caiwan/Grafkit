@@ -51,7 +51,7 @@ void Grafkit::TextureFromBitmap::Load(Grafkit::IResourceManager * const & resman
 	}
 
 	// --- load texture 
-	TextureRef texture = new Texture();
+	TextureRef texture = new Texture2D();
 
 	LOGGER(log(info) << "loading texture from resource");
 	

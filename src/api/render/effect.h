@@ -65,7 +65,7 @@ namespace Grafkit {
 	protected:
 
 		TextureRef m_texOut[3];
-		Texture *m_pTexRead, *m_pTexWrite, *m_pTexBack;
+		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexBack;
 
 		TextureSamplerRef m_textureSampler;
 
