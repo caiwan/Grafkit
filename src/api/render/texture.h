@@ -45,11 +45,46 @@ namespace Grafkit
 	typedef Ref<Bitmap> BitmapResourceRef;
 
 	// ========================================================================================================================
+	
+	/** 
+	Abstract class for texture generation,
+	quick and dirty solution for generate and update texture objects 
+	*/
+
+	class ATexture {
+	public:
+		ATexture();
+		virtual  ~ATexture();
+	
+		void Initialize();
+		void Shutdown();
+
+		ID3D11ShaderResourceView* GetTextureResource() { return this->m_pResourceView; }
+		ID3D11RenderTargetView* GetRenderTargetView() { return this->m_pTargetView; }
+
+	protected:
+		void CreateTexture1D(Renderer & device, ID3D11Texture1D *& outTexture, DXGI_FORMAT format, int w);
+		void CreateTexture2D(Renderer & device, ID3D11Texture2D *& outTexture, DXGI_FORMAT format, int w, int h);
+		void CreateTexture3D(Renderer & device, ID3D11Texture3D *& outTexture, DXGI_FORMAT format, int w, int h, int d);
+
+		void UpdateTexture1D(Renderer & device, void* data, size_t len, size_t stride);
+		void UpdateTexture2D(Renderer & device, void* data, size_t len, size_t stride);
+		void UpdateTexture2D(Renderer & device, const unsigned char* bitmap, size_t x, size_t y, size_t ch);
+		void UpdateTexture3D(Renderer & device, void* data, size_t len, size_t stride);
+
+	protected:
+		ID3D11ShaderResourceView * m_pResourceView;
+		ID3D11RenderTargetView * m_pTargetView;
+		int m_w, m_h, m_d;
+		int m_isGenerateMips;
+
+	};
+	
 	/**
 	1DTextureClass
 	with 32 bit float values
 	*/
-	__declspec(align(16)) class Texture1D : virtual public Referencable, public AlignedNew<Texture2D>
+	__declspec(align(16)) class Texture1D : public ATexture, virtual public Referencable, public AlignedNew<Texture2D>
 	{
 	public:
 		Texture1D();
@@ -64,21 +99,18 @@ namespace Grafkit
 		void Shutdown();
 
 		ID3D11Texture1D* GetTexture2D() { return this->m_pTex; }
-		ID3D11ShaderResourceView* GetTextureResource() { return this->m_pResourceView; }
-		ID3D11RenderTargetView* GetRenderTargetView() { return this->m_pRenderTargetView; }
+
 
 		void SetRenderTargetView(Renderer & device, size_t id = 0);
 
 	private:
 		ID3D11Texture1D * m_pTex;
-		ID3D11ShaderResourceView* m_pResourceView;
-		ID3D11RenderTargetView* m_pRenderTargetView;
 	};
 
 	/**
 	2D Texture class
 	*/
-	__declspec(align(16)) class Texture2D : virtual public Referencable, public AlignedNew<Texture2D>
+	__declspec(align(16)) class Texture2D : public ATexture, virtual public Referencable, public AlignedNew<Texture2D>
 	{
 	public:
 		Texture2D();
@@ -88,10 +120,17 @@ namespace Grafkit
 		void Initialize(Renderer & device, BitmapResourceRef bitmap);
 		
 		/// Inits an RGBA texture with 32 bit float per channel each
-		void Initialize(Renderer & device, size_t w = 0, size_t h = 0/*, const char* data = nullptr*/);
+		void InitializeFloatRGBA(Renderer & device, int w = 0, int h = 0);
+		
+		/// Inits single channel texture with 32 bit float per channel each
+		void InitializeFloat(Renderer & device, int w = 0, int h = 0);
+
+		/// Inits depth buffer
+		void InitializeDepth(Renderer & device, int w = 0, int h = 0);
 
 		/// Refresh bitmap 
 		void Update(Renderer & device, BitmapResourceRef bitmap);
+		void Update(Renderer & device, const void* bitmap);
 
 		void Shutdown();
 

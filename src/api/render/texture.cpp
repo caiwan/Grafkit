@@ -13,11 +13,96 @@ using namespace FWdebugExceptions;
 using namespace DirectX;
 using namespace Grafkit;
 
-Texture2D::Texture2D() //: IResource(),
-	:
-	m_pTex(nullptr),
-	m_pResourceView(nullptr),
-	m_pRenderTargetView(nullptr)
+
+// ========================================================================================================================
+
+Grafkit::ATexture::ATexture() : m_pResourceView(nullptr), m_pTargetView(nullptr)
+{
+}
+
+Grafkit::ATexture::~ATexture()
+{
+}
+
+void Grafkit::ATexture::Initialize()
+{
+}
+
+void Grafkit::ATexture::Shutdown()
+{
+	if (m_pResourceView)
+	{
+		m_pResourceView->Release();
+		m_pResourceView = nullptr;
+	}
+
+	if (m_pTargetView)
+	{
+		m_pTargetView->Release(); // ez valamiert nullptr exceptiont dob 
+		m_pTargetView = nullptr;
+	}
+}
+
+void Grafkit::ATexture::CreateTexture2D( Renderer & device, ID3D11Texture2D *& outTexture,  DXGI_FORMAT format, int w, int h)
+{
+	HRESULT result;
+
+	outTexture = nullptr;
+
+	int screenW = 0, screenH = 0; device.GetScreenSize(screenW, screenH);
+
+	D3D11_TEXTURE2D_DESC textureDesc;
+	textureDesc.Width = w > 0 ? w : screenW;
+	textureDesc.Height = h > 0 ? h : screenH;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = format;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
+
+	result = device->CreateTexture2D(&textureDesc, nullptr, &outTexture);
+	if (FAILED(result))
+	{
+		throw EX(TextureCreateException);
+	}
+	
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	renderTargetViewDesc.Format = textureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	result = device->CreateRenderTargetView(outTexture, &renderTargetViewDesc, &m_pTargetView);
+	if (FAILED(result))
+	{
+		throw EX(RenderTargetViewException);
+	}
+	
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	shaderResourceViewDesc.Format = textureDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	// Create the shader resource view.
+	result = device->CreateShaderResourceView(outTexture, &shaderResourceViewDesc, &m_pResourceView);
+	if (FAILED(result))
+	{
+		throw EX(ShaderResourceViewException);
+	}
+}
+
+void Grafkit::ATexture::UpdateTexture2D(Renderer & device, const unsigned char * bitmap, size_t x, size_t y, size_t ch)
+{
+
+}
+
+// ========================================================================================================================
+
+Texture2D::Texture2D() : ATexture(), 
+	m_pTex(nullptr)
 {
 }
 
@@ -130,76 +215,24 @@ void Grafkit::Texture2D::Initialize(Renderer & device, BitmapResourceRef bitmap)
 	}
 }
 
-void Grafkit::Texture2D::Initialize(Renderer & device, size_t w, size_t h/*, const char * data*/)
+void Grafkit::Texture2D::InitializeFloatRGBA(Renderer & device, int w, int h)
 {
-	D3D11_TEXTURE2D_DESC textureDesc;
-	HRESULT result;
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	CreateTexture2D(device, m_pTex, DXGI_FORMAT_R32G32B32A32_FLOAT, w, h);
+}
 
-	int screenW = 0, ScreenH = 0; device.GetScreenSize(screenW, ScreenH);
+void Grafkit::Texture2D::InitializeFloat(Renderer & device, int w, int h)
+{
+	CreateTexture2D(device, m_pTex, DXGI_FORMAT_R32_FLOAT, w, h);
+}
 
-	// Initialize the render target texture description.
-	ZeroMemory(&textureDesc, sizeof(textureDesc));
-
-	// Setup the render target texture description.
-	textureDesc.Width = w ? w : screenW;
-	textureDesc.Height = h ? h : ScreenH;
-	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = 0;
-
-	// Create the render target texture.
-	result = device->CreateTexture2D(&textureDesc, nullptr, &m_pTex);
-	if (FAILED(result))
-	{
-		throw EX(TextureCreateException);
-	}
-
-	// Setup the description of the render target view.
-	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-	// Create the render target view.
-	result = device->CreateRenderTargetView(m_pTex, &renderTargetViewDesc, &m_pRenderTargetView);
-	if (FAILED(result))
-	{
-		throw EX(RenderTargetViewException);
-	}
-
-	// Setup the description of the shader resource view.
-	shaderResourceViewDesc.Format = textureDesc.Format;
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-
-	// Create the shader resource view.
-	result = device->CreateShaderResourceView(m_pTex, &shaderResourceViewDesc, &m_pResourceView);
-	if (FAILED(result))
-	{
-		throw EX(ShaderResourceViewException);
-	}
+void Grafkit::Texture2D::InitializeDepth(Renderer & device, int w, int h)
+{
+	CreateTexture2D(device, m_pTex, DXGI_FORMAT_D32_FLOAT, w, h);
 }
 
 void Texture2D::Shutdown()
 {
-	if (m_pResourceView) 
-	{
-		m_pResourceView->Release();
-		m_pResourceView = nullptr;
-	}
-
-	if (m_pRenderTargetView)
-	{
-		m_pRenderTargetView->Release(); // ez valamiert nullptr exceptiont dob 
-		m_pRenderTargetView = nullptr;
-	}
+	ATexture::Shutdown();
 
 	if (m_pTex)
 	{
@@ -271,3 +304,5 @@ void Grafkit::TextureSampler::Shutdown()
 		m_pSamplerState = nullptr;
 	}
 }
+
+
