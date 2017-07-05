@@ -14,17 +14,13 @@ using namespace DirectX;
 using namespace Grafkit;
 
 #if 0
-
-#define TEX_1CH DXGI_FORMAT_R8_UNORM
-#define TEX_2CH DXGI_FORMAT_R8G0_UNORM
-#define TEX_4CH DXGI_FORMAT_R8G8B8A8_UNORM
-
+#define TEX_FMT_1CH DXGI_FORMAT_R8_UNORM
+#define TEX_FMT_2CH DXGI_FORMAT_R8G0_UNORM
+#define TEX_FMT_4CH DXGI_FORMAT_R8G8B8A8_UNORM
 #else
-
-#define TEX_1CH DXGI_FORMAT_R8_
-#define TEX_2CH DXGI_FORMAT_R8G0_UNORM
-#define TEX_4CH DXGI_FORMAT_R8G8B8A8_UNORM
-
+#define TEX_FMT_1CH DXGI_FORMAT_R8_UNORM
+#define TEX_FMT_2CH DXGI_FORMAT_R8G8_UNORM
+#define TEX_FMT_4CH DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
 #endif
 
 // ========================================================================================================================
@@ -142,10 +138,9 @@ void Grafkit::Texture2D::Initialize(Renderer & device, BitmapResourceRef bitmap)
 	desc.MipLevels = 1; // 0 = general magatol mipmapet
 	desc.ArraySize = 1; // multitextura szama, cubemap eseten n*6
 
-	/// @todo: ezt a structlibbol kellene potolni
 	switch (ch) {
-		case 1: desc.Format = DXGI_FORMAT_R8_UNORM; break;
-		case 2: desc.Format = DXGI_FORMAT_R8G8_UNORM; break;
+		case 1: desc.Format = TEX_FMT_1CH; break;
+		case 2: desc.Format = TEX_FMT_2CH; break;
 		case 3:
 		{
 			UINT* newdata = new UINT[x*y];
@@ -173,10 +168,10 @@ void Grafkit::Texture2D::Initialize(Renderer & device, BitmapResourceRef bitmap)
 			ch = 4;
 
 			data = (UCHAR*)newdata;
-			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.Format = TEX_FMT_4CH;
 		} break;
 
-		case 4: desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
+		case 4: desc.Format = TEX_FMT_4CH; break;
 
 		default: 
 			return ;
