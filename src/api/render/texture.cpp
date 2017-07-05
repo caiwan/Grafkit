@@ -13,6 +13,19 @@ using namespace FWdebugExceptions;
 using namespace DirectX;
 using namespace Grafkit;
 
+#if 0
+
+#define TEX_1CH DXGI_FORMAT_R8_UNORM
+#define TEX_2CH DXGI_FORMAT_R8G0_UNORM
+#define TEX_4CH DXGI_FORMAT_R8G8B8A8_UNORM
+
+#else
+
+#define TEX_1CH DXGI_FORMAT_R8_
+#define TEX_2CH DXGI_FORMAT_R8G0_UNORM
+#define TEX_4CH DXGI_FORMAT_R8G8B8A8_UNORM
+
+#endif
 
 // ========================================================================================================================
 
@@ -213,6 +226,11 @@ void Grafkit::Texture2D::Initialize(Renderer & device, BitmapResourceRef bitmap)
 	{
 		throw EX(ShaderResourceViewException);
 	}
+}
+
+void Grafkit::Texture2D::Initialize(Renderer & device, int w, int h)
+{
+	CreateTexture2D(device, m_pTex, DXGI_FORMAT_R8G8B8A8_UNORM, w, h);
 }
 
 void Grafkit::Texture2D::InitializeFloatRGBA(Renderer & device, int w, int h)

@@ -119,6 +119,9 @@ namespace Grafkit
 		/// Inits an RGBA texture with unisned 8 bit per channel each
 		void Initialize(Renderer & device, BitmapResourceRef bitmap);
 		
+		/// Inits an 8bit RGBA texture
+		void Initialize(Renderer & device, int w = 0, int h = 0);
+
 		/// Inits an RGBA texture with 32 bit float per channel each
 		void InitializeFloatRGBA(Renderer & device, int w = 0, int h = 0);
 		
