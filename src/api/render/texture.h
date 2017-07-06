@@ -65,31 +65,30 @@ namespace Grafkit
 
 		void SetRenderTargetView(Renderer & device, size_t id = 0) const;
 
+		void Update(Renderer & device, const void* bitmap);
+		void Update(Renderer & device, const BitmapRef bitmap);
+
 	protected:
-		void CreateTexture(Renderer & device, DXGI_FORMAT format, int w = 0, int h = 0, int d = 0);
-	
+		void CrateTexture(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0, int d = 0, bool isDynamic = true, bool hasMips = true);
 		void UpdateTexture(Renderer & device, const void* data, size_t len);
-		void UpdateTexture(Renderer & device, const BitmapRef bitmap);
-
-	protected:
-		void SetMipSlices(int mip) { m_mipSlices = mip; }
-		void SetMipLevels(int mip) { m_mipLevels = mip; }
-
+		
 		virtual int GetDimension() = 0;
 
 	protected:
 		ID3D11Resource * m_pTexture;
 		DXGI_FORMAT m_format;
 
-		int m_w, m_h, m_d, m_chW;
+		size_t m_w, m_h, m_d, m_ch, m_chW;
 
 		ID3D11ShaderResourceView * m_pResourceView;
 		ID3D11RenderTargetView * m_pTargetView;
 
-	private:
-		int m_mipSlices;
-		int m_mipLevels;
-
+	protected:
+		/*int m_mipSlices;
+		int m_maxMip;
+		int m_mipLevels;*/
+		/*D3D11_USAGE m_usage;
+		UINT m_CPUWriteFlags;*/
 	};
 	
 	/**
@@ -139,10 +138,6 @@ namespace Grafkit
 
 		/// Inits depth buffer
 		void InitializeDepth(Renderer & device, int w = 0, int h = 0);
-
-		/// Refresh bitmap 
-		void Update(Renderer & device, BitmapRef bitmap);
-		void Update(Renderer & device, const void* bitmap);
 
 		ID3D11Texture2D* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
 
