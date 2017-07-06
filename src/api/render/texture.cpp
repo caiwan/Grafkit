@@ -24,17 +24,20 @@ using namespace Grafkit;
 #endif
 
 // ========================================================================================================================
+// a bit of badly hacked thing, might need to clean it up later on
+// but for a while, it does well. 
+// ========================================================================================================================
 
-Grafkit::ATexture::ATexture() : m_pResourceView(nullptr), m_pTargetView(nullptr)
+Grafkit::ATexture::ATexture() : 
+	m_pResourceView(nullptr), m_pTargetView(nullptr), m_pTexture(nullptr),
+	m_mipSlices(0), m_mipLevels(0), 
+	m_w(0), m_h(0), m_d(0)
 {
 }
 
 Grafkit::ATexture::~ATexture()
 {
-}
-
-void Grafkit::ATexture::Initialize()
-{
+	Shutdown();
 }
 
 void Grafkit::ATexture::Shutdown()
@@ -47,225 +50,176 @@ void Grafkit::ATexture::Shutdown()
 
 	if (m_pTargetView)
 	{
-		m_pTargetView->Release(); // ez valamiert nullptr exceptiont dob 
+		m_pTargetView->Release();
 		m_pTargetView = nullptr;
 	}
-}
 
-void Grafkit::ATexture::CreateTexture2D( Renderer & device, ID3D11Texture2D *& outTexture,  DXGI_FORMAT format, int w, int h)
-{
-	HRESULT result;
-
-	outTexture = nullptr;
-
-	int screenW = 0, screenH = 0; device.GetScreenSize(screenW, screenH);
-
-	D3D11_TEXTURE2D_DESC textureDesc;
-	textureDesc.Width = w > 0 ? w : screenW;
-	textureDesc.Height = h > 0 ? h : screenH;
-	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = format;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = 0;
-
-	result = device->CreateTexture2D(&textureDesc, nullptr, &outTexture);
-	if (FAILED(result))
+	if (m_pTexture)
 	{
-		throw EX(TextureCreateException);
-	}
-	
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-	result = device->CreateRenderTargetView(outTexture, &renderTargetViewDesc, &m_pTargetView);
-	if (FAILED(result))
-	{
-		throw EX(RenderTargetViewException);
-	}
-	
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-	shaderResourceViewDesc.Format = textureDesc.Format;
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-
-	// Create the shader resource view.
-	result = device->CreateShaderResourceView(outTexture, &shaderResourceViewDesc, &m_pResourceView);
-	if (FAILED(result))
-	{
-		throw EX(ShaderResourceViewException);
+		m_pTexture->Release();
+		m_pTexture = nullptr;
 	}
 }
 
-void Grafkit::ATexture::UpdateTexture2D(Renderer & device, const unsigned char * bitmap, size_t x, size_t y, size_t ch)
+void Grafkit::ATexture::SetRenderTargetView(Renderer & device, size_t id) const
 {
-
-}
-
-// ========================================================================================================================
-
-Texture2D::Texture2D() : ATexture(), 
-	m_pTex(nullptr)
-{
-}
-
-Texture2D::~Texture2D()
-{
-	this->Shutdown();
-}
-
-/// @todo a kozos struct kitoltos reszeket ki kell tenni valami kozos helyre 
-
-void Grafkit::Texture2D::Initialize(Renderer & device, BitmapResourceRef bitmap)
-{
-	UINT x = bitmap->GetX(), y = bitmap->GetY(), ch = bitmap->GetCh();
-
-	HRESULT result = 0;
-
-	// fill etexture description
-	D3D11_TEXTURE2D_DESC desc; ZeroMemory(&desc, sizeof(desc));
-
-	UCHAR* data = (UCHAR*)bitmap->GetData();
-
-	desc.Width = x;
-	desc.Height = y;
-	desc.MipLevels = 1; // 0 = general magatol mipmapet
-	desc.ArraySize = 1; // multitextura szama, cubemap eseten n*6
-
-	switch (ch) {
-		case 1: desc.Format = TEX_FMT_1CH; break;
-		case 2: desc.Format = TEX_FMT_2CH; break;
-		case 3:
-		{
-			UINT* newdata = new UINT[x*y];
-			UCHAR* dst = (UCHAR*)newdata;
-			UCHAR* src = (UCHAR*)data;
-
-			size_t wx = x;
-			size_t wy = y;
-
-			size_t stride_src = wx * 3;
-			size_t stride_dst = wx * 4;
-
-			while (wy--) {
-				while (wx--) {
-					dst[4 * wx + 0] = src[3 * wx + 0];
-					dst[4 * wx + 1] = src[3 * wx + 1];
-					dst[4 * wx + 2] = src[3 * wx + 2];
-					dst[4 * wx + 3] = 0xff;
-				}
-				src += stride_src;
-				dst += stride_dst;
-				wx = x;
-			}
-
-			ch = 4;
-
-			data = (UCHAR*)newdata;
-			desc.Format = TEX_FMT_4CH;
-		} break;
-
-		case 4: desc.Format = TEX_FMT_4CH; break;
-
-		default: 
-			return ;
-	}
-
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-
-#define N 1
-	D3D11_SUBRESOURCE_DATA *initialData = new D3D11_SUBRESOURCE_DATA[N];
-	ZeroMemory(initialData, N * sizeof(initialData));
-	for (size_t i = 0; i < N; i++)
-	{
-		initialData[i].pSysMem = data;
-		initialData[i].SysMemPitch = x * ch;
-		initialData[i].SysMemSlicePitch = 0;
-
-	}
-#undef N
-
-	result = device->CreateTexture2D(&desc, initialData, &m_pTex);
-
-	if (FAILED(result)) {
-		delete[] initialData;
-		throw EX(TextureCreateException);
-	}
-
-	if (data != bitmap->GetData()) 
-		delete[] data;
-	delete[] initialData;
-
-	// --- shderresourceref
-	D3D11_SHADER_RESOURCE_VIEW_DESC resDesc;
-	ZeroMemory(&resDesc, sizeof(resDesc));
-
-	resDesc.Format = desc.Format;
-	resDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	resDesc.Texture2D.MostDetailedMip = 0;
-	resDesc.Texture2D.MipLevels = 1;
-
-	result = device->CreateShaderResourceView(&m_pTex[0], &resDesc, &m_pResourceView);
-	if (FAILED(result))
-	{
-		throw EX(ShaderResourceViewException);
-	}
-}
-
-void Grafkit::Texture2D::Initialize(Renderer & device, int w, int h)
-{
-	CreateTexture2D(device, m_pTex, DXGI_FORMAT_R8G8B8A8_UNORM, w, h);
-}
-
-void Grafkit::Texture2D::InitializeFloatRGBA(Renderer & device, int w, int h)
-{
-	CreateTexture2D(device, m_pTex, DXGI_FORMAT_R32G32B32A32_FLOAT, w, h);
-}
-
-void Grafkit::Texture2D::InitializeFloat(Renderer & device, int w, int h)
-{
-	CreateTexture2D(device, m_pTex, DXGI_FORMAT_R32_FLOAT, w, h);
-}
-
-void Grafkit::Texture2D::InitializeDepth(Renderer & device, int w, int h)
-{
-	CreateTexture2D(device, m_pTex, DXGI_FORMAT_D32_FLOAT, w, h);
-}
-
-void Texture2D::Shutdown()
-{
-	ATexture::Shutdown();
-
-	if (m_pTex)
-	{
-		m_pTex->Release();
-		m_pTex = nullptr;
-	}
-
-
-}
-
-void Grafkit::Texture2D::SetRenderTargetView(Renderer & device, size_t id)
-{
-	if (!m_pRenderTargetView) {
+	if (!m_pTargetView) {
 		throw EX(NoRenderTargetViewException);
 	}
 
-	device.SetRenderTargetView(m_pRenderTargetView, id);
+	device.SetRenderTargetView(m_pTargetView, id);
 }
 
+void Grafkit::ATexture::CreateTexture(Renderer & device, DXGI_FORMAT format, int w, int h, int d)
+{
+	HRESULT result;
 
+	m_w = w;
+	m_h = h;
+	m_d = d;
+
+	int dimension = GetDimension();
+
+	m_format = format;
+
+	D3D11_SRV_DIMENSION srvDimension;
+	D3D11_RTV_DIMENSION rtvDimension;
+
+	switch (dimension)
+	{
+		// Create 1D Texture
+		case 1:
+		{
+			if (!m_w)
+				return;
+
+			srvDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+			rtvDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
+
+			// ... 
+		}
+		// Create 2D Texture
+		case 2:
+		{
+			if (!m_w && !m_h)
+				device.GetScreenSize(m_w, m_h);
+			else if (!m_w || !m_h)
+				return;
+
+			srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+			D3D11_TEXTURE2D_DESC textureDesc;
+			ZeroMemory(&textureDesc, sizeof(textureDesc));
+			textureDesc.Width = m_w;
+			textureDesc.Height = m_h;
+			textureDesc.MipLevels = 1;
+			textureDesc.ArraySize = 1;
+			textureDesc.Format = m_format;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.CPUAccessFlags = 0;
+			textureDesc.MiscFlags = 0;
+
+			ID3D11Texture2D *ppTex = nullptr;
+			result = device->CreateTexture2D(&textureDesc, nullptr, &ppTex);
+
+			if (FAILED(result)) throw EX(TextureCreateException);
+			
+			m_pTexture = ppTex;
+		}
+		// Create 3D Texture
+		case 3:
+		{
+			if (!m_w || !m_h || !m_d)
+				return;
+
+			srvDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+			rtvDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+
+			// ... if needed
+		}
+		default:
+			return;
+	}
+
+	// --- 
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	shaderResourceViewDesc.Format = m_format;
+	shaderResourceViewDesc.ViewDimension = srvDimension;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
+
+	if (FAILED(result))
+		throw EX(ShaderResourceViewException);
+
+	// --- 
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	ZeroMemory(&renderTargetViewDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
+	renderTargetViewDesc.Format = m_format;
+	renderTargetViewDesc.ViewDimension = rtvDimension;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	result = device->CreateRenderTargetView(m_pTexture, &renderTargetViewDesc, &m_pTargetView);
+
+	if (FAILED(result))
+		throw EX(RenderTargetViewException);
+
+}
+
+void Grafkit::ATexture::UpdateTexture(Renderer & device, const void * data, size_t len)
+{
+	D3D11_MAPPED_SUBRESOURCE subRes;
+	device.GetDeviceContext()->Map(m_pTexture, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &subRes);
+	CopyMemory(subRes.pData, data, len);
+	device.GetDeviceContext()->Unmap(m_pTexture, NULL);
+}
+
+void Grafkit::ATexture::UpdateTexture(Renderer & device, const BitmapRef bitmap)
+{
+	UINT w = bitmap->GetX(), h = bitmap->GetY(), ch = bitmap->GetCh();
+	UCHAR* data = (UCHAR*)bitmap->GetData();
+
+	if (ch == 3)
+	{
+		UINT* newdata = new UINT[w*h];
+		UCHAR* dst = (UCHAR*)newdata;
+		UCHAR* src = (UCHAR*)data;
+
+		size_t x = w;
+		size_t y = h;
+
+		size_t stride_src = x * 3;
+		size_t stride_dst = x * 4;
+
+		while (y--) {
+			while (x--) {
+				dst[4 * x + 0] = src[3 * x + 0];
+				dst[4 * x + 1] = src[3 * x + 1];
+				dst[4 * x + 2] = src[3 * x + 2];
+				dst[4 * x + 3] = 0xff;
+			}
+			src += stride_src;
+			dst += stride_dst;
+			x = w;
+		}
+
+		ch = 4;
+
+		data = (UCHAR*)newdata;
+	} 
+
+	UpdateTexture(device, data, w * h * ch * sizeof(UCHAR));
+
+	if (data != bitmap->GetData())
+		delete[] data;
+}
+
+// ========================================================================================================================
 
 // ========================================================================================================================
 

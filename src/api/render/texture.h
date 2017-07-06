@@ -27,13 +27,13 @@ namespace Grafkit
 		Bitmap(void* data, UINT x, UINT y, UINT ch) : m_bmsize(0), m_ch(ch), m_x(x), m_y(y), m_data(data) { m_bmsize = x*y*ch; m_stride = x*ch; }
 		~Bitmap() { free(m_data); }
 
-		virtual void* GetData() { return m_data; }
-		virtual size_t GetSize() { return m_bmsize; }
+		virtual void* GetData() const { return m_data; }
+		virtual size_t GetSize() const { return m_bmsize; }
 
-		UINT GetX() { return m_x; }
-		UINT GetY() { return m_y; }
-		UINT GetCh() { return m_ch; }
-		UINT GetStride() { return m_stride; }
+		UINT GetX() const { return m_x; }
+		UINT GetY() const { return m_y; }
+		UINT GetCh() const { return m_ch; }
+		UINT GetStride() const { return m_stride; }
 
 		/// @todo resize if needed 
 
@@ -42,7 +42,7 @@ namespace Grafkit
 		UINT m_bmsize, m_stride, m_x, m_y, m_ch;
 	};
 
-	typedef Ref<Bitmap> BitmapResourceRef;
+	typedef Ref<Bitmap> BitmapRef;
 
 	// ========================================================================================================================
 	
@@ -56,39 +56,52 @@ namespace Grafkit
 		ATexture();
 		virtual  ~ATexture();
 	
-		void Initialize();
+		//void Initialize();
 		void Shutdown();
 
-		ID3D11ShaderResourceView* GetTextureResource() { return this->m_pResourceView; }
-		ID3D11RenderTargetView* GetRenderTargetView() { return this->m_pTargetView; }
+		ID3D11ShaderResourceView* GetShaderResourceView() const { return this->m_pResourceView; }
+		ID3D11RenderTargetView* GetRenderTargetView() const { return this->m_pTargetView; }
+		ID3D11Resource* GetTextureResource() const { return this->m_pTexture; }
+
+		void SetRenderTargetView(Renderer & device, size_t id = 0) const;
 
 	protected:
-		void CreateTexture1D(Renderer & device, ID3D11Texture1D *& outTexture, DXGI_FORMAT format, int w);
-		void CreateTexture2D(Renderer & device, ID3D11Texture2D *& outTexture, DXGI_FORMAT format, int w, int h);
-		void CreateTexture3D(Renderer & device, ID3D11Texture3D *& outTexture, DXGI_FORMAT format, int w, int h, int d);
-
-		void UpdateTexture1D(Renderer & device, void* data, size_t len, size_t stride);
-		void UpdateTexture2D(Renderer & device, void* data, size_t len, size_t stride);
-		void UpdateTexture2D(Renderer & device, const unsigned char* bitmap, size_t x, size_t y, size_t ch);
-		void UpdateTexture3D(Renderer & device, void* data, size_t len, size_t stride);
+		void CreateTexture(Renderer & device, DXGI_FORMAT format, int w = 0, int h = 0, int d = 0);
+	
+		void UpdateTexture(Renderer & device, const void* data, size_t len);
+		void UpdateTexture(Renderer & device, const BitmapRef bitmap);
 
 	protected:
+		void SetMipSlices(int mip) { m_mipSlices = mip; }
+		void SetMipLevels(int mip) { m_mipLevels = mip; }
+
+		virtual int GetDimension() = 0;
+
+	protected:
+		ID3D11Resource * m_pTexture;
+		DXGI_FORMAT m_format;
+
+		int m_w, m_h, m_d, m_chW;
+
 		ID3D11ShaderResourceView * m_pResourceView;
 		ID3D11RenderTargetView * m_pTargetView;
-		int m_w, m_h, m_d;
-		int m_isGenerateMips;
+
+	private:
+		int m_mipSlices;
+		int m_mipLevels;
 
 	};
 	
 	/**
-	1DTextureClass
+	QnD 1DTextureClass
 	with 32 bit float values
+	Contains just shortcuts
 	*/
 	__declspec(align(16)) class Texture1D : public ATexture, virtual public Referencable, public AlignedNew<Texture2D>
 	{
 	public:
-		Texture1D();
-		~Texture1D();
+		Texture1D() : ATexture() {}
+		~Texture1D() {}
 		
 		/// inits with 32 bit float 1D texture (array) 
 		void Initialize(Renderer & device, size_t w = 0, const float* data = nullptr);
@@ -96,28 +109,24 @@ namespace Grafkit
 		/// texture <- data
 		void Update(Renderer & device, const float* data = nullptr);
 
-		void Shutdown();
+		ID3D11Texture1D* GetTexture1D() { return (ID3D11Texture1D*)this->m_pTexture; }
 
-		ID3D11Texture1D* GetTexture2D() { return this->m_pTex; }
-
-
-		void SetRenderTargetView(Renderer & device, size_t id = 0);
-
-	private:
-		ID3D11Texture1D * m_pTex;
+	protected:
+		virtual int GetDimension() { return 1; }
 	};
 
 	/**
-	2D Texture class
+	QnD 2D Texture class
+	Contains just shortcuts
 	*/
 	__declspec(align(16)) class Texture2D : public ATexture, virtual public Referencable, public AlignedNew<Texture2D>
 	{
 	public:
-		Texture2D();
-		~Texture2D();
+		Texture2D() : ATexture() {}
+		~Texture2D() {}
 		
 		/// Inits an RGBA texture with unisned 8 bit per channel each
-		void Initialize(Renderer & device, BitmapResourceRef bitmap);
+		void Initialize(Renderer & device, BitmapRef bitmap);
 		
 		/// Inits an 8bit RGBA texture
 		void Initialize(Renderer & device, int w = 0, int h = 0);
@@ -132,21 +141,14 @@ namespace Grafkit
 		void InitializeDepth(Renderer & device, int w = 0, int h = 0);
 
 		/// Refresh bitmap 
-		void Update(Renderer & device, BitmapResourceRef bitmap);
+		void Update(Renderer & device, BitmapRef bitmap);
 		void Update(Renderer & device, const void* bitmap);
 
-		void Shutdown();
+		ID3D11Texture2D* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
 
-		ID3D11Texture2D* GetTexture2D() { return this->m_pTex; }
-		ID3D11ShaderResourceView* GetTextureResource() { return this->m_pResourceView; }
-		ID3D11RenderTargetView* GetRenderTargetView() { return this->m_pRenderTargetView; }
+	protected:
+		virtual int GetDimension() { return 2; }
 
-		void SetRenderTargetView(Renderer & device, size_t id =0);
-
-	private:
-		ID3D11Texture2D * m_pTex;
-		ID3D11ShaderResourceView* m_pResourceView;
-		ID3D11RenderTargetView* m_pRenderTargetView;
 	};
 
 	// ========================================================================================================================
