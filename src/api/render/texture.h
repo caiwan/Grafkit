@@ -84,11 +84,6 @@ namespace Grafkit
 		ID3D11RenderTargetView * m_pTargetView;
 
 	protected:
-		/*int m_mipSlices;
-		int m_maxMip;
-		int m_mipLevels;*/
-		/*D3D11_USAGE m_usage;
-		UINT m_CPUWriteFlags;*/
 	};
 	
 	/**
