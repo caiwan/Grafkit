@@ -98,7 +98,7 @@ void Grafkit::Material::Render(Renderer& render, ShaderRef &shader)
 
 	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
 		if (it->second.Valid() && it->second->Valid())
-			shader->SetBoundedResourcePointer(it->first, (*it->second)->GetTextureResource());
+			shader->SetBoundedResourcePointer(it->first, (*it->second)->GetShaderResourceView());
 	}
 }
 
