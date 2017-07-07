@@ -117,7 +117,7 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 			textureDesc.Format = m_format;
 			textureDesc.SampleDesc.Count = 1;
 			textureDesc.Usage = isDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-			textureDesc.BindFlags = (isDynamic ? 0 : D3D11_BIND_RENDER_TARGET) | D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.BindFlags = (!isDynamic ? D3D11_BIND_RENDER_TARGET : 0) | D3D11_BIND_SHADER_RESOURCE;
 			textureDesc.CPUAccessFlags = isDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 			textureDesc.MiscFlags = 0;
 
