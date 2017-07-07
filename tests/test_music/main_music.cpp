@@ -53,6 +53,7 @@ protected:
 	Renderer render;
 	MusicResRef m_music;
 	ShaderResRef m_fxFFTVisu;
+	Texture1DRef m_FFTTTex;
 	EffectComposerRef m_postfx;
 
 	float *m_fftData;
@@ -68,6 +69,9 @@ protected:
 		m_postfx = new EffectComposer();
 		m_postfx->AddPass(new EffectPass(m_fxFFTVisu));
 		m_postfx->Initialize(render);
+
+		m_FFTTTex = new Texture1D();
+		m_FFTTTex->Initialize(render, 256);
 
 		m_fftData = new float[256];
 
@@ -87,17 +91,19 @@ protected:
 	};
 
 	int mainloop() {
+		// update FFT 
+		(*m_music)->GetFFT(m_fftData, 256);
+		m_FFTTTex->Update(render, m_fftData);
 
+		// --- 
 		m_postfx->BindInput(render);
-
 		this->render.BeginScene();
 		{
 			// do nothing, the blank screen we have
 		}
 
 		// render fx chain 
-
-		//(*m_fxFFTVisu)->SetParamValue(render, "FFT", "fftData", m_fftData);
+		(*m_fxFFTVisu)->SetShaderResourceView("fftTex", m_FFTTTex->GetShaderResourceView());
 
 		m_postfx->Render(render);
 

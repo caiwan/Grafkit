@@ -65,7 +65,7 @@ namespace Grafkit
 
 		void SetRenderTargetView(Renderer & device, size_t id = 0) const;
 
-		void Update(Renderer & device, const void* bitmap);
+		void Update(Renderer & device, const void* data);
 		void Update(Renderer & device, const BitmapRef bitmap);
 
 	protected:
@@ -105,14 +105,13 @@ namespace Grafkit
 		/// inits with 32 bit float 1D texture (array) 
 		void Initialize(Renderer & device, size_t w = 0, const float* data = nullptr);
 
-		/// texture <- data
-		void Update(Renderer & device, const float* data = nullptr);
-
 		ID3D11Texture1D* GetTexture1D() { return (ID3D11Texture1D*)this->m_pTexture; }
 
 	protected:
 		virtual int GetDimension() { return 1; }
 	};
+
+	typedef Ref<Texture1D> Texture1DRef ;
 
 	/**
 	QnD 2D Texture class

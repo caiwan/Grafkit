@@ -1,8 +1,6 @@
 
-
-cbuffer FFT{
-	float fftData[64];
-};
+Texture1D<float> fftTex;
+SamplerState SampleType;
 
 struct PixelInputType
 {
@@ -12,7 +10,7 @@ struct PixelInputType
 
 float4 fftVisual(PixelInputType input) : SV_TARGET
 {
-	float4 color = float4(1,0,0,1);
-
+	float f = fftTex.Sample(SampleType, input.tex.x); 
+	float4 color = float4(f, f, f, 1);
 	return color;
 }

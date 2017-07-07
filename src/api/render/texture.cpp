@@ -80,6 +80,11 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 	D3D11_SRV_DIMENSION srvDimension;
 	D3D11_RTV_DIMENSION rtvDimension;
 
+	D3D11_USAGE usage = isDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+	UINT bindFlags = (!isDynamic ? D3D11_BIND_RENDER_TARGET : 0) | D3D11_BIND_SHADER_RESOURCE;
+	UINT CPUAccessFlags = isDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
+	UINT miscFlags = 0;
+
 	switch (dimension)
 	{
 		// Create 1D Texture
@@ -92,6 +97,24 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 			rtvDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
 
 			// ... 
+			D3D11_TEXTURE1D_DESC textureDesc;
+			ZeroMemory(&textureDesc, sizeof(textureDesc));
+			textureDesc.Width = m_w;
+			textureDesc.MipLevels = 1;
+			textureDesc.ArraySize = 1;
+			textureDesc.Format = m_format;
+			textureDesc.Usage = usage;
+			textureDesc.BindFlags = bindFlags;
+			textureDesc.CPUAccessFlags = CPUAccessFlags;
+			textureDesc.MiscFlags = miscFlags;
+
+			ID3D11Texture1D *ppTex = nullptr;
+			result = device->CreateTexture1D(&textureDesc, nullptr, &ppTex);
+
+			if (FAILED(result)) throw EX(TextureCreateException);
+
+			m_pTexture = ppTex;
+
 		} break;
 		// Create 2D Texture
 		case 2:
@@ -116,10 +139,10 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 			textureDesc.ArraySize = 1;
 			textureDesc.Format = m_format;
 			textureDesc.SampleDesc.Count = 1;
-			textureDesc.Usage = isDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-			textureDesc.BindFlags = (!isDynamic ? D3D11_BIND_RENDER_TARGET : 0) | D3D11_BIND_SHADER_RESOURCE;
-			textureDesc.CPUAccessFlags = isDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
-			textureDesc.MiscFlags = 0;
+			textureDesc.Usage = usage;
+			textureDesc.BindFlags = bindFlags;
+			textureDesc.CPUAccessFlags = CPUAccessFlags;
+			textureDesc.MiscFlags = miscFlags;
 
 			ID3D11Texture2D *ppTex = nullptr;
 			result = device->CreateTexture2D(&textureDesc, nullptr, &ppTex);
@@ -210,9 +233,9 @@ void Grafkit::ATexture::Update(Renderer & device, const void * bitmap)
 {
 	size_t len = 0;
 	switch (GetDimension()) {
-		case 1:	len = m_ch * m_chW * m_w;
-		case 2:	len = m_ch * m_chW * m_w * m_h;
-		case 3: len = m_ch * m_chW * m_w * m_h * m_d;
+		case 1:	len = m_ch * m_chW * m_w; break;
+		case 2:	len = m_ch * m_chW * m_w * m_h; break;
+		case 3: len = m_ch * m_chW * m_w * m_h * m_d; break;
 		default:  return;
 	}
 	
@@ -266,6 +289,12 @@ void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap)
 }
 
 // ========================================================================================================================
+
+void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, const float * data)
+{
+	this->CrateTexture(device, DXGI_FORMAT_R32_FLOAT, 1, 4, w);
+}
+
 
 // ========================================================================================================================
 
