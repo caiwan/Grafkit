@@ -169,7 +169,7 @@ protected:
 
 				vs->SetParam(render, "MatrixBuffer", &viewMatrices);
 
-				fs->SetShaderResourceView("diffuse", texture->GetTextureResource());
+				fs->SetShaderResourceView("diffuse", texture->GetShaderResourceView());
 				fs->SetSamplerSatate("SampleType", texSampler->GetSamplerState());
 
 				vs->Bind(this->render);

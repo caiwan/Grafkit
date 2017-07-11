@@ -1,0 +1,3 @@
+include (${GK2_ROOT_DIR}/cmake/create_demoapp.cmake)
+
+subdirs(01_padlizsan)

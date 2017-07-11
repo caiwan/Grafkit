@@ -1,8 +1,9 @@
-# Declare static files - 
+# Copies and install static files
 # caiwan/ir
+
 function(copy_static_files TARGET INSTALL_DEST FILES)
 	foreach(_file IN ITEMS ${FILES})
-
+	
 		if (IS_ABSOLUTE "${_file}")
 			file(RELATIVE_PATH _file_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_file}")
 		else()

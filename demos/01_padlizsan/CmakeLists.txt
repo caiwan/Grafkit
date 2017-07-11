@@ -1,0 +1,14 @@
+create_demoapp(demo_01_padlizsan)
+
+# TODO: add shaders and resources here 
+
+# file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inl)
+# file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inc)
+	
+# copy generated resources + install to production folder
+
+file(GLOB_RECURSE FILES "/assets/*.*")
+copy_static_files(assets "assets/" "${FILES}")
+
+assign_source_group("${FILES}")
+
