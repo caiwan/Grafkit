@@ -87,7 +87,7 @@ public:
 
 		std::array<char, 1024> buffer;
 		
-		//cmd = "{" + cmd + "} 
+		//cmd = "{" + cmd + "}"
 		cmd += " 2>&1";
 
 		std::shared_ptr<FILE> pipe(_popen(cmd.c_str(), "r"), _pclose);	// http://stackoverflow.com/questions/35297970
