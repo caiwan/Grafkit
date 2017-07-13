@@ -61,17 +61,24 @@ namespace {
 // Head
 // ================================================================================================================================================================
 
-Grafkit::AssimpLoader::AssimpLoader() : m_data(nullptr), m_length(0)
+Grafkit::AssimpLoader::AssimpLoader() : m_data(nullptr), m_length(0),
+m_is_lh(false)
 {
 }
 
-Grafkit::AssimpLoader::AssimpLoader(void * src_data, size_t src_length) : m_data(src_data), m_length(src_length)
+Grafkit::AssimpLoader::AssimpLoader(void * src_data, size_t src_length) : m_data(src_data), m_length(src_length),
+m_is_lh(false)
 {
 }
 
 
 Grafkit::AssimpLoader::~AssimpLoader()
 {
+}
+
+void Grafkit::AssimpLoader::SetLHFlag(bool islh)
+{
+	m_is_lh = islh;
 }
 
 
@@ -94,7 +101,7 @@ void Grafkit::AssimpLoader::AppendAssimp(const void * data, size_t length, Scene
 {
 	/// @todo genNormals szar. Miert?
 	aiscene = importer.ReadFileFromMemory(data, length,
-		// aiProcess_ConvertToLeftHanded |
+		(m_is_lh ? aiProcess_ConvertToLeftHanded : 0) |
 		0
 	);
 
@@ -185,36 +192,41 @@ void Grafkit::AssimpLoader::AssimpLoadMeshes(SceneRef &outScene)
 			model->SetName(mesh_name);
 
 			// SimpleMeshGenerator generator();
-
+/*
 			std::vector<float4> vertices;
 			std::vector<float2> texuvs;
 			std::vector<float4> normals;
-			std::vector<float4> tangents;
+			std::vector<float4> tangents;*/
+
+			float4* vertices = new float4[curr_mesh->mNumVertices];
+			float2* texuvs   = new float2[curr_mesh->mNumVertices];
+			float4* normals  = new float4[curr_mesh->mNumVertices];
+			float4* tangents = new float4[curr_mesh->mNumVertices];
 
 			for (k = 0; k < curr_mesh->mNumVertices; k++) {
 				float4 v;
-				assimp_vertices(curr_mesh->mVertices[k], v, 1.); vertices.push_back(v);
-				assimp_vertices(curr_mesh->mNormals[k], v, 1.); normals.push_back(v);
+				assimp_vertices(curr_mesh->mVertices[k], v, 1.); vertices[k] = v;
+				assimp_vertices(curr_mesh->mNormals[k], v, 1.); normals[k] = v;
 
 				if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
 					// @todo valamiert nincs mindig tangent
 					if (curr_mesh->mTangents) {
-						assimp_vertices(curr_mesh->mTangents[k], v, 1.); tangents.push_back(v);
+						assimp_vertices(curr_mesh->mTangents[k], v, 1.); tangents[k] = v;
 					}
-					assimp_vertices(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs.push_back(float2(v.x, v.y));
+					assimp_vertices(curr_mesh->mTextureCoords[0][k], v, 1.); texuvs[k]= (float2(v.x, v.y));
 				}
 
 			}
 
 			/**/
 
-			model->GetMesh()->AddPointer("POSITION", vertices.size() * sizeof(vertices), &vertices[0]);
-			model->GetMesh()->AddPointer("NORMAL", normals.size() * sizeof(normals), &normals[0]);
+			model->GetMesh()->AddPointer("POSITION", curr_mesh->mNumVertices * sizeof(*vertices), &vertices[0]);
+			model->GetMesh()->AddPointer("NORMAL", curr_mesh->mNumVertices * sizeof(*normals), &normals[0]);
 
 			if (curr_mesh->mTextureCoords && curr_mesh->mTextureCoords[0]) {
-				model->GetMesh()->AddPointer("TEXCOORD", texuvs.size() * sizeof(texuvs), &texuvs[0]);
+				model->GetMesh()->AddPointer("TEXCOORD", curr_mesh->mNumVertices * sizeof(*texuvs), &texuvs[0]);
 				if (curr_mesh->mTangents)
-					model->GetMesh()->AddPointer("TANGENT", tangents.size() * sizeof(tangents), &tangents[0]);
+					model->GetMesh()->AddPointer("TANGENT", curr_mesh->mNumVertices * sizeof(*tangents), &tangents[0]);
 			}
 
 			// -- faces

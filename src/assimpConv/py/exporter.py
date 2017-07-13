@@ -11,9 +11,9 @@ if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
 # there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
-from helpers.client import Connection
-from helpers.dump import Dump
-from helpers.collada import Collada
+from helpers import Connection
+from helpers import Dump
+from helpers import Collada
 
 def get_args():
     parser = argparse.ArgumentParser()

@@ -12,12 +12,10 @@ from .collada import Collada
 
 from client import Connection
 
-
-
 class Dump:
 
-	"""
-	"""
+    """
+    """
 
     def __init__(self):
         self._obj_set = set()

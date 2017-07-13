@@ -150,8 +150,7 @@ void Camera::Calculate(Renderer& renderer)
 	m_perspectiveMatrix = XMMatrixPerspectiveFovLH(fov, m_aspect, m_znear, m_zfar);
 	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
 
-
-	}
+}
 
 
 void Grafkit::Camera::serialize(Archive & ar)

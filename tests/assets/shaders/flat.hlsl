@@ -35,7 +35,7 @@ struct PixelOutType {
 
 // VertexShader
 //------------------------------------------------------------------------------------
-PixelInputType TextureVertexShader(VertexInputType input)
+PixelInputType mainVertex(VertexInputType input)
 {
 	PixelInputType output;
 
@@ -60,7 +60,7 @@ PixelInputType TextureVertexShader(VertexInputType input)
 
 // PixelShader
 //------------------------------------------------------------------------------------
-PixelOutType TexturePixelShader(PixelInputType input)
+PixelOutType mainPixel(PixelInputType input)
 {
 	PixelOutType output;
 	output.diff = float4(0.5,0.5,0.5,1);

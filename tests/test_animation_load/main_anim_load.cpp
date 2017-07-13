@@ -10,6 +10,8 @@
 
 #include "generator/ShaderLoader.h"
 
+#include "utils/InitializeSerializer.h"
+
 #include "generator/SceneLoader.h"
 #include "render/Scene.h"
 
@@ -21,7 +23,7 @@
 
 using namespace Grafkit;
 
-class Application : public Grafkit::System, protected Grafkit::ResourcePreloader
+class Application : public Grafkit::System, protected Grafkit::ResourcePreloader, protected Grafkit::ClonableInitializer
 {
 public:
 	Application() : Grafkit::System(),
@@ -69,16 +71,27 @@ protected:
 		LoadCache();
 
 		// -- load shader
-		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
-		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
+		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/flat.hlsl", ""));
+		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
+		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
 
 		DoPrecalc();
 		
 		m_scene->Get()->BuildScene(render, m_vs, m_fs);
 		m_scene->Get()->SetActiveCamera(0);
+
+		m_currCameraActor = m_scene->Get()->GetCamera(0);
+		Camera * c = dynamic_cast<Camera*>(m_currCameraActor->GetEntities()[0].Get());
+		if (c) {
+			//c->SetUp(0, 0, 1);
+			//c->SetLookTo(0, -1, 0);
+
+			//c->SetLookAt(0, 0, 0);
+			//c->SetPosition(10, -10, 10);
+			//c->SetLookTo(0, 0, 0);
+		}
 
 		m_t = 0;
 
@@ -95,7 +108,15 @@ protected:
 		{
 			m_t += .01;
 
+			//m_currCameraActor->Transform().Identity();
+			//m_currCameraActor->Matrix().Identity();
+			
+			//m_currCameraActor->Matrix().RotateRPY(55. * M_PI / 180., 0 * M_PI / 180., 45. * M_PI / 180.);
+			//m_currCameraActor->Matrix().Translate(5, 5, 5);
+			//m_currCameraActor->Matrix().Translate(0, 5, 0);
+
 			this->m_scene->Get()->UpdateAnimation(fmod(m_t, 10.5));
+			//this->m_scene->Get()->UpdateAnimation(0.);
 			this->m_scene->Get()->PreRender(render);
 			this->m_scene->Get()->Render(render);
 

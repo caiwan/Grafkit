@@ -208,7 +208,7 @@ protected:
 		
 				float f = abs(sin(t));
 				m_cameraActor->Transform().Identity();
-				m_cameraActor->Transform().Translate(0,0,f);
+				m_cameraActor->Transform().Translate(0,f,0);
 
 				scene->Get()->PreRender(render);
 				scene->Get()->Render(render);

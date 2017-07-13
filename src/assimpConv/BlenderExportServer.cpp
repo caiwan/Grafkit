@@ -293,6 +293,7 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 			daefile.copy(data, daefile.size() + 1);
 
 			AppendAssimp(data, daefile.size()+1, m_scene);
+
 		}
 
 		// --- handle raw data daumped form the script

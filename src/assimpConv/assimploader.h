@@ -33,6 +33,10 @@ namespace Grafkit {
 		AssimpLoader(void* data, size_t length);
 		~AssimpLoader();
 
+		// convert to left-handed
+		void SetLHFlag(bool islh);
+
+
 		SceneResRef Load();
 		void AppendAssimp(const void* data, size_t length, SceneRef inscene);
 
@@ -68,6 +72,8 @@ namespace Grafkit {
 
 		Assimp::Importer importer;
 		const aiScene *aiscene;
+
+		bool m_is_lh;
 	};
 
 }
