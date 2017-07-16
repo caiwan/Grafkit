@@ -21,6 +21,12 @@ namespace Grafkit {
 		void Initialize(ActorRef root);
 		void Shutdown();
 
+		void RenderFrame(Grafkit::Renderer & render, float time) {
+			UpdateAnimation(time);
+			PreRender(render);
+			Render(render);
+		}
+
 		void PreRender(Grafkit::Renderer & render);
 		void Render(Grafkit::Renderer & render);
 

@@ -108,7 +108,7 @@ namespace Grafkit {
 
 		/// @todo https://en.wikipedia.org/wiki/Euler_angles
 
-		/// Roll-Pitch-Yaw rotation
+		/// Roll-Pitch-Yaw rotation, in rad
 		void RotateRPY(float roll, float pitch, float yaw)
 		{
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw));

@@ -30,7 +30,10 @@ function(assign_source_group)
 
 		elseif("${_source}" MATCHES ".*\\.(py)\\s?")
 			set(_source_path_msvc "Source Files\\${_source_path_msvc}")		
-			
+            
+		elseif("${_source}" MATCHES ".*\\.(blend)\\s?")
+			set(_source_path_msvc "Blender Files\\${_source_path_msvc}")		
+						
 		else()
 			set(_source_path_msvc "Resource Files\\${_source_path_msvc}")
 			

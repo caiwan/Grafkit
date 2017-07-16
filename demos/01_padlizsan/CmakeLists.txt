@@ -2,13 +2,14 @@ create_demoapp(demo_01_padlizsan)
 
 # TODO: add shaders and resources here 
 
-# file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inl)
-# file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inc)
-	
-# copy generated resources + install to production folder
+file(GLOB_RECURSE BLEND_FILES assets/*.blend)
+file(GLOB_RECURSE STATIC_FILES "assets/*.scene" "assets/*.ogg" "assets/*.hlsl" "assets/textures/*.*")
 
-file(GLOB_RECURSE FILES "/assets/*.*")
-copy_static_files(assets "assets/" "${FILES}")
+# message(${STATIC_FILES})
 
-assign_source_group("${FILES}")
+add_custom_target(demo_01_padlizsan_assets SOURCES ${BLEND_FILES} ${STATIC_FILES})
+set_target_properties(demo_01_padlizsan_assets PROPERTIES FOLDER demos/assets)
 
+copy_static_files(demo_01_padlizsan_assets "demo_01_padlizsan/assets" "${STATIC_FILES}")
+
+assign_source_group(${BLEND_FILES} ${STATIC_FILES})

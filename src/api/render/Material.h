@@ -78,6 +78,7 @@ namespace Grafkit {
 		void RemoveTexture(TextureResRef texture, texture_type_e slot);
 
 		// persisthez kell
+		bool _IsTextureMapEmpty() { return m_textures.empty(); }
 		std::map<std::string, TextureResRef>::const_iterator _GetTextureMapIterator_Begin() { return m_textures.cbegin(); }
 		std::map<std::string, TextureResRef>::const_iterator _GetTextureMapIterator_End() { return m_textures.cend(); }
 
@@ -109,22 +110,20 @@ namespace Grafkit {
 				char ___3[4];
 			};
 
-			// miserable hack
-			// has to have this thing for a while for padding in serializer
 			union {
-				int has_texture[TT_COUNT];
-				// ezt mire kell paddolni
-				char ___4[TT_COUNT * 16];
+				float roughness;
+				char ___3[4];
 			};
 
+			union {
+				float albedo;
+				char ___3[4];
+			};
 		};
 
 		struct material_t m_material;
 
 		std::map<std::string, TextureResRef> m_textures;
-
-		// ShaderRef m_override_fshader;
-
 
 	protected:
 		void serialize(Archive& ar);

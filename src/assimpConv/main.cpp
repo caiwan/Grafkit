@@ -27,15 +27,6 @@ typedef unsigned int uint;
 
 /* ================================================================================================ */
 
-
-//#ifdef _WIN32
-//#define POPEN(a, b) _popen(" ", "w");
-//#define PCLOSE _pclose
-//#else
-//#define POPEN(a, b) popen(" ", "w");
-//#define PCLOSE pclose
-//#endif
-
 class Application{
 private:
 	Arguments args;
@@ -49,7 +40,7 @@ public:
 		//args.add("format", 'f').description("Output format. Overrides file extension.");
 		//args.add("axis", 'x').description("Change axis order of the vertex cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
 		//args.add("flip", 'p').description("Flips the camera 180 deg around one given axis.");
-		//args.add("lh").description("convert to left handed").flag(true);
+		args.add("lh").description("convert to left handed").flag(true);
 		//args.add("textures", 't').description("Strip path from texture filenames").flag(true);
 		//args.add("animation", 'a').description("Merge animations from an external json file").flag(true);
 	}
@@ -78,6 +69,11 @@ public:
 	int ExecuteBlender() {
 		
 		BlenderExportServer server;
+
+		//server.SetLHFlag(args.get("lh").isFound());
+		server.SetLHFlag(true);
+
+
 		server.Start();
 
 		std::string cmd = "blender -b -P py/exporter.py --";

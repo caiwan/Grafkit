@@ -21,7 +21,7 @@ function(copy_static_files TARGET INSTALL_DEST FILES)
 		endif()
 		
 		set(dst_path "${CMAKE_CURRENT_BINARY_DIR}/${_file_path}")
-		
+		 
 		file(MAKE_DIRECTORY ${dst_path})
 		
 		# -- win32 only
@@ -38,6 +38,8 @@ function(copy_static_files TARGET INSTALL_DEST FILES)
 			DEPENDS ${_file}
 		)
 		
+        # message("${TARGET} ${_file} ${_dest}")
+        
 		install(FILES "${_file_rel}" DESTINATION "${INSTALL_DEST}/${_file_path}")
 
 	endforeach(_file)

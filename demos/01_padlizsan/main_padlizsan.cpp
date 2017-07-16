@@ -1,13 +1,17 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#include "fwzSetup.h"
+
 #include "core/system.h"
 #include "core/Music.h"
 
 #include "generator/MusicBassLoader.h"
 #include "generator/ShaderLoader.h"
+#include "generator/SceneLoader.h"
 
 #include "render/renderer.h"
+#include "render/Scene.h"
 #include "render/shader.h"
 
 #include "render/effect.h"
@@ -20,28 +24,33 @@
 
 #include "utils/InitializeSerializer.h"
 
+#if 0
+#define HAVE_MUSIC(x) x
+#else
+#define HAVE_MUSIC(x)
+#endif
+
 using namespace Grafkit;
 
 class Application : public Grafkit::System, protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 {
 public:
-	Application() : ClonableInitializer(), Grafkit::System(),  ResourcePreloader(),
+	Application(fwzSettings &settings) : ClonableInitializer(), Grafkit::System(),  ResourcePreloader(),
 		m_file_loader(nullptr)
 	{
 		int screenWidth, screenHeight;
 
-		screenWidth = 800;
-		screenHeight = 600;
+		screenWidth = settings.scrWidth;
+		screenHeight = settings.scrHeight;
 
 		InitializeWindows(screenWidth, screenHeight);
 
 		screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
-		const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
 
 		int result = 0;
 
-		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
-		this->m_file_loader = new FileAssetFactory("/assets/");
+		result = this->render.Initialize(screenWidth, screenHeight, settings.nVsync, this->m_window.getHWnd(), !settings.nWindowed);
+		this->m_file_loader = new FileAssetFactory("./assets/");
 	}
 
 	~Application() {
@@ -51,21 +60,39 @@ public:
 
 protected:
 	Renderer render;
-	MusicResRef m_music;
+
+	HAVE_MUSIC(MusicResRef m_music);
 	ShaderResRef m_fxFFTVisu;
+	ShaderResRef m_vs;
+	ShaderResRef m_fs;
 	Texture1DRef m_FFTTTex;
+	
+	SceneResRef m_scene1;
+	SceneResRef m_scene2;
+	SceneResRef m_scene3;
+	
 	EffectComposerRef m_postfx;
 
 	float *m_fftData;
 
 	int init() 
 	{
-		m_music = Load<MusicRes>(new MusicBassLoader("padlizsan.ogg"));
-		m_fxFFTVisu = Load<ShaderRes>(new PixelShaderLoader("fxFFTvisual", "shaders/FFTVisual.hlsl", "fftVisual"));
+		HAVE_MUSIC(m_music = Load<MusicRes>(new MusicBassLoader("padlizsan.ogg")));
+		m_fxFFTVisu = Load<ShaderRes>(new PixelShaderLoader("fxFFTvisual", "shaders/postfx.hlsl", "passthrough"));
+
+		m_vs = Load<ShaderRes>(new PixelShaderLoader("vs", "shaders/flat.hlsl", "mainVertex"));
+		m_fs = Load<ShaderRes>(new PixelShaderLoader("fs", "shaders/flat.hlsl", "mainPixel"));
+
+		m_scene1 = Load<SceneRes>(new SceneLoader("scene1", "scene1.scene"));
+		//m_scene2 = Load<SceneRes>(new SceneLoader("scene1", "scene2.scene"));
+		//m_scene3 = Load<SceneRes>(new SceneLoader("scene1", "scene3.scene"));
 
 		LoadCache();
 		DoPrecalc();
 
+		(*m_scene1)->BuildScene(render, m_vs, m_fs);
+		(*m_scene1)->SetActiveCamera(0);
+		
 		m_postfx = new EffectComposer();
 		m_postfx->AddPass(new EffectPass(m_fxFFTVisu));
 		m_postfx->Initialize(render);
@@ -75,14 +102,14 @@ protected:
 
 		m_fftData = new float[256];
 
-		(*m_music)->Play();
-
+		HAVE_MUSIC((*m_music)->Play());
+		
 		return 0;
 	};
 
 	
 	void release() {
-		(*m_music)->Stop();
+		HAVE_MUSIC((*m_music)->Stop());
 
 		delete[] m_fftData;
 
@@ -92,14 +119,14 @@ protected:
 
 	int mainloop() {
 		// update FFT 
-		(*m_music)->GetFFT(m_fftData, 256);
+		HAVE_MUSIC((*m_music)->GetFFT(m_fftData, 256));
 		m_FFTTTex->Update(render, m_fftData);
 
 		// --- 
 		m_postfx->BindInput(render);
 		this->render.BeginScene();
 		{
-			// do nothing, the blank screen we have
+			(*m_scene1)->RenderFrame(render, 0.f);
 		}
 
 		// render fx chain 
@@ -109,7 +136,9 @@ protected:
 
 		this->render.EndScene();
 
-		return !(*m_music)->IsPlaying();
+		int res = 0;
+		HAVE_MUSIC(res = !(*m_music)->IsPlaying());
+		return res;
 	};
 
 private:
@@ -121,6 +150,20 @@ public:
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	Application app;
+	fwzSettings setup;
+	setup.hInstance = hInstance;
+
+	setup.scrBPP = 32;
+	setup.nVsync = 1;
+	setup.nMultisample = 0;
+
+	setup.nAlwaysOnTop = 1;
+	setup.scrWidth = 800;
+	setup.scrHeight = 600;
+	setup.nWindowed = 1;
+	if (!OpenSetupDialog(&setup))
+		return -1;
+
+	Application app(setup);
 	return app.execute();
 }

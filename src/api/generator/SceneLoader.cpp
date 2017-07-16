@@ -226,6 +226,9 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 // Which texture belong to this exact material, and which shader slot bound to
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef & material)
 {
+	if (material->_IsTextureMapEmpty())
+		return;
+
 	auto tx_begin = material->_GetTextureMapIterator_Begin();
 	auto tx_end = material->_GetTextureMapIterator_End();
 
