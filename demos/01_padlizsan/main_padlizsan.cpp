@@ -24,7 +24,7 @@
 
 #include "utils/InitializeSerializer.h"
 
-#if 0
+#if 1
 #define HAVE_MUSIC(x) x
 #else
 #define HAVE_MUSIC(x)
@@ -80,8 +80,8 @@ protected:
 		HAVE_MUSIC(m_music = Load<MusicRes>(new MusicBassLoader("padlizsan.ogg")));
 		m_fxFFTVisu = Load<ShaderRes>(new PixelShaderLoader("fxFFTvisual", "shaders/postfx.hlsl", "passthrough"));
 
-		m_vs = Load<ShaderRes>(new PixelShaderLoader("vs", "shaders/flat.hlsl", "mainVertex"));
-		m_fs = Load<ShaderRes>(new PixelShaderLoader("fs", "shaders/flat.hlsl", "mainPixel"));
+		m_vs = Load<ShaderRes>(new VertexShaderLoader("vs", "shaders/flat.hlsl", ""));
+		m_fs = Load<ShaderRes>(new PixelShaderLoader("fs", "shaders/flat.hlsl", ""));
 
 		m_scene1 = Load<SceneRes>(new SceneLoader("scene1", "scene1.scene"));
 		//m_scene2 = Load<SceneRes>(new SceneLoader("scene1", "scene2.scene"));
@@ -91,7 +91,7 @@ protected:
 		DoPrecalc();
 
 		(*m_scene1)->BuildScene(render, m_vs, m_fs);
-		(*m_scene1)->SetActiveCamera(0);
+		(*m_scene1)->SetActiveCamera("Camera_001");
 		
 		m_postfx = new EffectComposer();
 		m_postfx->AddPass(new EffectPass(m_fxFFTVisu));
@@ -119,14 +119,18 @@ protected:
 
 	int mainloop() {
 		// update FFT 
+
+		float t = 0.0f;
+
 		HAVE_MUSIC((*m_music)->GetFFT(m_fftData, 256));
+		HAVE_MUSIC(t = (*m_music)->GetTime());
 		m_FFTTTex->Update(render, m_fftData);
 
 		// --- 
 		m_postfx->BindInput(render);
 		this->render.BeginScene();
 		{
-			(*m_scene1)->RenderFrame(render, 0.f);
+			(*m_scene1)->RenderFrame(render, t);
 		}
 
 		// render fx chain 

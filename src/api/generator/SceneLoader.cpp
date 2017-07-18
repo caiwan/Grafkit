@@ -84,7 +84,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 {
 	Persist(ar, resman);
 
-	LOGGER(Log::Logger().Info("-ASSIGN-"));
+	LOGGER(Log::Logger().Info("-- ASSIGN --"));
 
 	// 5. material -> mesh relation
 	LOGGER(Log::Logger().Info("Materials: %d", m_materials_to_meshes.size()));
