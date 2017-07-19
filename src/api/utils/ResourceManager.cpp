@@ -78,6 +78,7 @@ void Grafkit::IResourceManager::DoPrecalc()
 		if (*it) {
 			(*it)->Load(this, Get<IResource>((*it)->GetName()));
 		}
+
 		// event after item had loaded
 		
 		i++;

@@ -54,11 +54,14 @@ void Grafkit::ActorAnimation::Update(double time)
 	Animation::FindKey(m_positionTrack, time, pos);
 	Animation::FindKey(m_scalingTrack, time, scale);
 	Animation::FindKey(m_rotationTrack, time, rotate);
-	
+
 	matrix.Identity();
 	matrix.Scale(scale);
 	matrix.Rotate(rotate);
 	matrix.Translate(pos);
+
+	// note:
+	// https://gamedev.stackexchange.com/questions/16719/what-is-the-correct-order-to-multiply-scale-rotation-and-translation-matrices-f
 	
 	m_actor->Matrix(matrix);
 }

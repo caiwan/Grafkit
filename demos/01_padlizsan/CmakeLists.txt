@@ -5,10 +5,11 @@ create_demoapp(demo_01_padlizsan)
 file(GLOB_RECURSE BLEND_FILES assets/*.blend)
 file(GLOB_RECURSE STATIC_FILES "assets/*.scene" "assets/*.ogg" "assets/*.hlsl" "assets/textures/*.*")
 
-# message(${STATIC_FILES})
-
 add_custom_target(demo_01_padlizsan_assets SOURCES ${BLEND_FILES} ${STATIC_FILES})
 set_target_properties(demo_01_padlizsan_assets PROPERTIES FOLDER demos/assets)
+
+# Still does not work
+# add_blend_assimpconv(demo_01_padlizsan_assets "demo_01_padlizsan/assets" "${BLEND_FILES}")
 
 copy_static_files(demo_01_padlizsan_assets "demo_01_padlizsan/assets" "${STATIC_FILES}")
 
