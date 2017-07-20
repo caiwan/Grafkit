@@ -182,6 +182,33 @@ PixelInputType mainVertex(VertexInputType input)
 //	), 1);
 //}
 
+//------------------------------------------------------------------------------------
+
+float orenNayarDiffuse(
+	float3 lightDirection,
+	float3 viewDirection,
+	float3 surfaceNormal,
+	float roughness,
+	float intensity
+)
+{
+
+	float LdotV = dot(lightDirection, viewDirection);
+	float NdotL = dot(lightDirection, surfaceNormal);
+	float NdotV = dot(surfaceNormal, viewDirection);
+
+	float s = LdotV - NdotL * NdotV;
+	float t = lerp(1.0, max(NdotL, NdotV), step(0.0, s));
+
+	float sigma2 = roughness * roughness;
+	float A = 1.0 + sigma2 * (intensity / (sigma2 + 0.13) + 0.5 / (sigma2 + 0.33));
+	float B = 0.45 * sigma2 / (sigma2 + 0.09);
+
+	return intensity * max(0.0, NdotL) * (A + B * s / t) / PI;
+}
+
+//------------------------------------------------------------------------------------
+
 struct phongBlinn_t {
 	float lambda;
 	float theta;
@@ -217,7 +244,8 @@ float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
 {
 	float4 color = material_ambient;
 		
-	float4 lp = float4(10, 10, 10, 1);
+	// float4 lp = float4(10, 10, 10, 1);
+	// float4 lp = lights[0].position;
 
 	phongBlinn_t phong = calcPhongBlinn(input.worldPosition, lp, input.normal, 10);
 	float l = phong.lambda;
@@ -237,3 +265,33 @@ float4 mainPixel_DiffuseTexture(PixelInputType input) : SV_TARGET
 
 	return color;
 }
+
+//------------------------------------------------------------------------------------
+
+float4 mainPixel_OrenNayar(PixelInputType input) : SV_TARGET
+{
+	float4 color = material_ambient;
+
+	float ep = float4(0,0,0,1);
+
+	float3 lightPosition = lights[0].position;
+	float3 surfacePosition = input.worldPosition;
+	float3 eyePosition = viewMatrix[3];
+
+	float3 lightDirection = normalize(lightPosition - surfacePosition);
+	float3 viewDirection = normalize(eyePosition - surfacePosition);
+
+	//Surface properties
+	vec3 normal = normalize(surfaceNormal);
+	float l = orenNayarDiffuse(
+		lightDirection,
+		viewDirection,
+		surfaceNormal,
+		roughness,
+		intensity
+	);
+
+	return color;
+}
+
+//------------------------------------------------------------------------------------
