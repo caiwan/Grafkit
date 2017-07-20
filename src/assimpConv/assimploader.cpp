@@ -191,13 +191,6 @@ void Grafkit::AssimpLoader::AssimpLoadMeshes(SceneRef &outScene)
 			LOGGER(Log::Logger().Trace("- #%d %s", i, mesh_name));
 			model->SetName(mesh_name);
 
-			// SimpleMeshGenerator generator();
-/*
-			std::vector<float4> vertices;
-			std::vector<float2> texuvs;
-			std::vector<float4> normals;
-			std::vector<float4> tangents;*/
-
 			float4* vertices = new float4[curr_mesh->mNumVertices];
 			float2* texuvs   = new float2[curr_mesh->mNumVertices];
 			float4* normals  = new float4[curr_mesh->mNumVertices];

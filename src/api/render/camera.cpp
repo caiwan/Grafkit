@@ -7,6 +7,8 @@
 
 using namespace Grafkit;
 
+#define CAMERA_RH
+
 PERSISTENT_IMPL(Grafkit::Camera)
 
 Camera::Camera() : Entity3D()
@@ -22,7 +24,7 @@ Camera::Camera() : Entity3D()
 	m_screenWidth = 100;
 
 	m_position = float3(0, 0, 0);
-	m_look = float3(0, 0, 1);
+	m_look = float3(0, 0, 1);	// LH coord
 	m_up = float3(0, 1, 0);
 	m_rotation = float3(0, 0, 0);
 
@@ -81,15 +83,30 @@ void Camera::Calculate(Renderer& renderer)
 
 	// http://www.gamedev.net/page/resources/_/technical/directx-and-xna/directx-11-c-game-camera-r2978
 
-	float3 pos = m_position;
-	float3 center = m_look;
-	float3 up = m_up;
+	dxvector E = XMLoadFloat3(&m_position);	// eye coord
+	dxvector C = XMLoadFloat3(&m_look);		// look reference or vector
+	dxvector U = XMLoadFloat3(&m_up);		// up vector
+
+#if 1 // use internal xmmatrix
+	if (m_mode == LOOK_AT) {
+#ifdef CAMERA_RH
+		m_viewMatrix = XMMatrixLookToRH(E, C, U);
+#else  //CAMERA_RH
+		m_viewMatrix = XMMatrixLookToLH(E, C, U);
+#endif //CAMERA_RH
+	}
+	else if (m_mode == LOOK_TO) {
+#ifdef CAMERA_RH
+		m_viewMatrix = XMMatrixLookAtRH(E, C, U);
+#else  //CAMERA_RH
+		m_viewMatrix = XMMatrixLookAtLH(E, C, U);
+#endif //CAMERA_RH
+	}
+
+#else // use calculate matrix by hand
 
 	dxvector v0, v1, v2;
 	dxvector s, u, f;
-	dxvector E = XMLoadFloat3(&pos);
-	dxvector C = XMLoadFloat3(&center);
-	dxvector U = XMLoadFloat3(&up);
 
 	// look at a reference point 
 	if (m_mode == LOOK_AT) {
@@ -98,19 +115,14 @@ void Camera::Calculate(Renderer& renderer)
 		f = XMVector3Normalize(f);	// lookat
 	}
 	// look towards a drirection
-	else if(m_mode == LOOK_TO) {
+	else if (m_mode == LOOK_TO) {
 		f = C;	// lookat = center 
 	}
-
-#if 0
-	m_viewMatrix = XMMatrixLookToLH(E, f, U);
-#else 
 
 	// kezzel fel kell irni a kamera matrixot, mert a D3D-s feliras valamiert nem okes. 
 	// https://github.com/g-truc/glm/blob/316460408a5ef0338029a7c8f387ac49a2f1561c/glm/gtc/matrix_transform.inl#L638
 
 	s = XMVector3Cross(U, f);	// right
-
 	u = XMVector3Cross(f, s);	// up
 
 	v0 = XMVector3Dot(s, E);
