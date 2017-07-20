@@ -156,9 +156,22 @@ namespace Grafkit {
 #else
 			return DirectX::XMVectorGetByIndex(mat.r[row], col);
 #endif 
+
 		}
 
-
-
+		// --- matrix - vector ops
+		float4 Transfrom(float4 &f4) const {
+			dxvector v = XMVector4Transform(XMLoadFloat4(&f4), mat);
+			float4 r;
+			XMStoreFloat4(&r, v);
+			return r;
+		}
+		
+		float3 Transfrom(float3 &f3) const {
+			dxvector v = XMVector3Transform(XMLoadFloat3(&f3), mat);
+			float3 r;
+			XMStoreFloat3(&r, v);
+			return r;
+		}
 	};
 }

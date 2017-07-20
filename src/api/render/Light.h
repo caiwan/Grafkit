@@ -22,10 +22,11 @@ namespace Grafkit{
 		~Light();
 
 		/// @todo ez csak egy QnD Hack, ki kell majd javitani a jovoben
-		float4 &Position() { return m_light.position; }
-		void Position(float4 p) {m_light.position = p; }
+		float4 &Position() { return m_position; }
+		void Position(float4 p) {m_position = p; }
 
-		float4 &Direction() { return m_light.direction; }
+		float4 &Direction() { return m_direction; }
+		void Direction(float4 d) { m_direction = d; }
 
 		float4 &Ambient() { return m_light.ambient; }
 		float4 &Diffuse() { return m_light.diffuse; }
@@ -41,8 +42,9 @@ namespace Grafkit{
 		/// Setup the corresponding constant buffer inside the shader
 		//void SetShaderCB(ShaderRef &rPShader);
 
-		void Render(Grafkit::Renderer& deviceContext, Scene* scene);
-		void Build(Grafkit::Renderer& deviceContext, Scene* scene) {}
+		void Render(Grafkit::Renderer& deviceContext, Scene*& scene);
+		void Calculate(Grafkit::Renderer& deviceContext, Scene* const & scene, Matrix &nodeMatrix);
+		void Build(Grafkit::Renderer& deviceContext, Scene*& scene) {}
 
 	protected:
 
@@ -68,6 +70,9 @@ namespace Grafkit{
 		};
 
 		struct light_t m_light;
+
+		float4 m_position;
+		float4 m_direction;
 
 	};
 

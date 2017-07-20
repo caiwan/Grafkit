@@ -176,6 +176,17 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 	PrerenderNode(render, m_root);
 
+	// --- lights
+	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++) {
+		if (it->Valid() && !it->Get()->GetEntities().empty() && it->Get()->GetEntities()[0].Valid()) {
+			Light* light = dynamic_cast<Light *>(it->Get()->GetEntities()[0].Get());
+			if (light) {
+				Matrix wm = it->Get()->WorldMatrix();
+				light->Calculate(render, this, wm);
+			}
+		}
+	}
+
 	// --- kamera
 	ActorRef &cameraActor = GetActiveCamera();
 	if (cameraActor.Valid() && (!cameraActor->GetEntities().empty() && cameraActor->GetEntities()[0].Valid())) {

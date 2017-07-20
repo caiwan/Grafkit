@@ -66,6 +66,7 @@ protected:
 	TextureSamplerRef texSampler;
 
 	LightRef light;
+	ActorRef lightActor;
 
 	ActorRef m_rootActor;
 	ActorRef m_cameraActor;
@@ -96,7 +97,9 @@ protected:
 
 		// -- add lights
 		light = new PointLight();
-		light->Position(float4(10,10,10,1));
+		lightActor = new Actor(light);
+
+		(*scene)->GetRootNode()->AddChild(lightActor);
 
 		// --- serialize && deserialize
 
