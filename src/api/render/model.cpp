@@ -29,7 +29,7 @@ Model::~Model()
 
 // ==================================================================
 
-void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* scene)
+void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* const & scene)
 {
 	if (m_geometryShader.Valid() && m_geometryShader->Valid())
 		m_geometryShader->Get()->Bind(render);
@@ -44,7 +44,7 @@ void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* scene)
 		m_geometryShader->Get()->Bind(render);
 }
 
-void Grafkit::Model::Build(Grafkit::Renderer & deviceContext, Scene * scene)
+void Grafkit::Model::Build(Grafkit::Renderer & deviceContext, Scene * const & scene)
 {
 	if (m_mesh.Valid())
 		m_mesh->Build(deviceContext, scene->GetVShader());

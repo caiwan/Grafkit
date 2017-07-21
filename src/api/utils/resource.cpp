@@ -40,7 +40,7 @@ template <typename T, typename U> inline U crawl(T in) {
 	return out;
 }
 
-// generates a totallz random tihng
+// generates a totally random tihng
 ULONG Grafkit::IResource::GenerateID()
 {
 	srand(crawl<milliseconds, UINT>(duration_cast<milliseconds>(system_clock::now().time_since_epoch())));

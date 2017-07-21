@@ -26,7 +26,7 @@ void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, Scene * const 
 	m_light.direction = nodeMatrix.Transfrom(m_direction);
 }
 
-void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, Scene *& scene)
+void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, Scene * const & scene)
 {
 	scene->GetPShader()->SetParamT<light_t>(deviceContext, "light", m_light);
 }

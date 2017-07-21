@@ -49,6 +49,7 @@ float onOff(float a, float b, float c)
 }
 
 float ramp(float y, float start, float end)
+
 {
 	float inside = step(start,y) - step(end,y);
 	float fact = (y-start)/(end-start)*inside;

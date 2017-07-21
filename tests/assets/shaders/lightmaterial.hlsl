@@ -1,3 +1,5 @@
+#define PI 3.14159265359
+
 cbuffer MatrixBuffer
 {
 	matrix worldMatrix;
