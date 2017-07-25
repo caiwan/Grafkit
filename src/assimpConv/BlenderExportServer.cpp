@@ -251,7 +251,9 @@ void BlenderExportServer::Stop()
 {
 	if (!m_serverThread)
 		return;
-	m_serverThread->Join();
+	
+	m_serverThread->Stop();
+	
 	delete m_serverThread;
 	m_serverThread = NULL;
 }
@@ -296,7 +298,7 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 
 		}
 
-		// --- handle raw data daumped form the script
+		// --- handle raw data dumped right form the script
 		else if (cmd.compare(_cmd_dump) == 0) {
 			/// ... 
 			std::ofstream fs("hello.json", std::ofstream::out);

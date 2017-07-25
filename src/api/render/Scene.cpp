@@ -14,8 +14,10 @@ using namespace FWdebugExceptions;
 
 PERSISTENT_IMPL(Grafkit::Scene);
 
-Grafkit::Scene::Scene():
-	m_root(nullptr)
+Grafkit::Scene::Scene() :
+	m_root(nullptr),
+	m_tStart(0.0f),
+	m_tEnd(10.0f)
 {
 }
 
@@ -169,7 +171,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 	for (int i = 0; i < m_animations.size(); i++) {
 		if (m_animations[i].Valid())
-			m_animations[i]->Update(m_animation_time);
+			m_animations[i]->Update(m_tAnim);
 	}
 
 	// update matrices here 
@@ -281,4 +283,6 @@ void Grafkit::Scene::Pop()
 void Grafkit::Scene::serialize(Archive & ar)
 {
 	// a tobbit a loader vegzi majd 
+	PERSIST_FIELD(ar, m_tStart);
+	PERSIST_FIELD(ar, m_tEnd);
 }

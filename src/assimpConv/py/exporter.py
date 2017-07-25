@@ -11,9 +11,10 @@ if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
 # there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
-from helpers import Connection
+
 from helpers import Dump
-from helpers import Collada
+from helpers.client import Connection
+from helpers.collada import Collada
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -41,12 +42,30 @@ if __name__ == "__main__":
         # open blendfile
         bpy.ops.wm.open_mainfile(filepath=infile)
         
-        c = Collada(conn)
-        c.dump()
+        # bake scene
+        
+        # with Bake as bake:
+            # pass
+        
+        # dump data from scene
+        with Dump(conn) as dump:
+            dump.add(Collada())
+            # dump.add()
+            
+        # c = Collada(conn)
+        # c.dump()
+    
+        # export scene data
+        # scene start, scene end, scene aspect
+        # d = Dump()
+        # scene = bpy.scene
+        # scene_data = d.dump({\
+            # "scene":{\
+                # "start":scene.frame_start, 
+                # "end":scene.frame_end,
+                # "fps":scene.render.fps,
+            # }
+        # })
     
         pass
         
-    # d = dump.Dump(conn)
-    # d.walk
-    #with dump.Dump(conn) as d:
-    #    d.dump(bpy.data)

@@ -234,7 +234,7 @@ phongBlinn_t calcPhongBlinn(float4 p, float4 lp, float4 N, float f) {
 	float3 R = reflect(-mp, N.xyz);	// reflected vector (double half vector)
 	
 	res.d = length(mp);
-	res.lambda = dot(N, L);
+	res.lambda = dot(N.xyz, L);
 	res.theta = pow(saturate(dot(R, E)), f);
 
 	return res;

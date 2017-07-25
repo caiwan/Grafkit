@@ -101,7 +101,8 @@ public:
 		server.Stop();
 
 		SceneResRef scene = server.GetScene(); 
-		SceneLoader::Save(scene->Get(), args.get("output").value());
+		if (scene.Valid() && scene->Valid())
+			SceneLoader::Save(scene->Get(), args.get("output").value());
 
 		return 0;
 	}

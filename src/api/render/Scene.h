@@ -53,7 +53,7 @@ namespace Grafkit {
 		void AddAnimation(AnimationRef anim);
 		void GetAnimations(std::vector<AnimationRef> &animations) { animations.clear(); animations.assign(m_animations.cbegin(), m_animations.cend()); }
 		AnimationRef GetAnimation(int i) { return m_animations[i]; }
-		void UpdateAnimation(double t) { m_animation_time = t; }
+		void UpdateAnimation(double t) { m_tAnim = t; }
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
@@ -63,11 +63,20 @@ namespace Grafkit {
 		void SetVShader(ShaderRef &VS) {this->m_vertexShader = VS; }
 		void SetPShader(ShaderRef &FS) {this->m_pixelShader = FS; }
 
+		float GetStartTime() { return m_tStart; }
+		float GetEndTime()   { return m_tEnd; }
+		
+		void GetStartTime(float start) { m_tStart = start; }
+		void GetEndTime(float end) {m_tEnd = end; }
+
+		bool IsActive() { return true && (m_tAnim >= m_tStart && m_tAnim < m_tEnd); }
+
 		void BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps);
 
 	private:
-		ActorRef m_root;
+		float m_tStart, m_tEnd;
 
+		ActorRef m_root;
 		ActorRef m_activeCamera;
 
 		// Todo: these neeeds to be optimiyed and tied up a bit
@@ -79,7 +88,7 @@ namespace Grafkit {
 
 		std::vector<AnimationRef> m_animations;
 
-		double m_animation_time;
+		double m_tAnim;
 
 		ShaderRef m_vertexShader;
 		ShaderRef m_pixelShader;

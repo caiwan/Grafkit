@@ -7,19 +7,76 @@ cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(insp
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
-from .bake import Bake
-from .collada import Collada
 
-from client import Connection
+class Dumpable:
+    """ Dumpable base class
+    """
+    
+    def __init__(self):
+        pass
+        
+    def dump(self):
+        """Returns the serialized object data"""
+        return ""
+        pass
+        
+    def get_cmd(self):
+        """ Retruns the command key of the object"""
+        return ""
+        pass
+        
+    pass
 
 class Dump:
-
+    """ Network dump framework class
     """
+    
+    def __init__(self, conn):
+        self._dumps = []
+        self._conn = conn;
+        pass #ctor
+        
+    def __enter__(self):
+        return self
+        pass
+        
+    def add(self, obj):
+        if isinstance(obj, Dumpable):
+            self._dumps.append(obj)
+        else:
+            raise TypeError("Object is not Dumpable")
+        
+        pass # dump
+        
+    def __exit__(self, type, value, traceback):
+        for obj in self._dumps:
+            o = obj.dump()
+            c = obj.get_cmd()
+            self._conn.send(c, o)
+            obj.clenaup()
+        pass
+    
+
+
+
+
+class DumapbleObject (Dumpable):
+    """ Recursive Object walker framework for bpy objects
     """
 
-    def __init__(self):
+    def __init__(self, obj, cmd="object"):
+        self._obj = obj
+        self._cmd = cmd
         self._obj_set = set()
         pass
+        
+        
+    def dump(self):
+        return self._walk_object(self._obj)
+        
+        
+    def get_cmd():
+        return self._cmd
         
     #
     _skip_data_types = ["bl_rna", "rna_type", "translation_context", "use_autopack", "is_dirty", "is_saved", "is_updated", "window_managers", "cache_files"]
@@ -27,13 +84,6 @@ class Dump:
     _iter_types = ["tuple", "list", "bpy_prop_collection"]
     _map_types = ["dict"]
         
-
-    #    
-    def dump(self, object):
-        return self._walk_object(object)
-        pass
-        
-    #  
     
     def _walk_vector(self, object):
         return { 'x':0, 'y':0, 'z':0, 'w':0 }
@@ -120,3 +170,9 @@ class Dump:
 
         return result["data"]
 
+
+# ---
+# from .bake import Bake
+# from .collada import Collada
+# from .scene import Scene
+# from .client import Connection
