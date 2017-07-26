@@ -1,4 +1,7 @@
-msvc/
+__pycache__
+*.pyc
+
+msvc*/
 tools-builds/
 
 ## Ignore Visual Studio temporary files, build results, and
