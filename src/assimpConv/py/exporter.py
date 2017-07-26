@@ -42,30 +42,14 @@ if __name__ == "__main__":
         # open blendfile
         bpy.ops.wm.open_mainfile(filepath=infile)
         
-        # bake scene
-        
+        # bake scene        
         # with Bake as bake:
             # pass
         
         # dump data from scene
         with Dump(conn) as dump:
             dump.add(Collada())
-            # dump.add()
-            
-        # c = Collada(conn)
-        # c.dump()
-    
-        # export scene data
-        # scene start, scene end, scene aspect
-        # d = Dump()
-        # scene = bpy.scene
-        # scene_data = d.dump({\
-            # "scene":{\
-                # "start":scene.frame_start, 
-                # "end":scene.frame_end,
-                # "fps":scene.render.fps,
-            # }
-        # })
+
     
         pass
         

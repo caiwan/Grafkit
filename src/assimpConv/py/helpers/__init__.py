@@ -58,8 +58,6 @@ class Dump:
     
 
 
-
-
 class DumapbleObject (Dumpable):
     """ Recursive Object walker framework for bpy objects
     """
