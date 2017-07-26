@@ -144,7 +144,7 @@ void Grafkit::LoggerHandler::FileLoggerHandler::Write(Grafkit::Logger::message_t
 
 Grafkit::LoggerHandler::ConsoleLogger::ConsoleLogger() : m_haveConsole(0), m_stdout(stdout), m_stderr(stderr)
 {
-#if 0
+#if 1
 	AllocConsole(); m_haveConsole = 1;
 
 	HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
