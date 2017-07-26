@@ -7,9 +7,9 @@ set basedir=%CD%
 
 cd ..\..\msvc17\deploy\tools\
 
-AssimpConverter.exe -b -lh -i %basedir%\models\locRotScale.blend -o %basedir%\locRotScale.scene
-AssimpConverter.exe -b -lh -i %basedir%\models\sphere.blend -o %basedir%\sphere.scene
+rem AssimpConverter.exe -b -lh -i %basedir%\models\locRotScale.blend -o %basedir%\locRotScale.scene
+REM AssimpConverter.exe -b -lh -i %basedir%\models\sphere.blend -o %basedir%\sphere.scene
 AssimpConverter.exe -b -lh -i %basedir%\models\spheres.blend -o %basedir%\spheres.scene
-rem AssimpConverter.exe -b -lh -i %basedir%\models\scene3.blend -o %basedir%\scene3.scene
+REM AssimpConverter.exe -b -lh -i %basedir%\models\box.blend -o %basedir%\box.scene
 
 cd %basedir%
