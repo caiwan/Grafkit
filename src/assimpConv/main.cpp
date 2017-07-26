@@ -51,6 +51,10 @@ public:
 public:
 
 	int Execute(int argc, char* argv[]) {
+
+		Log::Logger().AddHandler(new LoggerHandler::ConsoleLogger());
+		Log::Logger().AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
+
 		if (!args.evaluate(argc, argv)) {
 			cout << args.getErrorMessage() << endl;
 			cout << args.getHelpMessage() << endl;

@@ -16,8 +16,10 @@ using namespace FWdebugExceptions;
 
 Grafkit::Logger::Logger()
 {
-	this->AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
-	this->AddHandler(new LoggerHandler::ConsoleLogger());
+	// todo: csak az msvc outra irjon, a tobbi nem kell
+	//this->AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
+	//this->AddHandler(new LoggerHandler::ConsoleLogger());
+	this->AddHandler(new LoggerHandler::MsvcOutLogger());
 }
 
 Grafkit::Logger::~Logger()
@@ -176,9 +178,22 @@ void Grafkit::LoggerHandler::ConsoleLogger::Write(Grafkit::Logger::message_t * c
 			if (this->m_stdout)
 				fprintf_s(this->m_stdout, "%s\r\n", message->message);
 		}
-	//else 
-	{
-		OutputDebugStringA(message->message);
-		OutputDebugStringA("\r\n");
-	}
+}
+
+// ==================================================================================================
+// MSVC console output logger handler
+// ==================================================================================================
+
+Grafkit::LoggerHandler::MsvcOutLogger::MsvcOutLogger()
+{
+}
+
+Grafkit::LoggerHandler::MsvcOutLogger::~MsvcOutLogger()
+{
+}
+
+void Grafkit::LoggerHandler::MsvcOutLogger::Write(Grafkit::Logger::message_t * const & message)
+{
+	OutputDebugStringA(message->message);
+	OutputDebugStringA("\r\n");
 }

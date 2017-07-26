@@ -90,6 +90,7 @@ namespace Grafkit {
 	class LoggerHandler {
 		// =======================================================================================================================================
 	public:
+
 		class FileLoggerHandler : public Logger::ILoggerHandler {
 		public:
 			FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);
@@ -116,6 +117,17 @@ namespace Grafkit {
 
 			int m_haveConsole;
 		};
+
+		// ------------------------------------------------------------------
+
+		class MsvcOutLogger : public FileLoggerHandler{
+		public:
+			MsvcOutLogger();
+			~MsvcOutLogger();
+		protected:
+			virtual void Write(Grafkit::Logger::message_t * const & message);
+		};
+
 	};
 }
 
