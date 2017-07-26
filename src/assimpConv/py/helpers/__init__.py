@@ -53,7 +53,6 @@ class Dump:
             o = obj.dump()
             c = obj.get_cmd()
             self._conn.send(c, o)
-            obj.clenaup()
         pass
     
 
