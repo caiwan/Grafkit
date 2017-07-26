@@ -36,6 +36,8 @@ cbuffer material
 	float4 material_ambient, material_diffuse, material_specular, material_emission;
 	float material_specularLevel;
 	float material_shininess;
+	float material_roughness;
+	float material_intensity;
 };
 
  cbuffer light
@@ -245,9 +247,9 @@ phongBlinn_t calcPhongBlinn(float4 p, float4 lp, float4 N, float f) {
 float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
 {
 	float4 color = material_ambient;
-		
+	
 	// float4 lp = float4(10, 10, 10, 1);
-	// float4 lp = lights[0].position;
+	float4 lp = lights[0].position;
 
 	phongBlinn_t phong = calcPhongBlinn(input.worldPosition, lp, input.normal, 10);
 	float l = phong.lambda;
@@ -280,11 +282,16 @@ float4 mainPixel_OrenNayar(PixelInputType input) : SV_TARGET
 	float3 surfacePosition = input.worldPosition;
 	float3 eyePosition = viewMatrix[3];
 
+	float3 surfaceNormal = input.normal;
+
 	float3 lightDirection = normalize(lightPosition - surfacePosition);
 	float3 viewDirection = normalize(eyePosition - surfacePosition);
 
+	float roughness = material_roughness;
+	float intensity = material_intensity;
+
 	//Surface properties
-	vec3 normal = normalize(surfaceNormal);
+	float3 normal = normalize(surfaceNormal);
 	float l = orenNayarDiffuse(
 		lightDirection,
 		viewDirection,
@@ -292,6 +299,8 @@ float4 mainPixel_OrenNayar(PixelInputType input) : SV_TARGET
 		roughness,
 		intensity
 	);
+
+	color += material_diffuse * lights[0].diffuse * l;
 
 	return color;
 }
