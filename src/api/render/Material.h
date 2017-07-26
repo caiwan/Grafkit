@@ -14,16 +14,10 @@
 #include "shader.h"
 
 namespace Grafkit {
-	__declspec(align(16)) 
-	class Material : public Grafkit::IResource, public AlignedNew<Material>, public Persistent
+	__declspec(align(16))
+		class Material : public Grafkit::IResource, public AlignedNew<Material>, public Persistent
 	{
 	public:
-		enum material_type_e {
-			MT_flat,
-			MT_phong_blinn,
-			MT_COUNT
-		};
-
 		enum texture_type_e {
 			// regular types	
 			TT_diffuse,	///< 1st map
@@ -45,27 +39,25 @@ namespace Grafkit {
 		};
 
 	public:
-		Material(enum Material::material_type_e t = MT_phong_blinn);
+		Material();
 		~Material() {}
-
-		/// @todo ez nem ilyen lesz a jovoben
-		// operator material_t& () { return this->m_material; }
-
-		/**
-		@todo three.js szerint:
-			- blending + blending mode + opacity
-			- depth func + depth test -> itt mintha VS is benn lenne a shaderben, nem csak a FS
-			- polygon offsr, alpha test
-			- is_visible
-
-		*/
 
 		float4 &GetAmbient() { return m_material.ambient; }
 		float4 &GetDiffuse() { return m_material.diffuse; }
 		float4 &GetSpecular() { return m_material.specular; }
 		float4 &GetEmission() { return m_material.emission; }
-		float &GetSpecularLevel() { return m_material.specularLevel; }
-		float &GetShininess() { return m_material.shininess; }
+
+		float GetIntensity() { return m_material.intensity; }
+		float GetHardness() { return m_material.hardness; }
+		float GetRefraction() { return m_material.refraction; }
+		float GetRoughness() { return m_material.roughness; }
+		float GetSlope() { return m_material.slope; }
+
+		void SetIntensity(float intensity) { m_material.intensity = intensity; }
+		void SetHardness(float hardness) { m_material.hardness = hardness; }
+		void SetRefraction(float refraction) { m_material.refraction = refraction; }
+		void SetRoughness(float roughness) { m_material.roughness = roughness; }
+		void SetSlope(float slope) { m_material.slope = slope; }
 
 		TextureResRef GetTexture(std::string bindName);
 
@@ -88,10 +80,7 @@ namespace Grafkit {
 		struct material_t {
 			material_t() {}
 
-			union {
-				int type;	/* Material tipusa */
-				char ___0[16]; // az integert paddolni kell 16-ra
-			};
+			// 16-os alignmenttel, 4-re kell paddolni mindnet 
 
 			union {
 				struct {
@@ -101,27 +90,21 @@ namespace Grafkit {
 			};
 
 			union {
-				float specularLevel;
-				char ___2[4];
+				struct {
+					float intensity;	// specular level, 
+					float hardness;		// shininess
+					float refraction;
+					float roughness;
+					float slope;
+				};
+				char ___2[4 * 16]; // a float4 eleve 16-ra van paddolva
 			};
 
-			union {
-				float shininess;
-				char ___3[4];
-			};
-
-			union {
-				float roughness;
-				char ___3[4];
-			};
-
-			union {
-				float albedo;
-				char ___3[4];
-			};
 		};
 
 		struct material_t m_material;
+
+		int m_shaderLayer; // TODO: use multiple materials with shader in the same scene in the future 
 
 		std::map<std::string, TextureResRef> m_textures;
 

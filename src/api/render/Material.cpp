@@ -34,12 +34,12 @@ namespace {
 
 // ====================================
 
-Grafkit::Material::Material(enum Material::material_type_e t) : IResource() , Persistent()
+Grafkit::Material::Material() : IResource() , Persistent()
 {
 	ZeroMemory(&m_material, sizeof(m_material));
 	m_material.diffuse = float4(1, 1, 1, 1);
-	
-	m_material.type = t;
+
+	m_shaderLayer = 0;
 }
 
 TextureResRef Grafkit::Material::GetTexture(std::string bindName)
@@ -106,10 +106,7 @@ void Grafkit::Material::Render(Renderer& render, ShaderRef &shader)
 void Grafkit::Material::serialize(Archive & ar)
 {
 	this->IResource::_serialize(ar);
-
-	// ...
-	PERSIST_FIELD(ar, m_material);
 	
-	/// @todo override shader + 
-	/// @todo textures 
+	PERSIST_FIELD(ar, m_shaderLayer);
+	PERSIST_FIELD(ar, m_material);
 }

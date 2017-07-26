@@ -29,22 +29,29 @@ cbuffer MatrixBuffer
  	float angle, falloff;
  };
 
-cbuffer material
-{
-	// struct Material
-	int material_type;
-	float4 material_ambient, material_diffuse, material_specular, material_emission;
-	float material_specularLevel;
-	float material_shininess;
-	float material_roughness;
-	float material_intensity;
-};
-
  cbuffer light
  {
- 	int is_lightOn[4];
- 	struct Light lights[4];
+	 int is_lightOn[4];
+	 struct Light lights[4];
  }
+
+ struct Material
+ {
+	 float4 ambient, diffuse, specular, emission;
+	 float specularLevel;
+	 float shininess;
+	 float roughness;
+	 float intensity;
+	 float slope;
+	 float hardness;
+ };
+
+cbuffer material
+{
+	Material material;
+};
+
+ 
 
 struct VertexInputType
 {
@@ -124,67 +131,6 @@ PixelInputType mainVertex(VertexInputType input)
 // PixelShader
 //------------------------------------------------------------------------------------
 
-// regi glsl kod:
-//float4 calcMaterial(Material material, Light light, MaterialPass mp, float3 normal) {
-//	//if (light.isActive == 0.)
-//	//	return vec4(0.);
-//
-//	float4 color = vec4(light.ambient.rgb, 0.);
-//
-//	// L nem jon at <- mp.dir
-//
-//	float3 E = normalize(fragEyeVector);
-//	float3 N = normalize(normal);
-//	float3 L = normalize(mp.dir); float d = length(mp.dir);
-//	float3 R = normalize(mp.halfVector);
-//
-//	float lambda = dot(N, L);
-//	float blinn = dot(R, E);
-//
-//	return vec4(float3(L / (L + 1.)), 1.);
-//
-//	if (lambda > 0.0)
-//	{
-//		float a = 1. / (light.ca + d* light.la + d* d * light.qa);
-//		//float a = 1.;
-//		color += vec4(light.diffuse.rgb, 1.) * lambda * a;
-//		if (blinn>0. &&  material.shininess>0.) {
-//			color += vec4(light.specular.rgb, 1.) * pow(blinn, material.shininess) * material.specularLevel * a;
-//		}
-//	}
-//
-//	return color;
-//}
-
-//MaterialPass calcMaterialToLight(in Light light, in vec3 normal, in vec3 pos) {
-//	MaterialPass result;
-//
-//	vec4 lp = light.position - uModelView[3];
-//
-//	//result.dir = vec3(light.position.xyz - pos);
-//	result.dir = vec3(lp.xyz - pos);
-//	result.halfVector = reflect(-result.dir, normal);
-//
-//	return result;
-//}
-
-// forras?
-//float4 calcPhongBlinn(float4 worldPosition, float4 texel, float4 normal, Material material, Light light)
-//{
-//	float4 p = light.position;
-//	float3 d = normalize(worldPosition - p);
-//	float lambda = saturate(dot(normal, -d)); /* lambert */
-//	// lambda *= (light.qa / dot(p - worldPosition, p - worldPosition));
-//	
-//	float3 h = normalize(normalize(CameraPos - worldPosition) - d);
-//	float e = pow(saturate(dot(h, input.Normal)), material.m_shininess); /* specular */
-//
-//	return float4(saturate(
-//		material.m_ambient +
-//		(material.m_diffuse * light.diffuse * lambda * 0.6) + 
-//		(material.m_specular * light.specular * e * 0.5) 
-//	), 1);
-//}
 
 //------------------------------------------------------------------------------------
 
@@ -211,53 +157,55 @@ float orenNayarDiffuse(
 	return intensity * max(0.0, NdotL) * (A + B * s / t) / PI;
 }
 
+// TODO::
+// float CookTorrSpecular(){}
+// float WardIsoSpecular(){}
+
+//------------------------------------------------------------------------------------
+// Phong-Blinn 
 //------------------------------------------------------------------------------------
 
-struct phongBlinn_t {
-	float lambda;
-	float theta;
-	float d;
-};
-
 /*
-	Calc lambda and theta for Phong
+	Calc lambda for Phong
 	p: fragment coordiante
 	lp: lightsource coordinate
 	N: normal
 */
-phongBlinn_t calcPhongBlinn(float4 p, float4 lp, float4 N, float f) {
-	phongBlinn_t res;
+float phongDiffuse(float4 p, float4 lp, float4 N/*, float f*/) 
+{
+	float3 mp = lp.xyz - p.xyz;
+	float3 L = normalize(mp);		// light vector
 
-	float w = lp.w;
+	return dot(N.xyz, L);
+}
 
+/*
+	Calc theta for Blinn
+*/
+float blinnSpecular(float4 p, float4 lp, float4 N, float f)
+{
 	float3 mp = lp.xyz - p.xyz;
 	float3 E = normalize(-p.xyz);	// Eye vector
-	float3 L = normalize(mp);		// light vector
+	//float3 L = normalize(mp);		// light vector
 	float3 R = reflect(-mp, N.xyz);	// reflected vector (double half vector)
-	
-	res.d = length(mp);
-	res.lambda = dot(N.xyz, L);
-	res.theta = pow(saturate(dot(R, E)), f);
 
-	return res;
+	return /*res.theta = */ pow(saturate(dot(R, E)), f);
 }
 
 //------------------------------------------------------------------------------------
 
 float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
 {
-	float4 color = material_ambient;
+	float4 color = material.ambient;
 	
-	// float4 lp = float4(10, 10, 10, 1);
+	//float4 lp = float4(10, 10, 10, 1);
 	float4 lp = lights[0].position;
 
-	phongBlinn_t phong = calcPhongBlinn(input.worldPosition, lp, input.normal, 10);
-	float l = phong.lambda;
-	float p = phong.theta;
-	color.xyz = color.xyz + material_diffuse.xyz * float3(l,l,l);
-	color.xyz = color.xyz + material_specular.xyz * float3(p,p,p);
-	// color.xyz = .5 + N.xyz * .5; 
+	float lambda = phongDiffuse(input.worldPosition, lp, input.normal);
+	float theta = blinnSpecular(input.worldPosition, lp, input.normal, 10);
 	
+	color.xyz = float3(lambda, lambda, lambda);
+
 	return color;
 }
 
@@ -265,44 +213,44 @@ float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
 
 float4 mainPixel_DiffuseTexture(PixelInputType input) : SV_TARGET
 {
-	float4 color = material_ambient;
+	//float4 color = material_ambient;
 
-	return color;
+	//return color;
 }
 
 //------------------------------------------------------------------------------------
 
 float4 mainPixel_OrenNayar(PixelInputType input) : SV_TARGET
 {
-	float4 color = material_ambient;
+	//float4 color = material_ambient;
 
-	float ep = float4(0,0,0,1);
+	//float ep = float4(0,0,0,1);
 
-	float3 lightPosition = lights[0].position;
-	float3 surfacePosition = input.worldPosition;
-	float3 eyePosition = viewMatrix[3];
+	//float3 lightPosition = lights[0].position;
+	//float3 surfacePosition = input.worldPosition;
+	//float3 eyePosition = viewMatrix[3];
 
-	float3 surfaceNormal = input.normal;
+	//float3 surfaceNormal = input.normal;
 
-	float3 lightDirection = normalize(lightPosition - surfacePosition);
-	float3 viewDirection = normalize(eyePosition - surfacePosition);
+	//float3 lightDirection = normalize(lightPosition - surfacePosition);
+	//float3 viewDirection = normalize(eyePosition - surfacePosition);
 
-	float roughness = material_roughness;
-	float intensity = material_intensity;
+	//float roughness = material_roughness;
+	//float intensity = material_intensity;
 
-	//Surface properties
-	float3 normal = normalize(surfaceNormal);
-	float l = orenNayarDiffuse(
-		lightDirection,
-		viewDirection,
-		surfaceNormal,
-		roughness,
-		intensity
-	);
+	////Surface properties
+	//float3 normal = normalize(surfaceNormal);
+	//float l = orenNayarDiffuse(
+	//	lightDirection,
+	//	viewDirection,
+	//	surfaceNormal,
+	//	roughness,
+	//	intensity
+	//);
 
-	color += material_diffuse * lights[0].diffuse * l;
+	//color += material_diffuse * lights[0].diffuse * l;
 
-	return color;
+	//return color;
 }
 
 //------------------------------------------------------------------------------------

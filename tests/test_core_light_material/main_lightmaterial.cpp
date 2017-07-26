@@ -120,9 +120,9 @@ protected:
 		{
 			t += .01;
 
-			camera->Matrix().Identity();
-			camera->Matrix().Translate(0, 0, -10);
-			camera->Matrix().RotateRPY(t, .23847*t, .392847*t);
+			//camera->Matrix().Identity();
+			//camera->Matrix().Translate(0, 0, -10);
+			//camera->Matrix().RotateRPY(t, .23847*t, .392847*t);
 
 			this->scene->Get()->UpdateAnimation(fmod(t, 10.5));
 			this->scene->Get()->PreRender(render);
