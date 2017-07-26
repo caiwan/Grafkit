@@ -226,4 +226,6 @@ shader-error.txt
 *.dll
 
 *.assbin
-tests/assets/hello.scene
+
+*RCa14132
+*.blend*
