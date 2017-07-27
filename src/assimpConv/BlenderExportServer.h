@@ -1,18 +1,20 @@
 #pragma once 
 
 #include <list>
+#include <queue>
 
 #include "core/thread.h"
 #include "utils/exceptions.h"
 
 #include "common.h"
 
+#include "json.hpp"
+
 #include "assimploader.h"
 
 class ServerThread;
-class ParserWorkerThread;
 
-class BlenderExportServer
+class BlenderExportServer : public Grafkit::Runnable, public Grafkit::AssimpLoader
 {
 	friend class ServerThread;
 public:
@@ -29,12 +31,22 @@ public:
 	Grafkit::SceneResRef GetScene() {return m_scene; }
 
 private:
+
+	bool PostData(std::stringstream &ss);
+	int Run();
+	bool Parse(nlohmann::json &j);
+
 	ServerThread *m_serverThread;
-	ParserWorkerThread *m_workerThread;
+	Grafkit::Thread *m_myWorkerThread;
 
 	int m_port;
 
-	bool PostData(std::stringstream &ss);
+	std::queue<nlohmann::json> m_inputDataQueue;
+	Grafkit::Mutex m_inputDataQueueMutex;
+	bool m_isTerminate;
+
+	Grafkit::SceneResRef m_scene;
+
 };
 
 DEFINE_EXCEPTION(ServerCreateException, 1, "Could not create server")

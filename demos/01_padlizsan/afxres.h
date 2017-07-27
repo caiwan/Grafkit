@@ -46,7 +46,7 @@
 #endif
 
 #define RT_RIBBON_XML28
-#define RT_DIALOG_LAYOUT_T("AFX_DIALOG_LAYOUT")
+//#define RT_DIALOG_LAYOUT_T("AFX_DIALOG_LAYOUT")
 
 /////////////////////////////////////////////////////////////////////////////
 
