@@ -98,27 +98,24 @@ int Thread::GetCPUCount(){
 
 /////////////////////////////////////////////////////////
 
-//Mutex::Mutex() : m_count(0)
-//{
-//	m_hMutex = CreateMutex(nullptr, FALSE, nullptr);
-//}
-//
-//Grafkit::Mutex::~Mutex()
-//{
-//	if (m_hMutex)
-//		CloseHandle(m_hMutex);
-//}
-//
-//void Mutex::Reset(){
-//	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
-//	//m_count = 0;
-//	ReleaseMutex(m_hMutex); ///@todo handle error 
-//}
+Mutex::Mutex() : m_isLocked(0)
+{
+	m_hMutex = CreateMutex(nullptr, FALSE, nullptr);
+}
 
-//UINT Mutex::GetNext(){
-//	WaitForSingleObject(m_hMutex, INFINITE);  ///@todo handle error 
-//	UINT res = m_count++;
-//	ReleaseMutex(m_hMutex); ///@todo handle error 
-//
-//	return res;
-//}
+Grafkit::Mutex::~Mutex()
+{
+	if (m_hMutex)
+		CloseHandle(m_hMutex);
+}
+
+void Grafkit::Mutex::Lock() {
+	WaitForSingleObject(m_hMutex, INFINITE);
+	m_isLocked++;
+}
+
+void Grafkit::Mutex::Unlock() {
+	m_isLocked--;
+	ReleaseMutex(m_hMutex);
+}
+

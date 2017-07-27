@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <queue>
+
 #include "json.hpp"
 
 #include "BlenderExportServer.h"
@@ -36,6 +38,107 @@ https://msdn.microsoft.com/en-us/library/windows/desktop/ms737593(v=vs.85).aspx
 */
 
 #define DEFAULT_BUFLEN 16 * 4096
+
+
+/************************************************************************************************************
+Parse data that was recieved from Blender
+*************************************************************************************************************/
+
+class ParserWorkerThread : public Grafkit::Thread, public Grafkit::AssimpLoader
+{
+public:
+	ParserWorkerThread() : m_terminate(false)
+	{
+		if (m_scene.Invalid()) {
+			m_scene = new Resource<Scene>(new Scene());
+		}
+	}
+
+	~ParserWorkerThread() {}
+
+	void PostData(std::stringstream &ss) {
+		Grafkit::MutexLocker lock(m_mutex);
+		try {
+			json j = json::parse(ss);
+			m_inputJson.push(j);
+		}
+		catch (std::exception &e) {
+			throw new EX_DETAILS(ServerCreateException, e.what());
+			// Log::Logger().Error(e.what());
+		}
+	}
+
+	void Terminate() { m_terminate = true; }
+	bool IsTerminated() { return m_terminate; }
+
+
+private:
+	int Run() {
+		do {
+			bool is_done = false;
+			{
+				//Grafkit::MutexLocker lock(m_mutex);
+				is_done = m_inputJson.empty();
+			}
+			while (!is_done)
+			{
+				json j;
+				{
+					Grafkit::MutexLocker lock(m_mutex);
+					j = m_inputJson.front();
+					m_inputJson.pop();
+					is_done = m_inputJson.empty();
+				}
+
+				Parse(j);
+
+			}
+		} while (!m_terminate);
+	}
+
+	bool Parse(json &j)
+	{
+		std::string cmd = j["cmd"];
+		Log::Logger().Info((std::string("Json cmd = ") + cmd).c_str());
+
+		// --- 
+		if (cmd.compare(_cmd_initconn) == 0) {
+			// do nothing
+		}
+
+		// --- load standard collada and append it to the scene
+		else if (cmd.compare(_cmd_dae) == 0) {
+			std::string daefile = j["data"];
+
+			char * data = new char[daefile.size() + 1];
+			daefile.copy(data, daefile.size() + 1);
+
+			AppendAssimp(data, daefile.size() + 1, m_scene);
+
+		}
+
+		// --- handle raw data dumped right form the script
+		else if (cmd.compare(_cmd_dump) == 0) {
+			/// ... 
+			//std::ofstream fs("hello.json", std::ofstream::out);
+			//fs << j["data"];
+		}
+
+		// --- 
+		else if (cmd.compare(_cmd_closeconn) == 0) {
+			// TODO: get if any errors have happened
+			return true;
+		}
+	}
+
+private:
+	std::queue<json> m_inputJson;
+	Grafkit::Mutex m_mutex;
+	bool m_terminate;
+
+public:
+	Grafkit::SceneResRef m_scene;
+};
 
 
 /************************************************************************************************************
@@ -231,31 +334,38 @@ private:
 BlenderExportServer::BlenderExportServer()
 {
 	m_serverThread = NULL;
+	m_workerThread = NULL;
 	srand(time(NULL)); m_port = 1024 + rand() % 64512;
 }
 
 BlenderExportServer::~BlenderExportServer()
 {
-	if (m_serverThread)
-		m_serverThread->Stop();
-	delete m_serverThread;
+	Stop();
 }
 
 void BlenderExportServer::Start()
 {
 	m_serverThread = new ServerThread(this);
 	m_serverThread->Start();
+
+	m_workerThread= new ParserWorkerThread();
+	m_workerThread->Start();
 }
 
 void BlenderExportServer::Stop()
 {
-	if (!m_serverThread)
-		return;
+	if (m_workerThread) {
+		m_workerThread->Join();
+		delete m_workerThread;
+		m_workerThread = NULL;
+	}
 	
-	m_serverThread->Stop();
-	
-	delete m_serverThread;
-	m_serverThread = NULL;
+	if (m_serverThread) {
+		m_serverThread->Stop();
+		delete m_serverThread;
+		m_serverThread = NULL;
+	}
+
 }
 
 void BlenderExportServer::GetHost(std::string & str)
@@ -265,57 +375,9 @@ void BlenderExportServer::GetHost(std::string & str)
 	str = buf;
 }
 
-
-/************************************************************************************************************
-	Parse data that was recieved from Blender
-*************************************************************************************************************/
-
 bool BlenderExportServer::PostData(std::stringstream &ss) 
 {
-	if (m_scene.Invalid()) {
-		m_scene = new Resource<Scene>(new Scene());
-	}
-
-	try 
-	{
-		json j = json::parse(ss);
-		std::string cmd = j["cmd"];
-		Log::Logger().Info((std::string("Json cmd = ") + cmd).c_str());
-		
-		// --- 
-		if (cmd.compare(_cmd_initconn) == 0) {
-			// do nothing
-		} 
-		
-		// --- load standard collada and append it to the scene
-		else if (cmd.compare(_cmd_dae) == 0) {
-			std::string daefile = j["data"];
-			
-			char * data = new char[daefile.size()+1];
-			daefile.copy(data, daefile.size() + 1);
-
-			AppendAssimp(data, daefile.size()+1, m_scene);
-
-		}
-
-		// --- handle raw data dumped right form the script
-		else if (cmd.compare(_cmd_dump) == 0) {
-			/// ... 
-			std::ofstream fs("hello.json", std::ofstream::out);
-			fs << j["data"];
-		}
-		
-		// --- 
-		else if (cmd.compare(_cmd_closeconn) == 0) {
-			return true;
-		}
-
-	}
-	catch (std::exception &e) {
-		throw new EX_DETAILS(ServerCreateException, e.what());
-		// Log::Logger().Error(e.what());
-	}
-
-	return false;
+	m_workerThread->PostData(ss);
+	return m_workerThread->IsTerminated();
 }
 

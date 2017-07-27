@@ -10,8 +10,9 @@
 #include "assimploader.h"
 
 class ServerThread;
+class ParserWorkerThread;
 
-class BlenderExportServer : public Grafkit::AssimpLoader
+class BlenderExportServer
 {
 	friend class ServerThread;
 public:
@@ -29,11 +30,11 @@ public:
 
 private:
 	ServerThread *m_serverThread;
+	ParserWorkerThread *m_workerThread;
+
 	int m_port;
 
 	bool PostData(std::stringstream &ss);
-
-	Grafkit::SceneResRef m_scene;
 };
 
 DEFINE_EXCEPTION(ServerCreateException, 1, "Could not create server")

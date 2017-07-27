@@ -5,7 +5,7 @@ rem caiwan/IR
 
 set basedir=%CD%
 
-cd ..\..\msvc17\deploy\tools\
+cd ..\..\msvc15\deploy\tools\
 
 rem AssimpConverter.exe -b -lh -i %basedir%\models\locRotScale.blend -o %basedir%\locRotScale.scene
 REM AssimpConverter.exe -b -lh -i %basedir%\models\sphere.blend -o %basedir%\sphere.scene

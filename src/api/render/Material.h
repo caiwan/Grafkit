@@ -42,16 +42,18 @@ namespace Grafkit {
 		Material();
 		~Material() {}
 
+		// TODO: QND hack for assimp converter, opt out to return w/ ref
+
 		float4 &GetAmbient() { return m_material.ambient; }
 		float4 &GetDiffuse() { return m_material.diffuse; }
 		float4 &GetSpecular() { return m_material.specular; }
 		float4 &GetEmission() { return m_material.emission; }
 
-		float GetIntensity() { return m_material.intensity; }
-		float GetHardness() { return m_material.hardness; }
-		float GetRefraction() { return m_material.refraction; }
-		float GetRoughness() { return m_material.roughness; }
-		float GetSlope() { return m_material.slope; }
+		float &GetIntensity() { return m_material.intensity; }
+		float &GetHardness() { return m_material.hardness; }
+		float &GetRefraction() { return m_material.refraction; }
+		float &GetRoughness() { return m_material.roughness; }
+		float &GetSlope() { return m_material.slope; }
 
 		void SetIntensity(float intensity) { m_material.intensity = intensity; }
 		void SetHardness(float hardness) { m_material.hardness = hardness; }

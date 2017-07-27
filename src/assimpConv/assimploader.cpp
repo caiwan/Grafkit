@@ -153,6 +153,7 @@ void Grafkit::AssimpLoader::AssimpLoadMaterials(SceneRef &outScene)
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
 					LOGGER(Log::Logger().Trace("-- texture #%s #%d", texture_load_map[k].tt, j));
+					// TODO: does it work at all ?
 					// material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, resman), texture_load_map[k].tt);
 				}
 			}
@@ -161,8 +162,10 @@ void Grafkit::AssimpLoader::AssimpLoadMaterials(SceneRef &outScene)
 			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_AMBIENT, material->GetAmbient());
 			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_SPECULAR, material->GetSpecular());
 
-			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS, material->GetShininess());
-			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
+			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS, material->GetHardness());
+			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetIntensity());
+
+			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_REFRACTI, material->GetRefraction());
 
 			materials.push_back(material);
 			///@todo itt a resource managert kellene hasznalni

@@ -66,20 +66,35 @@ namespace Grafkit{
 	};
 
 	/**
-		threadsafe sorszam huzass
+	Mutex clazz
 	*/
-	//class Mutex{
-	//public:
-	//	Mutex();
-	//	~Mutex();
+	class Mutex{
+	public:
+		Mutex();
+		~Mutex();
 
-	//	UINT GetNext();
-	//	void Reset();
+		void Lock();
+		void Unlock();
 
-	//private:
-	//	UINT m_count;
-	//	HANDLE m_hMutex;
-	//};
+		bool IsLocked() { return m_isLocked != 0; }
+
+	private:
+		int m_isLocked;
+		HANDLE m_hMutex;
+	};
+
+
+	// Qt-inspired context locker
+	class MutexLocker {
+	public:
+		MutexLocker(Mutex& mutex) : m_mutex(mutex) { m_mutex.Lock(); }
+		~MutexLocker() { m_mutex.Unlock(); }
+
+		Mutex & GetMutex() { return m_mutex; }
+
+	private:
+		Mutex & m_mutex;
+	};
 
 }
 
