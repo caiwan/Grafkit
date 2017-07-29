@@ -13,6 +13,8 @@
 #include "core/system.h"
 #include "generator/SceneLoader.h"
 
+#include "utils/logger.h"
+
 #include "Arguments.hpp"
 #include "assimploader.h"
 #include "BlenderExportServer.h"
@@ -56,11 +58,11 @@ public:
 		Log::Logger().AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
 
 		if (!args.evaluate(argc, argv)) {
-			cout << args.getErrorMessage() << endl;
-			cout << args.getHelpMessage() << endl;
+			Log::Logger().Info(args.getErrorMessage().c_str());
+			Log::Logger().Info(args.getHelpMessage().c_str());
 			return 1;
 		} else if (args.get("help").isFound()) {
-			cout << args.getHelpMessage() << endl;
+			Log::Logger().Info(args.getHelpMessage().c_str());
 			return 0;
 		}
 
@@ -74,9 +76,8 @@ public:
 		
 		BlenderExportServer server;
 
-		//server.SetLHFlag(args.get("lh").isFound());
-		server.SetLHFlag(true);
-
+		server.SetLHFlag(args.get("lh").isFound());
+		//server.SetLHFlag(true);
 
 		server.Start();
 
@@ -98,8 +99,9 @@ public:
 
 		// pump 
 		while (!feof(pipe.get())) {
-			if (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL)
-				Log::Logger().Trace(buffer.data());
+			if (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL) {
+				//Log::Logger().Trace(buffer.data());
+			}
 		}
 
 		server.Stop();

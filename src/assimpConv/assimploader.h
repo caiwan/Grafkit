@@ -17,8 +17,8 @@
 #include "render/model.h"
 #include "render/texture.h"
 
-class aiNode;
-class aiMaterial;
+struct aiNode;
+struct aiMaterial;
 
 namespace Grafkit {
 

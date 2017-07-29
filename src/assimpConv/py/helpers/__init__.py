@@ -169,7 +169,14 @@ class DumapbleObject (Dumpable):
 
 
 # ---
-# from .bake import Bake
-# from .collada import Collada
-# from .scene import Scene
-# from .client import Connection
+class Bakeable:
+	pass
+	
+	
+class Bake:
+	pass
+	
+	
+# ---
+class ContextWalker:
+	pass
