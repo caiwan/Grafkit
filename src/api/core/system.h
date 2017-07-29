@@ -27,7 +27,7 @@ namespace Grafkit
 		virtual void release() = 0;
 
 
-		LRESULT CALLBACK MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+		LRESULT MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 	protected:
 		void InitializeWindows(int sreenWidth = 800, int screenHeight = 600, int isFullscreen = 0, int resizeable = 0);
@@ -36,6 +36,10 @@ namespace Grafkit
 	protected:
 		Window m_window;
 		Input* m_pInput;
+
+		// shortcut for esc
+		bool isEscPressed() { return m_pInput->IsKeyDown(VK_ESCAPE); }
+
 	};
 
 }

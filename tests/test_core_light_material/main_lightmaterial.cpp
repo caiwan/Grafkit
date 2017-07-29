@@ -132,7 +132,7 @@ protected:
 
 		this->render.EndScene();
 
-		return 0;
+		return isEscPressed();
 	};
 
 private:

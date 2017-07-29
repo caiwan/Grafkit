@@ -59,13 +59,16 @@ namespace {
 Window::Window(Window::WindowHandler *_handler)
 	:handler(_handler)
 {
+	window = this;
 	ZeroMemory(this->wndtitle, sizeof(this->wndtitle));
 	this->init();
+
 }
 
 Window::Window(Window::WindowHandler *_handler, TCHAR *title)
 	: handler(_handler)
 {
+	window = this;
 	lstrcpyn(title, this->wndtitle, 512);
 	this->init();
 }
@@ -105,6 +108,7 @@ void Window::init() {
 Window::~Window(){
 	this->destructEverything();
 //	unregisterHwnd(this);
+	window = NULL;
 }
 
 void Window::createWindow(int sx, int sy, int isfullscreen){

@@ -18,7 +18,7 @@ class Window
 		class WindowHandler 
 		{
 			public:
-				virtual LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM) = 0;
+				virtual LRESULT MessageHandler(HWND, UINT, WPARAM, LPARAM) = 0;
 		};
 
 	public:
@@ -69,10 +69,10 @@ class Window
 		HDC getHDc(){return this->hDc;}
 		HGLRC getHRc() {return this->hRc;}
 
-		WindowHandler *& getHandler() { return this->handler; }
+		WindowHandler *getHandler() { return this->handler; }
 
 	private:
-		WindowHandler *& handler;
+		WindowHandler *handler;
 
 		CHAR wndtitle[512];
 

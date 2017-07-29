@@ -4,6 +4,8 @@
 #include "input.h"
 #include "livereload.h"
 
+#include "window.h"
+
 ///@todo add log mock
 
 using namespace Grafkit;
@@ -121,27 +123,21 @@ int System::execute() {
 
 
 
-LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+LRESULT System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 	{
 		switch (umsg)
 		{
-			// Check if a key has been pressed on the keyboard.
 		case WM_KEYDOWN:
 		{
-			// If a key is pressed send it to the input object so it can record that state.
 			m_pInput->KeyDown((unsigned int)wparam);
 			return 0;
 		}
 
-		// Check if a key has been released on the keyboard.
 		case WM_KEYUP:
 		{
-			// If a key is released then send it to the input object so it can unset the state for that key.
 			m_pInput->KeyUp((unsigned int)wparam);
 			return 0;
 		}
-
-		// Any other messages send to the default message handler as our application won't make use of them.
 		default:
 		{
 			return DefWindowProc(hwnd, umsg, wparam, lparam);
@@ -153,6 +149,7 @@ void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen
 {
 	///@todo resizeable window
 
+	//this->m_window = new Window(this);
 	this->m_window.createWindow(screenWidth, screenHeight, fullscreen);
 	this->m_window.showWindow();
 
@@ -163,7 +160,10 @@ void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen
 
 void System::ShutdownWindows()
 {
-	this->m_window.destroyWindow();
-	return;
+	//if (m_window) {
+		this->m_window.destroyWindow();
+		//delete this->m_window;
+		//this->m_window = NULL;
+	//}
 }
 
