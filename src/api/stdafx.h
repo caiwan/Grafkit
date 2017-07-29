@@ -9,6 +9,9 @@
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
 
+// thread 
+#include "core/thread.h"
+
 // logger
 #include "utils/logger.h"
 

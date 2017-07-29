@@ -1,4 +1,5 @@
 /**
+	Note: [hun]
 	Alap, nem-threadsafe logger; csak a hibauzenetek kiirasara, legfeljeb debuggolasra
 
 	Ezek lehet, hogy a jovoben szep es jo dolgok lesznek;
@@ -18,8 +19,14 @@
 
 namespace Grafkit {
 
+	class Mutex;
+
 	class Logger;
 	class Log;
+
+	/*
+	QnD logger handler
+	*/
 
 	class Logger
 	{
@@ -40,7 +47,9 @@ namespace Grafkit {
 		};
 
 		// --- 
-		// Logger handler  class 
+		/**
+		Logger interface
+		*/
 		class ILoggerHandler
 		{
 			friend class Logger;
@@ -52,7 +61,7 @@ namespace Grafkit {
 			virtual void Write(message_t * const & message) = 0;
 		};
 
-		// Methods 
+		// Methods, ops
 
 		void AddHandler(ILoggerHandler* hdl) { this->m_loggers.insert(hdl);}
 		void RemoveHandler(ILoggerHandler* hdl) { this->m_loggers.erase(this->m_loggers.find(hdl));}
@@ -66,19 +75,22 @@ namespace Grafkit {
 		 void Error(const char* const message, ...);
 
 	protected:
+		void Write(logger_msg_type_e type);
+
 		Logger();
 		~Logger();
 
 
 	private:
-		typedef std::set<ILoggerHandler*> loggers_t;
-
-		loggers_t m_loggers;
-
+		std::set<ILoggerHandler*> m_loggers;
+		char * m_buffer;
+		Grafkit::Mutex *m_mutex;
 	};
 
+	/*
+		Lazy sginglewton for global logger handler
+	*/
 	class Log {
-		/// get logger; lazy singleton 
 	public:
 		static Logger & Logger()
 		{
@@ -87,10 +99,16 @@ namespace Grafkit {
 		}
 	};
 
+	// =======================================================================================================================================
+	
+	/*
+		Predefined logger handlers
+	*/
+
 	class LoggerHandler {
-		// =======================================================================================================================================
 	public:
 
+		// ------------------------------------------------------------------
 		class FileLoggerHandler : public Logger::ILoggerHandler {
 		public:
 			FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);

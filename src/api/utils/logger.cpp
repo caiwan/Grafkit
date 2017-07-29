@@ -1,21 +1,22 @@
-#include "stdafx.h"
-
-#include "logger.h"
-
-#include "exceptions.h"
-
 #include <stdio.h>
 #include <io.h>
 #include <fcntl.h>
 #include <windows.h>
 
-// #ifdef USE_LOGGER
+#include "stdafx.h"
+//#include "logger.h"	// already defied in stdafx
+//#include "exceptions.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+#define BUFFER_LEGTH 64*1024
+
 Grafkit::Logger::Logger()
 {
+	m_mutex = new Grafkit::Mutex;
+	m_buffer = new char[BUFFER_LEGTH];
+
 	// todo: csak az msvc outra irjon, a tobbi nem kell
 	//this->AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
 	//this->AddHandler(new LoggerHandler::ConsoleLogger());
@@ -24,23 +25,41 @@ Grafkit::Logger::Logger()
 
 Grafkit::Logger::~Logger()
 {
-	// clenaup
-	
-	for (loggers_t::iterator it = this->m_loggers.begin(); it != m_loggers.end(); it++) {
+	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); it++) {
 		delete *it;
 	}
+
+	delete[] m_buffer;
 }
 
 // ==================================================================================================
 
- void Grafkit::Logger::Write(logger_msg_type_e type, const char * const message)
+void Grafkit::Logger::Write(logger_msg_type_e type, const char * const message)
 {
+	Grafkit::MutexLocker locker(m_mutex);
+	strcpy_s(m_buffer, BUFFER_LEGTH, message);
+	Write(type);
+}
+
+void Grafkit::Logger::Write(logger_msg_type_e type)
+{
+	 size_t len = strlen(m_buffer);
+
+	// qnd trim cr/lf at the end
+	size_t k = len;
+	if (k)
+		while (k--)
+			if (m_buffer[k] && (m_buffer[k] != '\r' || m_buffer[k] != '\n'))
+				break;
+
+	m_buffer[k+1] = 0;
+
 	Logger::message_t message_pkg;
-	message_pkg.length = 0;
-	message_pkg.message = message;
+	message_pkg.length = k;
+	message_pkg.message = m_buffer;
 	message_pkg.type = type;
 
-	for (loggers_t::iterator it = this->m_loggers.begin(); it != m_loggers.end(); it++) 
+	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); it++) 
 	{
 		if (*it) (*it)->Write(&message_pkg);
 	}
@@ -50,43 +69,43 @@ Grafkit::Logger::~Logger()
 	va_list args; \
 	\
 	va_start(args, fmt); \
-	vsprintf_s(buffer, 65536, message, args); \
+	vsprintf_s(buffer, BUFFER_LEGTH, message, args); \
 	va_end(args); \
 }
 
  void Grafkit::Logger::Trace(const char * const message, ...)
 {
-	char buffer[65536];	
-	EXTRACT_VA(message, buffer);
-	Write(LOG_TRACE, buffer);
+	Grafkit::MutexLocker locker(m_mutex);
+	EXTRACT_VA(message, m_buffer);
+	Write(LOG_TRACE);
 }
 
  void Grafkit::Logger::Debug(const char * const message, ...)
 {
-	char buffer[65536];
-	EXTRACT_VA(message, buffer);
-	Write(LOG_DEBUG, buffer);
+	Grafkit::MutexLocker locker(m_mutex);
+	EXTRACT_VA(message, m_buffer);
+	Write(LOG_DEBUG);
 }
 
  void Grafkit::Logger::Info(const char * const message, ...)
 {
-	char buffer[65536];
-    EXTRACT_VA(message, buffer);
-	Write(LOG_INFO, buffer);
+	Grafkit::MutexLocker locker(m_mutex);
+	EXTRACT_VA(message, m_buffer);
+	Write(LOG_INFO);
 }
 
  void Grafkit::Logger::Warn(const char * const message, ...)
 {
-	char buffer[65536];
-	EXTRACT_VA(message, buffer);
-	Write(LOG_WARN, buffer);
+	Grafkit::MutexLocker locker(m_mutex);
+	EXTRACT_VA(message, m_buffer);
+	Write(LOG_WARN);
 }
 
  void Grafkit::Logger::Error(const char * const message, ...)
 {
-	char buffer[65536];
-	EXTRACT_VA(message, buffer);
-	Write(LOG_ERROR, buffer);
+	Grafkit::MutexLocker locker(m_mutex); 
+	EXTRACT_VA(message, m_buffer);
+	Write(LOG_ERROR);
 }
 
 #undef EXTRACT_VA
@@ -99,19 +118,13 @@ Grafkit::LoggerHandler::FileLoggerHandler::FileLoggerHandler(const char * filena
 {
 	if (filename) {
 		if (!fopen_s(&this->m_stdout, filename, "wb")) {
-			// ... 
-		}
-		else {
-			// ... 
+			// ... throw err
 		}
 	}
 	
 	if (errfile) {
 		if (!fopen_s(&this->m_stderr, errfile, "wb")) {
-			// ... 
-		}
-		else {
-			// ... 
+			// ... throw err
 		}
 	}
 }
@@ -127,13 +140,19 @@ void Grafkit::LoggerHandler::FileLoggerHandler::Write(Grafkit::Logger::message_t
 	if (!message)
 		return;
 
+	if (!message->length)
+		return;
+
 	if (message->type == Logger::LOG_ERROR || message->type == Logger::LOG_WARN) {
-		if (this->m_stderr) 
+		if (this->m_stderr) {
 			fprintf_s(this->m_stderr, "%s\r\n", message->message);
+		}
 	}
-	/*else*/ {
-		if(this->m_stdout) 
+	/*else*/ 
+	{
+		if (this->m_stdout) {
 			fprintf_s(this->m_stdout, "%s\r\n", message->message);
+		}
 	}
 }
 

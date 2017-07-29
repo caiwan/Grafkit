@@ -16,7 +16,7 @@ namespace Grafkit{
 	class Thread;
 
 	/**
-		Runnable interface
+	Java-like Runnable interface
 	*/
 	class Runnable {
 	friend Thread;
@@ -29,7 +29,6 @@ namespace Grafkit{
 	
 	/**
 		Java-like thread management
-		Thread interface
 	*/	
 	class Thread{
 	public:
@@ -66,7 +65,7 @@ namespace Grafkit{
 	};
 
 	/**
-	Mutex clazz
+	QT-like Mutex class
 	*/
 	class Mutex{
 	public:
@@ -83,17 +82,17 @@ namespace Grafkit{
 		HANDLE m_hMutex;
 	};
 
-
-	// Qt-inspired context locker
+	// Qt-inspired context/mutex locker
 	class MutexLocker {
 	public:
-		MutexLocker(Mutex& mutex) : m_mutex(mutex) { m_mutex.Lock(); }
-		~MutexLocker() { m_mutex.Unlock(); }
+		MutexLocker(Mutex& mutex) : m_mutex(&mutex) { m_mutex->Lock(); }
+		MutexLocker(Mutex* mutex) : m_mutex(mutex) { m_mutex->Lock(); }
+		~MutexLocker() { m_mutex->Unlock(); }
 
-		Mutex & GetMutex() { return m_mutex; }
+		Mutex * GetMutex() { return m_mutex; }
 
 	private:
-		Mutex & m_mutex;
+		Mutex * m_mutex;
 	};
 
 }
