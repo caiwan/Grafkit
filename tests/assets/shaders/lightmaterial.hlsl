@@ -38,12 +38,11 @@ cbuffer MatrixBuffer
  struct Material
  {
 	 float4 ambient, diffuse, specular, emission;
-	 float specularLevel;
-	 float shininess;
-	 float roughness;
 	 float intensity;
-	 float slope;
 	 float hardness;
+	 float refraction;
+	 float roughness;
+	 float slope;
  };
 
 cbuffer material
@@ -196,17 +195,17 @@ float blinnSpecular(float4 p, float4 lp, float4 N, float f)
 
 float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
 {
-	float4 color = material.ambient;
-	
+	float3 color = /*lights[0].ambient.xyz * */material.ambient.xyz;
+
 	//float4 lp = float4(10, 10, 10, 1);
 	float4 lp = lights[0].position;
 
 	float lambda = phongDiffuse(input.worldPosition, lp, input.normal);
 	float theta = blinnSpecular(input.worldPosition, lp, input.normal, 10);
 	
-	color.xyz = float3(lambda, lambda, lambda);
+	color += /*lights[0].diffuse.xyz * */ material.diffuse.xyz /** lambda*/;
 
-	return color;
+	return float4(color.x, color.y, color.z, 1);
 }
 
 //------------------------------------------------------------------------------------

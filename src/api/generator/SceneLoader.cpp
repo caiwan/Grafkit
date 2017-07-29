@@ -201,6 +201,8 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 	std::stack<Actor*> stack;
 	stack.push(scenegraph);
 
+	LOGGER(Log::Logger().Info(" --- ENTITIY RELATIONS --- "));
+
 	// --- collect assoc. map and tree for serialization 
 	int i = 0, j = 0, k = 0, l = 0;
 	while (!stack.empty()) {
@@ -210,8 +212,12 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 			m_actors.push_back(node);
 			m_actor_map[node] = m_cActorID;
 
+			LOGGER(Log::Logger().Info("Actor: %s %d {", node->GetName().c_str(), m_cActorID));
+			
 			BuildEntityMap(node);
-
+			
+			LOGGER(Log::Logger().Info("}"));
+			
 			++m_cActorID;
 		}
 
@@ -234,8 +240,11 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 
 	if (tx_begin != tx_end) {
 		for (auto tx_it = tx_begin; tx_it != tx_end; ++tx_it) {
-
+			
 			TextureResRef texture = tx_it->second;
+
+			LOGGER(Log::Logger().Info("      Texture: %s {", texture->GetName().c_str()));
+
 			if (texture.Valid() && texture->Valid()) {
 				texture_bind_t bind;
 				bind.first = texture->GetName();
@@ -246,6 +255,8 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 
 				++m_cTexID;
 			}
+
+			LOGGER(Log::Logger().Info("      }"));
 		}
 	}
 }
@@ -254,15 +265,34 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &model)
 {
 	MaterialRef material = model->GetMaterial();
-	if (material.Valid() && m_material_set.find(material) == m_material_set.end()) {
-		m_material_set.insert(material);
-		m_materials_to_meshes.push_back(assoc_t(m_cMatID, m_cEntityID));
-		m_materials.push_back(material);
+	USHORT matid = 0;
 
-		BuildTextureMap(material);
+	if (material.Valid()) {
+		auto matit = m_material_map.find(material);
+		if (matit == m_material_map.end())
+		{
 
-		++m_cMatID;
-	} // has material
+			LOGGER(Log::Logger().Info("    Material: %s %d{", material->GetName().c_str(), m_cMatID));
+
+			m_material_map[material] = m_cMatID;
+			m_materials.push_back(material);
+
+			matid = m_cMatID;
+
+			BuildTextureMap(material);
+
+			++m_cMatID;
+
+			LOGGER(Log::Logger().Info("    }"));
+		} // has material
+		else {
+			matid = matit->second;
+			LOGGER(Log::Logger().Info("    Material: %s %d", material->GetName().c_str(), matid));
+		}
+
+		m_materials_to_meshes.push_back(assoc_t(matid, m_cEntityID));
+	}
+
 }
 
 // which animation affects which entity or actor
@@ -304,7 +334,11 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &act
 {
 	for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().end(); ++entity_it) {
 		if (entity_it->Valid()) {
+
 			Entity3D *entity = (*entity_it).Get();
+			
+			LOGGER(Log::Logger().Info("  Entity: %s %d {", entity->GetName().c_str(), m_cEntityID));
+			
 			if (m_entity_map.find(entity) == m_entity_map.end()) {
 				m_entity_map[entity] = m_cEntityID;
 				m_entities.push_back(entity);
@@ -324,6 +358,9 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &act
 			else {
 				m_entities_to_actors.push_back(assoc_t(m_entity_map[entity], m_cActorID));
 			}
+
+			LOGGER(Log::Logger().Info("  }"));
+
 		}
 	} 
 }

@@ -76,7 +76,7 @@ namespace Grafkit {
 			std::vector<Animation*> m_Animations;
 
 			std::map<Entity3D*, USHORT> m_entity_map;
-			std::set<Material*> m_material_set;
+			std::map<Material*, USHORT> m_material_map;
 			std::map<Actor*, int> m_actor_map;
 
 			texture_assoc_t m_textures_to_materials;

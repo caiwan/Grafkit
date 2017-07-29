@@ -99,7 +99,7 @@ namespace Grafkit {
 					float roughness;
 					float slope;
 				};
-				char ___2[4 * 16]; // a float4 eleve 16-ra van paddolva
+				char ___2[6 * 4]; 
 			};
 
 		};

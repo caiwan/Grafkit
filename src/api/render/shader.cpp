@@ -448,7 +448,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		// -- determine DXGI format
 		this->GetDXGIFormat(input_desc, elementDesc.Format, elem.width);
 
-		LOGGER(Log::Logger().Trace("--- Input element: %s [%d], Format = {%d, %d}", input_desc.SemanticName, input_desc.SemanticIndex, elementDesc.Format, elem.width));
+		LOGGER(Log::Logger().Trace("--- Input element: \"%s\" [%d], Format = {%d, %d}", input_desc.SemanticName, input_desc.SemanticIndex, elementDesc.Format, elem.width));
 
 		elements.push_back(elementDesc);
 		
@@ -474,7 +474,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		OutputTargetRecord rec;
 		rec.desc = out_desc;
 		
-		LOGGER(Log::Logger().Trace("--- Output params: %s [%d]", out_desc.SemanticName, out_desc.SemanticIndex));
+		LOGGER(Log::Logger().Trace("--- Output params: \"%s\" [%d]", out_desc.SemanticName, out_desc.SemanticIndex));
 
 		m_outputTargets.push_back(rec);
 	}
@@ -508,7 +508,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
 		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
 
-		LOGGER(Log::Logger().Trace("--- Constant Buffer: %s [%d], Format = {t: %d, s: %d}", 
+		LOGGER(Log::Logger().Trace("--- Constant Buffer: \"%s\" [%d], Format = {t: %d, s: %d}", 
 			cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size));
 
 		// build up cbuffer variables
@@ -529,7 +529,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 			if (FAILED(result))
 				throw EX_HRESULT(ConstantBufferLocateException, result);
 
-			LOGGER(Log::Logger().Trace("---- Variable: %s [%d], Format = {t:%s, s: %d, o: %d}", 
+			LOGGER(Log::Logger().Trace("---- Variable: \"%s\" [%d], Format = {t:%s, s: %d, o: %d}", 
 				cbVar.m_var_desc.Name, j, cbVar.m_type_desc.Name, cbVar.m_var_desc.Size, cbVar.m_var_desc.StartOffset));
 
 			cbRecord.m_cbVars.push_back(cbVar);
@@ -554,7 +554,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		brRecord.m_boundSource = nullptr;
 		brRecord.m_desc = brDesc;
 
-		LOGGER(Log::Logger().Trace("--- Bounded Resource: %s [%d], Format = {%d}", 
+		LOGGER(Log::Logger().Trace("--- Bounded Resource: \"%s\" [%d], Format = {%d}", 
 brRecord.m_desc.Name, i, brRecord.m_desc.Type));
 
 		m_bResources.push_back(brRecord);
