@@ -19,7 +19,7 @@ namespace Grafkit {
 
 	class Actor;
 
-	class Entity3D : public Grafkit::IResource
+	class Entity3D : public Grafkit::IResource, public Persistent
 	{
 	protected:
 		void _serialize(Archive& ar);
@@ -32,6 +32,7 @@ namespace Grafkit {
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
 		virtual void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
 		
+		virtual void serialize(Archive& ar) = 0;
 	};
 
 	class Actor;

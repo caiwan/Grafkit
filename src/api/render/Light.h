@@ -15,10 +15,22 @@ namespace Grafkit{
 	class Light;
 	typedef Ref<Light> LightRef; 
 
-	class Light : virtual public Referencable, public Entity3D
+	__declspec(align(16))  
+	class Light : virtual public Referencable, public Entity3D, public AlignedNew<Light>
 	{
+
 	public:
-		Light();
+		enum light_type_t {
+			INVALID = 0, 
+			LT_point = 1 , 
+			LT_directional = 2, 
+			LT_spot = 3, 
+			LT_ambient = 4, 
+			COUNT
+		};
+
+	public:
+		Light(light_type_t t = LT_point);
 		~Light();
 
 		/// @todo ez csak egy QnD Hack, ki kell majd javitani a jovoben
@@ -46,14 +58,10 @@ namespace Grafkit{
 		void Calculate(Grafkit::Renderer& deviceContext, Scene * const & scene, Matrix &nodeMatrix);
 		void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) {}
 
+
 	protected:
 
-		///@todo ez egy kurvaszar megoldas, es nem kene hasznalni a feny tipusanak meghatarozasara; helyette virtualis fuggvennyekkel kellene~
-		enum type_t {
-			INVALID = 0, T_point=1, T_directional=2, T_spot=3, T_ambient=4, COUNT
-		};
-
-		virtual enum type_t GetLightType() = 0;
+		enum light_type_t m_type;
 
 		struct light_t {
 			int type;
@@ -74,54 +82,11 @@ namespace Grafkit{
 		float4 m_position;
 		float4 m_direction;
 
+		int m_id;
+
+	protected:
+		virtual void serialize(Archive& ar);
+		PERSISTENT_DECL(Grafkit::Light, 1);
 	};
 
-	// ============================================================================================================
-	__declspec(align(16)) class PointLight : public Light, public AlignedNew<PointLight>
-	// class PointLight : public Light 
-	{
-	public:
-		PointLight() : Light () {}
-		~PointLight() {}
-
-	private:
-		virtual enum type_t GetLightType() { return T_point; }
-	};
-
-	// ============================================================================================================
-	__declspec(align(16)) class DirectionalLight : public Light, public AlignedNew<DirectionalLight>
-	// class DirectionalLight : public Light
-	{
-		public:
-		DirectionalLight() : Light() {}
-		~DirectionalLight() {}
-
-	private:
-		virtual enum type_t GetLightType() { return T_directional; }
-
-	};
-
-	// ============================================================================================================
-	__declspec(align(16)) class SpotLight : public Light, public AlignedNew<SpotLight>
-	// class SpotLight : public Light
-	{
-	public:
-		SpotLight() : Light() {}
-		~SpotLight() {}
-
-	private:
-		virtual enum type_t GetLightType() { return T_spot; }
-	};
-
-	// ============================================================================================================
-	__declspec(align(16)) class AmbientLight : public Light, public AlignedNew<AmbientLight>
-	// class AmbientLight : public Light
-	{
-	public:
-		AmbientLight() : Light() {}
-		~AmbientLight() {}
-
-	private:
-		virtual enum type_t GetLightType() { return T_ambient; }
-	};
 }

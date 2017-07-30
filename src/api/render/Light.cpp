@@ -6,7 +6,9 @@
 
 using namespace Grafkit;
 
-Light::Light() : Entity3D()
+#define PERSISTENT_IMPL(Light);
+
+Grafkit::Light::Light(light_type_t t) : Entity3D(), m_type(t), m_id(0)
 {
 	m_position = float4(0, 0, 0, 1);
 	m_direction = float4(0, 0, -1, 0);
@@ -24,6 +26,15 @@ void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, Scene * const 
 	m_direction.w = 0.;
 	m_light.position = nodeMatrix.Transfrom(m_position);
 	m_light.direction = nodeMatrix.Transfrom(m_direction);
+}
+
+void Grafkit::Light::serialize(Archive & ar)
+{
+	Entity3D::_serialize(ar);
+
+	PERSIST_FIELD(ar, m_position);
+	PERSIST_FIELD(ar, m_direction);
+	PERSIST_FIELD(ar, m_light);
 }
 
 void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, Scene * const & scene)

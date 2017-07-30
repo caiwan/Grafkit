@@ -313,17 +313,17 @@ void Grafkit::AssimpLoader::AssimpLoadLights(SceneRef &outScene)
 			// light <- assimp light
 			switch (curr_light->mType) {
 			case aiLightSource_DIRECTIONAL:
-				light = new DirectionalLight();
+				light = new Light(Light::LT_directional);
 				ASSIMP_V3D_F4(curr_light->mDirection, light->Direction(), 0, 0f);
 				break;
 
 			case aiLightSource_POINT:
-				light = new PointLight();
+				light = new Light(Light::LT_point);
 				ASSIMP_V3D_F4(curr_light->mPosition, light->Position(), 0.0f);
 				break;
 
 			case aiLightSource_SPOT:
-				light = new SpotLight();
+				light = new Light(Light::LT_spot);
 				ASSIMP_V3D_F4(curr_light->mPosition, light->Position(), 1.0f);
 				ASSIMP_V3D_F4(curr_light->mDirection, light->Direction(), 0.0f);
 				(light->Angle()) = curr_light->mAngleInnerCone;
@@ -331,7 +331,7 @@ void Grafkit::AssimpLoader::AssimpLoadLights(SceneRef &outScene)
 				break;
 
 			case aiLightSource_AMBIENT:
-				light = new AmbientLight();
+				light = new Light(Light::LT_ambient);
 				break;
 			}
 

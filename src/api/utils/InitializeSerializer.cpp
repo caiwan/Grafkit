@@ -9,12 +9,20 @@
 #include "render/mesh.h"
 #include "render/model.h"
 
+#include "render/Light.h"
+#include "render/camera.h"
+
 #include "render/animation.h"
+
+#define ADD_CLONABLE(_name, _clazzname)\
+	Grafkit::AddClonable _name(#_clazzname, new _clazzname::Factory())
 
 Grafkit::ClonableInitializer::ClonableInitializer()
 {
-	Grafkit::AddClonable mesh("Grafkit::Mesh", new Grafkit::Mesh::Factory());
-	Grafkit::AddClonable model("Grafkit::Model", new Grafkit::Model::Factory());
-	Grafkit::AddClonable material("Grafkit::Material", new Grafkit::Material::Factory());
-	Grafkit::AddClonable actorAnimation("Grafkit::ActorAnimation", new Grafkit::ActorAnimation::Factory());
+	ADD_CLONABLE(mesh, Grafkit::Mesh);
+	ADD_CLONABLE(model, Grafkit::Model);
+	ADD_CLONABLE(material, Grafkit::Material);
+	ADD_CLONABLE(camera, Grafkit::Camera);
+	ADD_CLONABLE(light, Grafkit::Light);
+	ADD_CLONABLE(actorAnimation, Grafkit::ActorAnimation);
 }

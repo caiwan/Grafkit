@@ -26,7 +26,7 @@ namespace Grafkit
 	Stores extended data for a mesh, that makes it a model
 	*/
 
-	__declspec(align(16)) class Model : public Grafkit::Entity3D, public AlignedNew<Model>, public Persistent
+	__declspec(align(16)) class Model : public Grafkit::Entity3D, public AlignedNew<Model>
 	{
 	public:
 		Model(MeshRef mesh = nullptr, MaterialRef material = nullptr);

@@ -239,6 +239,11 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	m_vertexShader->Bind(render);
 	m_pixelShader->Bind(render);
 
+	// add lights
+	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++) {
+		(*it)->Render(render, this);
+	}
+
 	// render scenegraph
 	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {
 		if (node->Valid()) {

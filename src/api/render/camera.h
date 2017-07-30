@@ -13,7 +13,7 @@ namespace Grafkit {
 	// 
 
 	/** Basic camera class */
-	__declspec(align(16)) class Camera : public Entity3D, public AlignedNew<Camera>, public Persistent
+	__declspec(align(16)) class Camera : public Entity3D, public AlignedNew<Camera>/*, public Persistent*/
 	{
 	public:
 		Camera();
