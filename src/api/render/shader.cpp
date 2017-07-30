@@ -483,7 +483,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	for (UINT i = 0; i < desc.ConstantBuffers; i++)
 	{
 		CBRecord cbRecord; // = m_cBuffers[i];
-		cbRecord.m_slot = 0;
+		cbRecord.m_slot = i;
 		cbRecord.m_buffer = nullptr;
 
 		ID3D11ShaderReflectionConstantBuffer* pConstBuffer = this->m_pReflector->GetConstantBufferByIndex(i);
@@ -495,7 +495,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		// --- create buffer
 		D3D11_BUFFER_DESC bufferDesc;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC; // D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = (ceil(cbRecord.m_description.Size/16)+1)*16; 
+		bufferDesc.ByteWidth = 16 * (ceil(cbRecord.m_description.Size/16));
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		bufferDesc.MiscFlags = 0;
@@ -508,8 +508,8 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
 		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
 
-		LOGGER(Log::Logger().Trace("--- Constant Buffer: \"%s\" [%d], Format = {t: %d, s: %d}", 
-			cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size));
+		LOGGER(Log::Logger().Trace("--- Constant Buffer: \"%s\" [%d], Format = {t: %d, s: %d, bw: %d}", 
+			cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size, bufferDesc.ByteWidth));
 
 		// build up cbuffer variables
 
