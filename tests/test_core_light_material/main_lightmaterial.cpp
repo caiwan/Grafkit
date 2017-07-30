@@ -82,8 +82,8 @@ protected:
 		LoadCache();
 
 		// -- load shader
-		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/lightmaterial.hlsl", ""));
-		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "mainPixel_DiffuseColor"));
+		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "mainPixel_PhongBlinn"));
 
 		// -- model 
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "spheres.scene"));
@@ -96,10 +96,10 @@ protected:
 		camera = scene->Get()->GetActiveCamera();
 
 		// -- add lights
-		light = new PointLight();
-		lightActor = new Actor(light);
+		/*light = new PointLight();
+		lightActor = new Actor(light);*/
 
-		(*scene)->GetRootNode()->AddChild(lightActor);
+		//(*scene)->GetRootNode()->AddChild(lightActor);
 
 		// --- serialize && deserialize
 

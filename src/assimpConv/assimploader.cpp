@@ -159,7 +159,7 @@ void Grafkit::AssimpLoader::AssimpLoadMaterials(SceneRef &outScene)
 			}
 
 			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_DIFFUSE, material->GetDiffuse());
-			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_AMBIENT, material->GetAmbient());
+			//ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_AMBIENT, material->GetAmbient());
 			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_SPECULAR, material->GetSpecular());
 
 			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS, material->GetHardness());

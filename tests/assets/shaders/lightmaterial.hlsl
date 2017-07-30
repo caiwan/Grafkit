@@ -1,11 +1,11 @@
 #define PI 3.14159265359
 
-cbuffer MatrixBuffer
-{
-	matrix worldMatrix;
-	matrix viewMatrix;
-	matrix projectionMatrix;
-};
+//cbuffer MatrixBuffer
+//{
+//	matrix worldMatrix;
+//	matrix viewMatrix;
+//	matrix projectionMatrix;
+//};
 
 /**
 * http://www.rastertek.com/dx10tut06.html
@@ -17,6 +17,7 @@ cbuffer MatrixBuffer
  struct Light
  {
  	int type;
+	
  	float4 position;
  	float4 direction;
 
@@ -24,42 +25,20 @@ cbuffer MatrixBuffer
  	float4 diffuse;
  	float4 specular;
 
- 	float ca, la, qa;
-
- 	float angle, falloff;
+ 	float4 param1, param2;
  };
 
  cbuffer light
- {
-	 int is_lightOn[4];
-	 struct Light lights[4];
- }
-
- struct Material
- {
-	 float4 ambient, diffuse, specular, emission;
-	 float intensity;
-	 float hardness;
-	 float refraction;
-	 float roughness;
-	 float slope;
- };
-
-cbuffer material
 {
-	Material material;
+	 struct Light light;
+}
+
+
+cbuffer material_params
+{
+	float4 mat_param1, mat_param2;
 };
 
- 
-
-struct VertexInputType
-{
-	float4 position : POSITION;
-	float4 normal :	NORMAL;
-	float4 tangent : TANGENT;
-	float4 binormal : BINORMAL;
-	float2 tex : TEXCOORD;
-};
 
 struct PixelInputType
 {
@@ -67,7 +46,10 @@ struct PixelInputType
 	float4 normal : NORMAL;
 	float4 tangent : TANGENT;
 	float4 binormal : BINORMAL;
-	
+
+	float4 color0 : COLOR0;	// diffuse
+	//float4 color1 : COLOR1;	// specular
+
 	float4 tex : TEXCOORD0;
 	float4 worldPosition : TEXCOORD1;
 };
@@ -84,48 +66,6 @@ Texture2D t_normal;
 Texture2D t_specular;
 Texture2D t_shininess;
 
-PixelInputType mainVertex(VertexInputType input)
-{
-	PixelInputType output;
-
-	input.position.w = 1.0f;
-
-	output.worldPosition = input.position;
-	output.worldPosition = mul(output.worldPosition, worldMatrix);
-	output.worldPosition = mul(output.worldPosition, viewMatrix);
-	output.worldPosition.xyz = output.worldPosition.xyz / output.worldPosition.w;
-
-	output.position = input.position;
-	output.position = mul(output.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
-
-	input.normal.w = 0.0f;
-	output.normal = input.normal;
-	output.normal = mul(output.normal, worldMatrix);
-	output.normal = mul(output.normal, viewMatrix);
-	output.normal = mul(output.normal, projectionMatrix);
-	output.normal = normalize(output.normal);
-
-	input.tangent.w = 0.0f;
-	output.tangent = input.tangent;
-	output.tangent = mul(output.tangent, worldMatrix);
-	output.tangent = mul(output.tangent, viewMatrix);
-	output.tangent = mul(output.tangent, projectionMatrix);
-	output.tangent = normalize(output.tangent);
-
-	input.binormal.w = 0.0f;
-	output.binormal = input.binormal;
-	output.binormal = mul(output.binormal, worldMatrix);
-	output.binormal = mul(output.binormal, viewMatrix);
-	output.binormal = mul(output.binormal, projectionMatrix);
-	output.binormal = normalize(output.binormal);
-
-	output.tex.zw = float2(0.0f, 1.0f);
-	output.tex.xy = input.tex.xy;
-
-	return output;
-}
 
 // PixelShader
 //------------------------------------------------------------------------------------
@@ -161,51 +101,31 @@ float orenNayarDiffuse(
 // float WardIsoSpecular(){}
 
 //------------------------------------------------------------------------------------
-// Phong-Blinn 
+// Sttic Phong-Blinn model
 //------------------------------------------------------------------------------------
 
-/*
-	Calc lambda for Phong
-	p: fragment coordiante
-	lp: lightsource coordinate
-	N: normal
-*/
-float phongDiffuse(float4 p, float4 lp, float4 N/*, float f*/) 
+float4 mainPixel_PhongBlinn(PixelInputType input) : SV_TARGET
 {
-	float3 mp = lp.xyz - p.xyz;
-	float3 L = normalize(mp);		// light vector
-
-	return dot(N.xyz, L);
-}
-
-/*
-	Calc theta for Blinn
-*/
-float blinnSpecular(float4 p, float4 lp, float4 N, float f)
-{
-	float3 mp = lp.xyz - p.xyz;
-	float3 E = normalize(-p.xyz);	// Eye vector
-	//float3 L = normalize(mp);		// light vector
-	float3 R = reflect(-mp, N.xyz);	// reflected vector (double half vector)
-
-	return /*res.theta = */ pow(saturate(dot(R, E)), f);
-}
-
-//------------------------------------------------------------------------------------
-
-float4 mainPixel_DiffuseColor(PixelInputType input) : SV_TARGET
-{
-	float3 color = /*lights[0].ambient.xyz * */material.ambient.xyz;
-
-	//float4 lp = float4(10, 10, 10, 1);
-	float4 lp = lights[0].position;
-
-	float lambda = phongDiffuse(input.worldPosition, lp, input.normal);
-	float theta = blinnSpecular(input.worldPosition, lp, input.normal, 10);
+	float3 color = float3(0,0,0); 
 	
-	color += /*lights[0].diffuse.xyz * */ material.diffuse.xyz /** lambda*/;
+	//float3 m = input.color0.rgb;
+	float3 m = float3(1, 1, 1);
 
-	return float4(color.x, color.y, color.z, 1);
+	float3 p = input.worldPosition.xyz;
+	float3 lp = light.position.xyz;
+	float3 mp = lp - p;
+
+	float3 N = input.normal.xyz;
+	float3 E = normalize(-p.xyz);
+	float3 R = reflect(-mp, N.xyz);
+	float3 L = normalize(mp);
+
+	float lambda = saturate(dot(N, L));
+	//float theta = pow(saturate(dot(R, E)), f);
+
+	color = m * float3(lambda, lambda, lambda);
+
+	return float4(color.r, color.g, color.b, 1);
 }
 
 //------------------------------------------------------------------------------------

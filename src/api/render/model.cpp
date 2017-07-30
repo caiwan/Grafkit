@@ -35,7 +35,7 @@ void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* const & scene)
 		m_geometryShader->Get()->Bind(render);
 
 	if (m_material) 
-		this->m_material->Render(render, scene->GetPShader());
+		this->m_material->Render(render, scene->GetVShader(), scene->GetPShader());
 
 	if (m_mesh)
 		this->m_mesh->RenderMesh(render);

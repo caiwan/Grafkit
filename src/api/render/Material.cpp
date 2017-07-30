@@ -36,8 +36,10 @@ namespace {
 
 Grafkit::Material::Material() : IResource() , Persistent()
 {
-	ZeroMemory(&m_material, sizeof(m_material));
-	m_material.diffuse = float4(1, 1, 1, 1);
+	ZeroMemory(&m_colors, sizeof(m_colors));
+	ZeroMemory(&m_params, sizeof(m_params));
+
+	m_colors.diffuse = float4(1, 1, 1, 1);
 
 	m_shaderLayer = 0;
 }
@@ -92,13 +94,14 @@ void Grafkit::Material::RemoveTexture(TextureResRef texture, texture_type_e slot
 
 // ====================================
 
-void Grafkit::Material::Render(Renderer& render, ShaderRef &shader)
+void Grafkit::Material::Render(Renderer& render, ShaderRef &vs, ShaderRef &fs)
 {
-	shader->SetParam(render, "material", &m_material);
+	vs->SetParam(render, "material_colors", &m_colors);
+	fs->SetParam(render, "material_params", &m_params);
 
 	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
 		if (it->second.Valid() && it->second->Valid())
-			shader->SetBoundedResourcePointer(it->first, (*it->second)->GetShaderResourceView());
+			fs->SetBoundedResourcePointer(it->first, (*it->second)->GetShaderResourceView());
 	}
 }
 
@@ -108,5 +111,6 @@ void Grafkit::Material::serialize(Archive & ar)
 	this->IResource::_serialize(ar);
 	
 	PERSIST_FIELD(ar, m_shaderLayer);
-	PERSIST_FIELD(ar, m_material);
+	PERSIST_FIELD(ar, m_colors);
+	PERSIST_FIELD(ar, m_params);
 }

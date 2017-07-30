@@ -44,22 +44,24 @@ namespace Grafkit {
 
 		// TODO: QND hack for assimp converter, opt out to return w/ ref
 
-		float4 &GetAmbient() { return m_material.ambient; }
-		float4 &GetDiffuse() { return m_material.diffuse; }
-		float4 &GetSpecular() { return m_material.specular; }
-		float4 &GetEmission() { return m_material.emission; }
+		//float4 &GetAmbient() { return m_material.ambient; }
+		float4 &GetDiffuse() { return m_colors.diffuse; }
+		float4 &GetSpecular() { return m_colors.specular; }
+		//float4 &GetEmission() { return m_material.emission; }
 
-		float &GetIntensity() { return m_material.intensity; }
-		float &GetHardness() { return m_material.hardness; }
-		float &GetRefraction() { return m_material.refraction; }
-		float &GetRoughness() { return m_material.roughness; }
-		float &GetSlope() { return m_material.slope; }
+		float &GetIntensity() { return m_params.intensity; }
+		float &GetHardness() { return m_params.hardness; }
+		float &GetRefraction() { return m_params.refraction; }
+		float &GetRoughness() { return m_params.roughness; }
+		float &GetSlope() { return m_params.slope; }
+		float &GetEmission() { return m_params.emission; }
 
-		void SetIntensity(float intensity) { m_material.intensity = intensity; }
-		void SetHardness(float hardness) { m_material.hardness = hardness; }
-		void SetRefraction(float refraction) { m_material.refraction = refraction; }
-		void SetRoughness(float roughness) { m_material.roughness = roughness; }
-		void SetSlope(float slope) { m_material.slope = slope; }
+		void SetIntensity(float intensity) { m_params.intensity = intensity; }
+		void SetHardness(float hardness) { m_params.hardness = hardness; }
+		void SetRefraction(float refraction) { m_params.refraction = refraction; }
+		void SetRoughness(float roughness) { m_params.roughness = roughness; }
+		void SetSlope(float slope) { m_params.slope = slope; }
+		void SetEmission(float emission) { m_params.slope = emission; }
 
 		TextureResRef GetTexture(std::string bindName);
 
@@ -76,35 +78,30 @@ namespace Grafkit {
 		std::map<std::string, TextureResRef>::const_iterator _GetTextureMapIterator_Begin() { return m_textures.cbegin(); }
 		std::map<std::string, TextureResRef>::const_iterator _GetTextureMapIterator_End() { return m_textures.cend(); }
 
-		virtual void Render(Renderer& render, ShaderRef &pixelShader);
+		virtual void Render(Renderer& render, ShaderRef &vertexShader, ShaderRef &pixelShader);
 
 	protected:
-		struct material_t {
-			material_t() {}
+		struct material_color_t {
+			float4 diffuse, specular;
+		};
 
-			// 16-os alignmenttel, 4-re kell paddolni mindnet 
-
+		struct material_params_t {
 			union {
 				struct {
-					float4 ambient, diffuse, specular, emission;
+					float intensity;	// p0.x specular level, 
+					float hardness;		// p0.y shininess
+					float refraction;	// p0.z
+					float roughness;	// p0.w
+					float slope;		// p1.x
+					float emission;		// p1.y
 				};
-				char ___1[4 * 16]; // a float4 eleve 16-ra van paddolva
-			};
-
-			union {
-				struct {
-					float intensity;	// specular level, 
-					float hardness;		// shininess
-					float refraction;
-					float roughness;
-					float slope;
-				};
-				char ___2[6 * 4]; 
+				float4 param0, param1;
 			};
 
 		};
 
-		struct material_t m_material;
+		struct material_color_t m_colors;
+		struct material_params_t m_params;
 
 		int m_shaderLayer; // TODO: use multiple materials with shader in the same scene in the future 
 

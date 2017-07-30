@@ -64,7 +64,12 @@ namespace Grafkit{
 		enum light_type_t m_type;
 
 		struct light_t {
-			int type;
+			union 
+			{
+				int type;
+				char __1[4 * 4];
+			};
+			
 			float4 position;
 			float4 direction;
 
@@ -72,9 +77,18 @@ namespace Grafkit{
 			float4 diffuse;
 			float4 specular;
 
-			float ca, la, qa;
+			union
+			{
+				float ca, la, qa;
+				float4 param1;
+				char __2[4 * 4];
+			};
 
-			float angle, falloff;
+			union {
+				float angle, falloff;
+				float4 param2;
+				char __2[4 * 4];
+			};
 		};
 
 		struct light_t m_light;
