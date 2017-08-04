@@ -45,6 +45,7 @@ public:
 		args.add("lh").description("convert to left handed").flag(true);
 		//args.add("textures", 't').description("Strip path from texture filenames").flag(true);
 		//args.add("animation", 'a').description("Merge animations from an external json file").flag(true);
+		args.add("cwd").description("Command work directory, where the py folder is, if execution dir differs");
 	}
 
 	~Application() {
@@ -81,7 +82,16 @@ public:
 
 		server.Start();
 
-		std::string cmd = "blender -b -P py/exporter.py --";
+		std::string cwd = "";
+		if (args.get("cwd").isFound()) {
+			cwd = args.get("cwd").value();
+			// add trailing slash if none
+			if (cwd.at(cwd.length() - 1) != '/' || cwd.at(cwd.length() - 1) != '\\')
+				cwd.append("/");
+		}
+
+		std::string cmd = "blender -b -P "+ cwd +"py/exporter.py --";
+		
 		cmd += " -i " + args.get("input").value();
 		std::string host; server.GetHost(host);
 		cmd += " -p " + host;
