@@ -37,4 +37,4 @@ set(GK2_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_subdirectory(src)
 add_subdirectory(tests)
-add_subdirectory(demos)
+# add_subdirectory(demos)
