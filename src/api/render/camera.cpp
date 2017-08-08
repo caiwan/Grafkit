@@ -151,7 +151,7 @@ void Camera::Calculate(Renderer& renderer)
 
 #endif // 0
 
-	renderer.GetScreenSizef(m_screenWidth, m_screenHeight);
+	renderer.GetViewportSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
 	// --- projection & ortho --- 

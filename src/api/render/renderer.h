@@ -49,7 +49,6 @@ namespace Grafkit {
 		Renderer();
 		virtual ~Renderer();
 
-		///@todo viewporttal kell kezdnei valmait majd 
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen);
 		void Shutdown();
 
@@ -60,7 +59,7 @@ namespace Grafkit {
 
 		// --- setters
 		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
-		void SetSurface(int screenW, int screenH);
+		void SetViewportAspect(float aspectW, float aspectH);
 
 		void ApplyRenderTargetView(size_t count = 1);
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
@@ -76,12 +75,11 @@ namespace Grafkit {
 
 		void GetVideoCardInfo(char* dest);
 
-		void GetScreenSize(int &screenW, int &screenH);
-		void GetScreenSizef(float &screenW, float &screenH) {
-			int w=0, h=0;
-			this->GetScreenSize(w, h);
-			screenW = (float)w, screenH = (float)h;
-		}
+		void GetViewportSize(int &screenW, int &screenH);
+		void GetViewportSizef(float &screenW, float &screenH);
+
+		//float GetViewportAspect();
+
 	protected:
 		bool m_vsync_enabled;
 		char m_videoCardDescription[128];
@@ -96,6 +94,10 @@ namespace Grafkit {
 		ID3D11RasterizerState* m_rasterState;
 		
 		matrix m_worldMatrix;
+
+		D3D11_VIEWPORT m_viewport;
+		int m_screenW;
+		int m_screenH;
 	};
 }
 

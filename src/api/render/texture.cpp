@@ -121,7 +121,7 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 		{
 			if (!m_w && !m_h) {
 				int sw = 0, sh = 0;
-				device.GetScreenSize(sw, sh);
+				device.GetViewportSize(sw, sh);
 				m_w = sw, m_h = sh;
 			}
 			else if (!m_w || !m_h) {

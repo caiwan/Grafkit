@@ -14,7 +14,9 @@ Renderer::Renderer() :
 	m_depthStencilBuffer(nullptr),
 	m_depthStencilState(nullptr),
 	m_depthStencilView(nullptr),
-	m_rasterState(nullptr)
+	m_rasterState(nullptr),
+	m_screenW(0),
+	m_screenH(0)
 {
 	m_worldMatrix = XMMatrixIdentity();
 }
@@ -38,6 +40,8 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	int error;
 	D3D_FEATURE_LEVEL featureLevel;
 
+	m_screenW = screenWidth;
+	m_screenH = screenHeight;
 
 	// Store the vsync setting.
 	m_vsync_enabled = vsync;
@@ -360,13 +364,6 @@ void Renderer::Shutdown()
 	RELEASE(m_deviceContext);
 	RELEASE(m_swapChain);
 
-	//if(m_device)
-	//{
-	//	// Assign a nullptr to the ref will automatically release and delete it
-	//	this->AssingnRef(nullptr);
-	//	m_device = nullptr;
-	//}
-
 	RELEASE(m_device);
 	this->ptr = nullptr;
 
@@ -386,15 +383,16 @@ void Renderer::GetVideoCardInfo(char* cardName)
 	return;
 }
 
-void Grafkit::Renderer::GetScreenSize(int & screenW, int & screenH)
+void Grafkit::Renderer::GetViewportSize(int & screenW, int & screenH)
 {
-	/*static */ D3D11_VIEWPORT viewport;
-	UINT p_viewports[] = { 1 };
+	screenW = m_viewport.Width;
+	screenH = m_viewport.Height;
+}
 
-	this->m_deviceContext->RSGetViewports(p_viewports, &viewport);
-
-	screenW = viewport.Width;
-	screenH = viewport.Height;
+void Grafkit::Renderer::GetViewportSizef(float & screenW, float & screenH)
+{
+	screenW = m_viewport.Width;
+	screenH = m_viewport.Height;
 }
 
 
@@ -459,23 +457,31 @@ void Renderer::EndScene()
 
 void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int offsetY)
 {
-	D3D11_VIEWPORT viewport;
-	
 	// Setup the viewport for rendering.
-	viewport.Width = (float)screenW;
-	viewport.Height = (float)screenH;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = (float)offsetX;
-	viewport.TopLeftY = (float)offsetY;
-	
-		// Create the viewport.
-	m_deviceContext->RSSetViewports(1, &viewport);
+	m_viewport.Width = (float)screenW;
+	m_viewport.Height = (float)screenH;
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+	m_viewport.TopLeftX = (float)offsetX;
+	m_viewport.TopLeftY = (float)offsetY;
+
+	// Create the viewport.
+	m_deviceContext->RSSetViewports(1, &m_viewport);
 }
 
-void Grafkit::Renderer::SetSurface(int screenW, int screenH)
+void Grafkit::Renderer::SetViewportAspect(float aspectW, float aspectH)
 {
-	HRESULT result = 0;
+	// reset on invalid input
+	if (aspectW <= 0 || aspectH <= 0)
+		SetViewport(m_screenW, m_screenH, 0, 0);
+
+	if (aspectW > aspectH) {
+		float ah = aspectH / aspectW;
+		float h = floor((float)m_screenH * ah);
+		float oh = floor((m_screenH - h) * .5);
+		SetViewport(m_screenW, (int)h, 0, (int)oh);
+	}
+	// we dont care about the rest atm
 }
 
 void Grafkit::Renderer::SetRenderTargetView(ID3D11RenderTargetView * pRenderTargetView, size_t n)
