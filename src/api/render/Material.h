@@ -82,10 +82,20 @@ namespace Grafkit {
 
 	protected:
 		struct material_color_t {
+			
+			// it does need a ctor 
+			// to avoid compile failures for some reason
+			material_color_t(){}
+
 			float4 diffuse, specular;
 		};
 
 		struct material_params_t {
+
+			// it does need a ctor 
+			// to avoid compile failures for some reason
+			material_params_t(){}
+
 			union {
 				struct {
 					float intensity;	// p0.x specular level, 

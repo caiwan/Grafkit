@@ -64,6 +64,11 @@ namespace Grafkit{
 		enum light_type_t m_type;
 
 		struct light_t {
+
+			// it does need a ctor 
+			// to avoid compile failures for some reason
+			light_t(){}
+
 			union 
 			{
 				int type;
