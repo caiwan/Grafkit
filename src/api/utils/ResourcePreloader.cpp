@@ -26,12 +26,13 @@ namespace {
 
 /// @TODO init + shutdown
 
-ResourcePreloader::ResourcePreloader(PreloadEvents * pPreloader) : Grafkit::IResourceManager()
+ResourcePreloader::ResourcePreloader(IPreloadEvents * pPreloader) : Grafkit::IResourceManager()
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
 	for (size_t i = 0; i < sizeof(preloadFilters) / sizeof(preloadFilters[0]); i++) {
 		m_filters.push_back(new AssetFileFilter(preloadFilters[i].extensions, 8));
 	}
+	SetPreloadListener(pPreloader);
 }
 
 ResourcePreloader::~ResourcePreloader()

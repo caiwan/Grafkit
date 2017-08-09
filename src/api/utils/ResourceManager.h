@@ -13,12 +13,12 @@ namespace Grafkit {
 
 	class IAssetFactory;
 
-	/// Ez lesz majd a betoltocsik
-	class PreloadEvents {
+	class IPreloadEvents {
 	public:
-		virtual void OnBeginLoad() = 0;
+		//virtual void OnBeginLoad() = 0;
+		//virtual void OnBeforeElemLoad(IResourceBuilder *&builder, IResource *&res) = 0;
 		virtual void OnElemLoad(size_t actual, size_t count) = 0;
-		virtual void OnEndLoad() = 0;
+		//virtual void OnEndLoad() = 0;
 	};
 
 	class IResourceManager
@@ -32,6 +32,8 @@ namespace Grafkit {
 		void Add(Ref<IResource> pResource);
 		void Remove(const std::string &pName);
 		void RemoveAll();
+
+		void SetPreloadListener(IPreloadEvents* listener) { m_preloadEvents = listener; }
 		
 		// preloader
 		void Load(IResourceBuilder* builder);
@@ -56,6 +58,9 @@ namespace Grafkit {
 		std::map<std::string, std::string> m_pathMap;
 		std::map<std::string, Ref<IResource>> m_resources;
 		std::list<IResourceBuilder*> m_builders;
+
+	protected: 
+		IPreloadEvents* m_preloadEvents;
 	};
 
 	template<class T> inline Ref<T> IResourceManager::Get(const std::string &pName) const {

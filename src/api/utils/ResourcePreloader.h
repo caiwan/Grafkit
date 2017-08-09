@@ -20,7 +20,7 @@ namespace Grafkit{
 	class ResourcePreloader : public Grafkit::IResourceManager
 	{
 	public:
-		ResourcePreloader(PreloadEvents* pPreloader = nullptr);
+		ResourcePreloader(IPreloadEvents* pPreloader = nullptr);
 		~ResourcePreloader();
 
 		void LoadCache();

@@ -6,7 +6,7 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-IResourceManager::IResourceManager()
+IResourceManager::IResourceManager() : m_preloadEvents(nullptr)
 {
 	/* Alap resource pathek */
 	this->AddResourcePath("texture", "textures/");
@@ -79,6 +79,8 @@ void Grafkit::IResourceManager::DoPrecalc()
 			(*it)->Load(this, Get<IResource>((*it)->GetName()));
 		}
 
+		if (m_preloadEvents)
+			m_preloadEvents->OnElemLoad(i, len);
 		// event after item had loaded
 		
 		i++;
