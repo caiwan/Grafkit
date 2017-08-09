@@ -49,7 +49,7 @@ namespace Grafkit {
 		Renderer();
 		virtual ~Renderer();
 
-		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen);
+		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float aspectw = -1, float aspecth = -1);
 		void Shutdown();
 
 		// --- operations 
@@ -58,8 +58,6 @@ namespace Grafkit {
 		void EndScene();
 
 		// --- setters
-		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
-		void SetViewportAspect(float aspectW, float aspectH);
 
 		void ApplyRenderTargetView(size_t count = 1);
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
@@ -79,6 +77,9 @@ namespace Grafkit {
 		void GetViewportSizef(float &screenW, float &screenH);
 
 		//float GetViewportAspect();
+	protected:
+		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
+		void SetViewportAspect(float aspectW, float aspectH);
 
 	protected:
 		bool m_vsync_enabled;

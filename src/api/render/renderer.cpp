@@ -27,7 +27,7 @@ Renderer::~Renderer()
 }
 
 
-int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen)
+int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float aspectw, float aspecth)
 {
 	HRESULT result;
 	IDXGIFactory* factory;
@@ -121,6 +121,10 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	// Release the factory.
 	factory->Release();
 	factory = 0;
+
+	// -----------------------------------------------------------------------------
+	// --- setup viewport 
+	// folytkov
 
 	// -----------------------------------------------------------------------------
 	// --- setup swap chain
