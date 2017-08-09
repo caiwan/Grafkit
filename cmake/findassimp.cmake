@@ -15,6 +15,10 @@ if(WIN32)
 			${ASSIMP_ROOT_DIR}/include
 	)
 
+    get_filename_component(ASSIMP_ROOT_DIR ${ASSIMP_INCLUDE_DIR}/../ ABSOLUTE)
+    
+    message("ASSIMP_ROOT_DIR = ${ASSIMP_ROOT_DIR}")
+    
 	if(MSVC12)
 		set(ASSIMP_MSVC_VERSION "vc120")
 	elseif(MSVC14)	
@@ -26,14 +30,14 @@ if(WIN32)
 		find_path(ASSIMP_LIBRARY_DIR
 			NAMES
 				assimp-${ASSIMP_MSVC_VERSION}-mt.lib assimp-${ASSIMP_MSVC_VERSION}-mtd.lib
-			HINTS
+			PATH
 				${ASSIMP_ROOT_DIR}/lib
 		)
 		
 		find_path(ASSIMP_DLL_DIR
 			NAMES
 				assimp-${ASSIMP_MSVC_VERSION}-mt.dll assimp-${ASSIMP_MSVC_VERSION}-mt.dll 
-			HINTS
+			PATH
 				${ASSIMP_ROOT_DIR}/bin
 		)
 		
