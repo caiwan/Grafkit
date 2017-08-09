@@ -86,6 +86,20 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 {
 	Grafkit::MutexLocker lock(m_inputDataQueueMutex);
 	try {
+
+		static int counter = 0;
+		FILE* fp = nullptr;
+		char fn[256];
+		sprintf_s(fn, "dump%d", counter++);
+
+		//fopen_s(&fp, fn, "wb");
+		if (fp){
+			std::string s = ss.str();
+			fwrite(s.c_str(), s.length(), 1, fp);
+			fflush(fp);
+			fclose(fp);
+		}
+
 		json j = json::parse(ss);
 		m_inputDataQueue.push(j);
 	}

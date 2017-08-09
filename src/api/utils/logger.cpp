@@ -145,13 +145,13 @@ void Grafkit::LoggerHandler::FileLoggerHandler::Write(Grafkit::Logger::message_t
 
 	if (message->type == Logger::LOG_ERROR || message->type == Logger::LOG_WARN) {
 		if (this->m_stderr) {
-			fprintf_s(this->m_stderr, "%s\r\n", message->message);
+			fprintf_s(this->m_stderr, "%s\n", message->message);
 		}
 	}
 	/*else*/ 
 	{
 		if (this->m_stdout) {
-			fprintf_s(this->m_stdout, "%s\r\n", message->message);
+			fprintf_s(this->m_stdout, "%s\n", message->message);
 		}
 	}
 }
@@ -191,11 +191,11 @@ void Grafkit::LoggerHandler::ConsoleLogger::Write(Grafkit::Logger::message_t * c
 	if (m_haveConsole)
 		if (message->type == Logger::LOG_ERROR || message->type == Logger::LOG_WARN) {
 			if (this->m_stderr)
-				fprintf_s(this->m_stderr, "%s\r\n", message->message);
+				fprintf_s(this->m_stderr, "%s\n", message->message);
 		}
 		else {
 			if (this->m_stdout)
-				fprintf_s(this->m_stdout, "%s\r\n", message->message);
+				fprintf_s(this->m_stdout, "%s\n", message->message);
 		}
 }
 
@@ -214,5 +214,5 @@ Grafkit::LoggerHandler::MsvcOutLogger::~MsvcOutLogger()
 void Grafkit::LoggerHandler::MsvcOutLogger::Write(Grafkit::Logger::message_t * const & message)
 {
 	OutputDebugStringA(message->message);
-	OutputDebugStringA("\r\n");
+	OutputDebugStringA("\n");
 }

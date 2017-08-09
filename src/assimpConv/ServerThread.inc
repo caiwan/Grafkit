@@ -107,8 +107,12 @@ private:
 			// recv packet
 			std::stringstream ss;
 
+			static int c = 0;
+			char b[2456];
+			sprintf_s(b, "dump_recv%d", c++);
+
 			FILE* fp = NULL;
-			// if (fopen_s(&fp, "debug.json", "ab") != 0) fp = NULL;
+			// if (fopen_s(&fp, b, "ab") != 0) fp = NULL;
 
 			unsigned int bytesLeft = respLen;
 
@@ -117,17 +121,19 @@ private:
 				
 				res = recv(ClientSocket, recvbuf, bytesRead, 0);
 				if (res > 0) {
-					ss.write(recvbuf, bytesRead);
+					ss.write(recvbuf, res);
 					
 					if (fp) 
-						fwrite(recvbuf, 1, bytesRead, fp);
+						fwrite(recvbuf, 1, res, fp);
 
-					bytesLeft -= bytesRead;	
+					bytesLeft -= res;	
 				}
 
 				Log::Logger().Info("Read chunk %d %d", bytesRead, bytesLeft);
 			}
 			
+			Log::Logger().Info("Done read %d %d", respLen, ss.tellg());
+
 			ss.put(0);
 			ss.seekp(0);
 
