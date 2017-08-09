@@ -121,7 +121,7 @@ protected:
 				//fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
 				
 				float2 res = float2();
-				render.GetScreenSizef(res.x, res.y);
+				render.GetViewportSizef(res.x, res.y);
 
 				m_fxFXAA->Get()->SetParamValueT<float2>(render, "FXAA", "resolution", res);
 				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .1);
