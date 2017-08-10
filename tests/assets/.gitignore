@@ -1,3 +1,6 @@
 *.log
 *.dump
 *.dll
+
+# these could be converted as well
+*.scene
