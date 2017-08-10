@@ -224,8 +224,3 @@ ModelManifest.xml
 shader-error.txt
 *.exe
 *.dll
-
-*.assbin
-
-*RCa14132
-*.blend*
