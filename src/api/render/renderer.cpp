@@ -68,7 +68,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// Create a list to hold all the possible display modes for this monitor/video card combination.
 	displayModeList = new DXGI_MODE_DESC[numModes];
-	if(!displayModeList)
+	if (!displayModeList)
 	{
 		throw EX_DETAILS(InitializeRendererException, "No display mode list");
 	}
@@ -92,13 +92,13 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// Now go through all the display modes and find the one that matches the screen width and height.
 	// When a match is found store the numerator and denominator of the refresh rate for that monitor.
-	Log::Logger().Info("\nAvailable display modes:");	
-	for(i=0; i<numModes; i++)
+	Log::Logger().Info("\nAvailable display modes:");
+	for (i = 0; i < numModes; i++)
 	{
 		Log::Logger().Info("%d %d x %d, %d, scale %d", i, displayModeList[i].Width, displayModeList[i].Height, displayModeList[i].RefreshRate, displayModeList[i].Scaling);
-		if(displayModeList[i].Width == (unsigned int)m_screenW)
+		if (displayModeList[i].Width == (unsigned int)m_screenW)
 		{
-			if(displayModeList[i].Height == (unsigned int)m_screenH)
+			if (displayModeList[i].Height == (unsigned int)m_screenH)
 			{
 				numerator = displayModeList[i].RefreshRate.Numerator;
 				denominator = displayModeList[i].RefreshRate.Denominator;
@@ -107,7 +107,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	}
 
 	// Release the display mode list.
-	delete [] displayModeList;
+	delete[] displayModeList;
 	displayModeList = 0;
 
 	// Release the adapter output.
@@ -123,10 +123,6 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	factory = 0;
 
 	// -----------------------------------------------------------------------------
-	// --- setup viewport 
-	SetViewportAspect(aspectw, aspecth);
-
-	// -----------------------------------------------------------------------------
 	// --- setup swap chain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 
@@ -137,14 +133,14 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	swapChainDesc.BufferCount = 1;
 
 	// Set the width and height of the back buffer.
-	swapChainDesc.BufferDesc.Width = m_viewport.Width;
-	swapChainDesc.BufferDesc.Height = m_viewport.Height;
+	swapChainDesc.BufferDesc.Width = m_screenW;
+	swapChainDesc.BufferDesc.Height = m_screenH;
 
 	// Set regular 32-bit surface for the back buffer.
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
 	// Set the refresh rate of the back buffer.
-	if(m_vsync_enabled)
+	if (m_vsync_enabled)
 	{
 		swapChainDesc.BufferDesc.RefreshRate.Numerator = numerator;
 		swapChainDesc.BufferDesc.RefreshRate.Denominator = denominator;
@@ -166,7 +162,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	swapChainDesc.SampleDesc.Quality = 0;
 
 	// Set to full screen or windowed mode.
-	if(fullscreen)
+	if (fullscreen)
 	{
 		swapChainDesc.Windowed = false;
 	}
@@ -195,14 +191,14 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 #ifdef _DEBUG
 	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-	
-	result = D3D11CreateDeviceAndSwapChain(
-		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, deviceCreationFlags, 
-		&featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, 
-		&m_swapChain, &m_device, nullptr, &m_deviceContext
-		);
 
-	if(FAILED(result))
+	result = D3D11CreateDeviceAndSwapChain(
+		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, deviceCreationFlags,
+		&featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc,
+		&m_swapChain, &m_device, nullptr, &m_deviceContext
+	);
+
+	if (FAILED(result))
 		throw EX_HRESULT(InitializeRendererException, result);
 
 	// update our reference
@@ -232,8 +228,8 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
 	// Set up the description of the depth buffer.
-	depthBufferDesc.Width = m_viewport.Width;
-	depthBufferDesc.Height = m_viewport.Height;
+	depthBufferDesc.Width = m_screenW;
+	depthBufferDesc.Height = m_screenH;
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -248,7 +244,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = m_device->CreateTexture2D(&depthBufferDesc, nullptr, &m_depthStencilBuffer);
 	if (FAILED(result))
 		throw EX_HRESULT(InitializeRendererException, result);
-	
+
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	// Initialize the description of the stencil state.
@@ -343,8 +339,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// Now set the rasterizer state.
 	m_deviceContext->RSSetState(m_rasterState);
-	
-	m_deviceContext->RSSetViewports(1, &m_viewport);
+
+	// -----------------------------------------------------------------------------
+	SetViewportAspect(aspectw, aspecth);
 
 	return true;
 }
@@ -352,7 +349,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 void Renderer::Shutdown()
 {
 	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
-	if(m_swapChain)
+	if (m_swapChain)
 	{
 		m_swapChain->SetFullscreenState(false, nullptr);
 	}
@@ -360,7 +357,7 @@ void Renderer::Shutdown()
 	RELEASE(m_rasterState);
 	RELEASE(m_depthStencilView);
 	RELEASE(m_depthStencilState)
-	RELEASE(m_depthStencilBuffer);
+		RELEASE(m_depthStencilBuffer);
 	RELEASE(m_myRenderTargetView);
 	RELEASE(m_deviceContext);
 	RELEASE(m_swapChain);
@@ -384,19 +381,6 @@ void Renderer::GetVideoCardInfo(char* cardName)
 	return;
 }
 
-void Grafkit::Renderer::GetViewportSize(int & screenW, int & screenH)
-{
-	screenW = m_viewport.Width;
-	screenH = m_viewport.Height;
-}
-
-void Grafkit::Renderer::GetViewportSizef(float & screenW, float & screenH)
-{
-	screenW = m_viewport.Width;
-	screenH = m_viewport.Height;
-}
-
-
 void Renderer::BeginScene(float red, float green, float blue, float alpha)
 {
 	float color[4];
@@ -410,16 +394,17 @@ void Renderer::BeginScene(float red, float green, float blue, float alpha)
 
 	// Clear the back buffer.
 	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
-		if (m_renderTargetViews[i]) 
+		if (m_renderTargetViews[i])
 			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color);
-	
+
 	// Clear the depth buffer.
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 0.0f, 0);
 
 	return;
 }
 
-const float color_Citrus_flavoured_black[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+static const float black[4] = { 0.f, 0.f, 0.f, 1.f };
+static const float color_Citrus_flavoured_black[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
 /*
 [19:05:47] Citrus Lee: cornflower blue :D
 [19:05:52] Citrus Lee: you're welcome :D
@@ -429,9 +414,10 @@ void Renderer::BeginScene()
 {
 	// Clear the back buffer.
 	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
-		if (m_renderTargetViews[i])
-			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color_Citrus_flavoured_black);
-
+		if (m_renderTargetViews[i]) {
+			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], black);
+			//m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], black);
+		}
 	// Clear the depth buffer.
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -442,16 +428,18 @@ void Renderer::BeginScene()
 void Renderer::EndScene()
 {
 	// Present the back buffer to the screen since rendering is complete.
-	if(m_vsync_enabled)
+	if (m_vsync_enabled)
 	{
 		// Lock to screen refresh rate.
-		m_swapChain->Present(1, 0);
+		m_swapChain->Present1(1, 0);
 	}
 	else
 	{
 		// Present as fast as possible.
-		m_swapChain->Present(0, 0);
+		m_swapChain->Present1(0, 0);
 	}
+
+	//this->m_device->pre
 
 	return;
 }
@@ -468,7 +456,7 @@ void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int o
 
 	// TODO: the enitre render output stack and buffers has to be updated
 	if (m_deviceContext)
-	m_deviceContext->RSSetViewports(1, &m_viewport);
+		m_deviceContext->RSSetViewports(1, &m_viewport);
 }
 
 void Grafkit::Renderer::SetViewportAspect(float aspectW, float aspectH)

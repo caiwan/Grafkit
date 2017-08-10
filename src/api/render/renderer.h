@@ -9,6 +9,8 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
+#include <DXGI1_2.h>
+
 #include "../stdafx.h"
 
 #include "../utils/reference.h"
@@ -52,6 +54,9 @@ namespace Grafkit {
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float aspectw = -1, float aspecth = -1);
 		void Shutdown();
 
+		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
+		void SetViewportAspect(float aspectW, float aspectH);
+
 		// --- operations 
 		void BeginScene(float red, float green, float blue, float alpha);
 		void BeginScene();
@@ -73,13 +78,15 @@ namespace Grafkit {
 
 		void GetVideoCardInfo(char* dest);
 
-		void GetViewportSize(int &screenW, int &screenH);
-		void GetViewportSizef(float &screenW, float &screenH);
+		void GetScreenSize(int &screenW, int &screenH) { screenW = m_screenW; screenH = m_screenH; }
+		void GetScreenSizef(float &screenW, float &screenH) { screenW = m_screenW; screenH = m_screenH; }
+
+		void GetViewportSize(int &viewW, int &viewH) { viewW = m_viewport.Width; viewH = m_viewport.Height; }
+		void GetViewportSizef(float &viewW, float &viewH) { viewW = m_viewport.Width; viewH = m_viewport.Height; }
+
+		float GetAspectRatio() {return (float)m_viewport.Width / (float)m_viewport.Height;}
 
 		//float GetViewportAspect();
-	protected:
-		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
-		void SetViewportAspect(float aspectW, float aspectH);
 
 	protected:
 		bool m_vsync_enabled;
@@ -96,6 +103,7 @@ namespace Grafkit {
 		
 		matrix m_worldMatrix;
 
+		DXGI_PRESENT_PARAMETERS m_present;
 		D3D11_VIEWPORT m_viewport;
 		int m_screenW;
 		int m_screenH;
