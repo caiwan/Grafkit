@@ -76,24 +76,33 @@ protected:
 	float t;
 
 	ShaderResRef vs;
-	ShaderResRef fs;
+	ShaderResRef fs0;
+	ShaderResRef fs1;
+	ShaderResRef fs2;
+	ShaderResRef fs3;
 
 	int init() {
 		LoadCache();
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
-		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "mainPixel_PhongBlinn"));
+
+		fs0 = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "mainPixel_PhongBlinn"));
+		fs1 = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+		fs2 = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/normal.hlsl", ""));
 
 		// -- model 
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere_multimaterial.scene"));
 
 		DoPrecalc();
+		
+		(*scene)->AddMaterialLayer(1, fs1);
+		(*scene)->AddMaterialLayer(2, fs2);
 
-		scene->Get()->BuildScene(render, vs, fs);
-		scene->Get()->SetActiveCamera(0);
+		(*scene)->BuildScene(render, vs, fs0);
+		(*scene)->SetActiveCamera(0);
 
-		camera = scene->Get()->GetActiveCamera();
+		camera = (*scene)->GetActiveCamera();
 
 		// -- add lights
 		/*light = new PointLight();
@@ -119,10 +128,6 @@ protected:
 		this->render.BeginScene();
 		{
 			t += .01;
-
-			//camera->Matrix().Identity();
-			//camera->Matrix().Translate(0, 0, -10);
-			//camera->Matrix().RotateRPY(t, .23847*t, .392847*t);
 
 			this->scene->Get()->UpdateAnimation(fmod(t, 10.5));
 			this->scene->Get()->PreRender(render);

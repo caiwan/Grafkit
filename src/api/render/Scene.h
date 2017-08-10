@@ -57,6 +57,9 @@ namespace Grafkit {
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
+		void AddMaterialLayer(UINT layer, ShaderRef &shader) { m_materialShaderMap[layer] = shader; }
+		unsigned int GetLayerID() { return m_materialCurrentLayer; }
+
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
 		ShaderRef &GetPShader() { return this->m_pixelShader; }
 
@@ -94,6 +97,7 @@ namespace Grafkit {
 		ShaderRef m_pixelShader;
 
 	private:
+		void RenderLayer(Grafkit::Renderer & render, UINT layer);
 		void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
 		void Push();
 		void Pop();
@@ -105,6 +109,8 @@ namespace Grafkit {
 		std::list<ActorRef> m_nodes;
 
 		std::map<std::string, MaterialRef> m_materialMap;
+		std::map<UINT, ShaderRef> m_materialShaderMap;
+		UINT m_materialCurrentLayer;
 
 		Grafkit::Matrix m_cameraMatrix;
 

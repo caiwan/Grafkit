@@ -17,7 +17,8 @@ PERSISTENT_IMPL(Grafkit::Scene);
 Grafkit::Scene::Scene() :
 	m_root(nullptr),
 	m_tStart(0.0f),
-	m_tEnd(10.0f)
+	m_tEnd(10.0f),
+	m_materialCurrentLayer(0)
 {
 }
 
@@ -154,6 +155,8 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs,
 	if (ps.Valid()) 
 		m_pixelShader = ps;
 
+	AddMaterialLayer(0, ps);
+
 	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
 		(*it)->Build(deviceContext, this);
 	}
@@ -218,6 +221,16 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
+	for (auto it = m_materialShaderMap.begin(); it != m_materialShaderMap.end(); it++) {
+		m_pixelShader = it->second;
+		RenderLayer(render, it->first);
+	}
+}
+
+void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
+{
+	m_materialCurrentLayer = layer;
+
 	m_currentWorldMatrix.Identity();
 
 	// ezt a semat ki kell baszni innen 

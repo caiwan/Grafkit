@@ -31,11 +31,14 @@ Model::~Model()
 
 void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* const & scene)
 {
+	if (m_material) {
+		if (m_material->GetLayer() != scene->GetLayerID())
+			return;
+		this->m_material->Render(render, scene->GetVShader(), scene->GetPShader());
+	}
+
 	if (m_geometryShader.Valid() && m_geometryShader->Valid())
 		m_geometryShader->Get()->Bind(render);
-
-	if (m_material) 
-		this->m_material->Render(render, scene->GetVShader(), scene->GetPShader());
 
 	if (m_mesh)
 		this->m_mesh->RenderMesh(render);

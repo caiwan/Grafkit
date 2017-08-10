@@ -1,4 +1,4 @@
-#define PI 3.14159265359
+#include <types.hlsl>
 
 //cbuffer MatrixBuffer
 //{
@@ -33,25 +33,9 @@
 	 struct Light light;
 }
 
-
 cbuffer material_params
 {
 	float4 mat_param1, mat_param2;
-};
-
-
-struct PixelInputType
-{
-	float4 position : SV_POSITION;
-	float4 normal : NORMAL;
-	float4 tangent : TANGENT;
-	float4 binormal : BINORMAL;
-
-	float4 color0 : COLOR0;	// diffuse
-	//float4 color1 : COLOR1;	// specular
-
-	float4 tex : TEXCOORD0;
-	float4 worldPosition : TEXCOORD1;
 };
 
 SamplerState SampleType {
@@ -111,7 +95,7 @@ float4 mainPixel_PhongBlinn(PixelInputType input) : SV_TARGET
 	//float3 m = input.color0.rgb;
 	float3 m = float3(1, 1, 1);
 
-	float3 p = input.worldPosition.xyz;
+	float3 p = input.view.xyz;
 	float3 lp = light.position.xyz;
 	float3 mp = lp - p;
 

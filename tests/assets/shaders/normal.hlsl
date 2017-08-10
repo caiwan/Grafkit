@@ -6,6 +6,12 @@ SamplerState SampleType {
 	AddressV = Wrap;
 };
 
+Texture2D t_diffuse;
+Texture2D t_alpha;
+Texture2D t_normal;
+Texture2D t_specular;
+Texture2D t_shininess;
+
 struct PixelOutType {
 	float4 diff : SV_TARGET0;
 	float4 normal : SV_TARGET1;
@@ -19,6 +25,6 @@ PixelOutType mainPixel(PixelInputType input)
 	PixelOutType output;
 	output.normal = input.normal;
 	output.view = input.view;
-	output.diff = input.color0;
+	output.diff = .5 * input.normal - .5;
 	return output;
 }

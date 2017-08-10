@@ -47,7 +47,7 @@ public:
 			screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
 			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
 
-			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN, 2.39, 1.);
+			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			this->m_file_loader = new FileAssetFactory("./../assets/");
 		}
@@ -110,7 +110,7 @@ protected:
 		// ==================================================================================================================
 		int mainloop() {
 
-			//m_postfx->BindInput(render);
+			m_postfx->BindInput(render);
 
 			// pre fx-pass
 			this->render.BeginScene();
@@ -134,7 +134,7 @@ protected:
 			}
 
 			// render fx chain 
-			// m_postfx->Render(render);
+			 m_postfx->Render(render);
 			
 			this->render.EndScene();
 

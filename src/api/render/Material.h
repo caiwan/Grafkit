@@ -73,6 +73,9 @@ namespace Grafkit {
 		void AddTexture(TextureResRef texture, texture_type_e slot);
 		void RemoveTexture(TextureResRef texture, texture_type_e slot);
 
+		unsigned int GetLayer() { return m_layer; }
+		void SetLayer(unsigned int l) { m_layer = l; }
+
 		// persisthez kell
 		bool _IsTextureMapEmpty() { return m_textures.empty(); }
 		std::map<std::string, TextureResRef>::const_iterator _GetTextureMapIterator_Begin() { return m_textures.cbegin(); }
@@ -113,7 +116,7 @@ namespace Grafkit {
 		struct material_color_t m_colors;
 		struct material_params_t m_params;
 
-		int m_shaderLayer; // TODO: use multiple materials with shader in the same scene in the future 
+		unsigned int m_layer; // TODO: use multiple materials with shader in the same scene in the future 
 
 		std::map<std::string, TextureResRef> m_textures;
 
