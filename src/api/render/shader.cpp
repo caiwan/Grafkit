@@ -178,6 +178,32 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 
 void Grafkit::Shader::Unbind(ID3D11DeviceContext * deviceContext)
 {
+	// duck through the resources
+	if (this->GetBoundedResourceCount())
+	{
+		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
+			BResRecord &brRecord = this->m_bResources[i];
+			if (brRecord.m_boundSource != nullptr) {
+
+				switch (brRecord.m_desc.Type) {
+				case D3D_SIT_TEXTURE:
+				{
+					ID3D11ShaderResourceView * ppResV = nullptr;
+					SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
+
+				} break;
+
+				case D3D_SIT_SAMPLER:
+				{
+					ID3D11SamplerState * pSampler = nullptr;
+					SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
+				} break;
+
+				}
+			}
+		}
+	}
+
 	UnbindShader(deviceContext);
 }
 

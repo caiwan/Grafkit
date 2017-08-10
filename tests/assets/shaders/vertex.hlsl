@@ -30,7 +30,7 @@ struct PixelInputType
 	//float4 color1 : COLOR1;
 	
 	float4 tex : TEXCOORD0;
-	float4 worldPosition : TEXCOORD1;
+	float4 view : VIEW;
 };
 
 PixelInputType mainVertex(VertexInputType input)
@@ -39,10 +39,10 @@ PixelInputType mainVertex(VertexInputType input)
 
 	input.position.w = 1.0f;
 
-	output.worldPosition = input.position;
-	output.worldPosition = mul(output.worldPosition, worldMatrix);
-	output.worldPosition = mul(output.worldPosition, viewMatrix);
-	output.worldPosition.xyz = output.worldPosition.xyz / output.worldPosition.w;
+	output.view = input.position;
+	output.view = mul(output.view, worldMatrix);
+	output.view = mul(output.view, viewMatrix);
+	output.view.xyz = output.view.xyz / output.view.w;
 
 	output.position = input.position;
 	output.position = mul(output.position, worldMatrix);

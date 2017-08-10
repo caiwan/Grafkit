@@ -116,9 +116,25 @@ void Grafkit::EffectComposer::BindInput(Renderer & render)
 	render.ApplyRenderTargetView(count);
 }
 
+void Grafkit::EffectComposer::UnbindInput(Renderer & render)
+{
+	size_t count = 1;
+	render.SetRenderTargetView(nullptr, 0);
+
+	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
+		if (it->second.Valid()) {
+			render.SetRenderTargetView(nullptr, it->first);
+			count++;
+		}
+	}
+
+	render.ApplyRenderTargetView(1);
+}
+
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 {
+	UnbindInput(render);
 	RenderChain(render);
 	if (autoflush)
 		this->Flush(render);
@@ -156,14 +172,21 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 				fx->GetShader()->SetShaderResourceView("backBuffer", m_pTexBack->GetShaderResourceView());
 				fx->GetShader()->SetShaderResourceView("effectInput", m_pTexRead->GetShaderResourceView());
 				fx->GetShader()->SetSamplerSatate("SampleType", m_textureSampler->GetSamplerState());
-				fx->Render(render);
+				fx->BindFx(render);
 			}
 
 			m_fullscreenquad->RenderMesh(render);
+
+			if (fx && fx->GetShader().Valid()) {
+				fx->UnbindFx(render);
+				//fx->UnbindOutputs(render);
+			}
 		}
 
 		this->SwapBuffers();
 	}
+
+	m_shaderFullscreenQuad->Unbind(render);
 }
 
 void Grafkit::EffectComposer::Flush(Renderer & render)
@@ -179,6 +202,10 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 	m_shaderCopyScreen->Bind(render);
 
 	m_fullscreenquad->RenderMesh(render);
+
+	m_shaderCopyScreen->Unbind(render);
+
+	m_shaderFullscreenQuad->Unbind(render);
 
 	this->FlushBuffers();
 }
@@ -221,12 +248,32 @@ size_t Grafkit::EffectPass::BindOutputs(Renderer &render)
 	return count;
 }
 
-void Grafkit::EffectPass::Render(Renderer & render)
+size_t Grafkit::EffectPass::UnbindOutputs(Renderer & render)
+{
+	size_t count = 0;
+	for (auto it = m_output_map.begin(); it != m_output_map.end(); it++) {
+		if (it->second.Valid()) {
+			render.SetRenderTargetView(nullptr, it->first);
+			count++;
+		}
+	}
+	return count;
+}
+
+void Grafkit::EffectPass::BindFx(Renderer & render)
 {
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
 		m_shader->Get()->SetShaderResourceView(it->first, it->second->GetShaderResourceView());
 	}
 	m_shader->Get()->Bind(render);
+}
+
+void Grafkit::EffectPass::UnbindFx(Renderer & render)
+{
+	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
+		m_shader->Get()->SetShaderResourceView(it->first, nullptr);
+	}
+	m_shader->Get()->Unbind(render);
 }
 
 TextureRef Grafkit::EffectPass::GetOutput(size_t bind)

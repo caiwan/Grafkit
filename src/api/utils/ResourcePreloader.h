@@ -21,7 +21,7 @@ namespace Grafkit{
 	{
 	public:
 		ResourcePreloader(IPreloadEvents* pPreloader = nullptr);
-		~ResourcePreloader();
+		virtual ~ResourcePreloader();
 
 		void LoadCache();
 		void SaveCache();

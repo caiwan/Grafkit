@@ -74,13 +74,13 @@ protected:
 		ShaderResRef m_fs;
 		
 		int init() {
-			m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/default.hlsl", ""));
-			m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
+			m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
+			m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 			m_fxFXAA = Load<ShaderRes>(new PixelShaderLoader("xFXAA", "shaders/fxaa.hlsl", "FXAA"));
 			m_fxFishEye = Load<ShaderRes>(new PixelShaderLoader("xFishEye", "shaders/fisheye.hlsl", "fisheyeProc"));
 
-			m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
+			m_scene = this->Load<SceneRes>(new SceneLoader("scene", "spheres.scene"));
 
 			LoadCache();
 			DoPrecalc();

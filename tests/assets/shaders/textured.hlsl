@@ -19,55 +19,25 @@ Texture2D t_normal;
 Texture2D t_specular;
 Texture2D t_shininess;
 
-
-// TYPEDEFS //
-
-struct VertexInputType
-{
-	float4 position : POSITION;
-	float4 normal : NORMAL;
-	float2 tex : TEXCOORD;
-};
-
 struct PixelInputType
 {
-	float4 position : SV_POSITION; 
-	float4 view : VIEW;
+	float4 position : SV_POSITION;
 	float4 normal : NORMAL;
-	float2 tex : TEXCOORD;
-};
+	float4 tangent : TANGENT;
+	float4 binormal : BINORMAL;
 
+	float4 color0 : COLOR0;
+	//float4 color1 : COLOR1;
+
+	float4 tex : TEXCOORD0;
+	float4 view : VIEW;
+};
 
 struct PixelOutType {
 	float4 diff : SV_TARGET0;
 	float4 normal : SV_TARGET1;
 	float4 view : SV_TARGET2;
 };
-
-// VertexShader
-//------------------------------------------------------------------------------------
-PixelInputType mainVertex(VertexInputType input)
-{
-	PixelInputType output;
-
-	input.position.w = 1.0f;
-
-	output.position = input.position;
-	
-	output.position = mul(output.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
-	output.view = output.position;
-	output.position = mul(output.position, projectionMatrix);
-		
-	output.normal = input.normal;
-	output.normal = mul(output.normal, worldMatrix); 
-	output.normal = mul(output.normal, viewMatrix);
-	output.normal = normalize(output.normal);
-
-	output.tex = input.tex;
-
-	return output;
-}
 
 // PixelShader
 //------------------------------------------------------------------------------------

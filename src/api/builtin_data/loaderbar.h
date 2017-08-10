@@ -12,7 +12,8 @@ namespace GrafkitData {
 	class LoaderBar : public Grafkit::IPreloadEvents {
 	public:
 		LoaderBar();
-		~LoaderBar();
+		virtual ~LoaderBar();
+
 		void InitializeLoaderBar(Grafkit::Renderer & renderer);
 		void ShutdownLoaderBar();
 

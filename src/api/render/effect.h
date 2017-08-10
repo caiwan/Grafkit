@@ -36,6 +36,7 @@ namespace Grafkit {
 		/** Beallitja az elso read buffert a rendererenek, a render passhoz
 		*/
 		void BindInput(Renderer &render);
+		void UnbindInput(Renderer& render);
 
 		/** Vegigmegy a render chainen
 		*/
@@ -106,7 +107,10 @@ namespace Grafkit {
 		void Shutdown();
 
 		size_t BindOutputs(Renderer &render);
-		void Render(Renderer &render);
+		size_t UnbindOutputs(Renderer &render);
+
+		void BindFx(Renderer &render);
+		void UnbindFx(Renderer &render);
 
 		ShaderRef GetShader() { return m_shader->Get(); }
 

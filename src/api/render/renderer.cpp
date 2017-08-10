@@ -96,9 +96,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	for(i=0; i<numModes; i++)
 	{
 		Log::Logger().Info("%d %d x %d, %d, scale %d", i, displayModeList[i].Width, displayModeList[i].Height, displayModeList[i].RefreshRate, displayModeList[i].Scaling);
-		if(displayModeList[i].Width == (unsigned int)screenWidth)
+		if(displayModeList[i].Width == (unsigned int)m_screenW)
 		{
-			if(displayModeList[i].Height == (unsigned int)screenHeight)
+			if(displayModeList[i].Height == (unsigned int)m_screenH)
 			{
 				numerator = displayModeList[i].RefreshRate.Numerator;
 				denominator = displayModeList[i].RefreshRate.Denominator;
@@ -124,7 +124,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// -----------------------------------------------------------------------------
 	// --- setup viewport 
-	// folytkov
+	SetViewportAspect(aspectw, aspecth);
 
 	// -----------------------------------------------------------------------------
 	// --- setup swap chain
@@ -137,8 +137,8 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	swapChainDesc.BufferCount = 1;
 
 	// Set the width and height of the back buffer.
-	swapChainDesc.BufferDesc.Width = screenWidth;
-	swapChainDesc.BufferDesc.Height = screenHeight;
+	swapChainDesc.BufferDesc.Width = m_viewport.Width;
+	swapChainDesc.BufferDesc.Height = m_viewport.Height;
 
 	// Set regular 32-bit surface for the back buffer.
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -232,8 +232,8 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
 	// Set up the description of the depth buffer.
-	depthBufferDesc.Width = screenWidth;
-	depthBufferDesc.Height = screenHeight;
+	depthBufferDesc.Width = m_viewport.Width;
+	depthBufferDesc.Height = m_viewport.Height;
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -344,10 +344,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	// Now set the rasterizer state.
 	m_deviceContext->RSSetState(m_rasterState);
 	
-
-	// ---------------------------------------------
-
-	SetViewport(screenWidth, screenHeight);
+	m_deviceContext->RSSetViewports(1, &m_viewport);
 
 	return true;
 }
@@ -469,7 +466,8 @@ void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int o
 	m_viewport.TopLeftX = (float)offsetX;
 	m_viewport.TopLeftY = (float)offsetY;
 
-	// Create the viewport.
+	// TODO: the enitre render output stack and buffers has to be updated
+	if (m_deviceContext)
 	m_deviceContext->RSSetViewports(1, &m_viewport);
 }
 
