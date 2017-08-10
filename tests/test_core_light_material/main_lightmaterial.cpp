@@ -86,7 +86,7 @@ protected:
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "mainPixel_PhongBlinn"));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new SceneLoader("scene", "spheres.scene"));
+		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere_multimaterial.scene"));
 
 		DoPrecalc();
 
