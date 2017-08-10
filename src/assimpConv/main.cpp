@@ -80,6 +80,15 @@ public:
 		server.SetLHFlag(args.get("lh").isFound());
 		//server.SetLHFlag(true);
 
+		// check if input exists, otherwise do not start anything
+		std::string fn = args.get("input").value();
+		FILE* fp = nullptr; 
+		if (fopen_s(&fp, fn.c_str(), "rb") != 0) {
+			cout << "Could not open file:" << fn;
+			return 1;
+		} 
+		fclose(fp);
+
 		server.Start();
 
 		std::string cwd = "";
