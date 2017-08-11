@@ -15,7 +15,7 @@ if cmd_folder not in sys.path:
 
 # there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
 
-from helpers import Dump
+from helpers import Dump, ContextWalker
 from helpers.client import Filedump
     
 def get_args():
@@ -40,6 +40,11 @@ if __name__ == "__main__":
     bpy.ops.wm.open_mainfile(filepath=infile)
     
     with Filedump("out.json") as d:
-		pass
+        materials = []
+        for material in bpy.data.Materials:
+            with Material(material) as m:
+                material.append(m)
+            pass
+        pass
 		
     pass # main

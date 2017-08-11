@@ -97,4 +97,7 @@ ENV/
 /site
 
 
+out.json
 dump*
+
+*.blend*

@@ -16,6 +16,7 @@ class Connection:
         def __init__(self, cmd, data):
             self.cmd = cmd;
             self.data = data;
+
         
     def __init__(self, addr):
         r = re.search("([^\\:]+):([0-9]{4,5})", addr)
@@ -59,30 +60,48 @@ class Connection:
         self._send_network(Connection.Package(cmd, obj))
         pass
         
-		
+    def senderror(self, type, value, traceback):
+        ret = None
+        if value:
+            err = {"type":str(type), "value":str(value), "traceback":str(traceback)}
+            ret = {"error":err}
+            
+            _send_network(Connection.Package(self._cmd_closeconn, ret))
+        
+        
 class Filedump:
-	def __init__(self, fn):
-		self.fn = fn
-		pass
-		
-		
-	def __enter__(self):
-		self._f = open(f, "w")
-		return self
-	
-	
-	def __exit__(self, type, value, traceback):
-		ret = None
-		if value:
-			err = {"type":str(type), "value":str(value), "traceback":str(traceback)}
-			ret = {"error":err}
-				
-				
-	def _sendfile(self, obj):
-		json.dump(data, obj._fp, indent=4, sort_keys=True)
-			
-			
+    def __init__(self, fn):
+        self.fn = fn
+        pass
+        
+        
+    def __enter__(self):
+        self._fp = open(self.fn, "w")
+        return self
+    
+    
+    def __exit__(self, type, value, traceback):
+        ret = None
+        if value:
+            err = {"type":str(type), "value":str(value), "traceback":str(traceback)}
+            ret = {"error":err}
+            
+        self._fp.close()
+
+
+    def _sendfile(self, obj):
+        json.dump(obj.__dict__, self._fp, indent=4, sort_keys=True)
+        pass
+
     def send(self, cmd, obj):
         self._sendfile(Connection.Package(cmd, obj))
         pass
-
+        
+        
+    def senderror(self, type, value, traceback):
+        ret = None
+        if value:
+            err = {"type":str(type), "value":str(value), "traceback":str(traceback)}
+            ret = {"error":err}
+            
+            _send_network(Connection.Package(self._cmd_closeconn, ret))
