@@ -13,7 +13,10 @@ cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(insp
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
-import dump
+# there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
+
+from helpers import Dump
+from helpers.client import Filedump
     
 def get_args():
     parser = argparse.ArgumentParser()
@@ -36,8 +39,7 @@ if __name__ == "__main__":
     
     bpy.ops.wm.open_mainfile(filepath=infile)
     
-    d = dump.Dump()
-    with open("hello.json", "w") as fp:
-        data = d.dump(bpy.data.actions)
-        json.dump(data, fp, indent=4, sort_keys=True)
+    with Filedump("out.json") as d:
+		pass
+		
     pass # main
