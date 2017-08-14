@@ -17,13 +17,28 @@ class BpyObject:
             ret["keys"] = self.getkeys(object)
         return ret
     
-    # https://docs.blender.org/api/blender_python_api_2_67_1/bpy.props.html
     
+    # https://docs.blender.org/api/blender_python_api_2_67_1/bpy.props.html
     def getkeys(self, object):
         if isinstance(object, bpy.types.bpy_struct):
-            return object.items()
-                
+            items = {}
+            for k, v in object.items():
+                if not k.startswith("_"):
+                    items[k] = v
+            return items
         return None
+        
+        
+    def __enter__(self):    
+        return self._dumpobject()
+        # return self
+        
+        
+    def __exit__(self, a, b, c):
+        if b:
+            raise b 
+        pass
+        
         
     pass
 

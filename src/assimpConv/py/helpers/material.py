@@ -1,6 +1,4 @@
 import bpy
-
-
 from .bpyobjects import BpyObject
 
 class Material(BpyObject):
@@ -8,11 +6,9 @@ class Material(BpyObject):
     def __init__(self, object):
         BpyObject.__init__(self)
         self.m = object
-        pass
+        pass 
     
-    
-    
-    def __enter__(self):
+    def _dumpobject(self):
         res = self.newobject(self.m)
         
         res["diffuse_intensity"] = self.m.diffuse_intensity
@@ -25,11 +21,6 @@ class Material(BpyObject):
         res["ambient_level"] = self.m.ambient
         
         return res
-        
-    def __exit__(self, a, b, c):
-        if b:
-            raise b 
-        pass
         
     
     pass

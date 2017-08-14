@@ -1,8 +1,11 @@
 """
 QnD Scene exporter stuff
 """
+
 import bpy
-class Scene:
+from .bpyobjects import BpyObject
+
+class Scene (BpyObject):
     """
     helps to bake the animation data before export
 	
@@ -14,7 +17,21 @@ class Scene:
 	
     """
 
-    def __init__(self):
+    def __init__(self, object):
+        BpyObject.__init__(self)
+        self.s = object
         pass
+        
+    def _dumpobject(self):
+        res = {}
+        res["frame_start"] = self.s.frame_start
+        res["frame_end"] = self.s.frame_end
+        res["frame_step"] = self.s.frame_step
+        res["fps"] = self.s.render.fps
+        res["fps_base"] = self.s.render.fps_base
 
+        return res
     pass
+
+    
+    

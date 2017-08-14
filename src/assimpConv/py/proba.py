@@ -16,6 +16,7 @@ if cmd_folder not in sys.path:
 # there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
 
 from helpers.material import Material
+from helpers.scene import Scene
 from helpers.client import Filedump
     
 def get_args():
@@ -40,6 +41,12 @@ if __name__ == "__main__":
     bpy.ops.wm.open_mainfile(filepath=infile)
     
     with Filedump("out.json") as d:
+        scene = {}
+        with Scene(bpy.context.scene) as s:
+            scene = s
+            
+        d.send("Scene", s)
+    
         materials = []
         for material in bpy.data.materials:
             with Material(material) as m:
@@ -47,5 +54,16 @@ if __name__ == "__main__":
             pass
         d.send("Materials", materials)
         pass
+        
+        camera_keys = []
+        
+        for i in range(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
+            t = i * (scene["fps_base"] / scene["fps"])
+            key = {}
+            key ["t"] = t
+            key ["v"] = 0
+            camera_keys.append(key)
+            
+        d.send("CameraMain", camera_keys)
 		
     pass # main

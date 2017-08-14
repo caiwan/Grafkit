@@ -41,14 +41,41 @@ if __name__ == "__main__":
         # open blendfile
         bpy.ops.wm.open_mainfile(filepath=infile)
         
+        scene = bpy.data.scenes[0]
+
         # bake scene        
         # with Bake as bake:
             # pass
         
         # dump data from scene
-        with Dump(conn) as dump:
-            dump.add(Collada())
-
+        with Dump(conn) as d:
+            d.add(Collada())
+            
+        scene = {}
+        with Scene(bpy.context.scene) as s:
+            scene = s
+            
+        conn.send("Scene", s)
+    
+        materials = []
+        for material in bpy.data.materials:
+            with Material(material) as m:
+                materials.append(m)
+            pass
+        conn.send("Materials", materials)
+        pass
+        
+        camera_keys = []
+        
+        for i in range(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
+            t = i * (scene["fps_base"] / scene["fps"])
+            key = {}
+            key ["t"] = t
+            key ["v"] = 0
+            camera_keys.append(key)
+            
+        conn.send("CameraMain", camera_keys)
+            
     
         pass
         
