@@ -59,8 +59,12 @@ if __name__ == "__main__":
         
         for i in range(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
             t = i * (scene["fps_base"] / scene["fps"])
+            
             key = {}
             key ["t"] = t
+            
+            obj_camera = bpy.context.scene.camera
+            
             key ["v"] = 0
             camera_keys.append(key)
             

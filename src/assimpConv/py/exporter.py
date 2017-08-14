@@ -15,6 +15,8 @@ if cmd_folder not in sys.path:
 from helpers import Dump
 from helpers.client import Connection
 from helpers.collada import Collada
+from helpers.material import Material
+from helpers.scene import Scene
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -55,14 +57,14 @@ if __name__ == "__main__":
         with Scene(bpy.context.scene) as s:
             scene = s
             
-        conn.send("Scene", s)
+        conn.send("bpydump", {"Scene":s})
     
         materials = []
         for material in bpy.data.materials:
             with Material(material) as m:
                 materials.append(m)
             pass
-        conn.send("Materials", materials)
+        conn.send("bpydump", {"Materials": materials})
         pass
         
         camera_keys = []
@@ -74,7 +76,7 @@ if __name__ == "__main__":
             key ["v"] = 0
             camera_keys.append(key)
             
-        conn.send("CameraMain", camera_keys)
+        conn.send("bpydump", {"MainCameraMovement" : camera_keys})
             
     
         pass

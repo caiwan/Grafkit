@@ -159,9 +159,32 @@ bool BlenderExportServer::Parse(json & j)
 
 	// --- handle raw data dumped right form the script
 	else if (cmd.compare(_cmd_dump) == 0) {
-		/// ... 
-		//std::ofstream fs("hello.json", std::ofstream::out);
-		//fs << j["data"];
+		
+		// --- 
+		json scene = j["data"]["Scene"];
+
+		if (!scene.empty()) {
+			double frametime = (double)scene["fps_base"] / (double)scene["fps"];
+			(*m_scene)->SetStartTime(frametime * (double)scene["frame_start"]);
+			(*m_scene)->SetEndTime(frametime * (double)scene["frame_end"]);
+		}
+
+		// --
+		json materials = j["data"]["Materials"];
+		if (!materials.empty()) {
+			for (auto mat_it = materials.begin(); mat_it != materials.end; mat_it++) {
+				std::string matname = mat_it->at("name");
+				// findmat
+
+				int layerid = 0;
+			}
+		}
+		
+		// ---
+		json maincam = j["data"]["MainCameraMovement"];
+		if (!maincam.empty()) {
+
+		}
 	}
 
 	// --- 

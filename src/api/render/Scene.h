@@ -69,8 +69,8 @@ namespace Grafkit {
 		float GetStartTime() { return m_tStart; }
 		float GetEndTime()   { return m_tEnd; }
 		
-		void GetStartTime(float start) { m_tStart = start; }
-		void GetEndTime(float end) {m_tEnd = end; }
+		void SetStartTime(float start) { m_tStart = start; }
+		void SetEndTime(float end) {m_tEnd = end; }
 
 		bool IsActive() { return true && (m_tAnim >= m_tStart && m_tAnim < m_tEnd); }
 
