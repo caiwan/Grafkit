@@ -98,6 +98,7 @@ protected:
 		
 		(*scene)->AddMaterialLayer(1, fs1);
 		(*scene)->AddMaterialLayer(2, fs2);
+		(*scene)->AddMaterialLayer(3, fs0);
 
 		(*scene)->BuildScene(render, vs, fs0);
 		(*scene)->SetActiveCamera(0);

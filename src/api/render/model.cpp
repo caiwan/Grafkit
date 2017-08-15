@@ -32,8 +32,8 @@ Model::~Model()
 void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* const & scene)
 {
 	if (m_material) {
-		if (m_material->GetLayer() != scene->GetLayerID())
-			return;
+		//if (m_material->GetLayer() != scene->GetLayerID())
+			//return;
 		this->m_material->Render(render, scene->GetVShader(), scene->GetPShader());
 	}
 
@@ -43,8 +43,8 @@ void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* const & scene)
 	if (m_mesh)
 		this->m_mesh->RenderMesh(render);
 
-	if (m_geometryShader.Valid() && m_geometryShader->Valid())
-		m_geometryShader->Get()->Bind(render);
+	//if (m_geometryShader.Valid() && m_geometryShader->Valid())
+	//	m_geometryShader->Get()->Bind(render);
 }
 
 void Grafkit::Model::Build(Grafkit::Renderer & deviceContext, Scene * const & scene)

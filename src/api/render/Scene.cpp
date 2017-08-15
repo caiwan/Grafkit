@@ -230,7 +230,6 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 {
 	m_materialCurrentLayer = layer;
-
 	m_currentWorldMatrix.Identity();
 
 	// ezt a semat ki kell baszni innen 
@@ -267,6 +266,9 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 			}
 		}
 	}
+
+	m_vertexShader->Unbind(render);
+	m_pixelShader->Unbind(render);
 }
 
 void Grafkit::Scene::PrerenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)
