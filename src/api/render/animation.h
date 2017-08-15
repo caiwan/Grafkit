@@ -30,7 +30,7 @@ namespace Grafkit {
 		void SetDuration(float d) { m_duration = d; }
 		float GetDuration() { return m_duration; }
 
-		void CalcDuration(bool isMin = false);
+		//void CalcDuration(bool isMin = false);
 
 	protected:
 		void _serialize(Archive &ar);
@@ -99,6 +99,7 @@ namespace Grafkit {
 					return 1;
 				}
 				
+				// TODO: use binary search istead
 				for (size_t i = 0; i < count - 1; i++) {
 					if (m_track[i].m_key <= t && m_track[i + 1].m_key>= t) {
 						float d = m_track[i + 1].m_key - m_track[i].m_key;

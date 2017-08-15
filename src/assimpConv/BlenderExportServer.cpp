@@ -13,6 +13,9 @@
 
 #include "render/Scene.h"
 
+#include "render/animation.h"
+#include "render/camera.h"
+
 #include "core/thread.h"
 #include "utils/logger.h"
 
@@ -163,7 +166,7 @@ bool BlenderExportServer::Parse(json & j)
 		if (m_scene.Invalid() && m_scene->Invalid())
 			throw EX_DETAILS(AssertFailException, "Scene was not set yet");
 
-		//std::string str = j.dump();
+		std::string str = j.dump();
 
 		// --- 
 		json scene = j["data"]["Scene"];
@@ -188,23 +191,44 @@ bool BlenderExportServer::Parse(json & j)
 					}
 				}
 				if (mat.Valid()) {
-					json keys = mat_it->at("key");
-					if (!keys.empty()) {
-						int layerid = (int)keys["layer"];
-						mat->SetLayer(layerid);
+					try {
+						std::string ds = mat_it->dump();
+						json keys = mat_it->at("keys");
+						if (!keys.empty()) {
+							int layerid = (int)keys["layer"];
+							mat->SetLayer(layerid);
+						};
+					}
+					catch (nlohmann::detail::exception &e) {
+						// ... 
 					}
 
 					// TODO: rest of material properties
 
 				}
 			}
-
 		}
 
 		// ---
 		json maincam = j["data"]["MainCameraMovement"];
 		if (!maincam.empty()) {
-
+			ActorAnimation* animation = new ActorAnimation();
+			CameraRef camera = new Camera();
+			camera->SetName("MainCamera_1");
+			ActorRef cameraActor = new Actor(camera);
+			cameraActor->SetName("MainCamera");
+			animation->SetActor(cameraActor);
+			for (auto camit = maincam.begin(); camit != maincam.end(); camit++) {
+				double t = (double)camit->at("t");
+				json v = camit->at("v");
+				animation->AddPositionKey(t, float3(v["loc"][0], v["loc"][1], v["loc"][2]));
+				animation->AddRotationKey(t, float4(v["rot"][3], v["loc"][0], v["loc"][1], v["loc"][2]));
+				animation->AddScalingKey(t, float3(v["scale"][0], v["scale"][1], v["scale"][2]));
+			}
+			m_resources.cameras.push_back(camera);
+			m_resources.actors["MainCamera"] = cameraActor;
+			(*m_scene)->GetRootNode()->AddChild(cameraActor);
+			(*m_scene)->AddAnimation(animation);
 		}
 	}
 

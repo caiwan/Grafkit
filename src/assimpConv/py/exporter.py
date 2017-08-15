@@ -17,6 +17,7 @@ from helpers.client import Connection
 from helpers.collada import Collada
 from helpers.material import Material
 from helpers.scene import Scene
+from helpers.camera import Camera
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -71,9 +72,14 @@ if __name__ == "__main__":
         
         for i in range(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
             t = i * (scene["fps_base"] / scene["fps"])
+            bpy.context.scene.frame_set(i)
+            c = Camera(bpy.context.scene.camera)
+            
+            print("Rendering camera at frame", i)
+            
             key = {}
             key ["t"] = t
-            key ["v"] = 0
+            key ["v"] = c.dumpframe()
             camera_keys.append(key)
             
         conn.send("bpydump", {"MainCameraMovement" : camera_keys})

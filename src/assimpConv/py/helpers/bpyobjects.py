@@ -13,7 +13,7 @@ class BpyObject:
     def newobject(self, object):
         ret = {}
         if isinstance(object, bpy.types.ID):
-            ret["name"] = object.name
+            ret["name"] = object.name.replace(".", "_")
             ret["keys"] = self.getkeys(object)
         return ret
     
