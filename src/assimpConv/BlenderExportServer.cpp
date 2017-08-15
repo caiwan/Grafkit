@@ -32,9 +32,9 @@ using json = nlohmann::json;
 
 *************************************************************************************************************/
 
-BlenderExportServer::BlenderExportServer() : m_serverThread (NULL) ,m_myWorkerThread (NULL), m_isTerminate(false)
-{	
-	srand(time(NULL)); 
+BlenderExportServer::BlenderExportServer() : m_serverThread(NULL), m_myWorkerThread(NULL), m_isTerminate(false)
+{
+	srand(time(NULL));
 	m_port = 1024 + rand() % 64512;
 
 	m_scene = new SceneRes(new Scene());
@@ -82,7 +82,7 @@ void BlenderExportServer::GetHost(std::string & str)
 	str = buf;
 }
 
-bool BlenderExportServer::PostData(std::stringstream &ss) 
+bool BlenderExportServer::PostData(std::stringstream &ss)
 {
 	Grafkit::MutexLocker lock(m_inputDataQueueMutex);
 	try {
@@ -93,7 +93,7 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 		sprintf_s(fn, "dump%d", counter++);
 
 		//fopen_s(&fp, fn, "wb");
-		if (fp){
+		if (fp) {
 			std::string s = ss.str();
 			fwrite(s.c_str(), s.length(), 1, fp);
 			fflush(fp);
@@ -159,7 +159,12 @@ bool BlenderExportServer::Parse(json & j)
 
 	// --- handle raw data dumped right form the script
 	else if (cmd.compare(_cmd_dump) == 0) {
-		
+
+		if (m_scene.Invalid() && m_scene->Invalid())
+			throw EX_DETAILS(AssertFailException, "Scene was not set yet");
+
+		//std::string str = j.dump();
+
 		// --- 
 		json scene = j["data"]["Scene"];
 
@@ -172,14 +177,30 @@ bool BlenderExportServer::Parse(json & j)
 		// --
 		json materials = j["data"]["Materials"];
 		if (!materials.empty()) {
-			for (auto mat_it = materials.begin(); mat_it != materials.end; mat_it++) {
+			for (auto mat_it = materials.begin(); mat_it != materials.end(); mat_it++) {
 				std::string matname = mat_it->at("name");
-				// findmat
+				// TDOD : refactor this asap. see Scene.h and assimploader.h
+				MaterialRef mat; 
+				for (auto it = m_resources.materials.begin(); it != m_resources.materials.end(); it++) {
+					if (matname.compare(it->Get()->GetName()) == 0) {
+						mat = *it;
+						break;
+					}
+				}
+				if (mat.Valid()) {
+					json keys = mat_it->at("key");
+					if (!keys.empty()) {
+						int layerid = (int)keys["layer"];
+						mat->SetLayer(layerid);
+					}
 
-				int layerid = 0;
+					// TODO: rest of material properties
+
+				}
 			}
+
 		}
-		
+
 		// ---
 		json maincam = j["data"]["MainCameraMovement"];
 		if (!maincam.empty()) {

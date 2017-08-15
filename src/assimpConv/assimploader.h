@@ -41,6 +41,9 @@ namespace Grafkit {
 		void AppendAssimp(const void* data, size_t length, SceneRef inscene);
 
 	protected:
+
+		// TODO: store these in Scene and get them from there
+
 		struct {
 			std::vector<MaterialRef>		materials;
 			std::vector<ModelRef>			models;

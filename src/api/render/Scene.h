@@ -11,8 +11,8 @@
 #include "predefs.h"
 
 namespace Grafkit {
-	__declspec(align(16)) 
-	class Scene : virtual public Referencable, public AlignedNew<Scene>, public Persistent
+	__declspec(align(16))
+		class Scene : virtual public Referencable, public AlignedNew<Scene>, public Persistent
 	{
 	public:
 		Scene();
@@ -49,7 +49,7 @@ namespace Grafkit {
 		ActorRef GetLight(std::string name);
 
 		MaterialRef GetMaterial(std::string name);
-		
+
 		void AddAnimation(AnimationRef anim);
 		void GetAnimations(std::vector<AnimationRef> &animations) { animations.clear(); animations.assign(m_animations.cbegin(), m_animations.cend()); }
 		AnimationRef GetAnimation(int i) { return m_animations[i]; }
@@ -63,44 +63,41 @@ namespace Grafkit {
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
 		ShaderRef &GetPShader() { return this->m_pixelShader; }
 
-		void SetVShader(ShaderRef &VS) {this->m_vertexShader = VS; }
-		void SetPShader(ShaderRef &FS) {this->m_pixelShader = FS; }
+		void SetVShader(ShaderRef &VS) { this->m_vertexShader = VS; }
+		void SetPShader(ShaderRef &FS) { this->m_pixelShader = FS; }
 
 		float GetStartTime() { return m_tStart; }
-		float GetEndTime()   { return m_tEnd; }
-		
+		float GetEndTime() { return m_tEnd; }
+
 		void SetStartTime(float start) { m_tStart = start; }
-		void SetEndTime(float end) {m_tEnd = end; }
+		void SetEndTime(float end) { m_tEnd = end; }
 
 		bool IsActive() { return true && (m_tAnim >= m_tStart && m_tAnim < m_tEnd); }
 
 		void BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps);
 
-	private:
+	protected:
 		float m_tStart, m_tEnd;
 
+		// TODO: the datamodel for scenegraph shold be handled here,
+		// and objects should be accessed by their proper getter/setter
+		// unlike in assimploader
+		// + revew all the stuff stored here
+
 		ActorRef m_root;
+		Grafkit::Matrix m_cameraViewMatrix;
+		Grafkit::Matrix m_cameraProjectionMatrix;
+		Grafkit::Matrix m_cameraMatrix;
+
 		ActorRef m_activeCamera;
 
-		// Todo: these neeeds to be optimiyed and tied up a bit
-		std::vector<ActorRef> m_cameraNodes;
-		std::vector<ActorRef> m_lightNodes;
-
-		// This one as well
-		std::set<Entity3D*> m_entities;
-
 		std::vector<AnimationRef> m_animations;
-
-		double m_tAnim;
 
 		ShaderRef m_vertexShader;
 		ShaderRef m_pixelShader;
 
-	private:
-		void RenderLayer(Grafkit::Renderer & render, UINT layer);
-		void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
-		void Push();
-		void Pop();
+		std::vector<ActorRef> m_cameraNodes;
+		std::vector<ActorRef> m_lightNodes;
 
 		std::map<std::string, ActorRef> m_cameraMap;
 		std::map<std::string, ActorRef> m_lightMap;
@@ -109,18 +106,27 @@ namespace Grafkit {
 		std::list<ActorRef> m_nodes;
 
 		std::map<std::string, MaterialRef> m_materialMap;
+
+		// This one as well
+		std::set<Entity3D*> m_entities;
+
+	private:
+		double m_tAnim;
+
+	private:
+		void RenderLayer(Grafkit::Renderer & render, UINT layer);
+		void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
+		void Push();
+		void Pop();
+
+	private:
 		std::map<UINT, ShaderRef> m_materialShaderMap;
 		UINT m_materialCurrentLayer;
 
-		Grafkit::Matrix m_cameraMatrix;
-
 		Grafkit::Matrix m_currentWorldMatrix;
-		std::stack<Grafkit::Matrix> m_worldMatrixStack; 
-		
-		Grafkit::Matrix m_cameraViewMatrix;
-		Grafkit::Matrix m_cameraProjectionMatrix;
-	
-	// -- persistent
+		std::stack<Grafkit::Matrix> m_worldMatrixStack;
+
+		// -- persistent
 	protected:
 		virtual void serialize(Archive& ar);
 		PERSISTENT_DECL(Grafkit::Scene, 1);
