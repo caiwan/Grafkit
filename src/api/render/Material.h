@@ -73,8 +73,8 @@ namespace Grafkit {
 		void AddTexture(TextureResRef texture, texture_type_e slot);
 		void RemoveTexture(TextureResRef texture, texture_type_e slot);
 
-		unsigned int GetLayer() { return m_layer; }
-		void SetLayer(unsigned int l) { m_layer = l; }
+		float GetLayer() { return m_params.layer; }
+		void SetLayer(float l) { m_params.layer = l; }
 
 		// persisthez kell
 		bool _IsTextureMapEmpty() { return m_textures.empty(); }
@@ -106,9 +106,13 @@ namespace Grafkit {
 					float refraction;	// p0.z
 					float roughness;	// p0.w
 					float slope;		// p1.x
-					float emission;		// p1.y
+					float emission;		// p1.y emission level of diffuse color
+					float p1z, p1w;		// padding
+					float p2x, p2y, p2z;	//padding
+					float layer;		// layer if multiple shaders are used
+
 				};
-				float4 param0, param1;
+				float4 param0, param1, param2;
 			};
 
 		};
@@ -116,7 +120,7 @@ namespace Grafkit {
 		struct material_color_t m_colors;
 		struct material_params_t m_params;
 
-		unsigned int m_layer; // TODO: use multiple materials with shader in the same scene in the future 
+		//unsigned int m_layer; // TODO: use multiple materials with shader in the same scene in the future 
 
 		std::map<std::string, TextureResRef> m_textures;
 

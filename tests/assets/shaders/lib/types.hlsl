@@ -1,5 +1,11 @@
 #define PI 3.14159265359
 
+struct WoldMatrices{
+	matrix worldMatrix;
+	matrix viewMatrix;
+	matrix projectionMatrix;
+};
+
 struct VertexInputType
 {
 	float4 position : POSITION;
@@ -17,8 +23,22 @@ struct PixelInputType
 	float4 binormal : BINORMAL;
 	
 	float4 color0 : COLOR0;
-	//float4 color1 : COLOR1;
+	float4 color1 : COLOR1;
 	
 	float4 tex : TEXCOORD0;
 	float4 view : VIEW;
 };
+
+struct PixelOutType {
+	float4 diff : SV_TARGET0;
+	float4 normal : SV_TARGET1;
+	float4 view : SV_TARGET2;
+	float4 emission : sv_TARGET3;
+};
+
+struct FXPixelInputType
+{
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+};
+

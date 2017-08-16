@@ -12,11 +12,6 @@ Texture2D t_normal;
 Texture2D t_specular;
 Texture2D t_shininess;
 
-struct PixelOutType {
-	float4 diff : SV_TARGET0;
-	float4 normal : SV_TARGET1;
-	float4 view : SV_TARGET2;
-};
 
 // PixelShader
 //------------------------------------------------------------------------------------

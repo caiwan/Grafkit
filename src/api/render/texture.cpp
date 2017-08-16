@@ -20,7 +20,7 @@ using namespace Grafkit;
 // but for a while, it does well. 
 // ========================================================================================================================
 
-Grafkit::ATexture::ATexture() : 
+Grafkit::ATexture::ATexture() :
 	m_pResourceView(nullptr), m_pTargetView(nullptr), m_pTexture(nullptr),
 	//m_mipSlices(0), m_mipLevels(0), 
 	m_w(0), m_h(0), m_d(0),
@@ -63,10 +63,10 @@ void Grafkit::ATexture::SetRenderTargetView(Renderer & device, size_t id) const
 	device.SetRenderTargetView(m_pTargetView, id);
 }
 
-void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int channels, int chw, int w, int h, int d, bool isDynamic, bool hasMips)
+void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int channels, int chw, int w, int h, int d, bool isDynamic, bool hasMips, bool cubemap)
 {
 	HRESULT result;
-	
+
 	m_ch = channels;
 	m_chW = chw;
 	m_w = w;
@@ -88,82 +88,82 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 	switch (dimension)
 	{
 		// Create 1D Texture
-		case 1:
-		{
-			if (!m_w)
-				return;
-
-			srvDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
-			rtvDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
-
-			// ... 
-			D3D11_TEXTURE1D_DESC textureDesc;
-			ZeroMemory(&textureDesc, sizeof(textureDesc));
-			textureDesc.Width = m_w;
-			textureDesc.MipLevels = 1;
-			textureDesc.ArraySize = 1;
-			textureDesc.Format = m_format;
-			textureDesc.Usage = usage;
-			textureDesc.BindFlags = bindFlags;
-			textureDesc.CPUAccessFlags = CPUAccessFlags;
-			textureDesc.MiscFlags = miscFlags;
-
-			ID3D11Texture1D *ppTex = nullptr;
-			result = device->CreateTexture1D(&textureDesc, nullptr, &ppTex);
-
-			if (FAILED(result)) throw EX(TextureCreateException);
-
-			m_pTexture = ppTex;
-
-		} break;
-		// Create 2D Texture
-		case 2:
-		{
-			if (!m_w && !m_h) {
-				int sw = 0, sh = 0;
-				device.GetScreenSize(sw, sh);
-				m_w = sw, m_h = sh;
-			}
-			else if (!m_w || !m_h) {
-				return;
-			}
-
-			srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
-			D3D11_TEXTURE2D_DESC textureDesc;
-			ZeroMemory(&textureDesc, sizeof(textureDesc));
-			textureDesc.Width = m_w;
-			textureDesc.Height = m_h;
-			textureDesc.MipLevels = 1;
-			textureDesc.ArraySize = 1;
-			textureDesc.Format = m_format;
-			textureDesc.SampleDesc.Count = 1;
-			textureDesc.Usage = usage;
-			textureDesc.BindFlags = bindFlags;
-			textureDesc.CPUAccessFlags = CPUAccessFlags;
-			textureDesc.MiscFlags = miscFlags;
-
-			ID3D11Texture2D *ppTex = nullptr;
-			result = device->CreateTexture2D(&textureDesc, nullptr, &ppTex);
-
-			if (FAILED(result)) throw EX(TextureCreateException);
-			
-			m_pTexture = ppTex;
-		} break;
-		// Create 3D Texture
-		case 3:
-		{
-			if (!m_w || !m_h || !m_d)
-				return;
-
-			srvDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
-			rtvDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
-
-			// ... if needed
-		} break;
-		default:
+	case 1:
+	{
+		if (!m_w)
 			return;
+
+		srvDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+		rtvDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
+
+		// ... 
+		D3D11_TEXTURE1D_DESC textureDesc;
+		ZeroMemory(&textureDesc, sizeof(textureDesc));
+		textureDesc.Width = m_w;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = m_format;
+		textureDesc.Usage = usage;
+		textureDesc.BindFlags = bindFlags;
+		textureDesc.CPUAccessFlags = CPUAccessFlags;
+		textureDesc.MiscFlags = miscFlags;
+
+		ID3D11Texture1D *ppTex = nullptr;
+		result = device->CreateTexture1D(&textureDesc, nullptr, &ppTex);
+
+		if (FAILED(result)) throw EX(TextureCreateException);
+
+		m_pTexture = ppTex;
+
+	} break;
+	// Create 2D Texture
+	case 2:
+	{
+		if (!m_w && !m_h) {
+			int sw = 0, sh = 0;
+			device.GetScreenSize(sw, sh);
+			m_w = sw, m_h = sh;
+		}
+		else if (!m_w || !m_h) {
+			return;
+		}
+
+		srvDimension = !cubemap ? D3D11_SRV_DIMENSION_TEXTURE2D : D3D11_SRV_DIMENSION_TEXTURECUBE;
+		rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+		D3D11_TEXTURE2D_DESC textureDesc;
+		ZeroMemory(&textureDesc, sizeof(textureDesc));
+		textureDesc.Width = m_w;
+		textureDesc.Height = m_h;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = cubemap ? 6 : 1;
+		textureDesc.Format = m_format;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.Usage = usage;
+		textureDesc.BindFlags = bindFlags;
+		textureDesc.CPUAccessFlags = CPUAccessFlags;
+		textureDesc.MiscFlags = miscFlags | cubemap ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0;
+
+		ID3D11Texture2D *ppTex = nullptr;
+		result = device->CreateTexture2D(&textureDesc, nullptr, &ppTex);
+
+		if (FAILED(result)) throw EX(TextureCreateException);
+
+		m_pTexture = ppTex;
+	} break;
+	// Create 3D Texture
+	case 3:
+	{
+		if (!m_w || !m_h || !m_d)
+			return;
+
+		srvDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+		rtvDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+
+		// ... if needed
+	} break;
+	default:
+		return;
 	}
 
 	// --- 
@@ -175,15 +175,21 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 	switch (GetDimension()) {
 	case 1:
 		shaderResourceViewDesc.Texture1D.MostDetailedMip = 0;
-		shaderResourceViewDesc.Texture1D.MipLevels = 1; 
+		shaderResourceViewDesc.Texture1D.MipLevels = 1;
 		break;
 	case 2:
-		shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-		shaderResourceViewDesc.Texture2D.MipLevels = 1; 
+		if (!cubemap) {
+			shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+			shaderResourceViewDesc.Texture2D.MipLevels = 1;
+		}
+		else {
+			shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+			shaderResourceViewDesc.TextureCube.MipLevels = 1;
+		}
 		break;
 	case 3:
 		shaderResourceViewDesc.Texture3D.MostDetailedMip = 0;
-		shaderResourceViewDesc.Texture3D.MipLevels = 1; 
+		shaderResourceViewDesc.Texture3D.MipLevels = 1;
 		break;
 	}
 
@@ -193,7 +199,7 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 		throw EX(ShaderResourceViewException);
 
 	// --- 
-	if (!isDynamic) {
+	if (!isDynamic && !cubemap) {
 		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 		ZeroMemory(&renderTargetViewDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
 		renderTargetViewDesc.Format = m_format;
@@ -218,31 +224,31 @@ void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int 
 	}
 }
 
-void Grafkit::ATexture::UpdateTexture(Renderer & device, const void * data, size_t len)
+void Grafkit::ATexture::UpdateTexture(Renderer & device, const void * data, size_t len, size_t subRes, size_t offset)
 {
 	if (!len || !data)
 		return;
 
-	D3D11_MAPPED_SUBRESOURCE subRes;
-	device.GetDeviceContext()->Map(m_pTexture, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &subRes);
-	CopyMemory(subRes.pData, data, len);
-	device.GetDeviceContext()->Unmap(m_pTexture, NULL);
+	D3D11_MAPPED_SUBRESOURCE res;
+	device.GetDeviceContext()->Map(m_pTexture, subRes, D3D11_MAP_WRITE_DISCARD, NULL, &res);
+	CopyMemory((unsigned char*)(res.pData) + offset, data, len);
+	device.GetDeviceContext()->Unmap(m_pTexture, subRes);
 }
 
-void Grafkit::ATexture::Update(Renderer & device, const void * bitmap)
+void Grafkit::ATexture::Update(Renderer & device, const void * bitmap, size_t index)
 {
 	size_t len = 0;
 	switch (GetDimension()) {
-		case 1:	len = m_ch * m_chW * m_w; break;
-		case 2:	len = m_ch * m_chW * m_w * m_h; break;
-		case 3: len = m_ch * m_chW * m_w * m_h * m_d; break;
-		default:  return;
+	case 1:	len = m_ch * m_chW * m_w; break;
+	case 2:	len = m_ch * m_chW * m_w * m_h; break;
+	case 3: len = m_ch * m_chW * m_w * m_h * m_d; break;
+	default:  return;
 	}
-	
-	UpdateTexture(device, bitmap, len);
+
+	UpdateTexture(device, bitmap, len, index);
 }
 
-void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap)
+void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap, size_t index)
 {
 	UINT w = bitmap->GetX(), h = bitmap->GetY(), ch = bitmap->GetCh();
 	UCHAR* data = (UCHAR*)bitmap->GetData();
@@ -278,14 +284,23 @@ void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap)
 
 		device.GetDeviceContext()->Unmap(m_pTexture, NULL);
 	}
-	else 
+	else
 	{
-		UpdateTexture(device, data, w * h * ch * m_chW);
+		UpdateTexture(device, data, w * h * ch * m_chW, index);
 	}
 
-	
+}
 
-
+void Grafkit::ATexture::Update(Renderer & device, const CubemapRef cubemap)
+{
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb204881(v=vs.85).aspx
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476906(v=vs.85).aspx
+	Update(device, cubemap->GetPosX(), 0);
+	Update(device, cubemap->GetNegX(), 1);
+	Update(device, cubemap->GetPosY(), 2);
+	Update(device, cubemap->GetNegY(), 3);
+	Update(device, cubemap->GetPosZ(), 4);
+	Update(device, cubemap->GetNegZ(), 5);
 }
 
 // ========================================================================================================================
@@ -354,6 +369,39 @@ void Grafkit::Texture2D::InitializeDepth(Renderer & device, int w, int h)
 
 // ========================================================================================================================
 
+void Grafkit::TextureCube::Initialize(Renderer device , CubemapRef cubemap)
+{
+
+	DXGI_FORMAT fmt;
+	BitmapRef bitmap = cubemap->GetPosX(); //assume that everything is equal
+	int ch = bitmap->GetCh();
+	int chw = 1;
+
+	switch (ch) {
+	case 1:
+		fmt = DXGI_FORMAT_R8_UNORM;
+		break;
+	case 2:
+		fmt = DXGI_FORMAT_R8G8_UNORM;
+		break;
+	case 3:
+	case 4:
+#ifdef USE_SRGB_TEXTURE
+		fmt = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+#else
+		fmt = DXGI_FORMAT_R8G8B8A8_UNORM;
+#endif
+		ch = 4;
+		break;
+	}
+
+	this->CrateTexture(device, fmt, ch, chw, bitmap->GetX(), bitmap->GetY(), 0, false, true, true);
+	this->Update(device, cubemap);
+}
+
+
+// ========================================================================================================================
+
 Grafkit::TextureSampler::TextureSampler()
 	: m_pSamplerState(nullptr)
 {
@@ -402,4 +450,5 @@ void Grafkit::TextureSampler::Shutdown()
 		m_pSamplerState = nullptr;
 	}
 }
+
 

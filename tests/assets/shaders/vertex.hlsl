@@ -53,9 +53,8 @@ PixelInputType mainVertex(VertexInputType input)
 	output.tex.zw = float2(0.0f, 1.0f);
 	output.tex.xy = input.tex.xy;
 
-	//output.color0 = float4(1,1,1,1);
 	output.color0 = mat_diffuse;
-	//output.color1 = mat_specular;
+	output.color1 = mat_specular;
 	
 	return output;
 }

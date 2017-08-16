@@ -26,8 +26,6 @@ namespace Grafkit{
 	};
 
 	/**
-	Texture loader from bitmap
-	Ide kijegyzetelem, hogy mije van ennek, es hogyan kell vele banni:
 	*/
 	class TextureFromBitmap : public ITextureBuilder
 	{
@@ -44,5 +42,18 @@ namespace Grafkit{
 	protected:
 		int m_w, m_h;
 	};
+
+	class TextureCubemapFromBitmap : public ITextureBuilder {
+	public:
+		TextureCubemapFromBitmap(std::string name, std::string source_posx, std::string source_negx, std::string source_posy, std::string source_negy, std::string source_posz, std::string source_negz);
+		~TextureCubemapFromBitmap();
+
+		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+
+		virtual IResource* NewResource();
+	private:
+		std::string m_sourceNames[6];
+	};
+
 }
 

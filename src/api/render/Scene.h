@@ -57,8 +57,8 @@ namespace Grafkit {
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
-		void AddMaterialLayer(UINT layer, ShaderRef &shader) { m_materialShaderMap[layer] = shader; }
-		unsigned int GetLayerID() { return m_materialCurrentLayer; }
+		//void AddMaterialLayer(UINT layer, ShaderRef &shader) { m_materialShaderMap[layer] = shader; }
+		//unsigned int GetLayerID() { return m_materialCurrentLayer; }
 
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
 		ShaderRef &GetPShader() { return this->m_pixelShader; }
@@ -120,7 +120,7 @@ namespace Grafkit {
 		void Pop();
 
 	private:
-		std::map<UINT, ShaderRef> m_materialShaderMap;
+		//std::map<UINT, ShaderRef> m_materialShaderMap;
 		UINT m_materialCurrentLayer;
 
 		Grafkit::Matrix m_currentWorldMatrix;

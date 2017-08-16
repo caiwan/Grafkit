@@ -155,7 +155,7 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs,
 	if (ps.Valid()) 
 		m_pixelShader = ps;
 
-	AddMaterialLayer(0, ps);
+	//AddMaterialLayer(0, ps);
 
 	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
 		(*it)->Build(deviceContext, this);
@@ -221,10 +221,11 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
-	for (auto it = m_materialShaderMap.begin(); it != m_materialShaderMap.end(); it++) {
-		m_pixelShader = it->second;
-		RenderLayer(render, it->first);
-	}
+	//for (auto it = m_materialShaderMap.begin(); it != m_materialShaderMap.end(); it++) {
+		//m_pixelShader = it->second;
+		//RenderLayer(render, it->first);
+	//}
+	RenderLayer(render, 0);
 }
 
 void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)

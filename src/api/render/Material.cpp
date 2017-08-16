@@ -40,8 +40,6 @@ Grafkit::Material::Material() : IResource() , Persistent()
 	ZeroMemory(&m_params, sizeof(m_params));
 
 	m_colors.diffuse = float4(1, 1, 1, 1);
-
-	m_layer = 0;
 }
 
 TextureResRef Grafkit::Material::GetTexture(std::string bindName)
@@ -110,7 +108,6 @@ void Grafkit::Material::serialize(Archive & ar)
 {
 	this->IResource::_serialize(ar);
 	
-	PERSIST_FIELD(ar, m_layer);
 	PERSIST_FIELD(ar, m_colors);
 	PERSIST_FIELD(ar, m_params);
 }

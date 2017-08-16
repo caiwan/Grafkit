@@ -26,7 +26,7 @@ namespace Grafkit {
 		EffectComposer();
 		virtual ~EffectComposer();
 
-		void Initialize(Renderer &render);
+		void Initialize(Renderer &render, bool singlepass = false);
 		void Shutdown();
 
 		void AddPass(EffectPassRef in_fx) { m_effectChain.push_back(in_fx);}
@@ -81,6 +81,8 @@ namespace Grafkit {
 		typedef bind_map_t::iterator bind_map_it_t;
 
 		bind_map_t m_input_map;
+
+		bool m_singlepass;
 	};
 
 	// ---------------------------------------------------------------------------------------------------
@@ -136,8 +138,6 @@ namespace Grafkit {
 
 	};
 
-	// ---------------------------------------------------------------------------------------------------
-	
 	// ===================================================================================================
 
 }

@@ -32,6 +32,7 @@ Model::~Model()
 void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* const & scene)
 {
 	if (m_material) {
+		// bullshit, does not work
 		//if (m_material->GetLayer() != scene->GetLayerID())
 			//return;
 		this->m_material->Render(render, scene->GetVShader(), scene->GetPShader());

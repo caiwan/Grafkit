@@ -13,6 +13,7 @@
 #include "generator/SceneLoader.h"
 
 #include "render/Scene.h"
+#include "render/effect.h"
 
 #include "math/matrix.h"
 
@@ -21,8 +22,6 @@
 #include "utils/ResourcePreloader.h"
 
 #include "utils/InitializeSerializer.h"
-
-
 
 using namespace Grafkit;
 
@@ -63,6 +62,9 @@ protected:
 	Renderer render;
 	SceneResRef scene;
 
+	EffectComposerRef drawCubemap;
+	EffectComposerRef postfx;
+
 	TextureSamplerRef texSampler;
 
 	LightRef light;
@@ -76,31 +78,29 @@ protected:
 	float t;
 
 	ShaderResRef vs;
-	ShaderResRef fs0;
-	ShaderResRef fs1;
-	ShaderResRef fs2;
-	ShaderResRef fs3;
+	ShaderResRef fs;
+	ShaderResRef cubemapShader;
+
 
 	int init() {
 		LoadCache();
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "phongBlinn"));
 
-		fs0 = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "mainPixel_PhongBlinn"));
-		fs1 = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
-		fs2 = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/normal.hlsl", ""));
+		cubemapShader = Load<ShaderRes>(new PixelShaderLoader("cubemapShader", "shaders/cubemap.hlsl", ""));
 
 		// -- model 
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere_multimaterial.scene"));
 
 		DoPrecalc();
-		
-		(*scene)->AddMaterialLayer(1, fs1);
-		(*scene)->AddMaterialLayer(2, fs2);
-		(*scene)->AddMaterialLayer(3, fs0);
 
-		(*scene)->BuildScene(render, vs, fs0);
+		drawCubemap = new EffectComposer();
+		drawCubemap->AddPass(new EffectPass(cubemapShader));
+		drawCubemap->Initialize(render, true);
+
+		(*scene)->BuildScene(render, vs, fs);
 		(*scene)->SetActiveCamera(0);
 
 		camera = (*scene)->GetActiveCamera();
@@ -127,6 +127,9 @@ protected:
 	// ==================================================================================================================
 	int mainloop() {
 		this->render.BeginScene();
+
+		drawCubemap->Render(render);
+
 		{
 			t += .01;
 

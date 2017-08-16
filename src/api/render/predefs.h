@@ -54,10 +54,16 @@ namespace Grafkit {
 	// ---
 	class Bitmap;
 	class Texture2D;
+	class Cubemap;
+	class TextureCube;
 
 	typedef Ref<Texture2D> TextureRef;
 	typedef Resource<Texture2D> TextureRes;
 	typedef Ref<TextureRes> TextureResRef;
+
+	typedef Ref<TextureCube> TextureCubeRef;
+	typedef Resource<TextureCube> TextureCubeRes;
+	typedef Ref<TextureCubeRes> TextureCubeResRef;
 
 	class TextureSampler;
 

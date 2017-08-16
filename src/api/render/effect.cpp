@@ -5,7 +5,7 @@
 using namespace Grafkit;
 
 Grafkit::EffectComposer::EffectComposer():
-	m_pTexRead(nullptr), m_pTexWrite(nullptr), m_pTexBack(nullptr)
+	m_pTexRead(nullptr), m_pTexWrite(nullptr), m_pTexBack(nullptr), m_singlepass(false)
 {
 }
 
@@ -23,22 +23,22 @@ namespace {
 	"SamplerState SampleType;"
 
 	// TYPEDEFS //
-	"struct PixelInputType"
+	"struct FXPixelInputType"
 	"{"
 		"float4 position : SV_POSITION;"
 		"float2 tex : TEXCOORD;"
 	"};"
 
-	"struct VertexInputType"
+	"struct FXVertexInputType"
 	"{"
 		"float4 position : POSITION;"
 		"float2 tex : TEXCOORD;"
 	"};"
 
 	// VertexShader
-	"PixelInputType FullscreenQuad(VertexInputType input)"
+	"FXPixelInputType FullscreenQuad(FXVertexInputType input)"
 	"{"
-		"PixelInputType output;"
+		"FXPixelInputType output;"
 		"input.position.w = 1.0f;"
 		"output.position = input.position;"
 		"output.tex = input.tex;"
@@ -46,7 +46,7 @@ namespace {
 	"}"
 
 	// PixelShader
-	"float4 CopyScreen(PixelInputType input) : SV_TARGET"
+	"float4 CopyScreen(FXPixelInputType input) : SV_TARGET"
 	"{"
 		"float4 textureColor = float4(0,0,0,1);"
 		"textureColor = effectInput.Sample(SampleType, input.tex);"
@@ -60,21 +60,24 @@ namespace {
 #include "../builtin_data/cube.h"
 
 // ---------------------------------------------------------------------------------------------------
-void Grafkit::EffectComposer::Initialize(Renderer & render)
+void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 {
-	
+	m_singlepass = singlepass;
 	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
 
-	m_texOut[0] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[0];
-	m_texOut[1] = new Texture2D(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[1];
-	m_texOut[2] = new Texture2D(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[2];
-
+	if (!m_singlepass) {
+		m_texOut[0] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[0];
+		m_texOut[1] = new Texture2D(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[1];
+		m_texOut[2] = new Texture2D(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[2];
+	}
 	// --- 
 	m_shaderFullscreenQuad = new VertexShader();
 	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), "FullscreenQuad");
 
-	m_shaderCopyScreen = new PixelShader();
-	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), "CopyScreen");
+	if (!m_singlepass) {
+		m_shaderCopyScreen = new PixelShader();
+		m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), "CopyScreen");
+	}
 
 	// --- 
 	m_fullscreenquad = new Mesh();
@@ -103,6 +106,9 @@ void Grafkit::EffectComposer::Shutdown()
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::BindInput(Renderer & render)
 {
+	if (m_singlepass)
+		return;
+
 	size_t count = 1;
 	render.SetRenderTargetView(m_pTexRead->GetRenderTargetView(), 0);
 
@@ -118,6 +124,9 @@ void Grafkit::EffectComposer::BindInput(Renderer & render)
 
 void Grafkit::EffectComposer::UnbindInput(Renderer & render)
 {
+	if (m_singlepass)
+		return;
+
 	size_t count = 1;
 	render.SetRenderTargetView(nullptr, 0);
 
@@ -134,6 +143,9 @@ void Grafkit::EffectComposer::UnbindInput(Renderer & render)
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 {
+	if (m_singlepass)
+		return RenderChain(render);
+
 	UnbindInput(render);
 	RenderChain(render);
 	if (autoflush)
@@ -143,6 +155,9 @@ void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::SwapBuffers()
 {
+	if (m_singlepass)
+		return;
+
 	Texture2D* tmp = m_pTexWrite;
 	m_pTexWrite = m_pTexRead;
 	m_pTexRead = tmp;
@@ -150,6 +165,9 @@ void Grafkit::EffectComposer::SwapBuffers()
 
 void Grafkit::EffectComposer::FlushBuffers()
 {
+	if (m_singlepass)
+		return;
+
 	Texture2D* tmp = m_pTexBack;
 	m_pTexBack = m_pTexWrite;
 	m_pTexWrite = tmp;
@@ -161,16 +179,22 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 
 	m_shaderFullscreenQuad->Bind(render);
 
-	for (size_t i = 0; i < m_effectChain.size(); i++)
+	size_t fxcount = m_singlepass ? 1 : m_effectChain.size();
+
+	for (size_t i = 0; i < fxcount; i++)
 	{
 		EffectPass *fx = m_effectChain[i].Get();
-		this->m_pTexWrite->SetRenderTargetView(render);
-		render.ApplyRenderTargetView(1);
-		render.BeginScene();
+		if (!m_singlepass) {
+			this->m_pTexWrite->SetRenderTargetView(render);
+			render.ApplyRenderTargetView(1);
+			render.BeginScene();
+		}
 		{
 			if (fx && fx->GetShader().Valid()) {
-				fx->GetShader()->SetShaderResourceView("backBuffer", m_pTexBack->GetShaderResourceView());
-				fx->GetShader()->SetShaderResourceView("effectInput", m_pTexRead->GetShaderResourceView());
+				if (!m_singlepass) {
+					fx->GetShader()->SetShaderResourceView("backBuffer", m_pTexBack->GetShaderResourceView());
+					fx->GetShader()->SetShaderResourceView("effectInput", m_pTexRead->GetShaderResourceView());
+				}
 				fx->GetShader()->SetSamplerSatate("SampleType", m_textureSampler->GetSamplerState());
 				fx->BindFx(render);
 			}
@@ -192,6 +216,8 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 void Grafkit::EffectComposer::Flush(Renderer & render)
 {
 	// present the result 
+	if (m_singlepass)
+		return;
 
 	render.SetRenderTargetView();
 	render.BeginScene();
