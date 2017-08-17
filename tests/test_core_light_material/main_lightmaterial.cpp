@@ -15,6 +15,7 @@
 
 #include "render/Scene.h"
 #include "render/effect.h"
+#include "render/camera.h"
 
 #include "math/matrix.h"
 
@@ -76,7 +77,8 @@ protected:
 	ActorRef m_rootActor;
 	ActorRef m_cameraActor;
 
-	ActorRef camera;
+	ActorRef cameraActor;
+	CameraRef camera;
 
 	float t;
 
@@ -114,7 +116,8 @@ protected:
 		(*scene)->BuildScene(render, vs, fs);
 		(*scene)->SetActiveCamera(0);
 
-		camera = (*scene)->GetActiveCamera();
+		cameraActor = (*scene)->GetActiveCamera();
+		camera = dynamic_cast<Camera*>(cameraActor->GetEntities()[0].Get());
 
 		// -- add lights
 		/*light = new PointLight();
@@ -153,13 +156,20 @@ protected:
 			this->scene->Get()->UpdateAnimation(fmod(t, 10.5));
 			this->scene->Get()->PreRender(render);
 
+			resprops.ar = render.GetAspectRatio();
+			resprops.fov = 45; 
+
 			worldMatrices = (*scene)->GetWorldMatrices();
+			
 			(*cubemapShader)->SetParam(render, "ResolutionBuffer", &resprops);
 			(*cubemapShader)->SetParam(render, "MatrixBuffer", &worldMatrices);
 			(*cubemapShader)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
-			(*scene)->GetActiveCamera()->Matrix();
+			
+			render.ToggleDepthWrite(false);
 
 			drawCubemap->Render(render);
+
+			render.ToggleDepthWrite(true);
 
 			this->scene->Get()->Render(render);
 

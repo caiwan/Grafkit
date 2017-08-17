@@ -107,6 +107,9 @@ namespace Grafkit {
 		D3D11_VIEWPORT m_viewport;
 		int m_screenW;
 		int m_screenH;
+
+	private:
+		void CreateStencilState(bool isWriteEnabled);
 	};
 }
 

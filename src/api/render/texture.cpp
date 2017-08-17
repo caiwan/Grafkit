@@ -63,7 +63,7 @@ void Grafkit::ATexture::SetRenderTargetView(Renderer & device, size_t id) const
 	device.SetRenderTargetView(m_pTargetView, id);
 }
 
-// TODO: fuct this crapshit all over the place
+// TODO: fuct this crapshit out of all over the place hard
 void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int channels, int chw, int w, int h, int d, bool isDynamic, bool hasMips, bool cubemap)
 {
 	HRESULT result;
@@ -428,7 +428,7 @@ void Grafkit::TextureCube::Initialize(Renderer device, CubemapRef cubemap)
 	textureDesc.Width = m_w;
 	textureDesc.Height = m_h;
 	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = cubemap ? 6 : 1;
+	textureDesc.ArraySize = 6;
 	textureDesc.Format = m_format;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
