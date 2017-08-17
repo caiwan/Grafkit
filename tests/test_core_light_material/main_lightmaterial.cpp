@@ -11,6 +11,7 @@
 
 #include "generator/ShaderLoader.h"
 #include "generator/SceneLoader.h"
+#include "generator/TextureLoader.h"
 
 #include "render/Scene.h"
 #include "render/effect.h"
@@ -62,6 +63,8 @@ protected:
 	Renderer render;
 	SceneResRef scene;
 
+	TextureCubeResRef envmap;
+
 	EffectComposerRef drawCubemap;
 	EffectComposerRef postfx;
 
@@ -90,6 +93,14 @@ protected:
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "phongBlinn"));
 
 		cubemapShader = Load<ShaderRes>(new PixelShaderLoader("cubemapShader", "shaders/cubemap.hlsl", ""));
+
+		envmap = Load<TextureCubeRes>(new TextureCubemapFromBitmap("envmap",
+			"textures/yoko_negx.jpg",
+			"textures/yoko_negy.jpg",
+			"textures/yoko_negz.jpg",
+			"textures/yoko_posx.jpg",
+			"textures/yoko_posy.jpg",
+			"textures/yoko_posz.jpg"));
 
 		// -- model 
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere_multimaterial.scene"));
@@ -126,15 +137,30 @@ protected:
 
 	// ==================================================================================================================
 	int mainloop() {
+
+		struct {
+			float2 res;
+			float ar;
+			float fov;
+		} resprops;
+
+		Scene::WorldMatrices_t worldMatrices;
+
 		this->render.BeginScene();
-
-		drawCubemap->Render(render);
-
 		{
 			t += .01;
 
 			this->scene->Get()->UpdateAnimation(fmod(t, 10.5));
 			this->scene->Get()->PreRender(render);
+
+			worldMatrices = (*scene)->GetWorldMatrices();
+			(*cubemapShader)->SetParam(render, "ResolutionBuffer", &resprops);
+			(*cubemapShader)->SetParam(render, "MatrixBuffer", &worldMatrices);
+			(*cubemapShader)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
+			(*scene)->GetActiveCamera()->Matrix();
+
+			drawCubemap->Render(render);
+
 			this->scene->Get()->Render(render);
 
 		}

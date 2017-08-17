@@ -63,6 +63,7 @@ void Grafkit::ATexture::SetRenderTargetView(Renderer & device, size_t id) const
 	device.SetRenderTargetView(m_pTargetView, id);
 }
 
+// TODO: fuct this crapshit all over the place
 void Grafkit::ATexture::CrateTexture(Renderer & device, DXGI_FORMAT format, int channels, int chw, int w, int h, int d, bool isDynamic, bool hasMips, bool cubemap)
 {
 	HRESULT result;
@@ -235,6 +236,30 @@ void Grafkit::ATexture::UpdateTexture(Renderer & device, const void * data, size
 	device.GetDeviceContext()->Unmap(m_pTexture, subRes);
 }
 
+void Grafkit::ATexture::Channel3To4(const void * in, void * out, size_t w, size_t h)
+{
+	UCHAR* dst = (UCHAR*)out;
+	UCHAR* src = (UCHAR*)in;
+
+	size_t x = w;
+	size_t y = h;
+
+	size_t stride_src = x * 3;
+	size_t stride_dst = x * 4;
+
+	while (y--) {
+		while (x--) {
+			dst[4 * x + 0] = src[3 * x + 0];
+			dst[4 * x + 1] = src[3 * x + 1];
+			dst[4 * x + 2] = src[3 * x + 2];
+			dst[4 * x + 3] = 0xff;
+		}
+		src += stride_src;
+		dst += stride_dst;
+		x = w;
+	}
+}
+
 void Grafkit::ATexture::Update(Renderer & device, const void * bitmap, size_t index)
 {
 	size_t len = 0;
@@ -259,28 +284,9 @@ void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap, size_t
 		subRes.pData = nullptr;
 		subRes.DepthPitch = 0;
 		subRes.RowPitch = 0;
-		device.GetDeviceContext()->Map(m_pTexture, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &subRes);
+		device.GetDeviceContext()->Map(m_pTexture, index, D3D11_MAP_WRITE_DISCARD, NULL, &subRes);
 
-		UCHAR* dst = (UCHAR*)subRes.pData;
-		UCHAR* src = (UCHAR*)data;
-
-		size_t x = w;
-		size_t y = h;
-
-		size_t stride_src = x * 3;
-		size_t stride_dst = x * 4;
-
-		while (y--) {
-			while (x--) {
-				dst[4 * x + 0] = src[3 * x + 0];
-				dst[4 * x + 1] = src[3 * x + 1];
-				dst[4 * x + 2] = src[3 * x + 2];
-				dst[4 * x + 3] = 0xff;
-			}
-			src += stride_src;
-			dst += stride_dst;
-			x = w;
-		}
+		Channel3To4(data, subRes.pData, w, h);
 
 		device.GetDeviceContext()->Unmap(m_pTexture, NULL);
 	}
@@ -291,17 +297,17 @@ void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap, size_t
 
 }
 
-void Grafkit::ATexture::Update(Renderer & device, const CubemapRef cubemap)
-{
-	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb204881(v=vs.85).aspx
-	// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476906(v=vs.85).aspx
-	Update(device, cubemap->GetPosX(), 0);
-	Update(device, cubemap->GetNegX(), 1);
-	Update(device, cubemap->GetPosY(), 2);
-	Update(device, cubemap->GetNegY(), 3);
-	Update(device, cubemap->GetPosZ(), 4);
-	Update(device, cubemap->GetNegZ(), 5);
-}
+//void Grafkit::ATexture::Update(Renderer & device, const CubemapRef cubemap)
+//{
+//	// https://msdn.microsoft.com/en-us/library/windows/desktop/bb204881(v=vs.85).aspx
+//	// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476906(v=vs.85).aspx
+//	Update(device, cubemap->GetPosX(), 0);
+//	Update(device, cubemap->GetNegX(), 1);
+//	Update(device, cubemap->GetPosY(), 2);
+//	Update(device, cubemap->GetNegY(), 3);
+//	Update(device, cubemap->GetPosZ(), 4);
+//	Update(device, cubemap->GetNegZ(), 5);
+//}
 
 // ========================================================================================================================
 
@@ -369,8 +375,12 @@ void Grafkit::Texture2D::InitializeDepth(Renderer & device, int w, int h)
 
 // ========================================================================================================================
 
-void Grafkit::TextureCube::Initialize(Renderer device , CubemapRef cubemap)
+void Grafkit::TextureCube::Initialize(Renderer device, CubemapRef cubemap)
 {
+
+	HRESULT result;
+
+	bool isConvertCh3to4 = false;
 
 	DXGI_FORMAT fmt;
 	BitmapRef bitmap = cubemap->GetPosX(); //assume that everything is equal
@@ -385,6 +395,7 @@ void Grafkit::TextureCube::Initialize(Renderer device , CubemapRef cubemap)
 		fmt = DXGI_FORMAT_R8G8_UNORM;
 		break;
 	case 3:
+		isConvertCh3to4 = true;
 	case 4:
 #ifdef USE_SRGB_TEXTURE
 		fmt = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
@@ -395,9 +406,77 @@ void Grafkit::TextureCube::Initialize(Renderer device , CubemapRef cubemap)
 		break;
 	}
 
-	this->CrateTexture(device, fmt, ch, chw, bitmap->GetX(), bitmap->GetY(), 0, false, true, true);
-	this->Update(device, cubemap);
+	m_format = fmt;
+
+	m_w = cubemap->GetPosX()->GetX();
+	m_h = cubemap->GetPosX()->GetY();
+	m_ch = ch;
+	m_chW = 1;
+
+
+	//this->CrateTexture(device, fmt, ch, chw, bitmap->GetX(), bitmap->GetY(), 0, true, true, true);
+	//this->Update(device, cubemap);
+
+	D3D11_SRV_DIMENSION srvDimension;
+	D3D11_RTV_DIMENSION rtvDimension;
+
+	srvDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+	rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+	D3D11_TEXTURE2D_DESC textureDesc;
+	ZeroMemory(&textureDesc, sizeof(textureDesc));
+	textureDesc.Width = m_w;
+	textureDesc.Height = m_h;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = cubemap ? 6 : 1;
+	textureDesc.Format = m_format;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+
+	// setup inital data 
+	D3D11_SUBRESOURCE_DATA pData[6];
+
+	for (int i = 0; i < 6; i++)
+	{
+		void *inData = cubemap->GetBitmap(i)->GetData();
+		void *outData = inData;
+		if (isConvertCh3to4) {
+			outData = new unsigned char[m_w * m_h * m_ch * m_chW];
+			Channel3To4(inData, outData, m_w, m_h);
+		}
+		pData[i].pSysMem = outData;
+		pData[i].SysMemPitch = m_w * 4;
+		pData[i].SysMemSlicePitch = 0;
+	}
+
+	ID3D11Texture2D *ppTex = nullptr;
+	result = device->CreateTexture2D(&textureDesc, pData, &ppTex);
+
+	if (isConvertCh3to4)
+		for (int i = 0; i < 6; i++)
+			delete pData[i].pSysMem;
+
+	if (FAILED(result)) throw EX(TextureCreateException);
+
+	m_pTexture = ppTex;
+
+	// set srv
+	// --- 
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	shaderResourceViewDesc.Format = m_format;
+	shaderResourceViewDesc.ViewDimension = srvDimension;
+
+
+	shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;
+	shaderResourceViewDesc.TextureCube.MipLevels = 1;
+
+	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 }
+
 
 
 // ========================================================================================================================

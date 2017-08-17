@@ -110,7 +110,7 @@ void Grafkit::TextureCubemapFromBitmap::Load(Grafkit::IResourceManager * const &
 
 	for (int i = 0; i < 6; i++) {
 		int x = 0, y = 0, ch = 0;
-		IAssetRef asset = this->GetSourceAsset(resman);
+		IAssetRef asset = this->GetAsset(resman, m_sourceNames[i]);
 
 		// kikenyszeritett rgba mod
 		UCHAR *data = stbi_load_from_memory((UCHAR *)asset->GetData(), asset->GetSize(), &x, &y, &ch, 0);

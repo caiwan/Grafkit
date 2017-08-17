@@ -14,3 +14,10 @@ IAssetRef IResourceBuilder::GetSourceAsset(IResourceManager * const & assman)
 		return IAssetRef();
 }
 
+IAssetRef Grafkit::IResourceBuilder::GetAsset(IResourceManager * const & assman, std::string asset)
+{
+	if (assman && assman->GetAssetFactory())
+		return assman->GetAssetFactory()->Get(asset);
+	return IAssetRef();
+}
+

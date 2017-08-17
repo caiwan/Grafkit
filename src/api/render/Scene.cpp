@@ -217,6 +217,11 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 		throw EX_DETAILS(NullPointerException, "Camera actor nem jo, vagy Nem seteltel be a nodeba kamerat");
 	}
 	
+	// to get the matrices before the scenegraph renders
+	m_worldMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
+
+	m_worldMatrices.viewMatrix = XMMatrixTranspose(m_cameraViewMatrix.Get());
+	m_worldMatrices.projectionMatrix = XMMatrixTranspose(m_cameraProjectionMatrix.Get());
 }
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
@@ -233,21 +238,6 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	m_materialCurrentLayer = layer;
 	m_currentWorldMatrix.Identity();
 
-	// ezt a semat ki kell baszni innen 
-	struct {
-		matrix worldMatrix;
-		matrix viewMatrix;
-		matrix projectionMatrix;
-	} viewMatrices;
-
-	// CameraRef &camera = GetActiveCamera();
-	// camera->Calculate(render);
-
-	viewMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
-
-	viewMatrices.viewMatrix = XMMatrixTranspose(m_cameraViewMatrix.Get());
-	viewMatrices.projectionMatrix = XMMatrixTranspose(m_cameraProjectionMatrix.Get());
-
 	//ez itt elviekben jo kell, hogy legyen
 	m_vertexShader->Bind(render);
 	m_pixelShader->Bind(render);
@@ -261,8 +251,8 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {
 		if (node->Valid()) {
 			if (!(*node)->IsHidden()) {
-				viewMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
-				m_vertexShader->SetParam(render, "MatrixBuffer", &viewMatrices);
+				m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
+				m_vertexShader->SetParam(render, "MatrixBuffer", &m_worldMatrices);
 				(*node)->Render(render, this);
 			}
 		}

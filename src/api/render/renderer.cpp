@@ -357,7 +357,7 @@ void Renderer::Shutdown()
 	RELEASE(m_rasterState);
 	RELEASE(m_depthStencilView);
 	RELEASE(m_depthStencilState)
-		RELEASE(m_depthStencilBuffer);
+	RELEASE(m_depthStencilBuffer);
 	RELEASE(m_myRenderTargetView);
 	RELEASE(m_deviceContext);
 	RELEASE(m_swapChain);

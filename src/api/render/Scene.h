@@ -76,6 +76,16 @@ namespace Grafkit {
 
 		void BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps);
 
+	public:
+		// qnd hack of shit
+		struct WorldMatrices_t {
+			matrix worldMatrix;
+			matrix viewMatrix;
+			matrix projectionMatrix;
+		};
+
+		struct WorldMatrices_t GetWorldMatrices() { return m_worldMatrices; }
+
 	protected:
 		float m_tStart, m_tEnd;
 
@@ -123,6 +133,10 @@ namespace Grafkit {
 		//std::map<UINT, ShaderRef> m_materialShaderMap;
 		UINT m_materialCurrentLayer;
 
+
+		struct WorldMatrices_t m_worldMatrices;
+
+		//Grafkit::Matrix m_currentCameraMatrix;
 		Grafkit::Matrix m_currentWorldMatrix;
 		std::stack<Grafkit::Matrix> m_worldMatrixStack;
 

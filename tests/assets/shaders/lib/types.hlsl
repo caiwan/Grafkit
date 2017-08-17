@@ -1,9 +1,15 @@
 #define PI 3.14159265359
 
-struct WoldMatrices{
+struct WorldMatrices{
 	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
+};
+
+struct Resolution {
+	float2 resolution;
+	float aspect;
+	float fov;
 };
 
 struct VertexInputType

@@ -41,27 +41,34 @@ namespace Grafkit
 		void *m_data;
 		UINT m_bmsize, m_stride, m_x, m_y, m_ch;
 	};
-	
+
 	typedef Ref<Bitmap> BitmapRef;
 
 	class Cubemap : public Referencable {
 	public:
-		Cubemap() : m_posx(), m_negx(), m_posy(), m_negy(), m_posz(), m_negz() {}
-		Cubemap(BitmapRef posx, BitmapRef negx, BitmapRef posy, BitmapRef negy, BitmapRef posz, BitmapRef negz) : m_posx(posx), m_negx(negx), m_posy(posy), m_negy(negy), m_posz(posz), m_negz(negz) {}
-		Cubemap(BitmapRef bitmaps[6]) : m_posx(bitmaps[0]), m_negx(bitmaps[1]), m_posy(bitmaps[2]), m_negy(bitmaps[3]), m_posz(bitmaps[4]), m_negz(bitmaps[5]) {}
+		Cubemap() {
+		}
+		
+		Cubemap(BitmapRef bitmaps[6]) {
+			for (int i = 0; i < 6; i++)
+				m_cube[i] = bitmaps[i];
+		}
 
-		BitmapRef GetPosX() const { return m_posx; }
-		BitmapRef GetPosY() const { return m_posy; }
-		BitmapRef GetPosZ() const { return m_posz; }
-		BitmapRef GetNegX() const { return m_negx; }
-		BitmapRef GetNegY() const { return m_negy; }
-		BitmapRef GetNegZ() const { return m_negz; }
+		BitmapRef GetBitmap(int i) { return m_cube[i % 6]; }
+
+		BitmapRef GetPosX() const { return m_cube[0]; }
+		BitmapRef GetNegX() const { return m_cube[1]; }
+		BitmapRef GetPosY() const { return m_cube[2]; }
+		BitmapRef GetNegY() const { return m_cube[3]; }
+		BitmapRef GetPosZ() const { return m_cube[4]; }
+		BitmapRef GetNegZ() const { return m_cube[5]; }
 
 	private:
-		BitmapRef m_posx, m_negx, m_posy, m_negy, m_posz, m_negz;
+		//BitmapRef m_posx, m_negx, m_posy, m_negy, m_posz, m_negz;
+		BitmapRef m_cube[6];
 	};
 
-	
+
 	typedef Ref<Cubemap> CubemapRef;
 
 	// ========================================================================================================================
@@ -87,11 +94,13 @@ namespace Grafkit
 
 		void Update(Renderer & device, const void* data, size_t index = 0);
 		void Update(Renderer & device, const BitmapRef bitmap, size_t index = 0);
-		void Update(Renderer & device, const CubemapRef cubemap);
+		//void Update(Renderer & device, const CubemapRef cubemap);
 
 	protected:
-		void CrateTexture(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0, int d = 0, bool isDynamic = true, bool hasMips = true, bool cubemap = false);
+		virtual void CrateTexture(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0, int d = 0, bool isDynamic = true, bool hasMips = true, bool cubemap = false);
 		virtual void UpdateTexture(Renderer & device, const void* data, size_t len, size_t subresource = 0, size_t offset = 0);
+
+		void Channel3To4(const void *in, void *out, size_t w, size_t h);
 
 		virtual int GetDimension() = 0;
 
@@ -167,15 +176,17 @@ namespace Grafkit
 	{
 	public:
 		TextureCube() : ATexture() {}
-		~TextureCube() {}	
+		~TextureCube() {}
 
 		void Initialize(Renderer device, CubemapRef cubemap);
 
 		void* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
 
 	protected:
-		virtual int GetDimension() { return -2; }
+		virtual int GetDimension() { return 2; }
+		//virtual void CrateTexture(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0, int d = 0, bool isDynamic = true, bool hasMips = true, bool cubemap = false);
 
+		void **m_initial_data;
 	};
 
 	// ========================================================================================================================

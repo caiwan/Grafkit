@@ -29,6 +29,7 @@ namespace Grafkit {
 
 	protected:
 		IAssetRef GetSourceAsset(IResourceManager * const & assman);
+		IAssetRef GetAsset(IResourceManager * const & assman, std::string asset);
 
 		std::string m_name;
 		std::string m_srcName;
