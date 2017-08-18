@@ -29,7 +29,7 @@ float4 mainPixel(FXPixelInputType input) : SV_TARGET
 	float v = input.tex.y * res.aspect;
 	float w = 1. / tan(res.fov *.5);
 
-	float3 uvw = normalize(mul(float4(u, v, w, 0), view).xyz);
+	float3 uvw = normalize(mul(- float4(u, v, w, 0), view).xyz);
 
-	return skybox.Sample(TextureSampler, uvw);
+	return skybox.SampleLevel(TextureSampler, uvw, 8);
 }

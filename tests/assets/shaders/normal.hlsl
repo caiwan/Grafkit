@@ -12,6 +12,7 @@ Texture2D t_normal;
 Texture2D t_specular;
 Texture2D t_shininess;
 
+TextureCube envmap;
 
 // PixelShader
 //------------------------------------------------------------------------------------
@@ -23,3 +24,13 @@ PixelOutType mainPixel(PixelInputType input)
 	output.diff = .5 * input.normal - .5;
 	return output;
 }
+
+PixelOutType envmapNormal(PixelInputType input)
+{
+	PixelOutType output;
+	output.normal = input.normal;
+	output.view = input.view;
+	output.diff = envmap.Sample(SampleType, input.normal);
+	return output;
+}
+

@@ -92,17 +92,20 @@ protected:
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
-		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "phongBlinn"));
+		//fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "phongBlinn"));
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/normal.hlsl", "envmapNormal"));
+
 
 		cubemapShader = Load<ShaderRes>(new PixelShaderLoader("cubemapShader", "shaders/cubemap.hlsl", ""));
 
 		envmap = Load<TextureCubeRes>(new TextureCubemapFromBitmap("envmap",
-			"textures/yoko_negx.jpg",
-			"textures/yoko_negy.jpg",
-			"textures/yoko_negz.jpg",
 			"textures/yoko_posx.jpg",
+			"textures/yoko_negx.jpg",
 			"textures/yoko_posy.jpg",
-			"textures/yoko_posz.jpg"));
+			"textures/yoko_negy.jpg",
+			"textures/yoko_posz.jpg",
+			"textures/yoko_negz.jpg"
+		));
 
 		// -- model 
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere_multimaterial.scene"));
@@ -157,7 +160,7 @@ protected:
 			this->scene->Get()->PreRender(render);
 
 			resprops.ar = render.GetAspectRatio();
-			resprops.fov = 45; 
+			resprops.fov = camera->GetFOV();
 
 			worldMatrices = (*scene)->GetWorldMatrices();
 			
@@ -170,6 +173,9 @@ protected:
 			drawCubemap->Render(render);
 
 			render.ToggleDepthWrite(true);
+
+			(*fs)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
+			(*fs)->SetShaderResourceView("envmap", (*envmap)->GetShaderResourceView());
 
 			this->scene->Get()->Render(render);
 

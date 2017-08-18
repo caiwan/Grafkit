@@ -186,3 +186,4 @@ struct PixelOutType orenNayarTextured(PixelInputType input) {
 struct PixelOutType mainPixelDispatcher(PixelInputType input) {
 	// this just dispatches between the defferent material layers
 }
+
