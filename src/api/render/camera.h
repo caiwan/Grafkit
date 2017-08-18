@@ -43,7 +43,7 @@ namespace Grafkit {
 		
 		/// Horizontal FOV in radian
 		void SetFOV(float fov) { this->m_hFov = fov; }
-		/// @todo GetFOV()
+		float GetFOV() { return this->m_hFov; }
 		
 		void SetClippingPlanes(float znear, float zfar) { this->m_znear = znear, this->m_zfar = zfar; }
 		/// @todo void GetClippingPlanes(float &znear, float &zfar);

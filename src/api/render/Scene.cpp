@@ -253,6 +253,7 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 			if (!(*node)->IsHidden()) {
 				m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
 				m_vertexShader->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+				m_pixelShader->SetParam(render, "MatrixBuffer", &m_worldMatrices);
 				(*node)->Render(render, this);
 			}
 		}
