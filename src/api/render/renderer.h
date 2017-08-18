@@ -62,6 +62,8 @@ namespace Grafkit {
 		void BeginScene();
 		void EndScene();
 
+		void ToggleDepthWrite(bool isEanbled);
+
 		// --- setters
 
 		void ApplyRenderTargetView(size_t count = 1);
@@ -97,7 +99,7 @@ namespace Grafkit {
 		ID3D11RenderTargetView *m_renderTargetViews[RENDER_TARGET_MAX], *m_myRenderTargetView;
 		size_t m_renderTargetViewCount;
 		ID3D11Texture2D* m_depthStencilBuffer;
-		ID3D11DepthStencilState* m_depthStencilState;
+		ID3D11DepthStencilState* m_depthStencilState, *m_depthStencilStateWriteDisabled;
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11RasterizerState* m_rasterState;
 		
@@ -109,7 +111,7 @@ namespace Grafkit {
 		int m_screenH;
 
 	private:
-		void CreateStencilState(bool isWriteEnabled);
+		ID3D11DepthStencilState* CreateStencilState(bool isWriteEnabled);
 	};
 }
 
