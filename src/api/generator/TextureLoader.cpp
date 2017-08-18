@@ -85,14 +85,20 @@ IResource * Grafkit::ITextureBuilder::NewResource()
 /*
 */
 
-Grafkit::TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name, std::string source_posx, std::string source_negx, std::string source_posy, std::string source_negy, std::string source_posz, std::string source_negz) : ITextureBuilder(name, "")
+Grafkit::TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name, 
+	std::string source_posx, 
+	std::string source_negx, 
+	std::string source_posy, 
+	std::string source_negy, 
+	std::string source_posz, 
+	std::string source_negz) : ITextureBuilder(name, "")
 {
-	m_sourceNames[0] = source_negx;
-	m_sourceNames[1] = source_negy;
-	m_sourceNames[2] = source_negz;
-	m_sourceNames[3] = source_posx;
-	m_sourceNames[4] = source_posy;
-	m_sourceNames[5] = source_posz;
+	m_sourceNames[0] = source_posx;
+	m_sourceNames[1] = source_negx;
+	m_sourceNames[2] = source_posy;
+	m_sourceNames[3] = source_negy;
+	m_sourceNames[4] = source_posz;
+	m_sourceNames[5] = source_negz;
 }
 
 Grafkit::TextureCubemapFromBitmap::~TextureCubemapFromBitmap()

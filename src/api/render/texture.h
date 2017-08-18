@@ -48,7 +48,7 @@ namespace Grafkit
 	public:
 		Cubemap() {
 		}
-		
+
 		Cubemap(BitmapRef bitmaps[6]) {
 			for (int i = 0; i < 6; i++)
 				m_cube[i] = bitmaps[i];
@@ -97,10 +97,11 @@ namespace Grafkit
 		//void Update(Renderer & device, const CubemapRef cubemap);
 
 	protected:
-		virtual void CrateTexture(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0, int d = 0, bool isDynamic = true, bool hasMips = true, bool cubemap = false);
+		//virtual void CrateTexture(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0, int d = 0, bool isDynamic = true, bool hasMips = true, bool cubemap = false);
 		virtual void UpdateTexture(Renderer & device, const void* data, size_t len, size_t subresource = 0, size_t offset = 0);
 
-		void Channel3To4(const void *in, void *out, size_t w, size_t h);
+		// convert 3 component bitmap to 4
+		void CopyChannel3To4(const void *in, void *out, size_t w, size_t h);
 
 		virtual int GetDimension() = 0;
 
@@ -133,6 +134,8 @@ namespace Grafkit
 		ID3D11Texture1D* GetTexture1D() { return (ID3D11Texture1D*)this->m_pTexture; }
 
 	protected:
+		void CreateTexture(Renderer & device, DXGI_FORMAT format, size_t w, const void * initaldata = nullptr);
+
 		virtual int GetDimension() { return 1; }
 	};
 
@@ -166,6 +169,13 @@ namespace Grafkit
 		ID3D11Texture2D* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
 
 	protected:
+		void CreateTextureBitmap(Renderer & device, DXGI_FORMAT format, int channels = 4, int w = 0, int h = 0, const void * initialData = nullptr);
+		void CreateTextureTarget(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0);
+
+		void CreateRTV(Renderer & device, );
+		void CreateSRV(Renderer & device, );
+
+
 		virtual int GetDimension() { return 2; }
 
 	};
@@ -178,7 +188,7 @@ namespace Grafkit
 		TextureCube() : ATexture() {}
 		~TextureCube() {}
 
-		void Initialize(Renderer device, CubemapRef cubemap);
+		void Initialize(Renderer &device, CubemapRef cubemap);
 
 		void* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
 
