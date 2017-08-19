@@ -8,7 +8,7 @@ cbuffer ResolutionBuffer {
 	Resolution res;
 };
 
-SamplerState TextureSampler
+SamplerState SampleType
 {
 	Filter = ANISOTROPIC;
 	AddressU = WRAP;
@@ -31,5 +31,5 @@ float4 mainPixel(FXPixelInputType input) : SV_TARGET
 
 	float3 uvw = normalize(mul(- float4(u, v, w, 0), view).xyz);
 
-	return skybox.SampleLevel(TextureSampler, uvw, 8);
+	return skybox.SampleLevel(SampleType, uvw, 10);
 }

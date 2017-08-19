@@ -64,6 +64,8 @@ protected:
 	Renderer render;
 	SceneResRef scene;
 
+	TextureSamplerRef sampler;
+
 	TextureCubeResRef envmap;
 
 	EffectComposerRef drawCubemap;
@@ -128,6 +130,9 @@ protected:
 
 		//(*scene)->GetRootNode()->AddChild(lightActor);
 
+		sampler = new TextureSampler();
+		sampler->Initialize(render);
+
 		// --- serialize && deserialize
 
 		this->t = 0;
@@ -167,6 +172,7 @@ protected:
 			(*cubemapShader)->SetParam(render, "ResolutionBuffer", &resprops);
 			(*cubemapShader)->SetParam(render, "MatrixBuffer", &worldMatrices);
 			(*cubemapShader)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
+			(*cubemapShader)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
 			
 			render.ToggleDepthWrite(false);
 
@@ -176,6 +182,7 @@ protected:
 
 			(*fs)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
 			(*fs)->SetShaderResourceView("envmap", (*envmap)->GetShaderResourceView());
+			(*fs)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
 
 			this->scene->Get()->Render(render);
 

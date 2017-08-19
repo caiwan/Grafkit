@@ -25,6 +25,7 @@ PixelOutType mainPixel(PixelInputType input)
 	return output;
 }
 
+// maps envmap to output from the view
 PixelOutType envmapNormal(PixelInputType input)
 {
 	PixelOutType output;

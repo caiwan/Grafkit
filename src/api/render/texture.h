@@ -172,10 +172,6 @@ namespace Grafkit
 		void CreateTextureBitmap(Renderer & device, DXGI_FORMAT format, int channels = 4, int w = 0, int h = 0, const void * initialData = nullptr);
 		void CreateTextureTarget(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0);
 
-		void CreateRTV(Renderer & device, );
-		void CreateSRV(Renderer & device, );
-
-
 		virtual int GetDimension() { return 2; }
 
 	};
