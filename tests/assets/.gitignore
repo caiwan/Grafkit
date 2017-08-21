@@ -4,3 +4,5 @@
 
 # these could be converted as well
 *.scene
+
+*.blend?
