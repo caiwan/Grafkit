@@ -424,6 +424,9 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 	m_ch = (m_ch == 3) ? 4 : ch; // if bitmap has 3 component per pixel, we'll force it to 4 and convert it before creating initial data
 	m_chW = 1;
 
+	int MipMapCount = 1 + floor(log10((float)max(this->x, this->y)) / log10(2.0));
+	
+
 	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = m_w;
@@ -479,7 +482,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 
 	if (FAILED(result)) throw EX_HRESULT(TextureCreateException, result);
 
-	device.GetDeviceContext()->GenerateMips(m_pResourceView);
+	//device.GetDeviceContext()->GenerateMips(m_pResourceView);
 }
 
 // ========================================================================================================================
