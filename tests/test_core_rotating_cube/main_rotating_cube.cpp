@@ -91,7 +91,7 @@ protected:
 
 			// -- load shader
 			
-			ShaderLoader *vShaderLoader = new VertexShaderLoader("vshader", "shaders/flat.hlsl", "TextureVertexShader");
+			ShaderLoader *vShaderLoader = new VertexShaderLoader("vshader", "shaders/vertex.hlsl", "");
 			ShaderResRef vShaderRef = (ShaderRes*)(vShaderLoader->NewResource());
 			vShaderLoader->Load(this, vShaderRef);
 			
@@ -99,7 +99,7 @@ protected:
 
 			delete vShaderLoader;
 
-			ShaderLoader *pShaderLoader = new PixelShaderLoader("pshader", "shaders/flat.hlsl", "TexturePixelShader");
+			ShaderLoader *pShaderLoader = new PixelShaderLoader("pshader", "shaders/flat.hlsl", "");
 			ShaderResRef pShaderRef = (ShaderRes*)(pShaderLoader->NewResource());
 			pShaderLoader->Load(this, pShaderRef);
 

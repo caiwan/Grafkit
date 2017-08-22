@@ -78,30 +78,30 @@ protected:
 		this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 		// init file loader
-		this->m_file_loader = new FileAssetFactory("./../../assets/rotating_cube/");
+		this->m_file_loader = new FileAssetFactory("./../assets/");
 
 		// --------------------------------------------------
 
 		// -- camera
 		CameraRef camera = new Camera;
-		camera->SetPosition(0.0f, 0.0f, -10.0f);
-		camera->SetLookAt(0, 0, 0);
+		//camera->SetPosition(0.0f, 0.0f, -10.0f);
+		//camera->SetLookTo(0, 0, -1);
 
 		// -- texture
 		TextureResRef texture = new TextureRes();
 
-		texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
+		texture = this->Load<TextureRes>(new TextureFromBitmap("normap", "textures/Normap.jpg"));
 
 		// -- texture sampler
 		m_textureSampler = new TextureSampler();
 		m_textureSampler->Initialize(render);
 
 		// -- load shader
-		m_vertexShader = Load<ShaderRes>(new ShaderLoader("vShader", "texture.hlsl", "TextureVertexShader", ST_Vertex));
-		m_fragmentShader = Load<ShaderRes>(new ShaderLoader("pShader", "texture.hlsl", "TexturePixelShader", ST_Pixel));
+		m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
+		m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/textured.hlsl", ""));
 
 		// -- load music
-		music = Load<MusicRes>(new MusicBassLoader("AceMan - Go Back To The River!.mp3"));
+		music = Load<MusicRes>(new MusicBassLoader("alpha_c_-_euh.ogg"));
 
 		// -- precalc
 		this->DoPrecalc();
@@ -115,15 +115,16 @@ protected:
 
 		// -- model 
 		ModelRef model = new Model;
-		model->SetMaterial(new BaseMaterial());
+		model->SetMaterial(new Material());
 		model->GetMaterial()->AddTexture(texture, "diffuse");
 
-
-		SimpleMeshGenerator generator(render, m_vertexShader);
-		generator["POSITION"] = (void*)GrafkitData::cubeVertices;
-		generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
-
-		generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
+		model = new Model(new Mesh());
+		model->SetName("cube");
+		model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
+		model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeTextureUVsSize, GrafkitData::cubeTextureUVs);
+		model->GetMesh()->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
+		model->GetMesh()->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
+		model->GetMesh()->Build(render, m_vertexShader);
 
 		// -- setup scene 
 		scene = new Scene();
@@ -140,11 +141,9 @@ protected:
 			{ 0, 0, -1 }, /* elol */{ 0, 0, 1 }, /* hatul */
 		};
 
-		char names[] = "r\0l\0u\0d\0f\0b";	/*right, left, up, down, front, back*/
+		char *names[] = { "r", "l", "u", "d", "f", "b" };	/*right, left, up, down, front, back*/
 
 		this->trk_rotate_root = valTracker->newFloat3Track("root", "r", "rpy");
-
-		
 
 		// size_t i = 5; 
 		for (size_t i = 0; i < 6; i++)
@@ -161,26 +160,22 @@ protected:
 
 			actor->Matrix().Translate(v);
 
-			this->trk_rotate[i] = valTracker->newFloat2Track("b", &names[2*i], "rpy");
+			this->trk_rotate[i] = valTracker->newFloat2Track("b", names[i], "rpy");
 
 		}
 
-
-		// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
-
 		ActorRef rootActor = new Actor();
-		// rootActor->AddChild(cameraActor);
+		cameraActor->Matrix().Translate(0,0,-10);
+
+		rootActor->AddChild(cameraActor);
 		rootActor->AddChild(modelActor);
 
 		m_rootActor = rootActor;
 
+		scene->BuildScene(render, m_vertexShader, m_fragmentShader);
 		scene->Initialize(rootActor);
-		scene->AddCameraNode(cameraActor);
-		// scene->AddLightNode(lightActor);
 
-		scene->SetVShader(m_vertexShader);
-		scene->SetFShader(m_fragmentShader);
-
+		scene->SetActiveCamera(0);
 		// --- 
 
 		this->t = 0;
@@ -216,7 +211,7 @@ protected:
 				modelActors[i]->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
 			}
 
-			fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+			fragmentShader->SetSamplerSatate("SampleType", m_textureSampler->GetSamplerState());
 
 			scene->PreRender(render);
 			scene->Render(render);

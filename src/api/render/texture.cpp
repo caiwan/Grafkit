@@ -287,7 +287,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-	textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 	D3D11_SUBRESOURCE_DATA *pData = nullptr, subresData;
@@ -424,14 +424,11 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 	m_ch = (m_ch == 3) ? 4 : ch; // if bitmap has 3 component per pixel, we'll force it to 4 and convert it before creating initial data
 	m_chW = 1;
 
-	int MipMapCount = 1 + floor(log10((float)max(this->x, this->y)) / log10(2.0));
-	
-
 	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = m_w;
 	textureDesc.Height = m_h;
-	textureDesc.MipLevels = 0;
+	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 6;
 	textureDesc.Format = m_format;
 	textureDesc.SampleDesc.Count = 1;
@@ -482,7 +479,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 
 	if (FAILED(result)) throw EX_HRESULT(TextureCreateException, result);
 
-	//device.GetDeviceContext()->GenerateMips(m_pResourceView);
+	device.GetDeviceContext()->GenerateMips(m_pResourceView);
 }
 
 // ========================================================================================================================
@@ -505,8 +502,8 @@ void Grafkit::TextureSampler::Initialize(Renderer & device)
 	D3D11_SAMPLER_DESC samplerDesc;
 	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
 
-	//samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	//samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;

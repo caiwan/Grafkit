@@ -1,1 +1,6 @@
 create_testapp(test_synctracker)
+target_link_libraries(test_synctracker ${BASS_LIBRARY_RELEASE})
+bass_copy_binaries(test_synctracker "/")
+if(WIN32)
+  target_link_libraries(test_synctracker wsock32 ws2_32)
+endif()

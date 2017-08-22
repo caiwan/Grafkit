@@ -6,6 +6,7 @@ create_testapp(AssimpConverter)
 # settings
 set_target_properties(AssimpConverter PROPERTIES FOLDER tools)
 msvc_set_console(AssimpConverter)
+
 if(WIN32)
   target_link_libraries(AssimpConverter wsock32 ws2_32)
 endif()
