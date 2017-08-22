@@ -17,6 +17,7 @@ using namespace Grafkit;
 
 namespace {
 	DXGI_FORMAT bitmapformats[] = {
+		DXGI_FORMAT_UNKNOWN,
 		DXGI_FORMAT_R8_UNORM,
 		DXGI_FORMAT_R8G8_UNORM,
 #ifdef USE_SRGB_TEXTURE
@@ -219,7 +220,7 @@ void Grafkit::Texture2D::Initialize(Renderer & device, BitmapRef bitmap)
 	int ch = bitmap->GetCh();
 	int chw = 1;
 
-	fmt = bitmapformats[ch % 4];
+	fmt = bitmapformats[ch % 5];
 
 	void * data = bitmap->GetData();
 
@@ -415,7 +416,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 
 	BitmapRef bitmap = cubemap->GetPosX(); //assume that everything is equal there
 	int ch = bitmap->GetCh();
-	DXGI_FORMAT fmt = bitmapformats[ch % 4];
+	DXGI_FORMAT fmt = bitmapformats[ch % 5];
 
 	m_format = fmt;
 

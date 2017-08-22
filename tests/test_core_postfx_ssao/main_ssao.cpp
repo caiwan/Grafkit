@@ -149,7 +149,7 @@ protected:
 
 	// ==================================================================================================================
 	int mainloop() {
-
+		float4 ssaoparams = float4(1, 1, .1, .025);
 		Scene::WorldMatrices_t worldMatrices;
 
 		postfx->BindInput(render);
@@ -164,6 +164,9 @@ protected:
 			worldMatrices = (*scene)->GetWorldMatrices();
 			this->scene->Get()->Render(render);
 		}
+
+		(*aofs)->SetParam(render, "ssaoParamBuffer", &ssaoparams);
+		(*aofs)->SetParam(render, "MatrixBuffer", &worldMatrices);
 
 		postfx->Render(render);
 

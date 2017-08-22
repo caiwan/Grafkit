@@ -22,12 +22,11 @@ PixelInputType mainVertex(VertexInputType input)
 	output.view = input.position;
 	output.view = mul(output.view, worldMatrix);
 	output.view = mul(output.view, viewMatrix);
-	output.view.xyz = output.view.xyz / output.view.w;
 
-	output.position = input.position;
-	output.position = mul(output.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
+	output.position = output.view;
 	output.position = mul(output.position, projectionMatrix);
+
+	output.view.xyz = output.view.xyz / output.view.w;
 
 	input.normal.w = 0.0f;
 	output.normal = input.normal;

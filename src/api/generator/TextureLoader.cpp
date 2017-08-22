@@ -164,9 +164,6 @@ void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, 
 
 	LOGGER(Log::Logger().Trace("loading texture from resource"));
 
-	int x = 0, y = 0, ch = 0;
-	IAssetRef asset = this->GetSourceAsset(resman);
-
 	size_t k = m_size * m_size * 4;
 	UCHAR *data = new UCHAR[m_size * m_size * 4];
 
@@ -174,7 +171,7 @@ void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, 
 		data[i] = rand() % 255;
 	}
 
-	texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, x, y, ch));
+	texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, m_size, m_size, 4));
 
 	// --- xchg texture 
 	if (dstTexture->Valid()) {
