@@ -8,6 +8,7 @@
 * http://www.glge.org/demos/fxaa/
 */
 
+#include<types.hlsl>
 
 #ifndef FXAA_REDUCE_MIN
 	#define FXAA_REDUCE_MIN   (1.0/ 128.0)
@@ -26,16 +27,10 @@ cbuffer FXAA
 	float2 resolution;
 };
 
-struct PixelInputType
-{
-	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD;
-};
-
 Texture2D effectInput;
 SamplerState SampleType;
 
-float4 FXAA(PixelInputType input) : SV_TARGET {
+float4 FXAA(FXPixelInputType input) : SV_TARGET {
 
 	float4 color = float4(0,0,0,1);
 	float2 inverseVP = float2(1.0 / resolution.x, 1.0 / resolution.y);
@@ -82,7 +77,6 @@ float4 FXAA(PixelInputType input) : SV_TARGET {
 		color = float4(rgbA, texColor.a);
 	else
 		color = float4(rgbB, texColor.a);
-	
-	// return float4(dir.x, dir.y, 0, 1.);
+
 	return color;
 }

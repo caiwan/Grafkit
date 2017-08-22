@@ -20,7 +20,12 @@ namespace {
 
 	// GLOBALS //
 	"Texture2D effectInput;\r\n"
-	"SamplerState SampleType;"
+
+	"SamplerState SampleType{\n"
+		"Filter = MIN_MAG_MIP_LINEAR;\n"
+		"AddressU = Wrap;\n"
+		"AddressV = Wrap;\n"
+	"};\n"
 
 	// TYPEDEFS //
 	"struct FXPixelInputType"
@@ -32,7 +37,7 @@ namespace {
 	"struct FXVertexInputType"
 	"{"
 		"float4 position : POSITION;"
-		"float2 tex : TEXCOORD;"
+		"float2 tex : TEXCOORD0;"
 	"};"
 
 	// VertexShader

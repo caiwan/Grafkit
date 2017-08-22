@@ -146,3 +146,40 @@ IResource * Grafkit::TextureCubemapFromBitmap::NewResource()
 {
 	return new TextureCubeRes();
 }
+
+Grafkit::TextureNoiseMap::TextureNoiseMap(size_t size) : TextureFromBitmap("NOISE", ""), m_size(size)
+{
+	m_name = "NOISE"; // ... 
+}
+
+void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
+{
+	TextureResRef dstTexture = dynamic_cast<TextureRes*>(source);
+	if (dstTexture.Invalid()) {
+		throw EX(NullPointerException);
+	}
+
+	// --- load texture 
+	TextureRef texture = new Texture2D();
+
+	LOGGER(Log::Logger().Trace("loading texture from resource"));
+
+	int x = 0, y = 0, ch = 0;
+	IAssetRef asset = this->GetSourceAsset(resman);
+
+	size_t k = m_size * m_size * 4;
+	UCHAR *data = new UCHAR[m_size * m_size * 4];
+
+	for (int i = 0; i < k; i++) {
+		data[i] = rand() % 255;
+	}
+
+	texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, x, y, ch));
+
+	// --- xchg texture 
+	if (dstTexture->Valid()) {
+		dstTexture->Release();
+	}
+
+	dstTexture->AssingnRef(texture);
+}

@@ -359,14 +359,14 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = m_w;
 	textureDesc.Height = m_h;
-	textureDesc.MipLevels = 0;
+	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = m_format;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	textureDesc.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA *pData = nullptr, subresData;
 

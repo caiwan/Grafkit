@@ -1,204 +1,69 @@
-// Ssao shader
-// elso iteracio; THREE.js peldabol lenyulva
-// ezt a multipass chain elso elemehez kell betenni
+#include <types.hlsl>
+#include <common.hlsl>
 
-#define DL 2.399963229728653  // PI * ( 3.0 - sqrt( 5.0 ) )
-#define EULER 2.718281828459045
+cbuffer MatrixBuffer {
+	WorldMatrices matrices;
+}
 
-Texture2D positionMap;
-Texture2D normalMap;
+Texture2D<float4> normalMapTexture;
+Texture2D<float4> viewMapTexture;
 Texture2D effectInput;
-SamplerState SampleType;
 
-cbuffer camera {
-	float cameraNear;
-	float cameraFar;
+Texture2D noiseMap;
+
+
+static const int MAX_ITERATIONS = 8; 
+
+cbuffer ssaoParams{
+	float2 noiseScale;
+	float sampleRasius;
+	float rangeCheck;
 }
 
-cbuffer SSAOparams{
-	bool onlyAO;      // use only ambient occlusion pass?
-
-	float2 size;        // texture width, height
-	float aoClamp;    // depth clamp - reduces haloing at screen edges
-
-	float lumInfluence;  // how much luminance affects occlusion
-}
-
-
-// user variables
-
-const int samples = 8;     // ao sample count
-const float radius = 5.0;  // ao radius
-
-const bool useNoise = false;      // use noise instead of pattern for sample dithering
-const float noiseAmount = 0.0003; // dithering amount
-
-const float diffArea = 0.4;   // self-shadowing reduction
-const float gDisplace = 0.4;  // gauss bell center
-
-// RGBA depth
-
-//float unpackDepth(const in vec4 rgba_depth) {
-//
-//	const vec4 bit_shift = vec4(1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0);
-//	float depth = dot(rgba_depth, bit_shift);
-//	return depth;
-//
-//}
-
-float unpackDepth(float2 coord) {
-	return positionMap.Sample(SampleType, coord);
-}
-
-// generating noise / pattern texture for dithering
-
-float2 rand(const float2 coord) 
-{
-
-	float2 noise;
-
-	if (useNoise) {
-
-		float nx = dot(coord, float2(12.9898, 78.233));
-		float ny = dot(coord, float2(12.9898, 78.233) * 2.0);
-
-		noise = clamp(frac(43758.5453 * sin(float2(nx, ny))), 0.0, 1.0);
-
-	}
-	else {
-
-		float ff = frac(1.0 - coord.x * (size.x / 2.0));
-		float gg = frac(coord.y * (size.y / 2.0));
-
-		noise = float2(0.25, 0.75) * float2(ff,ff)+float2(0.75, 0.25) * gg;
-
-	}
-
-	return (noise * 2.0 - 1.0) * noiseAmount;
-
-}
-
-float readDepth(const in float2 coord) 
-{
-	float cameraFarPlusNear = camera.cameraFar + camera.cameraNear;
-	float cameraFarMinusNear = camera.cameraFar - camera.cameraNear;
-	float cameraCoef = 2.0 * camera.cameraNear;
-
-	//  return ( 2.0 * cameraNear ) / ( cameraFar + cameraNear - unpackDepth( texture2D( tDepth, coord ) ) * ( cameraFar - cameraNear ) );
-	return cameraCoef / (cameraFarPlusNear - unpackDepth(coord) * cameraFarMinusNear);
-
-
-}
-
-float compareDepths(const in float depth1, const in float depth2, inout int far) 
-{
-	float garea = 2.0;                         // gauss bell width
-	float diff = (depth1 - depth2) * 100.0;  // depth difference (0-100)
-
-	// reduce left bell width to avoid self-shadowing
-	if (diff < gDisplace) {
-
-		garea = diffArea;
-
-	}
-	else {
-
-		far = 1;
-
-	}
-
-	float dd = diff - gDisplace;
-	float gauss = pow(EULER, -2.0 * dd * dd / (garea * garea));
-	return gauss;
-
-}
-
-float calcAO(float depth, float dw, float dh) 
-{
-	float dd = radius - depth * radius;
-	float2 vv = float2(dw, dh);
-
-	float2 coord1 = vUv + dd * vv;
-	float2 coord2 = vUv - dd * vv;
-
-	float temp1 = 0.0;
-	float temp2 = 0.0;
-
-	int far = 0;
-	temp1 = compareDepths(depth, readDepth(coord1), far);
-
-	// DEPTH EXTRAPOLATION
-
-	if (far > 0) {
-
-		temp2 = compareDepths(readDepth(coord2), depth, far);
-		temp1 += (1.0 - temp1) * temp2;
-
-	}
-
-	return temp1;
-
-}
-
-// TYPEDEFS //
-
-struct PixelInputType
-{
-	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD;
+SamplerState SampleType {
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = Wrap;
+	AddressV = Wrap;
 };
 
-struct VertexInputType
+float4 SSAO(FXPixelInputType input) : SV_TARGET
 {
-	float4 position : POSITION;
-	float2 tex : TEXCOORD;
-};
+	float4 pos = viewMapTexture.Sample(SampleType, input.tex);
+	float4 normal = normalMapTexture.Sample(SampleType, input.tex);
+	float ao = 0;
 
-// MAIN
+	if (length(normal) > 0.001) {
+		normal = normalize(normal);
+		float3 rvec = normalize(noiseMap.Sample(SampleType, input.tex * noiseScale) * 2.0 - 1.0);
+		float3 tangent = normalize(rvec - normal * dot(rvec, normal));
+		float3 bitangent = cross(normal, tangent);
+		matrix tbn = matrix(tangent, bitangent, normal);
 
-float4 main(PixelInputType input) : SV_TARGET
-{
-	float2 noise = rand(input.tex);
-	float depth = readDepth(input.tex);
+		for (int i = 0; i < MAX_ITERATIONS; i++) {
+			float3 rn = normalize(noise3(input.tex));
+			rn.z = abs(rn.z);
+			float scale = float(i) / float(MAX_ITERATIONS);
+			scale = lerp(0.1f, 1.0f, scale * scale);
+			rn *= scale;
 
-	float tt = clamp(depth, SSAOparams.aoClamp, 1.0);
+			float3 samplepos = tbn * rn;
+			samplepos = samplepos * sampleRadius + pos;
 
-	float w = (1.0 / SSAOparams.size.x) / tt + (noise.x * (1.0 - noise.x));
-	float h = (1.0 / SSAOparams.size.y) / tt + (noise.y * (1.0 - noise.y));
+			vec4 offset = vec4(sampleuv, 1.0);
+			offset = mul(offset, matrices.projectionMatrix);
+			offset.xy /= offset.w;
+			offset.xy = offset.xy * 0.5 + 0.5;
 
-	float ao = 0.0;
+			float d = viewMapTexture.Sample(SampleType, offset).z;
 
-	float dz = 1.0 / float(samples);
-	float z = 1.0 - dz / 2.0;
-	float l = 0.0;
+			float rangeCheck = abs(origin.z - sampleDepth) < sampleRadius ? 1.0 : 0.0;
+			ao += (d <= sample.z ? 1.0 : 0.0) * rangeCheck;
+		}
 
-	for (int i = 0; i <= samples; i++) {
-
-		float r = sqrt(1.0 - z);
-
-		float pw = cos(l) * r;
-		float ph = sin(l) * r;
-		ao += calcAO(depth, pw * w, ph * h);
-		z = z - dz;
-		l = l + DL;
-
+		ao /= MAX_ITERATIONS;
 	}
 
-	ao /= float(samples);
-	ao = 1.0 - ao;
+	ao = 1. - ao;
 
-	float3 color = texture2D(tDiffuse, vUv).rgb;
-
-	float3 lumcoeff = float3(0.299, 0.587, 0.114);
-	float lum = dot(color.rgb, lumcoeff);
-	float3 luminance = float3(lum);
-
-	float3 final = float3(color * mix(float3(ao), float3(1.0), luminance * SSAOparams.lumInfluence));  // mix( color * ao, white, luminance )
-
-	if (SSAOparams.onlyAO) {
-		final = float3(mix(float3(ao), float3(1.0), luminance * SSAOparams.lumInfluence));  // ambient occlusion only
-	}
-
-	return flaot4(final, 1.0);
-
+	return float3(ao, ao, ao, 1);
 }

@@ -55,5 +55,13 @@ namespace Grafkit{
 		std::string m_sourceNames[6];
 	};
 
+	class TextureNoiseMap : public TextureFromBitmap {
+	public:
+		TextureNoiseMap(size_t size);
+		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+	private:
+		size_t m_size;
+	};
+
 }
 

@@ -1,11 +1,5 @@
 #include <types.hlsl>
 
-SamplerState SampleType {
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;
-	AddressV = Wrap;
-};
-
 // PixelShader
 //------------------------------------------------------------------------------------
 PixelOutType mainPixel(PixelInputType input)
