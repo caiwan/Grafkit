@@ -18,6 +18,7 @@
 #include "render/camera.h"
 
 #include "math/matrix.h"
+#include "math/halton.h"
 
 #include "utils/AssetFile.h"
 #include "utils/ResourceManager.h"
@@ -84,6 +85,8 @@ protected:
 
 	float t;
 
+	float4 *kernels;
+
 	ShaderResRef vs;
 	ShaderResRef fs, aofs;
 	ShaderResRef cubemapShader;
@@ -103,6 +106,9 @@ protected:
 		// -- generate some random texture
 
 		noiseMap = Load<TextureRes>(new TextureNoiseMap(256));
+
+		kernels = new float4[128];
+		Halton3D::HemiSphereDistribution(kernels, 128);
 
 		DoPrecalc();
 
@@ -125,6 +131,7 @@ protected:
 		(*aofs)->SetShaderResourceView("normalMapTexture", normalMap->GetShaderResourceView());
 		(*aofs)->SetShaderResourceView("viewMapTexture", positionMap->GetShaderResourceView());
 		(*aofs)->SetShaderResourceView("noiseMap", (*noiseMap)->GetShaderResourceView());
+		(*aofs)->SetParam(render, "ssaoKernelBuffer", kernels);
 
 		// ...
 
@@ -145,11 +152,16 @@ protected:
 
 	void release() {
 		this->render.Shutdown();
+
+		if (kernels)
+			delete[] kernels;
+		kernels = nullptr;
 	};
 
 	// ==================================================================================================================
 	int mainloop() {
-		float4 ssaoparams = float4(1, 1, .1, .025);
+		float4 ssaoparams = float4(10, 10, 1., .25);
+
 		Scene::WorldMatrices_t worldMatrices;
 
 		postfx->BindInput(render);

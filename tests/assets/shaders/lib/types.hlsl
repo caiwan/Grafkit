@@ -32,6 +32,7 @@ struct PixelInputType
 	float4 color1 : COLOR1;
 	
 	float4 tex : TEXCOORD0;
+
 	float4 view : VIEW;
 };
 

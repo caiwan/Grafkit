@@ -11,11 +11,15 @@ Texture2D effectInput;
 
 Texture2D noiseMap;
 
-static const int MAX_ITERATIONS = 8; 
+static const int MAX_ITERATIONS = 16; 
 
 cbuffer ssaoParamBuffer{
 	float4 ssaoParams;
 }
+
+cbuffer ssaoKernelBuffer {
+	float4 kernels[128];
+};
 
 SamplerState SampleType {
 	Filter = MIN_MAG_MIP_LINEAR;
@@ -29,7 +33,8 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 	float4 normal = normalMapTexture.Sample(SampleType, input.tex);
 	float ao = 0;
 
-	//if (length(normal) > 0.0001) 
+	// depth is usually null where ther is no depth information 
+	if (length(pos.x) > 0.0001) 
 	{
 		float2 noiseScale = ssaoParams.xy;
 		float sampleRadius = ssaoParams.z;
@@ -38,20 +43,13 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 		normal = normalize(normal);
 
 		float3 rvec = normalize(noiseMap.Sample(SampleType, input.tex * noiseScale).xyz * 2.0 - 1.0);
-		float3 tangent = normalize(rvec - normal * dot(rvec, normal.xyz));
+		float3 tangent = normalize(rvec - normal.xyz * dot(rvec, normal.xyz));
 		float3 bitangent = cross(normal, tangent);
-		matrix tbn = matrix (
-			tangent.x, bitangent.x, normal.x, 0,
-			tangent.y, bitangent.y, normal.y, 0,
-			tangent.z, bitangent.z, normal.z, 0,
-			0, 0, 0, 1
-		);
+		matrix tbn = mat3row(tangent, bitangent, normal);
 
 		for (int i = 0; i < MAX_ITERATIONS; i++) {
-			float4 rn;
-			rn.w = 1.;
-				rn.xyz = normalize(noise3(input.tex));
-			rn.z = abs(rn.z);
+			float4 rn = kernels[i];
+
 			float scale = float(i) / float(MAX_ITERATIONS);
 			scale = lerp(0.1f, 1.0f, scale * scale);
 			rn *= scale;
