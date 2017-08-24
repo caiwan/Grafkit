@@ -88,7 +88,7 @@ protected:
 	float4 *kernels;
 
 	ShaderResRef vs;
-	ShaderResRef fs, aofs;
+	ShaderResRef fs, aofs, blurfs;
 	ShaderResRef cubemapShader;
 
 
@@ -98,7 +98,10 @@ protected:
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+
 		aofs = Load<ShaderRes>(new PixelShaderLoader("fxSSAOShader", "shaders/ssao.hlsl", "SSAO"));
+
+		blurfs = Load<ShaderRes>(new PixelShaderLoader("fxblur", "shaders/blur.hlsl", "blur3x3"));
 
 		// -- model 
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "ao.scene"));
@@ -123,6 +126,7 @@ protected:
 
 		postfx = new EffectComposer();
 		postfx->AddPass(new EffectPass(aofs));
+		postfx->AddPass(new EffectPass(blurfs));
 		postfx->SetInput(1, normalMap);
 		postfx->SetInput(2, positionMap);
 		postfx->Initialize(render);
@@ -132,6 +136,8 @@ protected:
 		(*aofs)->SetShaderResourceView("viewMapTexture", positionMap->GetShaderResourceView());
 		(*aofs)->SetShaderResourceView("noiseMap", (*noiseMap)->GetShaderResourceView());
 		(*aofs)->SetParam(render, "ssaoKernelBuffer", kernels);
+
+		(*blurfs)->SetSamplerSatate("sm", sampler->GetSamplerState());
 
 		// ...
 
