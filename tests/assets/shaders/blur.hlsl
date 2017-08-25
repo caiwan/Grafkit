@@ -98,11 +98,11 @@ float4 blur3x3(FXPixelInputType input) : SV_TARGET
 	};
 #else
 	// moving average
-float kernel[9] = {
-	1., 1., 1.,
-	1., 1., 1.,
-	1., 1., 1.
-};
+	float kernel[9] = {
+		1., 1., 1.,
+		1., 1., 1.,
+		1., 1., 1.
+	};
 #endif
 
 	float4 res = float4(0,0,0,0);
