@@ -46,7 +46,7 @@ void Grafkit::TextureFromBitmap::Load(Grafkit::IResourceManager * const & resman
 {
 	TextureResRef dstTexture = dynamic_cast<TextureRes*>(source);
 	if (dstTexture.Invalid()) {
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 	}
 
 	// --- load texture 
@@ -64,7 +64,7 @@ void Grafkit::TextureFromBitmap::Load(Grafkit::IResourceManager * const & resman
 
 	if (!data)
 	{
-		throw EX_DETAILS(BitmapLoadException, stbi_failure_reason());
+		throw new EX_DETAILS(BitmapLoadException, stbi_failure_reason());
 	}
 
 	texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, x, y, ch));
@@ -109,7 +109,7 @@ void Grafkit::TextureCubemapFromBitmap::Load(Grafkit::IResourceManager * const &
 {
 	TextureCubeResRef dstTexture = dynamic_cast<TextureCubeRes*>(source);
 	if (dstTexture.Invalid()) {
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 	}
 
 	BitmapRef bitmaps[6];
@@ -125,7 +125,7 @@ void Grafkit::TextureCubemapFromBitmap::Load(Grafkit::IResourceManager * const &
 
 		if (!data)
 		{
-			throw EX_DETAILS(BitmapLoadException, stbi_failure_reason());
+			throw new EX_DETAILS(BitmapLoadException, stbi_failure_reason());
 		}
 
 		bitmaps[i] = new Bitmap(data, x, y, ch);
@@ -156,7 +156,7 @@ void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, 
 {
 	TextureResRef dstTexture = dynamic_cast<TextureRes*>(source);
 	if (dstTexture.Invalid()) {
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 	}
 
 	// --- load texture 

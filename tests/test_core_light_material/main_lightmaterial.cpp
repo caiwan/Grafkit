@@ -185,10 +185,11 @@ protected:
 			(*fs)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
 
 			this->scene->Get()->Render(render);
-
 		}
 
 		this->render.EndScene();
+
+		m_file_loader->PollEvents(this);
 
 		return isEscPressed();
 	};

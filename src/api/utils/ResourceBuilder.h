@@ -21,6 +21,7 @@ namespace Grafkit {
 			virtual ~IResourceBuilder() {}
 
 			std::string GetName() { return m_name; }
+			std::string GetSourceName() { return m_srcName; }
 
 			// pure virtuals 
 			virtual IResource* NewResource() = 0;

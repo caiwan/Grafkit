@@ -83,7 +83,7 @@ public:
 		ThingRef thing = new Thing();
 		
 		// oops, something happened intentionally 
-		throw EX(FWdebugExceptions::NullPointerException); 
+		throw new EX(FWdebugExceptions::NullPointerException); 
 		
 		thing->SetAsd(0x010101);
 

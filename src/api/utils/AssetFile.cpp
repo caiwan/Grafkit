@@ -10,6 +10,7 @@
 
 #include "../core/thread.h"
 
+#include <algorithm>
 #include <windows.h>
 #include <Winbase.h>
 #include <stdlib.h>
@@ -70,13 +71,8 @@ namespace LiveReload {
 		OVERLAPPED Overlapped;
 
 	public:
-		/// @todo eleminate miserable hack
-		int m_isReloadEngine;
 
-	public:
-
-		WatchDirectory(LPCSTR path) : Thread(),
-			m_isReloadEngine(0)
+		WatchDirectory(LPCSTR path) : Thread()
 		{
 			m_hDir = CreateFile(path, GENERIC_READ | FILE_LIST_DIRECTORY,
 				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
@@ -95,6 +91,12 @@ namespace LiveReload {
 		~WatchDirectory() {
 			if (m_hDir) 
 				CloseHandle(m_hDir);
+		}
+
+		void PushFile(std::string infn) {
+			MutexLocker locker(&m_queueMutex);
+			std::replace(infn.begin(), infn.end(), '\\', '/');
+			m_fileReloadList.push_back(infn);
 		}
 
 		int Run() {
@@ -161,7 +163,7 @@ namespace LiveReload {
 					
 					case FILE_ACTION_MODIFIED:
 						LOGGER(Log::Logger().Info("The file is modified. This can be a change in the time stamp or attributes: [%s]", filename));
-						m_isReloadEngine = 1;
+						PushFile(filename);
 						break;
 
 					case FILE_ACTION_RENAMED_OLD_NAME:
@@ -223,7 +225,7 @@ IAssetRef FileAssetFactory::Get(std::string name)
 	LOGGER(Log::Logger().Info("Accessin file %s", fullname.c_str()));
 
 	if (!fp) {
-		throw EX_DETAILS(AssetLoadException, fullname.c_str());
+		throw new EX_DETAILS(AssetLoadException, fullname.c_str());
 	}
 
 	fseek(fp, 0, SEEK_END);
@@ -259,11 +261,12 @@ void Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 	static unsigned char count;
 	if (count == 0) {
 		LiveReload::WatchDirectory* w = ((LiveReload::WatchDirectory*)m_eventWatcher);
-		if (w && w->m_isReloadEngine){
-			w->m_isReloadEngine = 0;
-			throw EX(LiveReloadCannotReloadItem);
+		if (w && w->HasItems()){
+			do {
+				resman->TriggerReload(w->PopFile());
+			} while (w->HasItems());
 		}
-		count = 80;
+		count = 120;
 	}
 	count--;
 #endif

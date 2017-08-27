@@ -4,6 +4,7 @@
 
 #include "Asset.h"
 #include "AssetFactory.h"
+#include "core/thread.h"
 
 namespace Grafkit {
 
@@ -15,7 +16,25 @@ namespace Grafkit {
 		IFileEventWatch() {}
 		virtual ~IFileEventWatch() {}
 
+		std::string PopFile() {
+			MutexLocker lock(&m_queueMutex);
+			std::string fn;
+			if (!m_fileReloadList.empty()) {
+				fn = m_fileReloadList.front();
+				m_fileReloadList.pop_front();
+			}
+			return fn;
+		}
+
+		bool HasItems() {
+			return !m_fileReloadList.empty();
+		}
+
 		virtual void Poll() = 0;
+
+	protected:
+		std::list<std::string> m_fileReloadList;
+		Mutex m_queueMutex;
 	};
 
 	/**

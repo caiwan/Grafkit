@@ -28,7 +28,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & resman, Graf
 {
 	SceneResRef dstScene = dynamic_cast<SceneRes*>(source);
 	if (dstScene.Invalid()) {
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 	}
 
 	IAssetRef asset = this->GetSourceAsset(resman);
@@ -48,7 +48,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 {
 	FILE *fp = nullptr;
 	fopen_s(&fp, dst_name.c_str(), "wb");
-	if (!fp) throw EX_DETAILS(SceneLoadException, "cannot serialize object");
+	if (!fp) throw new EX_DETAILS(SceneLoadException, "cannot serialize object");
 
 	ArchiveFile ar(fp, true);
 
@@ -401,7 +401,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceMan
 	PERSIST_REFOBJECT(ar, m_scene);
 
 	if (!ar.IsStoring() && m_scene.Invalid())
-		throw EX(SceneLoadException);
+		throw new EX(SceneLoadException);
 
 	PersistMaterials(ar, resman);
 	PersistEntities(ar, resman);

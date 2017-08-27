@@ -7,23 +7,23 @@ using namespace FWdebugExceptions;
 
 Thread::Thread(Runnable *r) : m_pRunnable(r) {
 	if(!m_pRunnable)
-		throw EX_DETAILS(ThreadException, "Runnable *r failed ");
+		throw new EX_DETAILS(ThreadException, "Runnable *r failed ");
 	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
 	this->m_hThread = CreateThread(nullptr, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	if(!m_hThread)
-		throw EX_DETAILS(ThreadException, "_beginthreadex failed");
+		throw new EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
 Thread::Thread() : m_pRunnable(nullptr) {
 	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
 	this->m_hThread = CreateThread(nullptr, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	if(!m_hThread)
-		throw EX_DETAILS(ThreadException, "_beginthreadex failed");
+		throw new EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
 DWORD WINAPI Thread::startThreadRunnable(LPVOID pVoid) {
 	if (!pVoid) 
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 
 	Thread* rThread = static_cast<Thread*>(pVoid);
 	rThread->m_lastResult = rThread->m_pRunnable->Run();
@@ -34,7 +34,7 @@ DWORD WINAPI Thread::startThreadRunnable(LPVOID pVoid) {
 
 DWORD WINAPI Thread::startThread(LPVOID pVoid) {
 	if (!pVoid)
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 
 	Thread* aThread = static_cast<Thread*>(pVoid);
 	//aThread->status = TS_run;
@@ -50,7 +50,7 @@ Thread::~Thread() {
 		DWORD rc = CloseHandle(m_hThread);
 /*
 		if(!rc)
-			throw EX_DETAILS(ThreadException, 5003, "CloseHandle failed");			
+			throw new EX_DETAILS(ThreadException, 5003, "CloseHandle failed");			
 */
 	}
 }
@@ -58,12 +58,12 @@ Thread::~Thread() {
 void Thread::Start() {
 	//assert(m_hThread);
 	if(!this->m_hThread)
-		throw EX_DETAILS(ThreadException, "ResumeThread failed !m_hThread");
+		throw new EX_DETAILS(ThreadException, "ResumeThread failed !m_hThread");
 
 	DWORD rc = ResumeThread(m_hThread);
 	if(rc == -1){
 		// FWcore::writeLog(true, MSG_warn, "Last error %d", GetLastError());
-		throw EX_DETAILS(ThreadException, "ResumeThread failed !rc");
+		throw new EX_DETAILS(ThreadException, "ResumeThread failed !rc");
 	}
 }
 
@@ -86,7 +86,7 @@ void Thread::recreate(){
 		this->m_hThread = CreateThread(nullptr, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	}
 	if (!m_hThread) 
-		throw EX_DETAILS(ThreadException, "_beginthreadex failed");
+		throw new EX_DETAILS(ThreadException, "_beginthreadex failed");
 }*/
 
 int Thread::GetCPUCount(){

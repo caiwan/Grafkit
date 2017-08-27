@@ -90,8 +90,8 @@ DEFINE_EXCEPTION(OutOfBoundsException, 7, "Index out of bounds");
 DEFINE_EXCEPTION(NotImplementedMethodException, 8, "Method that being called has no implementation");
 
 #ifndef LIVE_RELEASE
-#define ASSERT(EXP) if ((EXP) != 0) throw EX(FWdebugExceptions::AssertFailException)
-#define ASSERT_DETAILS(EXP, REASON) if ((EXP) != 0) throw EX_DETAILS(FWdebugExceptions::AssertFailException, REASON)
+#define ASSERT(EXP) if ((EXP) != 0) throw new EX(FWdebugExceptions::AssertFailException)
+#define ASSERT_DETAILS(EXP, REASON) if ((EXP) != 0) throw new EX_DETAILS(FWdebugExceptions::AssertFailException, REASON)
 #else //LIVE_RELEASE
 #define ASSERT(EXP) 
 #define ASSERT_DETAILS(EXP, REASON) 

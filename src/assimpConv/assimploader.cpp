@@ -88,7 +88,7 @@ void Grafkit::AssimpLoader::SetLHFlag(bool islh)
 SceneResRef Grafkit::AssimpLoader::Load()
 {
 	if (!m_data)
-		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
+		throw new EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
 
 	SceneRef outScene = new Scene();
 
@@ -106,7 +106,7 @@ void Grafkit::AssimpLoader::AppendAssimp(const void * data, size_t length, Scene
 	);
 
 	if (!aiscene)
-		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
+		throw new EX_DETAILS(AssimpParseException, importer.GetErrorString());
 
 	AssimpLoadMaterials(inScene);
 	AssimpLoadMeshes(inScene);
@@ -496,7 +496,7 @@ void Grafkit::AssimpLoader::AssimpParseScenegraphNode(aiNode * ai_node, ActorRef
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
 		if (m_resources.models.size() <= mesh_id)
-			throw EX(OutOfBoundsException);
+			throw new EX(OutOfBoundsException);
 		actor->AddEntity(m_resources.models[mesh_id]);
 		LOGGER(sprintf_s(kbuf, buflen, "%s %d,", kbuf, i));
 	}
@@ -532,7 +532,7 @@ void Grafkit::AssimpLoader::AssimpParseScenegraphNode(aiNode * ai_node, ActorRef
 Grafkit::Matrix Grafkit::AssimpLoader::ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 {
 	if (!m)
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 
 #if 0
 	return Grafkit::Matrix(
@@ -571,7 +571,7 @@ TextureResRef Grafkit::AssimpLoader::assimpTexture(enum aiTextureType source, ai
 		LOGGER(Log::Logger().Trace("--- %s", name.c_str()));
 		texture = resman->Get<TextureRes>(name);
 		if (texture.Invalid() || texture->Invalid())
-			throw EX_DETAILS(NullPointerException, name.c_str());
+			throw new EX_DETAILS(NullPointerException, name.c_str());
 	}
 
 	return texture;

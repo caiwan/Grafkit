@@ -37,12 +37,12 @@ Persistent* Persistent::load(Archive& ar)
 #ifdef DEBUG
 		Clonables::Instance().dumpClonables();
 #endif
-		throw EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
+		throw new EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
 	}
 
 	Persistent * obj = dynamic_cast<Persistent *>(clone);
 	if (obj == NULL) {
-		throw EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
+		throw new EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
 	}
 
 	PERSIST_FIELD(ar, ver);
@@ -51,7 +51,7 @@ Persistent* Persistent::load(Archive& ar)
 
 	//
 	if (ver != obj->version()) {
-		throw EX(PersistentVersionMismatch);
+		throw new EX(PersistentVersionMismatch);
 	}
 
 	obj->serialize(ar);

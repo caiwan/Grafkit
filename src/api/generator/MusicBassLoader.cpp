@@ -64,7 +64,7 @@ namespace {
 
 		if (!res) {
 			// int errcode = BASS_ErrorGetCode();
-			throw EX(MusicDeviceInitException);
+			throw new EX(MusicDeviceInitException);
 		}
 
 		m_stream = BASS_StreamCreateFile(TRUE, data, 0, data_size,
@@ -74,7 +74,7 @@ namespace {
 
 		if (!m_stream) {
 			//int errcode = BASS_ErrorGetCode();
-			throw EX(MusicDeviceInitException);
+			throw new EX(MusicDeviceInitException);
 		}
 
 		BASS_Start();
@@ -209,7 +209,7 @@ void Grafkit::MusicBassLoader::Load(IResourceManager * const & resman, IResource
 {
 	MusicResRef dest = dynamic_cast<MusicRes*>(source);
 	if (dest.Invalid()) {
-		throw EX(NullPointerException);
+		throw new EX(NullPointerException);
 	}
 
 	Music* music = new MusicBass();

@@ -77,7 +77,7 @@ void Timer::Connect(const char *_ipaddr){
 
 /* <ROCKET SPECIFIC> */
 		m_rocket = sync_create_device("script/sync");
-		if (!m_rocket) throw EX(NoRocketDeviceException);
+		if (!m_rocket) throw new EX(NoRocketDeviceException);
 
 #ifndef SYNC_PLAYER
 		//sync_set_callbacks(rocket, &timer_cb, this);
@@ -87,7 +87,7 @@ void Timer::Connect(const char *_ipaddr){
 		int row = this->GetRowI(); //debugging madorfakor
 		if (sync_update(m_rocket, row, &timer_cb, this))
 				if (sync_connect(m_rocket, this->m_ipaddress, SYNC_DEFAULT_PORT))
-						throw EX(NoRocketDeviceException);
+						throw new EX(NoRocketDeviceException);
 
 #endif /*SYNC_PLAYER*/
 /* </ROCKET SPECIFIC>*/
@@ -99,7 +99,7 @@ void Timer::Update(){
 		int row = this->GetRowI(); //debugging madorfakor
 		if (sync_update(m_rocket, row, &timer_cb, this))
 				if (sync_connect(m_rocket, this->m_ipaddress, SYNC_DEFAULT_PORT))
-						throw EX(NoRocketDeviceException);
+						throw new EX(NoRocketDeviceException);
 #endif /*SYNC_PLAYER*/
 		this->m_music->Get()->Update();
 /* </ROCKET SPECIFIC>*/
@@ -183,17 +183,17 @@ ValueTracker::Track::Track(ValueTracker *parent, val_track_e type, const char *n
 		break;
 
 	case VTT_Float2:
-		if (!vname) throw EX(InvalidTrackNameException);
+		if (!vname) throw new EX(InvalidTrackNameException);
 		subtracks = 2;
 		break;
 
 	case VTT_Float3:
-		if (!vname) throw EX(InvalidTrackNameException);
+		if (!vname) throw new EX(InvalidTrackNameException);
 		subtracks = 3;
 		break;
 
 	case VTT_Float4:
-		if (!vname) throw EX(InvalidTrackNameException);
+		if (!vname) throw new EX(InvalidTrackNameException);
 		subtracks = 4;
 		break;
 	}

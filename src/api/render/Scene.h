@@ -60,11 +60,11 @@ namespace Grafkit {
 		//void AddMaterialLayer(UINT layer, ShaderRef &shader) { m_materialShaderMap[layer] = shader; }
 		//unsigned int GetLayerID() { return m_materialCurrentLayer; }
 
-		ShaderRef &GetVShader() { return this->m_vertexShader; }
-		ShaderRef &GetPShader() { return this->m_pixelShader; }
+		ShaderRef GetVShader() { return this->m_vertexShader->Get(); }
+		ShaderRef GetPShader() { return this->m_pixelShader->Get(); }
 
-		void SetVShader(ShaderRef &VS) { this->m_vertexShader = VS; }
-		void SetPShader(ShaderRef &FS) { this->m_pixelShader = FS; }
+		void SetVShader(ShaderResRef &VS) { this->m_vertexShader = VS; }
+		void SetPShader(ShaderResRef &FS) { this->m_pixelShader = FS; }
 
 		float GetStartTime() { return m_tStart; }
 		float GetEndTime() { return m_tEnd; }
@@ -74,7 +74,7 @@ namespace Grafkit {
 
 		bool IsActive() { return true && (m_tAnim >= m_tStart && m_tAnim < m_tEnd); }
 
-		void BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps);
+		void BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps);
 
 	public:
 		// qnd hack of shit
@@ -103,8 +103,8 @@ namespace Grafkit {
 
 		std::vector<AnimationRef> m_animations;
 
-		ShaderRef m_vertexShader;
-		ShaderRef m_pixelShader;
+		ShaderResRef m_vertexShader;
+		ShaderResRef m_pixelShader;
 
 		std::vector<ActorRef> m_cameraNodes;
 		std::vector<ActorRef> m_lightNodes;

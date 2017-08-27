@@ -32,7 +32,8 @@ TestArchiver::~TestArchiver()
 
 void TestArchiver::Write(const void* buffer, size_t length)
 {
-	if (this->crsr + length >= this->size) throw new EX(OutOfBoundsException);
+	if (this->crsr + length >= this->size) 
+		throw new EX(OutOfBoundsException);
 	unsigned char *dst = &this->data[this->crsr];
 	const unsigned char *src = (const unsigned char*)buffer;
 	for (size_t i = 0; i < length; ++i)
@@ -44,7 +45,8 @@ void TestArchiver::Write(const void* buffer, size_t length)
 
 void TestArchiver::Read(void* buffer, size_t length)
 {
-	if (this->crsr + length >= this->size) throw new EX(OutOfBoundsException);
+	if (this->crsr + length >= this->size) 
+		throw new EX(OutOfBoundsException);
 	unsigned char *src = &this->data[this->crsr];
 	unsigned char *dst = (unsigned char*)buffer;
 	for (size_t i = 0; i < length; ++i)

@@ -106,7 +106,7 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 		json j = json::parse(ss);
 		m_inputDataQueue.push(j);
 	}
-	catch (std::exception &e) {
+	catch (std::exception *e) {
 		throw new EX_DETAILS(ServerCreateException, e.what());
 		//Log::Logger().Error(e.what());
 	}
@@ -164,7 +164,7 @@ bool BlenderExportServer::Parse(json & j)
 	else if (cmd.compare(_cmd_dump) == 0) {
 
 		if (m_scene.Invalid() && m_scene->Invalid())
-			throw EX_DETAILS(AssertFailException, "Scene was not set yet");
+			throw new EX_DETAILS(AssertFailException, "Scene was not set yet");
 
 		std::string str = j.dump();
 

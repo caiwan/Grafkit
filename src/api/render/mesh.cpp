@@ -114,7 +114,7 @@ void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	Grafkit::StructPack packer;
 
 	if (shader.Invalid()) {
-		throw EX_DETAILS(NullPointerException, "Nincs shader betoltve");
+		throw new EX_DETAILS(NullPointerException, "Nincs shader betoltve");
 	}
 
 	for (size_t i = 0; i < elem_count; ++i)
@@ -155,7 +155,7 @@ void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	// Now create the vertex buffer.
 	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
 	if (FAILED(result)) {
-		throw EX(CreateIndevBufferException);
+		throw new EX(CreateIndevBufferException);
 	}
 
 	packer.dealloc(vertex_buffer_data);
@@ -190,7 +190,7 @@ void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	// Create the index buffer.
 	result = device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
 	if (FAILED(result)) {
-		throw EX(CreateIndevBufferException);
+		throw new EX(CreateIndevBufferException);
 	}
 
 	this->m_indexBuffer = indexBuffer;

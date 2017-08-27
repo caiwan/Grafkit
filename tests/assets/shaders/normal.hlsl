@@ -32,6 +32,9 @@ PixelOutType envmapNormal(PixelInputType input)
 	output.normal = input.normal;
 	output.view = input.view;
 	output.diff = envmap.Sample(SampleType, input.normal);
-	return output;
-}
 
+	//nincsilyen;
+
+	//output.diff = float4(1, 0, 0, 1);
+	return output;
+} 

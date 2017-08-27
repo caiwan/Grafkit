@@ -79,39 +79,47 @@ Grafkit::ShaderLoader::~ShaderLoader()
 {
 }
 
-void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
+void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource* source)
 {
 	if (m_entrypoint.empty())
 		m_entrypoint = DefaultEntryPointName();
 	
-	ShaderResRef dstSahder = (ShaderRes*)source;
-	if (dstSahder.Invalid()) {
+	ShaderResRef dstShader = (ShaderRes*)source;
+	if (dstShader.Invalid()) {
 		return;
 	}
 	
-	Grafkit::IAssetRef asset = this->GetSourceAsset(resman);
-	ShaderRef shader = NewShader();
-	// load from asset
-	if (asset.Valid()) {
-		LOGGER(Log::Logger().Info("Lading shader from resource %d %s@%s", shader->GetShaderType(), m_name.c_str(), m_entrypoint.c_str()));
-		ID3DInclude * pInclude= new IncludeProvider(resman);
-		shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
-		delete pInclude;
+	try {
+		Grafkit::IAssetRef asset = this->GetSourceAsset(resman);
+		ShaderRef shader = NewShader();
+		// load from asset
+		if (asset.Valid()) {
+			LOGGER(Log::Logger().Info("Lading shader from resource %d %s@%s", shader->GetShaderType(), m_name.c_str(), m_entrypoint.c_str()));
+			ID3DInclude * pInclude = new IncludeProvider(resman);
+			shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
+			delete pInclude;
+		}
+		else {
+			///@todo load from compiled shader
+			throw EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a forrasbol valo shader betoltes");
+		}
+
+		// 2.
+		if (dstShader->Valid()) {
+			(*dstShader)->Shutdown();
+		}
+
+		// 3.
+		dstShader->AssingnRef(shader);
+
+	} catch(ShaderException *&ex){
+		// if we are about to replace an existing shader, but we had a compile error
+		// then toss the error, due it was prompted to stodut
+		// otherwise thow the ex
+		if (dstShader->Invalid()) {
+			throw ex;
+		}
 	}
-	else {
-		///@todo load from compiled shader
-		throw EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a forrasbol valo shader betoltes");
-	}
-
-
-	// 2.
-	if (dstSahder->Valid()) {
-		dstSahder->Release();
-	}
-
-	// 3.
-	dstSahder->AssingnRef(shader);
-
 }
 
 IResource * Grafkit::ShaderLoader::NewResource()

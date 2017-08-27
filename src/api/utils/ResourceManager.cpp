@@ -58,12 +58,33 @@ void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
 	}
 }
 
+void Grafkit::IResourceManager::TriggerReload(std::string filename)
+{
+	// filename => {resource name, builder object}
+
+	auto it = m_filenamesToBuilder.find(filename);
+	if (it != m_filenamesToBuilder.end()) {
+		auto value = it->second;
+		IResourceBuilder * builder = value.second;
+		IResource *oldResource = Get<IResource>(value.first);
+		if (oldResource && builder) {
+			LOGGER(Log::Logger().Trace("Reloading modified resource %s => %s", it->first.c_str(), value.first.c_str()));
+			builder->Load(this, oldResource);
+			Add(oldResource);
+		}
+	}
+}
+
 void Grafkit::IResourceManager::Reload(IResourceBuilder * builder)
 {
 	IResource *resource = builder->NewResource();
-	resource->SetName(builder->GetName());
+	std::string name = builder->GetName();
+	resource->SetName(name);
 	Add(resource);
-	m_builders.push_back(builder);
+	m_builders[name] = builder;
+	if (!builder->GetSourceName().empty()) {
+		m_filenamesToBuilder[builder->GetSourceName()] = std::pair<std::string, IResourceBuilder*>(name, builder);
+	}
 }
 
 void Grafkit::IResourceManager::DoPrecalc()
@@ -75,8 +96,9 @@ void Grafkit::IResourceManager::DoPrecalc()
 
 	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
 		LOGGER(Log::Logger().Trace("Preloading item %d of %d", i, len));
-		if (*it) {
-			(*it)->Load(this, Get<IResource>((*it)->GetName()));
+		IResourceBuilder * builder = it->second;
+		if (builder) {
+			builder->Load(this, Get<IResource>(builder->GetName()));
 		}
 
 		if (m_preloadEvents)
@@ -93,13 +115,16 @@ void Grafkit::IResourceManager::DoPrecalc()
 
 void Grafkit::IResourceManager::ClearLoadStack()
 {
+#ifdef LIVE_RELEASE
 	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
-		if (*it) {
-			delete (*it);
+		IResourceBuilder * builder = it->second;
+		if (builder) {
+			delete builder;
 		}
-	}
+}
 
 	m_builders.clear();
+#endif // !LIVE_RELEASE
 }
 
 void Grafkit::IResourceManager::AddResourcePath(std::string resourceType, std::string path)

@@ -20,21 +20,24 @@ class EvtHandler(FileSystemEventHandler):
         self.lg = logging.getLogger('EvtHandler')
         pass
         
-    def on_created(self, evt):
+    def copy(self, evt):
         try:
-            shutil.copy(evt.src_path, self.dst)
-            self.lg.info("Copy file " + evt.src_path)
+            if not evt.src_path.lower().endswith(".tmp"):
+                shutil.copy(evt.src_path, self.dst)
+                self.lg.info("Copy file to " + evt.src_path)
         except:
             pass
         pass
         
+    def on_created(self, evt):
+        self.copy(evt)
+        
     def on_modified(self, evt):
-        try :
-            shutil.copy(evt.src_path, self.dst)
-            self.lg.info("Copy file " + evt.src_path)
-        except:
-            pass
-        pass        
+        self.copy(evt)
+    pass
+    
+    def on_moved(self, evt):
+        self.copy(evt)
     pass
     
 if __name__ == "__main__":
@@ -55,6 +58,8 @@ if __name__ == "__main__":
     observer.schedule(event_handler_log, input, recursive=True)
     observer.schedule(event_handler, input, recursive=True)
     observer.start()
+    
+    print ("Watching asset changes from now on")
     
     try:
         while True:

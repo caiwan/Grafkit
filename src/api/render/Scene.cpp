@@ -147,7 +147,7 @@ void Grafkit::Scene::AddAnimation(AnimationRef anim)
 	m_animations.push_back(anim);
 }
 
-void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderRef vs, ShaderRef ps)
+void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps)
 {
 	if(vs.Valid()) 
 		m_vertexShader = vs;
@@ -210,11 +210,11 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 			m_cameraViewMatrix.Invert();
 		}
 		else {
-			throw EX(NullPointerException);
+			throw new EX(NullPointerException);
 		}
 	}
 	else {
-		throw EX_DETAILS(NullPointerException, "Camera actor nem jo, vagy Nem seteltel be a nodeba kamerat");
+		throw new EX_DETAILS(NullPointerException, "Camera actor nem jo, vagy Nem seteltel be a nodeba kamerat");
 	}
 	
 	// to get the matrices before the scenegraph renders
@@ -239,8 +239,8 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	m_currentWorldMatrix.Identity();
 
 	//ez itt elviekben jo kell, hogy legyen
-	m_vertexShader->Bind(render);
-	m_pixelShader->Bind(render);
+	(*m_vertexShader)->Bind(render);
+	(*m_pixelShader)->Bind(render);
 
 	// add lights
 	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++) {
@@ -252,15 +252,15 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 		if (node->Valid()) {
 			if (!(*node)->IsHidden()) {
 				m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
-				m_vertexShader->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-				m_pixelShader->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+				(*m_vertexShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+				(*m_pixelShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
 				(*node)->Render(render, this);
 			}
 		}
 	}
 
-	m_vertexShader->Unbind(render);
-	m_pixelShader->Unbind(render);
+	(*m_vertexShader)->Unbind(render);
+	(*m_pixelShader)->Unbind(render);
 }
 
 void Grafkit::Scene::PrerenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)

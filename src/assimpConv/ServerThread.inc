@@ -71,7 +71,7 @@ private:
 			}
 
 		}
-		catch (Exception *e) {
+		catch (Exception &e) {
 			if (adinfo) freeaddrinfo(adinfo);
 			throw e;
 		}

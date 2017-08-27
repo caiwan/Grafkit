@@ -54,7 +54,7 @@ Grafkit::ArchiveMemory::~ArchiveMemory()
 void Grafkit::ArchiveMemory::Read(void * buffer, size_t length)
 {
 	if (length + m_cursor > m_length)
-		throw EX(OutOfBoundsException);
+		throw new EX(OutOfBoundsException);
 
 	//Log::Logger().Debug("Read bytes %d at pos %d", length, m_cursor);
 
