@@ -3,24 +3,10 @@ Recurse search and disables all the shader compilations in solution files
 """
 
 import os
+import re
 import sys
 import inspect
-import argparse
 import fnmatch
-
-def get_args():
-    parser = argparse.ArgumentParser()
-
-    # get all script args
-    _, all_arguments = parser.parse_known_args()
-    double_dash_index = all_arguments.index('--')
-    script_args = all_arguments[double_dash_index + 1:]
-
-    # add parser rules
-    parser.add_argument('-c', '--cwd', help="")
-    parsed_script_args, _ = parser.parse_known_args(script_args)
-
-    return parsed_script_args
     
 def get_vcxproj(cwd):
     matches = []
@@ -29,34 +15,47 @@ def get_vcxproj(cwd):
             matches.append(os.path.join(root, filename))
             
     return matches;
-
-def replace_fx(lines):
-    res = []
-    for line in lines:
-        res.append(line)
        
 if __name__ == "__main__":
     print("Remove all shader compilations from solutions")
     
-    args = get_args()
-    files = get_vcxproj(args.cwd)
+    if len(sys.argv) != 2:
+        print("Search root dir was not specified.")
+        print("usage:")
+        print("sln_disable_shader_compil.py <search_folder>")
+        sys.exit(0)
+
+    in_folder = sys.argv[1]
     
+    files = get_vcxproj(in_folder)
+    
+    # <FXCompile Include="C:\work\ir-demos\ir-f17\assets\shaders\flat.hlsl" />
+    # <None Include="C:\work\ir-demos\ir-f17\assets\sonic_attack.mp3" />
+    fxcompie_re = re.compile("<(FXCompile)\\s(Include=\"(.*)\")\\s\\/>")
+        
     for file in files:
         try:
+        
+            # --- read and replace stuff 
             res = []
-            with open(infile, 'r') as f:
-                res = replace_fx(f.readlines())
-                
+            with open(file, 'r') as f:
+                for line in f.readlines():
+                    rline = line
+                    match = fxcompie_re.search(line)
+                    if match:
+                        name = match.group(3)
+                        rline = "<None Include=\"{0}\"/>\r\n".format(name)
+                    res.append(rline)
+
             if not res:
-                raise RuntimeError("fuckup")
+                raise RuntimeError("gereral fuckup occured")
                 
-            with open(infile, 'w') as f:
+            # --- write everything back
+            with open(file, 'w') as f:
                 f.writelines(res)
         
             print("{0} has writen".format(file))
         except RuntimeError as e:
             print("{0} has fucked up".format(file))
-    
-    # <FXCompile Include="C:\work\ir-demos\ir-f17\assets\shaders\flat.hlsl" />
-    # <None Include="C:\work\ir-demos\ir-f17\assets\sonic_attack.mp3" />
-    
+
+            
