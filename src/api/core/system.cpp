@@ -49,11 +49,13 @@ int System::execute() {
 				return 1;
 			}
 		}
-		catch (FWdebug::Exception& ex)
+		catch (FWdebug::Exception *& ex)
 		{
 			///@todo handle exceptions here 
-			MessageBoxA(NULL, ex.what(), "Exception", 0);
-			LOGGER(Log::Logger().Error(ex.what()));
+			MessageBoxA(NULL, ex->what(), "Exception", 0);
+			LOGGER(Log::Logger().Error(ex->what()));
+
+			delete ex;
 
 			break;
 		}

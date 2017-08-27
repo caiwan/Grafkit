@@ -31,10 +31,10 @@ PixelOutType envmapNormal(PixelInputType input)
 	PixelOutType output;
 	output.normal = input.normal;
 	output.view = input.view;
-	output.diff = envmap.Sample(SampleType, input.normal);
+	//output.diff = envmap.Sample(SampleType, input.normal);
 
 	//nincsilyen;
 
-	//output.diff = float4(1, 0, 0, 1);
+	output.diff = float4(1, 0, 0, 1);
 	return output;
 } 
