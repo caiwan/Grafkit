@@ -28,6 +28,24 @@ class BpyObject:
             return items
         return None
         
+    def worldmatrix(self, object):
+        res = {}
+        loc, rot, scale = object.matrix_world.decompose()
+        res["loc"] = (loc.x , loc.y, loc.z)
+        res["rot"] = (rot.w, rot.x, rot.y, rot.z) 
+        res["scale"] = (scale.x, scale.y, scale.z)
+        return res
+        
+    def localmatrix(self, object):
+        res = {}
+        
+        loc, rot, scale = (object.location, object.rotation_quaternion, object.scale)
+        res["loc"] = (loc.x , loc.y, loc.z)
+        res["rot"] = (rot.w, rot.x, rot.y, rot.z) 
+        res["scale"] = (scale.x, scale.y, scale.z)
+        
+        return res
+        
         
     def __enter__(self):    
         return self._dumpobject()

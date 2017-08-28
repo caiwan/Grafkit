@@ -3,6 +3,7 @@ import sys
 import inspect
 import argparse
 import bpy
+import tqdm
 from subprocess import call
 
 # fix import paths for internal imports
@@ -70,7 +71,7 @@ if __name__ == "__main__":
         
         camera_keys = []
         
-        for i in range(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
+        for i in trange(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
             t = i * (scene["fps_base"] / scene["fps"])
             bpy.context.scene.frame_set(i)
             c = Camera(bpy.context.scene.camera)
@@ -81,6 +82,9 @@ if __name__ == "__main__":
             key ["t"] = t
             key ["v"] = c.dumpframe()
             camera_keys.append(key)
+            
+            # export everz single objects position
+            
             
         conn.send("bpydump", {"MainCameraMovement" : camera_keys})
             

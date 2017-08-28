@@ -1,3 +1,3 @@
 @echo off
-blender -b -P proba2.py -- --input sphere_multimaterial.blend
+blender -b -P proba2.py -- --input animtest2.blend
 pause

@@ -15,9 +15,12 @@ if cmd_folder not in sys.path:
 
 # there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
 
+import tqdm
+
 from helpers.material import Material
 from helpers.scene import Scene
 from helpers.client import Filedump
+from helpers.bpyobjects import BpyObject
     
 def get_args():
     parser = argparse.ArgumentParser()
@@ -41,33 +44,41 @@ if __name__ == "__main__":
     bpy.ops.wm.open_mainfile(filepath=infile)
     
     with Filedump("out.json") as d:
-        scene = {}
-        with Scene(bpy.context.scene) as s:
-            scene = s
-            
-        d.send("Scene", s)
-    
-        materials = []
-        for material in bpy.data.materials:
-            with Material(material) as m:
-                materials.append(m)
-            pass
-        d.send("Materials", materials)
-        pass
+
+        # camera_keys = []
         
-        camera_keys = []
+        scene = bpy.context.scene
+
+        objects = [obj for obj in scene.objects]
+        object_keys = {}
         
-        for i in range(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
-            t = i * (scene["fps_base"] / scene["fps"])
+        print("num of obj:", len(objects))
+        
+        for obj in objects:
+            res = obj.newobject()
+            res["frames"] = []
+            object_keys[res["nme"]] = res
+        
+        bpyobj = BpyObject()
+        
+        for i in tqdm.trange(scene.frame_start, scene.frame_end, scene.frame_step):
+            t = i * (scene.render.fps_base / scene.render.fps)
             
-            key = {}
-            key ["t"] = t
+            for object in objects:
+                
+                # fk https://docs.blender.org/api/2.73a/bpy.types.Object.html#bpy.types.Object
+                
+                key = {}
+                key ["t"] = t
+                
+                # obj_camera = bpy.context.scene.camera
+                
+                key ["v"] = object.localmatrix(object)
+                # camera_keys.append(key)
+                
+                object_keys[object.name]["frames"].append(key)
             
-            obj_camera = bpy.context.scene.camera
-            
-            key ["v"] = 0
-            camera_keys.append(key)
-            
-        d.send("CameraMain", camera_keys)
+        # d.send("CameraMain", camera_keys)
+        d.send("ObjectAnimations", object_keys)
 		
     pass # main
