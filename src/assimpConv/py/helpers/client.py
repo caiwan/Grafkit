@@ -8,6 +8,8 @@ import socket
 import json
 from struct import pack
 
+from . import DumpJSON
+
 class Connection:
     _cmd_initconn = "hello"
     _cmd_closeconn = "goodbye"
@@ -48,7 +50,7 @@ class Connection:
         
         
     def _send_network(self, obj):
-        j = json.dumps(obj.__dict__).encode("utf-8")
+        j = json.dumps(obj, default=DumpJSON).encode("utf-8")
         h = pack("I", len(j))
         print("sending {} bytes of data".format(len(j)))
         self.s.send(h)
@@ -67,7 +69,6 @@ class Connection:
             ret = {"error":err}
             
             _send_network(Connection.Package(self._cmd_closeconn, ret))
-        
         
 class Filedump:
     def __init__(self, fn):
@@ -90,7 +91,7 @@ class Filedump:
 
 
     def _sendfile(self, obj):
-        json.dump(obj.__dict__, self._fp, indent=4, sort_keys=True)
+        json.dump(obj.__dict__, self._fp, indent=4, sort_keys=True, default=DumpJSON)
         pass
 
     def send(self, cmd, obj):

@@ -37,14 +37,18 @@ if __name__ == "__main__":
     
     bpy.ops.wm.open_mainfile(filepath=infile)
     
-    with client.Filedump("out.json") as d:
+    with client.Filedump("out.json") as conn:
 
-        # camera_keys = []
-        
         scene = bpy.context.scene
-
-        # List of objects to be baked
-        # Cameras will be done in a different way
+    
+        conn.send("collada", Collada())
+        conn.send("bpydump", {"Scene", bpyexport.Scene(scene)})
+        
+        materials = [bpyexport().Material(material) for matarial in bpy.data.materials]
+        conn.send("bpydump", {"Materials": materials})
+    
+        camera_keys = []
+        
         objects = {(obj.name.replace(".", "_"), obj) for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]}
         
         object_keys = {name: bpyexport.BpyObject().newobject(obj) for name, obj in objects}
@@ -56,6 +60,13 @@ if __name__ == "__main__":
             
             print("Baking frame {}".format(i))
             
+            camera = bpy.context.camera
+            scene.frame_set(i)
+            
+            v = bpyexport.CameraFrame()
+            key = {"v":v, "t":t}
+            camera_keys.append(key)
+            
             for name, object in objects:
                 v =  bpyexport.BpyObject().eval_animations(object, i) 
                 if v:
@@ -66,7 +77,8 @@ if __name__ == "__main__":
                     
                     object_keys[name]["frames"].append(key)
             
-        d.send("ObjectAnimations", object_keys)
+        conn.send("bpydump", {"ObjectAnimations": object_keys})
+        conn.send("bpydump", {"MainCameraMovement" : camera_keys})
 		
     pass # main
     

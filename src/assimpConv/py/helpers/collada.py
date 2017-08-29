@@ -5,22 +5,17 @@ import os
 import sys
 import inspect
 
-# cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(inspect.currentframe()))[0]))
-# if cmd_folder not in sys.path:
-    # sys.path.insert(0, cmd_folder)
-
 from . import Dumpable
 
 class Collada(Dumpable):
     """
     Export scene to a tempfile as collada, then push the data to the server
     """
-
-    _cmd_dae = "collada"
+    _cmd = "collada"
 
     def __init__(self):
         Dumpable.__init__(self)
-   
+        
         self.triangulate = True
         self.use_texture_copies = False
         self.include_material_textures = True
@@ -28,7 +23,7 @@ class Collada(Dumpable):
 
         pass #ctor
 
-    def dump(self):
+    def reprJSON(self):
         self.tmp = tempfile.NamedTemporaryFile(delete=False)
         self.tmp.close()
         os.unlink(self.tmp.name)
@@ -49,7 +44,7 @@ class Collada(Dumpable):
         pass # dump dae
         
     def get_cmd(self):
-        return self._cmd_dae
+        return self._cmd
         
     def _save_collada(self):
         # https://docs.blender.org/api/blender_python_api_current/bpy.ops.wm.html

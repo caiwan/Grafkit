@@ -48,25 +48,14 @@ if __name__ == "__main__":
     with Connection(hostaddr) as conn:
        scene = bpy.context.scene
         
-        # dump data from scene
-        # should be rewritten later
-        with dump(conn) as d:
-            d.add(collada())
-            
+        conn.send("collada", Collada())
         conn.send("bpydump", {"Scene", bpyexport.Scene(scene)})
         
-        materials = [bpzexport().Scene().default()]
-        for material in bpy.data.materials:
-            # with Material(material) as m:
-                # materials.append(m)
-            # pass
-        # conn.send("bpydump", {"Materials": materials})
-        # pass
+        materials = [bpyexport().Material(material) for matarial in bpy.data.materials]
+        conn.send("bpydump", {"Materials": materials})
         
         # camera_keys = []
         
-        
-
         # List of objects to be baked
         # Cameras will be done in a different way
         objects = {(obj.name.replace(".", "_"), obj) for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]}
