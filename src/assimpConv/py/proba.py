@@ -13,14 +13,8 @@ cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(insp
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
-# there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
-
-import tqdm
-
-from helpers.material import Material
-from helpers.scene import Scene
-from helpers.client import Filedump
-from helpers.bpyobjects import BpyObject
+from helpers import client
+from helpers import bpyexport
     
 def get_args():
     parser = argparse.ArgumentParser()
@@ -43,42 +37,36 @@ if __name__ == "__main__":
     
     bpy.ops.wm.open_mainfile(filepath=infile)
     
-    with Filedump("out.json") as d:
+    with client.Filedump("out.json") as d:
 
         # camera_keys = []
         
         scene = bpy.context.scene
 
-        objects = [obj for obj in scene.objects]
-        object_keys = {}
+        # List of objects to be baked
+        # Cameras will be done in a different way
+        objects = {(obj.name.replace(".", "_"), obj) for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]}
         
-        print("num of obj:", len(objects))
+        object_keys = {name: bpyexport.BpyObject().newobject(obj) for name, obj in objects}
         
-        for obj in objects:
-            res = obj.newobject()
-            res["frames"] = []
-            object_keys[res["nme"]] = res
+        print("Objects to be baked ({}) : [{}]".format(len(objects), ", ".join([n for n, _ in objects])))
         
-        bpyobj = BpyObject()
-        
-        for i in tqdm.trange(scene.frame_start, scene.frame_end, scene.frame_step):
+        for i in range(scene.frame_start - 1, scene.frame_end, scene.frame_step):
             t = i * (scene.render.fps_base / scene.render.fps)
             
-            for object in objects:
-                
-                # fk https://docs.blender.org/api/2.73a/bpy.types.Object.html#bpy.types.Object
-                
-                key = {}
-                key ["t"] = t
-                
-                # obj_camera = bpy.context.scene.camera
-                
-                key ["v"] = object.localmatrix(object)
-                # camera_keys.append(key)
-                
-                object_keys[object.name]["frames"].append(key)
+            print("Baking frame {}".format(i))
             
-        # d.send("CameraMain", camera_keys)
+            for name, object in objects:
+                v =  bpyexport.BpyObject().eval_animations(object, i) 
+                if v:
+                    key = {"v":v, "t":t}
+                   
+                    if not "frames" in object_keys[name]:
+                        object_keys[name]["frames"] = []
+                    
+                    object_keys[name]["frames"].append(key)
+            
         d.send("ObjectAnimations", object_keys)
 		
     pass # main
+    

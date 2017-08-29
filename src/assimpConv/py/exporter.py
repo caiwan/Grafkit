@@ -16,9 +16,7 @@ if cmd_folder not in sys.path:
 from helpers import Dump
 from helpers.client import Connection
 from helpers.collada import Collada
-from helpers.material import Material
-from helpers.scene import Scene
-from helpers.camera import Camera
+from helpers import bpyexport
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -41,52 +39,77 @@ if __name__ == "__main__":
     infile = str(args.input)
     hostaddr = str(args.host)
 
+    # open blendfile
+    bpy.ops.wm.open_mainfile(filepath=infile)
+    
+    # bake stuff 
+    # ... 
+    
     with Connection(hostaddr) as conn:
-        # open blendfile
-        bpy.ops.wm.open_mainfile(filepath=infile)
-        
-        scene = bpy.data.scenes[0]
-
-        # bake scene        
-        # with Bake as bake:
-            # pass
+       scene = bpy.context.scene
         
         # dump data from scene
-        with Dump(conn) as d:
-            d.add(Collada())
+        # should be rewritten later
+        with dump(conn) as d:
+            d.add(collada())
             
-        scene = {}
-        with Scene(bpy.context.scene) as s:
-            scene = s
-            
-        conn.send("bpydump", {"Scene":s})
-    
-        materials = []
+        conn.send("bpydump", {"Scene", bpyexport.Scene(scene)})
+        
+        materials = [bpzexport().Scene().default()]
         for material in bpy.data.materials:
-            with Material(material) as m:
-                materials.append(m)
-            pass
-        conn.send("bpydump", {"Materials": materials})
-        pass
+            # with Material(material) as m:
+                # materials.append(m)
+            # pass
+        # conn.send("bpydump", {"Materials": materials})
+        # pass
         
-        camera_keys = []
+        # camera_keys = []
         
-        for i in trange(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
-            t = i * (scene["fps_base"] / scene["fps"])
-            bpy.context.scene.frame_set(i)
-            c = Camera(bpy.context.scene.camera)
+        
+
+        # List of objects to be baked
+        # Cameras will be done in a different way
+        objects = {(obj.name.replace(".", "_"), obj) for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]}
+        
+        object_keys = {name: bpyexport.BpyObject().newobject(obj) for name, obj in objects}
+        
+        print("Objects to be baked ({}) : [{}]".format(len(objects), ", ".join([n for n, _ in objects])))
+        
+        for i in range(scene.frame_start - 1, scene.frame_end, scene.frame_step):
+            t = i * (scene.render.fps_base / scene.render.fps)
             
-            print("Rendering camera at frame", i)
+            print("Baking frame {}".format(i))
             
-            key = {}
-            key ["t"] = t
-            key ["v"] = c.dumpframe()
-            camera_keys.append(key)
+            for name, object in objects:
+                v =  bpyexport.BpyObject().eval_animations(object, i) 
+                if v:
+                    key = {"v":v, "t":t}
+                   
+                    if not "frames" in object_keys[name]:
+                        object_keys[name]["frames"] = []
+                    
+                    object_keys[name]["frames"].append(key)
             
-            # export everz single objects position
+        d.send("ObjectAnimations", object_keys)
+        
+        
+        
+        # for i in trange(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
+            # t = i * (scene["fps_base"] / scene["fps"])
+            # bpy.context.scene.frame_set(i)
+            # c = Camera(bpy.context.scene.camera)
+            
+            # print("Rendering camera at frame", i)
+            
+            # key = {}
+            # key ["t"] = t
+            # key ["v"] = c.dumpframe()
+            # camera_keys.append(key)
+            
+            # # export everz single objects position
             
             
-        conn.send("bpydump", {"MainCameraMovement" : camera_keys})
+        # conn.send("bpydump", {"MainCameraMovement" : camera_keys})
             
     
         pass
