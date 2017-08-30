@@ -7,6 +7,7 @@
 using namespace Grafkit;
 
 PERSISTENT_IMPL(ActorAnimation, 1);
+PERSISTENT_IMPL(CameraAnimation, 1);
 
 /* ============================================================================================== */
 
@@ -91,7 +92,15 @@ void Grafkit::CameraAnimation::Update(double t)
 {
 	Camera* cam = dynamic_cast<Camera*>(m_entity.Get());
 	if (cam) {
-		float fov = 0; FindKey(m_fov, t, fov); cam->SetFOV(fov);
+		float fov = 0; 
+		FindKey(m_fov, t, fov); 
+		cam->SetFOV(fov);
 		// focal shit??
 	}
+}
+
+void Grafkit::CameraAnimation::serialize(Archive & ar)
+{
+	this->Animation::_serialize(ar);
+	m_fov.serialize(ar);
 }

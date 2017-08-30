@@ -213,6 +213,7 @@ bool BlenderExportServer::Parse(json & j)
 		json maincam = j["data"]["MainCameraMovement"];
 		if (!maincam.empty()) {
 			ActorAnimation* animation = new ActorAnimation();
+			CameraAnimation* camAnimation = new CameraAnimation();
 			CameraRef camera = new Camera();
 			camera->SetName("MainCamera_1");
 			ActorRef cameraActor = new Actor(camera);
@@ -224,27 +225,29 @@ bool BlenderExportServer::Parse(json & j)
 				animation->AddPositionKey(t, float3(wm["loc"][0], wm["loc"][1], wm["loc"][2]));
 				animation->AddRotationKey(t, float4(wm["rot"][3], wm["loc"][0], wm["loc"][1], wm["loc"][2]));
 				animation->AddScalingKey(t, float3(wm["scale"][0], wm["scale"][1], wm["scale"][2]));
-				// todo: camera angle
-				//json ca = 
+				json ca = camit->at("v")["angle"];
+				camAnimation->AddFovKey(t, ca);
 			}
 			m_resources.cameras.push_back(camera);
 			m_resources.actors["MainCamera"] = cameraActor;
 			(*m_scene)->GetRootNode()->AddChild(cameraActor);
 			(*m_scene)->AddAnimation(animation);
+			(*m_scene)->AddAnimation(camAnimation);
 		}
 
 		// ---
 		json objectanim = j["data"]["ObjectAnimations"];
 		if (!objectanim.empty()) {
 			for (auto objit = objectanim.begin(); objit != objectanim.end(); objit++) {
-				if (!objit->at("frames").empty()) {
+				json frames = (*objit)["frames"];
+				if (!frames.empty()) {
 					std::string objanme = objit->at("name");
-					
+
 					auto actorit = m_resources.actors.find(objanme);
 					if (actorit == m_resources.actors.end())
 						continue;
-					
-					json lm = objit["localmatrix"];
+
+					json lm = objit->at("localmatrix");
 					float3 pos = float3(lm["loc"][0], lm["loc"][1], lm["loc"][2]);
 					float4 rot = float4(lm["rot"][3], lm["loc"][0], lm["loc"][1], lm["loc"][2]);
 					float3 scale = float3(lm["scale"][0], lm["scale"][1], lm["scale"][2]);
@@ -252,7 +255,6 @@ bool BlenderExportServer::Parse(json & j)
 					ActorAnimation* animation = new ActorAnimation();
 					animation->SetActor(actorit->second);
 
-					json frames = objit->at("frames");
 					for (auto frit = frames.begin(); frit != frames.end(); frit++) {
 						double t = (double)frit->at("t");
 						json val = frit->at("v");
@@ -261,7 +263,6 @@ bool BlenderExportServer::Parse(json & j)
 							animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], loc_frame[2]));
 						else
 							animation->AddPositionKey(t, pos);
-
 
 						json rot_frame = val["rotation_euler"];
 						if (!rot_frame.empty()) {
@@ -272,6 +273,7 @@ bool BlenderExportServer::Parse(json & j)
 						else
 							animation->AddRotationKey(t, rot);
 					}
+					// TODO: remoove old scene animations to replace them w/ the new one
 				}
 			}
 		}

@@ -162,7 +162,6 @@ namespace Grafkit {
 		void AddPositionKey(float key, float3 value) { m_positionTrack.AddKey(Vector3Key(key, value)); }
 		void AddScalingKey(float key, float3 value) { m_scalingTrack.AddKey(Vector3Key(key, value)); }
 		void AddRotationKey(float key, float4 value) { m_rotationTrack.AddKey(Vector4Key(key, value)); }
-		//void AddRotationKey(float key,  Quaternion value) { m_rotationTrack.AddKey(Vector4Key(key, (float4)value)); }
 
 		virtual void Update(double time);
 	
@@ -207,10 +206,14 @@ namespace Grafkit {
 	public:
 		void Update(double t);
 
-		void AddFovKey(float key, float value) { m_fov.AddKey(key, value); }
+		void AddFovKey(float key, float value) { m_fov.AddKey(FloatKey(key, value)); }
 
 	private:
 		FloatTrack m_fov;
+
+	protected:
+		virtual void serialize(Archive& ar);
+		PERSISTENT_DECL(CameraAnimation, 1);
 	};
 
 	/* ============================================================================================== */
