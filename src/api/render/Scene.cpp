@@ -147,7 +147,7 @@ void Grafkit::Scene::AddAnimation(AnimationRef anim)
 	m_animations.push_back(anim);
 }
 
-void Grafkit::Scene::GetAnimations(ActorRef & actor, std::vector<AnimationRef> animations)
+void Grafkit::Scene::GetAnimations(ActorRef & actor, std::vector<AnimationRef>& animations)
 {
 	animations.clear();
 	for (auto it = m_animations.begin(); it != m_animations.end(); it++) {

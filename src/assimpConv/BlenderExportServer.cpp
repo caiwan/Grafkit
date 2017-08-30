@@ -252,7 +252,20 @@ bool BlenderExportServer::Parse(json & j)
 					float4 rot = float4(lm["rot"][3], lm["loc"][0], lm["loc"][1], lm["loc"][2]);
 					float3 scale = float3(lm["scale"][0], lm["scale"][1], lm["scale"][2]);
 
-					ActorAnimation* animation = new ActorAnimation();
+					std::vector<AnimationRef> anims;
+					ActorRef actor = actorit->second;
+					(*m_scene)->GetAnimations(actor, anims);
+
+					ActorAnimation* animation = dynamic_cast<ActorAnimation*>(anims[0].Get());
+
+					if (!animation) {
+						animation = new ActorAnimation();
+						(*m_scene)->AddAnimation(animation);
+					}
+					else {
+						animation->Clear();
+					}
+
 					animation->SetActor(actorit->second);
 
 					for (auto frit = frames.begin(); frit != frames.end(); frit++) {
@@ -273,7 +286,7 @@ bool BlenderExportServer::Parse(json & j)
 						else
 							animation->AddRotationKey(t, rot);
 					}
-					// TODO: remoove old scene animations to replace them w/ the new one
+
 				}
 			}
 		}
