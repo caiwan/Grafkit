@@ -46,21 +46,20 @@ if __name__ == "__main__":
     # ... 
     
     with Connection(hostaddr) as conn:
-       scene = bpy.context.scene
-        
+
+        scene = bpy.context.scene
+    
         conn.send("collada", Collada())
-        conn.send("bpydump", {"Scene", bpyexport.Scene(scene)})
+        conn.send("bpydump", {"Scene": bpyexport.Scene(scene)})
         
-        materials = [bpyexport().Material(material) for matarial in bpy.data.materials]
+        materials = [bpyexport.Material(material) for material in bpy.data.materials]
         conn.send("bpydump", {"Materials": materials})
+    
+        camera_keys = []
         
-        # camera_keys = []
-        
-        # List of objects to be baked
-        # Cameras will be done in a different way
         objects = {(obj.name.replace(".", "_"), obj) for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]}
         
-        object_keys = {name: bpyexport.BpyObject().newobject(obj) for name, obj in objects}
+        object_keys = {name: bpyexport.BpyObject(obj).newobject() for name, obj in objects}
         
         print("Objects to be baked ({}) : [{}]".format(len(objects), ", ".join([n for n, _ in objects])))
         
@@ -69,8 +68,15 @@ if __name__ == "__main__":
             
             print("Baking frame {}".format(i))
             
+            camera = scene.camera
+            scene.frame_set(i)
+            
+            v = bpyexport.CameraFrame(camera).reprJSON()
+            key = {"v":v, "t":t}
+            camera_keys.append(key)
+            
             for name, object in objects:
-                v =  bpyexport.BpyObject().eval_animations(object, i) 
+                v =  bpyexport.BpyObject(object).eval_animations(i) 
                 if v:
                     key = {"v":v, "t":t}
                    
@@ -79,27 +85,8 @@ if __name__ == "__main__":
                     
                     object_keys[name]["frames"].append(key)
             
-        d.send("ObjectAnimations", object_keys)
+        conn.send("bpydump", {"ObjectAnimations": object_keys})
+        conn.send("bpydump", {"MainCameraMovement" : camera_keys})
         
-        
-        
-        # for i in trange(scene["frame_start"], scene["frame_end"], scene["frame_step"]):
-            # t = i * (scene["fps_base"] / scene["fps"])
-            # bpy.context.scene.frame_set(i)
-            # c = Camera(bpy.context.scene.camera)
-            
-            # print("Rendering camera at frame", i)
-            
-            # key = {}
-            # key ["t"] = t
-            # key ["v"] = c.dumpframe()
-            # camera_keys.append(key)
-            
-            # # export everz single objects position
-            
-            
-        # conn.send("bpydump", {"MainCameraMovement" : camera_keys})
-            
-    
         pass
         

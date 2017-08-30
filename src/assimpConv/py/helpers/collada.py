@@ -24,13 +24,12 @@ class Collada(Dumpable):
         pass #ctor
 
     def reprJSON(self):
-        self.tmp = tempfile.NamedTemporaryFile(delete=False)
-        self.tmp.close()
-        os.unlink(self.tmp.name)
+        tfile = tempfile.NamedTemporaryFile()
+        tname = tfile.name
+        self._save_collada(tname)
+        tfile.close()
 
-        self._save_collada()
-
-        daefile = self.tmp.name + ".dae"
+        daefile = tname + ".dae"
         
         dae = ""
         
@@ -41,15 +40,14 @@ class Collada(Dumpable):
             os.unlink(daefile) 
 
         return dae
-        pass # dump dae
         
     def get_cmd(self):
         return self._cmd
         
-    def _save_collada(self):
+    def _save_collada(self, tname):
         # https://docs.blender.org/api/blender_python_api_current/bpy.ops.wm.html
         bpy.ops.wm.collada_export(
-            filepath=self.tmp.name, \
+            filepath=tname, \
             #apply_modifier=True, \
             triangulate=self.triangulate, \
             use_texture_copies=self.use_texture_copies, \

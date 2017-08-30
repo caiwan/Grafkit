@@ -1,4 +1,3 @@
-import json 
 import bpy
 
 """
@@ -113,9 +112,10 @@ class CameraFrame(BpyObject):
         pass 
         
     def reprJSON(self):
-        res = self.worldmatrix(object)
+        res = self.worldmatrix()
         res["angle"] = self.o.data.angle
-        res["dof_distance"] = self.o.dof_distance
+        if hasattr(self.o, "dof_distance"):
+            res["dof_distance"] = self.o.dof_distance
         return res
         
         

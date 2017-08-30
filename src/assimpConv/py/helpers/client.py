@@ -91,7 +91,7 @@ class Filedump:
 
 
     def _sendfile(self, obj):
-        json.dump(obj.__dict__, self._fp, indent=4, sort_keys=True, default=DumpJSON)
+        json.dump(obj.__dict__, self._fp, indent=4, sort_keys=False, cls=DumpJSON)
         pass
 
     def send(self, cmd, obj):
