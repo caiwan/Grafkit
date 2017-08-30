@@ -87,7 +87,7 @@ namespace Grafkit {
 			/** Finds a key inside the track
 			@return 1 if key found
 			*/
-			int findKey(float t, V& v0, V& v1, float &f) const {
+			int FindKey(float t, V& v0, V& v1, float &f) const {
 				size_t count = m_track.size();
 				f = 0.f;
 				if (!count) {
@@ -135,6 +135,7 @@ namespace Grafkit {
 		typedef Animation::Track<float4> Vector4Track;
 	
 	protected:
+		static void FindKey(FloatTrack track, double &time, float &value);
 		static void FindKey(Vector3Track track, double &time, float3 &value);
 		static void FindKey(Vector4Track, double &time, Quaternion &value);
 
@@ -197,6 +198,19 @@ namespace Grafkit {
 	protected:
 		Ref<Entity3D> m_entity;
 
+	};
+
+	/** Qnd Camera fov animation
+	*/
+
+	class CameraAnimation : public EntityAnimation{
+	public:
+		void Update(double t);
+
+		void AddFovKey(float key, float value) { m_fov.AddKey(key, value); }
+
+	private:
+		FloatTrack m_fov;
 	};
 
 	/* ============================================================================================== */
