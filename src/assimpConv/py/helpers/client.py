@@ -18,6 +18,9 @@ class Connection:
         def __init__(self, cmd, data):
             self.cmd = cmd;
             self.data = data;
+            
+        def reprJSON(self):
+            return self.__dict__
 
         
     def __init__(self, addr):
@@ -50,7 +53,7 @@ class Connection:
         
         
     def _send_network(self, obj):
-        j = json.dumps(obj, default=DumpJSON).encode("utf-8")
+        j = json.dumps(obj, cls=DumpJSON).encode("utf-8")
         h = pack("I", len(j))
         print("sending {} bytes of data".format(len(j)))
         self.s.send(h)

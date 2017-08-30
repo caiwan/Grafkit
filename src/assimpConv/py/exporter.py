@@ -3,7 +3,6 @@ import sys
 import inspect
 import argparse
 import bpy
-import tqdm
 from subprocess import call
 
 # fix import paths for internal imports
@@ -13,7 +12,6 @@ if cmd_folder not in sys.path:
 
 # there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
 
-from helpers import Dump
 from helpers.client import Connection
 from helpers.collada import Collada
 from helpers import bpyexport
@@ -57,11 +55,12 @@ if __name__ == "__main__":
     
         camera_keys = []
         
-        objects = {(obj.name.replace(".", "_"), obj) for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]}
+        objects = [obj for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]]
         
-        object_keys = {name: bpyexport.BpyObject(obj).newobject() for name, obj in objects}
-        
-        print("Objects to be baked ({}) : [{}]".format(len(objects), ", ".join([n for n, _ in objects])))
+        # object_keys = {name: bpyexport.BpyObject(obj).newobject() for name, obj in objects}
+        object_keys = [bpyexport.BpyObject(obj).newobject() for obj in objects]
+        for i in range(len(objects)):
+            object_keys[i].update(bpyexport.BpyObject(objects[i]).localmatrix()) #bazdmeg
         
         for i in range(scene.frame_start - 1, scene.frame_end, scene.frame_step):
             t = i * (scene.render.fps_base / scene.render.fps)
@@ -75,15 +74,16 @@ if __name__ == "__main__":
             key = {"v":v, "t":t}
             camera_keys.append(key)
             
-            for name, object in objects:
+            for i in range(len(objects)):
+                object = objects[i]
                 v =  bpyexport.BpyObject(object).eval_animations(i) 
                 if v:
                     key = {"v":v, "t":t}
                    
-                    if not "frames" in object_keys[name]:
-                        object_keys[name]["frames"] = []
+                    if not "frames" in object_keys[i]:
+                        object_keys[i]["frames"] = []
                     
-                    object_keys[name]["frames"].append(key)
+                    object_keys[i]["frames"].append(key)
             
         conn.send("bpydump", {"ObjectAnimations": object_keys})
         conn.send("bpydump", {"MainCameraMovement" : camera_keys})
