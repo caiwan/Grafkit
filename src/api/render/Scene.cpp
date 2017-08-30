@@ -147,6 +147,17 @@ void Grafkit::Scene::AddAnimation(AnimationRef anim)
 	m_animations.push_back(anim);
 }
 
+void Grafkit::Scene::GetAnimations(ActorRef & actor, std::vector<AnimationRef> animations)
+{
+	animations.clear();
+	for (auto it = m_animations.begin(); it != m_animations.end(); it++) {
+		ActorAnimation *actorAnim = dynamic_cast<ActorAnimation*>(it->Get());
+		if (actorAnim && actorAnim->GetActor().Get() == actor.Get()) {
+			animations.push_back(actorAnim);
+		}
+	}
+}
+
 void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps)
 {
 	if(vs.Valid()) 

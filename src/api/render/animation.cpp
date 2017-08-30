@@ -77,6 +77,13 @@ void Grafkit::ActorAnimation::Update(double time)
 	m_actor->Matrix(matrix);
 }
 
+void Grafkit::ActorAnimation::Clear()
+{
+	m_positionTrack.Clear();
+	m_rotationTrack.Clear();
+	m_scalingTrack.Clear();
+}
+
 void Grafkit::ActorAnimation::serialize(Archive & ar)
 {
 	this->Animation::_serialize(ar);
@@ -97,6 +104,11 @@ void Grafkit::CameraAnimation::Update(double t)
 		cam->SetFOV(fov);
 		// focal shit??
 	}
+}
+
+void Grafkit::CameraAnimation::Clear()
+{
+	m_fov.Clear();
 }
 
 void Grafkit::CameraAnimation::serialize(Archive & ar)

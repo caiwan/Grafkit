@@ -32,6 +32,8 @@ namespace Grafkit {
 
 		//void CalcDuration(bool isMin = false);
 
+		virtual void Clear() = 0;
+
 	protected:
 		void _serialize(Archive &ar);
 
@@ -117,6 +119,7 @@ namespace Grafkit {
 
 		public:
 			void serialize(Archive &ar);
+			void Clear() { m_track.clear(); }
 
 		public:
 			std::vector<Key<V>> m_track;
@@ -164,6 +167,7 @@ namespace Grafkit {
 		void AddRotationKey(float key, float4 value) { m_rotationTrack.AddKey(Vector4Key(key, value)); }
 
 		virtual void Update(double time);
+		virtual void Clear();
 	
 	protected:
 		ActorRef m_actor;
@@ -205,6 +209,7 @@ namespace Grafkit {
 	class CameraAnimation : public EntityAnimation{
 	public:
 		void Update(double t);
+		void Clear();
 
 		void AddFovKey(float key, float value) { m_fov.AddKey(FloatKey(key, value)); }
 
