@@ -106,7 +106,7 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 		json j = json::parse(ss);
 		m_inputDataQueue.push(j);
 	}
-	catch (std::exception *e) {
+	catch (std::exception &e) {
 		throw new EX_DETAILS(ServerCreateException, e.what());
 		//Log::Logger().Error(e.what());
 	}
