@@ -71,7 +71,7 @@ protected:
 		LoadCache();
 
 		// -- load shader
-		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/flat.hlsl", ""));
+		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
 		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 		// -- model 
