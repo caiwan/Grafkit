@@ -30,7 +30,7 @@ namespace Grafkit
 		LRESULT MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 	protected:
-		void InitializeWindows(int sreenWidth = 800, int screenHeight = 600, int isFullscreen = 0, int resizeable = 0);
+		void InitializeWindows(int sreenWidth = 800, int screenHeight = 600, int isFullscreen = 0, int resizeable = 0, const char *pTitle = "Grafkit2 Application");
 		void ShutdownWindows();
 
 	protected:

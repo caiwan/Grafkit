@@ -29,7 +29,6 @@ namespace Grafkit{
 			A pathnek leteznie kell `./sync/` kulonben nem mukodik, es nem ad vissza hibat
 			*/
 			void Connect(const char *_ipaddr = NULL);
-			/** Updateli a rocketet */
 			void Update();
 
 		// synctracker wrapper

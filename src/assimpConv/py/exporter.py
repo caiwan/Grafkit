@@ -56,8 +56,7 @@ if __name__ == "__main__":
         camera_keys = []
         
         objects = [obj for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]]
-        
-        # object_keys = {name: bpyexport.BpyObject(obj).newobject() for name, obj in objects}
+
         object_keys = [bpyexport.BpyObject(obj).newobject() for obj in objects]
         for i in range(len(objects)):
             object_keys[i].update(bpyexport.BpyObject(objects[i]).localmatrix()) #bazdmeg

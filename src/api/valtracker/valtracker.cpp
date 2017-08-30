@@ -153,7 +153,7 @@ int Timer::GetEnd() const {
 #ifndef SYNC_PLAYER
 	return 0;       // keep goin forever
 #else
-	return !this->music->isPlaying();
+	return !(*this->m_music)->IsPlaying();
 #endif
 }
 

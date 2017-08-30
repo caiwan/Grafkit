@@ -12,7 +12,7 @@ using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 System::System()
-	: Window::WindowHandler() , m_window(this), m_pInput(nullptr)
+	: Window::WindowHandler(), m_window(this), m_pInput(nullptr)
 {
 	// init logger 
 	LOGGER(Log::Logger().Info("---- APPSTART ----"));
@@ -30,93 +30,78 @@ int System::execute() {
 
 	// Initialize the message structure.
 	ZeroMemory(&msg, sizeof(MSG));
-	
+
 	// ================================================================================================================================
 	// --- init
-	
+
 	// +++ crete graphics device here 
-#ifndef LIVE_RELEASE
-	bool reload = false;
-	do {
-		reload = false;
-#endif //LIVE_RELEASE
-		// + exception handling
-		try
-		{
-			result = this->init();
-			if (result != 0) {
-				this->release();
-				return 1;
-			}
+
+	// + exception handling
+	try
+	{
+		result = this->init();
+		if (result != 0) {
+			this->release();
+			return 1;
 		}
-		catch (FWdebug::Exception *& ex)
+	}
+	catch (FWdebug::Exception *& ex)
+	{
+		///@todo handle exceptions here 
+		MessageBoxA(NULL, ex->what(), "Exception", 0);
+		LOGGER(Log::Logger().Error(ex->what()));
+
+		delete ex;
+
+		return 0;	// who will do the shutdown???
+	}
+
+	// ================================================================================================================================
+	// --- mainloop
+
+	try
+	{
+		int done = 0;
+		while (!done)
 		{
-			///@todo handle exceptions here 
-			MessageBoxA(NULL, ex->what(), "Exception", 0);
-			LOGGER(Log::Logger().Error(ex->what()));
-
-			delete ex;
-
-			break;
-		}
-
-		// ================================================================================================================================
-		// --- mainloop
-
-		try
-		{
-			int done = 0;
-			while (!done)
+			// Handle the windows messages.
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
-				// Handle the windows messages.
-				if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 
-				// If windows signals to end the application then exit out.
-				if (msg.message == WM_QUIT)
+			// If windows signals to end the application then exit out.
+			if (msg.message == WM_QUIT)
+			{
+				done = 1;
+			}
+			else
+			{
+				// Otherwise do the frame processing.
+				result = this->mainloop();
+				if (result != 0)
 				{
 					done = 1;
 				}
-				else
-				{
-					// Otherwise do the frame processing.
-					result = this->mainloop();
-					if (result != 0)
-					{
-						done = 1;
-					}
-				}
-
 			}
 
 		}
-#ifndef LIVE_RELEASE
-		catch (LiveReloadCannotReloadItem &ex) {
-			LOGGER(Log::Logger().Error(ex.what()));
-			reload = true;
-		}
-#endif //LIVE_RELEASE
-		catch (FWdebug::Exception& ex)
-		{
-			///@todo handle exceptions here 
-			//  DebugBreak();
-			MessageBoxA(NULL, ex.what(), "Exception", 0);
-			LOGGER(Log::Logger().Error(ex.what()));
 
-			break;
-		}
-		// ================================================================================================================================
-		// --- teardown
-		{
-			this->release();
-		}
+	}
+	catch (FWdebug::Exception& ex)
+	{
+		///@todo handle exceptions here 
+		//  DebugBreak();
+		MessageBoxA(NULL, ex.what(), "Exception", 0);
+		LOGGER(Log::Logger().Error(ex.what()));
 
-#ifndef LIVE_RELEASE
-	} while (reload);
-#endif //LIVE_RELEASE
+	}
+	// ================================================================================================================================
+	// --- teardown
+	{
+		this->release();
+	}
 
 	this->ShutdownWindows();
 
@@ -126,46 +111,39 @@ int System::execute() {
 
 
 LRESULT System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+{
+	switch (umsg)
 	{
-		switch (umsg)
-		{
-		case WM_KEYDOWN:
-		{
-			m_pInput->KeyDown((unsigned int)wparam);
-			return 0;
-		}
-
-		case WM_KEYUP:
-		{
-			m_pInput->KeyUp((unsigned int)wparam);
-			return 0;
-		}
-		default:
-		{
-			return DefWindowProc(hwnd, umsg, wparam, lparam);
-		}
-		}
+	case WM_KEYDOWN:
+	{
+		m_pInput->KeyDown((unsigned int)wparam);
+		return 0;
 	}
 
-void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen, int resizeable)
-{
-	///@todo resizeable window
+	case WM_KEYUP:
+	{
+		m_pInput->KeyUp((unsigned int)wparam);
+		return 0;
+	}
+	default:
+	{
+		return DefWindowProc(hwnd, umsg, wparam, lparam);
+	}
+	}
+}
 
-	//this->m_window = new Window(this);
+void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen, int resizeable, const char* pTitle)
+{
 	this->m_window.createWindow(screenWidth, screenHeight, fullscreen);
 	this->m_window.showWindow();
+	this->m_window.setTitle(pTitle);
 
 	m_pInput = new Input();
 	m_pInput->Initialize();
-
 }
 
 void System::ShutdownWindows()
 {
-	//if (m_window) {
-		this->m_window.destroyWindow();
-		//delete this->m_window;
-		//this->m_window = NULL;
-	//}
+	this->m_window.destroyWindow();
 }
 
