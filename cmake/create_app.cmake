@@ -20,4 +20,4 @@ function(create_app _application)
 	assign_source_group("${SOURCE_FILES}")
 	assign_source_group("${HEADER_FILES}")
 	
-endfunction(create_testapp)
+endfunction(create_app)
