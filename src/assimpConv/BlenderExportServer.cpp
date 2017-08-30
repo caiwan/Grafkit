@@ -183,7 +183,7 @@ bool BlenderExportServer::Parse(json & j)
 			for (auto mat_it = materials.begin(); mat_it != materials.end(); mat_it++) {
 				std::string matname = mat_it->at("name");
 				// TDOD : refactor this asap. see Scene.h and assimploader.h
-				MaterialRef mat; 
+				MaterialRef mat;
 				for (auto it = m_resources.materials.begin(); it != m_resources.materials.end(); it++) {
 					if (matname.compare(it->Get()->GetName()) == 0) {
 						mat = *it;
@@ -220,15 +220,60 @@ bool BlenderExportServer::Parse(json & j)
 			animation->SetActor(cameraActor);
 			for (auto camit = maincam.begin(); camit != maincam.end(); camit++) {
 				double t = (double)camit->at("t");
-				json v = camit->at("v");
-				animation->AddPositionKey(t, float3(v["loc"][0], v["loc"][1], v["loc"][2]));
-				animation->AddRotationKey(t, float4(v["rot"][3], v["loc"][0], v["loc"][1], v["loc"][2]));
-				animation->AddScalingKey(t, float3(v["scale"][0], v["scale"][1], v["scale"][2]));
+				json wm = camit->at("v")["worldmatrix"];
+				animation->AddPositionKey(t, float3(wm["loc"][0], wm["loc"][1], wm["loc"][2]));
+				animation->AddRotationKey(t, float4(wm["rot"][3], wm["loc"][0], wm["loc"][1], wm["loc"][2]));
+				animation->AddScalingKey(t, float3(wm["scale"][0], wm["scale"][1], wm["scale"][2]));
+				// todo: camera angle
+				//json ca = 
 			}
 			m_resources.cameras.push_back(camera);
 			m_resources.actors["MainCamera"] = cameraActor;
 			(*m_scene)->GetRootNode()->AddChild(cameraActor);
 			(*m_scene)->AddAnimation(animation);
+		}
+
+		// ---
+		json objectanim = j["data"]["ObjectAnimations"];
+		if (!objectanim.empty()) {
+			for (auto objit = objectanim.begin(); objit != objectanim.end(); objit++) {
+				if (!objit->at("frames").empty()) {
+					std::string objanme = objit->at("name");
+					
+					auto actorit = m_resources.actors.find(objanme);
+					if (actorit == m_resources.actors.end())
+						continue;
+					
+					json lm = objit["localmatrix"];
+					float3 pos = float3(lm["loc"][0], lm["loc"][1], lm["loc"][2]);
+					float4 rot = float4(lm["rot"][3], lm["loc"][0], lm["loc"][1], lm["loc"][2]);
+					float3 scale = float3(lm["scale"][0], lm["scale"][1], lm["scale"][2]);
+
+					ActorAnimation* animation = new ActorAnimation();
+					animation->SetActor(actorit->second);
+
+					json frames = objit->at("frames");
+					for (auto frit = frames.begin(); frit != frames.end(); frit++) {
+						double t = (double)frit->at("t");
+						json val = frit->at("v");
+						json loc_frame = val["location"];
+						if (!loc_frame.empty())
+							animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], loc_frame[2]));
+						else
+							animation->AddPositionKey(t, pos);
+
+
+						json rot_frame = val["rotation_euler"];
+						if (!rot_frame.empty()) {
+							Quaternion q;
+							q.fromEuler(rot_frame[0], rot_frame[1], rot_frame[2]);
+							animation->AddRotationKey(t, q);
+						}
+						else
+							animation->AddRotationKey(t, rot);
+					}
+				}
+			}
 		}
 	}
 

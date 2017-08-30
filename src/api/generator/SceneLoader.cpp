@@ -93,7 +93,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		USHORT key = it->first;
 		USHORT val = it->second;
 
-		Material * material = m_materials[key];	
+		Material * material = m_materials[key];
 		Model *model = dynamic_cast<Model *>(m_entities[val]);
 
 		if (model && material) {
@@ -110,7 +110,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 	{
 		USHORT key = it->first;
 		USHORT val = it->second;
-		
+
 		Entity3D *entity = m_entities[key];
 		Actor *actor = m_actors[val];
 
@@ -127,7 +127,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 	LOGGER(Log::Logger().Info("Actors: %d", m_actor_to_actor.size()));
 	for (auto it = m_actor_to_actor.begin(); it != m_actor_to_actor.end(); ++it)
 	{
-		USHORT key = it->first;		
+		USHORT key = it->first;
 		USHORT val = it->second;
 
 		Actor *child = m_actors[val];
@@ -140,7 +140,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		}
 	}
 
-	 //8, 9 animation -> actor, entity
+	//8, 9 animation -> actor, entity
 	LOGGER(Log::Logger().Info("Animations: %d", m_animation_to_actor.size() + m_animation_to_entity.size()));
 	for (auto it = m_animation_to_actor.cbegin(); it != m_animation_to_actor.cend(); ++it)
 	{
@@ -172,8 +172,8 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 				LOGGER(Log::Logger().Info("Entity %hu -> %hu", key, value));
 			}
 		}
-		
-		
+
+
 	}
 
 	if (m_actors.empty())
@@ -213,16 +213,17 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 			m_actor_map[node] = m_cActorID;
 
 			LOGGER(Log::Logger().Info("Actor: %s %d {", node->GetName().c_str(), m_cActorID));
-			
+
 			BuildEntityMap(node);
-			
+
 			LOGGER(Log::Logger().Info("}"));
-			
+
 			++m_cActorID;
 		}
 
-		for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
-			stack.push(*it);
+		if (node && !node->GetChildren().empty())
+			for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
+				stack.push(*it);
 	}
 
 	BuildActorMap();
@@ -240,7 +241,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 
 	if (tx_begin != tx_end) {
 		for (auto tx_it = tx_begin; tx_it != tx_end; ++tx_it) {
-			
+
 			TextureResRef texture = tx_it->second;
 
 			LOGGER(Log::Logger().Info("      Texture: %s {", texture->GetName().c_str()));
@@ -250,7 +251,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 				bind.first = texture->GetName();
 				bind.second = tx_it->first;
 				m_textures_to_materials[m_cMatID].push_back(bind);
-			
+
 				// .. ami kell meg ide johet
 
 				++m_cTexID;
@@ -307,23 +308,23 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 		Animation *animation = dynamic_cast<ActorAnimation*>(it->Get());
 		if (animation) {
 			//qnd rtty
-			ActorAnimation *actor_animation = dynamic_cast<ActorAnimation*>(animation); 
+			ActorAnimation *actor_animation = dynamic_cast<ActorAnimation*>(animation);
 			EntityAnimation *entity_animation = dynamic_cast<EntityAnimation*>(animation);
-			
+
 			if (actor_animation) {
 				auto actor_it = m_actor_map.find(actor_animation->GetActor());
 				if (actor_it != m_actor_map.end()) {
 					m_animation_to_actor.push_back(assoc_t(i, actor_it->second)); //[i].push_back(actor_it->second);
 				}
 			}
-			
+
 			else if (entity_animation) {
 				auto entity_it = m_entity_map.find(entity_animation->GetEntity());
 				if (entity_it != m_entity_map.end()) {
 					m_animation_to_entity.push_back(assoc_t(i, entity_it->second)); //[i].push_back(entity_it->second);
 				}
 			}
-			
+
 			m_Animations.push_back(it->Get());
 		}
 	}
@@ -336,9 +337,9 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &act
 		if (entity_it->Valid()) {
 
 			Entity3D *entity = (*entity_it).Get();
-			
+
 			LOGGER(Log::Logger().Info("  Entity: %s %d {", entity->GetName().c_str(), m_cEntityID));
-			
+
 			if (m_entity_map.find(entity) == m_entity_map.end()) {
 				m_entity_map[entity] = m_cEntityID;
 				m_entities.push_back(entity);
@@ -362,13 +363,13 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &act
 			LOGGER(Log::Logger().Info("  }"));
 
 		}
-	} 
+	}
 }
 
 // which actor whose child of
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 {
-	for (size_t i = 0; i<m_actors.size(); ++i)
+	for (size_t i = 0; i < m_actors.size(); ++i)
 	{
 		Actor *actor = m_actors[i];
 		if (actor) {
@@ -377,7 +378,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 				auto it = m_actor_map.find(parent);
 				if (it != m_actor_map.end()) {
 					UINT key = (it->second), val = i;
-					m_actor_to_actor.push_back(assoc_t(key, val)); 
+					m_actor_to_actor.push_back(assoc_t(key, val));
 				}
 			}
 		}
@@ -421,14 +422,14 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IRes
 	if (ar.IsStoring())
 		materialCount = m_materials.size();
 
-	PERSIST_FIELD(ar , materialCount);
+	PERSIST_FIELD(ar, materialCount);
 	for (UINT i = 0; i < materialCount; ++i) {
-		
-		Material *material = nullptr; 
-		if (ar.IsStoring()) 
+
+		Material *material = nullptr;
+		if (ar.IsStoring())
 			material = m_materials[i];
 
-		PERSIST_OBJECT(ar , material);
+		PERSIST_OBJECT(ar, material);
 
 		if (!ar.IsStoring())
 			m_materials.push_back(material);
@@ -442,8 +443,8 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IRes
 			textureCount = tx_bind.size();
 		}
 
-		PERSIST_FIELD(ar , textureCount);
-		
+		PERSIST_FIELD(ar, textureCount);
+
 		for (UINT j = 0; j < textureCount; ++j) {
 			texture_bind_t tx;
 			if (ar.IsStoring())
@@ -470,7 +471,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IReso
 	UINT entityCount = 0;
 	if (ar.IsStoring())
 		entityCount = m_entities.size();
-	
+
 	PERSIST_FIELD(ar, entityCount);
 	for (UINT i = 0; i < entityCount; ++i) {
 		Entity3D* entity = nullptr;
@@ -478,7 +479,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IReso
 			entity = m_entities[i];
 
 		PERSIST_OBJECT(ar, entity);
-		
+
 		if (!ar.IsStoring()) {
 			m_entities.push_back(entity);
 		}
@@ -495,7 +496,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResour
 
 	for (UINT i = 0; i < actorCount; ++i) {
 		Actor* actor = nullptr;
-	
+
 		if (ar.IsStoring())
 			actor = m_actors[i];
 
@@ -540,7 +541,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, std::v
 	PERSIST_FIELD(ar, size);
 
 	for (size_t i = 0; i < size; ++i) {
-	
+
 		if (ar.IsStoring())
 			pair = keymap[i];
 
