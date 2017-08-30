@@ -222,9 +222,19 @@ bool BlenderExportServer::Parse(json & j)
 			for (auto camit = maincam.begin(); camit != maincam.end(); camit++) {
 				double t = (double)camit->at("t");
 				json wm = camit->at("v")["worldmatrix"];
-				animation->AddPositionKey(t, float3(wm["loc"][0], wm["loc"][1], wm["loc"][2]));
-				animation->AddRotationKey(t, float4(wm["rot"][3], wm["loc"][0], wm["loc"][1], wm["loc"][2]));
-				animation->AddScalingKey(t, float3(wm["scale"][0], wm["scale"][1], wm["scale"][2]));
+				// see if does not sucks
+				if (m_is_lh && false) 
+				{
+					animation->AddPositionKey(t, float3(wm["loc"][0], wm["loc"][1], -(float)wm["loc"][2]));
+					animation->AddRotationKey(t, float4(-(float)wm["rot"][3], wm["rot"][0], wm["rot"][1], wm["rot"][2]));
+					animation->AddScalingKey(t, float3(wm["scale"][0], wm["scale"][1], wm["scale"][2]));
+				}
+				else 
+				{
+					animation->AddPositionKey(t, float3(wm["loc"][0], wm["loc"][1], wm["loc"][2]));
+					animation->AddRotationKey(t, float4(wm["rot"][3], wm["rot"][0], wm["rot"][1], wm["rot"][2]));
+					animation->AddScalingKey(t, float3(wm["scale"][0], wm["scale"][1], wm["scale"][2]));
+				}
 				json ca = camit->at("v")["angle"];
 				camAnimation->AddFovKey(t, ca);
 			}

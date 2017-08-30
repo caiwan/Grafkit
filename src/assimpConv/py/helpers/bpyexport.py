@@ -28,11 +28,12 @@ class BpyObject():
                     ret["parent"] = self.o.parent.name.replace(".", "_")
         return ret
     
-    def getkeys(self, res={}):
+    def getkeys(self):
+        res = {}
         if isinstance(self.o, bpy.types.bpy_struct):
             for k, v in self.o.items():
                 if not k.startswith("_"):
-                    items[k] = v
+                    res[k] = v
             return res
         return None
          

@@ -56,10 +56,10 @@ public:
 
 protected:
 	Renderer render;
-	
+
 	ActorRef m_currCameraActor;
 	CameraRef m_camera;
-	
+
 	SceneResRef m_scene;
 
 	float m_t;
@@ -75,13 +75,15 @@ protected:
 		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 		// -- model 
-		// m_scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
-		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotScale.scene"));
+		//m_scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
+		//m_scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotScale.scene"));
+		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "animtest2.scene"));
 
 		DoPrecalc();
-		
+
 		m_scene->Get()->BuildScene(render, m_vs, m_fs);
-		m_scene->Get()->SetActiveCamera(0);
+		//m_scene->Get()->SetActiveCamera(0);
+		m_scene->Get()->SetActiveCamera("MainCamera");
 
 		m_currCameraActor = m_scene->Get()->GetCamera(0);
 		Camera * c = dynamic_cast<Camera*>(m_currCameraActor->GetEntities()[0].Get());
@@ -111,7 +113,7 @@ protected:
 
 			//m_currCameraActor->Transform().Identity();
 			//m_currCameraActor->Matrix().Identity();
-			
+
 			//m_currCameraActor->Matrix().RotateRPY(55. * M_PI / 180., 0 * M_PI / 180., 45. * M_PI / 180.);
 			//m_currCameraActor->Matrix().Translate(5, 5, 5);
 			//m_currCameraActor->Matrix().Translate(0, 5, 0);

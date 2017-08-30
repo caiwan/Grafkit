@@ -75,7 +75,9 @@ namespace Grafkit {
 
 		Assimp::Importer importer;
 		const aiScene *aiscene;
-
+		
+	protected:
+		// flags
 		bool m_is_lh;
 	};
 
