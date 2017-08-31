@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <time.h>
 
@@ -223,16 +224,20 @@ bool BlenderExportServer::Parse(json & j)
 				double t = (double)camit->at("t");
 				json wm = camit->at("v")["worldmatrix"];
 				// see if does not sucks
-				if (m_is_lh && false) 
+				if (m_is_lh)
 				{
-					animation->AddPositionKey(t, float3(wm["loc"][0], wm["loc"][1], -(float)wm["loc"][2]));
-					animation->AddRotationKey(t, float4(-(float)wm["rot"][3], wm["rot"][0], wm["rot"][1], wm["rot"][2]));
+					float3 p = float3(wm["loc"][0], wm["loc"][1], -(float)wm["loc"][2]);
+					animation->AddPositionKey(t, p);
+					Quaternion q = Quaternion(float4(-(float)wm["rot"][1], -(float)wm["rot"][2], wm["rot"][3], (float)wm["rot"][0]));
+					animation->AddRotationKey(t, q);
+					float4 lolmi = q.toAxisAngle(); //dbg
 					animation->AddScalingKey(t, float3(wm["scale"][0], wm["scale"][1], wm["scale"][2]));
 				}
-				else 
+				else
 				{
 					animation->AddPositionKey(t, float3(wm["loc"][0], wm["loc"][1], wm["loc"][2]));
-					animation->AddRotationKey(t, float4(wm["rot"][3], wm["rot"][0], wm["rot"][1], wm["rot"][2]));
+					Quaternion q = Quaternion(float4(wm["rot"][1], wm["rot"][2], wm["rot"][3], wm["rot"][0]));
+					animation->AddRotationKey(t, q);
 					animation->AddScalingKey(t, float3(wm["scale"][0], wm["scale"][1], wm["scale"][2]));
 				}
 				json ca = camit->at("v")["angle"];
@@ -259,8 +264,12 @@ bool BlenderExportServer::Parse(json & j)
 
 					json lm = objit->at("localmatrix");
 					float3 pos = float3(lm["loc"][0], lm["loc"][1], lm["loc"][2]);
-					float4 rot = float4(lm["rot"][3], lm["loc"][0], lm["loc"][1], lm["loc"][2]);
+					if (m_is_lh) pos = float3(lm["loc"][0], lm["loc"][1], -(float)lm["loc"][2]);
+					Quaternion rot = Quaternion(float4(lm["rot"][1], lm["rot"][2], lm["rot"][3], lm["rot"][0]));
+					if (m_is_lh) rot = Quaternion(float4(-(float)lm["rot"][1], -(float)lm["rot"][2], lm["rot"][3], lm["rot"][0]));
 					float3 scale = float3(lm["scale"][0], lm["scale"][1], lm["scale"][2]);
+
+					float4 lolmi = rot.toAxisAngle(); //dbg
 
 					std::vector<AnimationRef> anims;
 					ActorRef actor = actorit->second;
@@ -283,18 +292,30 @@ bool BlenderExportServer::Parse(json & j)
 						json val = frit->at("v");
 						json loc_frame = val["location"];
 						if (!loc_frame.empty())
-							animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], loc_frame[2]));
+							if (m_is_lh)
+								animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], -(float)loc_frame[2]));
+							else
+								animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], loc_frame[2]));
+
 						else
 							animation->AddPositionKey(t, pos);
 
 						json rot_frame = val["rotation_euler"];
 						if (!rot_frame.empty()) {
-							Quaternion q;
-							q.fromEuler(rot_frame[0], rot_frame[1], rot_frame[2]);
+							Quaternion q = Quaternion::fromEuler(rot_frame[0], rot_frame[1], rot_frame[2]);
+							if (m_is_lh) {
+								float4 p = q;
+								p.x *= -1.;
+								p.y *= -1.;
+								p = Quaternion(p);
+							}
+							float4 lolmi = q.toAxisAngle();
 							animation->AddRotationKey(t, q);
 						}
 						else
 							animation->AddRotationKey(t, rot);
+
+						animation->AddScalingKey(t, scale);
 					}
 
 				}

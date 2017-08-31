@@ -27,26 +27,19 @@ namespace Grafkit {
 			q = DirectX::XMLoadFloat4(&in);
 		}
 
-		// --- setterek
+		// --- setters
 		void Set(float x, float y, float z, float w) {
 			DirectX::XMVectorSet(x, y, z, w);
 		}
 
-		// --- muveletek
+		// --- operations
 		void Slerp(const Quaternion &q0, const Quaternion &q1, float t) {
 			q = DirectX::XMQuaternionSlerp(q0.q, q1.q, t);
 		}
 
-		// --- konverziok
-
-		operator matrix() const {
-			return DirectX::XMMatrixRotationQuaternion(q);
-		}
-
-		operator float4() const {
-			float4 res;
-			DirectX::XMStoreFloat4(&res, q);
-			return res;
+		Quaternion& operator*(const Quaternion& in) {
+			q = DirectX::XMQuaternionMultiply(q, in.q);
+			return *this;
 		}
 
 		// --- operator = 
@@ -65,8 +58,30 @@ namespace Grafkit {
 			return *this;
 		}
 
+		// --- conversion
+
+		operator matrix() const {
+			return DirectX::XMMatrixRotationQuaternion(q);
+		}
+
 		static Quaternion fromEuler(float r, float p, float y) {
 			return Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(r, p, y));
+		}
+
+		float4 toAxisAngle() {
+			dxvector axis;
+			float angle = 0;
+			DirectX::XMQuaternionToAxisAngle(&axis, &angle, q);
+			float4 res;
+			DirectX::XMStoreFloat4(&res, axis);
+			res.w = angle;
+			return res;
+		}
+
+		operator float4() const {
+			float4 res;
+			DirectX::XMStoreFloat4(&res, q);
+			return res;
 		}
 	};
 }

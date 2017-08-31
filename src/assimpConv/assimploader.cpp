@@ -437,6 +437,7 @@ void Grafkit::AssimpLoader::AssimpLoadAnimations(SceneRef &outScene)
 
 					for (k = 0; k < curr_nodeAnim->mNumRotationKeys; k++) {
 						ASSIMP_V4D_F4(curr_nodeAnim->mRotationKeys[k].mValue, f4);
+						float4 lolmi = Quaternion(f4).toAxisAngle(); //dbg
 						anim->AddRotationKey(curr_nodeAnim->mRotationKeys[k].mTime, f4);
 					}
 

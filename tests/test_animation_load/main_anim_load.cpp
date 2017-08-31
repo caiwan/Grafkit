@@ -8,7 +8,10 @@
 #include "render/Material.h"
 #include "render/shader.h"
 
+#include "render/effect.h"
+
 #include "generator/ShaderLoader.h"
+#include "generator/TextureLoader.h"
 
 #include "utils/InitializeSerializer.h"
 
@@ -57,15 +60,23 @@ public:
 protected:
 	Renderer render;
 
-	ActorRef m_currCameraActor;
-	CameraRef m_camera;
+	ActorRef currCameraActor;
+	CameraRef camera;
 
-	SceneResRef m_scene;
+	TextureSamplerRef sampler;
+
+	TextureCubeResRef envmap;
+
+	EffectComposerRef drawCubemap;
+
+	SceneResRef scene;
 
 	float m_t;
 
 	ShaderResRef m_vs;
 	ShaderResRef m_fs;
+
+	ShaderResRef cubemapShader;
 
 	int init() {
 		LoadCache();
@@ -75,19 +86,37 @@ protected:
 		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 		// -- model 
-		//m_scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
-		//m_scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotScale.scene"));
-		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "animtest2.scene"));
+		scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
+		//scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotScale.scene"));
+		//scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotCamera.scene"));
+		//scene = this->Load<SceneRes>(new SceneLoader("scene", "animtest2.scene"));
+
+		cubemapShader = Load<ShaderRes>(new PixelShaderLoader("cubemapShader", "shaders/cubemap.hlsl", ""));
+
+		envmap = Load<TextureCubeRes>(new TextureCubemapFromBitmap("envmap",
+			"textures/yoko_posx.jpg",
+			"textures/yoko_negx.jpg",
+			"textures/yoko_posy.jpg",
+			"textures/yoko_negy.jpg",
+			"textures/yoko_posz.jpg",
+			"textures/yoko_negz.jpg"
+		));
+
 
 		DoPrecalc();
 
-		m_scene->Get()->BuildScene(render, m_vs, m_fs);
-		//m_scene->Get()->SetActiveCamera(0);
-		m_scene->Get()->SetActiveCamera("MainCamera");
+		drawCubemap = new EffectComposer();
+		drawCubemap->AddPass(new EffectPass(cubemapShader));
+		drawCubemap->Initialize(render, true);
 
-		m_currCameraActor = m_scene->Get()->GetCamera(0);
-		Camera * c = dynamic_cast<Camera*>(m_currCameraActor->GetEntities()[0].Get());
-		if (c) {
+		scene->Get()->BuildScene(render, m_vs, m_fs);
+		//m_scene->Get()->SetActiveCamera(0);
+		//m_scene->Get()->SetActiveCamera("Camera");
+		scene->Get()->SetActiveCamera("MainCamera");
+
+		currCameraActor = scene->Get()->GetActiveCamera();
+		camera = dynamic_cast<Camera*>(currCameraActor->GetEntities()[0].Get());
+		if (camera.Valid()) {
 			//c->SetUp(0, 0, 1);
 			//c->SetLookTo(0, -1, 0);
 
@@ -95,6 +124,10 @@ protected:
 			//c->SetPosition(10, -10, 10);
 			//c->SetLookTo(0, 0, 0);
 		}
+
+
+		sampler = new TextureSampler();
+		sampler->Initialize(render);
 
 		m_t = 0;
 
@@ -106,22 +139,43 @@ protected:
 		RemoveAll();
 	};
 
-	int mainloop() {
+	int mainloop() 
+	{
+
+		struct {
+			float2 res;
+			float ar;
+			float fov;
+		} resprops;
+
+		Scene::WorldMatrices_t worldMatrices;
+
 		this->render.BeginScene();
 		{
+
+			this->scene->Get()->UpdateAnimation(fmod(m_t, 10.5));
+			this->scene->Get()->PreRender(render);
+
+			resprops.ar = render.GetAspectRatio();
+			resprops.fov = camera->GetFOV();
+
+			worldMatrices = (*scene)->GetWorldMatrices();
+
+			(*cubemapShader)->SetParam(render, "ResolutionBuffer", &resprops);
+			(*cubemapShader)->SetParam(render, "MatrixBuffer", &worldMatrices);
+			(*cubemapShader)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
+			(*cubemapShader)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
+
+			render.ToggleDepthWrite(false);
+
+			drawCubemap->Render(render);
+
+			render.ToggleDepthWrite(true);
+
 			m_t += .01;
-
-			//m_currCameraActor->Transform().Identity();
-			//m_currCameraActor->Matrix().Identity();
-
-			//m_currCameraActor->Matrix().RotateRPY(55. * M_PI / 180., 0 * M_PI / 180., 45. * M_PI / 180.);
-			//m_currCameraActor->Matrix().Translate(5, 5, 5);
-			//m_currCameraActor->Matrix().Translate(0, 5, 0);
-
-			this->m_scene->Get()->UpdateAnimation(fmod(m_t, 10.5));
-			//this->m_scene->Get()->UpdateAnimation(0.);
-			this->m_scene->Get()->PreRender(render);
-			this->m_scene->Get()->Render(render);
+			
+			(*m_fs)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
+			this->scene->Get()->Render(render);
 
 		}
 
