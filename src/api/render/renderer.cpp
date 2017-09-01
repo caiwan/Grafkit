@@ -124,6 +124,63 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// -----------------------------------------------------------------------------
 	// --- setup swap chain
+
+#if 1
+	// Dual swpachain for having different render area inside the windows than its size
+
+
+	// https://stackoverflow.com/questions/45815757/how-to-letterbox-crop-without-setting-the-viewport-in-directx-11/45978806#45978806
+
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
+	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+
+	swapChainDesc.Width = m_screenW;
+	swapChainDesc.Height = m_screenH;
+	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	swapChainDesc.Stereo = false;
+	swapChainDesc.SampleDesc = ;
+	swapChainDesc.BufferUsage;
+	swapChainDesc.BufferCount;
+	swapChainDesc.Scaling;
+	swapChainDesc.SwapEffect;
+	swapChainDesc.AlphaMode;
+	swapChainDesc.Flags;
+
+	// First, convert our ID3D11Device1 into an IDXGIDevice1
+	IDXGIDevice2 *dxgiDevice = nullptr;
+	result = m_device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgiDevice);
+
+	if (FAILED(result))
+		throw EX_HRESULT(InitializeRendererException, result);
+
+	// Second, use the IDXGIDevice1 interface to get access to the adapter
+	IDXGIAdapter* dxgiAdapter = nullptr;
+	result = dxgiDevice->GetAdapter(&dxgiAdapter);
+
+	if (FAILED(result))
+		throw EX_HRESULT(InitializeRendererException, result);
+
+	// Third, use the IDXGIAdapter interface to get access to the factory
+	IDXGIFactory2* dxgiFactory = nullptr;
+	result = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&dxgiFactory);
+
+	// Folytkov: 
+
+	//if (FAILED(result))
+	//	throw EX_HRESULT(InitializeRendererException, result);
+
+	//result = dxgiFactory->CreateSwapChainForComposition(m_device, &swapChainDesc,
+	//	reinterpret_cast<IUnknown*>(hwnd), &m_swapChain
+	//); 
+
+	//if (FAILED(result))
+	//	throw EX_HRESULT(InitializeRendererException, result);
+
+	//result = 
+
+#else
+	// Signle swap chain for single window and its viewport
+
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 
 	// Initialize the swap chain description.
@@ -188,6 +245,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	DWORD deviceCreationFlags = 0;
 
+
 #ifdef _DEBUG
 	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
@@ -197,9 +255,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 		&featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc,
 		&m_swapChain, &m_device, nullptr, &m_deviceContext
 	);
-
 	if (FAILED(result))
 		throw EX_HRESULT(InitializeRendererException, result);
+#endif
 
 	// update our reference
 	this->AssingnRef(m_device);

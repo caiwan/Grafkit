@@ -88,8 +88,8 @@ protected:
 		// -- model 
 		//scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
 		//scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotScale.scene"));
-		scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotCamera.scene"));
-		//scene = this->Load<SceneRes>(new SceneLoader("scene", "animtest2.scene"));
+		//scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotCamera.scene"));
+		scene = this->Load<SceneRes>(new SceneLoader("scene", "animtest2.scene"));
 
 		cubemapShader = Load<ShaderRes>(new PixelShaderLoader("cubemapShader", "shaders/cubemap.hlsl", ""));
 
