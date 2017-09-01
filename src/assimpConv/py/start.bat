@@ -1,3 +1,3 @@
 @echo off
-blender -b -P proba.py -- --input animtest2.blend
+blender -b -P exporter.py -- --input animtest2.blend --test out.json
 pause

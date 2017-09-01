@@ -86,9 +86,9 @@ protected:
 		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
+		//scene = this->Load<SceneRes>(new SceneLoader("scene", "box.scene"));
 		//scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotScale.scene"));
-		//scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotCamera.scene"));
+		scene = this->Load<SceneRes>(new SceneLoader("scene", "locRotCamera.scene"));
 		//scene = this->Load<SceneRes>(new SceneLoader("scene", "animtest2.scene"));
 
 		cubemapShader = Load<ShaderRes>(new PixelShaderLoader("cubemapShader", "shaders/cubemap.hlsl", ""));
@@ -111,8 +111,8 @@ protected:
 
 		scene->Get()->BuildScene(render, m_vs, m_fs);
 		//m_scene->Get()->SetActiveCamera(0);
-		//m_scene->Get()->SetActiveCamera("Camera");
-		scene->Get()->SetActiveCamera("MainCamera");
+		scene->Get()->SetActiveCamera("Camera");
+		//scene->Get()->SetActiveCamera("MainCamera");
 
 		currCameraActor = scene->Get()->GetActiveCamera();
 		camera = dynamic_cast<Camera*>(currCameraActor->GetEntities()[0].Get());

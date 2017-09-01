@@ -210,6 +210,8 @@ bool BlenderExportServer::Parse(json & j)
 			}
 		}
 
+#if 0 //MainCamera
+
 		// ---
 		json maincam = j["data"]["MainCameraMovement"];
 		if (!maincam.empty()) {
@@ -249,6 +251,10 @@ bool BlenderExportServer::Parse(json & j)
 			(*m_scene)->AddAnimation(animation);
 			(*m_scene)->AddAnimation(camAnimation);
 		}
+
+#endif // Main Camnera
+
+#if 0 // Object Baking 
 
 		// ---
 		json objectanim = j["data"]["ObjectAnimations"];
@@ -290,37 +296,71 @@ bool BlenderExportServer::Parse(json & j)
 					for (auto frit = frames.begin(); frit != frames.end(); frit++) {
 						double t = (double)frit->at("t");
 						json val = frit->at("v");
-						json loc_frame = val["location"];
-						if (!loc_frame.empty())
-							if (m_is_lh)
-								animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], -(float)loc_frame[2]));
-							else
-								animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], loc_frame[2]));
 
-						else
-							animation->AddPositionKey(t, pos);
+						// This is the overall calculated local matrix relative to the actors parent
+						json localmatrix = val["localmatrix"];
+						if (!localmatrix.empty()) {
+							json j_loc = localmatrix["loc"];
+							json j_rot = localmatrix["rot"];
+							json j_scale = localmatrix["scale"];
 
-						json rot_frame = val["rotation_euler"];
-						if (!rot_frame.empty()) {
-							Quaternion q = Quaternion::fromEuler(rot_frame[0], rot_frame[1], rot_frame[2]);
+							float3 p, s;
+							Quaternion q;
+
 							if (m_is_lh) {
-								float4 p = q;
-								p.x *= -1.;
-								p.y *= -1.;
-								p = Quaternion(p);
+								p = float3(j_loc[0], j_loc[1], -(float)j_loc[2]);
+								q = Quaternion(float4(-(float)j_rot[1], -(float)j_rot[2], j_rot[3], j_rot[0]));
 							}
-							float4 lolmi = q.toAxisAngle();
-							animation->AddRotationKey(t, q);
-						}
-						else
-							animation->AddRotationKey(t, rot);
+							else {
+								p = float3(j_loc[0], j_loc[1], j_loc[2]);
+								q = Quaternion(float4(j_rot[1], j_rot[2], j_rot[3], j_rot[0]));
+							}
+							s = float3(j_scale[0], j_scale[1], j_scale[2]);
 
-						animation->AddScalingKey(t, scale);
+							animation->AddPositionKey(t, p);
+							animation->AddRotationKey(t, q);
+							animation->AddScalingKey(t, s);
+						}
+#if 0
+						// These comes right from the animation curves
+						json actions = val["actions"];
+						if (!actions.empty()) {
+							json loc_frame = val["location"];
+							if (!loc_frame.empty())
+								if (m_is_lh)
+									animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], -(float)loc_frame[2]));
+								else
+									animation->AddPositionKey(t, float3(loc_frame[0], loc_frame[1], loc_frame[2]));
+
+							else
+								animation->AddPositionKey(t, pos);
+
+							json rot_frame = val["rotation_euler"];
+							if (!rot_frame.empty()) {
+								Quaternion q = Quaternion::fromEuler(rot_frame[0], rot_frame[1], rot_frame[2]);
+								if (m_is_lh) {
+									float4 p = q;
+									p.x *= -1.;
+									p.y *= -1.;
+									p = Quaternion(p);
+								}
+								float4 lolmi = q.toAxisAngle();
+								animation->AddRotationKey(t, q);
+							}
+							else
+								animation->AddRotationKey(t, rot);
+
+							animation->AddScalingKey(t, scale);
+						}
+
+#endif // 0
 					}
 
 				}
 			}
 		}
+
+#endif // Object baking
 	}
 
 	// --- 
