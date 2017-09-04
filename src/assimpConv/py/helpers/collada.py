@@ -6,6 +6,35 @@ import sys
 import inspect
 
 from . import Dumpable
+from godot.export_dae import DaeExporter
+
+
+class ColladaGodot(Dumpable):
+    """ Uses godot exporter to dunp stuff to collada 
+    https://github.com/godotengine/collada-exporter
+    """
+    
+    def __init__(self):
+        Dumpable.__init__(self)
+        pass
+
+    def report(self: a, b):
+        print(b)
+        
+    def reprJSON(self):
+        tfile = tempfile.NamedTemporaryFile()
+        tname = tfile.name
+        self._save_collada(tname)
+        tfile.close()
+
+        daefile = tname + ".dae"
+        
+        dae = ""
+        with DaeExporter(daefile, kwargs, self) as exp:
+            exp.export()
+    
+        pass
+    
 
 class Collada(Dumpable):
     """

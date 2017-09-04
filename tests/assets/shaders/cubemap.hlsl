@@ -30,6 +30,7 @@ float4 mainPixel(FXPixelInputType input) : SV_TARGET
 	float w = 1. / tan(res.fov *.5);
 
 	float3 uvw = normalize(mul(- float4(u, v, w, 0), view).xyz);
+	//uvw.z = uvw.z * -1;
 
 	return skybox.SampleLevel(SampleType, uvw, 10);
 }
