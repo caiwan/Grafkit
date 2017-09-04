@@ -16,6 +16,7 @@ AssimpConverter.exe -b --lh -i %basedir%\models\sphere.blend -o %basedir%\sphere
 AssimpConverter.exe -b --lh -i %basedir%\models\spheres.blend -o %basedir%\spheres.scene
 AssimpConverter.exe -b --lh -i %basedir%\models\box.blend -o %basedir%\box.scene
 AssimpConverter.exe -b --lh -i %basedir%\models\sphere_multimaterial.blend -o %basedir%\sphere_multimaterial.scene
+AssimpConverter.exe -b --lh -i %basedir%\models\sphere_pbr.blend -o %basedir%\sphere_pbr.scene
 AssimpConverter.exe -b --lh -i %basedir%\models\ao.blend -o %basedir%\ao.scene
 
 cd %basedir%
