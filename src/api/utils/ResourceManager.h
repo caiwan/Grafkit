@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <map>
 #include <list>
@@ -65,8 +66,13 @@ namespace Grafkit {
 		IPreloadEvents* m_preloadEvents;
 	};
 
-	template<class T> inline Ref<T> IResourceManager::Get(const std::string &pName) const {
-		auto it = m_resources.find(pName);
+	template<class T> inline Ref<T> IResourceManager::Get(const std::string &pName) const 
+	{
+		// FUCKING case sensitive Windows filesystem crap shit
+		std::string name = pName;
+		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+		auto it = m_resources.find(name);
 
 		if (it != m_resources.end()) {
 			return Ref<T>(dynamic_cast<T*>(it->second.Get()));

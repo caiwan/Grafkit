@@ -8,7 +8,7 @@ using namespace FWdebugExceptions;
 
 IResourceManager::IResourceManager() : m_preloadEvents(nullptr)
 {
-	/* Alap resource pathek */
+	/* Base resource paths inside the asset directory */
 	this->AddResourcePath("texture", "textures/");
 	this->AddResourcePath("shader", "shaders/");
 	this->AddResourcePath("shaderincludesystem", "shaders/lib/");
@@ -31,8 +31,11 @@ void IResourceManager::Add(Ref<IResource> pResource)
 				throw new EX_DETAILS(UpdateResourceExcpetion, "(A resource pointerek nem egyformak. Geteld ki elobb, aztan frissits.)");
 			}
 		}
+		// FUCKING case sensitive Windows filesystem crap shit
+		std::string name = pResource->GetName();
+		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 
-		m_resources[pResource->GetName()] = pResource;
+		m_resources[name] = pResource;
 	}	
 }
 
@@ -40,7 +43,7 @@ void IResourceManager::Remove(const std::string & pName)
 {
 	auto it = m_resources.find(pName);
 	if (it != m_resources.end()) {
-		m_resources.erase(it); // feltehetoleg a resouece manager torli maga utan a ptr-t
+		m_resources.erase(it);
 	}
 }
 
@@ -61,7 +64,6 @@ void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
 void Grafkit::IResourceManager::TriggerReload(std::string filename)
 {
 	// filename => {resource name, builder object}
-
 	auto it = m_filenamesToBuilder.find(filename);
 	if (it != m_filenamesToBuilder.end()) {
 		auto value = it->second;
