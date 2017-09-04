@@ -178,8 +178,8 @@ protected:
 			
 			(*cubemapShader)->SetParam(render, "ResolutionBuffer", &resprops);
 			(*cubemapShader)->SetParam(render, "MatrixBuffer", &worldMatrices);
-			(*cubemapShader)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
-			(*cubemapShader)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
+			(*cubemapShader)->SetShaderResourceView(render, "skybox", (*envmap)->GetShaderResourceView());
+			(*cubemapShader)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
 			
 			render.ToggleDepthWrite(false);
 
@@ -187,9 +187,9 @@ protected:
 
 			render.ToggleDepthWrite(true);
 
-			(*fs)->SetShaderResourceView("skybox", (*envmap)->GetShaderResourceView());
-			(*fs)->SetShaderResourceView("envmap", (*envmap)->GetShaderResourceView());
-			(*fs)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
+			(*fs)->SetShaderResourceView(render, "skybox", (*envmap)->GetShaderResourceView());
+			(*fs)->SetShaderResourceView(render, "envmap", (*envmap)->GetShaderResourceView());
+			(*fs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
 
 			this->scene->Get()->Render(render);
 		}
