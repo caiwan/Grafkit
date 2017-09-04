@@ -22,12 +22,12 @@ namespace Grafkit {
 			// regular types	
 			TT_diffuse,	///< 1st map
 
+			TT_metalness,
+			TT_roughness,
+			TT_emission,
+
 			TT_alpha,		///< alpha map
 			TT_normal,		///< bump map
-			TT_shiniess,	///< shininess map
-			TT_specular,	///< specular map
-			TT_selfillum,	///< self illumination map
-			TT_reflect,		///< reflection map
 			TT_bump,		///< bump map
 
 			TT_aux0,		///< aux texture, used for pretty much everything else
@@ -41,6 +41,10 @@ namespace Grafkit {
 	public:
 		Material();
 		~Material() {}
+
+		/* THESE PROPERTIES ARE NOT REALLY SUPPORTED ANYMORE DUE PBR 
+		I'll refactor it later on
+		*/
 
 		// TODO: QND hack for assimp converter, opt out to return w/ ref
 

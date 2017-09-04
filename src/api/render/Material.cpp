@@ -18,12 +18,11 @@ namespace {
 	const char *texture_map_names[Material::TT_COUNT] =
 	{
 		"t_diffuse",
+		"t_metallic",
+		"t_roughness",
+		"t_emission",
 		"t_alpha",
 		"t_normal",
-		"t_shiniess",
-		"t_specular",
-		"t_selfillum",
-		"t_reflect",
 		"t_bump",
 		"t_aux0",
 		"t_aux1",
@@ -99,7 +98,7 @@ void Grafkit::Material::Render(Renderer& render, ShaderRef &vs, ShaderRef &fs)
 
 	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
 		if (it->second.Valid() && it->second->Valid())
-			fs->SetBoundedResourcePointer(it->first, (*it->second)->GetShaderResourceView());
+			fs->SetBoundedResourcePointer(render, it->first, (*it->second)->GetShaderResourceView());
 	}
 }
 

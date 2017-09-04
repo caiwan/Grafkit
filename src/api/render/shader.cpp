@@ -46,12 +46,12 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ID3DIn
 	ID3D10Blob* errorMessage = nullptr;
 	ID3D10Blob* shaderBuffer = nullptr;
 	unsigned int numElements = 0;
-	
-	// input checking
-	if (!entry) 
-		throw new EX(NullPointerException);	
 
-	if (!file) 
+	// input checking
+	if (!entry)
+		throw new EX(NullPointerException);
+
+	if (!file)
 		throw new EX(NullPointerException);
 
 	result = CompileShaderFromFile(file, pDefines, pInclude, entry, shaderBuffer, errorMessage);
@@ -137,9 +137,9 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 	BindShader(deviceContext);
 
 	// duck the constant buffers around
-	if (this->GetParamCount()) 
+	if (this->GetParamCount())
 	{
-		for (size_t i = 0; i < this->GetParamCount(); i++){
+		for (size_t i = 0; i < this->GetParamCount(); i++) {
 			ID3D11Buffer* buffer = this->m_cBuffers[i].m_buffer;
 			UINT slot = this->m_cBuffers[i].m_slot;
 
@@ -147,40 +147,6 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 		}
 	}
 
-	// duck through the resources
-	if (this->GetBoundedResourceCount()) 
-	{
-		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
-			BResRecord &brRecord = this->m_bResources[i];
-			if (brRecord.m_boundSource != nullptr) {
-				
-				/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
-				if (brRecord.m_desc.BindCount != 1)
-					DebugBreak();
-
-				switch (brRecord.m_desc.Type) {
-				case D3D_SIT_TEXTURE: 
-				{
-					///@todo ezzel kell meg valamit kezdeni 
-					ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
-
-					SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
-
-				} break;
-
-				case D3D_SIT_SAMPLER:
-				{
-					ID3D11SamplerState * pSampler = (ID3D11SamplerState*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
-					SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
-				}break;
-				
-				}
-
-				// zero, mindenesetre
-				// brRecord.m_boundSource = nullptr;
-			}
-		}
-	}
 }
 
 void Grafkit::Shader::Unbind(ID3D11DeviceContext * deviceContext)
@@ -297,7 +263,7 @@ void* Shader::MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int
 	if (FAILED(result))
 		throw new EX_HRESULT(ConstantBufferMapException, result);
 
-	return cbRecord.m_mappedResource.pData; 
+	return cbRecord.m_mappedResource.pData;
 }
 
 void * Shader::GetMappedPtr(size_t id)
@@ -317,24 +283,55 @@ void Shader::UnMapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id)
 
 // ============================================================================================================================================
 
-void Grafkit::Shader::SetBoundedResourcePointer(std::string name, void * ptr)
+void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, std::string name, void * ptr)
 {
 	auto it = this->m_mapBResources.find(name);
 	if (it != this->m_mapBResources.end())
-		SetBoundedResourcePointer(it->second, ptr);
+		SetBoundedResourcePointer(deviceContext, it->second, ptr);
 }
 
-void Grafkit::Shader::SetBoundedResourcePointer(size_t id, void * ptr)
+void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, size_t id, void * ptr)
 {
-	if (id < GetBoundedResourceCount())
-		this->m_bResources[id].m_boundSource = ptr;
+	if (id >= GetBoundedResourceCount())
+		return;
+
+	this->m_bResources[id].m_boundSource = ptr;
+
+	BResRecord &brRecord = this->m_bResources[id];
+	if (brRecord.m_boundSource != nullptr) {
+
+		/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
+		if (brRecord.m_desc.BindCount != 1)
+			DebugBreak();
+
+		switch (brRecord.m_desc.Type) {
+		case D3D_SIT_TEXTURE:
+		{
+			///@todo ezzel kell meg valamit kezdeni 
+			ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
+
+			SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
+
+		} break;
+
+		case D3D_SIT_SAMPLER:
+		{
+			ID3D11SamplerState * pSampler = (ID3D11SamplerState*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
+			SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
+		}break;
+
+		}
+
+		// zero, mindenesetre
+		// brRecord.m_boundSource = nullptr;
+	}
 }
 
 void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
 {
 	char* compileErrors = nullptr;
 	unsigned long bufferSize = 0;
-	
+
 	// duck this rainbow
 	FILE* fp = nullptr;
 
@@ -360,7 +357,7 @@ void Shader::GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 	while (mask)
 	{
 		if (mask & 0x01) varCount++;
-		mask >>= 1; 
+		mask >>= 1;
 	}
 
 	res = DXGI_FORMAT_UNKNOWN;
@@ -368,70 +365,70 @@ void Shader::GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 
 	///@todo I should took this mess into a LUT
 	switch (pd.ComponentType) {
-		case D3D_REGISTER_COMPONENT_FLOAT32:
-		{
-			switch (varCount) {
-			case 4:
-				res = DXGI_FORMAT_R32G32B32A32_FLOAT;
-				byteWidth = 4*4;
-				return;
-			case 3:
-				res = DXGI_FORMAT_R32G32B32_FLOAT;
-				byteWidth = 4*3;
-				return;
-			case 2:
-				res = DXGI_FORMAT_R32G32_FLOAT;
-				byteWidth = 4*2;
-				return;
-			case 1:
-				res = DXGI_FORMAT_R32_FLOAT;
-				byteWidth = 4*1;
-				return;
-			}
-			break;
+	case D3D_REGISTER_COMPONENT_FLOAT32:
+	{
+		switch (varCount) {
+		case 4:
+			res = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			byteWidth = 4 * 4;
+			return;
+		case 3:
+			res = DXGI_FORMAT_R32G32B32_FLOAT;
+			byteWidth = 4 * 3;
+			return;
+		case 2:
+			res = DXGI_FORMAT_R32G32_FLOAT;
+			byteWidth = 4 * 2;
+			return;
+		case 1:
+			res = DXGI_FORMAT_R32_FLOAT;
+			byteWidth = 4 * 1;
+			return;
 		}
-		case D3D_REGISTER_COMPONENT_SINT32:
-		{
-			switch (varCount) {
-			case 4:
-				res = DXGI_FORMAT_R32G32B32A32_SINT;
-				byteWidth = 2 * 4;
-				return;
-			case 3:
-				res = DXGI_FORMAT_R32G32B32_SINT;
-				byteWidth = 2 * 3;
-				return;
-			case 2:
-				res = DXGI_FORMAT_R32G32_SINT;
-				byteWidth = 2 * 2;
-				return;
-			case 1:
-				res = DXGI_FORMAT_R32_SINT;
-				byteWidth = 2 * 1;
-				return;
-			}
+		break;
+	}
+	case D3D_REGISTER_COMPONENT_SINT32:
+	{
+		switch (varCount) {
+		case 4:
+			res = DXGI_FORMAT_R32G32B32A32_SINT;
+			byteWidth = 2 * 4;
+			return;
+		case 3:
+			res = DXGI_FORMAT_R32G32B32_SINT;
+			byteWidth = 2 * 3;
+			return;
+		case 2:
+			res = DXGI_FORMAT_R32G32_SINT;
+			byteWidth = 2 * 2;
+			return;
+		case 1:
+			res = DXGI_FORMAT_R32_SINT;
+			byteWidth = 2 * 1;
+			return;
 		}
-		case D3D_REGISTER_COMPONENT_UINT32:
-		{
-			switch (varCount) {
-			case 4:
-				res = DXGI_FORMAT_R32G32B32A32_UINT;
-				byteWidth = 4 * 4;
-				return;
-			case 3:
-				res = DXGI_FORMAT_R32G32B32_UINT;
-				byteWidth = 4 * 3;
-				return;
-			case 2:
-				res = DXGI_FORMAT_R32G32_UINT;
-				byteWidth = 4 * 2;
-				return;
-			case 1:
-				res = DXGI_FORMAT_R32_UINT;
-				byteWidth = 4 * 1;
-				return;
-			}
+	}
+	case D3D_REGISTER_COMPONENT_UINT32:
+	{
+		switch (varCount) {
+		case 4:
+			res = DXGI_FORMAT_R32G32B32A32_UINT;
+			byteWidth = 4 * 4;
+			return;
+		case 3:
+			res = DXGI_FORMAT_R32G32B32_UINT;
+			byteWidth = 4 * 3;
+			return;
+		case 2:
+			res = DXGI_FORMAT_R32G32_UINT;
+			byteWidth = 4 * 2;
+			return;
+		case 1:
+			res = DXGI_FORMAT_R32_UINT;
+			byteWidth = 4 * 1;
+			return;
 		}
+	}
 	}
 }
 
@@ -460,7 +457,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
 		this->m_pReflector->GetInputParameterDesc(i, &input_desc);
-		
+
 		// --- 
 		// https://takinginitiative.wordpress.com/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
 
@@ -473,7 +470,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		elementDesc.SemanticIndex = input_desc.SemanticIndex;
 		elementDesc.InputSlot = 0;
 		elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-		elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;	
+		elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		elementDesc.InstanceDataStepRate = 0;
 
 		elem.desc = elementDesc;
@@ -484,9 +481,9 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		LOGGER(Log::Logger().Trace("--- Input element: \"%s\" [%d], Format = {%d, %d}", input_desc.SemanticName, input_desc.SemanticIndex, elementDesc.Format, elem.width));
 
 		elements.push_back(elementDesc);
-		
+
 		const char *name = elementDesc.SemanticName;
-		
+
 		this->m_mapInputElems.push_back(elem);
 	}
 
@@ -503,10 +500,10 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC out_desc;
 		this->m_pReflector->GetOutputParameterDesc(i, &out_desc);
-		
+
 		OutputTargetRecord rec;
 		rec.desc = out_desc;
-		
+
 		LOGGER(Log::Logger().Trace("--- Output params: \"%s\" [%d]", out_desc.SemanticName, out_desc.SemanticIndex));
 
 		m_outputTargets.push_back(rec);
@@ -528,7 +525,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		// --- create buffer
 		D3D11_BUFFER_DESC bufferDesc;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC; // D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = 16 * (ceil(cbRecord.m_description.Size/16));
+		bufferDesc.ByteWidth = 16 * (ceil(cbRecord.m_description.Size / 16));
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		bufferDesc.MiscFlags = 0;
@@ -541,7 +538,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
 		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
 
-		LOGGER(Log::Logger().Trace("--- Constant Buffer: \"%s\" [%d], Format = {t: %d, s: %d, bw: %d}", 
+		LOGGER(Log::Logger().Trace("--- Constant Buffer: \"%s\" [%d], Format = {t: %d, s: %d, bw: %d}",
 			cbRecord.m_description.Name, i, cbRecord.m_description.Type, cbRecord.m_description.Size, bufferDesc.ByteWidth));
 
 		// build up cbuffer variables
@@ -562,7 +559,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 			if (FAILED(result))
 				throw new EX_HRESULT(ConstantBufferLocateException, result);
 
-			LOGGER(Log::Logger().Trace("---- Variable: \"%s\" [%d], Format = {t:%s, s: %d, o: %d}", 
+			LOGGER(Log::Logger().Trace("---- Variable: \"%s\" [%d], Format = {t:%s, s: %d, o: %d}",
 				cbVar.m_var_desc.Name, j, cbVar.m_type_desc.Name, cbVar.m_var_desc.Size, cbVar.m_var_desc.StartOffset));
 
 			cbRecord.m_cbVars.push_back(cbVar);
@@ -587,8 +584,8 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		brRecord.m_boundSource = nullptr;
 		brRecord.m_desc = brDesc;
 
-		LOGGER(Log::Logger().Trace("--- Bounded Resource: \"%s\" [%d], Format = {%d}", 
-brRecord.m_desc.Name, i, brRecord.m_desc.Type));
+		LOGGER(Log::Logger().Trace("--- Bounded Resource: \"%s\" [%d], Format = {%d}",
+			brRecord.m_desc.Name, i, brRecord.m_desc.Type));
 
 		m_bResources.push_back(brRecord);
 		m_mapBResources[brDesc.Name] = i;
@@ -650,7 +647,7 @@ void Grafkit::VertexShader::SetShaderResources(ID3D11DeviceContext * device, UIN
 
 void Grafkit::VertexShader::SetConstantBuffer(ID3D11DeviceContext * device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
-	device->VSSetConstantBuffers(slot, numBuffers, &buffer); 
+	device->VSSetConstantBuffers(slot, numBuffers, &buffer);
 }
 
 

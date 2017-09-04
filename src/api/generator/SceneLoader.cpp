@@ -246,7 +246,9 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 
 			LOGGER(Log::Logger().Info("      Texture: %s {", texture->GetName().c_str()));
 
-			if (texture.Valid() && texture->Valid()) {
+			// the texture itself does not need to be valid
+			// we just want to have its name
+			if (texture.Valid()) {
 				texture_bind_t bind;
 				bind.first = texture->GetName();
 				bind.second = tx_it->first;
@@ -459,11 +461,6 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IRes
 			}
 		}
 	}
-}
-
-void Grafkit::SceneLoader::SceneLoaderHelper::PersistTextures(Archive & ar, MaterialRef & material, IResourceManager * const & resman)
-{
-	// ... 
 }
 
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IResourceManager * const & resman)

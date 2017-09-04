@@ -92,14 +92,14 @@ namespace Grafkit {
 		size_t GetBoundedResourceCount() { return this->m_bResources.size(); }
 		D3D11_SHADER_INPUT_BIND_DESC GetBoundedResourceDesc(size_t id) { return m_bResources[id].m_desc; }
 		
-		void SetSamplerSatate(std::string name, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(name, pSampler); }
-		void SetSamplerSatate(size_t id, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(id, pSampler); }
+		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, std::string name, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, name, pSampler); }
+		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, size_t id, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, id, pSampler); }
 
-		void SetShaderResourceView(std::string name, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(name, pResView); }
-		void SetShaderResourceView(size_t id, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(id, pResView); }
+		void SetShaderResourceView(ID3D11DeviceContext * deviceContext, std::string name, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, name, pResView); }
+		void SetShaderResourceView(ID3D11DeviceContext * deviceContext, size_t id, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, id, pResView); }
 
-		void SetBoundedResourcePointer(std::string name, void* ptr);
-		void SetBoundedResourcePointer(size_t id, void* ptr);
+		void SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, std::string name, void* ptr);
+		void SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, size_t id, void* ptr);
 
 		// ----
 		// access input layout 

@@ -60,7 +60,6 @@ namespace Grafkit {
 			// --- 
 			void Persist(Archive &ar, IResourceManager * const & resman);
 			void PersistMaterials(Archive &ar, IResourceManager * const & resman);
-			void PersistTextures(Archive &ar, MaterialRef &material, IResourceManager * const & resman);
 			void PersistEntities(Archive &ar, IResourceManager * const & resman);
 			void PersistActors(Archive &ar, IResourceManager * const & resman);
 			void PersistAnimations(Archive &ar, IResourceManager * const & resman);
