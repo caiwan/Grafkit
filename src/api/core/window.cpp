@@ -219,7 +219,6 @@ bool Window::peekWindowMessage(){
 }
 
 void Window::setTitle(const char* txt){
-	///@todo implement
-	//strncpy(this->wndtitle, txt, 512);
+	SetWindowText(hWnd, txt);
 }
 
