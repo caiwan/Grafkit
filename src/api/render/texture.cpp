@@ -297,7 +297,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	if (initialData) {
 		subresData.pSysMem = initialData;
 		subresData.SysMemSlicePitch = 0;
-		if (m_ch = 3) {
+		if (m_ch == 3) {
 			m_ch = 4;
 			unsigned char *data = new unsigned char[m_w * m_h * m_ch * m_chW];
 			CopyChannel3To4(initialData, data, m_w, m_h);
