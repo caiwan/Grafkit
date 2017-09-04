@@ -124,84 +124,6 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// -----------------------------------------------------------------------------
 	// --- setup swap chain
-
-#if 1
-	// compositing swap chain 
-	featureLevel = D3D_FEATURE_LEVEL_10_0;
-
-	DWORD deviceCreationFlags = 0;
-#ifdef _DEBUG
-	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-	result = D3D11CreateDevice(
-		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 
-		deviceCreationFlags, 
-		&featureLevel, 1, 
-		D3D11_SDK_VERSION, &m_device, 
-		nullptr, &m_deviceContext
-	);
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-	// https://stackoverflow.com/questions/45815757/how-to-letterbox-crop-without-setting-the-viewport-in-directx-11/45978806#45978806
-
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
-	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-
-	swapChainDesc.Width = m_screenW;
-	swapChainDesc.Height = m_screenH;
-	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	//swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	swapChainDesc.Stereo = false;
-	swapChainDesc.SampleDesc.Count = 1;
-	swapChainDesc.SampleDesc.Quality = 0;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.BufferCount = 2;
-	swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-	swapChainDesc.Flags = 0;
-
-	DXGI_SWAP_CHAIN_FULLSCREEN_DESC swapFullscreenDesc;
-	ZeroMemory(&swapFullscreenDesc, sizeof(swapFullscreenDesc));
-
-	// fk
-	//swapFullscreenDesc.
-
-	// First, convert our ID3D11Device1 into an IDXGIDevice1
-	IDXGIDevice2 *dxgiDevice = nullptr;
-	result = m_device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgiDevice);
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-	// Second, use the IDXGIDevice1 interface to get access to the adapter
-	IDXGIAdapter* dxgiAdapter = nullptr;
-	result = dxgiDevice->GetAdapter(&dxgiAdapter);
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-	// Third, use the IDXGIAdapter interface to get access to the factory
-	IDXGIFactory2* dxgiFactory = nullptr;
-	result = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&dxgiFactory);
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-	//result = dxgiFactory->CreateSwapChainForComposition(
-	result = dxgiFactory->CreateSwapChainForHwnd(
-		m_device, hwnd,
-		&swapChainDesc, nullptr, nullptr, &m_swapChain); 
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-#else
-	// Signle swap chain for single window and its viewport
-
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 
 	// Initialize the swap chain description.
@@ -266,45 +188,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	DWORD deviceCreationFlags = 0;
 
-
 #ifdef _DEBUG
 	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-
-#if 
-
-	result = D3D11CreateDevice(
-		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
-		deviceCreationFlags,
-		&featureLevel, 1,
-		D3D11_SDK_VERSION, &m_device,
-		nullptr, nullptr
-	);
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-	// First, convert our ID3D11Device1 into an IDXGIDevice1
-	IDXGIDevice2 *dxgiDevice = nullptr;
-	result = m_device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgiDevice);
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-	// Second, use the IDXGIDevice1 interface to get access to the adapter
-	IDXGIAdapter* dxgiAdapter = nullptr;
-	result = dxgiDevice->GetAdapter(&dxgiAdapter);
-
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
-
-	// Third, use the IDXGIAdapter interface to get access to the factory
-	IDXGIFactory2* dxgiFactory = nullptr;
-	result = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&dxgiFactory);
-
-	dxgiFactory->CreateSwapChainForHwnd(m_device, hwnd &swapChainDesc, m_swapChain);
-
-#else 
 
 	result = D3D11CreateDeviceAndSwapChain(
 		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, deviceCreationFlags,
@@ -314,9 +200,6 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	if (FAILED(result))
 		throw EX_HRESULT(InitializeRendererException, result);
-#endif
-
-#endif
 
 	// update our reference
 	this->AssingnRef(m_device);
