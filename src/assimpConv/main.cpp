@@ -78,7 +78,6 @@ public:
 		BlenderExportServer server;
 
 		server.SetLHFlag(args.get("lh").isFound());
-		//server.SetLHFlag(true);
 
 		// check if input exists, otherwise do not start anything
 		std::string fn = args.get("input").value();

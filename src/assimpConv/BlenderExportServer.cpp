@@ -117,26 +117,32 @@ bool BlenderExportServer::PostData(std::stringstream &ss)
 
 int BlenderExportServer::Run()
 {
-	do {
-		bool is_done = false;
-		{
-			Grafkit::MutexLocker lock(m_inputDataQueueMutex);
-			is_done = m_inputDataQueue.empty();
-		}
-		while (!is_done)
-		{
-			json j;
+	try {
+		do {
+			bool is_done = false;
 			{
 				Grafkit::MutexLocker lock(m_inputDataQueueMutex);
-				j = m_inputDataQueue.front();
-				m_inputDataQueue.pop();
 				is_done = m_inputDataQueue.empty();
 			}
+			while (!is_done)
+			{
+				json j;
+				{
+					Grafkit::MutexLocker lock(m_inputDataQueueMutex);
+					j = m_inputDataQueue.front();
+					m_inputDataQueue.pop();
+					is_done = m_inputDataQueue.empty();
+				}
 
-			m_isTerminate = !Parse(j);
-		}
-	} while (!m_isTerminate);
-
+				m_isTerminate = !Parse(j);
+			}
+		} while (!m_isTerminate);
+	}
+	catch (Exception *& ex) {
+		Log::Logger().Error(ex->what());
+		delete ex;
+		return 1;
+	}
 	return 0;
 }
 
