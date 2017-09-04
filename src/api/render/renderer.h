@@ -96,7 +96,7 @@ namespace Grafkit {
 		bool m_vsync_enabled;
 		char m_videoCardDescription[128];
 		IDXGISwapChain1* m_swapChain;
-		ID3D11Device2* m_device;
+		ID3D11Device* m_device;
 		ID3D11DeviceContext* m_deviceContext;
 		ID3D11RenderTargetView *m_renderTargetViews[RENDER_TARGET_MAX], *m_myRenderTargetView;
 		size_t m_renderTargetViewCount;
