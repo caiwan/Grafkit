@@ -14,29 +14,46 @@ def print_usage():
 
 
 class EvtHandler(FileSystemEventHandler): 
-    def __init__(self, dst_dir):
+    def __init__(self, src_dir, dst_dir):
         FileSystemEventHandler.__init__(self)
+        self.src = src_dir
         self.dst = dst_dir
         self.lg = logging.getLogger('EvtHandler')
         pass
         
     def copy(self, evt):
-        try:
-            if not evt.src_path.lower().endswith(".tmp"):
-                shutil.copy(evt.src_path, self.dst)
-                self.lg.info("Copy file to " + evt.src_path)
-        except:
+        for i in range(3):
+            try:
+                src = evt.src_path.lower()
+                if not os.path.isfile(src):
+                    return
+                    
+                if src.endswith(".tmp") or src.lower().endswith("~"):
+                    return
+                    
+                dst = self.dst + os.path.relpath(evt.src_path, start=self.src)
+                shutil.copy(evt.src_path, dst)
+                self.lg.info("Copy file "+evt.src_path+ " to " + dst)
+                
+                return
+            except IOError as e:
+                self.lg.error("fuk {}".format(str(e)))
+                if e.errno == 2:
+                    return
+                time.sleep(.25)
             pass
-        pass
         
     def on_created(self, evt):
+        # time.sleep(2)
         self.copy(evt)
         
     def on_modified(self, evt):
+        # time.sleep(2)
         self.copy(evt)
     pass
     
     def on_moved(self, evt):
+        # time.sleep()
         self.copy(evt)
     pass
     
@@ -52,7 +69,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
                         
     event_handler_log = LoggingEventHandler()
-    event_handler = EvtHandler(output)
+    event_handler = EvtHandler(input, output)
     
     observer = Observer()
     observer.schedule(event_handler_log, input, recursive=True)
