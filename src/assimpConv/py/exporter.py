@@ -14,6 +14,7 @@ if cmd_folder not in sys.path:
 
 from helpers import client
 from helpers.collada import Collada
+from helpers.bake import Bake
 from helpers import bpyexport
 
 def get_args():
@@ -32,49 +33,6 @@ def get_args():
 
     return parsed_script_args
 
-    
-def dump_shitz_per_frmae(conn, scene):
-    """ This crappy fuckshit seems does not work at all
-    """
-    camera_keys = []
-    
-    objects = [obj for obj in scene.objects if obj.type in ["MESH", "EMPTY", "LIGHT"]]
-
-    object_keys = [bpyexport.BpyObject(obj).newobject() for obj in objects]
-    for i in range(len(objects)):
-        object_keys[i].update(bpyexport.BpyObject(objects[i]).localmatrix()) #bazdmeg
-    
-    for i in range(scene.frame_start - 1, scene.frame_end, scene.frame_step):
-        t = i * (scene.render.fps_base / scene.render.fps)
-        
-        print("Baking frame {}".format(i))
-        
-        camera = scene.camera
-        scene.frame_set(i)
-        
-        bpy.ops.object.paths_calculate()
-        scene.update()
-        
-        v = bpyexport.CameraFrame(camera).reprJSON()
-        key = {"v":v, "t":t}
-        camera_keys.append(key)
-        
-        for i in range(len(objects)):
-            object = objects[i]
-            v = {}
-            v["actions"] = bpyexport.BpyObject(object).eval_animations(i) 
-            v.update(bpyexport.BpyObject(object).localmatrix())
-            if v:
-                key = {"v":v, "t":t}
-               
-                if not "frames" in object_keys[i]:
-                    object_keys[i]["frames"] = []
-                
-                object_keys[i]["frames"].append(key)
-        
-    conn.send("bpydump", {"ObjectAnimations": object_keys})
-    conn.send("bpydump", {"MainCameraMovement" : camera_keys})
-    
     
 def do_dump(conn):
     scene = bpy.context.scene
@@ -99,33 +57,10 @@ def do_bake():
         https://wiki.blender.org/index.php/Dev:2.4/Source/Animation/AnimationBaking
         https://docs.blender.org/api/blender_python_api_2_72_1/bpy.ops.nla.html#bpy.ops.nla.bake
     """ 
-    scene = bpy.context.scene
     
-    # needs to be iterated 
-    # due it missses the other children in scenegraph
-    # otherwise it bakes only a random child
-    for obj in scene.objects:
-        scene.objects.active = obj
-        scene.update()
-        
-        # this would be nice too 
-        # for modifier in obj.modifiers:
-        #   modifier.apply()
-    
-        print("Baking object {}".format(obj.name))
-    
-        # visual keying = bakes constraints
-        # aside that, parenting and constraints should be cleared
-        bpy.ops.nla.bake(\
-            frame_start=scene.frame_start,\
-            frame_end=scene.frame_end,\
-            step=scene.frame_step,\
-            only_selected=True,\
-            visual_keying=True,\
-            clear_constraints=True,\
-            clear_parents=True,\
-            bake_types={'OBJECT'}\
-        )
+    bake = Bake()
+    bake.bake_material_textures()
+    bake.bake_animations()
     
     
 # Main

@@ -146,6 +146,19 @@ int BlenderExportServer::Run()
 	return 0;
 }
 
+namespace {
+	// TODO: refactor later on
+	void QND_AddTextureToMaterialSafe(MaterialRef& resMat, json &j, std::string key, Material::texture_type_e tslot) 
+	{
+		if (j[key].is_string()) {
+			std::string name = j[key];
+			TextureResRef t = new TextureRes();
+			t->SetName(name);
+			resMat->SetTexture(t, tslot);
+		}
+	}
+}
+
 bool BlenderExportServer::Parse(json & j)
 {
 	std::string cmd = j["cmd"];
@@ -202,15 +215,19 @@ bool BlenderExportServer::Parse(json & j)
 						std::string ds = mat_it->dump();
 						json keys = mat_it->at("keys");
 						if (!keys.empty()) {
-							int layerid = (int)keys["layer"];
-							mat->SetLayer(layerid);
+							/*int layerid = (int)keys["layer"];
+							mat->SetLayer(layerid);*/
+
+							QND_AddTextureToMaterialSafe(mat, keys, "mat_normal", Material::TT_normal);
+							QND_AddTextureToMaterialSafe(mat, keys, "mat_matallic", Material::TT_metalness);
+							QND_AddTextureToMaterialSafe(mat, keys, "mat_roughness", Material::TT_roughness);
+							QND_AddTextureToMaterialSafe(mat, keys, "mat_base_color", Material::TT_diffuse);
+							QND_AddTextureToMaterialSafe(mat, keys, "mat_emission", Material::TT_emission);
 						};
 					}
 					catch (nlohmann::detail::exception &e) {
-						// ... 
+						DebugBreak();
 					}
-
-					// TODO: rest of material properties
 
 				}
 			}

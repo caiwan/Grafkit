@@ -33,6 +33,8 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+// TODO: this other kind of mess is not really sipported much on
+
 namespace {
 	// AI texture -- internal texture type mapping 
 	const struct {
@@ -42,16 +44,16 @@ namespace {
 	texture_load_map[] = {
 		aiTextureType_NONE,		    Material::TT_aux0,
 		aiTextureType_DIFFUSE,      Material::TT_diffuse,
-		aiTextureType_SPECULAR,     Material::TT_specular,
+		aiTextureType_SPECULAR,     Material::TT_aux0,
 		aiTextureType_AMBIENT,      Material::TT_aux0,
 		aiTextureType_EMISSIVE,     Material::TT_aux0,
 		aiTextureType_HEIGHT,       Material::TT_aux0,
 		aiTextureType_NORMALS,      Material::TT_normal,
-		aiTextureType_SHININESS,    Material::TT_shiniess,
+		aiTextureType_SHININESS,    Material::TT_aux0,
 		aiTextureType_OPACITY,      Material::TT_alpha,
 		aiTextureType_DISPLACEMENT, Material::TT_bump,
 		aiTextureType_LIGHTMAP,		Material::TT_aux0,
-		aiTextureType_REFLECTION,	Material::TT_reflect,
+		aiTextureType_REFLECTION,	Material::TT_aux0,
 		aiTextureType_UNKNOWN,		Material::TT_aux0,
 	};
 }
@@ -551,6 +553,8 @@ Grafkit::Matrix Grafkit::AssimpLoader::ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 	);
 #endif 
 }
+
+// This is another mess I'd like to remove or at least do something with it
 
 /**
 * AI materialbol textura infot extractol, majd resouce managerbol kiszedi a texturat hozza.

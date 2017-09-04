@@ -14,11 +14,28 @@ class ColladaGodot(Dumpable):
     https://github.com/godotengine/collada-exporter
     """
     
+    # These are the params that should be set up later on:
+    # params = {}
+    # params["use_export_selected"] = False,
+    # params["use_mesh_modifiers"] = False,
+    # params["use_tangent_arrays"] = False,
+    # params["use_triangles"] = False,
+    # params["use_copy_images"] = False,
+    # params["use_active_layers"] = True,
+    # params["use_exclude_ctrl_bones"] = True,
+    # params["use_anim"] = False,
+    # params["use_anim_action_all"] = False,
+    # params["use_anim_skip_noexp"] = True,
+    # params["use_anim_optimize"] = True,
+    # params["use_shape_key_export"] = False,
+    # params["anim_optimize_precision"] = 6.0,
+    # params["use_metadata"] = True,
+    
     def __init__(self):
         Dumpable.__init__(self)
         pass
 
-    def report(self: a, b):
+    def report(self, a, b):
         print(b)
         
     def reprJSON(self):
@@ -47,7 +64,10 @@ class Collada(Dumpable):
         
         self.triangulate = True
         self.use_texture_copies = False
-        self.include_material_textures = True
+        
+        # Blender does not exports texture filenames, but Godot would
+        # that will be refractored lateron (or something)
+        self.include_material_textures = False  
         self.include_uv_textures = True
 
         pass #ctor
