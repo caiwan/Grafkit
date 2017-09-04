@@ -19,6 +19,8 @@
 
 #include "math/matrix.h"
 
+#include "builtin_data/loaderbar.h"
+
 #include "utils/AssetFile.h"
 #include "utils/ResourceManager.h"
 #include "utils/ResourcePreloader.h"
@@ -29,10 +31,14 @@ using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-class Application : public Grafkit::System, protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
+class Application : 
+	public Grafkit::System, 
+	protected Grafkit::ResourcePreloader,
+	private Grafkit::ClonableInitializer, 
+	protected GrafkitData::LoaderBar
 {
 public:
-	Application() : ClonableInitializer(), Grafkit::System(), ResourcePreloader(),
+	Application() : ClonableInitializer(), Grafkit::System(), ResourcePreloader(this), LoaderBar(),
 		m_file_loader(nullptr)
 	{
 		int screenWidth, screenHeight;
@@ -90,13 +96,14 @@ protected:
 
 
 	int init() {
+		InitializeLoaderBar(render);
+
 		LoadCache();
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
 		//fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightmaterial.hlsl", "phongBlinn"));
-		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/normal.hlsl", "envmapNormal"));
-
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/lightpbr.hlsl", ""));
 
 		cubemapShader = Load<ShaderRes>(new PixelShaderLoader("cubemapShader", "shaders/cubemap.hlsl", ""));
 
@@ -110,7 +117,7 @@ protected:
 		));
 
 		// -- model 
-		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere_multimaterial.scene"));
+		scene = this->Load<SceneRes>(new SceneLoader("scene", "sphere_pbr.scene"));
 
 		DoPrecalc();
 
@@ -196,6 +203,11 @@ protected:
 
 private:
 	FileAssetFactory *m_file_loader;
+
+	protected:
+		void UpdateLoaderBar(float p) {
+			DrawLoaderBar(render, p);
+		}
 
 public:
 	IAssetFactory* GetAssetFactory() { return m_file_loader; };
