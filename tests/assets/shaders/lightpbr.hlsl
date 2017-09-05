@@ -201,7 +201,7 @@ PixelOutType mainPixel(PixelInputType input)
 
     color += noise / 256.0;
 	 
-    output.diff = color;
+    output.diff = lightCount / 2;
 	output.normal.xyz = surface_normal;
 	output.view = input.view;
     output.emission = emission_color;

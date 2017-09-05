@@ -47,7 +47,7 @@ struct PixelOutType {
 	float4 diff : SV_TARGET0;
 	float4 normal : SV_TARGET1;
 	float4 view : SV_TARGET2;
-	float4 emission : sv_TARGET3;
+	float4 emission : SV_TARGET3;
 };
 
 struct FXPixelInputType
