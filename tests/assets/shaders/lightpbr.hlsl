@@ -159,7 +159,8 @@ PixelOutType mainPixel(PixelInputType input)
     {
         float3 light_dir = normalize(lights[i].position.xyz - pixel_pos);
         float3 light_color = lights[i].color.rgb;
-        float light_intensity = lights[i].param1.a * 1000;
+        float light_intensity = .25; 
+        //lights[i].param1.a * 1000;
       
         // DIFFUSE
         diffuse_light += float4((saturate(dot(-light_dir, normal_sample)) * OneDivPi) * light_color * light_intensity * base_color.rgb, 1.0f);
@@ -167,9 +168,8 @@ PixelOutType mainPixel(PixelInputType input)
 		// SPECULAR 
         float3 halfVector = normalize(ray_dir + light_dir);
         float halfVecDotNorm = dot(halfVector, normal_sample);
-        float normDotCam = max(dot(surface_normal, ray_dir), 0);
+        float normDotCam = max(dot(surface_normal, -ray_dir), 0);
         float normDotLight = max(dot(surface_normal, -light_dir), 0);
-
 
         // Fresnel term
         float4 schlick_fresnel = specular_color + (1 - specular_color) * (pow(1 - dot(ray_dir, halfVector), 5) / (6 - 5 * (1 - roughness_sample)));
@@ -186,40 +186,33 @@ PixelOutType mainPixel(PixelInputType input)
 
         // Add the spec from this light
 		// foltykov
-        specular_light += float4(((schlick_fresnel * ggxDistribution * schlickGgxGeometry) / 4 * normDotLight * normDotCam).rrr * light_color * specular_color.rgb * light_intensity, 1.0f);
-        dbg = specular_light;
+        float alpha = (schlick_fresnel * ggxDistribution * schlickGgxGeometry) / 4 * normDotLight * normDotCam;
+        specular_light += float4(alpha * light_color * specular_color.rgb * light_intensity, 1.0f);
     }
   
-
     // Ambient cubemap light
-    //diffuse_light.rgb += cubemap_sampleAmbient.rgb * base_color.rgb;
+    diffuse_light.rgb += cubemap_sampleAmbient.rgb * base_color.rgb;
  
     // Specular cubemap light 
-    float normDotCam = max(
-		dot(
-			lerp(input.normal, normal_sample, max(dot(input.normal, ray_view), 0)), ray_view), 0);
+    float normDotCam = max(dot(lerp(input.normal, normal_sample, max(dot(input.normal, ray_view), 0)), ray_view), 0);
     float4 schlick_fresnel = saturate(specular_color + (1 - specular_color) * pow(1 - normDotCam, 5));
-
-	 // Ambient cubemap light
-    //diffuse_light.rgb += cubemap_sampleAmbient.rgb * base_color.rgb;
 
     // Composite
     float4 color;
-    color.rgb = schlick_fresnel;
+    //color.rgb = schlick_fresnel;
     color = lerp(diffuse_light, cubemap_sampleSpec, schlick_fresnel);
     color += specular_light;
 
     float noise = hash(input.position * 0.01, color);
 
-    //color = pow(abs(color), .4545);
+    color = pow(abs(color), .4545);
     color.a = base_color.a;
 
-    //color += emission_color;
+    color += emission_color;
 
     color += noise / 256.0;
-	 
-    dbg.a = 1;
-    output.diff = dbg;
+
+    output.diff = base_color;
     
     output.normal.xyz = surface_normal;
     output.view = input.view;
