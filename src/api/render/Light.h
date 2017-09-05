@@ -40,9 +40,9 @@ namespace Grafkit{
 		//float4 &Direction() { return m_direction; }
 		//void Direction(float4 d) { m_direction = d; }
 
-		/*float4 &Ambient() { return m_light.ambient; }
-		float4 &Diffuse() { return m_light.diffuse; }
-		float4 &Specular() { return m_light.specular; }*/
+		///*float4 &Ambient() { return m_light.ambient; }
+		float4 &Diffuse() { return m_light.color; }
+		//float4 &Specular() { return m_light.specular; }*/
 
 		float &ConstantAttenuation() { return m_light.ca; }
 		float &LinearAttenuation() { return m_light.la; }
@@ -57,8 +57,6 @@ namespace Grafkit{
 		void Render(Grafkit::Renderer& deviceContext, Scene * const & scene);
 		void Calculate(Grafkit::Renderer& deviceContext, Scene * const & scene, Matrix &nodeMatrix);
 		void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) {}
-
-
 
 	protected:
 
@@ -99,18 +97,27 @@ namespace Grafkit{
 
 	public:
 		struct light2_t {
-			float4 position;
-			float4 color;
+			light2_t(){}
+
 			union {
-				float ca, la, qa;
-				float intensity;
-				float4 _param1, _param2;
+				struct {
+					float4 position;
+					float4 color;
+				};
+				union {
+					struct {
+						float ca, la, qa;
+						float intensity;
+					};
+					float4 _param1, _param2;
+				};
+				char _padding[64];
 			};
 		};
 
 		// QND stuff to get the calculated data 
 		// to set it into the cbuffer
-		virtual void GetInternalData(void *const p);
+		virtual size_t GetInternalData(void *const& p);
 		light2_t GetData() { return m_light; }
 
 	private:

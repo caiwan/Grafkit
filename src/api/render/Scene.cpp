@@ -253,7 +253,11 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	(*m_vertexShader)->Bind(render);
 	(*m_pixelShader)->Bind(render);
 
-	struct {
+	// shit that happen here
+
+	struct ld_t {
+		ld_t(){}
+
 		Light::light2_t lights[16];
 		union {
 			int lightCount;
@@ -270,6 +274,8 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 		(*it)->GetInternalData(&lightData.lights[lightData.lightCount]);
 		lightData.lightCount++;
 	}
+
+	(*m_pixelShader)->SetParam(render, "LightBuffer", &lightData);
 
 	// render scenegraph
 	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {

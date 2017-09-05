@@ -14,6 +14,7 @@ Grafkit::Light::Light(light_type_t t) : Entity3D(), m_type(t), m_id(0)
 	//m_direction = float4(0, 0, -1, 0);
 	ZeroMemory(&m_light, sizeof(m_light));
 	m_light.la = 1.0;
+	m_light.color = float4(1, 1, 1, 1);
 }
 
 Light::~Light()
@@ -28,9 +29,10 @@ void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, Scene * const 
 	//m_light.direction = nodeMatrix.Transfrom(m_direction);
 }
 
-void Grafkit::Light::GetInternalData(void * const p)
+size_t Grafkit::Light::GetInternalData(void * const & p)
 {
 	CopyMemory(p, &m_light, sizeof(light2_t*));
+	return sizeof(light2_t*);
 }
 
 void Grafkit::Light::serialize(Archive & ar)

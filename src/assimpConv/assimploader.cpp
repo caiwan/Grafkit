@@ -314,14 +314,15 @@ void Grafkit::AssimpLoader::AssimpLoadLights(SceneRef &outScene)
 
 			// light <- assimp light
 			switch (curr_light->mType) {
-			case aiLightSource_DIRECTIONAL:
-				light = new Light(Light::LT_directional);
-				ASSIMP_V3D_F4(curr_light->mDirection, light->Direction(), 0, 0f);
-				break;
-
 			case aiLightSource_POINT:
 				light = new Light(Light::LT_point);
 				ASSIMP_V3D_F4(curr_light->mPosition, light->Position(), 0.0f);
+				break;
+
+#if 0
+			case aiLightSource_DIRECTIONAL:
+				light = new Light(Light::LT_directional);
+				ASSIMP_V3D_F4(curr_light->mDirection, light->Direction(), 0, 0f);
 				break;
 
 			case aiLightSource_SPOT:
@@ -335,16 +336,17 @@ void Grafkit::AssimpLoader::AssimpLoadLights(SceneRef &outScene)
 			case aiLightSource_AMBIENT:
 				light = new Light(Light::LT_ambient);
 				break;
+#endif
 			}
-
+#if 1
 			(light->ConstantAttenuation()) = curr_light->mAttenuationConstant;
 			(light->LinearAttenuation()) = curr_light->mAttenuationLinear;
 			(light->QuardicAttenuation()) = curr_light->mAttenuationQuadratic;
 
-			ASSIMP_COLOR_F4(curr_light->mColorAmbient, light->Ambient());
+			//ASSIMP_COLOR_F4(curr_light->mColorAmbient, light->Ambient());
 			ASSIMP_COLOR_F4(curr_light->mColorDiffuse, light->Diffuse());
-			ASSIMP_COLOR_F4(curr_light->mColorSpecular, light->Specular());
-
+			//ASSIMP_COLOR_F4(curr_light->mColorSpecular, light->Specular());
+#endif
 			///@todo ez kell-e majd?
 			light->SetName(light_name);
 
