@@ -219,7 +219,7 @@ bool BlenderExportServer::Parse(json & j)
 							mat->SetLayer(layerid);*/
 
 							QND_AddTextureToMaterialSafe(mat, keys, "mat_normal", Material::TT_normal);
-							QND_AddTextureToMaterialSafe(mat, keys, "mat_metalness", Material::TT_metalness);
+							QND_AddTextureToMaterialSafe(mat, keys, "mat_matallic", Material::TT_metallic);
 							QND_AddTextureToMaterialSafe(mat, keys, "mat_roughness", Material::TT_roughness);
 							QND_AddTextureToMaterialSafe(mat, keys, "mat_base_color", Material::TT_diffuse);
 							QND_AddTextureToMaterialSafe(mat, keys, "mat_emission", Material::TT_emission);

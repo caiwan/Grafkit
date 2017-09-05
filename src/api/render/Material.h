@@ -22,7 +22,7 @@ namespace Grafkit {
 			// regular types	
 			TT_diffuse,	///< 1st map
 
-			TT_metalness,
+			TT_metallic,
 			TT_roughness,
 			TT_emission,
 
