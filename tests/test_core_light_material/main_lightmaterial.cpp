@@ -73,6 +73,7 @@ protected:
 	TextureSamplerRef sampler;
 
 	TextureCubeResRef envmap;
+	TextureCubeResRef irradiancemap;
 
 	EffectComposerRef drawCubemap;
 	EffectComposerRef postfx;
@@ -114,6 +115,15 @@ protected:
 			"textures/yoko_negy.jpg",
 			"textures/yoko_posz.jpg",
 			"textures/yoko_negz.jpg"
+		));
+
+		irradiancemap = Load<TextureCubeRes>(new TextureCubemapFromBitmap("irradiance",
+			"textures/yoko_low_posx.jpg",
+			"textures/yoko_low_negx.jpg",
+			"textures/yoko_low_posy.jpg",
+			"textures/yoko_low_negy.jpg",
+			"textures/yoko_low_posz.jpg",
+			"textures/yoko_low_negz.jpg"
 		));
 
 		// -- model 
@@ -188,7 +198,7 @@ protected:
 			render.ToggleDepthWrite(true);
 
 			(*fs)->SetShaderResourceView(render, "c_specular", (*envmap)->GetShaderResourceView());
-			(*fs)->SetShaderResourceView(render, "c_irradiance", (*envmap)->GetShaderResourceView());
+			(*fs)->SetShaderResourceView(render, "c_irradiance", (*irradiancemap)->GetShaderResourceView());
 			(*fs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
 
 			this->scene->Get()->Render(render);
