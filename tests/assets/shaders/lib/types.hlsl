@@ -40,7 +40,7 @@ struct PixelInputType
 	
 	float4 tex : TEXCOORD0;
 
-	float4 view : VIEW;
+    float4 view : VIEW0;
 };
 
 struct PixelOutType {

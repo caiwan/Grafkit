@@ -96,9 +96,15 @@ void Grafkit::Material::Render(Renderer& render, ShaderRef &vs, ShaderRef &fs)
 	vs->SetParam(render, "material_colors", &m_colors);
 	fs->SetParam(render, "material_params", &m_params);
 
+	for (int i = 0; i < TT_COUNT; i++) {
+		fs->SetBoundedResourcePointer(render, texture_map_names[i], nullptr);
+	}
+
 	for (auto it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
 		if (it->second.Valid() && it->second->Valid())
 			fs->SetBoundedResourcePointer(render, it->first, (*it->second)->GetShaderResourceView());
+		else
+			fs->SetBoundedResourcePointer(render, it->first, nullptr);
 	}
 }
 

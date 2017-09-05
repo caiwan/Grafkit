@@ -298,33 +298,29 @@ void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceCont
 	this->m_bResources[id].m_boundSource = ptr;
 
 	BResRecord &brRecord = this->m_bResources[id];
-	if (brRecord.m_boundSource != nullptr) {
 
-		/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
-		if (brRecord.m_desc.BindCount != 1)
-			DebugBreak();
+	/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
+	if (brRecord.m_desc.BindCount != 1)
+		DebugBreak();
 
-		switch (brRecord.m_desc.Type) {
-		case D3D_SIT_TEXTURE:
-		{
-			///@todo ezzel kell meg valamit kezdeni 
-			ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
+	switch (brRecord.m_desc.Type) {
+	case D3D_SIT_TEXTURE:
+	{
+		///@todo ezzel kell meg valamit kezdeni 
+		ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
 
-			SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
+		SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
 
-		} break;
+	} break;
 
-		case D3D_SIT_SAMPLER:
-		{
-			ID3D11SamplerState * pSampler = (ID3D11SamplerState*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
-			SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
-		}break;
+	case D3D_SIT_SAMPLER:
+	{
+		ID3D11SamplerState * pSampler = (ID3D11SamplerState*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
+		SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
+	}break;
 
-		}
-
-		// zero, mindenesetre
-		// brRecord.m_boundSource = nullptr;
 	}
+
 }
 
 void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)

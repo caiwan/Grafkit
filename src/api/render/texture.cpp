@@ -13,7 +13,7 @@ using namespace FWdebugExceptions;
 using namespace DirectX;
 using namespace Grafkit;
 
-#define USE_SRGB_TEXTURE
+//#define USE_SRGB_TEXTURE
 
 namespace {
 	DXGI_FORMAT bitmapformats[] = {
