@@ -32,6 +32,9 @@ namespace Grafkit {
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
 		virtual void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
 		
+		// qnd shit for cbuffer aggregattion
+		virtual size_t GetInternalData(void *const& p) { return 0; }
+
 		virtual void serialize(Archive& ar) = 0;
 	};
 
@@ -58,6 +61,9 @@ namespace Grafkit {
 		Grafkit::Matrix& Transform() { return m_transformMatrix; }
 
 		virtual void Render(Grafkit::Renderer &render, Scene* scene);
+
+		// qnd shit for cbuffer aggregattion
+		virtual size_t GetInternalData(void *const& p);
 
 		/// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
 		void AddChild(Actor* child);

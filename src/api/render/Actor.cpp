@@ -48,6 +48,16 @@ void Grafkit::Actor::Render(Grafkit::Renderer & render, Scene * scene)
 	}
 }
 
+// i  really should sleep now
+size_t Grafkit::Actor::GetInternalData(void * const & p)
+{
+	size_t s = 0;
+	for (auto it = m_pEntities.begin(); it != m_pEntities.end(); it++) {
+		s += (*it)->GetInternalData((char * const)(p) + s);
+	}
+	return s;
+}
+
 void Grafkit::Actor::AddChild(Actor* child)
 {
 	m_pChildren.push_back(child);

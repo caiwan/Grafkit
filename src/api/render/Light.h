@@ -37,19 +37,19 @@ namespace Grafkit{
 		float4 &Position() { return m_position; }
 		void Position(float4 p) {m_position = p; }
 
-		float4 &Direction() { return m_direction; }
-		void Direction(float4 d) { m_direction = d; }
+		//float4 &Direction() { return m_direction; }
+		//void Direction(float4 d) { m_direction = d; }
 
-		float4 &Ambient() { return m_light.ambient; }
+		/*float4 &Ambient() { return m_light.ambient; }
 		float4 &Diffuse() { return m_light.diffuse; }
-		float4 &Specular() { return m_light.specular; }
+		float4 &Specular() { return m_light.specular; }*/
 
 		float &ConstantAttenuation() { return m_light.ca; }
 		float &LinearAttenuation() { return m_light.la; }
 		float &QuardicAttenuation() { return m_light.qa; }
 
-		float& Angle() { return m_light.angle; }
-		float& Falloff() { return m_light.falloff; }
+		/*float& Angle() { return m_light.angle; }
+		float& Falloff() { return m_light.falloff; }*/
 
 		/// Setup the corresponding constant buffer inside the shader
 		//void SetShaderCB(ShaderRef &rPShader);
@@ -57,6 +57,7 @@ namespace Grafkit{
 		void Render(Grafkit::Renderer& deviceContext, Scene * const & scene);
 		void Calculate(Grafkit::Renderer& deviceContext, Scene * const & scene, Matrix &nodeMatrix);
 		void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) {}
+
 
 
 	protected:
@@ -96,10 +97,28 @@ namespace Grafkit{
 			};
 		};
 
-		struct light_t m_light;
+	public:
+		struct light2_t {
+			float4 position;
+			float4 color;
+			union {
+				float ca, la, qa;
+				float intensity;
+				float4 _param1, _param2;
+			};
+		};
+
+		// QND stuff to get the calculated data 
+		// to set it into the cbuffer
+		virtual void GetInternalData(void *const p);
+		light2_t GetData() { return m_light; }
+
+	private:
+
+		struct light2_t m_light;
 
 		float4 m_position;
-		float4 m_direction;
+		//float4 m_direction;
 
 		int m_id;
 

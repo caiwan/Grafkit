@@ -23,8 +23,8 @@ struct Light
 
 cbuffer light
 {
-	struct Light light;
-}
+    Light  light;
+};
 
 cbuffer material_params
 {

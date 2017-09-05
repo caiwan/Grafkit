@@ -12,6 +12,13 @@ struct Resolution {
 	float fov;
 };
 
+struct Light
+{
+    float4 position;
+    float4 color;
+    float4 param1, param2;
+};
+
 struct VertexInputType
 {
 	float4 position : POSITION;

@@ -187,8 +187,8 @@ protected:
 
 			render.ToggleDepthWrite(true);
 
-			(*fs)->SetShaderResourceView(render, "skybox", (*envmap)->GetShaderResourceView());
-			(*fs)->SetShaderResourceView(render, "envmap", (*envmap)->GetShaderResourceView());
+			(*fs)->SetShaderResourceView(render, "c_specular", (*envmap)->GetShaderResourceView());
+			(*fs)->SetShaderResourceView(render, "c_irradiance", (*envmap)->GetShaderResourceView());
 			(*fs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
 
 			this->scene->Get()->Render(render);
