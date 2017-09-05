@@ -146,7 +146,7 @@ PixelOutType mainPixel(PixelInputType input)
     // Directional lights
     float4 diffuse_light = 0;
     float4 specular_light = 0;
-    for (int i = 0; i < lightCount; i++)
+    for (int i = 0; i < 1; i++)
     {
         float3 light_dir = normalize(lights[i].position.xyz);
         float3 light_color = lights[i].color.rgb;
@@ -188,9 +188,11 @@ PixelOutType mainPixel(PixelInputType input)
     diffuse_light.rgb += cubemap_sampleAmbient.rgb * base_color.rgb;
 
     // Composite
-    float4 color = 0;
-    color = lerp(diffuse_light, cubemap_sampleSpec, schlick_fresnel);
-    color += specular_light;
+    float4 color;
+    color.rgb = metallic_sample;
+    color.a = 1.;
+    //color = lerp(diffuse_light, cubemap_sampleSpec, schlick_fresnel);
+    //color += specular_light;
 
     float noise = hash(input.position * 0.01, color);
 
@@ -201,7 +203,7 @@ PixelOutType mainPixel(PixelInputType input)
 
     color += noise / 256.0;
 	 
-    output.diff = lightCount / 2;
+    output.diff = color;
 	output.normal.xyz = surface_normal;
 	output.view = input.view;
     output.emission = emission_color;
