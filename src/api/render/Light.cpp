@@ -31,8 +31,8 @@ void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, Scene * const 
 
 size_t Grafkit::Light::GetInternalData(void * const & p)
 {
-	CopyMemory(p, &m_light, sizeof(light2_t*));
-	return sizeof(light2_t*);
+	CopyMemory(p, &m_light, sizeof(light2_t));
+	return sizeof(light2_t);
 }
 
 void Grafkit::Light::serialize(Archive & ar)

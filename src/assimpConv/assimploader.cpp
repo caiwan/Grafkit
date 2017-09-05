@@ -316,7 +316,7 @@ void Grafkit::AssimpLoader::AssimpLoadLights(SceneRef &outScene)
 			switch (curr_light->mType) {
 			case aiLightSource_POINT:
 				light = new Light(Light::LT_point);
-				ASSIMP_V3D_F4(curr_light->mPosition, light->Position(), 0.0f);
+				ASSIMP_V3D_F4(curr_light->mPosition, light->Position(), 1.0f);
 				break;
 
 #if 0
