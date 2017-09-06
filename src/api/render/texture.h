@@ -107,7 +107,6 @@ namespace Grafkit
 
 	protected:
 		ID3D11Resource * m_pTexture;
-		DXGI_FORMAT m_format;
 
 		size_t m_w, m_h, m_d, m_ch, m_chW;
 

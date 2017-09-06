@@ -400,22 +400,27 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Save(Archive &ar)
 
 void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceManager * const & resman)
 {
-	// --- persist scene 
-	PERSIST_REFOBJECT(ar, m_scene);
+	try {
+		// --- persist scene 
+		PERSIST_REFOBJECT(ar, m_scene);
 
-	if (!ar.IsStoring() && m_scene.Invalid())
-		throw new EX(SceneLoadException);
+		if (!ar.IsStoring() && m_scene.Invalid())
+			throw new EX(SceneLoadException);
 
-	PersistMaterials(ar, resman);
-	PersistEntities(ar, resman);
-	PersistActors(ar, resman);
-	PersistAnimations(ar, resman);
+		PersistMaterials(ar, resman);
+		PersistEntities(ar, resman);
+		PersistActors(ar, resman);
+		PersistAnimations(ar, resman);
 
-	PersistKeymap(ar, m_materials_to_meshes);
-	PersistKeymap(ar, m_entities_to_actors);
-	PersistKeymap(ar, m_actor_to_actor);
-	PersistKeymap(ar, m_animation_to_actor);
-	PersistKeymap(ar, m_animation_to_entity);
+		PersistKeymap(ar, m_materials_to_meshes);
+		PersistKeymap(ar, m_entities_to_actors);
+		PersistKeymap(ar, m_actor_to_actor);
+		PersistKeymap(ar, m_animation_to_actor);
+		PersistKeymap(ar, m_animation_to_entity);
+	}
+	catch (int i) {
+		return;
+	}
 }
 
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IResourceManager * const & resman)

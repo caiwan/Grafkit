@@ -36,9 +36,10 @@ namespace {
 		"	float4 main(PixelInputType input) : SV_TARGET\n"
 		"	{\n"
 		"		float2 uv = 2. * (input.tex.xy - .5);\n"
-		"		uv.y = uv.y / barParams.x;"
+		"		uv.y = uv.y / barParams.z;"
 		"\n"
-		"	float4 color = getLoader(1.6 * uv , barParams.z);\n"
+		"	float4 color = getLoader(1.6 * uv , barParams.w);\n"
+		//"	color.rg = uv;"
 		"	color.a = 1.;"
 		"	return color;\n"
 		"	}\n"
@@ -83,8 +84,9 @@ void GrafkitData::LoaderBar::OnElemLoad(size_t actual, size_t count)
 void GrafkitData::LoaderBar::DrawLoaderBar(Grafkit::Renderer & render, float p)
 {
 	float4 par;
-	par.x = render.GetAspectRatio();
-	par.z = p;
+	render.GetViewportSizef(par.x, par.y);
+	par.z = render.GetAspectRatio();
+	par.w = p;
 
 	m_ps->Get()->SetParamT<float4>(render, "LoaderBar", par);
 

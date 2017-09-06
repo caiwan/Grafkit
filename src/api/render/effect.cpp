@@ -16,16 +16,21 @@ Grafkit::EffectComposer::~EffectComposer()
 
 /// @tod ezeket valami elegansabb helyre el kellene rakni
 namespace {
-	const char shader_source [] = "\r\n"
+	const char shader_source[] = "\r\n"
 
-	// GLOBALS //
-	"Texture2D effectInput;\r\n"
+		// GLOBALS //
+		"Texture2D effectInput;\r\n"
 
-	"SamplerState SampleType{\n"
+		"SamplerState SampleType{\n"
 		"Filter = MIN_MAG_MIP_LINEAR;\n"
 		"AddressU = Wrap;\n"
 		"AddressV = Wrap;\n"
-	"};\n"
+		"};\n"
+
+		"cbuffer EffectParams{\n"
+		"float4 fxScreen;"
+		"float4 fxViewport;"
+		"}\n"
 
 	// TYPEDEFS //
 	"struct FXPixelInputType"
@@ -54,7 +59,7 @@ namespace {
 	"float4 CopyScreen(FXPixelInputType input) : SV_TARGET"
 	"{"
 		"float4 textureColor = float4(0,0,0,1);"
-		"textureColor = effectInput.Sample(SampleType, input.tex);"
+		"textureColor = effectInput.Sample(SampleType, input.position / fxScreen.xy);"
 		"return textureColor;"
 	"}"
 
@@ -82,6 +87,18 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	if (!m_singlepass) {
 		m_shaderCopyScreen = new PixelShader();
 		m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), "CopyScreen");
+
+		struct {
+			float4 s, v;
+		} screen_params;
+		screen_params.s = float4(0,0,0,0);
+		screen_params.v = float4(0,0,0,0);
+		render.GetScreenSizef(screen_params.s.x, screen_params.s.y);
+		render.GetViewportSizef(screen_params.v.x, screen_params.v.y);
+		screen_params.v.z = render.GetAspectRatio();
+
+		m_shaderCopyScreen->SetParam(render, "EffectParams", &screen_params);
+
 	}
 
 	// --- 
@@ -230,6 +247,7 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 	m_shaderFullscreenQuad->Bind(render);
 
 	m_shaderCopyScreen->SetShaderResourceView(render, "effectInput", m_pTexRead->GetShaderResourceView());
+
 	m_shaderCopyScreen->Bind(render);
 
 	m_fullscreenquad->RenderMesh(render);

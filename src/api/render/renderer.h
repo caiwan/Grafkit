@@ -60,6 +60,7 @@ namespace Grafkit {
 		// --- operations 
 		void BeginScene(float red, float green, float blue, float alpha);
 		void BeginScene();
+		void BeginSceneDev();
 		void EndScene();
 
 		void ToggleDepthWrite(bool isEanbled);

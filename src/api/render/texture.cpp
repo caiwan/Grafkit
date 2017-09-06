@@ -174,11 +174,11 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	textureDesc.Width = m_w;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
-	textureDesc.Format = m_format;
+	textureDesc.Format = format;
 	textureDesc.Usage = D3D11_USAGE_DYNAMIC;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	textureDesc.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA *pData = nullptr, subresData;
 	// initialdata
@@ -201,7 +201,7 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-	shaderResourceViewDesc.Format = m_format;
+	shaderResourceViewDesc.Format = format;
 	shaderResourceViewDesc.ViewDimension = srvDimension;
 
 	shaderResourceViewDesc.Texture1D.MostDetailedMip = 0;
@@ -264,8 +264,6 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	m_h = h;
 	m_d = 0;
 
-	m_format = format;
-
 	if (!m_w && !m_h) {
 		int sw = 0, sh = 0;
 		device.GetScreenSize(sw, sh);
@@ -284,7 +282,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	textureDesc.Height = m_h;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
-	textureDesc.Format = m_format;
+	textureDesc.Format = format;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
@@ -320,7 +318,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	// SRV, RTV
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-	shaderResourceViewDesc.Format = m_format;
+	shaderResourceViewDesc.Format = format;
 	shaderResourceViewDesc.ViewDimension = srvDimension;
 
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
@@ -342,8 +340,6 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	m_h = h;
 	m_d = 0;
 
-	m_format = format;
-
 	if (!m_w && !m_h) {
 		int sw = 0, sh = 0;
 		device.GetScreenSize(sw, sh);
@@ -362,7 +358,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	textureDesc.Height = m_h;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
-	textureDesc.Format = m_format;
+	textureDesc.Format = format;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
@@ -381,7 +377,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	// SRV
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
-	shaderResourceViewDesc.Format = m_format;
+	shaderResourceViewDesc.Format = format;
 	shaderResourceViewDesc.ViewDimension = srvDimension;
 
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
@@ -395,7 +391,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	// RTV
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
-	renderTargetViewDesc.Format = m_format;
+	renderTargetViewDesc.Format = format;
 	renderTargetViewDesc.ViewDimension = rtvDimension;
 
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
@@ -416,9 +412,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 
 	BitmapRef bitmap = cubemap->GetPosX(); //assume that everything is equal there
 	int ch = bitmap->GetCh();
-	DXGI_FORMAT fmt = bitmapformats[ch % 5];
-
-	m_format = fmt;
+	DXGI_FORMAT format = bitmapformats[ch % 5];
 
 	m_w = cubemap->GetPosX()->GetX();
 	m_h = cubemap->GetPosX()->GetY();
@@ -431,7 +425,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 	textureDesc.Height = m_h;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 6;
-	textureDesc.Format = m_format;
+	textureDesc.Format = format;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
 	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE| D3D11_BIND_RENDER_TARGET;
@@ -470,7 +464,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 	// --- srv
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-	shaderResourceViewDesc.Format = m_format;
+	shaderResourceViewDesc.Format = format;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 
 	shaderResourceViewDesc.TextureCube.MostDetailedMip = 0;

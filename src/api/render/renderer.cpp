@@ -371,7 +371,7 @@ void Renderer::BeginScene(float red, float green, float blue, float alpha)
 			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color);
 
 	// Clear the depth buffer.
-	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 0.0f, 0);
+	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	return;
 }
@@ -388,7 +388,21 @@ void Renderer::BeginScene()
 	// Clear the back buffer.
 	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
 		if (m_renderTargetViews[i]) {
+			//m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color_Citrus_flavoured_black);
 			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], black);
+		}
+	// Clear the depth buffer.
+	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	return;
+}
+
+void Renderer::BeginSceneDev()
+{
+	// Clear the back buffer.
+	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
+		if (m_renderTargetViews[i]) {
+			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color_Citrus_flavoured_black);
 			//m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], black);
 		}
 	// Clear the depth buffer.
