@@ -42,6 +42,7 @@ class Bake:
             #   modifier.apply()
         
             print("Baking object {}".format(obj.name))
+            sys.stdout.flush()
         
             # visual keying = bakes constraints
             # aside that, parenting and constraints should be cleared

@@ -92,6 +92,7 @@ if __name__ == "__main__":
 
     # open
     print("=== READING FILE {}".format(infile))
+    sys.stdout.flush()
     bpy.ops.wm.open_mainfile(filepath=infile)
     
     # bake
