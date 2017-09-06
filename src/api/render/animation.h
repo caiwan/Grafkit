@@ -15,7 +15,7 @@ namespace Grafkit {
 	typedef Ref<Animation> AnimationRef;
 
 	/**
-	Common anim. interface 
+	Common anim. interface
 	*/
 	class Animation : public virtual Referencable {
 	public:
@@ -38,13 +38,13 @@ namespace Grafkit {
 	protected:
 		void _serialize(Archive &ar);
 
-	private: 
+	private:
 		std::string m_name;
 		float m_duration;
 
 	public:
 
-		enum KeyInterpolation_e{
+		enum KeyInterpolation_e {
 			KI_step,
 			KI_linear,
 			KI_ramp,
@@ -55,7 +55,7 @@ namespace Grafkit {
 
 		/** Tamplate for anim keys */
 		template <typename V> struct Key {
-		
+
 			Key() : m_key(0), m_value(), m_type(KI_linear) {}
 			Key(float t, V value) : m_key(t), m_value(value), m_type(KI_linear) {}
 
@@ -64,7 +64,7 @@ namespace Grafkit {
 			enum KeyInterpolation_e m_type;
 		};
 
-		/** 
+		/**
 			Template for animation track
 		*/
 		template <typename V> class Track {
@@ -73,10 +73,10 @@ namespace Grafkit {
 
 			typedef V value_t;
 
-			Track(){}
+			Track() {}
 
-			void AddKey(Key<V> key) { 
-				m_track.push_back(key); 
+			void AddKey(Key<V> key) {
+				m_track.push_back(key);
 			}
 
 			Key<V> GetKey(size_t i) {
@@ -87,18 +87,21 @@ namespace Grafkit {
 				return m_track.size();
 			}
 
-			int FindKey(float t) {
+			int FindKeyIndex(float t) const {
 				size_t count = m_track.size();
+				if (count <= 2)
+					return 0;
+#if 1
 				size_t u = count - 1, l = 0, m = 0;
-				while (u > l) {
+				while (u >= l) {
 					m = l + (u - l) / 2;
-					float k0 = m_track[m].key;
-					float k1 = m_track[m + 1].key;
+					float k0 = m_track[m].m_key;
+					float k1 = m_track[m + 1].m_key;
 
 					if (k0 <= t && k1 >= t) {
 						return m;
 					}
-					else if (k1 < t) {
+					else if (k0 > t) {
 						u = m - 1;
 					}
 					else {
@@ -106,6 +109,16 @@ namespace Grafkit {
 					}
 				}
 				return -1;
+
+#else 
+				for (size_t i = 0; i < count - 1; i++) {
+					if (m_track[i].m_key <= t && m_track[i + 1].m_key >= t)
+						return i;
+				}
+
+				return -1;
+#endif
+
 			}
 
 			/** Finds a key inside the track
@@ -118,29 +131,23 @@ namespace Grafkit {
 					return 0;
 				}
 
-				if (count == 1 || m_track[0].m_key > t) {
-					f = 0.
-					v1 = v0 = m_track[0].m_value;
-					return 1;
-				}
-
-#if 1
-				if (m_track[0].key > t) {
+				if (m_track[0].m_key > t) {
 					f = 0.;
 					v0 = m_track[0].m_value;
 					v1 = m_track[1].m_value;
 					return 0;
 				}
-				else if (m_track[count-1].key < t) {
+				else if (m_track[count - 1].m_key < t) {
 					f = 1.;
-					v0 = m_track[count-2].m_value;
-					v1 = m_track[count-1].m_value;
+					v0 = m_track[count - 2].m_value;
+					v1 = m_track[count - 1].m_value;
 					return 0;
 				}
 
-				int i = FindKey(t);
+				int i = FindKeyIndex(t);
+
 				if (i == -1)
-					return;
+					return 0;
 
 				float d = m_track[i + 1].m_key - m_track[i].m_key;
 				f = (t - m_track[i].m_key) / d;
@@ -149,32 +156,21 @@ namespace Grafkit {
 				v1 = m_track[i + 1].m_value;
 
 				return 1;
-#else 
-				for (size_t i = 0; i < count - 1; i++) {
-					if (m_track[i].m_key <= t && m_track[i + 1].m_key>= t) {
-						float d = m_track[i + 1].m_key - m_track[i].m_key;
-						f = (t - m_track[i].m_key) / d;
-			
-						v0 = m_track[i].m_value;
-						v1 = m_track[i + 1].m_value;
-
-						return 1;
-					}
-				}
-
-				v1 = v0 = m_track[count - 1].m_value;
-				return 1;
-#endif
 			}
 
 		public:
 			void serialize(Archive &ar);
 			void Clear() { m_track.clear(); }
 
-			void CopyKey(float t, Track<T>& other) {
-				int i = FindKey(t);
+			void CopyKey(float t, Track<V>& other) {
+				if (t <= m_track.front().m_key)
+					return other.AddKey(m_track.front());
+				if (t >= m_track.back().m_key)
+					return other.AddKey(m_track.back());
+
+				int i = FindKeyIndex(t);
 				if (i > -1) {
-					other.AddKey(m_track[t]);
+					other.AddKey(m_track[i]);
 				}
 			}
 
@@ -193,7 +189,7 @@ namespace Grafkit {
 		typedef Animation::Track<float2> Vector2Track;
 		typedef Animation::Track<float3> Vector3Track;
 		typedef Animation::Track<float4> Vector4Track;
-	
+
 	protected:
 		static void FindKey(FloatTrack track, double &time, float &value);
 		static void FindKey(Vector3Track track, double &time, float3 &value);
@@ -206,10 +202,10 @@ namespace Grafkit {
 
 	/* ============================================================================================== */
 
-	/** 
-	Animation for scenegraph nodes 
+	/**
+	Animation for scenegraph nodes
 	*/
-	class ActorAnimation : public Animation, public Persistent{
+	class ActorAnimation : public Animation, public Persistent {
 	public:
 		ActorAnimation() : Animation() {}
 		~ActorAnimation() { }
@@ -226,7 +222,7 @@ namespace Grafkit {
 		virtual void Update(double time);
 		virtual void Clear();
 		virtual void CopyKey(float f, Animation * const & other);
-	
+
 	protected:
 		ActorRef m_actor;
 
@@ -241,18 +237,18 @@ namespace Grafkit {
 
 	/* ============================================================================================== */
 
-	/** 
+	/**
 	Animation for entities inside the scenegraph nodes
 	*/
 
 	class EntityAnimation : public Animation, public Persistent {
 		// .. 
 	public:
-		EntityAnimation(){}
+		EntityAnimation() {}
 		~EntityAnimation() {}
 
 		void SetEntity(Ref<Entity3D> & entity) { m_entity = entity; }
-		Ref<Entity3D> GetEntity() {return m_entity;}
+		Ref<Entity3D> GetEntity() { return m_entity; }
 
 		virtual void Update(double time) = 0;
 
@@ -264,7 +260,7 @@ namespace Grafkit {
 	/** Qnd Camera fov animation
 	*/
 
-	class CameraAnimation : public EntityAnimation{
+	class CameraAnimation : public EntityAnimation {
 	public:
 		void Update(double t);
 		void Clear();
