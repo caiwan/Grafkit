@@ -338,19 +338,23 @@ void Grafkit::AssimpLoader::AssimpLoadLights(SceneRef &outScene)
 				break;
 #endif
 			}
+			
+			// we support point light atm
+			if (light.Valid()) {
 #if 1
-			(light->ConstantAttenuation()) = curr_light->mAttenuationConstant;
-			(light->LinearAttenuation()) = curr_light->mAttenuationLinear;
-			(light->QuardicAttenuation()) = curr_light->mAttenuationQuadratic;
+				(light->ConstantAttenuation()) = curr_light->mAttenuationConstant;
+				(light->LinearAttenuation()) = curr_light->mAttenuationLinear;
+				(light->QuardicAttenuation()) = curr_light->mAttenuationQuadratic;
 
-			//ASSIMP_COLOR_F4(curr_light->mColorAmbient, light->Ambient());
-			ASSIMP_COLOR_F4(curr_light->mColorDiffuse, light->Diffuse());
-			//ASSIMP_COLOR_F4(curr_light->mColorSpecular, light->Specular());
+				//ASSIMP_COLOR_F4(curr_light->mColorAmbient, light->Ambient());
+				ASSIMP_COLOR_F4(curr_light->mColorDiffuse, light->Diffuse());
+				//ASSIMP_COLOR_F4(curr_light->mColorSpecular, light->Specular());
 #endif
 			///@todo ez kell-e majd?
-			light->SetName(light_name);
+				light->SetName(light_name);
 
-			lights.push_back(light);
+				lights.push_back(light);
+			}
 		}
 	}
 
