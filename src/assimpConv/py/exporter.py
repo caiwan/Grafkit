@@ -34,7 +34,27 @@ def get_args():
     return parsed_script_args
 
     
+def do_dump_camera_frmaes(conn):
+    """ Helps us to get which camera is active on the right scene"""
+    
+    scene = bpy.context.scene
+    
+    camera_keys = []
+    
+    for i in range(scene.frame_start - 1, scene.frame_end, scene.frame_step):
+        t = i * (scene.render.fps_base / scene.render.fps)
+        scene.frame_set(i)
+        scene.update()
+        camera = scene.camera
+        
+        camera_keys.append({"v":{"key":camera.name}, "t":t})
+        
+    conn.send("bpydump", {"CameraKeys": camera_keys})
+    
+    pass
+    
 def do_dump(conn):
+    """ Dumps all the data from the context """
     scene = bpy.context.scene
     
     conn.send("collada", Collada())
@@ -42,6 +62,8 @@ def do_dump(conn):
     
     materials = [bpyexport.Material(material) for material in bpy.data.materials]
     conn.send("bpydump", {"Materials": materials})
+    
+    do_dump_camera_frmaes(conn)
     
     # dump_shitz_per_frmae(conn, scene)
     pass #shit

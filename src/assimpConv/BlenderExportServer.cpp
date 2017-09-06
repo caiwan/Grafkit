@@ -1,3 +1,4 @@
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <time.h>
@@ -195,6 +196,42 @@ bool BlenderExportServer::Parse(json & j)
 			double frametime = (double)scene["fps_base"] / (double)scene["fps"];
 			(*m_scene)->SetStartTime(frametime * (double)scene["frame_start"]);
 			(*m_scene)->SetEndTime(frametime * (double)scene["frame_end"]);
+		}
+
+		//--
+		json camkeys = j["data"]["CameraKeys"];
+		if(!camkeys.empty()) {
+			ActorAnimation* animation = new ActorAnimation();
+			CameraRef camera = new Camera();
+			camera->SetName("MainCamera_1");
+			ActorRef cameraActor = new Actor(camera);
+			cameraActor->SetName("MainCamera");
+			animation->SetActor(cameraActor);
+			std::vector<AnimationRef> animations;
+			for (auto camit = camkeys.begin(); camit != camkeys.end(); camit++) {
+				double t = (double)camit->at("t");
+				json v = camit->at("v");
+				if (!v["key"].empty()) {
+					std::string key = v["key"];
+					auto it = m_resources.actors.find(key);
+					if (it != m_resources.actors.end()) {
+						ActorRef ar = it->second.Get();
+						(*m_scene)->GetAnimations(ar, animations);
+						if (!animations.empty()) {
+							// There should be a camera animation somewhere
+							for (int i = 0; i < animations.size(); i++) {
+								ActorAnimation* anim = dynamic_cast<ActorAnimation*>(animations[0].Get());
+								if (anim)
+									anim->CopyKey(t, animation);
+							}
+						}
+					}
+				}
+			}
+			m_resources.cameras.push_back(camera);
+			m_resources.actors["MainCamera"] = cameraActor;
+			(*m_scene)->GetRootNode()->AddChild(cameraActor);
+			(*m_scene)->AddAnimation(animation);
 		}
 
 		// --

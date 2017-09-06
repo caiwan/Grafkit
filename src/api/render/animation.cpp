@@ -84,6 +84,16 @@ void Grafkit::ActorAnimation::Clear()
 	m_scalingTrack.Clear();
 }
 
+void Grafkit::ActorAnimation::CopyKey(float f, Animation *const& other)
+{
+	ActorAnimation *a = dynamic_cast<ActorAnimation*>(other);
+	if (a) {
+		m_positionTrack.CopyKey(f, a->m_positionTrack);
+		m_rotationTrack.CopyKey(f, a->m_rotationTrack);
+		m_scalingTrack.CopyKey(f, a->m_scalingTrack);
+	}
+}
+
 void Grafkit::ActorAnimation::serialize(Archive & ar)
 {
 	this->Animation::_serialize(ar);
@@ -109,6 +119,14 @@ void Grafkit::CameraAnimation::Update(double t)
 void Grafkit::CameraAnimation::Clear()
 {
 	m_fov.Clear();
+}
+
+void Grafkit::CameraAnimation::CopyKey(float f, Animation * const & other)
+{
+	CameraAnimation *a = dynamic_cast<CameraAnimation*>(other);
+	if (a) {
+		m_fov.CopyKey(f, a->m_fov);
+	}
 }
 
 void Grafkit::CameraAnimation::serialize(Archive & ar)

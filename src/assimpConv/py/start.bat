@@ -1,3 +1,3 @@
 @echo off
-blender -b -P exporter.py -- --input sphere_pbr.blend --test out.json
+blender -b -P exporter.py -- --input animtest2.blend --test out.json
 pause

@@ -33,6 +33,7 @@ namespace Grafkit {
 		//void CalcDuration(bool isMin = false);
 
 		virtual void Clear() = 0;
+		virtual void CopyKey(float t, Animation * const & other) = 0;
 
 	protected:
 		void _serialize(Archive &ar);
@@ -86,6 +87,27 @@ namespace Grafkit {
 				return m_track.size();
 			}
 
+			int FindKey(float t) {
+				size_t count = m_track.size();
+				size_t u = count - 1, l = 0, m = 0;
+				while (u > l) {
+					m = l + (u - l) / 2;
+					float k0 = m_track[m].key;
+					float k1 = m_track[m + 1].key;
+
+					if (k0 <= t && k1 >= t) {
+						return m;
+					}
+					else if (k1 < t) {
+						u = m - 1;
+					}
+					else {
+						l = m + 1;
+					}
+				}
+				return -1;
+			}
+
 			/** Finds a key inside the track
 			@return 1 if key found
 			*/
@@ -95,13 +117,39 @@ namespace Grafkit {
 				if (!count) {
 					return 0;
 				}
-						
+
 				if (count == 1 || m_track[0].m_key > t) {
+					f = 0.
 					v1 = v0 = m_track[0].m_value;
 					return 1;
 				}
-				
-				// TODO: use binary search istead
+
+#if 1
+				if (m_track[0].key > t) {
+					f = 0.;
+					v0 = m_track[0].m_value;
+					v1 = m_track[1].m_value;
+					return 0;
+				}
+				else if (m_track[count-1].key < t) {
+					f = 1.;
+					v0 = m_track[count-2].m_value;
+					v1 = m_track[count-1].m_value;
+					return 0;
+				}
+
+				int i = FindKey(t);
+				if (i == -1)
+					return;
+
+				float d = m_track[i + 1].m_key - m_track[i].m_key;
+				f = (t - m_track[i].m_key) / d;
+
+				v0 = m_track[i].m_value;
+				v1 = m_track[i + 1].m_value;
+
+				return 1;
+#else 
 				for (size_t i = 0; i < count - 1; i++) {
 					if (m_track[i].m_key <= t && m_track[i + 1].m_key>= t) {
 						float d = m_track[i + 1].m_key - m_track[i].m_key;
@@ -113,13 +161,22 @@ namespace Grafkit {
 						return 1;
 					}
 				}
+
 				v1 = v0 = m_track[count - 1].m_value;
 				return 1;
+#endif
 			}
 
 		public:
 			void serialize(Archive &ar);
 			void Clear() { m_track.clear(); }
+
+			void CopyKey(float t, Track<T>& other) {
+				int i = FindKey(t);
+				if (i > -1) {
+					other.AddKey(m_track[t]);
+				}
+			}
 
 		public:
 			std::vector<Key<V>> m_track;
@@ -168,6 +225,7 @@ namespace Grafkit {
 
 		virtual void Update(double time);
 		virtual void Clear();
+		virtual void CopyKey(float f, Animation * const & other);
 	
 	protected:
 		ActorRef m_actor;
@@ -210,6 +268,8 @@ namespace Grafkit {
 	public:
 		void Update(double t);
 		void Clear();
+		void CopyKey(float f, Animation * const & other);
+
 
 		void AddFovKey(float key, float value) { m_fov.AddKey(FloatKey(key, value)); }
 
