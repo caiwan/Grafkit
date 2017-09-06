@@ -29,7 +29,7 @@ typedef unsigned int uint;
 
 /* ================================================================================================ */
 
-class Application{
+class Application {
 private:
 	Arguments args;
 
@@ -62,30 +62,31 @@ public:
 			Log::Logger().Info(args.getErrorMessage().c_str());
 			Log::Logger().Info(args.getHelpMessage().c_str());
 			return 1;
-		} else if (args.get("help").isFound()) {
+		}
+		else if (args.get("help").isFound()) {
 			Log::Logger().Info(args.getHelpMessage().c_str());
 			return 0;
 		}
 
 		if (args.get("blender").isFound())
 			return ExecuteBlender();
-		
+
 		return ExecuteAssimp();
 	}
 
 	int ExecuteBlender() {
-		
+
 		BlenderExportServer server;
 
 		server.SetLHFlag(args.get("lh").isFound());
 
 		// check if input exists, otherwise do not start anything
 		std::string fn = args.get("input").value();
-		FILE* fp = nullptr; 
+		FILE* fp = nullptr;
 		if (fopen_s(&fp, fn.c_str(), "rb") != 0) {
 			cout << "Could not open file:" << fn;
 			return 1;
-		} 
+		}
 		fclose(fp);
 
 		server.Start();
@@ -98,14 +99,14 @@ public:
 				cwd.append("/");
 		}
 
-		std::string cmd = "blender -b -P "+ cwd +"py/exporter.py --";
-		
+		std::string cmd = "blender -b -P " + cwd + "py/exporter.py --";
+
 		cmd += " -i " + args.get("input").value();
 		std::string host; server.GetHost(host);
 		cmd += " -p " + host;
 
 		std::array<char, 1024> buffer;
-		
+
 		//cmd = "{" + cmd + "}"
 		cmd += " 2>&1";
 
@@ -124,9 +125,16 @@ public:
 
 		server.Stop();
 
-		SceneResRef scene = server.GetScene(); 
-		if (scene.Valid() && scene->Valid())
-			SceneLoader::Save(scene->Get(), args.get("output").value());
+		try {
+			SceneResRef scene = server.GetScene();
+			if (scene.Valid() && scene->Valid())
+				SceneLoader::Save(scene->Get(), args.get("output").value());
+		}
+
+		catch (FWdebug::Exception *ex) {
+			cout << ex->what();
+			delete ex;
+		}
 
 		return 0;
 	}
