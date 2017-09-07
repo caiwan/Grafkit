@@ -211,7 +211,7 @@ protected:
 				modelActors[i]->Transform().RotateRPY(rot_rp.x, rot_rp.y, 0);
 			}
 
-			fragmentShader->SetSamplerSatate("SampleType", m_textureSampler->GetSamplerState());
+			fragmentShader->SetSamplerSatate(render, "SampleType", m_textureSampler->GetSamplerState());
 
 			scene->PreRender(render);
 			scene->Render(render);

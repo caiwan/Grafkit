@@ -31,6 +31,9 @@ namespace GrafkitData {
 		virtual void UpdateLoaderBar(float p) = 0;
 		void DrawLoaderBar(Grafkit::Renderer &render, float p);
 
+		// To override ps if needed
+		virtual std::string GetLoaderBarSrc();
+
 	protected:
 		// Abstract factory to substitude the single shader with other funky things
 		virtual Grafkit::ShaderResRef CreateShader(Grafkit::Renderer & renderer);

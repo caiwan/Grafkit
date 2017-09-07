@@ -4,6 +4,7 @@
 using namespace Grafkit;
 
 namespace {
+
 	static const char pPSahderSrc[] = ""
 		"#define LIM .001\n"
 		"#define THICK .08\n"
@@ -99,10 +100,16 @@ void GrafkitData::LoaderBar::DrawLoaderBar(Grafkit::Renderer & render, float p)
 	render.EndScene();
 }
 
+std::string GrafkitData::LoaderBar::GetLoaderBarSrc()
+{
+	return std::string(pPSahderSrc);
+}
+
 Grafkit::ShaderResRef GrafkitData::LoaderBar::CreateShader(Grafkit::Renderer & renderer)
 {
 	ShaderRef ps = new PixelShader();
-	ps->LoadFromMemory(renderer, "main", pPSahderSrc, sizeof(pPSahderSrc), "loaderbar");
+	std::string psSrc = GetLoaderBarSrc();
+	ps->LoadFromMemory(renderer, "main", psSrc.c_str(), psSrc.length(), "loaderbar");
 	return new ShaderRes(ps);
 }
 

@@ -91,12 +91,25 @@ int System::execute() {
 	}
 	catch (FWdebug::Exception& ex)
 	{
-		///@todo handle exceptions here 
-		//  DebugBreak();
+#ifdef _DEBUG
+		DebugBreak();
+#endif 
 		MessageBoxA(NULL, ex.what(), "Exception", 0);
 		LOGGER(Log::Logger().Error(ex.what()));
 
 	}
+
+	catch (FWdebug::Exception* ex)
+	{
+#ifdef _DEBUG
+		DebugBreak();
+#endif 
+		MessageBoxA(NULL, ex->what(), "Exception", 0);
+		LOGGER(Log::Logger().Error(ex->what()));
+
+		delete ex;
+	}
+
 	// ================================================================================================================================
 	// --- teardown
 	{
