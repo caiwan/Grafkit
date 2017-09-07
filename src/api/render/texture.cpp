@@ -280,7 +280,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = m_w;
 	textureDesc.Height = m_h;
-	textureDesc.MipLevels = 1;
+	textureDesc.MipLevels = 0;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = format;
 	textureDesc.SampleDesc.Count = 1;
@@ -328,6 +328,8 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 
 	if (FAILED(result))
 		throw new EX(ShaderResourceViewException);
+
+	device.GetDeviceContext()->GenerateMips(m_pResourceView);
 }
 
 void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT format, int channels, int channelWidth, int w, int h)

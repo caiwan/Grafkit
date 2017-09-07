@@ -47,7 +47,7 @@ def do_dump_camera_frmaes(conn):
         scene.update()
         camera = scene.camera
         
-        camera_keys.append({"v":{"key":camera.name}, "t":t})
+        camera_keys.append({"v":{"key":camera.name.replace(".", "_")}, "t":t})
         
     conn.send("bpydump", {"CameraKeys": camera_keys})
     
