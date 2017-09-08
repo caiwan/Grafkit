@@ -4,7 +4,7 @@
 
 using namespace Grafkit;
 
-Grafkit::EffectComposer::EffectComposer():
+Grafkit::EffectComposer::EffectComposer() :
 	m_pTexRead(nullptr), m_pTexWrite(nullptr), m_pTexBack(nullptr), m_singlepass(false)
 {
 }
@@ -32,38 +32,38 @@ namespace {
 		"float4 fxViewport;"
 		"}\n"
 
-	// TYPEDEFS //
-	"struct FXPixelInputType"
-	"{"
+		// TYPEDEFS //
+		"struct FXPixelInputType"
+		"{"
 		"float4 position : SV_POSITION;"
 		"float2 tex : TEXCOORD;"
-	"};"
+		"};"
 
-	"struct FXVertexInputType"
-	"{"
+		"struct FXVertexInputType"
+		"{"
 		"float4 position : POSITION;"
 		"float2 tex : TEXCOORD0;"
-	"};"
+		"};"
 
-	// VertexShader
-	"FXPixelInputType FullscreenQuad(FXVertexInputType input)"
-	"{"
+		// VertexShader
+		"FXPixelInputType FullscreenQuad(FXVertexInputType input)"
+		"{"
 		"FXPixelInputType output;"
 		"input.position.w = 1.0f;"
 		"output.position = input.position;"
 		"output.tex = input.tex;"
 		"return output;"
-	"}"
+		"}"
 
-	// PixelShader
-	"float4 CopyScreen(FXPixelInputType input) : SV_TARGET"
-	"{"
+		// PixelShader
+		"float4 CopyScreen(FXPixelInputType input) : SV_TARGET"
+		"{"
 		"float4 textureColor = float4(0,0,0,1);"
 		"textureColor = effectInput.Sample(SampleType, input.position / fxScreen.xy);"
 		"return textureColor;"
-	"}"
+		"}"
 
-	"";
+		"";
 }
 
 
@@ -76,35 +76,32 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
 
 	if (!m_singlepass) {
-		m_texOut[0] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[0];
-		m_texOut[1] = new Texture2D(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[1];
-		m_texOut[2] = new Texture2D(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[2];
+		m_texOut[0] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexFront = m_texOut[0];
+		m_texOut[1] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[1];
+		m_texOut[2] = new Texture2D(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[2];
+		m_texOut[3] = new Texture2D(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[3];
 	}
 	// --- 
 	m_shaderFullscreenQuad = new VertexShader();
 	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), "FullscreenQuad");
 
+	m_shaderCopyScreen = new PixelShader();
+	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), "CopyScreen");
+
+	m_screen_params.s = float4(0, 0, 0, 0);
+	m_screen_params.v = float4(0, 0, 0, 0);
+	render.GetScreenSizef(m_screen_params.s.x, m_screen_params.s.y);
+	render.GetViewportSizef(m_screen_params.v.x, m_screen_params.v.y);
+	m_screen_params.v.z = render.GetAspectRatio();
+
 	if (!m_singlepass) {
-		m_shaderCopyScreen = new PixelShader();
-		m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), "CopyScreen");
-
-		struct {
-			float4 s, v;
-		} screen_params;
-		screen_params.s = float4(0,0,0,0);
-		screen_params.v = float4(0,0,0,0);
-		render.GetScreenSizef(screen_params.s.x, screen_params.s.y);
-		render.GetViewportSizef(screen_params.v.x, screen_params.v.y);
-		screen_params.v.z = render.GetAspectRatio();
-
-		m_shaderCopyScreen->SetParam(render, "EffectParams", &screen_params);
-
+		m_shaderCopyScreen->SetParam(render, "EffectParams", &m_screen_params);
 	}
 
 	// --- 
 	m_fullscreenquad = new Mesh();
-	m_fullscreenquad->AddPointer("POSITION", sizeof(GrafkitData::quad[0]) * 4 *4 , GrafkitData::quad);
-	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord[0]) * 4 *4, GrafkitData::quad_texcoord);
+	m_fullscreenquad->AddPointer("POSITION", sizeof(GrafkitData::quad[0]) * 4 * 4, GrafkitData::quad);
+	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord[0]) * 4 * 4, GrafkitData::quad_texcoord);
 	m_fullscreenquad->SetIndices(4, 6, GrafkitData::quadIndices);
 	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
 
@@ -132,7 +129,7 @@ void Grafkit::EffectComposer::BindInput(Renderer & render)
 		return;
 
 	size_t count = 1;
-	render.SetRenderTargetView(m_pTexRead->GetRenderTargetView(), 0);
+	render.SetRenderTargetView(m_pTexFront->GetRenderTargetView(), 0);
 
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
 		if (it->second.Valid()) {
@@ -193,12 +190,15 @@ void Grafkit::EffectComposer::FlushBuffers()
 	Texture2D* tmp = m_pTexBack;
 	m_pTexBack = m_pTexWrite;
 	m_pTexWrite = tmp;
+
+	tmp = m_pTexFront;
+	m_pTexBack = m_pTexFront;
+	m_pTexFront = tmp;
 }
 
 void Grafkit::EffectComposer::RenderChain(Renderer & render)
 {
 	///@todo a kozbenso effektek inputjait is bindelje ossze
-
 	m_shaderFullscreenQuad->Bind(render);
 
 	size_t fxcount = m_singlepass ? 1 : m_effectChain.size();
@@ -215,9 +215,14 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 			if (fx && fx->GetShader().Valid()) {
 				if (!m_singlepass) {
 					fx->GetShader()->SetShaderResourceView(render, "backBuffer", m_pTexBack->GetShaderResourceView());
-					fx->GetShader()->SetShaderResourceView(render, "effectInput", m_pTexRead->GetShaderResourceView());
+					fx->GetShader()->SetShaderResourceView(render, "frontBuffer", m_pTexFront->GetShaderResourceView());
+					if (fxcount == 0)
+						fx->GetShader()->SetShaderResourceView(render, "effectInput", m_pTexFront->GetShaderResourceView());
+					else
+						fx->GetShader()->SetShaderResourceView(render, "effectInput", m_pTexRead->GetShaderResourceView());
 				}
-				fx->GetShader()->SetSamplerSatate(render,"SampleType", m_textureSampler->GetSamplerState());
+				fx->GetShader()->SetSamplerSatate(render, "SampleType", m_textureSampler->GetSamplerState());
+				fx->GetShader()->SetParam(render, "EffectParams", &m_screen_params);
 				fx->BindFx(render);
 			}
 
@@ -261,7 +266,7 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 
 // ===================================================================================================
 
-Grafkit::EffectPass::EffectPass(ShaderResRef shader)  : m_shader(shader)
+Grafkit::EffectPass::EffectPass(ShaderResRef shader) : m_shader(shader)
 {
 }
 

@@ -118,6 +118,7 @@ void Grafkit::AssimpLoader::AppendAssimp(const void * data, size_t length, Scene
 	AssimpBuildScenegraph(inScene);
 
 	AssimpLoadAnimations(inScene);
+
 }
 
 void Grafkit::AssimpLoader::AssimpLoadMaterials(SceneRef &outScene)
@@ -369,7 +370,6 @@ void Grafkit::AssimpLoader::AssimpBuildScenegraph(SceneRef &outScene)
 	ActorRef root_node = new Actor;
 	LOGGER(Log::Logger().Trace("Building scenegraph"));
 	AssimpParseScenegraphNode(aiscene->mRootNode, root_node);
-	outScene->Initialize(root_node);
 
 	/* Workaround:
 	* a root node matrixat identbe kell tenni, mert vices dolgokat csinal
@@ -406,6 +406,8 @@ void Grafkit::AssimpLoader::AssimpBuildScenegraph(SceneRef &outScene)
 			}
 		}
 	}
+
+	outScene->Initialize(root_node);
 }
 
 void Grafkit::AssimpLoader::AssimpLoadAnimations(SceneRef &outScene)

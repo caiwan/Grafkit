@@ -17,8 +17,8 @@ PERSISTENT_IMPL(Grafkit::Scene);
 Grafkit::Scene::Scene() :
 	m_root(nullptr),
 	m_tStart(0.0f),
-	m_tEnd(10.0f),
-	m_materialCurrentLayer(0)
+	m_tEnd(10.0f)
+	//m_materialCurrentLayer(0)k
 {
 }
 
@@ -66,8 +66,6 @@ void Grafkit::Scene::Initialize(ActorRef root)
 
 			const Camera * camera = dynamic_cast<Camera*>((*entity).Get());
 			if (camera) {
-				//m_cameraNodes.push_back(node);
-				//m_cameraMap[node->GetName()] = node;
 				AddCamera(node);
 				break; // assume if we have only one camera uder a node
 			}
@@ -118,6 +116,7 @@ ActorRef Grafkit::Scene::GetCamera(std::string name)
 	return ActorRef();
 }
 
+
 void Grafkit::Scene::AddCamera(ActorRef camera)
 {
 	m_cameraNodes.push_back(camera);
@@ -147,23 +146,12 @@ void Grafkit::Scene::AddAnimation(AnimationRef anim)
 	m_animations.push_back(anim);
 }
 
-void Grafkit::Scene::GetAnimations(ActorRef & actor, std::vector<AnimationRef>& animations)
-{
-	animations.clear();
-	for (auto it = m_animations.begin(); it != m_animations.end(); it++) {
-		ActorAnimation *actorAnim = dynamic_cast<ActorAnimation*>(it->Get());
-		if (actorAnim && actorAnim->GetActor().Get() == actor.Get()) {
-			animations.push_back(actorAnim);
-		}
-	}
-}
-
 void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps)
 {
-	if(vs.Valid()) 
+	if (vs.Valid())
 		m_vertexShader = vs;
 
-	if (ps.Valid()) 
+	if (ps.Valid())
 		m_pixelShader = ps;
 
 	//AddMaterialLayer(0, ps);
@@ -173,7 +161,6 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef 
 	}
 
 }
-
 
 /******************************************************************************
  * RENDER
@@ -207,7 +194,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 	ActorRef &cameraActor = GetActiveCamera();
 	if (cameraActor.Valid() && (!cameraActor->GetEntities().empty() && cameraActor->GetEntities()[0].Valid())) {
 		// itt csak az elso entitast vesszuk figyelembe
-		Camera * camera = dynamic_cast<Camera *>(cameraActor->GetEntities()[0].Get());
+		Camera * camera = dynamic_cast<Camera *>(cameraActor->GetEntity(0).Get());
 		if (camera) {
 			camera->Calculate(render);
 
@@ -246,7 +233,7 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 
 void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 {
-	m_materialCurrentLayer = layer;
+	//m_materialCurrentLayer = layer;
 	m_currentWorldMatrix.Identity();
 
 	//ez itt elviekben jo kell, hogy legyen
@@ -327,4 +314,6 @@ void Grafkit::Scene::serialize(Archive & ar)
 	// a tobbit a loader vegzi majd 
 	PERSIST_FIELD(ar, m_tStart);
 	PERSIST_FIELD(ar, m_tEnd);
+
+	m_activecameraTrack.serialize(ar);
 }

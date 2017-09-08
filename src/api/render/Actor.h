@@ -69,11 +69,20 @@ namespace Grafkit {
 		void AddChild(Actor* child);
 		Ref<Actor> GetParent() { return m_pParent; }
 
+		// TODO: rm this
 		std::vector<Ref<Actor>>& GetChildren() { return this->m_pChildren; }
+		// TODO: use this
+		ActorRef GetChild(int i) { return this->m_pChildren[i]; }
 
 		void AddEntity(Ref<Entity3D> entity) { m_pEntities.push_back(entity); }
 
+		// TODO: rm this
 		std::vector<Ref<Entity3D>>& GetEntities() { return m_pEntities; }
+		// TODO: use this
+		Entity3DRef GetEntity(int id){ return m_pEntities[id]; }
+
+		// -- 
+		// Ez most eppen nem mukodik, de jo lenne, ha igen:
 
 		/** Elrejti az akutalis nodeot, a gyerkeket meghagyja, a rendert atlepi */
 		void Hide() { m_is_nodeHidden = 1; }
@@ -89,6 +98,8 @@ namespace Grafkit {
 
 		int IsHidden() { return m_is_nodeHidden; }
 		int IsChildrenHidden() { return m_is_childrenHidden; }
+
+		// --
 
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }

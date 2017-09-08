@@ -280,7 +280,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = m_w;
 	textureDesc.Height = m_h;
-	textureDesc.MipLevels = 0;
+	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = format;
 	textureDesc.SampleDesc.Count = 1;

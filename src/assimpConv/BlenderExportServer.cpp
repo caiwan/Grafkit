@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <map>
+
 #include "BlenderExportServer.h"
 
 #include "render/Scene.h"
@@ -149,7 +151,7 @@ int BlenderExportServer::Run()
 
 namespace {
 	// TODO: refactor later on
-	void QND_AddTextureToMaterialSafe(MaterialRef& resMat, json &j, std::string key, Material::texture_type_e tslot) 
+	void QND_AddTextureToMaterialSafe(MaterialRef& resMat, json &j, std::string key, Material::texture_type_e tslot)
 	{
 		if (j[key].is_string()) {
 			std::string name = j[key];
@@ -200,38 +202,31 @@ bool BlenderExportServer::Parse(json & j)
 
 		//--
 		json camkeys = j["data"]["CameraKeys"];
-		if(!camkeys.empty()) {
-			ActorAnimation* animation = new ActorAnimation();
-			CameraRef camera = new Camera();
-			camera->SetName("MainCamera_1");
-			ActorRef cameraActor = new Actor(camera);
-			cameraActor->SetName("MainCamera");
-			animation->SetActor(cameraActor);
-			std::vector<AnimationRef> animations;
+		if (!camkeys.empty()) {
+
+			// Compromises.
+			// Compromises everywhere
+
+			std::map<std::string, int> cameraIdMap;
+		
+			for (int i = 0; i < (*m_scene)->GetCameraCount(); i++) {
+				ActorRef a = (*m_scene)->GetCamera(i);
+				std::string n = a->GetName();
+				cameraIdMap[n] = i;
+			}
+			
 			for (auto camit = camkeys.begin(); camit != camkeys.end(); camit++) {
 				double t = (double)camit->at("t");
 				json v = camit->at("v");
 				if (!v["key"].empty()) {
 					std::string key = v["key"];
-					auto it = m_resources.actors.find(key);
-					if (it != m_resources.actors.end()) {
-						ActorRef ar = it->second.Get();
-						(*m_scene)->GetAnimations(ar, animations);
-						if (!animations.empty()) {
-							// There should be a camera animation somewhere
-							for (int i = 0; i < animations.size(); i++) {
-								ActorAnimation* anim = dynamic_cast<ActorAnimation*>(animations[0].Get());
-								if (anim)
-									anim->CopyKey(t, animation);
-							}
-						}
+					auto cidit = cameraIdMap.find(key);
+					if (cidit != cameraIdMap.end()) {
+						(*m_scene)->AddCurrentCameraFrame(t, cidit->second);
 					}
 				}
 			}
-			m_resources.cameras.push_back(camera);
-			m_resources.actors["MainCamera"] = cameraActor;
-			(*m_scene)->GetRootNode()->AddChild(cameraActor);
-			(*m_scene)->AddAnimation(animation);
+
 		}
 
 		// --

@@ -34,7 +34,9 @@ namespace Grafkit {
 
 		// --- 
 		void SetActiveCamera(std::string name);
-		void SetActiveCamera(size_t id = 0) { m_activeCamera = m_cameraNodes[id]; }
+		void SetActiveCamera(size_t id) { m_activeCamera = m_cameraNodes[id]; }
+
+		void SetActiveCameraFrame(float t) { int k = GetCurrentCameraFrame(t); if (k>=0) m_activeCamera = m_cameraNodes[k]; }
 
 		ActorRef GetActiveCamera() { return m_activeCamera; }
 
@@ -51,9 +53,19 @@ namespace Grafkit {
 		MaterialRef GetMaterial(std::string name);
 
 		void AddAnimation(AnimationRef anim);
+
+		void AddCurrentCameraFrame(float t, int id) { m_activecameraTrack.AddKey(Animation::Key<int>(t, id)); }
+		int GetCurrentCameraFrame(float t) {
+			int i0 = -1, i1 = -1; float k = 0;
+			if (m_activecameraTrack.FindKey(t, i0, i1, k))
+				return i0;
+			return -1;
+		}
+
 		void GetAnimations(std::vector<AnimationRef> &animations) { animations.clear(); animations.assign(m_animations.cbegin(), m_animations.cend()); }
 		AnimationRef GetAnimation(int i) { return m_animations[i]; }
-		void GetAnimations(ActorRef & actor, std::vector<AnimationRef> &animations);
+		//void GetAnimations(ActorRef & actor, std::vector<AnimationRef> &animations);
+
 		void UpdateAnimation(double t) { m_tAnim = t; }
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
@@ -101,6 +113,7 @@ namespace Grafkit {
 		Grafkit::Matrix m_cameraMatrix;
 
 		ActorRef m_activeCamera;
+		Animation::Track<int> m_activecameraTrack;
 
 		std::vector<AnimationRef> m_animations;
 
@@ -132,8 +145,7 @@ namespace Grafkit {
 
 	private:
 		//std::map<UINT, ShaderRef> m_materialShaderMap;
-		UINT m_materialCurrentLayer;
-
+		//UINT m_materialCurrentLayer;
 
 		struct WorldMatrices_t m_worldMatrices;
 

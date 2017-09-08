@@ -65,8 +65,8 @@ namespace Grafkit {
 
 	protected:
 
-		TextureRef m_texOut[3];
-		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexBack;
+		TextureRef m_texOut[4];
+		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
 
 		TextureSamplerRef m_textureSampler;
 
@@ -81,6 +81,10 @@ namespace Grafkit {
 		typedef bind_map_t::iterator bind_map_it_t;
 
 		bind_map_t m_input_map;
+
+		struct {
+			float4 s, v;
+		} m_screen_params;
 
 		bool m_singlepass;
 	};

@@ -7,6 +7,7 @@ cbuffer MatrixBuffer {
 
 Texture2D<float4> normalMapTexture;
 Texture2D<float4> viewMapTexture;
+Texture2D frontBuffer;
 Texture2D effectInput;
 
 Texture2D noiseMap;
@@ -29,8 +30,8 @@ SamplerState SampleType {
 
 float4 SSAO(FXPixelInputType input) : SV_TARGET
 {
-	float4 pos = viewMapTexture.Sample(SampleType, input.tex);
-	float4 normal = normalMapTexture.Sample(SampleType, input.tex);
+	float4 pos = viewMapTexture.Sample(SampleType, uv);
+	float4 normal = normalMapTexture.Sample(SampleType, uv);
 	float ao = 0;
 
 	// depth is usually null where ther is no depth information 
@@ -42,7 +43,9 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 
 		normal = normalize(normal);
 
-		float3 rvec = normalize(noiseMap.Sample(SampleType, input.tex * noiseScale).xyz * 2.0 - 1.0);
+		float2 uv = // fuck it asap
+
+		float3 rvec = normalize(noiseMap.Sample(SampleType, uv * noiseScale).xyz * 2.0 - 1.0);
 		float3 tangent = normalize(rvec - normal.xyz * dot(rvec, normal.xyz));
 		float3 bitangent = cross(normal, tangent);
 		matrix tbn = mat3row(tangent, bitangent, normal);
@@ -64,7 +67,7 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 			offset.xy = offset.xy *0.5 + 0.5;
 			offset.y = 1. - offset.y;
 
-			float d = viewMapTexture.Sample(SampleType, offset).z;
+			float d = viewMapTexture.Sample(SampleType, offset.xy).z;
 
 			float rangeCheck = abs(pos.z - d) < sampleRadius ? 1.0 : 0.0;
 			ao += (d <= samplepos.z ? 1.0 : 0.0) * rangeCheck;
@@ -76,4 +79,15 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 	ao = 1. - ao;
 
 	return float4(ao, ao, ao, 1);
+}
+
+float4 SSAOMerge(FXPixelInputType input) : SV_TARGET
+{
+    float4 color;
+
+    float2 uv = // fuck it asap
+	color = frontBuffer.Sample(SampleType, uv);
+    color = color + effectInput.Sample(SampleType, uv);
+
+    return color;
 }

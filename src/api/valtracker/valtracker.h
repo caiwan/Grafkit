@@ -14,7 +14,7 @@ typedef const sync_track sync_track_t;
 namespace Grafkit{
 	class ValueTracker;
 
-	class Timer{
+	class Timer : public Referencable{
 		friend ValueTracker;
 
 		public:
@@ -77,10 +77,10 @@ namespace Grafkit{
 		VTT_VCOUNT
 	};
 
-	class ValueTracker{
+	class ValueTracker : public Referencable{
 
 		protected:
-			class Track{
+			class Track : public Referencable{
 			public:
 				Track(ValueTracker *parent, val_track_e type, const char *name, const char *vclassName, const char *vname);
 				virtual ~Track();
