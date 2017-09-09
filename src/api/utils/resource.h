@@ -37,13 +37,8 @@ namespace Grafkit{
 		std::string GetName() { return this->m_name; }
 		void SetName(std::string name) { m_name = name; }
 
-		ULONG GetID() { return this->m_id; }
-		ULONG GenerateID(); 
-
 	protected:
-		/// Sets asset manager 
 		std::string m_name;
-		ULONG m_id;
 
 	};
 

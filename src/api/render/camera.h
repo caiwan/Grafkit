@@ -13,30 +13,14 @@ namespace Grafkit {
 	// 
 
 	/** Basic camera class */
-	__declspec(align(16)) class Camera : public Entity3D, public AlignedNew<Camera>/*, public Persistent*/
+	__declspec(align(16)) 
+		class Camera : public Entity3D, public AlignedNew<Camera>
 	{
 	public:
-		Camera();
+		enum camera_mode { CAMERA_LH, CAMERA_RH };
+
+		Camera(camera_mode mode = CAMERA_LH);
 		~Camera();
-
-		void SetPosition(float x, float y, float z);
-		float3 &GetPosition() { return this->m_position; }
-		
-		/// Camera looka at a reference point 
-		void SetLookAt(float x, float y, float z);
-		void SetLookAt(float3 p) { SetLookAt(p.x, p.y, p.z); }
-
-		/// Camera looks towards a given vector
-		void SetLookTo(float x, float y, float z);
-		void SetLookTo(float3 p) { SetLookTo(p.x, p.y, p.z); }
-
-		float3 &GetLook() { return this->m_position; }
-
-		void SetUp(float x, float y, float z);
-		float3 &GetUp() { return this->m_up; }
-
-		void SetRotation(float x, float y, float z);
-		float3 &GetRotation() { return this->m_rotation; }
 
 		void SetAspect(float aspect) { this->m_aspect = aspect; }
 		/// @todo GetAspect()
@@ -72,7 +56,7 @@ namespace Grafkit {
 			}
 		}
 
-		enum camera_mode { LOOK_TO, LOOK_AT };
+		
 
 		enum camera_mode getMode() {
 			return m_mode;
@@ -89,11 +73,6 @@ namespace Grafkit {
 		}
 
 	private:
-		float3 m_position;
-		float3 m_look;
-		float3 m_up;
-		float3 m_rotation;
-
 		float m_znear, m_zfar;
 		float m_aspect, m_screenWidth, m_screenHeight;
 		float m_hFov;

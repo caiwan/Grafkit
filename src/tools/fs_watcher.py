@@ -40,20 +40,20 @@ class EvtHandler(FileSystemEventHandler):
                 self.lg.error("fuk {}".format(str(e)))
                 if e.errno == 2:
                     return
-                time.sleep(.25)
+                time.sleep(.5)
             pass
         
     def on_created(self, evt):
-        # time.sleep(2)
+        time.sleep(.5)
         self.copy(evt)
         
     def on_modified(self, evt):
-        # time.sleep(2)
+        time.sleep(.5)
         self.copy(evt)
     pass
     
     def on_moved(self, evt):
-        # time.sleep()
+        time.sleep(.5)
         self.copy(evt)
     pass
     

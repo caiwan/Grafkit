@@ -31,9 +31,6 @@ namespace Grafkit {
 
 		virtual void Render(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
 		virtual void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
-		
-		// qnd shit for cbuffer aggregattion
-		virtual size_t GetInternalData(void *const& p) { return 0; }
 
 		virtual void serialize(Archive& ar) = 0;
 	};
@@ -62,55 +59,30 @@ namespace Grafkit {
 
 		virtual void Render(Grafkit::Renderer &render, Scene* scene);
 
-		// qnd shit for cbuffer aggregattion
-		virtual size_t GetInternalData(void *const& p);
-
 		/// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
-		void AddChild(Actor* child);
 		Ref<Actor> GetParent() { return m_pParent; }
 
-		// TODO: rm this
-		std::vector<Ref<Actor>>& GetChildren() { return this->m_pChildren; }
-		// TODO: use this
-		ActorRef GetChild(int i) { return this->m_pChildren[i]; }
+		void AddChild(Actor* child);
+		ActorRef GetChild(int i = 0) { return this->m_pChildren[i]; }
+		size_t GetChildrenCount() { return this->m_pChildren.size(); }
 
 		void AddEntity(Ref<Entity3D> entity) { m_pEntities.push_back(entity); }
-
-		// TODO: rm this
-		std::vector<Ref<Entity3D>>& GetEntities() { return m_pEntities; }
-		// TODO: use this
-		Entity3DRef GetEntity(int id){ return m_pEntities[id]; }
-
-		// -- 
-		// Ez most eppen nem mukodik, de jo lenne, ha igen:
-
-		/** Elrejti az akutalis nodeot, a gyerkeket meghagyja, a rendert atlepi */
-		void Hide() { m_is_nodeHidden = 1; }
-
-		/** a renderban latszik az akualis node */
-		void Show() { m_is_nodeHidden = 0; }
-
-		/** Elrejti az akutalis node gyerekeit, a render atlepi a fat */
-		void HideChildren() { m_is_childrenHidden = 1; }
-
-		/** latszanak a node gyerekei */
-		void ShowChildren() { m_is_childrenHidden = 0; }
-
-		int IsHidden() { return m_is_nodeHidden; }
-		int IsChildrenHidden() { return m_is_childrenHidden; }
+		Entity3DRef GetEntity(int id = 0) { return m_pEntities[id]; }
+		size_t GetEntityCount(){ return m_pEntities.size(); }
 
 		// --
+
+		//void AddAnimation(AnimationRef animation){m_animations.push_back(animation);}
 
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
 		Grafkit::Matrix & WorldMatrix() { return m_worldMatrix; }
 
-		Grafkit::Matrix m_viewMatrix;			///< Node transyformacioja
+		Grafkit::Matrix m_viewMatrix;			///< Node tranyyformacioja
 		Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
-		Grafkit::Matrix m_worldMatrix;		///< Szarmaztatott matrix
+		Grafkit::Matrix m_worldMatrix;			///< Szarmaztatott matrix
 
-		BYTE m_is_nodeHidden;
-		BYTE m_is_childrenHidden;
+		//std::vector<AnimationRef> m_animations;
 
 		Ref<Actor> m_pParent;
 		std::vector<Ref<Actor>> m_pChildren;

@@ -30,7 +30,7 @@ Grafkit::Scene::~Scene()
 void Grafkit::Scene::Initialize(ActorRef root)
 {
 	m_root = root;
-	
+
 	std::stack<int> parentIdStack;
 	parentIdStack.push(-1);
 
@@ -46,37 +46,40 @@ void Grafkit::Scene::Initialize(ActorRef root)
 		m_nodes.push_back(node);
 
 		m_nodeMap[node->GetName()] = node;
-		
+
 		// collect material for models
-		for (auto entity = node->GetEntities().begin(); entity != node->GetEntities().end(); entity++) {
-			
-			const Model * model = dynamic_cast<Model*>((*entity).Get());
+		//for (auto entity = node->GetEntities().begin(); entity != node->GetEntities().end(); entity++) 
+		for (int i = 0; i < node->GetEntityCount(); i++)
+		{
+			Entity3D * entity = node->GetEntity(i);
+			const Model * model = dynamic_cast<Model*>(entity);
 			if (model) {
 				MaterialRef material = model->GetMaterial();
 				if (material.Valid())
 					m_materialMap[material->GetName()] = material;
 			}
 
-			const Light * light = dynamic_cast<Light*>((*entity).Get());
-			if (light){
+			const Light * light = dynamic_cast<Light*>(entity);
+			if (light) {
 				m_lightNodes.push_back(node);
 				m_lightMap[node->GetName()] = node;
 				break; // assume if we have only one light uder a node
 			}
 
-			const Camera * camera = dynamic_cast<Camera*>((*entity).Get());
+			const Camera * camera = dynamic_cast<Camera*>(entity);
 			if (camera) {
 				AddCamera(node);
 				break; // assume if we have only one camera uder a node
 			}
 
-			m_entities.insert(*entity);
+			m_entities.insert(entity);
 		}
 		// </yield>
 
-		for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++) {
+		//for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++) {
+		for (int i = 0; i < node->GetChildrenCount(); i++) {
 			parentIdStack.push(id);
-			stack.push(*it);
+			stack.push(node->GetChild(i));
 		}
 	}
 
@@ -89,11 +92,11 @@ void Grafkit::Scene::Shutdown()
 	m_nodeMap.clear();
 
 	m_animations.clear();
-	
+
 	m_activeCamera = nullptr;
 	m_cameraNodes.clear();
 	m_entities.clear();
-	
+
 	m_root = nullptr;
 
 	m_pixelShader = nullptr;
@@ -180,9 +183,12 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 	PrerenderNode(render, m_root);
 
 	// --- lights
-	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++) {
-		if (it->Valid() && !it->Get()->GetEntities().empty() && it->Get()->GetEntities()[0].Valid()) {
-			Light* light = dynamic_cast<Light *>(it->Get()->GetEntities()[0].Get());
+	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++)
+	{
+		//if (it->Valid() && !it->Get()->GetEntities().empty() && it->Get()->GetEntities()[0].Valid()) 
+		{
+			Entity3D * e = (*it)->GetEntity();
+			Light* light = dynamic_cast<Light *>(e);
 			if (light) {
 				Matrix wm = it->Get()->WorldMatrix();
 				light->Calculate(render, this, wm);
@@ -192,9 +198,10 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 	// --- kamera
 	ActorRef &cameraActor = GetActiveCamera();
-	if (cameraActor.Valid() && (!cameraActor->GetEntities().empty() && cameraActor->GetEntities()[0].Valid())) {
-		// itt csak az elso entitast vesszuk figyelembe
-		Camera * camera = dynamic_cast<Camera *>(cameraActor->GetEntity(0).Get());
+	if (cameraActor.Valid())
+	{
+		Entity3D * e = cameraActor->GetEntity();
+		Camera * camera = dynamic_cast<Camera *>(e);
 		if (camera) {
 			camera->Calculate(render);
 
@@ -202,7 +209,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 			Matrix matv = camera->GetViewMatrix();
 			Matrix matw = cameraActor->WorldMatrix();
-			
+
 			m_cameraViewMatrix = matv;
 			m_cameraViewMatrix.Multiply(matw);
 			m_cameraViewMatrix.Invert();
@@ -214,7 +221,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 	else {
 		throw new EX_DETAILS(NullPointerException, "Camera actor nem jo, vagy Nem seteltel be a nodeba kamerat");
 	}
-	
+
 	// to get the matrices before the scenegraph renders
 	m_worldMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
 
@@ -243,7 +250,7 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	// shit that happen here
 
 	struct ld_t {
-		ld_t(){}
+		ld_t() {}
 
 		Light::light2_t lights[16];
 		union {
@@ -255,9 +262,8 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	lightData.lightCount = 0;
 
 	// add lights
-	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++) 
+	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++)
 	{
-		// see what kind of shit will happen
 		(*it)->GetInternalData(&lightData.lights[lightData.lightCount]);
 		lightData.lightCount++;
 	}
@@ -267,12 +273,12 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	// render scenegraph
 	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {
 		if (node->Valid()) {
-			if (!(*node)->IsHidden()) {
-				m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
-				(*m_vertexShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-				(*m_pixelShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-				(*node)->Render(render, this);
-			}
+
+			m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
+			(*m_vertexShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+			(*m_pixelShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+			(*node)->Render(render, this);
+
 		}
 	}
 
@@ -290,7 +296,7 @@ void Grafkit::Scene::PrerenderNode(Grafkit::Renderer & render, Actor * actor, in
 	m_currentWorldMatrix.Multiply(actor->Matrix());
 	m_currentWorldMatrix.Multiply(actor->Transform());
 	actor->WorldMatrix(m_currentWorldMatrix);
-	
+
 	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
 		PrerenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);
 	}

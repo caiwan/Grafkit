@@ -161,6 +161,10 @@ namespace Grafkit {
 		// -- output sampler
 		std::vector<OutputTargetRecord> m_outputTargets;
 
+		// 
+		int m_isBound;
+		std::string m_name;
+
 		// ================================================================================================================================
 
 		// pure virtuals for shader type specific stuff (vs, fs, etc..)

@@ -10,13 +10,11 @@ using namespace Grafkit;
 using namespace std::chrono;
 
 void IResource::_serialize(Archive& ar) {
-	PERSIST_FIELD(ar, m_id);
 	PERSIST_STRING(ar, m_name);
 }
 
 Grafkit::IResource::IResource()
 {
-	GenerateID();
 }
 
 Grafkit::IResource::~IResource()
@@ -40,15 +38,3 @@ template <typename T, typename U> inline U crawl(T in) {
 	return out;
 }
 
-// generates a totally random tihng
-ULONG Grafkit::IResource::GenerateID()
-{
-	srand(crawl<milliseconds, UINT>(duration_cast<milliseconds>(system_clock::now().time_since_epoch())));
-	
-	m_id = 0;
-	BYTE * const pId = (BYTE*)&m_id;
-	for (int i = 0; i < sizeof(m_id); i++) {
-		pId[i] = crawl<int, BYTE>(rand());
-	}
-	return m_id;
-}

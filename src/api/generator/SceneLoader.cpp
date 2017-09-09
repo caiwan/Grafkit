@@ -221,9 +221,11 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 			++m_cActorID;
 		}
 
-		if (node && !node->GetChildren().empty())
-			for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++)
-				stack.push(*it);
+		if (node && !node->GetChildrenCount() != 0) {
+			int k = node->GetChildrenCount();
+			for (int i = 0; i < k; i++)
+				stack.push(node->GetChild(i));
+		}
 	}
 
 	BuildActorMap();
@@ -335,37 +337,39 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 // which entity belongs to which actor
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &actor)
 {
-	for (auto entity_it = actor->GetEntities().begin(); entity_it != actor->GetEntities().end(); ++entity_it) {
-		if (entity_it->Valid()) {
+	int k = actor->GetEntityCount();
+	for (int i = 0; i < k; i++)
+	{
+		Entity3D *entity = actor->GetEntity(i);
 
-			Entity3D *entity = (*entity_it).Get();
 
-			LOGGER(Log::Logger().Info("  Entity: %s %d {", entity->GetName().c_str(), m_cEntityID));
 
-			if (m_entity_map.find(entity) == m_entity_map.end()) {
-				m_entity_map[entity] = m_cEntityID;
-				m_entities.push_back(entity);
-				m_entities_to_actors.push_back(assoc_t(m_cEntityID, m_cActorID)); // [m_cEntityID].push_back(m_cActorID);
+		LOGGER(Log::Logger().Info("  Entity: %s %d {", entity->GetName().c_str(), m_cEntityID));
 
-				// model 
-				const ModelRef model = dynamic_cast<Model*>((*entity_it).Get());
-				if (model.Valid()) {
-					BuildMaterialMap(model);
-					// ... ide jon, ami kell meg
-				}
+		if (m_entity_map.find(entity) == m_entity_map.end()) {
+			m_entity_map[entity] = m_cEntityID;
+			m_entities.push_back(entity);
+			m_entities_to_actors.push_back(assoc_t(m_cEntityID, m_cActorID)); // [m_cEntityID].push_back(m_cActorID);
 
-				// ... ide jon, ami kell meg 
-
-				++m_cEntityID;
-			}
-			else {
-				m_entities_to_actors.push_back(assoc_t(m_entity_map[entity], m_cActorID));
+			// model 
+			const ModelRef model = dynamic_cast<Model*>(entity);
+			if (model.Valid()) {
+				BuildMaterialMap(model);
+				// ... ide jon, ami kell meg
 			}
 
-			LOGGER(Log::Logger().Info("  }"));
+			// ... ide jon, ami kell meg 
 
+			++m_cEntityID;
 		}
+		else {
+			m_entities_to_actors.push_back(assoc_t(m_entity_map[entity], m_cActorID));
+		}
+
+		LOGGER(Log::Logger().Info("  }"));
+
 	}
+
 }
 
 // which actor whose child of

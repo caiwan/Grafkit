@@ -23,16 +23,12 @@ Grafkit::Entity3D::~Entity3D()
 PERSISTENT_IMPL(Grafkit::Actor)
 
 Grafkit::Actor::Actor() : Persistent(),
-	m_viewMatrix(), m_transformMatrix(),
-	m_is_childrenHidden(0),
-	m_is_nodeHidden(0)
+	m_viewMatrix(), m_transformMatrix()
 {
 }
 
 Grafkit::Actor::Actor(Ref<Entity3D> entity) : Persistent(),
-	m_viewMatrix(), m_transformMatrix(),
-	m_is_childrenHidden(0),
-	m_is_nodeHidden(0)
+	m_viewMatrix(), m_transformMatrix()
 {
 	AddEntity(entity);
 }
@@ -48,16 +44,6 @@ void Grafkit::Actor::Render(Grafkit::Renderer & render, Scene * scene)
 	}
 }
 
-// i  really should sleep now
-size_t Grafkit::Actor::GetInternalData(void * const & p)
-{
-	size_t s = 0;
-	for (auto it = m_pEntities.begin(); it != m_pEntities.end(); it++) {
-		s += (*it)->GetInternalData((char * const)(p) + s);
-	}
-	return s;
-}
-
 void Grafkit::Actor::AddChild(Actor* child)
 {
 	m_pChildren.push_back(child);
@@ -67,9 +53,6 @@ void Grafkit::Actor::AddChild(Actor* child)
 void Grafkit::Actor::serialize(Archive & ar)
 {
 	IResource::_serialize(ar);
-
-	PERSIST_FIELD(ar, m_is_nodeHidden);
-	PERSIST_FIELD(ar, m_is_childrenHidden);
 
 	PERSIST_FIELD(ar, m_viewMatrix);
 	PERSIST_FIELD(ar, m_transformMatrix);

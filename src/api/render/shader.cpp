@@ -28,7 +28,7 @@ using namespace FWdebugExceptions;
 
 Shader::Shader() :
 	m_pReflector(nullptr),
-	m_layout(nullptr)
+	m_layout(nullptr), m_isBound(0)
 {
 }
 
@@ -84,6 +84,8 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 	if (!entry) throw new EX(NullPointerException);
 	if (!source) throw new EX(NullPointerException);
 
+	m_name = name;
+
 	result = CompileShaderFromSource(source, size, name, pDefines, pInclude, entry, shaderBuffer, errorMessage);
 
 	if (FAILED(result))
@@ -136,6 +138,8 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 {
 	BindShader(deviceContext);
 
+	m_isBound = 1;
+
 	// duck the constant buffers around
 	if (this->GetParamCount())
 	{
@@ -144,6 +148,14 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 			UINT slot = this->m_cBuffers[i].m_slot;
 
 			SetConstantBuffer(deviceContext, slot, 1, buffer);
+		}
+	}
+
+	if (this->GetBoundedResourceCount())
+	{
+		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
+			BResRecord &brRecord = this->m_bResources[i];
+			SetBoundedResourcePointer(deviceContext, i, brRecord.m_boundSource);
 		}
 	}
 
@@ -156,28 +168,21 @@ void Grafkit::Shader::Unbind(ID3D11DeviceContext * deviceContext)
 	{
 		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
 			BResRecord &brRecord = this->m_bResources[i];
-			if (brRecord.m_boundSource != nullptr) {
+			SetBoundedResourcePointer(deviceContext, i, nullptr);
+		}
+	}
 
-				switch (brRecord.m_desc.Type) {
-				case D3D_SIT_TEXTURE:
-				{
-					ID3D11ShaderResourceView * ppResV = nullptr;
-					SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
-
-				} break;
-
-				case D3D_SIT_SAMPLER:
-				{
-					ID3D11SamplerState * pSampler = nullptr;
-					SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
-				} break;
-
-				}
-			}
+	if (this->GetBoundedResourceCount())
+	{
+		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
+			BResRecord &brRecord = this->m_bResources[i];
+			SetBoundedResourcePointer(deviceContext, i, nullptr);
 		}
 	}
 
 	UnbindShader(deviceContext);
+
+	m_isBound = 0;
 }
 
 void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
@@ -295,7 +300,11 @@ void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceCont
 	if (id >= GetBoundedResourceCount())
 		return;
 
-	this->m_bResources[id].m_boundSource = ptr;
+	if (ptr)
+		this->m_bResources[id].m_boundSource = ptr;
+
+	if (!m_isBound)
+		return;
 
 	BResRecord &brRecord = this->m_bResources[id];
 
@@ -308,7 +317,6 @@ void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceCont
 	{
 		///@todo ezzel kell meg valamit kezdeni 
 		ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
-
 		SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
 
 	} break;

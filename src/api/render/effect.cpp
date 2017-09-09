@@ -76,11 +76,22 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
 
 	if (!m_singlepass) {
-		m_texOut[0] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexFront = m_texOut[0];
-		m_texOut[1] = new Texture2D(); m_texOut[0]->Initialize(render); m_pTexBack = m_texOut[1];
-		m_texOut[2] = new Texture2D(); m_texOut[1]->Initialize(render); m_pTexRead = m_texOut[2];
-		m_texOut[3] = new Texture2D(); m_texOut[2]->Initialize(render); m_pTexWrite = m_texOut[3];
+		for (int i = 0; i < 4; i++) {
+			m_texOut[i] = new Texture2D();
+			m_texOut[i]->Initialize(render);
+		}
+
+		m_pTexFront = m_texOut[0];
+		m_pTexBack = m_texOut[1];
+		m_pTexRead = m_texOut[2];
+		m_pTexWrite = m_texOut[3];
 	}
+
+
+	// -- 
+	m_textureSampler = new TextureSampler();
+	m_textureSampler->Initialize(render);
+
 	// --- 
 	m_shaderFullscreenQuad = new VertexShader();
 	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), "FullscreenQuad");
@@ -96,6 +107,7 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 
 	if (!m_singlepass) {
 		m_shaderCopyScreen->SetParam(render, "EffectParams", &m_screen_params);
+		m_shaderCopyScreen->SetSamplerSatate(render, "SamplerType", m_textureSampler->GetSamplerState());
 	}
 
 	// --- 
@@ -104,10 +116,6 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord[0]) * 4 * 4, GrafkitData::quad_texcoord);
 	m_fullscreenquad->SetIndices(4, 6, GrafkitData::quadIndices);
 	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
-
-	// -- 
-	m_textureSampler = new TextureSampler();
-	m_textureSampler->Initialize(render);
 
 	for (auto it = m_effectChain.begin(); it != m_effectChain.end(); ++it) {
 		(*it)->Initialize(render);
@@ -192,8 +200,8 @@ void Grafkit::EffectComposer::FlushBuffers()
 	m_pTexWrite = tmp;
 
 	tmp = m_pTexFront;
-	m_pTexBack = m_pTexFront;
-	m_pTexFront = tmp;
+	m_pTexFront = m_pTexBack;
+	m_pTexBack = tmp;
 }
 
 void Grafkit::EffectComposer::RenderChain(Renderer & render)
@@ -203,9 +211,13 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 
 	size_t fxcount = m_singlepass ? 1 : m_effectChain.size();
 
-	for (size_t i = 0; i < fxcount; i++)
+	if (!m_singlepass) {
+
+	}
+
+	for (size_t fxid = 0; fxid < fxcount; fxid++)
 	{
-		EffectPass *fx = m_effectChain[i].Get();
+		EffectPass *fx = m_effectChain[fxid].Get();
 		if (!m_singlepass) {
 			this->m_pTexWrite->SetRenderTargetView(render);
 			render.ApplyRenderTargetView(1);
@@ -216,7 +228,7 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 				if (!m_singlepass) {
 					fx->GetShader()->SetShaderResourceView(render, "backBuffer", m_pTexBack->GetShaderResourceView());
 					fx->GetShader()->SetShaderResourceView(render, "frontBuffer", m_pTexFront->GetShaderResourceView());
-					if (fxcount == 0)
+					if (fxid == 0)
 						fx->GetShader()->SetShaderResourceView(render, "effectInput", m_pTexFront->GetShaderResourceView());
 					else
 						fx->GetShader()->SetShaderResourceView(render, "effectInput", m_pTexRead->GetShaderResourceView());

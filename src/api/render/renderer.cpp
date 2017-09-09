@@ -281,13 +281,14 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 		if (SUCCEEDED(d3dDebug->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&d3dInfoQueue)))
 		{
 
+			//d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_WARNING, true);
 			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
 			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
 
 			D3D11_MESSAGE_ID hide[] =
 			{
 				D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
-				// Add more message IDs here as needed
+				D3D11_MESSAGE_ID_DEVICE_DRAW_SAMPLER_NOT_SET
 			};
 
 			D3D11_INFO_QUEUE_FILTER filter;
@@ -388,7 +389,6 @@ void Renderer::BeginScene()
 	// Clear the back buffer.
 	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
 		if (m_renderTargetViews[i]) {
-			//m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color_Citrus_flavoured_black);
 			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], black);
 		}
 	// Clear the depth buffer.
@@ -403,7 +403,6 @@ void Renderer::BeginSceneDev()
 	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
 		if (m_renderTargetViews[i]) {
 			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color_Citrus_flavoured_black);
-			//m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], black);
 		}
 	// Clear the depth buffer.
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);

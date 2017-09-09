@@ -269,18 +269,21 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 		device.GetScreenSize(sw, sh);
 		m_w = sw, m_h = sh;
 	}
-	else if (!m_w || !m_h) {
+	else if (!m_w || !m_h || m_w != m_h) {
+		DebugBreak();
 		return;
 	}
 
 	D3D11_SRV_DIMENSION srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
+	int miplevels = floor(log2f(m_w));
+
 	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
 	textureDesc.Width = m_w;
 	textureDesc.Height = m_h;
-	textureDesc.MipLevels = 1;
+	textureDesc.MipLevels = miplevels;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = format;
 	textureDesc.SampleDesc.Count = 1;
@@ -289,20 +292,37 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
-	D3D11_SUBRESOURCE_DATA *pData = nullptr, subresData;
+	//D3D11_SUBRESOURCE_DATA *pData = nullptr, subresData;
+	//D3D11_SUBRESOURCE_DATA *pData = new D3D11_SUBRESOURCE_DATA[miplevels];
+	D3D11_SUBRESOURCE_DATA pData[16];
 
 	// Initial data
 	if (initialData) {
-		subresData.pSysMem = initialData;
-		subresData.SysMemSlicePitch = 0;
+		pData[0].pSysMem = initialData;
+		pData[0].SysMemSlicePitch = 0;
 		if (m_ch == 3) {
 			m_ch = 4;
 			unsigned char *data = new unsigned char[m_w * m_h * m_ch * m_chW];
 			CopyChannel3To4(initialData, data, m_w, m_h);
-			subresData.pSysMem = data;
+			pData[0].pSysMem = data;
 		}
-		subresData.SysMemPitch = m_w * m_ch;
-		pData = &subresData;
+		pData[0].SysMemPitch = m_w * m_ch;
+
+		size_t s = m_w * m_h * m_ch * m_chW;
+		size_t ww = m_w;
+
+		for (int i = 1; i < miplevels; i++) {
+			s = s / 2;
+			ww = ww / 2;
+			unsigned char *data = new unsigned char[s];
+			pData[i].pSysMem = data;
+			pData[i].SysMemPitch = ww*m_chW;
+			pData[i].SysMemSlicePitch = 0;
+		}
+	}
+	else {
+		// bazmeg, nem adtal be pointert te szegeny
+		DebugBreak();
 	}
 
 	ID3D11Texture2D *ppTex = nullptr;
@@ -311,9 +331,6 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	if (FAILED(result)) throw new EX(TextureCreateException);
 
 	m_pTexture = ppTex;
-
-	if (pData->pSysMem != initialData)
-		delete pData->pSysMem;
 
 	// SRV, RTV
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
@@ -330,6 +347,12 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 		throw new EX(ShaderResourceViewException);
 
 	device.GetDeviceContext()->GenerateMips(m_pResourceView);
+
+	if (pData[0].pSysMem != initialData)
+		delete pData[0].pSysMem;
+
+	//delete[] pData;
+
 }
 
 void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT format, int channels, int channelWidth, int w, int h)
@@ -430,7 +453,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 	textureDesc.Format = format;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE| D3D11_BIND_RENDER_TARGET;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
@@ -458,7 +481,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 		if (pData[i].pSysMem != cubemap->GetBitmap(i)->GetData())
 			delete pData[i].pSysMem;
 
-	if (FAILED(result)) 
+	if (FAILED(result))
 		throw new EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;
