@@ -264,7 +264,8 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	// add lights
 	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++)
 	{
-		(*it)->GetInternalData(&lightData.lights[lightData.lightCount]);
+		// do need this thing obviously
+		//(*it)->GetInternalData(&lightData.lights[lightData.lightCount]);
 		lightData.lightCount++;
 	}
 
