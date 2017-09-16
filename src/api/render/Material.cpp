@@ -109,6 +109,19 @@ void Grafkit::Material::Render(Renderer& render, ShaderRef &vs, ShaderRef &fs)
 }
 
 // ====================================
+
+bool Grafkit::Material::GetTextureMap(std::map<std::string, TextureResRef>& textureMap)
+{
+	textureMap.clear();
+
+	if (m_textures.empty())
+		return false;
+
+	textureMap.insert(m_textures.cbegin(), m_textures.cend());
+
+	return true;
+}
+
 void Grafkit::Material::serialize(Archive & ar)
 {
 	this->IResource::_serialize(ar);

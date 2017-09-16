@@ -47,8 +47,6 @@ void Grafkit::Light::serialize(Archive & ar)
 
 void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, Scene * const & scene)
 {
-	//scene->GetPShader()->SetParamT<light_t>(deviceContext, "light", m_light);
-	// we should have something else here
 }
 
 // ============================================================================================================

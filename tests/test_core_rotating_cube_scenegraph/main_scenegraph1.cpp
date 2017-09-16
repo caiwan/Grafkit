@@ -79,6 +79,7 @@ protected:
 			CameraRef camera = new Camera;
 			camera->SetName("camera");
 
+
 			// -- texture
 			TextureResRef texture = new TextureRes();
 
@@ -89,7 +90,7 @@ protected:
 			m_textureSampler->Initialize(render);
 
 			// -- load shader
-			m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/textured.hlsl", ""));
+			m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
 			m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/textured.hlsl", ""));
 
 			// -- precalc
@@ -97,7 +98,7 @@ protected:
 
 			// -- model 
 			ModelRef model = new Model(new Mesh());
-			model->SetMaterial(new Material(Material::MT_flat));
+			model->SetMaterial(new Material());
 			model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 			model->GetMaterial()->SetName("GridMaterial");
 
@@ -149,9 +150,6 @@ protected:
 
 				actor->SetName(cubes[i].name);
 			}
-
-			// kozepso kockat elrejtjuk
-			modelActor->Hide();
 
 			/*
 			Kockak felfuzese a rootba

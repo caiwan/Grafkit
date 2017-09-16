@@ -6,6 +6,9 @@
 
 #include "math/matrix.h"
 
+#include "Light.h"
+#include "Camera.h"
+
 #include "renderer.h"
 #include "animation.h"
 #include "predefs.h"
@@ -18,9 +21,11 @@ namespace Grafkit {
 		Scene();
 		~Scene();
 
+		// Init, shutdown 
 		void Initialize(ActorRef root);
 		void Shutdown();
 
+		// Render stuff 
 		void RenderFrame(Grafkit::Renderer & render, float time) {
 			UpdateAnimation(time);
 			PreRender(render);
@@ -30,26 +35,30 @@ namespace Grafkit {
 		void PreRender(Grafkit::Renderer & render);
 		void Render(Grafkit::Renderer & render);
 
+		// Add / Get node
+		void AddNode(ActorRef& actor);
+		ActorRef GetNode(std::string name);
+
 		ActorRef& GetRootNode() { return m_root; }
 
 		// --- 
-		
-		void AddCamera(ActorRef camera);
-		size_t GetCameraCount() { return m_cameraNodes.size(); }
-		ActorRef GetCamera(size_t id) { return m_cameraNodes[id]; }
+
+		//void AddCamera(ActorRef camera);
+		size_t GetCameraCount() { return m_cameras.size(); }
+		ActorRef GetCamera(size_t id) { return m_cameras[id].actor; }
 		ActorRef GetCamera(std::string name);
 
 		void AddCameraFrame(float t, std::string name);
-		
-		void SetActiveCamera(std::string name);
-		void SetActiveCamera(size_t id) { m_activeCamera = m_cameraNodes[id]; }
 
-		ActorRef GetActiveCamera() { return m_activeCamera; }
+		void SetActiveCamera(std::string name);
+		void SetActiveCamera(size_t id) { m_activeCamera = m_cameras[id]; }
+
+		ActorRef GetActiveCamera() { return m_activeCamera.actor; }
 
 		// 
 
-		size_t GetLightCount() { return this->m_lightNodes.size(); }
-		ActorRef GetLight(int n) { return this->m_lightNodes[n]; }
+		size_t GetLightCount() { return this->m_lights.size(); }
+		ActorRef GetLight(int n) { return this->m_lights[n].actor; }
 		ActorRef GetLight(std::string name);
 
 		MaterialRef GetMaterial(std::string name);
@@ -63,9 +72,6 @@ namespace Grafkit {
 		void UpdateAnimation(double t) { m_tAnim = t; }
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
-
-		//void AddMaterialLayer(UINT layer, ShaderRef &shader) { m_materialShaderMap[layer] = shader; }
-		//unsigned int GetLayerID() { return m_materialCurrentLayer; }
 
 		ShaderRef GetVShader() { return this->m_vertexShader->Get(); }
 		ShaderRef GetPShader() { return this->m_pixelShader->Get(); }
@@ -96,38 +102,58 @@ namespace Grafkit {
 	protected:
 		float m_tStart, m_tEnd;
 
-		// TODO: the datamodel for scenegraph shold be handled here,
-		// and objects should be accessed by their proper getter/setter
-		// unlike in assimploader
-		// + revew all the stuff stored here
-
 		ActorRef m_root;
 		Grafkit::Matrix m_cameraViewMatrix;
 		Grafkit::Matrix m_cameraProjectionMatrix;
 		Grafkit::Matrix m_cameraMatrix;
-
-		ActorRef m_activeCamera;
-		Animation::Track<int> m_activecameraTrack;
 
 		std::vector<AnimationRef> m_animations;
 
 		ShaderResRef m_vertexShader;
 		ShaderResRef m_pixelShader;
 
-		std::vector<ActorRef> m_cameraNodes;
-		std::vector<ActorRef> m_lightNodes;
-
-		std::map<std::string, ActorRef> m_cameraMap;
-		std::map<std::string, ActorRef> m_lightMap;
+		std::list<ActorRef> m_nodes;
 		std::map<std::string, ActorRef> m_nodeMap;
 
-		std::list<ActorRef> m_nodes;
+		struct camera_t {
+			camera_t() {}
+
+			ActorRef actor;
+			CameraRef camera;
+			size_t id;
+		};
+
+		camera_t m_activeCamera;
+		Animation::Track<int> m_activecameraTrack;
+
+		std::vector<camera_t> m_cameras;
+		std::map<std::string, camera_t> m_cameraMap;
+
+		struct lightData_t {
+			lightData_t() {}
+
+			Light::light2_t lights[16];
+			union {
+				int lightCount;
+				float4 _;
+			};
+		} m_lightData;
+
+		struct light_t {
+			light_t() {}
+
+			ActorRef actor;
+			LightRef light;
+			size_t id;
+		};
+
+		std::vector<light_t> m_lights;
+		std::map<std::string, light_t> m_lightMap;
 
 		std::map<std::string, MaterialRef> m_materialMap;
 
-		// This one as well
 		std::set<Entity3D*> m_entities;
-		
+
 		struct WorldMatrices_t m_worldMatrices;
 
 	private:
@@ -140,10 +166,6 @@ namespace Grafkit {
 		void Pop();
 
 	private:
-		//std::map<UINT, ShaderRef> m_materialShaderMap;
-		//UINT m_materialCurrentLayer;
-
-
 		Grafkit::Matrix m_currentWorldMatrix;
 		std::stack<Grafkit::Matrix> m_worldMatrixStack;
 

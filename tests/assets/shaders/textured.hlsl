@@ -2,9 +2,7 @@
 // GLOBALS //
 cbuffer MatrixBuffer
 {
-	matrix worldMatrix;
-	matrix viewMatrix;
-	matrix projectionMatrix;
+    WorldMatrices wolrd;
 };
 
 SamplerState SampleType {

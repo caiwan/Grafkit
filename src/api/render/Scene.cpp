@@ -18,7 +18,6 @@ Grafkit::Scene::Scene() :
 	m_root(nullptr),
 	m_tStart(0.0f),
 	m_tEnd(10.0f)
-	//m_materialCurrentLayer(0)k
 {
 }
 
@@ -42,39 +41,7 @@ void Grafkit::Scene::Initialize(ActorRef root)
 		int id = (int)m_nodes.size();
 		int parentId = parentIdStack.top(); parentIdStack.pop();
 
-		// <yield>
-		m_nodes.push_back(node);
-
-		m_nodeMap[node->GetName()] = node;
-
-		// collect material for models
-		//for (auto entity = node->GetEntities().begin(); entity != node->GetEntities().end(); entity++) 
-		for (int i = 0; i < node->GetEntityCount(); i++)
-		{
-			Entity3D * entity = node->GetEntity(i);
-			const Model * model = dynamic_cast<Model*>(entity);
-			if (model) {
-				MaterialRef material = model->GetMaterial();
-				if (material.Valid())
-					m_materialMap[material->GetName()] = material;
-			}
-
-			const Light * light = dynamic_cast<Light*>(entity);
-			if (light) {
-				m_lightNodes.push_back(node);
-				m_lightMap[node->GetName()] = node;
-				break; // assume if we have only one light uder a node
-			}
-
-			const Camera * camera = dynamic_cast<Camera*>(entity);
-			if (camera) {
-				AddCamera(node);
-				break; // assume if we have only one camera uder a node
-			}
-
-			m_entities.insert(entity);
-		}
-		// </yield>
+		AddNode(node);
 
 		//for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++) {
 		for (int i = 0; i < node->GetChildrenCount(); i++) {
@@ -87,14 +54,20 @@ void Grafkit::Scene::Initialize(ActorRef root)
 
 void Grafkit::Scene::Shutdown()
 {
-	m_cameraMap.clear();
-	m_lightMap.clear();
 	m_nodeMap.clear();
 
 	m_animations.clear();
 
-	m_activeCamera = nullptr;
-	m_cameraNodes.clear();
+	m_activeCamera.actor = nullptr;
+	m_activeCamera.camera = nullptr;
+	m_activeCamera.id = 0;
+
+	m_cameraMap.clear();
+	m_cameras.clear();
+	
+	m_lightMap.clear();
+	m_lights.clear();
+
 	m_entities.clear();
 
 	m_root = nullptr;
@@ -115,24 +88,15 @@ ActorRef Grafkit::Scene::GetCamera(std::string name)
 {
 	auto it = m_cameraMap.find(name);
 	if (it != m_cameraMap.end())
-		return it->second;
+		return it->second.actor;
 	return ActorRef();
-}
-
-
-void Grafkit::Scene::AddCamera(ActorRef camera)
-{
-	m_cameraNodes.push_back(camera);
-	m_cameraMap[camera->GetName()] = camera;
-	if (camera->GetParent().Invalid())
-		m_root->AddChild(camera);
 }
 
 ActorRef Grafkit::Scene::GetLight(std::string name)
 {
 	auto it = m_lightMap.find(name);
 	if (it != m_lightMap.end())
-		return it->second;
+		return it->second.actor;
 	return ActorRef();
 }
 
@@ -156,8 +120,6 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef 
 
 	if (ps.Valid())
 		m_pixelShader = ps;
-
-	//AddMaterialLayer(0, ps);
 
 	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
 		(*it)->Build(deviceContext, this);
@@ -183,40 +145,30 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 	PrerenderNode(render, m_root);
 
 	// --- lights
-	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++)
+	m_lightData.lightCount = m_lights.size();
+	for (size_t i = 0; i<m_lights.size(); ++i)
 	{
-		//if (it->Valid() && !it->Get()->GetEntities().empty() && it->Get()->GetEntities()[0].Valid()) 
-		{
-			Entity3D * e = (*it)->GetEntity();
-			Light* light = dynamic_cast<Light *>(e);
-			if (light) {
-				Matrix wm = it->Get()->WorldMatrix();
-				light->Calculate(render, this, wm);
-			}
-		}
+		light_t & l = m_lights[i];
+		Matrix wm = l.actor->WorldMatrix();
+		l.light->Calculate(render, this, wm);
+		l.light->GetInternalData(&m_lightData.lights[i]);
 	}
 
-	// --- kamera
-	ActorRef &cameraActor = GetActiveCamera();
-	if (cameraActor.Valid())
+	// --- camera
+	if (m_activeCamera.actor.Valid() && m_activeCamera.camera.Valid())
 	{
-		Entity3D * e = cameraActor->GetEntity();
-		Camera * camera = dynamic_cast<Camera *>(e);
-		if (camera) {
-			camera->Calculate(render);
+		CameraRef & camera = m_activeCamera.camera;
+		ActorRef & cameraActor = m_activeCamera.actor;
+		camera->Calculate(render);
 
-			m_cameraProjectionMatrix = camera->ProjectionMatrix();
+		m_cameraProjectionMatrix = camera->ProjectionMatrix();
 
-			Matrix matv = camera->GetViewMatrix();
-			Matrix matw = cameraActor->WorldMatrix();
+		Matrix matv = camera->GetViewMatrix();
+		Matrix matw = cameraActor->WorldMatrix();
 
-			m_cameraViewMatrix = matv;
-			m_cameraViewMatrix.Multiply(matw);
-			m_cameraViewMatrix.Invert();
-		}
-		else {
-			throw new EX(NullPointerException);
-		}
+		m_cameraViewMatrix = matv;
+		m_cameraViewMatrix.Multiply(matw);
+		m_cameraViewMatrix.Invert();
 	}
 	else {
 		throw new EX_DETAILS(NullPointerException, "Camera actor nem jo, vagy Nem seteltel be a nodeba kamerat");
@@ -238,6 +190,61 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	RenderLayer(render, 0);
 }
 
+void Grafkit::Scene::AddNode(ActorRef & node)
+{
+	m_nodes.push_back(node);
+	m_nodeMap[node->GetName()] = node;
+
+	for (int i = 0; i < node->GetEntityCount(); i++)
+	{
+		// collect material for models
+		Entity3D * entity = node->GetEntity(i);
+		const Model * model = dynamic_cast<Model*>(entity);
+		if (model) {
+			MaterialRef material = model->GetMaterial();
+			if (material.Valid())
+				m_materialMap[material->GetName()] = material;
+		}
+
+		// Lights
+		LightRef light = dynamic_cast<Light*>(entity);
+		if (light.Valid()) {
+			light_t l;
+			l.actor = node;
+			l.light = light;
+			l.id = m_lights.size();
+
+			m_lights.push_back(l);
+			m_lightMap[node->GetName()] = l;
+			break; // assume if we have only one light uder a node
+		}
+
+		// CamerasS
+		CameraRef  camera = dynamic_cast<Camera*>(entity);
+		if (camera.Valid()) {
+			camera_t c;
+			c.actor = node;
+			c.camera = camera;
+			c.id = m_cameras.size();
+
+			m_cameras.push_back(c);
+			m_cameraMap[node->GetName()] = c;
+			break; // assume if we have only one camera uder a node
+		}
+
+		m_entities.insert(entity);
+	}
+
+}
+
+ActorRef Grafkit::Scene::GetNode(std::string name)
+{
+	auto it = m_nodeMap.find(name);
+	if (it != m_nodeMap.end())
+		return it->second;
+	return nullptr;
+}
+
 void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 {
 	//m_materialCurrentLayer = layer;
@@ -247,29 +254,7 @@ void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
 	(*m_vertexShader)->Bind(render);
 	(*m_pixelShader)->Bind(render);
 
-	// shit that happen here
-
-	struct ld_t {
-		ld_t() {}
-
-		Light::light2_t lights[16];
-		union {
-			int lightCount;
-			float4 _;
-		};
-	} lightData;
-
-	lightData.lightCount = 0;
-
-	// add lights
-	for (auto it = m_lightNodes.begin(); it != m_lightNodes.end(); it++)
-	{
-		// do need this thing obviously
-		//(*it)->GetInternalData(&lightData.lights[lightData.lightCount]);
-		lightData.lightCount++;
-	}
-
-	(*m_pixelShader)->SetParam(render, "LightBuffer", &lightData);
+	(*m_pixelShader)->SetParam(render, "LightBuffer", &m_lightData);
 
 	// render scenegraph
 	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {

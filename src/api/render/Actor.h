@@ -70,10 +70,6 @@ namespace Grafkit {
 		Entity3DRef GetEntity(int id = 0) { return m_pEntities[id]; }
 		size_t GetEntityCount(){ return m_pEntities.size(); }
 
-		// --
-
-		//void AddAnimation(AnimationRef animation){m_animations.push_back(animation);}
-
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
 		Grafkit::Matrix & WorldMatrix() { return m_worldMatrix; }
@@ -81,8 +77,6 @@ namespace Grafkit {
 		Grafkit::Matrix m_viewMatrix;			///< Node tranyyformacioja
 		Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
 		Grafkit::Matrix m_worldMatrix;			///< Szarmaztatott matrix
-
-		//std::vector<AnimationRef> m_animations;
 
 		Ref<Actor> m_pParent;
 		std::vector<Ref<Actor>> m_pChildren;
