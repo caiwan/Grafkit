@@ -43,7 +43,6 @@ void Grafkit::Scene::Initialize(ActorRef root)
 
 		AddNode(node);
 
-		//for (auto it = node->GetChildren().begin(); it != node->GetChildren().end(); it++) {
 		for (int i = 0; i < node->GetChildrenCount(); i++) {
 			parentIdStack.push(id);
 			stack.push(node->GetChild(i));

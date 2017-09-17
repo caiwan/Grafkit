@@ -173,8 +173,11 @@ protected:
 			/* ------------------------------------------------------------ */
 
 			/* Export and import stuff to file, then build it */
+#if 1
 			SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
 			scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
+#endif 
+
 			this->DoPrecalc();
 
 			scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);

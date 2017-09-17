@@ -173,7 +173,6 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 			}
 		}
 
-
 	}
 
 	if (m_actors.empty())
@@ -212,6 +211,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 			m_actors.push_back(node);
 			m_actor_map[node] = m_cActorID;
 
+			// yield
 			LOGGER(Log::Logger().Info("Actor: %s %d {", node->GetName().c_str(), m_cActorID));
 
 			BuildEntityMap(node);
@@ -219,10 +219,10 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 			LOGGER(Log::Logger().Info("}"));
 
 			++m_cActorID;
-		}
+			// /yield
 
-		if (node && !node->GetChildrenCount() != 0) {
-			int k = node->GetChildrenCount();
+			// push next
+			k = node->GetChildrenCount();
 			for (int i = 0; i < k; i++)
 				stack.push(node->GetChild(i));
 		}
@@ -343,8 +343,6 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &act
 	for (int i = 0; i < k; i++)
 	{
 		Entity3D *entity = actor->GetEntity(i);
-
-
 
 		LOGGER(Log::Logger().Info("  Entity: %s %d {", entity->GetName().c_str(), m_cEntityID));
 

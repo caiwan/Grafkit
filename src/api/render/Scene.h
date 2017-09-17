@@ -53,8 +53,8 @@ namespace Grafkit {
 		void SetActiveCamera(std::string name);
 		void SetActiveCamera(size_t id) { m_activeCamera = m_cameras[id]; }
 
-		ActorRef GetActiveCamera() { return m_activeCamera.actor; }
-
+		ActorRef GetActiveCameraNode() { return m_activeCamera.actor; }
+		CameraRef GetActiveCamera() { return m_activeCamera.camera; }
 		// 
 
 		size_t GetLightCount() { return this->m_lights.size(); }
