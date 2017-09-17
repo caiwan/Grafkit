@@ -14,6 +14,8 @@
 #include "generator/TextureLoader.h"
 
 #include "render/Scene.h"
+#include "render/Model.h"
+
 #include "render/effect.h"
 #include "render/camera.h"
 
@@ -65,6 +67,8 @@ protected:
 	Renderer render;
 	SceneResRef scene;
 
+	TextureResRef texture;
+
 	TextureSamplerRef sampler;
 	TextureRef normalMap;
 	TextureRef positionMap;
@@ -77,8 +81,6 @@ protected:
 	LightRef light;
 	ActorRef lightActor;
 
-	ActorRef m_rootActor;
-	ActorRef m_cameraActor;
 
 	ActorRef cameraActor;
 	CameraRef camera;
@@ -93,7 +95,8 @@ protected:
 
 
 	int init() {
-		LoadCache();
+
+		texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
@@ -104,8 +107,50 @@ protected:
 		blurfs = Load<ShaderRes>(new PixelShaderLoader("fxblur", "shaders/blur.hlsl", "blur3x3"));
 
 		// -- model 
+#if 0
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "ao.scene"));
+#else
+		camera = new Camera;
+		camera->SetName("camera");
 
+		ModelRef model = new Model(GrafkitData::CreateCube());
+		model->SetMaterial(new Material());
+		model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
+		model->GetMaterial()->SetName("GridMaterial");
+
+		// -- setup scene 
+		scene = new SceneRes(new Scene());
+
+		cameraActor = new Actor();
+		cameraActor->SetName("cameraNode");
+		cameraActor->AddEntity(camera);
+
+		cameraActor->Matrix().Translate(10, 10, -10);
+		cameraActor->Matrix().RotateRPY(M_PI / 4, M_PI / 4, M_PI / 4);
+
+		ActorRef modelActor = new Actor();
+		modelActor->SetName("center");
+
+#define N 9
+		for (int x = 0; x < N; x++) {
+			for (int y = 0; y < N; y++) {
+				ActorRef actor = new Actor();
+				actor->AddEntity(model);
+				actor->Matrix().Translate(x - N / 2, .5 * ((float)(rand() % 256)) / 256., y - N / 2);
+				modelActor->AddChild(actor);
+			}
+		}
+#undef N
+
+		ActorRef rootActor;
+		rootActor = new Actor();
+		rootActor->SetName("root");
+		rootActor->AddChild(cameraActor);
+		rootActor->AddChild(modelActor);
+
+		(*scene)->Initialize(rootActor);
+
+#endif
 		// -- generate some random texture
 
 		noiseMap = Load<TextureRes>(new TextureNoiseMap(256));
@@ -131,23 +176,23 @@ protected:
 		postfx->SetInput(2, positionMap);
 		postfx->Initialize(render);
 
-		(*aofs)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
-		(*aofs)->SetShaderResourceView("normalMapTexture", normalMap->GetShaderResourceView());
-		(*aofs)->SetShaderResourceView("viewMapTexture", positionMap->GetShaderResourceView());
-		(*aofs)->SetShaderResourceView("noiseMap", (*noiseMap)->GetShaderResourceView());
+		(*aofs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
+		(*aofs)->SetShaderResourceView(render, "normalMapTexture", normalMap->GetShaderResourceView());
+		(*aofs)->SetShaderResourceView(render, "viewMapTexture", positionMap->GetShaderResourceView());
+		(*aofs)->SetShaderResourceView(render, "noiseMap", (*noiseMap)->GetShaderResourceView());
 		(*aofs)->SetParam(render, "ssaoKernelBuffer", kernels);
 
-		(*blurfs)->SetSamplerSatate("sm", sampler->GetSamplerState());
+		(*blurfs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
 
 		// ...
 
 		(*scene)->BuildScene(render, vs, fs);
 		(*scene)->SetActiveCamera(0);
 
-		cameraActor = (*scene)->GetActiveCamera();
-		camera = dynamic_cast<Camera*>(cameraActor->GetEntities()[0].Get());
+		cameraActor = (*scene)->GetActiveCameraNode();
+		camera = (*scene)->GetActiveCamera();
 
-		(*fs)->SetSamplerSatate("SampleType", sampler->GetSamplerState());
+		(*fs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
 
 		this->t = 0;
 

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "cube.h" 
 
+using namespace Grafkit;
+
 static const float _triangle[]= { 
 	0.0f,  1.0f, -0.1f,
 	1.0f, -1.0f, -0.1f,
@@ -183,3 +185,13 @@ const size_t GrafkitData::cubeVertexSize     = sizeof(_cube_vertices);
 const size_t GrafkitData::cubeNormalSize 	 = sizeof(_cube_normals);
 const size_t GrafkitData::cubeTextureUVsSize = sizeof(_cube_texcoords);
 const size_t GrafkitData::cubeIndicesSize	 = sizeof(_cube_indices);
+
+Grafkit::MeshRef GrafkitData::CreateCube()
+{
+	MeshRef mesh = new Mesh();
+	mesh->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
+	mesh->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
+	mesh->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
+	mesh->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
+	return mesh;
+}

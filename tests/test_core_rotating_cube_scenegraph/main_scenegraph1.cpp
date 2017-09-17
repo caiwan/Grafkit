@@ -79,7 +79,6 @@ protected:
 			CameraRef camera = new Camera;
 			camera->SetName("camera");
 
-
 			// -- texture
 			TextureResRef texture = new TextureRes();
 

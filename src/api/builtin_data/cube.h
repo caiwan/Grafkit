@@ -2,6 +2,9 @@
  *  @file
  *  @brief static geometry data 
  */
+
+#include "../render/mesh.h"
+
 namespace GrafkitData {
 	extern const float * const triangle;					///< Vertices of a single triangle
 	extern const unsigned short * const triangleIndices;	///< Indices of a single triangle
@@ -24,4 +27,7 @@ namespace GrafkitData {
 	extern const size_t	cubeNormalSize;
 	extern const size_t cubeTextureUVsSize;
 	extern const size_t	cubeIndicesSize;
+
+	extern Grafkit::MeshRef CreateCube();
+
 }
