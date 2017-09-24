@@ -14,7 +14,6 @@ namespace Grafkit {
 	*/
 
 	__declspec(align(16)) class Matrix : public AlignedNew<Matrix>
-//	class Matrix
 	{
 
 	private:
@@ -40,7 +39,7 @@ namespace Grafkit {
 			);
 		}
 
-		Matrix(const matrix &m) : mat(m){
+		Matrix(const matrix &m) : mat(m) {
 		}
 
 		Matrix(const Matrix &m) : mat(m.mat) {
@@ -52,7 +51,7 @@ namespace Grafkit {
 
 		// identity
 		void Identity() {
-			 this->mat = DirectX::XMMatrixIdentity();
+			this->mat = DirectX::XMMatrixIdentity();
 		}
 
 		///@{
@@ -113,8 +112,23 @@ namespace Grafkit {
 		{
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw));
 		}
-		
+
 		// --- lookat
+		void LookAtLH(const float3 &e, const float3 &c = float3(0,0,0), const float3 & u = float3(0, 1, 0)) {
+			dxvector ev = XMLoadFloat3(&e);
+			dxvector cv = XMLoadFloat3(&c);
+			dxvector uv = XMLoadFloat3(&u);
+			mat = DirectX::XMMatrixLookAtLH(ev, cv, uv);
+			//Invert(); // something goez wrong w/ the matrix
+		}
+
+		void LookAtRH(const float3 &e, const float3 &c = float3(), const float3 & u = float3(0, 1, 0)) {
+			dxvector ev = XMLoadFloat3(&e);
+			dxvector cv = XMLoadFloat3(&c);
+			dxvector uv = XMLoadFloat3(&u);
+			mat = DirectX::XMMatrixLookAtRH(ev, cv, uv);
+			//Invert(); // something goez wrong w/ the matrix
+		}
 
 		/// Transpose matrix
 		void Transpose() {
@@ -133,7 +147,7 @@ namespace Grafkit {
 		void Set(const matrix& m) { mat = m; }
 
 		/// @note operator= valamiert nem mukodik, kiveve, ha ... 
-		Matrix& operator= (const Matrix& m) 
+		Matrix& operator= (const Matrix& m)
 		{
 			mat = m.mat;
 			return *this;
@@ -166,7 +180,7 @@ namespace Grafkit {
 			XMStoreFloat4(&r, v);
 			return r;
 		}
-		
+
 		float3 Transfrom(float3 &f3) const {
 			dxvector v = XMVector3Transform(XMLoadFloat3(&f3), mat);
 			float3 r;

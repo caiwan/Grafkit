@@ -167,7 +167,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 		m_cameraViewMatrix = matv;
 		m_cameraViewMatrix.Multiply(matw);
-		m_cameraViewMatrix.Invert();
+		//m_cameraViewMatrix.Invert();
 	}
 	else {
 		throw new EX_DETAILS(NullPointerException, "Camera actor nem jo, vagy Nem seteltel be a nodeba kamerat");
@@ -182,11 +182,29 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
-	//for (auto it = m_materialShaderMap.begin(); it != m_materialShaderMap.end(); it++) {
-		//m_pixelShader = it->second;
-		//RenderLayer(render, it->first);
-	//}
-	RenderLayer(render, 0);
+	//m_materialCurrentLayer = layer;
+	m_currentWorldMatrix.Identity();
+
+	//ez itt elviekben jo kell, hogy legyen
+	(*m_vertexShader)->Bind(render);
+	(*m_pixelShader)->Bind(render);
+
+	(*m_pixelShader)->SetParam(render, "LightBuffer", &m_lightData);
+
+	// render scenegraph
+	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {
+		if (node->Valid()) {
+
+			m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
+			(*m_vertexShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+			(*m_pixelShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+			(*node)->Render(render, this);
+
+		}
+	}
+
+	(*m_vertexShader)->Unbind(render);
+	(*m_pixelShader)->Unbind(render);
 }
 
 void Grafkit::Scene::AddNode(ActorRef & node)
@@ -242,33 +260,6 @@ ActorRef Grafkit::Scene::GetNode(std::string name)
 	if (it != m_nodeMap.end())
 		return it->second;
 	return nullptr;
-}
-
-void Grafkit::Scene::RenderLayer(Grafkit::Renderer & render, UINT layer)
-{
-	//m_materialCurrentLayer = layer;
-	m_currentWorldMatrix.Identity();
-
-	//ez itt elviekben jo kell, hogy legyen
-	(*m_vertexShader)->Bind(render);
-	(*m_pixelShader)->Bind(render);
-
-	(*m_pixelShader)->SetParam(render, "LightBuffer", &m_lightData);
-
-	// render scenegraph
-	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {
-		if (node->Valid()) {
-
-			m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
-			(*m_vertexShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-			(*m_pixelShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-			(*node)->Render(render, this);
-
-		}
-	}
-
-	(*m_vertexShader)->Unbind(render);
-	(*m_pixelShader)->Unbind(render);
 }
 
 void Grafkit::Scene::PrerenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)

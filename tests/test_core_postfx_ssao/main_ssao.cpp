@@ -125,8 +125,7 @@ protected:
 		cameraActor->SetName("cameraNode");
 		cameraActor->AddEntity(camera);
 
-		cameraActor->Matrix().Translate(10, 10, -10);
-		cameraActor->Matrix().RotateRPY(M_PI / 4, M_PI / 4, M_PI / 4);
+		cameraActor->Matrix().LookAtLH(float3(10, 10, -10));
 
 		ActorRef modelActor = new Actor();
 		modelActor->SetName("center");
@@ -136,7 +135,13 @@ protected:
 			for (int y = 0; y < N; y++) {
 				ActorRef actor = new Actor();
 				actor->AddEntity(model);
-				actor->Matrix().Translate(x - N / 2, .5 * ((float)(rand() % 256)) / 256., y - N / 2);
+
+				float xx = x - N / 2;
+				float yy = y - N / 2;
+				float zz = (float)(rand() % 256) / 256.;
+
+				actor->Matrix().Scale(.5, .5, .5);
+				actor->Matrix().Translate(xx, zz, yy);
 				modelActor->AddChild(actor);
 			}
 		}
@@ -211,7 +216,15 @@ protected:
 
 	// ==================================================================================================================
 	int mainloop() {
-		float4 ssaoparams = float4(10, 10, 1., .25);
+		struct{
+			float2 noiseScele;
+			float radius;
+			float treshold;
+		}ssaopar;
+
+		ssaopar.noiseScele = float2(20, 20);
+		ssaopar.radius = .1;
+		ssaopar.treshold = .25;
 
 		Scene::WorldMatrices_t worldMatrices;
 
@@ -228,7 +241,7 @@ protected:
 			this->scene->Get()->Render(render);
 		}
 
-		(*aofs)->SetParam(render, "ssaoParamBuffer", &ssaoparams);
+		(*aofs)->SetParam(render, "ssaoParamBuffer", &ssaopar);
 		(*aofs)->SetParam(render, "MatrixBuffer", &worldMatrices);
 
 		postfx->Render(render);

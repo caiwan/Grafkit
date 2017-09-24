@@ -32,21 +32,6 @@ Camera::~Camera()
 void Camera::Calculate(Renderer& renderer)
 {
 
-	// http://www.gamedev.net/page/resources/_/technical/directx-and-xna/directx-11-c-game-camera-r2978
-
-	float3 position = float3(0, 0, 0);
-	float3 look = float3(0, 0, 1);			// LH coord
-	float3 up = float3(0, 1, 0);
-
-	dxvector E = XMLoadFloat3(&position);	// eye coord
-	dxvector C = XMLoadFloat3(&look);		// look reference or vector
-	dxvector U = XMLoadFloat3(&up);			// up vector
-
-	if (m_mode == CAMERA_RH)
-		m_viewMatrix = XMMatrixLookToRH(E, C, U);
-	else 
-		m_viewMatrix = XMMatrixLookToLH(E, C, U);
-
 	renderer.GetViewportSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
@@ -55,9 +40,28 @@ void Camera::Calculate(Renderer& renderer)
 	float fov = M_PI / 4;
 	fov = 2 * atanf(tanf(m_hFov / 2) / m_aspect);
 
-	m_perspectiveMatrix = XMMatrixPerspectiveFovLH(fov, m_aspect, m_znear, m_zfar);
-	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
+	// http://www.gamedev.net/page/resources/_/technical/directx-and-xna/directx-11-c-game-camera-r2978
 
+	float3 position = float3(0, 0, 0);
+	float3 look = float3(0, 0, 1);
+	float3 up = float3(0, 1, 0);
+
+	dxvector E = XMLoadFloat3(&position);	// eye coord
+	dxvector C = XMLoadFloat3(&look);		// look reference or vector
+	dxvector U = XMLoadFloat3(&up);			// up vector
+
+	if (m_mode == CAMERA_RH) {
+		m_viewMatrix = XMMatrixLookToRH(E, C, U);
+
+		m_perspectiveMatrix = XMMatrixPerspectiveFovRH(fov, m_aspect, m_znear, m_zfar);
+		m_orthoMatrix = XMMatrixOrthographicRH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
+	}
+	else {
+		m_viewMatrix = XMMatrixLookToLH(E, C, U);
+
+		m_perspectiveMatrix = XMMatrixPerspectiveFovLH(fov, m_aspect, m_znear, m_zfar);
+		m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
+	}
 }
 
 

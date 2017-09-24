@@ -160,7 +160,6 @@ namespace Grafkit {
 		double m_tAnim;
 
 	private:
-		void RenderLayer(Grafkit::Renderer & render, UINT layer);
 		void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
 		void Push();
 		void Pop();
