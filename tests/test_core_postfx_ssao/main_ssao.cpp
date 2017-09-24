@@ -106,8 +106,7 @@ protected:
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 		aoFs = Load<ShaderRes>(new PixelShaderLoader("fxSSAOShader", "shaders/ssao.hlsl", "SSAO"));
-
-		blurFs = Load<ShaderRes>(new PixelShaderLoader("fxblur", "shaders/blur.hlsl", "blur3x3"));
+		blurFs = Load<ShaderRes>(new PixelShaderLoader("fxSSAOSmooth", "shaders/ssao.hlsl", "SSAOSmooth"));
 
 #ifndef LIVE_RELEASE
 		troubleshootFs = Load<ShaderRes>(new PixelShaderLoader("fxDebug", "shaders/troubleshoot.hlsl", "debugFx"));
@@ -183,7 +182,7 @@ protected:
 
 		postfx = new EffectComposer();
 		postfx->AddPass(new EffectPass(aoFs));
-		// postfx->AddPass(new EffectPass(blurFs));
+		postfx->AddPass(new EffectPass(blurFs));
 
 #ifndef LIVE_RELEASE
 		postfx->AddPass(new EffectPass(troubleshootFs));
@@ -208,6 +207,15 @@ protected:
 
 		troubleshootPar.showMap = 0;
 		troubleshootPar.showOutput = 0;
+
+		// 
+		float w, h;
+		render.GetScreenSizef(w, h);
+		ssaopar.noiseScele.x = w / 256;
+		ssaopar.noiseScele.y = h / 256;
+
+		ssaopar.radius = .5;
+		ssaopar.treshold = .5;
 
 		return 0;
 	};
@@ -263,14 +271,15 @@ protected:
 	// ==================================================================================================================
 
 	int mainloop() {
-
+#ifndef LIVE_RELEASE
 		setupMaps();
 
-#ifndef LIVE_RELEASE
 		int key = -1;
-		for (int i = 0; i < 8; i++) { 
-			if (m_pInput->IsKeyDown(VK_F1 + i)) { 
-				key = i; break; } }
+		for (int i = 0; i < 8; i++) {
+			if (m_pInput->IsKeyDown(VK_F1 + i)) {
+				key = i; break;
+			}
+		}
 		if (key != -1) {
 			if (m_pInput->IsKeyDown(VK_SHIFT)) { troubleshootPar.showOutput = key; }
 			else { troubleshootPar.showMap = key; }
@@ -278,11 +287,6 @@ protected:
 
 		(*troubleshootFs)->SetParam(render, "TroubleshootParams", &troubleshootPar);
 #endif //LIVE_RELEASE
-
-		// 
-		ssaopar.noiseScele = float2(20, 20);
-		ssaopar.radius = .5;
-		ssaopar.treshold = .25;
 
 		(*aoFs)->SetParam(render, "ssaoParamBuffer", &ssaopar);
 

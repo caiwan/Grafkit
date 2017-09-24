@@ -14,6 +14,7 @@ PERSISTENT_IMPL(Grafkit::Camera)
 
 Grafkit::Camera::Camera(camera_mode mode) :Entity3D()
 {
+	m_type = PERSPECTIVE;
 	m_mode = mode;
 	m_hFov = M_PI / 4.0f;
 
@@ -37,8 +38,7 @@ void Camera::Calculate(Renderer& renderer)
 
 	// --- projection & ortho --- 
 
-	float fov = M_PI / 4;
-	fov = 2 * atanf(tanf(m_hFov / 2) / m_aspect);
+	float fov = 2 * atanf(tanf(m_hFov / 2) / m_aspect);
 
 	// http://www.gamedev.net/page/resources/_/technical/directx-and-xna/directx-11-c-game-camera-r2978
 
@@ -57,7 +57,8 @@ void Camera::Calculate(Renderer& renderer)
 		m_orthoMatrix = XMMatrixOrthographicRH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
 	}
 	else {
-		m_viewMatrix = XMMatrixLookToLH(E, C, U);
+		//m_viewMatrix = XMMatrixLookToLH(E, C, U);
+		m_viewMatrix = XMMatrixIdentity();
 
 		m_perspectiveMatrix = XMMatrixPerspectiveFovLH(fov, m_aspect, m_znear, m_zfar);
 		m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);

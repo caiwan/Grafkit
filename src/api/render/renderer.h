@@ -85,7 +85,7 @@ namespace Grafkit {
 		void GetScreenSizef(float &screenW, float &screenH) { screenW = m_screenW; screenH = m_screenH; }
 
 		void GetViewportSize(int &viewW, int &viewH) { viewW = m_viewport.Width; viewH = m_viewport.Height; }
-		void GetViewportSizef(float &viewW, float &viewH) { viewW = m_viewport.Width; viewH = m_viewport.Height; }
+		void GetViewportSizef(float &viewW, float &viewH) { viewW = (float)m_viewport.Width; viewH = (float)m_viewport.Height; }
 
 		float GetAspectRatio() {return (float)m_viewport.Width / (float)m_viewport.Height;}
 
