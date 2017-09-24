@@ -15,10 +15,11 @@ IF(BUILD_LIVE_RELEASE)
     ADD_DEFINITIONS(-DLIVE_RELEASE -DSYNC_PLAYER)
 ENDIF(BUILD_LIVE_RELEASE)
 
-add_library(BlenderImport STATIC ${SOURCE_FILES} ${HEADER_FILES})
-target_include_directories(BlenderImport PUBLIC "${CMAKE_SOURCE_DIR}")
+add_library(BlenderImporter STATIC ${SOURCE_FILES} ${HEADER_FILES})
+target_include_directories(BlenderImporter PUBLIC "${CMAKE_SOURCE_DIR}")
 
-set_target_properties(BlenderImport PROPERTIES DEBUG_POSTFIX "d")
+set_target_properties(BlenderImporter PROPERTIES DEBUG_POSTFIX "d")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES})
 
+set_target_properties(BlenderImporter PROPERTIES FOLDER tools)

@@ -1,0 +1,31 @@
+# Assimp converter
+include (${GK2_ROOT_DIR}/cmake/create_app.cmake)
+
+set(APPLICATION BlenderImporterCli)
+
+create_app(${APPLICATION})
+
+# settings
+set_target_properties(${APPLICATION} PROPERTIES FOLDER tools)
+msvc_set_console(${APPLICATION})
+
+if(WIN32)
+  target_link_libraries(${APPLICATION} wsock32 ws2_32)
+endif()
+
+# Additional deps
+include_directories("${ASSIMP_INCLUDE_DIR}")
+target_link_libraries(${APPLICATION} optimized "${ASSIMP_LIBRARY_RELEASE}")
+target_link_libraries(${APPLICATION} debug "${ASSIMP_LIBRARY_DEBUG}")
+
+add_dependencies(${APPLICATION} ${APPLICATION}Py)
+target_link_libraries(${_application} BlenderImporter)
+
+ASSIMP_COPY_BINARIES(${APPLICATION} ${CMAKE_CURRENT_BINARY_DIR})
+
+install(TARGETS ${APPLICATION} DESTINATION tools)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_REL}" CONFIGURATIONS Release MinSizeRel DESTINATION tools)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_DEB}" CONFIGURATIONS Debug RelWithDebInfo DESTINATION tools)
+
+subdirs(py)
+subdirs(lib)

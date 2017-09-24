@@ -1,0 +1,10 @@
+# Add blender py scripts as well
+file(GLOB_RECURSE BLENDER_SCRIPTS *.py)
+
+add_custom_target(BlenderImporterPy SOURCES ${BLENDER_SCRIPTS})
+
+assign_source_group("${BLENDER_SCRIPTS}")
+copy_static_files(BlenderImporterPy "tools/py" "${BLENDER_SCRIPTS}")
+
+set_target_properties(BlenderImporterPy PROPERTIES FOLDER tools)
+
