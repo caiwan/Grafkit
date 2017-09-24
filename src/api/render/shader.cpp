@@ -155,7 +155,7 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 	{
 		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
 			BResRecord &brRecord = this->m_bResources[i];
-			SetBoundedResourcePointer(deviceContext, i, brRecord.m_boundSource);
+			SetBoundedResource(deviceContext, i, brRecord.m_boundSource);
 		}
 	}
 
@@ -163,20 +163,19 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 
 void Grafkit::Shader::Unbind(ID3D11DeviceContext * deviceContext)
 {
-	// duck through the resources
-	if (this->GetBoundedResourceCount())
+	if (this->GetParamCount())
 	{
-		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
-			BResRecord &brRecord = this->m_bResources[i];
-			SetBoundedResourcePointer(deviceContext, i, nullptr);
+		for (size_t i = 0; i < this->GetParamCount(); i++) {
+			ID3D11Buffer* buffer = nullptr;
+			UINT slot = this->m_cBuffers[i].m_slot;
+			SetConstantBuffer(deviceContext, slot, 1, buffer);
 		}
 	}
 
 	if (this->GetBoundedResourceCount())
 	{
 		for (size_t i = 0; i < this->GetBoundedResourceCount(); i++) {
-			BResRecord &brRecord = this->m_bResources[i];
-			SetBoundedResourcePointer(deviceContext, i, nullptr);
+			SetBoundedResource(deviceContext, i, nullptr);
 		}
 	}
 
@@ -300,30 +299,29 @@ void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceCont
 	if (id >= GetBoundedResourceCount())
 		return;
 
-	if (ptr)
-		this->m_bResources[id].m_boundSource = ptr;
+	this->m_bResources[id].m_boundSource = ptr;
 
-	if (!m_isBound)
-		return;
+	if (m_isBound)
+		SetBoundedResource(deviceContext, id, ptr);
+}
+
+void Grafkit::Shader::SetBoundedResource(ID3D11DeviceContext * deviceContext, size_t id, void * ptr) {
 
 	BResRecord &brRecord = this->m_bResources[id];
 
-	/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
 	if (brRecord.m_desc.BindCount != 1)
 		DebugBreak();
 
 	switch (brRecord.m_desc.Type) {
 	case D3D_SIT_TEXTURE:
 	{
-		///@todo ezzel kell meg valamit kezdeni 
-		ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
+		ID3D11ShaderResourceView * ppResV = (ID3D11ShaderResourceView*)ptr;
 		SetShaderResources(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, ppResV);
-
 	} break;
 
 	case D3D_SIT_SAMPLER:
 	{
-		ID3D11SamplerState * pSampler = (ID3D11SamplerState*)brRecord.m_boundSource; // *(brRecord.m_boundSource);
+		ID3D11SamplerState * pSampler = (ID3D11SamplerState*)ptr;
 		SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
 	}break;
 

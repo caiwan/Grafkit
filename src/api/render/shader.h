@@ -100,7 +100,11 @@ namespace Grafkit {
 
 		void SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, std::string name, void* ptr);
 		void SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, size_t id, void* ptr);
+		
+	private:
+		void SetBoundedResource(ID3D11DeviceContext * deviceContext, size_t id, void* ptr);
 
+	public:
 		// ----
 		// access input layout 
 		size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
