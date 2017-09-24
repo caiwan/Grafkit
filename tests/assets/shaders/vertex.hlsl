@@ -29,7 +29,7 @@ PixelInputType mainVertex(VertexInputType input)
     output.view.xyz = output.view.xyz / output.view.w;
 
     input.normal.w = 0.0f;
-    output.normal = - input.normal; // normals are flipped for some reason
+    output.normal = input.normal; // normals are flipped for some reason
     output.normal = mul(output.normal, worldMatrix);
     output.normal = mul(output.normal, viewMatrix);
 

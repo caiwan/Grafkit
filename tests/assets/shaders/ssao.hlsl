@@ -16,8 +16,8 @@ cbuffer ssaoParamBuffer
     float4 ssaoParams;
 }
 
-Texture2D<float4> normalMapTexture;
-Texture2D<float4> viewMapTexture;
+Texture2D<float4> normalMap;
+Texture2D<float4> viewMap;
 Texture2D frontBuffer;
 Texture2D effectInput;
 
@@ -44,8 +44,9 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 
     float2 uv = input.position / fxParams.screen.xy;
 
-    float3 pos = viewMapTexture.Sample(SampleType, uv).xyz;
-    float3 normal = normalMapTexture.Sample(SampleType, uv).xyz;
+    float4 pos = viewMap.Sample(SampleType, uv);
+    float4 normal = normalMap.Sample(SampleType, uv);
+    normal.w = 0;
     float ao = 0;
 
    // depth is usually null where ther is no depth information 
@@ -57,11 +58,16 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 
         normal = normalize(normal);
 
-        float3 noise = noiseMap.Sample(SampleType, uv * noiseScale).xyz;
-        float3 rvec = normalize(noise * 2.0 - 1.0);
-        float3 tangent = normalize(rvec - normal.xyz * dot(rvec, normal.xyz));
-        float3 bitangent = cross(normal, tangent);
-        matrix tbn = mat3row(tangent, bitangent, normal);
+		// fuk it
+        float4 noise = noiseMap.Sample(SampleType, uv * noiseScale);
+        float4 rvec = normalize(noise * 2.0 - 1.0);
+        float4 tangent = normalize(rvec - normal * dot(rvec, normal));
+        tangent.w = 0;
+        float4 bitangent = float4(0,0,0,0);
+        bitangent.xyz = cross(normal.xyz, tangent.xyz);
+        bitangent.w = 0;
+        tangent.w = 0;
+        matrix tbn = matrix(tangent, bitangent, normal, float4(0,0,0,1));
 		
         for (int i = 0; i < MAX_ITERATIONS; i++)
         {
@@ -82,7 +88,7 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
             offset.xy = offset.xy * 0.5 + 0.5;
             offset.y = 1. - offset.y;
 
-            float d = viewMapTexture.Sample(SampleType, offset.xy).z;
+            float d = viewMap.Sample(SampleType, offset.xy).z;
 
             float rangeCheck = abs(pos.z - d) < sampleRadius ? 1.0 : 0.0;
             ao += (d <= samplepos.z ? 1.0 : 0.0) * rangeCheck;
@@ -95,6 +101,37 @@ float4 SSAO(FXPixelInputType input) : SV_TARGET
 
     return float4(ao, ao, ao, 1);
 }
+
+
+float4 SSAODenoise(FXPixelInputType input) : SV_TARGET
+{
+	/*
+    void main
+    (){
+
+        vec4 center = 
+        texture2D( tInput, vUv);
+        vec4 color = vec4(0.0);
+        float total = 0.0;
+        for (float x = -4.0; x <= 4.0; x += 1.0)
+        {
+            for (float y = -4.0; y <= 4.0; y += 1.0)
+            {
+                vec4 sample = 
+                texture2D( tInput, vUv
+                +vec2(x, y) / resolution);
+                float weight = 1.0 - abs(dot(sample.rgb - center.rgb, vec3(0.25)));
+                weight = pow(weight, exponent);
+                color += sample * weight;
+                total += weight;
+            }
+        }
+        gl_FragColor = color / total;
+	
+    }
+*/
+}
+
 
 float4 SSAOMerge(FXPixelInputType input) : SV_TARGET
 {

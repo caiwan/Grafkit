@@ -81,7 +81,6 @@ protected:
 	LightRef light;
 	ActorRef lightActor;
 
-
 	ActorRef cameraActor;
 	CameraRef camera;
 
@@ -90,8 +89,12 @@ protected:
 	float4 *kernels;
 
 	ShaderResRef vs;
-	ShaderResRef fs, aofs, blurfs;
+	ShaderResRef fs, aoFs, blurFs;
 	ShaderResRef cubemapShader;
+
+#ifndef LIVE_RELEASE
+	ShaderResRef troubleshootFs;
+#endif // !LIVE_RELEASE
 
 
 	int init() {
@@ -102,9 +105,13 @@ protected:
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
-		aofs = Load<ShaderRes>(new PixelShaderLoader("fxSSAOShader", "shaders/ssao.hlsl", "SSAO"));
+		aoFs = Load<ShaderRes>(new PixelShaderLoader("fxSSAOShader", "shaders/ssao.hlsl", "SSAO"));
 
-		blurfs = Load<ShaderRes>(new PixelShaderLoader("fxblur", "shaders/blur.hlsl", "blur3x3"));
+		blurFs = Load<ShaderRes>(new PixelShaderLoader("fxblur", "shaders/blur.hlsl", "blur3x3"));
+
+#ifndef LIVE_RELEASE
+		troubleshootFs = Load<ShaderRes>(new PixelShaderLoader("fxDebug", "shaders/troubleshoot.hlsl", "debugFx"));
+#endif // !LIVE_RELEASE
 
 		// -- model 
 #if 0
@@ -175,19 +182,16 @@ protected:
 		positionMap->InitializeFloatRGBA(render);
 
 		postfx = new EffectComposer();
-		postfx->AddPass(new EffectPass(aofs));
-		postfx->AddPass(new EffectPass(blurfs));
+		postfx->AddPass(new EffectPass(aoFs));
+		// postfx->AddPass(new EffectPass(blurFs));
+
+#ifndef LIVE_RELEASE
+		postfx->AddPass(new EffectPass(troubleshootFs));
+#endif
+
 		postfx->SetInput(1, normalMap);
 		postfx->SetInput(2, positionMap);
 		postfx->Initialize(render);
-
-		(*aofs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
-		(*aofs)->SetShaderResourceView(render, "normalMapTexture", normalMap->GetShaderResourceView());
-		(*aofs)->SetShaderResourceView(render, "viewMapTexture", positionMap->GetShaderResourceView());
-		(*aofs)->SetShaderResourceView(render, "noiseMap", (*noiseMap)->GetShaderResourceView());
-		(*aofs)->SetParam(render, "ssaoKernelBuffer", kernels);
-
-		(*blurfs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
 
 		// ...
 
@@ -197,9 +201,13 @@ protected:
 		cameraActor = (*scene)->GetActiveCameraNode();
 		camera = (*scene)->GetActiveCamera();
 
-		(*fs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
+		setupMaps();
+
 
 		this->t = 0;
+
+		troubleshootPar.showMap = 0;
+		troubleshootPar.showOutput = 0;
 
 		return 0;
 	};
@@ -215,19 +223,73 @@ protected:
 	};
 
 	// ==================================================================================================================
-	int mainloop() {
-		struct{
-			float2 noiseScele;
-			float radius;
-			float treshold;
-		}ssaopar;
 
+	void setupMaps() {
+#ifndef LIVE_RELEASE
+		(*troubleshootFs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
+		(*troubleshootFs)->SetShaderResourceView(render, "normalMap", normalMap->GetShaderResourceView());
+		(*troubleshootFs)->SetShaderResourceView(render, "viewMap", positionMap->GetShaderResourceView());
+#endif //LIVE_RELEASE
+
+		(*aoFs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
+		(*aoFs)->SetShaderResourceView(render, "normalMap", normalMap->GetShaderResourceView());
+		(*aoFs)->SetShaderResourceView(render, "viewMap", positionMap->GetShaderResourceView());
+		(*aoFs)->SetShaderResourceView(render, "noiseMap", (*noiseMap)->GetShaderResourceView());
+		(*aoFs)->SetParam(render, "ssaoKernelBuffer", kernels);
+
+		(*blurFs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
+
+		(*fs)->SetSamplerSatate(render, "SampleType", sampler->GetSamplerState());
+	}
+
+	struct {
+		float2 noiseScele;
+		float radius;
+		float treshold;
+	}ssaopar;
+
+#ifndef LIVE_RELEASE
+	struct {
+		union {
+			struct {
+				int showOutput;
+				int showMap;
+			};
+			float4 _;
+		};
+	} troubleshootPar;
+#endif LIVE_RELEASE
+
+	// ==================================================================================================================
+
+	int mainloop() {
+
+		setupMaps();
+
+#ifndef LIVE_RELEASE
+		int key = -1;
+		for (int i = 0; i < 8; i++) { 
+			if (m_pInput->IsKeyDown(VK_F1 + i)) { 
+				key = i; break; } }
+		if (key != -1) {
+			if (m_pInput->IsKeyDown(VK_SHIFT)) { troubleshootPar.showOutput = key; }
+			else { troubleshootPar.showMap = key; }
+		}
+
+		(*troubleshootFs)->SetParam(render, "TroubleshootParams", &troubleshootPar);
+#endif //LIVE_RELEASE
+
+		// 
 		ssaopar.noiseScele = float2(20, 20);
-		ssaopar.radius = .1;
+		ssaopar.radius = .5;
 		ssaopar.treshold = .25;
 
+		(*aoFs)->SetParam(render, "ssaoParamBuffer", &ssaopar);
+
+		// 
 		Scene::WorldMatrices_t worldMatrices;
 
+		// 
 		postfx->BindInput(render);
 
 		this->render.BeginScene();
@@ -241,15 +303,19 @@ protected:
 			this->scene->Get()->Render(render);
 		}
 
-		(*aofs)->SetParam(render, "ssaoParamBuffer", &ssaopar);
-		(*aofs)->SetParam(render, "MatrixBuffer", &worldMatrices);
+		//
+		(*aoFs)->SetParam(render, "MatrixBuffer", &worldMatrices);
 
 		postfx->Render(render);
 
 		this->render.EndScene();
 
+		m_file_loader->PollEvents(this);
+
 		return isEscPressed();
 	};
+
+	// ==================================================================================================================
 
 private:
 	FileAssetFactory *m_file_loader;
@@ -258,6 +324,8 @@ public:
 	IAssetFactory* GetAssetFactory() { return m_file_loader; };
 	Renderer & GetDeviceContext() { return this->render; };
 };
+
+// ==================================================================================================================
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
