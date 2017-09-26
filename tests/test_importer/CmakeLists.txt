@@ -1,0 +1,20 @@
+include_directories(${GTEST_INCLUDE_DIRS})
+
+set(APPLICATION IT_Importer )
+
+file(GLOB_RECURSE SOURCE_FILES *.cpp)
+file(GLOB_RECURSE HEADER_FILES *.h)
+
+include_directories("${CMAKE_SOURCE_DIR}")
+include_directories("${GK2_INCLUDE_DIR}")
+include_directories("${GTEST_INCLUDE_DIRS}")
+include_directories("${GK2_SRC_DIR}/Importer")
+
+enable_testing()
+add_executable(${APPLICATION} EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES})
+add_test(Tests ${APPLICATION})
+
+target_link_libraries(${APPLICATION} Importer Grafkit2 ${GTEST_BOTH_LIBRARIES})
+target_include_directories(${APPLICATION} PUBLIC include)
+
+set_target_properties(${APPLICATION} PROPERTIES FOLDER tests)
