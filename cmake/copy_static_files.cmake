@@ -33,6 +33,7 @@ function(copy_static_files TARGET INSTALL_DEST FILES)
 		string(REPLACE "/" "//" _dest "${_dest}")
 		
 		add_custom_command(
+            PRE_BUILD
 			TARGET ${TARGET}
 			COMMAND copy ${_file} ${_dest}
 			DEPENDS ${_file}

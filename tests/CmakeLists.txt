@@ -16,3 +16,5 @@ subdirs(test_synctracker)
 subdirs(test_music)
 subdirs(test_loaderbar)
 subdirs(test_utils)
+
+subdirs(test_importer)

@@ -20,6 +20,12 @@ ENDIF(BUILD_LIVE_RELEASE)
 add_library(${APPLICATION} STATIC ${SOURCE_FILES} ${HEADER_FILES})
 target_include_directories(${APPLICATION} PUBLIC "${CMAKE_SOURCE_DIR}")
 
+target_link_libraries(${APPLICATION} Grafkit2)
+target_link_libraries(${APPLICATION} wsock32 ws2_32)
+target_link_libraries(${APPLICATION} optimized "${ASSIMP_LIBRARY_RELEASE}")
+target_link_libraries(${APPLICATION} debug "${ASSIMP_LIBRARY_DEBUG}")
+
+
 set_target_properties(${APPLICATION} PROPERTIES DEBUG_POSTFIX "d")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES})
