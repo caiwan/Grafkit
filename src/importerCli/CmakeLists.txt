@@ -1,7 +1,7 @@
 # Assimp converter
 include (${GK2_ROOT_DIR}/cmake/create_app.cmake)
 
-set(APPLICATION BlenderImporterCli)
+set(APPLICATION ImporterCli)
 
 create_app(${APPLICATION})
 
@@ -19,13 +19,10 @@ target_link_libraries(${APPLICATION} optimized "${ASSIMP_LIBRARY_RELEASE}")
 target_link_libraries(${APPLICATION} debug "${ASSIMP_LIBRARY_DEBUG}")
 
 add_dependencies(${APPLICATION} ${APPLICATION}Py)
-target_link_libraries(${_application} BlenderImporter)
+target_link_libraries(${_application} Importer)
 
 ASSIMP_COPY_BINARIES(${APPLICATION} ${CMAKE_CURRENT_BINARY_DIR})
 
 install(TARGETS ${APPLICATION} DESTINATION tools)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_REL}" CONFIGURATIONS Release MinSizeRel DESTINATION tools)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${_ASSIMP_DLL_DEB}" CONFIGURATIONS Debug RelWithDebInfo DESTINATION tools)
-
-subdirs(py)
-subdirs(lib)

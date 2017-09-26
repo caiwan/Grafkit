@@ -1,2 +1,3 @@
 subdirs(framework)
-subdirs(assimpConv)
+subdirs(importer)
+subdirs(importerCli)

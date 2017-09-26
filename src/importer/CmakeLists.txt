@@ -1,6 +1,8 @@
 # Grafkit 2 library
 Project(Grafkit2API)
 
+set(APPLICATION Importer)
+
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inc)
 file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inl)
 
@@ -15,11 +17,13 @@ IF(BUILD_LIVE_RELEASE)
     ADD_DEFINITIONS(-DLIVE_RELEASE -DSYNC_PLAYER)
 ENDIF(BUILD_LIVE_RELEASE)
 
-add_library(BlenderImporter STATIC ${SOURCE_FILES} ${HEADER_FILES})
-target_include_directories(BlenderImporter PUBLIC "${CMAKE_SOURCE_DIR}")
+add_library(${APPLICATION} STATIC ${SOURCE_FILES} ${HEADER_FILES})
+target_include_directories(${APPLICATION} PUBLIC "${CMAKE_SOURCE_DIR}")
 
-set_target_properties(BlenderImporter PROPERTIES DEBUG_POSTFIX "d")
+set_target_properties(${APPLICATION} PROPERTIES DEBUG_POSTFIX "d")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES})
 
-set_target_properties(BlenderImporter PROPERTIES FOLDER tools)
+set_target_properties(${APPLICATION} PROPERTIES FOLDER tools)
+
+subdirs(py)
