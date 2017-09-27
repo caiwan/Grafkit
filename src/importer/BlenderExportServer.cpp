@@ -23,17 +23,19 @@
 #include "core/thread.h"
 #include "utils/logger.h"
 
+#include "ServerThread.h"
+
 #define _cmd_initconn "hello"
 #define _cmd_closeconn "goodbye"
 #define _cmd_dae "collada"
 #define _cmd_dump "bpydump"
 
-using namespace FWdebugExceptions;
-using namespace FWdebug;
 using namespace Grafkit;
+using namespace GKimporter;
+using namespace FWdebug;
+using namespace FWdebugExceptions;
 using json = nlohmann::json;
 
-#include "ServerThread.inc"
 
 /************************************************************************************************************
 

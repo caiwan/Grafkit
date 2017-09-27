@@ -15,6 +15,8 @@
 
 #include "utils/logger.h"
 
+#include "application.h"
+
 #include "Arguments.hpp"
 #include "assimploader.h"
 #include "BlenderExportServer.h"
@@ -24,12 +26,14 @@ using namespace ideup;
 
 using namespace Grafkit;
 
+using namespace GKimporter;
+
 typedef unsigned int uint;
 
 
 /* ================================================================================================ */
 
-class Application {
+class Application : public ImporterTool{
 private:
 	Arguments args;
 
