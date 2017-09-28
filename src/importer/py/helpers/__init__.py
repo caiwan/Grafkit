@@ -8,7 +8,8 @@ import re
 cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(inspect.currentframe()))[0]))
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
-
+    
+    
 # https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-snake-case
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
@@ -23,7 +24,6 @@ class Dumpable:
 
 
 class DumpJSON (json.JSONEncoder):
-
     def default(self, obj):
         if hasattr(obj,'reprJSON'):
             return obj.reprJSON()
@@ -35,3 +35,8 @@ class DumpJSON (json.JSONEncoder):
             except TypeError:
                 return json.JSONEncoder.default(self, obj)
             pass
+
+            
+from .bake import do_bake
+from .dump import do_dump
+    

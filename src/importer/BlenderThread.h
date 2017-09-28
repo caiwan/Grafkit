@@ -11,6 +11,7 @@ namespace GKimporter {
 		BlenderThread();
 
 		void AddArgument(std::string argument, std::string value) { arguments[argument] = value; }
+		void SetScriptRoot(std::string root) { scriptRoot = root; }
 
 		void Terminate() { isTerminate = true; }
 
@@ -18,6 +19,8 @@ namespace GKimporter {
 
 	protected:
 		virtual int Run();
+
+		std::string GetExecuteCommand();
 
 	private:
 		std::map<std::string, std::string> arguments;

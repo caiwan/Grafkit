@@ -2,6 +2,7 @@
 
 #include "ImporterTool.h"
 #include "BlenderThread.h"
+#include "ServerThread.h"
 
 #include <gtest/gtest.h>
 
@@ -37,7 +38,13 @@ public:
 	}
 
 	int SetupBlender() {
-		// ... 
+#ifndef LIVE_RELEASE
+		blenderThread->SetScriptRoot(IMPORTER_PY_ROOT);
+#endif
+		blenderThread->AddArgument("host", "8080");
+		
+		
+		
 		blenderThread->Start();
 
 		if (!blenderThread->IsRunning())

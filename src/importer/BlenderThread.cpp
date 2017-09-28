@@ -23,19 +23,8 @@ int GKimporter::BlenderThread::Run()
 {
 	std::array<char, DEFAULT_BUFLEN> buffer;
 
-	// --- snip
-	std::stringstream cmdArguments;
-
-	cmdArguments << "blender ";
-	cmdArguments << "-b -P " << scriptRoot << "/py/exporter.py" << " -- ";
-
-	for (auto argument = arguments.begin(); argument != arguments.end(); ++argument) {
-		cmdArguments << "-" << argument->first << " " << argument->second;
-	}
-
-	// --- snap
-	
-	const char * command = cmdArguments.str().c_str();
+	std::string execCommand = GetExecuteCommand();
+	const char * command = execCommand.c_str();
 	std::shared_ptr<FILE> pipe(_popen(command, "r"), _pclose);
 	if (!pipe) {
 		Log::Logger().Error("Could not start Blender. Command: %s", command);
@@ -54,4 +43,21 @@ int GKimporter::BlenderThread::Run()
 	isRunning = false;
 
 	return 0;
+}
+
+std::string GKimporter::BlenderThread::GetExecuteCommand()
+{
+	std::stringstream cmdLine;
+
+	cmdLine << "blender ";
+	cmdLine << "-b -P " << scriptRoot << "/py/exporter.py" << " -- ";
+
+	for (auto argument = arguments.begin(); argument != arguments.end(); ++argument) {
+		cmdLine << "--" << argument->first << " " << argument->second;
+	}
+
+	cmdLine.put(0);
+	cmdLine.seekp(0);
+
+	return cmdLine.str();
 }

@@ -10,12 +10,13 @@ cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(insp
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
-# there is no chance to make __init__.py weork under blender properly, fuck it, damn crap shit    
-
+from helpers import do_bake, do_dump
 from helpers import client
-from helpers.collada import Collada
-from helpers.bake import Bake
-from helpers import bpyexport
+
+try:
+    from tests import build_test_scene
+except ImportError:
+    pass
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -27,85 +28,28 @@ def get_args():
 
     # add parser rules
     parser.add_argument('-i', '--input', help="input blender file")
-    parser.add_argument('-t', '--test', help="dumps out stuff to json")
     parser.add_argument('-p', '--host', help="host:port we connect to dump data to")
     parsed_script_args, _ = parser.parse_known_args(script_args)
 
     return parsed_script_args
 
     
-def do_dump_camera_frmaes(conn):
-    """ Helps us to get which camera is active on the right scene"""
-    
-    scene = bpy.context.scene
-    
-    camera_keys = []
-    
-    for i in range(scene.frame_start - 1, scene.frame_end, scene.frame_step):
-        t = i * (scene.render.fps_base / scene.render.fps)
-        scene.frame_set(i)
-        scene.update()
-        camera = scene.camera
-        
-        camera_keys.append({"v":{"key":camera.name.replace(".", "_")}, "t":t})
-        
-    conn.send("bpydump", {"CameraKeys": camera_keys})
-    
-    pass
-    
-def do_dump(conn):
-    """ Dumps all the data from the context """
-    scene = bpy.context.scene
-    
-    conn.send("collada", Collada())
-    conn.send("bpydump", {"Scene": bpyexport.Scene(scene)})
-    
-    materials = [bpyexport.Material(material) for material in bpy.data.materials]
-    conn.send("bpydump", {"Materials": materials})
-    
-    do_dump_camera_frmaes(conn)
-    
-    # dump_shitz_per_frmae(conn, scene)
-    pass #shit
-
-
-def do_bake():
-    """ This thing tries to bake all the object animations
-        and camera movement into a single track
-        
-        Drawback: it eleminates scenegraph hierarchy and flattens everzthing 
-        
-        This suposed to be it, but fingers crossed:
-        https://wiki.blender.org/index.php/Dev:2.4/Source/Animation/AnimationBaking
-        https://docs.blender.org/api/blender_python_api_2_72_1/bpy.ops.nla.html#bpy.ops.nla.bake
-    """ 
-    
-    bake = Bake()
-    bake.bake_material_textures()
-    bake.bake_animations()
-    
-    
 # Main
 if __name__ == "__main__":
     args = get_args()
-    infile = args.input
-
-    # open
-    print("=== READING FILE {}".format(infile))
-    sys.stdout.flush()
-    bpy.ops.wm.open_mainfile(filepath=infile)
     
-    # bake
+    if args.input:
+        print("=== READING FILE {}".format(infile))
+        sys.stdout.flush()
+        infile = args.input
+        bpy.ops.wm.open_mainfile(filepath=infile)
+    else:
+        print("=== BUILD TEST SCENE ===")
+        build_test_scene()
+        pass
+    
     do_bake()
     
-    # hope 
-    outfile = args.test
-    if outfile:
-        print("--- DUMPS TO FILE ---")
-        print("Output: {}".format(outfile))
-        with client.Filedump(outfile) as conn:
-            do_dump(conn)
-    else:
-        hostaddr = str(args.host)
-        with client.Connection(hostaddr) as conn:
-            do_dump(conn)
+    hostaddr = str(args.host)
+    with client.Connection(hostaddr) as conn:
+        do_dump(conn)
