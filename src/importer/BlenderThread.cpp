@@ -14,7 +14,7 @@ using namespace GKimporter;
 
 #define DEFAULT_BUFLEN 16 * 4096
 
-GKimporter::BlenderThread::BlenderThread() : isRunning(false), isTerminate(false)
+GKimporter::BlenderThread::BlenderThread() : Grafkit::Thread(), isRunning(false), isTerminate(false)
 {
 	scriptRoot = "";
 }
@@ -22,6 +22,8 @@ GKimporter::BlenderThread::BlenderThread() : isRunning(false), isTerminate(false
 int GKimporter::BlenderThread::Run()
 {
 	std::array<char, DEFAULT_BUFLEN> buffer;
+
+	isRunning = true;
 
 	std::string execCommand = GetExecuteCommand();
 	const char * command = execCommand.c_str();
@@ -31,8 +33,6 @@ int GKimporter::BlenderThread::Run()
 		return 1;
 	}
 
-	isRunning = true;
-	
 	// pump 
 	while (!feof(pipe.get()) || !isTerminate) {
 		if (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL) {

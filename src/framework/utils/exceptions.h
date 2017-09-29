@@ -26,6 +26,7 @@ namespace FWdebug {
 	public:
 		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const char* deatils=NULL);
 		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const HRESULT hresult);
+		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const DWORD dword);
 		~Exception();
 
 		inline int getErrorCode() { return this->m_code; }
@@ -58,6 +59,7 @@ namespace FWdebug {
 #define EX(x) x(EX_WHERE)
 #define EX_DETAILS(x, details) x(EX_WHERE, details)
 #define EX_HRESULT(x, hresult) x(EX_WHERE, hresult)
+#define EX_DWORD(x, dword) x(EX_WHERE, dword)
 
 # endif // temporaly takeout 
 

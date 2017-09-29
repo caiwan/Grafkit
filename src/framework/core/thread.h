@@ -11,7 +11,7 @@
 #include <memory>
 #include <process.h>
 
-namespace Grafkit{
+namespace Grafkit {
 
 	class Thread;
 
@@ -19,23 +19,23 @@ namespace Grafkit{
 	Java-like Runnable interface
 	*/
 	class Runnable {
-	friend Thread;
-		
+		friend Thread;
+
 	public:
 		virtual int Run() = 0;
-		virtual ~Runnable(){}
+		virtual ~Runnable() {}
 	};
-	
-	
+
+
 	/**
 		Java-like thread management
-	*/	
-	class Thread{
+	*/
+	class Thread {
 	public:
 		//Thread(std::auto_ptr<Runnable> run);
 		Thread(Runnable *run);
 		Thread();
-			
+
 		virtual ~Thread();
 
 		void Start();
@@ -47,11 +47,12 @@ namespace Grafkit{
 	protected:
 		virtual int Run() { return 0; }
 
+	protected:
+		Runnable *m_pRunnable;
+
 	private:
 		HANDLE m_hThread;
 		DWORD m_wThreadID;
-
-		Runnable *m_pRunnable;
 
 		Thread(const Thread&);
 		const Thread& operator=(const Thread&);
@@ -67,7 +68,7 @@ namespace Grafkit{
 	/**
 	QT-like Mutex class
 	*/
-	class Mutex{
+	class Mutex {
 	public:
 		Mutex();
 		~Mutex();

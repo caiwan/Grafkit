@@ -3,8 +3,13 @@
 #include "ImporterTool.h"
 #include "BlenderThread.h"
 #include "ServerThread.h"
+#include "DispatcherThread.h"
+
+#include "utils/logger.h"
 
 #include <gtest/gtest.h>
+
+using namespace Grafkit;
 
 using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
@@ -24,33 +29,29 @@ public:
 	int Execute(int argc, char **argv) {
 		int result = 0;
 
+#ifndef LIVE_RELEASE
+		Log::Logger().AddHandler(new LoggerHandler::ConsoleLogger());
+		Log::Logger().AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
+#endif
+
 		InitGoogleTest(&argc, argv);
+		Setup();
+		Start();
 
-		result = SetupBlender();
-		if (result != 0)
-			return result;
+		// TODO: check if blender exited first
 
-		result = RUN_ALL_TESTS();
+		Join();
 
-		blenderThread->Join();
-
-		return result;
+		return RUN_ALL_TESTS();
 	}
 
-	int SetupBlender() {
+	void Setup() {
+
 #ifndef LIVE_RELEASE
-		blenderThread->SetScriptRoot(IMPORTER_PY_ROOT);
+		blender->SetScriptRoot(IMPORTER_PY_ROOT);
 #endif
-		blenderThread->AddArgument("host", "8080");
-		
-		
-		
-		blenderThread->Start();
+		blender->AddArgument("host", GetHost());
 
-		if (!blenderThread->IsRunning())
-			return 1;
-
-		return 0;
 	}
 
 };

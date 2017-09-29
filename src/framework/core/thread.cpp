@@ -58,12 +58,11 @@ Thread::~Thread() {
 void Thread::Start() {
 	//assert(m_hThread);
 	if(!this->m_hThread)
-		throw new EX_DETAILS(ThreadException, "ResumeThread failed !m_hThread");
+		throw new EX_DWORD(ThreadException, GetLastError());
 
 	DWORD rc = ResumeThread(m_hThread);
 	if(rc == -1){
-		// FWcore::writeLog(true, MSG_warn, "Last error %d", GetLastError());
-		throw new EX_DETAILS(ThreadException, "ResumeThread failed !rc");
+		throw new EX_DWORD(ThreadException, GetLastError());
 	}
 }
 
