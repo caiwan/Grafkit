@@ -1,16 +1,23 @@
 #pragma once 
 
+#include "core/thread.h"
+
 namespace GKimporter {
 
 	class DispatcherThread;
 	class ServerThreadPrivate;
 
-	class ServerThread : public Grafkit::Thread {
+	class ServerThread {
 	public:
 		ServerThread(DispatcherThread* dispatcher, int port);
 		~ServerThread();
 
+		void Start() { thread->Start(); }
+		void Stop() { thread->Stop(); }
+		void Join() { thread->Join();  }
+
 	private:
+		Grafkit::Thread* thread; 
 		ServerThreadPrivate *serverThread;
 	};
 

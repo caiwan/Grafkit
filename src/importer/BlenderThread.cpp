@@ -34,7 +34,7 @@ int GKimporter::BlenderThread::Run()
 	}
 
 	// pump 
-	while (!feof(pipe.get()) || !isTerminate) {
+	while (!feof(pipe.get()) && !isTerminate) {
 		if (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL) {
 			Log::Logger().Trace(buffer.data());
 		}

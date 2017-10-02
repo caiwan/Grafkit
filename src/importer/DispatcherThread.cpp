@@ -79,6 +79,8 @@ bool GKimporter::DispatcherThread::Parse(nlohmann::json & j)
 
 int GKimporter::DispatcherThread::Run()
 {
+	Log::Logger().Info("Dispatcher start");
+
 	try {
 		do {
 			bool is_done = false;

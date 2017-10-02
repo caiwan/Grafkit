@@ -20,6 +20,8 @@ namespace GKimporter {
 
 		void AddCommand(Ref<Command> command);
 
+		bool IsTemrinate() { return isTerminate; }
+
 	protected:
 		bool PostData(std::stringstream &ss);
 		bool Parse(nlohmann::json &j);

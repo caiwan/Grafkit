@@ -168,6 +168,9 @@ namespace GKimporter {
 
 	private:
 		int Run() {
+
+			Log::Logger().Info("Server startup, on port %d", port);
+
 			int res = 0;
 
 			try {
@@ -208,11 +211,11 @@ namespace GKimporter {
 
 	};
 
-	ServerThread::ServerThread(DispatcherThread * dispatcher, int port)
+	ServerThread::ServerThread(DispatcherThread * dispatcher, int port) : 
+		serverThread(nullptr), thread(nullptr)
 	{
 		serverThread = new ServerThreadPrivate(dispatcher, port);
-		m_pRunnable = serverThread;
-	
+		thread = new Thread(serverThread);
 	}
 
 	ServerThread::~ServerThread()

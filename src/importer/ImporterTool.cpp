@@ -51,12 +51,17 @@ void GKimporter::ImporterTool::Join()
 	if (blender)
 		blender->Join();
 
-	// TODO: check if blender had exited first, without disconnection
+	if (dispatch && server)
 
-	if (dispatch)
-		dispatch->Join();
-	if (server)
-		server->Join();
+		if (!dispatch->IsTemrinate()) {
+			dispatch->Stop();
+			server->Stop();
+		}
+		else {
+
+			dispatch->Join();
+			server->Join();
+		}
 }
 
 void GKimporter::ImporterTool::Stop()
