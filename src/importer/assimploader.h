@@ -1,11 +1,14 @@
 #pragma once
 
+#include "Command.h"
+
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/matrix4x4.h"
 
 #include "assimp/vector2.h"
 #include "assimp/vector3.h"
+//#include "assimp/vector4.h"
 
 #include "utils/exceptions.h"
 
@@ -20,54 +23,47 @@
 struct aiNode;
 struct aiMaterial;
 
-namespace Grafkit {
+namespace GKimporter {
 
 	/*
 		A huge dirty Importer class for the engine 
 	*/
 
-	class AssimpLoader
+	class AssimpLoader : public Command
 	{
 	public:
 		AssimpLoader();
 		AssimpLoader(void* data, size_t length);
 		~AssimpLoader();
 
-		// convert to left-handed
-		void SetLHFlag(bool islh);
-
-
-		SceneResRef Load();
-		void AppendAssimp(const void* data, size_t length, SceneRef inscene);
-
-	protected:
-
-		// TODO: store these in Scene and get them from there
-
-		struct {
-			std::vector<MaterialRef>		materials;
-			std::vector<ModelRef>			models;
-			std::vector<CameraRef>			cameras;
-			std::vector<LightRef>			lights;
-			std::map<std::string, ActorRef> actors;
-		} m_resources;
+		virtual void Evaluate(Environment*& env, nlohmann::json json);
+		virtual std::string GetCommandString() { return "collada"; }
 
 
 	private:		
-		void AssimpLoadMaterials(SceneRef &outScene);
-		void AssimpLoadMeshes(SceneRef &outScene);
-		void AssimpLoadCameras(SceneRef &outScene);
-		void AssimpLoadLights(SceneRef &outScene);
-		void AssimpBuildScenegraph(SceneRef &outScene);
-		void AssimpLoadAnimations(SceneRef &outScene);
+		void AssimpLoadMaterials(Environment*& env, Grafkit::SceneRef &outScene);
+		void AssimpLoadMeshes(Environment*& env, Grafkit::SceneRef &outScene);
+		void AssimpLoadCameras(Environment*& env, Grafkit::SceneRef &outScene);
+		void AssimpLoadLights(Environment*& env, Grafkit::SceneRef &outScene);
+		void AssimpBuildScenegraph(Environment*& env, Grafkit::SceneRef &outScene);
+		void AssimpLoadAnimations(Environment*& env, Grafkit::SceneRef &outScene);
 
-		void AssimpParseScenegraphNode(aiNode* ai_node, ActorRef &actor_node, int maxdepth = 1024);
+		void AssimpParseScenegraphNode(Environment*& env, aiNode* ai_node, Grafkit::ActorRef &actor_node, int maxdepth = 1024);
+
+		std::string GetMaterialName(int index);
 
 	private:
 		static Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m);
-		static TextureResRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IResourceManager * const & resman);
 		static inline aiVector3D crossProduct(aiVector3D a, aiVector3D b);
-		static inline void swap_vertices(aiVector3D *vertices, char order[], char polarity[]);
+
+		static inline float2 aiVector2DToFloat2(aiVector2D &v);
+		static inline float2 aiVector3DToFloat2(aiVector3D &v);
+		static inline float3 aiVector3DToFloat3(aiVector3D &v);
+		static inline float4 aiVector3DToFloat4(aiVector3D &v, float w);
+		static inline float4 aiColor3DToFloat4(aiColor3D &c);
+
+		static inline float4 aiMatkey4ToFloat4(aiMaterial *&mat, const char* key, int a1, int a2);
+		static inline float aiMatkeyToFloat(aiMaterial *&mat, const char* key, int a1, int a2);
 
 	private:
 		const void* m_data;
@@ -76,72 +72,14 @@ namespace Grafkit {
 		Assimp::Importer importer;
 		const aiScene *aiscene;
 		
-	protected:
+	//protected:
 		// flags
-		bool m_is_lh;
+		//bool m_is_lh;
 	};
 
 }
 
-// ================================================================================================================================================================
-// Assimp helpers
-// ================================================================================================================================================================
 
-// aiVector3D to float3
-#define ASSIMP_V3D_F3(SRC, DST)\
-{\
-	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z;\
-}
-
-#define ASSIMP_V3D_F3_SET(SRC, DST)\
-(DST(((float)(SRC).x), ((float)(SRC).y), ((float)(SRC).z)))
-
-
-// aiVector3D to float4
-#define ASSIMP_V3D_F4(SRC, DST, W)\
-{\
-	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z, (DST).w = (W);\
-}
-
-// aiVector4D to float4
-#define ASSIMP_V4D_F4(SRC, DST)\
-{\
-	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z, (DST).w = (SRC).w;\
-}
-
-#define ASSIMP_V3D_F4_SET(SRC, DST)\
-(DST(((float)(SRC).x), ((float)(SRC).y), ((float)(SRC).z)))
-
-
-#define ASSIMP_COLOR_F4(SRC, DST)\
-{\
-	(DST).x = (SRC).r, (DST).y = (SRC).g, (DST).z = (SRC).b, (DST).z = 1.0f; \
-}
-
-// ezeket mashogy nem lehet megoldnai, mert a matkey is egy makro
-#define ASSIMPMATERIALKEY_F4(SRC, _AI_ENUM, OUT)\
-{\
-	aiColor3D ac; float4& fv = (OUT); \
-	(SRC)->Get(_AI_ENUM, ac); \
-	fv.x = ac.r, fv.y = ac.g, fv.z = ac.b, fv.w = 1.0; \
-}
-
-#define ASSIMPMATERIALKEY_FLOAT(SRC, _AI_ENUM, OUT) \
-{\
-	float &scalar = (OUT);\
-	(SRC)->Get(_AI_ENUM, scalar);\
-}
-
-// blender workaround miatt kell
-// vertex order nem oke, (x y z) -> (x -z y)
-#if 0
-#define assimp_vertices(SRC, DST, W)\
-{\
-	(DST).x = (SRC).x, (DST).y = -(SRC).z, (DST).z = (SRC).y, (DST).w = (W);\
-}
-#else 
-#define assimp_vertices(SRC, DST, W) ASSIMP_V3D_F4(SRC, DST, W)
-#endif
 
 
 // exceptions

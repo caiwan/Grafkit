@@ -61,7 +61,7 @@ namespace Grafkit {
 		ActorRef GetLight(int n) { return this->m_lights[n].actor; }
 		ActorRef GetLight(std::string name);
 
-		MaterialRef GetMaterial(std::string name);
+		// MaterialRef GetMaterial(std::string name);
 
 		//
 		void AddAnimation(AnimationRef anim);
@@ -150,7 +150,7 @@ namespace Grafkit {
 		std::vector<light_t> m_lights;
 		std::map<std::string, light_t> m_lightMap;
 
-		std::map<std::string, MaterialRef> m_materialMap;
+		// std::map<std::string, MaterialRef> m_materialMap;
 
 		std::set<Entity3D*> m_entities;
 

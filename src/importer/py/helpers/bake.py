@@ -3,14 +3,15 @@ import sys
 import inspect
 
 import bpy
+import bmesh
 
 cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile(inspect.currentframe()))[0]))
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
 from . import camel2snake
-    
 
+scene = bpy.context.scene
     
 def add_material_names_as_pbr_textures():
     # quick add pbr texture properties
@@ -20,10 +21,31 @@ def add_material_names_as_pbr_textures():
                 continue
             material["mat_{0}".format(camel2snake(key))] = "pbr_{0}_{1}.jpg".format(material.name, key)    
 
-                
-def bake_flat_animations():
-    scene = bpy.context.scene
 
+def bake_animations():
+    pass
+    
+    
+def triangulate_object(obj):
+    me = obj.data
+
+    bm = bmesh.new()
+    bm.from_mesh(me)
+
+    bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method=0, ngon_method=0)
+
+    bm.to_mesh(me)
+    bm.free()
+    
+def bake_triangulate():
+    for obj in scene.objects:
+        scene.objects.active = obj
+        scene.update()
+        
+        triangulate_object(obj)
+
+            
+def bake_flat_animations():
     # needs to be iterated 
     # due it missses the other children in scenegraph
     # otherwise it bakes only a random child
@@ -63,4 +85,7 @@ def do_bake():
         https://docs.blender.org/api/blender_python_api_2_72_1/bpy.ops.nla.html#bpy.ops.nla.bake
     """ 
     add_material_names_as_pbr_textures()
+    # bake_triangulate()
+    # bake_animations()
     bake_flat_animations()
+    

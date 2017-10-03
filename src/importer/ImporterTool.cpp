@@ -11,6 +11,8 @@
 #include "DispatcherThread.h"
 #include "ServerThread.h"
 
+#include "assimploader.h"
+
 using namespace GKimporter;
 
 
@@ -24,6 +26,8 @@ GKimporter::ImporterTool::ImporterTool() : blender(nullptr), dispatch(nullptr), 
 	blender = new BlenderThread();
 	dispatch = new DispatcherThread(env);
 	server = new ServerThread(dispatch, port);
+
+	dispatch->AddCommand(new AssimpLoader());
 }
 
 GKimporter::ImporterTool::~ImporterTool()
@@ -60,7 +64,8 @@ void GKimporter::ImporterTool::Join()
 		else {
 
 			dispatch->Join();
-			server->Join();
+			//server->Join();
+			server->Stop(); // fuck you then
 		}
 }
 

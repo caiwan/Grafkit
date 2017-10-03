@@ -99,13 +99,13 @@ ActorRef Grafkit::Scene::GetLight(std::string name)
 	return ActorRef();
 }
 
-MaterialRef Grafkit::Scene::GetMaterial(std::string name)
-{
-	auto it = m_materialMap.find(name);
-	if (it != m_materialMap.end())
-		return it->second;
-	return MaterialRef();
-}
+//MaterialRef Grafkit::Scene::GetMaterial(std::string name)
+//{
+//	auto it = m_materialMap.find(name);
+//	if (it != m_materialMap.end())
+//		return it->second;
+//	return MaterialRef();
+//}
 
 void Grafkit::Scene::AddAnimation(AnimationRef anim)
 {
@@ -217,11 +217,11 @@ void Grafkit::Scene::AddNode(ActorRef & node)
 		// collect material for models
 		Entity3D * entity = node->GetEntity(i);
 		const Model * model = dynamic_cast<Model*>(entity);
-		if (model) {
-			MaterialRef material = model->GetMaterial();
-			if (material.Valid())
-				m_materialMap[material->GetName()] = material;
-		}
+		//if (model) {
+		//	//MaterialRef material = model->GetMaterial();
+		//	//if (material.Valid())
+		//	//	m_materialMap[material->GetName()] = material;
+		//}
 
 		// Lights
 		LightRef light = dynamic_cast<Light*>(entity);

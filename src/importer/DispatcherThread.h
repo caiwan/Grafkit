@@ -17,6 +17,7 @@ namespace GKimporter {
 		friend class ServerThreadPrivate;
 	public:
 		DispatcherThread(Environment* env);
+		DispatcherThread();
 
 		void AddCommand(Ref<Command> command);
 

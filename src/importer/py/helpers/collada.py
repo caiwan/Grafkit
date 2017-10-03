@@ -9,13 +9,13 @@ from . import Dumpable
 from godot.export_dae import DaeExporter
 
 
-class ColladaGodot(Dumpable):
+class GodotExporter(Dumpable):
     """ Uses godot exporter to dunp stuff to collada 
     https://github.com/godotengine/collada-exporter
     """
     
     # These are the params that should be set up later on:
-    # params = {}
+    params = {}
     # params["use_export_selected"] = False,
     # params["use_mesh_modifiers"] = False,
     # params["use_tangent_arrays"] = False,
@@ -41,24 +41,29 @@ class ColladaGodot(Dumpable):
     def reprJSON(self):
         tfile = tempfile.NamedTemporaryFile()
         tname = tfile.name
-        self._save_collada(tname)
+        # self._save_collada(tname)
         tfile.close()
 
         daefile = tname + ".dae"
         
         dae = ""
-        with DaeExporter(daefile, kwargs, self) as exp:
+        with DaeExporter(daefile, self.params, self) as exp:
             exp.export()
-    
-        pass
-    
+        
+        if os.path.exists(daefile):
+            with open(daefile) as f:
+                print("Reading dae")
+                dae = f.read()
+            os.unlink(daefile) 
 
-class Collada(Dumpable):
+        return dae
+        
+
+class InternalExporter(Dumpable):
     """
     Export scene to a tempfile as collada, then push the data to the server
     """
-    _cmd = "collada"
-
+    
     def __init__(self):
         Dumpable.__init__(self)
         

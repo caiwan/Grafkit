@@ -16,6 +16,12 @@ GKimporter::DispatcherThread::DispatcherThread(Environment * env) : Grafkit::Thr
 {
 }
 
+GKimporter::DispatcherThread::DispatcherThread()
+{
+	for (auto it = commands.begin(); it != commands.end(); it++)
+		delete it->second;
+}
+
 void GKimporter::DispatcherThread::AddCommand(Ref<Command> command)
 {
 	commands[command->GetCommandString()] = command;

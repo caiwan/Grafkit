@@ -74,19 +74,6 @@ void Thread::Stop(){
 	WaitForSingleObject(this->m_hThread, 250);
 	TerminateThread(this->m_hThread, 0);
 }
-/*
-void Thread::recreate(){
-	this->stop();
-	DWORD rc = CloseHandle(m_hThread);
-	m_hThread = nullptr;
-	if (!m_pRunnable){
-		this->m_hThread = CreateThread(nullptr, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
-	}else{
-		this->m_hThread = CreateThread(nullptr, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
-	}
-	if (!m_hThread) 
-		throw new EX_DETAILS(ThreadException, "_beginthreadex failed");
-}*/
 
 int Thread::GetCPUCount(){
 	SYSTEM_INFO si;

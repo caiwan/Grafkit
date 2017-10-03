@@ -23,8 +23,8 @@ namespace GKimporter {
 	public:
 
 		ServerThreadPrivate(DispatcherThread* dispatcher, int port) : terminate(false), dispatcher(dispatcher), port(port),
-			ListenSocket(INVALID_SOCKET),
-			ClientSocket(INVALID_SOCKET),
+			listenSocket(INVALID_SOCKET),
+			clientSocket(INVALID_SOCKET),
 			recvbuflen(DEFAULT_BUFLEN)
 
 		{
@@ -66,13 +66,13 @@ namespace GKimporter {
 				}
 
 				// Create a SOCKET for connecting to server
-				ListenSocket = socket(adinfo->ai_family, adinfo->ai_socktype, adinfo->ai_protocol);
-				if (ListenSocket == INVALID_SOCKET) {
+				listenSocket = socket(adinfo->ai_family, adinfo->ai_socktype, adinfo->ai_protocol);
+				if (listenSocket == INVALID_SOCKET) {
 					printf("socket failed with error: %ld\n", WSAGetLastError());
 				}
 
 				// Setup the TCP listening socket
-				res = bind(ListenSocket, adinfo->ai_addr, (int)adinfo->ai_addrlen);
+				res = bind(listenSocket, adinfo->ai_addr, (int)adinfo->ai_addrlen);
 				if (res == SOCKET_ERROR) {
 					sprintf(b, "bind failed with error: %d\n", WSAGetLastError());
 					throw new EX_DETAILS(ServerCreateException, b);
@@ -91,25 +91,32 @@ namespace GKimporter {
 		void Accept() {
 			int res = 0;
 			char b[256];
-			res = listen(ListenSocket, SOMAXCONN);
+			res = listen(listenSocket, SOMAXCONN);
 			if (res == SOCKET_ERROR) {
 				sprintf(b, "listen failed with error: %d\n", WSAGetLastError());
 				throw new EX_DETAILS(ServerCreateException, b);
 			}
 
 			// Accept a client socket
-			ClientSocket = accept(ListenSocket, NULL, NULL);
-			if (ClientSocket == INVALID_SOCKET) {
+			clientSocket = accept(listenSocket, NULL, NULL);
+			if (clientSocket == INVALID_SOCKET) {
 				sprintf(b, "accept failed with error: %d\n", WSAGetLastError());
 				throw new EX_DETAILS(ServerCreateException, b);
 			}
+
+			// make it tick
+			struct timeval tv;
+			tv.tv_sec = 0; 
+			tv.tv_usec = 250 * 1000;
+
+			setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&tv, sizeof(struct timeval));
 		}
 
 		int Listen() {
 			int res = 0;
 			int recvRes = 0;
 			unsigned int respLen = 0;
-			res = recv(ClientSocket, (char*)&respLen, 4, 0);
+			res = recv(clientSocket, (char*)&respLen, 4, 0);
 
 			if (res > 0) {
 				// recv packet
@@ -127,7 +134,7 @@ namespace GKimporter {
 				while (bytesLeft > 0) {
 					int bytesRead = bytesLeft > recvbuflen ? recvbuflen : bytesLeft;
 
-					res = recv(ClientSocket, recvbuf, bytesRead, 0);
+					res = recv(clientSocket, recvbuf, bytesRead, 0);
 					if (res > 0) {
 						ss.write(recvbuf, res);
 
@@ -161,8 +168,8 @@ namespace GKimporter {
 		}
 
 		void TearDown() {
-			if (ListenSocket != INVALID_SOCKET) closesocket(ListenSocket);
-			if (ClientSocket != INVALID_SOCKET) closesocket(ClientSocket);
+			if (listenSocket != INVALID_SOCKET) closesocket(listenSocket);
+			if (clientSocket != INVALID_SOCKET) closesocket(clientSocket);
 			WSACleanup();
 		}
 
@@ -203,15 +210,15 @@ namespace GKimporter {
 
 		WSADATA wsaData;
 
-		SOCKET ListenSocket;
-		SOCKET ClientSocket;
+		SOCKET listenSocket;
+		SOCKET clientSocket;
 
 		char *recvbuf;
 		int recvbuflen;
 
 	};
 
-	ServerThread::ServerThread(DispatcherThread * dispatcher, int port) : 
+	ServerThread::ServerThread(DispatcherThread * dispatcher, int port) :
 		serverThread(nullptr), thread(nullptr)
 	{
 		serverThread = new ServerThreadPrivate(dispatcher, port);
