@@ -15,7 +15,7 @@
 #include "utils/asset.h"
 #include "utils/resource.h"
 #include "utils/ResourceBuilder.h"
-			
+
 #include "render/Scene.h"
 #include "render/model.h"
 #include "render/texture.h"
@@ -26,27 +26,26 @@ struct aiMaterial;
 namespace GKimporter {
 
 	/*
-		A huge dirty Importer class for the engine 
+		A huge dirty Importer class for the engine
 	*/
 
 	class AssimpLoader : public Command
 	{
 	public:
-		AssimpLoader();
-		AssimpLoader(void* data, size_t length);
-		~AssimpLoader();
+		AssimpLoader() {}
+		~AssimpLoader(){ }
 
 		virtual void Evaluate(Environment*& env, nlohmann::json json);
 		virtual std::string GetCommandString() { return "collada"; }
 
 
-	private:		
-		void AssimpLoadMaterials(Environment*& env, Grafkit::SceneRef &outScene);
-		void AssimpLoadMeshes(Environment*& env, Grafkit::SceneRef &outScene);
-		void AssimpLoadCameras(Environment*& env, Grafkit::SceneRef &outScene);
-		void AssimpLoadLights(Environment*& env, Grafkit::SceneRef &outScene);
-		void AssimpBuildScenegraph(Environment*& env, Grafkit::SceneRef &outScene);
-		void AssimpLoadAnimations(Environment*& env, Grafkit::SceneRef &outScene);
+	private:
+		void AssimpLoadMaterials(Environment*& env);
+		void AssimpLoadMeshes(Environment*& env);
+		void AssimpLoadCameras(Environment*& env);
+		void AssimpLoadLights(Environment*& env);
+		void AssimpBuildScenegraph(Environment*& env);
+		void AssimpLoadAnimations(Environment*& env);
 
 		void AssimpParseScenegraphNode(Environment*& env, aiNode* ai_node, Grafkit::ActorRef &actor_node, int maxdepth = 1024);
 
@@ -66,15 +65,8 @@ namespace GKimporter {
 		static inline float aiMatkeyToFloat(aiMaterial *&mat, const char* key, int a1, int a2);
 
 	private:
-		const void* m_data;
-		size_t m_length;
-
 		Assimp::Importer importer;
 		const aiScene *aiscene;
-		
-	//protected:
-		// flags
-		//bool m_is_lh;
 	};
 
 }

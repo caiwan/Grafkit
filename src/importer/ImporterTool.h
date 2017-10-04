@@ -1,5 +1,7 @@
 #pragma once 
 
+#include <string>
+
 namespace GKimporter {
 
 	class BlenderThread;
@@ -7,8 +9,11 @@ namespace GKimporter {
 	class DispatcherThread;
 
 	class Environment;
-	
+
 	class ImporterTool {
+	public:
+		ImporterTool* Instance() { return self; }
+
 	public:
 		ImporterTool();
 		virtual ~ImporterTool();
@@ -22,6 +27,9 @@ namespace GKimporter {
 		void Join();
 		void Stop();
 
+		void Build();
+		//void Save();
+
 		virtual int Execute(int argc, char* argv[]) = 0;
 
 	protected:
@@ -31,8 +39,10 @@ namespace GKimporter {
 
 		Environment *env;
 
+		static ImporterTool * self;
+
 	private:
 		int port;
-	
+
 	};
 }

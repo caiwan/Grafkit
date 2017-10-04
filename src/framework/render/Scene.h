@@ -39,7 +39,7 @@ namespace Grafkit {
 		void AddNode(ActorRef& actor);
 		ActorRef GetNode(std::string name);
 
-		ActorRef& GetRootNode() { return m_root; }
+		ActorRef GetRootNode() { return m_root; }
 
 		// --- 
 

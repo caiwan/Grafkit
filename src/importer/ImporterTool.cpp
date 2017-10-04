@@ -15,9 +15,13 @@
 
 using namespace GKimporter;
 
+ImporterTool * GKimporter::ImporterTool::self;
 
 GKimporter::ImporterTool::ImporterTool() : blender(nullptr), dispatch(nullptr), server(nullptr)
 {
+	if (self != nullptr)
+		exit(1);
+
 	env = new Environment();
 
 	srand(time(NULL));
@@ -28,11 +32,14 @@ GKimporter::ImporterTool::ImporterTool() : blender(nullptr), dispatch(nullptr), 
 	server = new ServerThread(dispatch, port);
 
 	dispatch->AddCommand(new AssimpLoader());
+
+	self = this;
 }
 
 GKimporter::ImporterTool::~ImporterTool()
 {
 	Stop();
+	self = nullptr;
 }
 
 std::string GKimporter::ImporterTool::GetHost()
@@ -89,3 +96,12 @@ void GKimporter::ImporterTool::Stop()
 		server = nullptr;
 	}
 }
+
+void GKimporter::ImporterTool::Build()
+{
+	env->GetBuilder().Compose();
+}
+
+//void GKimporter::ImporterTool::Save()
+//{
+//}

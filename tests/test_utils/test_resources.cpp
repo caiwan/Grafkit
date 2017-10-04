@@ -16,7 +16,7 @@ public:
 	}
 	
 	void TearDown() {
-	}
+	}   
 };
 
 
@@ -38,7 +38,7 @@ TEST_F(ResourceManagerTest, given_ResourceManager_when_AddResource_then_GetResou
 	resource->SetName("theThing");
 
 	ASSERT_TRUE(resource.Valid() && resource->Valid());
-
+    
 	resman->Add(resource);
 
 	ThingResourceRef retresource = resman->Get<ThingResource>("theThing");

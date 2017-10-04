@@ -147,7 +147,7 @@ namespace GKimporter {
 					Log::Logger().Info("Read chunk %d %d", bytesRead, bytesLeft);
 				}
 
-				Log::Logger().Info("Done read %d %d", respLen, ss.tellg());
+				Log::Logger().Info("Done read %d", respLen);
 
 				ss.put(0);
 				ss.seekp(0);

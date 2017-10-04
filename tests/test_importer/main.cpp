@@ -1,9 +1,6 @@
 #include "stdafx.h"
 
-#include "ImporterTool.h"
-#include "BlenderThread.h"
-#include "ServerThread.h"
-#include "DispatcherThread.h"
+
 
 #include "utils/logger.h"
 
@@ -11,18 +8,11 @@
 
 using namespace Grafkit;
 
-using ::testing::EmptyTestEventListener;
 using ::testing::InitGoogleTest;
-using ::testing::Test;
-using ::testing::TestCase;
-using ::testing::TestEventListeners;
-using ::testing::TestInfo;
-using ::testing::TestPartResult;
-using ::testing::UnitTest;
 
-class ImporterIntegrationTest : public GKimporter::ImporterTool {
+class ImporterIntegrationTest {
 public:
-	ImporterIntegrationTest() : ImporterTool() {
+	ImporterIntegrationTest(){
 
 	}
 
@@ -35,23 +25,7 @@ public:
 #endif
 
 		InitGoogleTest(&argc, argv);
-		Setup();
-		Start();
-
-		// TODO: check if blender exited first
-
-		Join();
-
 		return RUN_ALL_TESTS();
-	}
-
-	void Setup() {
-
-#ifndef LIVE_RELEASE
-		blender->SetScriptRoot(IMPORTER_PY_ROOT);
-#endif
-		blender->AddArgument("host", GetHost());
-
 	}
 
 };

@@ -3,6 +3,8 @@
 #include <stack>
 #include <vector>
 
+#include "json.hpp"
+
 #include "assimploader.h"
 
 #include "assimp/Importer.hpp"
@@ -59,75 +61,34 @@ namespace {
 }
 
 
-
-// ================================================================================================================================================================
-// Head
-// ================================================================================================================================================================
-
-GKimporter::AssimpLoader::AssimpLoader() : m_data(nullptr), m_length(0)
-//,m_is_lh(false)
-{
-}
-
-GKimporter::AssimpLoader::AssimpLoader(void * src_data, size_t src_length) : m_data(src_data), m_length(src_length)
-//,m_is_lh(false)
-{
-}
-
-
-GKimporter::AssimpLoader::~AssimpLoader()
-{
-}
-
-//void GKimporter::AssimpLoader::SetLHFlag(bool islh)
-//{
-//	m_is_lh = islh;
-//}
-
-
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-//SceneResRef GKimporter::AssimpLoader::Load()
-//{
-//	if (!m_data)
-//		throw new EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
-//
-//	SceneRef outScene = new Scene();
-//
-//	AppendAssimp(m_data, m_length, outScene);
-//
-//	return new Resource<Scene>(outScene);
-//}
-//
-//void GKimporter::AssimpLoader::AppendAssimp(const void * data, size_t length, SceneRef inScene)
-//{
-//	/// @todo genNormals szar. Miert?
-//	aiscene = importer.ReadFileFromMemory(data, length,
-//		(m_is_lh ? aiProcess_ConvertToLeftHanded : 0) | aiProcess_CalcTangentSpace |
-//		0
-//	);
-//
-//	if (!aiscene)
-//		throw new EX_DETAILS(AssimpParseException, importer.GetErrorString());
-//
-//	AssimpLoadMaterials(inScene);
-//	AssimpLoadMeshes(inScene);
-//	AssimpLoadCameras(inScene);
-//	AssimpLoadLights(inScene);
-//
-//	AssimpBuildScenegraph(inScene);
-//
-//	AssimpLoadAnimations(inScene);
-//
-//}
 
 void GKimporter::AssimpLoader::Evaluate(Environment *& env, nlohmann::json json)
 {
+	std::string daeData = json;
+
+	aiscene = importer.ReadFileFromMemory(daeData.c_str(), daeData.length(),
+		aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace |
+		0
+	);
+
+	if (!aiscene)
+		throw new EX_DETAILS(AssimpParseException, importer.GetErrorString());
+
+	AssimpLoadMaterials(env);
+	AssimpLoadMeshes(env);
+	AssimpLoadCameras(env);
+	AssimpLoadLights(env);
+
+	AssimpBuildScenegraph(env);
+
+	AssimpLoadAnimations(env);
 
 }
 
-void GKimporter::AssimpLoader::AssimpLoadMaterials(Environment*& env, SceneRef &outScene)
+void GKimporter::AssimpLoader::AssimpLoadMaterials(Environment*& env)
 {
 	if (aiscene->HasMaterials())
 	{
@@ -165,7 +126,7 @@ void GKimporter::AssimpLoader::AssimpLoadMaterials(Environment*& env, SceneRef &
 	}
 }
 
-void GKimporter::AssimpLoader::AssimpLoadMeshes(Environment*& env, SceneRef &outScene)
+void GKimporter::AssimpLoader::AssimpLoadMeshes(Environment*& env)
 {
 	if (aiscene->HasMeshes())
 	{
@@ -236,14 +197,14 @@ void GKimporter::AssimpLoader::AssimpLoadMeshes(Environment*& env, SceneRef &out
 			}
 
 			env->GetBuilder().AddModel(model);
-		
+
 			MaterialRef material = env->GetBuilder().FindMaterial(srcMesh->mMaterialIndex);
 			model->SetMaterial(material);
 		}
 	}
 }
 
-void GKimporter::AssimpLoader::AssimpLoadCameras(Environment*& env, SceneRef &outScene)
+void GKimporter::AssimpLoader::AssimpLoadCameras(Environment*& env)
 {
 	if (aiscene->HasCameras()) {
 		LOGGER(Log::Logger().Trace("Cameras"));
@@ -269,7 +230,7 @@ void GKimporter::AssimpLoader::AssimpLoadCameras(Environment*& env, SceneRef &ou
 	}
 }
 
-void GKimporter::AssimpLoader::AssimpLoadLights(Environment*& env, SceneRef &outScene)
+void GKimporter::AssimpLoader::AssimpLoadLights(Environment*& env)
 {
 	if (aiscene->HasLights()) {
 		LOGGER(Log::Logger().Trace("Lights"));
@@ -324,7 +285,7 @@ void GKimporter::AssimpLoader::AssimpLoadLights(Environment*& env, SceneRef &out
 	}
 }
 
-void GKimporter::AssimpLoader::AssimpBuildScenegraph(Environment*& env, SceneRef &outScene)
+void GKimporter::AssimpLoader::AssimpBuildScenegraph(Environment*& env)
 {
 	ActorRef root_node = new Actor;
 	LOGGER(Log::Logger().Trace("Building scenegraph"));
@@ -354,15 +315,15 @@ void GKimporter::AssimpLoader::AssimpBuildScenegraph(Environment*& env, SceneRef
 			std::string name = curr_light->mName.C_Str();
 
 			LightRef light = env->GetBuilder().FindLight(name);
-			ActorRef actor = env->GetBuilder().FindActor(name); 
+			ActorRef actor = env->GetBuilder().FindActor(name);
 
 			actor->AddEntity(light);
-			}
 		}
+	}
 
 }
 
-void GKimporter::AssimpLoader::AssimpLoadAnimations(Environment*& env, SceneRef &outScene)
+void GKimporter::AssimpLoader::AssimpLoadAnimations(Environment*& env)
 {
 #if 0
 	size_t i = 0, j = 0, k = 0, l = 0;
@@ -448,10 +409,10 @@ void GKimporter::AssimpLoader::AssimpParseScenegraphNode(Environment*& env, aiNo
 	// ---
 	for (size_t i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
-		
+
 		ModelRef model = env->GetBuilder().FindModel(mesh_id);
 		actor->AddEntity(model);
-		
+
 		LOGGER(sprintf_s(kbuf, buflen, "%s %d,", kbuf, i));
 	}
 
