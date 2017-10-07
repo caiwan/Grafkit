@@ -241,7 +241,7 @@ void GKimporter::AssimpLoader::AssimpLoadLights(Environment*& env)
 			const char *light_name = srcLight->mName.C_Str();
 			LOGGER(Log::Logger().Trace("- #%d %s %d", i, light_name, srcLight->mType));
 
-			light->SetName(light_name);
+
 
 			switch (srcLight->mType) {
 
@@ -273,6 +273,8 @@ void GKimporter::AssimpLoader::AssimpLoadLights(Environment*& env)
 			}
 
 			if (light.Valid()) {
+				light->SetName(light_name);
+
 				(light->ConstantAttenuation()) = srcLight->mAttenuationConstant;
 				(light->LinearAttenuation()) = srcLight->mAttenuationLinear;
 				(light->QuardicAttenuation()) = srcLight->mAttenuationQuadratic;

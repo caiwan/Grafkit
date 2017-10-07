@@ -27,6 +27,8 @@ void ImporterSuite::Execute(const char * pyname)
 
 	blender->AddArgument("host", GetHost());
 
+	blender->AddArgument("test", pyname);
+
 	Start();
 	Join();
 }

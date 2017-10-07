@@ -12,18 +12,25 @@
 using namespace Grafkit;
 using namespace GKimporter;
 
-class ImportSchemaTest : public testing::TestCase {
+class ImportSchemaTest : public testing::Test {
 public:
 	ImportSchemaTest() {
 		suite = nullptr;
+	}
+
+	~ImportSchemaTest() {
+	}
+
+	void SetUp() {
+		//suite = nullptr;
 
 		suite = new ImporterSuite();
-		suite->Execute("schemaTest.py");
+		suite->Execute("build_test_scene_1");
 		suite->Build();
 
 		// decompose 
 		scene = this->suite->Env()->GetBuilder().GetScene();
-		if (!scene.Invalid() || !scene->Invalid())
+		if (scene.Invalid() || scene->Invalid())
 			return;
 
 		root = (*scene)->GetRootNode();
@@ -31,16 +38,10 @@ public:
 			return;
 	}
 
-	~ImportSchemaTest() {
+	void TearDown() {
 		if (suite)
 			delete suite;
 		suite = nullptr;
-	}
-
-	void SetUp() {
-	}
-
-	void TearDown() {
 	}
 
 public:
@@ -50,9 +51,14 @@ public:
 	ActorRef root;
 };
 
-TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkEmpty_then_success)
+TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkSchema_then_success)
 {
 	// given
+	int cameraCount = (*scene)->GetCameraCount();
+	int lightCount = (*scene)->GetLightCount();
+
+	ActorRef cube = (*scene)->GetNode("Cube_001");
+
 	//when
 
 	// then
@@ -60,20 +66,12 @@ TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkEmpty_then_success)
 	ASSERT_FALSE(scene->Invalid());
 
 	ASSERT_FALSE(root.Invalid());
-	ASSERT_NE(0, root->GetChildrenCount());
-}
-
-TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkSchema_then_success)
-{
-	ASSERT_FALSE(root.Invalid());
-	ASSERT_NE(0, root->GetChildrenCount());
-
-	// given
-	// when
-	int cameraCount = (*scene)->GetCameraCount();
-	int lightCount = (*scene)->GetLightCount();
-
-	// then
+	ASSERT_EQ(3, root->GetChildrenCount());
+	
 	ASSERT_EQ(1, cameraCount);
 	ASSERT_EQ(1, lightCount);
+
+	ASSERT_FALSE(cube.Invalid());
 }
+
+

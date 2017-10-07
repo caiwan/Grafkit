@@ -17,39 +17,36 @@ if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
     
 
-def cleanup_scene():
+def _cleanup_scene():
     for object in scene.objects:
         scene.objects.unlink(object)
     
     
-def add_camera():
-    cam_data = bpy.data.cameras.new(name="Camera")  
-    cam_ob = bpy.data.objects.new(name="Camera", object_data=cam_data)  
-    scene.objects.link(cam_ob)  
-    cam_ob.location = (-3, 0, 5)  
-    cam_ob.rotation_euler = (3.14/6,0,-0.3)  
+def _add_camera(name, pos=(0,0,0), euler=(0,0,0), lens=10):
+    cam_data = bpy.data.cameras.new(name=name + "_obj")  
+    cam_ob = bpy.data.objects.new(name=name, object_data=cam_data)  
+    scene.objects.link(cam_ob)
+    cam_ob.location = pos  
+    cam_ob.rotation_euler = euler  
     cam = bpy.data.cameras[cam_data.name]  
-    cam.lens = 10
+    cam.lens = lens
     return cam_ob
     
     
-def add_light():
-    lamp_data = bpy.data.lamps.new(name="lampa", type='POINT')  
-    lamp_object = bpy.data.objects.new(name="Lampicka", object_data=lamp_data)  
+def _add_light(name):
+    lamp_data = bpy.data.lamps.new(name=name + "_obj", type='POINT')  
+    lamp_object = bpy.data.objects.new(name=name, object_data=lamp_data)  
     scene.objects.link(lamp_object)  
     lamp_object.location = (-3, 0, 12)
     return lamp_object
     
     
-def add_cube(x=0, y=0, z=0):
-    bpy.ops.mesh.primitive_cube_add(location = (x,y,z))  
-    return bpy.context.object
+def _add_cube(name, x=0, y=0, z=0):
+    bpy.ops.mesh.primitive_cube_add(location=(x,y,z))  
+    obj =  bpy.context.object
+    obj.name = name
+    return obj
     
     
-def build_test_scene():
-    cleanup_scene()
-    
-    cube = add_cube()
-    
-    # add animation
+
     
