@@ -19,15 +19,15 @@ int ImporterSuite::Execute(int argc, char ** argv)
 	return 0;
 }
 
-void ImporterSuite::Execute(const char * pyname)
+void ImporterSuite::Execute(const char * name)
 {
 #ifndef LIVE_RELEASE
 	blender->SetScriptRoot(IMPORTER_PY_ROOT);
 #endif
 
 	blender->AddArgument("host", GetHost());
-
-	blender->AddArgument("test", pyname);
+	if (name)
+		blender->AddArgument("input", name);
 
 	Start();
 	Join();

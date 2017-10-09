@@ -68,13 +68,23 @@ namespace Grafkit {
 			return Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(r, p, y));
 		}
 
-		float4 toAxisAngle() {
+		float4 ToAxisAngle() {
 			dxvector axis;
 			float angle = 0;
 			DirectX::XMQuaternionToAxisAngle(&axis, &angle, q);
 			float4 res;
 			DirectX::XMStoreFloat4(&res, axis);
 			res.w = angle;
+			return res;
+		}
+
+		float3 ToEulerAngle() {
+
+			// folytkov https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
+			dxvector euler (q);
+			float3 res;
+			DirectX::XMStoreFloat3(&res, euler);
 			return res;
 		}
 

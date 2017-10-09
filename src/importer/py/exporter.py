@@ -25,7 +25,6 @@ def get_args():
     # add parser rules
     parser.add_argument('-i', '--input', help="input blender file")
     parser.add_argument('-p', '--host', help="host:port we connect to dump data to")
-    parser.add_argument('-t', "--test", help="")
     parsed_script_args, _ = parser.parse_known_args(script_args)
 
     return parsed_script_args
@@ -35,28 +34,13 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
     
-    if args.input:
-        print("=== READING FILE {}".format(infile))
-        sys.stdout.flush()
-        infile = args.input
-        bpy.ops.wm.open_mainfile(filepath=infile)
-    else:
-        print("=== BUILD TEST SCENE ===")
-        
-        try:
-            from tests import test_scenes
-                
-            test_name = args.test
-            functions_list = {o for o in inspect.getmembers(test_scenes) if inspect.isfunction(o[1]) and not o[0].startswith("_")}
-            
-            if test_name in functions_list:
-                functions_list[test_name]()
-            
-        except ImportError:
-            print("nincsilyen")
-            pass
 
-        pass
+    if args.input: 
+        print("=== READING FILE {}", args.input)
+        sys.stdout.flush()
+        bpy.ops.wm.open_mainfile(filepath=args.input)
+    else:
+        print("using startup scene")
     
     do_bake()
     

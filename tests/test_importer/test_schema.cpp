@@ -1,13 +1,20 @@
 #include "stdafx.h"
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <gtest/gtest.h>
 
-#include "importerSuite.h"
+#include "Assert.h"
 
 #include "utils/reference.h"
-
-#include "Environment.h"
 #include "render/Scene.h"
+
+#include "importerSuite.h"
+#include "Environment.h"
+
+#define DEG_RAD (3.14159265359/180.)
+#define RAD_DEG (180./3.14159265359)
 
 using namespace Grafkit;
 using namespace GKimporter;
@@ -54,12 +61,17 @@ public:
 TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkSchema_then_success)
 {
 	// given
+	// blender default scene
+	// containing 
+	// - a single cube
+	// - a camera
+	// - point light
+
+	//when
 	int cameraCount = (*scene)->GetCameraCount();
 	int lightCount = (*scene)->GetLightCount();
 
-	ActorRef cube = (*scene)->GetNode("Cube_001");
-
-	//when
+	ActorRef cube = (*scene)->GetNode("Cube");
 
 	// then
 	ASSERT_FALSE(scene.Invalid());
@@ -67,11 +79,57 @@ TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkSchema_then_success)
 
 	ASSERT_FALSE(root.Invalid());
 	ASSERT_EQ(3, root->GetChildrenCount());
-	
+
 	ASSERT_EQ(1, cameraCount);
 	ASSERT_EQ(1, lightCount);
 
 	ASSERT_FALSE(cube.Invalid());
+}
+
+
+TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkCoords_then_success)
+{
+	// given
+	// blender default scene
+	// containing 
+	// - a single cube
+	// - a camera
+	// - point light
+
+	//when
+	ActorRef cube = (*scene)->GetNode("Cube");
+	ActorRef camera = (*scene)->GetNode("Camera");
+	ActorRef light = (*scene)->GetNode("Lamp");
+
+	// then
+	ASSERT_FALSE(scene.Invalid());
+	ASSERT_FALSE(scene->Invalid());
+
+	ASSERT_FALSE(root.Invalid());
+	ASSERT_EQ(3, root->GetChildrenCount());
+
+	// 
+	ASSERT_FALSE(cube.Invalid());
+
+	// 
+	ASSERT_FALSE(camera.Invalid());
+
+	float3 cameraPos;
+	Quaternion cameraOirentation;
+	float3 cameraScale;
+	ASSERT_TRUE(camera->Matrix().Decompose(cameraPos, cameraOirentation, cameraScale));
+	
+	ASSERT_FLOAT3_EQ(float3(7.48113, -6.50764, -5.34367), cameraPos);
+	
+	float3 rotation = cameraOirentation.ToEulerAngle();
+	rotation.x *= RAD_DEG;
+	rotation.y *= RAD_DEG;
+	rotation.z *= RAD_DEG;
+	ASSERT_FLOAT3_EQ(float3(63.559, 0, 46.692), rotation);
+
+	//
+	ASSERT_FALSE(light.Invalid());
+
 }
 
 

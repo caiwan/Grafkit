@@ -11,6 +11,6 @@ public:
 	~ImporterSuite();
 
 	int Execute(int argc, char **argv);
-	void Execute(const char * pyname);
+	void Execute(const char * name = nullptr);
 };
 

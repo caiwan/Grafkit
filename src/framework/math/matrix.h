@@ -170,7 +170,15 @@ namespace Grafkit {
 #else
 			return DirectX::XMVectorGetByIndex(mat.r[row], col);
 #endif 
+		}
 
+		const bool Decompose(float3 &outTranslation, Quaternion &outOrientation, float3 &outScale) {
+			dxvector loc, rot, scale;
+			bool res = DirectX::XMMatrixDecompose(&scale, &rot, &loc, mat);
+			DirectX::XMStoreFloat3(&outTranslation, loc);
+			outOrientation = Quaternion(scale);
+			DirectX::XMStoreFloat3(&outScale, rot);
+			return res;
 		}
 
 		// --- matrix - vector ops
