@@ -112,8 +112,11 @@ namespace Grafkit {
 		ShaderResRef m_vertexShader;
 		ShaderResRef m_pixelShader;
 
-		std::list<ActorRef> m_nodes;
+		std::vector<ActorRef> m_nodes;
+
 		std::map<std::string, ActorRef> m_nodeMap;
+
+		// camera
 
 		struct camera_t {
 			camera_t() {}
@@ -128,6 +131,8 @@ namespace Grafkit {
 
 		std::vector<camera_t> m_cameras;
 		std::map<std::string, camera_t> m_cameraMap;
+
+		// light
 
 		struct lightData_t {
 			lightData_t() {}
@@ -159,10 +164,10 @@ namespace Grafkit {
 	private:
 		double m_tAnim;
 
-	private:
-		void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
-		void Push();
-		void Pop();
+	//private:
+	//	void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
+	//	void Push();
+	//	void Pop();
 
 	private:
 		Grafkit::Matrix m_currentWorldMatrix;

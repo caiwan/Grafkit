@@ -30,21 +30,15 @@ void Grafkit::Scene::Initialize(ActorRef root)
 {
 	m_root = root;
 
-	std::stack<int> parentIdStack;
-	parentIdStack.push(-1);
-
 	std::stack<ActorRef> stack;
 	stack.push(root);
 
 	while (!stack.empty()) {
 		ActorRef node = stack.top(); stack.pop();
-		int id = (int)m_nodes.size();
-		int parentId = parentIdStack.top(); parentIdStack.pop();
 
 		AddNode(node);
 
 		for (int i = 0; i < node->GetChildrenCount(); i++) {
-			parentIdStack.push(id);
 			stack.push(node->GetChild(i));
 		}
 	}
@@ -63,7 +57,7 @@ void Grafkit::Scene::Shutdown()
 
 	m_cameraMap.clear();
 	m_cameras.clear();
-	
+
 	m_lightMap.clear();
 	m_lights.clear();
 
@@ -99,14 +93,6 @@ ActorRef Grafkit::Scene::GetLight(std::string name)
 	return ActorRef();
 }
 
-//MaterialRef Grafkit::Scene::GetMaterial(std::string name)
-//{
-//	auto it = m_materialMap.find(name);
-//	if (it != m_materialMap.end())
-//		return it->second;
-//	return MaterialRef();
-//}
-
 void Grafkit::Scene::AddAnimation(AnimationRef anim)
 {
 	m_animations.push_back(anim);
@@ -134,21 +120,32 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
 	// --- animation
 
-	for (int i = 0; i < m_animations.size(); i++) {
-		if (m_animations[i].Valid())
-			m_animations[i]->Update(m_tAnim);
+	for (size_t i = 0; i < m_animations.size(); i++) {
+		AnimationRef &animation = m_animations[i];
+		animation->Update(m_tAnim);
 	}
 
-	// update matrices here 
-
-	PrerenderNode(render, m_root);
+	// --- update matrices
+	for (size_t i = 0; i < m_nodes.size(); i++) {
+		ActorRef &actor = m_nodes[i];
+		ActorRef &parent = actor->GetParent();
+		Matrix &matrix = actor->Matrix();
+		Matrix &transform = actor->Transform();
+		Matrix &world = actor->WorldMatrix();
+		if (parent.Invalid())
+			world.Identity();
+		else
+			world = parent->WorldMatrix();
+		world.Multiply(matrix);
+		world.Multiply(transform); // should have changed on the actor 
+	}
 
 	// --- lights
 	m_lightData.lightCount = m_lights.size();
-	for (size_t i = 0; i<m_lights.size(); ++i)
+	for (size_t i = 0; i < m_lights.size(); ++i)
 	{
 		light_t & l = m_lights[i];
-		Matrix wm = l.actor->WorldMatrix();
+		Matrix &wm = l.actor->WorldMatrix();
 		l.light->Calculate(render, this, wm);
 		l.light->GetInternalData(&m_lightData.lights[i]);
 	}
@@ -162,8 +159,8 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 		m_cameraProjectionMatrix = camera->ProjectionMatrix();
 
-		Matrix matv = camera->GetViewMatrix();
-		Matrix matw = cameraActor->WorldMatrix();
+		Matrix &matv = camera->GetViewMatrix();
+		Matrix &matw = cameraActor->WorldMatrix();
 
 		m_cameraViewMatrix = matv;
 		m_cameraViewMatrix.Multiply(matw);
@@ -182,33 +179,35 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
-	//m_materialCurrentLayer = layer;
 	m_currentWorldMatrix.Identity();
 
-	//ez itt elviekben jo kell, hogy legyen
-	(*m_vertexShader)->Bind(render);
-	(*m_pixelShader)->Bind(render);
+	Shader *ps = m_pixelShader->Get();
+	Shader *vs = m_vertexShader->Get();
 
-	(*m_pixelShader)->SetParam(render, "LightBuffer", &m_lightData);
+	vs->Bind(render);
+	ps->Bind(render);
+
+	ps->SetParam(render, "LightBuffer", &m_lightData);
 
 	// render scenegraph
-	for (auto node = m_nodes.begin(); node != m_nodes.end(); node++) {
-		if (node->Valid()) {
-
-			m_worldMatrices.worldMatrix = XMMatrixTranspose((*node)->WorldMatrix().Get());
-			(*m_vertexShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-			(*m_pixelShader)->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-			(*node)->Render(render, this);
-
-		}
+	for (size_t i = 0; i < m_nodes.size(); i++)
+	{
+		ActorRef & actor = m_nodes[i];
+		m_worldMatrices.worldMatrix = XMMatrixTranspose(actor->WorldMatrix().Get());
+		vs->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+		ps->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+		actor->Render(render, this);
 	}
 
-	(*m_vertexShader)->Unbind(render);
-	(*m_pixelShader)->Unbind(render);
+	vs->Unbind(render);
+	ps->Unbind(render);
 }
 
 void Grafkit::Scene::AddNode(ActorRef & node)
 {
+	if (node.Invalid())
+		return;
+
 	m_nodes.push_back(node);
 	m_nodeMap[node->GetName()] = node;
 
@@ -217,11 +216,6 @@ void Grafkit::Scene::AddNode(ActorRef & node)
 		// collect material for models
 		Entity3D * entity = node->GetEntity(i);
 		const Model * model = dynamic_cast<Model*>(entity);
-		//if (model) {
-		//	//MaterialRef material = model->GetMaterial();
-		//	//if (material.Valid())
-		//	//	m_materialMap[material->GetName()] = material;
-		//}
 
 		// Lights
 		LightRef light = dynamic_cast<Light*>(entity);
@@ -236,7 +230,7 @@ void Grafkit::Scene::AddNode(ActorRef & node)
 			break; // assume if we have only one light uder a node
 		}
 
-		// CamerasS
+		// Cameras
 		CameraRef  camera = dynamic_cast<Camera*>(entity);
 		if (camera.Valid()) {
 			camera_t c;
@@ -262,38 +256,8 @@ ActorRef Grafkit::Scene::GetNode(std::string name)
 	return nullptr;
 }
 
-void Grafkit::Scene::PrerenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)
-{
-	if (maxdepth < 0) return;
-	if (!actor) return;
-
-	Push();
-
-	m_currentWorldMatrix.Multiply(actor->Matrix());
-	m_currentWorldMatrix.Multiply(actor->Transform());
-	actor->WorldMatrix(m_currentWorldMatrix);
-
-	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
-		PrerenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);
-	}
-
-	Pop();
-}
-
-void Grafkit::Scene::Push()
-{
-	this->m_worldMatrixStack.push(m_currentWorldMatrix);
-}
-
-void Grafkit::Scene::Pop()
-{
-	m_currentWorldMatrix = this->m_worldMatrixStack.top();
-	this->m_worldMatrixStack.pop();
-}
-
 void Grafkit::Scene::serialize(Archive & ar)
 {
-	// a tobbit a loader vegzi majd 
 	PERSIST_FIELD(ar, m_tStart);
 	PERSIST_FIELD(ar, m_tEnd);
 
