@@ -89,8 +89,8 @@ protected:
 	float4 *kernels;
 
 	ShaderResRef vs;
-	ShaderResRef fs, aoFs, blurFs;
-	ShaderResRef cubemapShader;
+	ShaderResRef fs;
+	ShaderResRef aoFs, blurFs;
 
 #ifndef LIVE_RELEASE
 	ShaderResRef troubleshootFs;
