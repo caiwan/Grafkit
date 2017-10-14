@@ -54,7 +54,7 @@ namespace Grafkit {
 		virtual filelist_t GetAssetList();
 		virtual filelist_t GetAssetList(AssetFileFilter * filter);
 
-		virtual void PollEvents(IResourceManager *resman);
+		virtual bool PollEvents(IResourceManager *resman);
 
 	private:
 		std::string m_root;

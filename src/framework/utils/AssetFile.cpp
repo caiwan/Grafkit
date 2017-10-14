@@ -255,7 +255,7 @@ std::list<std::string> FileAssetFactory::GetAssetList(AssetFileFilter * filter)
 	return filelist;
 }
 
-void Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
+bool Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 {
 #ifndef LIVE_RELEASE
 	static unsigned char count;
@@ -266,9 +266,13 @@ void Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 				resman->TriggerReload(w->PopFile());
 			} while (w->HasItems());
 		}
-		count = 120;
+		count = 30;
+		return true;
 	}
 	count--;
+	return false;
+#else
+	return false;
 #endif
 }
 
@@ -277,7 +281,9 @@ void Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 
 inline FileAssetFactory::FileAsset::~FileAsset()
 {
-	//if (m_data)
-	free(m_data);
+	if (m_data) {
+		free(m_data);
+		m_data = nullptr;
+	}
 }
 

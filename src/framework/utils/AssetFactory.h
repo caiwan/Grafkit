@@ -42,7 +42,7 @@ namespace Grafkit {
 
 		virtual ~IAssetFactory() {}
 
-		virtual void PollEvents(IResourceManager *resman) {}
+		virtual bool PollEvents(IResourceManager *resman) { return false; }
 
 	public:
 

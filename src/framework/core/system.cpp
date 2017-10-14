@@ -101,9 +101,6 @@ int System::execute() {
 
 	catch (FWdebug::Exception* ex)
 	{
-#ifdef _DEBUG
-		DebugBreak();
-#endif 
 		MessageBoxA(NULL, ex->what(), "Exception", 0);
 		LOGGER(Log::Logger().Error(ex->what()));
 
