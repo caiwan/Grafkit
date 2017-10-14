@@ -5,6 +5,8 @@
 	@author Caiwan
 */
 
+#if 0
+
 #include <stack>
 #include <stdio.h>
 
@@ -176,6 +178,8 @@ public:
 
 };
 
+#endif
+
 /* ================================================================================================ */
 
 //#define TESTING
@@ -183,8 +187,13 @@ public:
 // "-i ..\\..\\tests\\assets\\models\\test.blend -b -o test.scene"
 
 int main(int argc, char* argv[]) {
+
+#if 0
 	Application app;
 	int ret = app.Execute(argc, argv);
 	//system("pause");
 	return ret;
+#else 
+	return 0;
+#endif
 }
