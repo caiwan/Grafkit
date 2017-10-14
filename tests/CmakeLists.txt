@@ -5,7 +5,7 @@ subdirs(assets)
 
 subdirs(test_animation)
 subdirs(test_animation_load)
-# subdirs(test_core_camera)
+subdirs(test_core_stress)
 subdirs(test_core_geometry)
 subdirs(test_core_light_material)
 subdirs(test_core_postfx)
