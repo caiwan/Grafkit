@@ -28,6 +28,8 @@ struct VertexInputType
     float4 tangent : TANGENT;
     float4 binormal : BINORMAL;
     float2 tex : TEXCOORD;
+    int group0 : BLENDIDNBLENDINDICES0;
+    float weight0 : BLENDWBLENDWEIGHT0;
 };
 
 struct PixelInputType

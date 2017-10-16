@@ -27,8 +27,8 @@ namespace Grafkit {
 
 		void Shutdown();
 
-		void Bind(ID3D11DeviceContext* deviceContext);
-		void Unbind(ID3D11DeviceContext* deviceContext);
+		void Bind(ID3D11DeviceContext *& deviceContext);
+		void Unbind(ID3D11DeviceContext *& deviceContext);
 
 		virtual enum ShaderType_e GetShaderType() = 0;
 
@@ -54,25 +54,31 @@ namespace Grafkit {
 
 		// ----
 		// access constant buffers and variables 
-		///@todo bounds check
-		size_t GetParamCount() { return this->m_cBuffers.size(); }
-		size_t GetParamValueCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
 
-		void SetParam(ID3D11DeviceContext * deviceContext, std::string name, const void * const pData, size_t size = 0, size_t offset = 0);
-		void SetParam(ID3D11DeviceContext * deviceContext, size_t id, const void * const pData, size_t size = 0, size_t offset = 0);
+		// reflection?
+		inline size_t GetParamCount() { return this->m_cBuffers.size(); }
+		inline size_t GetParamValueCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
 
-		template <typename T > void SetParamT(ID3D11DeviceContext * deviceContext, std::string name, T v) { SetParam(deviceContext, name, &v); }
+		// get direct id, to spped it up a bit 
+		int GetParamId(ID3D11DeviceContext *& deviceContext, std::string name);
 
-		void SetParamValue(ID3D11DeviceContext * deviceContext, std::string name, std::string valueName, void * const pData, size_t size = 0, size_t offset = 0);
-		void SetParamValue(ID3D11DeviceContext * deviceContext, size_t id, size_t valueid, const void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParam(ID3D11DeviceContext *& deviceContext, std::string name, const void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParam(ID3D11DeviceContext *& deviceContext, int id, const void * const pData, size_t size = 0, size_t offset = 0);
 
-		template <typename T > void SetParamValueT(ID3D11DeviceContext * deviceContext, std::string name, std::string valueName, T v) { SetParamValue(deviceContext, name, valueName, &v, sizeof(T)); }
+		template <typename T > void SetParamT(ID3D11DeviceContext *& deviceContext, std::string name, T& v) { SetParam(deviceContext, name, &v); }
+		template <typename T > void SetParamT(ID3D11DeviceContext *& deviceContext, int id, T& v) { SetParam(deviceContext, id, &v); }
 
+		// we don't really need much of these
+		void SetParamValue(ID3D11DeviceContext *& deviceContext, std::string name, std::string valueName, void * const pData, size_t size = 0, size_t offset = 0);
+		void SetParamValue(ID3D11DeviceContext *& deviceContext, size_t id, size_t valueid, const void * const pData, size_t size = 0, size_t offset = 0);
+
+		// and this one 
+		template <typename T > void SetParamValueT(ID3D11DeviceContext *& deviceContext, std::string name, std::string valueName, T v) { SetParamValue(deviceContext, name, valueName, &v, sizeof(T)); }
 
 	protected:
-		void* MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int isDiscard = 1);
+		void* MapParamBuffer(ID3D11DeviceContext *& deviceContext, size_t id, int isDiscard = 1);
 		void* GetMappedPtr(size_t id);
-		void UnMapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id);
+		void UnMapParamBuffer(ID3D11DeviceContext *& deviceContext, size_t id);
 
 	public:
 
@@ -92,17 +98,17 @@ namespace Grafkit {
 		size_t GetBoundedResourceCount() { return this->m_bResources.size(); }
 		D3D11_SHADER_INPUT_BIND_DESC GetBoundedResourceDesc(size_t id) { return m_bResources[id].m_desc; }
 		
-		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, std::string name, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, name, pSampler); }
-		void SetSamplerSatate(ID3D11DeviceContext * deviceContext, size_t id, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, id, pSampler); }
+		void SetSamplerSatate(ID3D11DeviceContext *& deviceContext, std::string name, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, name, pSampler); }
+		void SetSamplerSatate(ID3D11DeviceContext *& deviceContext, size_t id, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, id, pSampler); }
 
-		void SetShaderResourceView(ID3D11DeviceContext * deviceContext, std::string name, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, name, pResView); }
-		void SetShaderResourceView(ID3D11DeviceContext * deviceContext, size_t id, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, id, pResView); }
+		void SetShaderResourceView(ID3D11DeviceContext *& deviceContext, std::string name, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, name, pResView); }
+		void SetShaderResourceView(ID3D11DeviceContext *& deviceContext, size_t id, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, id, pResView); }
 
-		void SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, std::string name, void* ptr);
-		void SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, size_t id, void* ptr);
+		void SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, std::string name, void* ptr);
+		void SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, size_t id, void* ptr);
 		
 	private:
-		void SetBoundedResource(ID3D11DeviceContext * deviceContext, size_t id, void* ptr);
+		void SetBoundedResource(ID3D11DeviceContext *& deviceContext, size_t id, void* ptr);
 
 	public:
 		// ----
@@ -143,7 +149,7 @@ namespace Grafkit {
 			std::vector<CBVar> m_cbVars;
 		};
 
-		std::map<std::string, size_t> m_mapCBuffers;
+		std::map<std::string, int> m_mapCBuffers;
 		std::vector<CBRecord> m_cBuffers;
 
 		// -- input layout 
@@ -178,14 +184,14 @@ namespace Grafkit {
 			virtual HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) = 0;
 			virtual HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) = 0;
 			
-			virtual void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr) = 0;
+			virtual void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr) = 0;
 
-			virtual void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer) = 0;
-			virtual void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView) = 0;
-			virtual void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) = 0;
+			virtual void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer) = 0;
+			virtual void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView) = 0;
+			virtual void SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) = 0;
 
-			virtual void BindShader(ID3D11DeviceContext * deviceContext) = 0;
-			virtual void UnbindShader(ID3D11DeviceContext * deviceContext) = 0;
+			virtual void BindShader(ID3D11DeviceContext *& deviceContext) = 0;
+			virtual void UnbindShader(ID3D11DeviceContext *& deviceContext) = 0;
 	};
 
 	// ================================================================================================================================
@@ -219,14 +225,14 @@ namespace Grafkit {
 		void ShutdownChild();
 		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
 		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
 		
-		void SetSamplerPtr(ID3D11DeviceContext* device,UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
-		void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
-		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+		void SetSamplerPtr(ID3D11DeviceContext *& device,UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
+		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
-		void BindShader(ID3D11DeviceContext * deviceContext);
-		void UnbindShader(ID3D11DeviceContext * deviceContext);
+		void BindShader(ID3D11DeviceContext *& deviceContext);
+		void UnbindShader(ID3D11DeviceContext *& deviceContext);
 		
 
 	private:
@@ -247,14 +253,14 @@ namespace Grafkit {
 		void ShutdownChild();
 		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
 		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
 
-		void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
-		void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
-		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+		void SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
+		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
-		void BindShader(ID3D11DeviceContext * deviceContext);
-		void UnbindShader(ID3D11DeviceContext * deviceContext);
+		void BindShader(ID3D11DeviceContext *& deviceContext);
+		void UnbindShader(ID3D11DeviceContext *& deviceContext);
 	private:
 		ID3D11PixelShader* m_pxShader;
 	};
@@ -273,14 +279,14 @@ namespace Grafkit {
 		void ShutdownChild();
 		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
 		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		void CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
 
-		void SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
-		void SetShaderResources(ID3D11DeviceContext * deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
-		void SetConstantBuffer(ID3D11DeviceContext * deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+		void SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
+		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
+		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
 
-		void BindShader(ID3D11DeviceContext * deviceContext);
-		void UnbindShader(ID3D11DeviceContext * deviceContext);
+		void BindShader(ID3D11DeviceContext *& deviceContext);
+		void UnbindShader(ID3D11DeviceContext *& deviceContext);
 
 	private:
 		ID3D11GeometryShader* m_gmShader;

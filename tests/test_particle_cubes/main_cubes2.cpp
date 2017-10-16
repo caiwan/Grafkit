@@ -71,17 +71,10 @@ protected:
 		int init() {
 
 			// --------------------------------------------------
-
-			/* Itt letrhozzuk a kamerat, hozzaadjuk a scenehez, de nem kapcsoljuk hozza a scenegraphoz. */
-
-			// -- camera
-			/* Az alap kamera origoban van, +z iranyba nez, es +y felfele irany */
 			CameraRef camera = new Camera;
 			camera->SetName("camera");
 
-			// -- texture
 			TextureResRef texture = new TextureRes();
-
 			texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 			// -- texture sampler
@@ -90,22 +83,18 @@ protected:
 
 			// -- load shader
 			m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
-			m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/textured.hlsl", ""));
+			m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 			// -- precalc
 			this->DoPrecalc();
 
 			// -- model 
-			ModelRef model = new Model(new Mesh());
+			ModelRef model = new Model(GrafkitData::CreateCubes(1));
 			model->SetMaterial(new Material());
 			model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 			model->GetMaterial()->SetName("GridMaterial");
 
 			model->SetName("cube");
-			model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
-			model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
-			model->GetMesh()->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
-			model->GetMesh()->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
 			model->GetMesh()->Build(render, m_vertexShader);
 
 			// -- setup scene 
@@ -116,42 +105,11 @@ protected:
 			m_cameraActor->AddEntity(camera);
 			
 			/* Kocka kozepen */
-			ActorRef modelActor = new Actor(); 
-			modelActor->SetName("kozepen");
-			modelActor->AddEntity(model);
+			ActorRef modelActor = new Actor(model); 
+			modelActor->SetName("center");
 			
 			/*
-			Alap right-handed koordinatarendszer szerint osszerakunk egy keresztet
-			Ezeket adjuk hozza a belso kockahoz
-			*/
-			struct {
-				float3 coord;
-				std::string name;
-			} cubes [] = {
-				{{ 1, 0, 0 }, "Jobb", }, {{ -1, 0, 0 }, "Bal",  },
-				{{ 0, 1, 0 }, "fent", }, {{  0,-1, 0 }, "lent", },
-				{{ 0, 0, -1}, "elol", }, {{  0, 0, 1 }, "hatul",},
-			};
-
-			//size_t i = 0; // egyesevel itt lehet hozzaadni/elvenni
-			for (size_t i = 0; i < 6; i++)
-			{
-				ActorRef actor = new Actor();
-				actor->AddEntity(model);
-				modelActor->AddChild(actor);
-
-				float3 v = cubes[i].coord;
-				v.x *= 3;
-				v.y *= 3;
-				v.z *= 3;
-				
-				actor->Matrix().Translate(v);
-
-				actor->SetName(cubes[i].name);
-			}
-
-			/*
-			Kockak felfuzese a rootba
+			Add cubes to the root 
 			*/
 			m_rootActor = new Actor();
 			m_rootActor->SetName("root");
@@ -167,22 +125,15 @@ protected:
 			scene->Get()->SetPShader(m_fragmentShader);
 
 			m_cameraActor->Matrix().Identity();
-			m_cameraActor->Matrix().Translate(0, 0, -10);
+			m_cameraActor->Matrix().LookAtLH(float3(10, 10, 10));
 
 			/* ------------------------------------------------------------ */
-
-			/* Export and import stuff to file, then build it */
-#if 1
-			SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
-			scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
-#endif 
 
 			this->DoPrecalc();
 
 			scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);
-
 			scene->Get()->SetActiveCamera(0);
-			
+	
 			// --- 
 
 			m_rootActor = scene->Get()->GetRootNode();
@@ -201,15 +152,8 @@ protected:
 
 		// ==================================================================================================================
 		int mainloop() {
-			this->render.BeginScene();
+			this->render.BeginSceneDev();
 			{				
-				m_rootActor->Matrix().Identity();
-				m_rootActor->Matrix().RotateRPY(t,0,0);
-		
-				float f = abs(sin(t));
-				m_cameraActor->Transform().Identity();
-				m_cameraActor->Transform().Translate(0,f,0);
-
 				scene->Get()->PreRender(render);
 				scene->Get()->Render(render);
 

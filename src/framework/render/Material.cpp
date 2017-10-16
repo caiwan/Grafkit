@@ -10,7 +10,7 @@ using namespace  Grafkit;
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
 
-using std::vector;
+Material* Grafkit::Material::g_lastMaterial = nullptr;
 
 PERSISTENT_IMPL(Grafkit::Material);
 
@@ -93,6 +93,19 @@ void Grafkit::Material::RemoveTexture(TextureResRef texture, texture_type_e slot
 
 void Grafkit::Material::Render(Renderer& render, ShaderRef &vs, ShaderRef &fs)
 {
+#if 0
+	if (g_lastMaterial == this && m_lastVShader == vs && m_lastPShader == fs)
+		return;
+
+	g_lastMaterial = this;
+	if (m_lastVShader != fs || m_lastPShader) {
+		m_lastPShader = fs;
+		m_lastVShader = vs;
+		//m_colors_id = vs->GetParamId(render, )
+		//m_params_id = 
+	}
+#endif 
+
 	vs->SetParam(render, "material_colors", &m_colors);
 	fs->SetParam(render, "material_params", &m_params);
 

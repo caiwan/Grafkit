@@ -29,5 +29,6 @@ namespace GrafkitData {
 	extern const size_t	cubeIndicesSize;
 
 	extern Grafkit::MeshRef CreateCube();
+	extern Grafkit::MeshRef CreateCubes(size_t count);
 
 }

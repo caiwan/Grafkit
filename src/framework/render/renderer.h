@@ -71,11 +71,11 @@ namespace Grafkit {
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
 
 		// --- getters
-		ID3D11Device* GetDevice() { return this->m_device; }
-		operator ID3D11Device * const &() { return this->m_device; }
+		ID3D11Device * const & GetDevice() { return this->m_device; }
+		operator ID3D11Device *&() { return this->m_device; }
 
-		ID3D11DeviceContext* GetDeviceContext() { return this->m_deviceContext; }
-		operator ID3D11DeviceContext * const &() { return this->m_deviceContext; }
+		ID3D11DeviceContext * const & GetDeviceContext() { return this->m_deviceContext; }
+		operator ID3D11DeviceContext *&() { return this->m_deviceContext; }
 
 		void GetWorldMatrix(matrix&);
 

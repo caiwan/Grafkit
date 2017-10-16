@@ -137,7 +137,8 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 		else
 			world = parent->WorldMatrix();
 		world.Multiply(matrix);
-		world.Multiply(transform); // should have changed on the actor 
+		world.Multiply(transform);
+		actor->WorldMatrix(world);
 	}
 
 	// --- lights
@@ -187,15 +188,18 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	vs->Bind(render);
 	ps->Bind(render);
 
-	ps->SetParam(render, "LightBuffer", &m_lightData);
+	int vsMatrixId = vs->GetParamId(render, "MatrixBuffer");
+	int psMatrixId = ps->GetParamId(render, "MatrixBuffer");
+
+	ps->SetParamT(render, "LightBuffer", m_lightData);
 
 	// render scenegraph
 	for (size_t i = 0; i < m_nodes.size(); i++)
 	{
 		ActorRef & actor = m_nodes[i];
 		m_worldMatrices.worldMatrix = XMMatrixTranspose(actor->WorldMatrix().Get());
-		vs->SetParam(render, "MatrixBuffer", &m_worldMatrices);
-		ps->SetParam(render, "MatrixBuffer", &m_worldMatrices);
+		vs->SetParamT(render, vsMatrixId, m_worldMatrices);
+		ps->SetParamT(render, psMatrixId, m_worldMatrices);
 		actor->Render(render, this);
 	}
 

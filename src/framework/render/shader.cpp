@@ -134,7 +134,7 @@ void Shader::Shutdown()
 }
 
 
-void Shader::Bind(ID3D11DeviceContext * deviceContext)
+void Shader::Bind(ID3D11DeviceContext *& deviceContext)
 {
 	BindShader(deviceContext);
 
@@ -161,7 +161,7 @@ void Shader::Bind(ID3D11DeviceContext * deviceContext)
 
 }
 
-void Grafkit::Shader::Unbind(ID3D11DeviceContext * deviceContext)
+void Grafkit::Shader::Unbind(ID3D11DeviceContext *& deviceContext)
 {
 	if (this->GetParamCount())
 	{
@@ -187,46 +187,51 @@ void Grafkit::Shader::Unbind(ID3D11DeviceContext * deviceContext)
 void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 {
 	LOGGER(Log::Logger().Info("- Compiling shader"));
-	CreateShader(device.GetDevice(), shaderBuffer);
+	CreateShader(device, shaderBuffer);
 	LOGGER(Log::Logger().Info("- Compiling shader OK"));
 
 	this->BuildReflection(device, shaderBuffer);
 }
 
-// ============================================================================================================================================
-// set param
-void Grafkit::Shader::SetParam(ID3D11DeviceContext * deviceContext, std::string name, const void * const pData, size_t size, size_t offset)
+int Grafkit::Shader::GetParamId(ID3D11DeviceContext *& deviceContext, std::string name)
 {
 	auto it = this->m_mapCBuffers.find(name);
 	if (it != m_mapCBuffers.end()) {
-		SetParam(deviceContext, it->second, pData, size, offset);
+		return it->second;
 	}
+	return -1;
 }
 
-void Grafkit::Shader::SetParam(ID3D11DeviceContext * deviceContext, size_t id, const void * const pData, size_t size, size_t offset)
+// ============================================================================================================================================
+// set param
+void Grafkit::Shader::SetParam(ID3D11DeviceContext *& deviceContext, std::string name, const void * const pData, size_t size, size_t offset)
 {
-	if (id < GetParamCount())
-	{
-		if (size == 0) {
-			size = m_cBuffers[id].m_description.Size;
-			offset = 0;
-		}
+	int id = GetParamId(deviceContext, name);
+	SetParam(deviceContext, id, pData, size, offset);
+}
 
-		if (size + offset <= m_cBuffers[id].m_description.Size)
-			CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
-		else
-			DebugBreak();
+void Grafkit::Shader::SetParam(ID3D11DeviceContext *& deviceContext, int id, const void * const pData, size_t size, size_t offset)
+{
+	if (id < 0 || id >= GetParamCount())
+		return;
 
-		CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
-		this->UnMapParamBuffer(deviceContext, id);
+	if (size == 0) {
+		size = m_cBuffers[id].m_description.Size;
+		offset = 0;
 	}
-	else {
+
+	if (size + offset <= m_cBuffers[id].m_description.Size)
+		CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
+	else
 		DebugBreak();
-	}
+
+	CopyMemory((BYTE*)this->MapParamBuffer(deviceContext, id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+	this->UnMapParamBuffer(deviceContext, id);
+
 }
 
 // set value inside a value 
-void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, std::string name, std::string valueName, void * const pData, size_t size, size_t offset)
+void Grafkit::Shader::SetParamValue(ID3D11DeviceContext *& deviceContext, std::string name, std::string valueName, void * const pData, size_t size, size_t offset)
 {
 	auto it = this->m_mapCBuffers.find(name);
 	if (it != m_mapCBuffers.end()) {
@@ -235,7 +240,7 @@ void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, std::st
 	}
 }
 
-void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, size_t id, size_t valueid, const void * const pData, size_t size, size_t offset)
+void Grafkit::Shader::SetParamValue(ID3D11DeviceContext *& deviceContext, size_t id, size_t valueid, const void * const pData, size_t size, size_t offset)
 {
 	if (id < GetParamCount() && valueid < GetParamValueCount(id))
 	{
@@ -258,7 +263,7 @@ void Grafkit::Shader::SetParamValue(ID3D11DeviceContext * deviceContext, size_t 
 	}
 }
 
-void* Shader::MapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id, int isDiscard)
+void* Shader::MapParamBuffer(ID3D11DeviceContext *& deviceContext, size_t id, int isDiscard)
 {
 	HRESULT result = 0;
 
@@ -275,7 +280,7 @@ void * Shader::GetMappedPtr(size_t id)
 	return m_cBuffers[id].m_mappedResource.pData;
 }
 
-void Shader::UnMapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id)
+void Shader::UnMapParamBuffer(ID3D11DeviceContext *& deviceContext, size_t id)
 {
 	//if (id < m_cBufferCount)
 	{
@@ -287,14 +292,14 @@ void Shader::UnMapParamBuffer(ID3D11DeviceContext * deviceContext, size_t id)
 
 // ============================================================================================================================================
 
-void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, std::string name, void * ptr)
+void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, std::string name, void * ptr)
 {
 	auto it = this->m_mapBResources.find(name);
 	if (it != this->m_mapBResources.end())
 		SetBoundedResourcePointer(deviceContext, it->second, ptr);
 }
 
-void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceContext, size_t id, void * ptr)
+void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, size_t id, void * ptr)
 {
 	if (id >= GetBoundedResourceCount())
 		return;
@@ -305,7 +310,7 @@ void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext * deviceCont
 		SetBoundedResource(deviceContext, id, ptr);
 }
 
-void Grafkit::Shader::SetBoundedResource(ID3D11DeviceContext * deviceContext, size_t id, void * ptr) {
+void Grafkit::Shader::SetBoundedResource(ID3D11DeviceContext *& deviceContext, size_t id, void * ptr) {
 
 	BResRecord &brRecord = this->m_bResources[id];
 
@@ -323,7 +328,7 @@ void Grafkit::Shader::SetBoundedResource(ID3D11DeviceContext * deviceContext, si
 	{
 		ID3D11SamplerState * pSampler = (ID3D11SamplerState*)ptr;
 		SetSamplerPtr(deviceContext, brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, pSampler);
-	}break;
+	} break;
 
 	}
 
@@ -627,7 +632,7 @@ HRESULT Grafkit::VertexShader::CompileShaderFromSource(LPCSTR source, size_t siz
 }
 
 
-void Grafkit::VertexShader::CreateShader(ID3D11Device* device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
+void Grafkit::VertexShader::CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
 {
 	HRESULT result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_vxShader);
 	if (FAILED(result))
@@ -635,31 +640,31 @@ void Grafkit::VertexShader::CreateShader(ID3D11Device* device, ID3D10Blob* shade
 }
 
 
-void Grafkit::VertexShader::SetSamplerPtr(ID3D11DeviceContext* device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
+void Grafkit::VertexShader::SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
 {
 	device->VSSetSamplers(bindPoint, bindCount, &pSampler);
 }
 
 
-void Grafkit::VertexShader::SetShaderResources(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+void Grafkit::VertexShader::SetShaderResources(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
 {
 	device->VSSetShaderResources(bindPoint, bindCount, &pResView);
 }
 
 
-void Grafkit::VertexShader::SetConstantBuffer(ID3D11DeviceContext * device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+void Grafkit::VertexShader::SetConstantBuffer(ID3D11DeviceContext *& device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
 	device->VSSetConstantBuffers(slot, numBuffers, &buffer);
 }
 
 
-void Grafkit::VertexShader::BindShader(ID3D11DeviceContext * device)
+void Grafkit::VertexShader::BindShader(ID3D11DeviceContext *& device)
 {
 	device->IASetInputLayout(m_layout);
 	device->VSSetShader(m_vxShader, nullptr, 0);
 }
 
-void Grafkit::VertexShader::UnbindShader(ID3D11DeviceContext * device)
+void Grafkit::VertexShader::UnbindShader(ID3D11DeviceContext *& device)
 {
 	device->VSSetShader(nullptr, nullptr, 0);
 }
@@ -694,7 +699,7 @@ HRESULT Grafkit::PixelShader::CompileShaderFromSource(LPCSTR source, size_t size
 }
 
 
-void Grafkit::PixelShader::CreateShader(ID3D11Device * device, ID3D10Blob * shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
+void Grafkit::PixelShader::CreateShader(ID3D11Device *& device, ID3D10Blob * shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
 {
 	HRESULT result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_pxShader);
 	if (FAILED(result))
@@ -702,29 +707,29 @@ void Grafkit::PixelShader::CreateShader(ID3D11Device * device, ID3D10Blob * shad
 }
 
 
-void Grafkit::PixelShader::SetSamplerPtr(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
+void Grafkit::PixelShader::SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
 {
 	device->PSSetSamplers(bindPoint, bindCount, &pSampler);
 }
 
-void Grafkit::PixelShader::SetShaderResources(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+void Grafkit::PixelShader::SetShaderResources(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
 {
 	device->PSSetShaderResources(bindPoint, bindCount, &pResView);
 }
 
 
-void Grafkit::PixelShader::SetConstantBuffer(ID3D11DeviceContext * device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+void Grafkit::PixelShader::SetConstantBuffer(ID3D11DeviceContext *& device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
 	device->PSSetConstantBuffers(slot, numBuffers, &buffer);
 }
 
 
-void Grafkit::PixelShader::BindShader(ID3D11DeviceContext * device)
+void Grafkit::PixelShader::BindShader(ID3D11DeviceContext *& device)
 {
 	device->PSSetShader(m_pxShader, nullptr, 0);
 }
 
-void Grafkit::PixelShader::UnbindShader(ID3D11DeviceContext * device)
+void Grafkit::PixelShader::UnbindShader(ID3D11DeviceContext *& device)
 {
 	device->PSSetShader(nullptr, nullptr, 0);
 }
@@ -755,34 +760,34 @@ HRESULT Grafkit::GeometryShader::CompileShaderFromSource(LPCSTR source, size_t s
 	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, GS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 }
 
-void Grafkit::GeometryShader::CreateShader(ID3D11Device * device, ID3D10Blob * shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
+void Grafkit::GeometryShader::CreateShader(ID3D11Device *& device, ID3D10Blob * shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
 {
 	HRESULT result = device->CreateGeometryShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_gmShader);
 	if (FAILED(result))
 		throw new EX_HRESULT(PSCrerateException, result);
 }
 
-void Grafkit::GeometryShader::SetSamplerPtr(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
+void Grafkit::GeometryShader::SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)
 {
 	device->PSSetSamplers(bindPoint, bindCount, &pSampler);
 }
 
-void Grafkit::GeometryShader::SetShaderResources(ID3D11DeviceContext * device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
+void Grafkit::GeometryShader::SetShaderResources(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView)
 {
 	device->PSSetShaderResources(bindPoint, bindCount, &pResView);
 }
 
-void Grafkit::GeometryShader::SetConstantBuffer(ID3D11DeviceContext * device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
+void Grafkit::GeometryShader::SetConstantBuffer(ID3D11DeviceContext *& device, UINT slot, UINT numBuffers, ID3D11Buffer *& buffer)
 {
 	device->GSSetConstantBuffers(slot, numBuffers, &buffer);
 }
 
-void Grafkit::GeometryShader::BindShader(ID3D11DeviceContext * device)
+void Grafkit::GeometryShader::BindShader(ID3D11DeviceContext *& device)
 {
 	device->GSSetShader(m_gmShader, nullptr, 0);
 }
 
-void Grafkit::GeometryShader::UnbindShader(ID3D11DeviceContext * device)
+void Grafkit::GeometryShader::UnbindShader(ID3D11DeviceContext *& device)
 {
 	device->GSSetShader(nullptr, nullptr, 0);
 }

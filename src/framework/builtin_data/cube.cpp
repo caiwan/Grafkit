@@ -3,20 +3,20 @@
 
 using namespace Grafkit;
 
-static const float _triangle[]= { 
+static const float _triangle[] = {
 	0.0f,  1.0f, -0.1f,
 	1.0f, -1.0f, -0.1f,
 	-1.0f, -1.0f,-0.1f,
-	
+
 	-1.0f, -1.0f, 0.1f,
 	1.0f, -1.0f,  0.1f,
 	0.0f,  1.0f,  0.1f,
- };
+};
 
 static const unsigned short _triangleIndices[] = {
 	0,1,2,
 	3,4,5,
- };
+};
 
 const float * const GrafkitData::triangle = _triangle;
 const unsigned short * const  GrafkitData::triangleIndices = _triangleIndices;
@@ -38,9 +38,9 @@ static const float _quad_vertices2[] = {
 };
 
 static const float _quad_texcoord[] = {
-	0, 1, 
-	1, 1, 
-	1, 0, 
+	0, 1,
+	1, 1,
+	1, 0,
 	0, 0
 };
 
@@ -64,7 +64,7 @@ const int * const GrafkitData::quadIndices = _quad_mesh;
 // Left Face
 
 
-static const float _cube_normals [] = {
+static const float _cube_normals[] = {
 	0.0f, 0.0f, 1.0f, 0.0f,	//front
 	0.0f, 0.0f, 1.0f, 0.0f,
 	0.0f, 0.0f, 1.0f, 0.0f,
@@ -101,27 +101,27 @@ static const float _cube_texcoords[] = {
 	1.0f, 0.0f,
 	1.0f, 1.0f,
 	0.0f, 1.0f,
-			
+
 	1.0f, 0.0f,
 	1.0f, 1.0f,
 	0.0f, 1.0f,
 	0.0f, 0.0f,
-			
+
 	0.0f, 1.0f,
 	0.0f, 0.0f,
 	1.0f, 0.0f,
 	1.0f, 1.0f,
-			
+
 	1.0f, 1.0f,
 	0.0f, 1.0f,
 	0.0f, 0.0f,
 	1.0f, 0.0f,
-			
+
 	1.0f, 0.0f,
 	1.0f, 1.0f,
 	0.0f, 1.0f,
 	0.0f, 0.0f,
-			
+
 	0.0f, 0.0f,
 	1.0f, 0.0f,
 	1.0f, 1.0f,
@@ -130,7 +130,7 @@ static const float _cube_texcoords[] = {
 
 
 
-static const float _cube_vertices []= {
+static const float _cube_vertices[] = {
 	-1.0f, -1.0f, 1.0f ,0.0f,    // Point 1 (Front)
 	1.0f, -1.0f, 1.0f  ,0.0f,    // Point 2 (Front)
 	1.0f, 1.0f, 1.0f   ,0.0f,    // Point 3 (Front)
@@ -181,10 +181,10 @@ const   int * const GrafkitData::cubeIndices = _cube_indices;
 const unsigned int GrafkitData::cubeVertexCount = 6 * 4;
 const unsigned int GrafkitData::cubeIndicesCount = 6 * 6;
 
-const size_t GrafkitData::cubeVertexSize     = sizeof(_cube_vertices);
-const size_t GrafkitData::cubeNormalSize 	 = sizeof(_cube_normals);
+const size_t GrafkitData::cubeVertexSize = sizeof(_cube_vertices);
+const size_t GrafkitData::cubeNormalSize = sizeof(_cube_normals);
 const size_t GrafkitData::cubeTextureUVsSize = sizeof(_cube_texcoords);
-const size_t GrafkitData::cubeIndicesSize	 = sizeof(_cube_indices);
+const size_t GrafkitData::cubeIndicesSize = sizeof(_cube_indices);
 
 Grafkit::MeshRef GrafkitData::CreateCube()
 {
@@ -193,5 +193,56 @@ Grafkit::MeshRef GrafkitData::CreateCube()
 	mesh->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
 	mesh->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
 	mesh->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
+	return mesh;
+}
+
+Grafkit::MeshRef GrafkitData::CreateCubes(size_t count)
+{
+	const size_t &vertlen = GrafkitData::cubeVertexCount;
+	const size_t &indlen = GrafkitData::cubeIndicesCount;
+
+	const size_t vertcount = vertlen * count; 
+	const size_t indcount = indlen * count;
+
+	int *indices = new int[indcount];
+
+	int *groups = new int[vertcount];
+	float4 * vertices = new float4[vertcount];
+	float2 * texcoords = new float2[vertcount];
+	float4 * normals = new float4[vertcount];
+
+	for (size_t i = 0; i < count; i++) {
+
+		// copy indices
+		for (size_t j = 0; j < indlen; j++) {
+			size_t k = i * indlen;
+			indices[k + j] = k + GrafkitData::cubeIndices[j];
+		}
+
+		// copy vertices
+		for (size_t j = 0; j < vertlen; j++) {
+			size_t k = i * vertlen + j;
+			groups[k] = i;
+
+			vertices[k] = reinterpret_cast<const float4*>(GrafkitData::cubeVertices)[j];
+			texcoords[k] = reinterpret_cast<const float2*>(GrafkitData::cubeTextureUVs)[j];
+			normals[k] = reinterpret_cast<const float4*>(GrafkitData::cubeNormals)[j];
+		}
+	}
+
+	MeshRef mesh = new Mesh();
+
+	mesh->AddPointer("POSITION", vertcount * sizeof(*vertices), vertices);
+	mesh->AddPointer("TEXCOORD", vertcount * sizeof(*texcoords), texcoords);
+	mesh->AddPointer("NORMAL", vertcount * sizeof(*normals), normals);
+	mesh->AddPointer("BLENDINDICES0", vertcount * sizeof(*groups), groups);
+	mesh->SetIndices(vertcount, indcount, indices);
+
+	delete[] indices;
+	delete[] groups;
+	delete[] vertices;
+	delete[] texcoords;
+	delete[] normals;
+
 	return mesh;
 }

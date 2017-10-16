@@ -105,6 +105,15 @@ namespace Grafkit {
 	protected:
 		void serialize(Archive& ar);
 		PERSISTENT_DECL(Grafkit::Material, 1);
+
+	private:
+		// slight optimalization trick, to avoid bind parameters to shader twice
+		static Material* g_lastMaterial; 
+		Shader* m_lastVShader;
+		Shader* m_lastPShader;
+
+		int m_colors_id;
+		int m_params_id;
 	};
 
 	typedef Ref<Material> MaterialRef;
