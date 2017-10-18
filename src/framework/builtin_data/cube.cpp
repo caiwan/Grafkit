@@ -201,32 +201,34 @@ Grafkit::MeshRef GrafkitData::CreateCubes(size_t count)
 	const size_t &vertlen = GrafkitData::cubeVertexCount;
 	const size_t &indlen = GrafkitData::cubeIndicesCount;
 
-	const size_t vertcount = vertlen * count; 
+	const size_t vertcount = vertlen * count;
 	const size_t indcount = indlen * count;
 
 	int *indices = new int[indcount];
 
-	int *groups = new int[vertcount];
+	uint16_t *groups = new uint16_t[vertcount];
 	float4 * vertices = new float4[vertcount];
 	float2 * texcoords = new float2[vertcount];
 	float4 * normals = new float4[vertcount];
 
+	size_t vertindex = 0;
+	size_t faceindex = 0;
 	for (size_t i = 0; i < count; i++) {
 
 		// copy indices
 		for (size_t j = 0; j < indlen; j++) {
-			size_t k = i * indlen;
-			indices[k + j] = k + GrafkitData::cubeIndices[j];
+			indices[faceindex] = i*vertlen + GrafkitData::cubeIndices[j];
+			faceindex++;
 		}
 
 		// copy vertices
 		for (size_t j = 0; j < vertlen; j++) {
-			size_t k = i * vertlen + j;
-			groups[k] = i;
+			groups[vertindex] = i;
 
-			vertices[k] = reinterpret_cast<const float4*>(GrafkitData::cubeVertices)[j];
-			texcoords[k] = reinterpret_cast<const float2*>(GrafkitData::cubeTextureUVs)[j];
-			normals[k] = reinterpret_cast<const float4*>(GrafkitData::cubeNormals)[j];
+			vertices[vertindex] = reinterpret_cast<const float4*>(GrafkitData::cubeVertices)[j];
+			texcoords[vertindex] = reinterpret_cast<const float2*>(GrafkitData::cubeTextureUVs)[j];
+			normals[vertindex] = reinterpret_cast<const float4*>(GrafkitData::cubeNormals)[j];
+			vertindex++;
 		}
 	}
 

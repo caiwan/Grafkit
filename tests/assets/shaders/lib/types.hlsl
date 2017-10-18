@@ -7,8 +7,14 @@ struct WorldMatrices
     matrix projectionMatrix;
 };
 
+struct BoneMatrices
+{
+    matrix boneMatrix[64];
+};
+
 struct Resolution
 {
+
     float2 resolution;
     float aspect;
     float fov;
@@ -28,8 +34,14 @@ struct VertexInputType
     float4 tangent : TANGENT;
     float4 binormal : BINORMAL;
     float2 tex : TEXCOORD;
-    int group0 : BLENDIDNBLENDINDICES0;
-    float weight0 : BLENDWBLENDWEIGHT0;
+    int group0 : BLENDINDICES0;
+    int group1 : BLENDINDICES1;
+    int group2 : BLENDINDICES2;
+    int group3 : BLENDINDICES3;
+    float weight0 : BLENDWEIGHT0;
+    float weight1 : BLENDWEIGHT1;
+    float weight2 : BLENDWEIGHT2;
+    float weight4 : BLENDWEIGHT3;
 };
 
 struct PixelInputType
@@ -66,4 +78,4 @@ struct EffectParamType
 {
     float4 screen;
     float4 viewport;
-}; 
+};
