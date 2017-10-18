@@ -158,12 +158,13 @@ protected:
 
 	// ==================================================================================================================
 
-	struct cube_params_t{
-		cube_params_t(){}
+	struct cube_params_t {
+		cube_params_t() {}
 		union {
 			struct {
 				int cubew, cubeh;
-			}; float4 _p;
+			};
+			char _0[16];
 		};
 		float4 p[CUBEW];
 	};
@@ -175,9 +176,9 @@ protected:
 		cube_params.cubeh = CUBEH;
 
 		for (int i = 0; i < 64; i++) {
-			cube_params.p[i] = float4(0,0,0,0);
-			cube_params.p[i].x = fbm(float2(0, (float)i / 64.));
-			cube_params.p[i].y = fbm(float2((float)i / 64., 0.));
+			cube_params.p[i] = float4(0, 0, 0, 0);
+			cube_params.p[i].x = fbm(float2(t, (float)i / 64.));
+			cube_params.p[i].y = fbm(float2((float)i / 64., t));
 		}
 
 		this->render.BeginSceneDev();

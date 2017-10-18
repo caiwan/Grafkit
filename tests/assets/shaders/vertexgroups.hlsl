@@ -22,9 +22,6 @@ cbuffer cube_params
     float4 cubeHeight[64];
 }
 
-
-
-
 PixelInputType mainVertex(
     VertexInputType input)
 {
@@ -42,6 +39,7 @@ PixelInputType mainVertex(
     float yt = (float) y / 64.;
 	
     float h = cubeHeight[x].x * cubeHeight[y].y;
+    h *= 100;
 
     float4 pp = float4(0, 0, 0, 1);
     pp.x = cubew * 3 / 2 - x * 3,

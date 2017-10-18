@@ -7,7 +7,6 @@
 
 /*
 QND reverse-engineered Fractional Brownian motion
-
 Avoid using it, and please rely on shaders
 */
 
@@ -20,6 +19,11 @@ namespace Grafkit {
 	float dot(float2 v, float2 w) {
 		return v.x * w.x + v.y * w.y;
 	}
+
+float hash2(float2 co){
+static float[64*64] lut;
+int fisttime = 0;
+}
 
 	float hash(float2 co) {
 		float a = 12.9898, b = 78.233, c = 43758.5453;
