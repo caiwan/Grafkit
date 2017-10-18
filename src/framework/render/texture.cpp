@@ -274,9 +274,6 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 		return;
 	}
 
-	D3D11_SRV_DIMENSION srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	D3D11_RTV_DIMENSION rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-
 	int miplevels = floor(log2f(m_w));
 
 	D3D11_TEXTURE2D_DESC textureDesc;
@@ -292,8 +289,6 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
-	//D3D11_SUBRESOURCE_DATA *pData = nullptr, subresData;
-	//D3D11_SUBRESOURCE_DATA *pData = new D3D11_SUBRESOURCE_DATA[miplevels];
 	D3D11_SUBRESOURCE_DATA pData[16];
 
 	// Initial data
@@ -321,7 +316,6 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 		}
 	}
 	else {
-		// bazmeg, nem adtal be pointert te szegeny
 		DebugBreak();
 	}
 
@@ -336,7 +330,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
 	shaderResourceViewDesc.Format = format;
-	shaderResourceViewDesc.ViewDimension = srvDimension;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 	shaderResourceViewDesc.Texture2D.MipLevels = -1;
@@ -350,8 +344,6 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 
 	if (pData[0].pSysMem != initialData)
 		delete pData[0].pSysMem;
-
-	//delete[] pData;
 
 }
 
