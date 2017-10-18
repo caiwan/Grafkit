@@ -22,7 +22,8 @@ namespace Grafkit {
 
 float hash2(float2 co){
 static float[64*64] lut;
-int fisttime = 0;
+static int fisttime = 0;
+
 }
 
 	float hash(float2 co) {
