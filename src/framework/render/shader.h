@@ -46,6 +46,7 @@ namespace Grafkit {
 			D3D11_INPUT_ELEMENT_DESC desc;
 			UINT width;
 			UINT offset;
+			std::string name;
 		};
 
 		struct OutputTargetRecord {
@@ -113,8 +114,8 @@ namespace Grafkit {
 	public:
 		// ----
 		// access input layout 
-		size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
-		InputElementRecord GetILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
+		size_t GetILayoutElemCount() { return this->m_inputElems.size(); }
+		InputElementRecord GetILayoutElem(size_t index) { return this->m_inputElems[index]; }
 
 	private:
 		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
@@ -154,7 +155,7 @@ namespace Grafkit {
 
 		// -- input layout 
 		typedef std::vector<InputElementRecord> inputElements_t;
-		inputElements_t m_mapInputElems;
+		inputElements_t m_inputElems;
 		ID3D11InputLayout* m_layout;
 
 		// -- bounded resource

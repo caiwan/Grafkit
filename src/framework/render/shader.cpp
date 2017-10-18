@@ -20,6 +20,7 @@ using namespace FWdebugExceptions;
 #define PS_VERSION "ps_4_0"
 #define VS_VERSION "vs_4_0"
 #define GS_VERSION "gs_4_0"
+#define CS_VERSION "cs_4_0"
 
 
 // TODO http://stackoverflow.com/questions/24323281/the-pixel-shader-unit-expects-a-sampler
@@ -361,6 +362,7 @@ void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file,
 void Shader::GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth) {
 	BYTE mask = pd.Mask;
 	int varCount = 0;
+
 	while (mask)
 	{
 		if (mask & 0x01) varCount++;
@@ -454,13 +456,17 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	D3D11_SHADER_DESC desc;
 	this->m_pReflector->GetDesc(&desc);
 
-	// fetch input descriptors
-	this->m_mapInputElems.clear();
+	// ----
+	// fetch input schemantic descriptors
+	this->m_inputElems.clear();
+
 
 	LOGGER(Log::Logger().Trace("-- Reflection"));
 
+	std::map<std::string, size_t> elemcount;
+
 	std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
-	for (UINT i = 0; i < desc.InputParameters; i++)
+	for (size_t i = 0; i < desc.InputParameters; i++)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC input_desc;
 		this->m_pReflector->GetInputParameterDesc(i, &input_desc);
@@ -482,26 +488,48 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 		elem.desc = elementDesc;
 
+		// count elements for numbering if an input array was specified
+		elem.name = input_desc.SemanticName;
+
+		auto elemit = elemcount.find(elem.name);
+		if (elemit == elemcount.end()) {
+			elemcount[elem.name] = 0;
+		}
+		else {
+			elemit->second++;
+		}
+
 		// -- determine DXGI format
 		this->GetDXGIFormat(input_desc, elementDesc.Format, elem.width);
 
-		LOGGER(Log::Logger().Trace("--- Input element: \"%s\" [%d], Format = {%d, %d}", input_desc.SemanticName, input_desc.SemanticIndex, elementDesc.Format, elem.width));
-
 		elements.push_back(elementDesc);
-
-		const char *name = elementDesc.SemanticName;
-
-		this->m_mapInputElems.push_back(elem);
+		this->m_inputElems.push_back(elem);
 	}
 
-	// IL csak V-shaderhez kell
+	// add numbering for schemantic names
+	size_t elementRelativeOffset = 0;
+	// geezus.
+	for (size_t i = 0; i < m_inputElems.size(); i++)
+	{
+		InputElementRecord & elem = m_inputElems[i];
+		auto it = elemcount.find(elem.name);
+		if (it == elemcount.end())
+			continue;
+		if (it->second > 0)
+			elem.name = elem.name + std::to_string(elem.desc.SemanticIndex);
+
+		LOGGER(Log::Logger().Trace("--- Input element: \"%s\" [%d], Format = {%d, %d}", elem.name.c_str(), elem.desc.SemanticIndex, elem.offset, elementRelativeOffset));
+		elementRelativeOffset += elem.width;
+	}
+
+	// IL only needed for Vertex shader
 	if (this->GetShaderType() == SHADER_VERTEX) {
 		result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
 
 		if (FAILED(result))
 			throw new EX_HRESULT(InputLayoutCreateException, result);
 	}
-
+	// ----
 	// fetch output desctiptor
 	for (UINT i = 0; i < desc.OutputParameters; i++)
 	{
