@@ -20,11 +20,11 @@ namespace Grafkit {
 		return v.x * w.x + v.y * w.y;
 	}
 
-float hash2(float2 co){
-static float[64*64] lut;
-static int fisttime = 0;
-
-}
+//float hash2(float2 co){
+//static float[64*64] lut;
+//static int fisttime = 0;
+//
+//}
 
 	float hash(float2 co) {
 		float a = 12.9898, b = 78.233, c = 43758.5453;
