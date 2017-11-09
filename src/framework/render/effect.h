@@ -33,13 +33,9 @@ namespace Grafkit {
 
 		EffectPassRef GetEffect(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
 
-		/** Beallitja az elso read buffert a rendererenek, a render passhoz
-		*/
 		void BindInput(Renderer &render);
 		void UnbindInput(Renderer& render);
 
-		/** Vegigmegy a render chainen
-		*/
 		void Render(Renderer &render, int autoflush = 1);
 		void Flush(Renderer &render);
 
@@ -48,19 +44,8 @@ namespace Grafkit {
 		void ClearInput() { m_input_map.clear(); }
 
 	protected:
-		/**
-		Megcsereli a read es a write buffert
-		*/
 		void SwapBuffers();
-
-		/**
-		Megcsereli az utolso read buffert a backbufferrel
-		*/
 		void FlushBuffers();
-
-		/**
-		Lerendereli a chaint
-		*/
 		void RenderChain(Renderer &render);
 
 	protected:

@@ -28,6 +28,8 @@ namespace GrafkitData {
 	extern const size_t cubeTextureUVsSize;
 	extern const size_t	cubeIndicesSize;
 
+	extern Grafkit::MeshRef CreateQuad();
+
 	extern Grafkit::MeshRef CreateCube();
 	extern Grafkit::MeshRef CreateCubes(size_t count);
 

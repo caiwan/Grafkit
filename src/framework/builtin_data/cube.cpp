@@ -186,6 +186,16 @@ const size_t GrafkitData::cubeNormalSize = sizeof(_cube_normals);
 const size_t GrafkitData::cubeTextureUVsSize = sizeof(_cube_texcoords);
 const size_t GrafkitData::cubeIndicesSize = sizeof(_cube_indices);
 
+
+Grafkit::MeshRef GrafkitData::CreateQuad()
+{
+	MeshRef mesh = new Mesh();
+	mesh->AddPointer("POSITION", sizeof(GrafkitData::quad[0]) * 4 * 4, GrafkitData::quad);
+	mesh->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord[0]) * 4 * 4, GrafkitData::quad_texcoord);
+	mesh->SetIndices(4, 6, GrafkitData::quadIndices);
+	return mesh;
+}
+
 Grafkit::MeshRef GrafkitData::CreateCube()
 {
 	MeshRef mesh = new Mesh();

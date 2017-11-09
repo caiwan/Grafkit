@@ -68,6 +68,7 @@ namespace Grafkit {
 		// --- setters
 
 		void ApplyRenderTargetView(size_t count = 1);
+		void SetDepthStencilView(ID3D11DepthStencilView* pDepthStencilView = nullptr);
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
 
 		// --- getters
@@ -85,6 +86,7 @@ namespace Grafkit {
 		void GetScreenSizef(float &screenW, float &screenH) { screenW = m_screenW; screenH = m_screenH; }
 
 		void GetViewportSize(int &viewW, int &viewH) { viewW = m_viewport.Width; viewH = m_viewport.Height; }
+		void GetViewportSize(int &viewW, int &viewH, int &viewX, int &viewY) { viewW = m_viewport.Width; viewH = m_viewport.Height; viewX = m_viewport.TopLeftX; viewY = m_viewport.TopLeftY; }
 		void GetViewportSizef(float &viewW, float &viewH) { viewW = (float)m_viewport.Width; viewH = (float)m_viewport.Height; }
 
 		float GetAspectRatio() {return (float)m_viewport.Width / (float)m_viewport.Height;}
@@ -101,6 +103,7 @@ namespace Grafkit {
 		size_t m_renderTargetViewCount;
 		ID3D11Texture2D* m_depthStencilBuffer;
 		ID3D11DepthStencilState* m_depthStencilState, *m_depthStencilStateWriteDisabled;
+		ID3D11DepthStencilView* m_myDepthStencilView;
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11RasterizerState* m_rasterState;
 		

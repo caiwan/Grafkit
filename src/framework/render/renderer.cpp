@@ -13,6 +13,7 @@ Renderer::Renderer() :
 	m_renderTargetViewCount(0), m_myRenderTargetView(nullptr),
 	m_depthStencilBuffer(nullptr),
 	m_depthStencilState(nullptr), m_depthStencilStateWriteDisabled(nullptr),
+	m_myDepthStencilView(nullptr),
 	m_depthStencilView(nullptr),
 	m_rasterState(nullptr),
 	m_screenW(0),
@@ -261,14 +262,14 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
 	// Create the depth stencil view.
-	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
+	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_myDepthStencilView);
 	if (FAILED(result))
 		throw EX_HRESULT(InitializeRendererException, result);
 
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
 	SetRenderTargetView();
+	SetDepthStencilView();
 	ApplyRenderTargetView();
-
 
 	// -----------------------------------------------------------------------------
 
@@ -329,7 +330,7 @@ void Renderer::Shutdown()
 	}
 
 	RELEASE(m_rasterState);
-	RELEASE(m_depthStencilView);
+	RELEASE(m_myDepthStencilView);
 	RELEASE(m_depthStencilState);
 	RELEASE(m_depthStencilBuffer);
 	RELEASE(m_myRenderTargetView);
@@ -475,7 +476,6 @@ void Grafkit::Renderer::SetRenderTargetView(ID3D11RenderTargetView * pRenderTarg
 	n = n < RENDER_TARGET_MAX ? n : RENDER_TARGET_MAX;
 	if (pRenderTargetView == nullptr) {
 		m_renderTargetViews[0] = m_myRenderTargetView;
-		ApplyRenderTargetView(); // shortcut
 	}
 	else {
 		m_renderTargetViews[n] = pRenderTargetView;
@@ -486,6 +486,16 @@ void Grafkit::Renderer::ApplyRenderTargetView(size_t count)
 {
 	m_renderTargetViewCount = count < RENDER_TARGET_MAX ? count : RENDER_TARGET_MAX;
 	m_deviceContext->OMSetRenderTargets(m_renderTargetViewCount, m_renderTargetViews, m_depthStencilView);
+}
+
+void Grafkit::Renderer::SetDepthStencilView(ID3D11DepthStencilView * pDepthStencilview)
+{
+	if (pDepthStencilview == nullptr) {
+		m_depthStencilView = m_myDepthStencilView;
+	}
+	else {
+		m_depthStencilView = pDepthStencilview;
+	}
 }
 
 

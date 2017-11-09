@@ -14,60 +14,8 @@ Grafkit::EffectComposer::~EffectComposer()
 	this->Shutdown();
 }
 
-/// @tod ezeket valami elegansabb helyre el kellene rakni
-namespace {
-	const char shader_source[] = "\r\n"
-
-		// GLOBALS //
-		"Texture2D effectInput;\r\n"
-
-		"SamplerState SampleType{\n"
-		"Filter = MIN_MAG_MIP_LINEAR;\n"
-		"AddressU = Wrap;\n"
-		"AddressV = Wrap;\n"
-		"};\n"
-
-		"cbuffer EffectParams{\n"
-		"float4 fxScreen;"
-		"float4 fxViewport;"
-		"}\n"
-
-		// TYPEDEFS //
-		"struct FXPixelInputType"
-		"{"
-		"float4 position : SV_POSITION;"
-		"float2 tex : TEXCOORD;"
-		"};"
-
-		"struct FXVertexInputType"
-		"{"
-		"float4 position : POSITION;"
-		"float2 tex : TEXCOORD0;"
-		"};"
-
-		// VertexShader
-		"FXPixelInputType FullscreenQuad(FXVertexInputType input)"
-		"{"
-		"FXPixelInputType output;"
-		"input.position.w = 1.0f;"
-		"output.position = input.position;"
-		"output.tex = input.tex;"
-		"return output;"
-		"}"
-
-		// PixelShader
-		"float4 CopyScreen(FXPixelInputType input) : SV_TARGET"
-		"{"
-		"float4 textureColor = float4(0,0,0,1);"
-		"textureColor = effectInput.Sample(SampleType, input.position / fxScreen.xy);"
-		"return textureColor;"
-		"}"
-
-		"";
-}
-
-
 #include "../builtin_data/cube.h"
+#include "../builtin_data/defaultShader.h"
 
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
@@ -94,10 +42,20 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 
 	// --- 
 	m_shaderFullscreenQuad = new VertexShader();
-	m_shaderFullscreenQuad->LoadFromMemory(render, "FullscreenQuad", shader_source, sizeof(shader_source), "FullscreenQuad");
+	m_shaderFullscreenQuad->LoadFromMemory(
+		render, 
+		GrafkitData::effectFullscreenQuadEntry,
+		GrafkitData::effectShader, strlen(GrafkitData::effectShader), 
+		"FullscreenQuad"
+	);
 
 	m_shaderCopyScreen = new PixelShader();
-	m_shaderCopyScreen->LoadFromMemory(render, "CopyScreen", shader_source, sizeof(shader_source), "CopyScreen");
+	m_shaderCopyScreen->LoadFromMemory(
+		render, 
+		GrafkitData::effectCopyScreenEntry, 
+		GrafkitData::effectShader, strlen(GrafkitData::effectShader),
+		"CopyScreen"
+	);
 
 	m_screen_params.s = float4(0, 0, 0, 0);
 	m_screen_params.v = float4(0, 0, 0, 0);
@@ -111,10 +69,7 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	}
 
 	// --- 
-	m_fullscreenquad = new Mesh();
-	m_fullscreenquad->AddPointer("POSITION", sizeof(GrafkitData::quad[0]) * 4 * 4, GrafkitData::quad);
-	m_fullscreenquad->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord[0]) * 4 * 4, GrafkitData::quad_texcoord);
-	m_fullscreenquad->SetIndices(4, 6, GrafkitData::quadIndices);
+	m_fullscreenquad = GrafkitData::CreateQuad();
 	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
 
 	for (auto it = m_effectChain.begin(); it != m_effectChain.end(); ++it) {

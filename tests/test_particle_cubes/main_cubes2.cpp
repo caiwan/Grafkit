@@ -20,6 +20,8 @@
 
 #include "generator/SceneLoader.h"
 
+#include "render/compute.h"
+
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
@@ -64,15 +66,18 @@ protected:
 	Renderer render;
 	SceneResRef scene;
 
-	TextureSamplerRef m_textureSampler;
+	TextureSamplerRef textureSampler;
 
-	ActorRef m_rootActor;
-	ActorRef m_cameraActor;
+	ActorRef rootActor;
+	ActorRef cameraActor;
 
 	float t;
 
-	ShaderResRef m_vertexShader;
-	ShaderResRef m_fragmentShader;
+	ShaderResRef vs;
+	ShaderResRef fs;
+
+	ComputeRef liquidCompute;
+	ShaderResRef fsLiquid;
 
 	int init() {
 
@@ -84,12 +89,14 @@ protected:
 		texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 		// -- texture sampler
-		m_textureSampler = new TextureSampler();
-		m_textureSampler->Initialize(render);
+		textureSampler = new TextureSampler();
+		textureSampler->Initialize(render);
 
 		// -- load shader
-		m_vertexShader = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertexgroups.hlsl", ""));
-		m_fragmentShader = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertexgroups.hlsl", ""));
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+
+		fsLiquid = Load<ShaderRes>(new PixelShaderLoader("LiquidCompute", "shaders/liquid.hlsl", "LiquidCompute"));
 
 		// -- precalc
 		this->DoPrecalc();
@@ -101,14 +108,14 @@ protected:
 		model->GetMaterial()->SetName("GridMaterial");
 
 		model->SetName("cube");
-		model->GetMesh()->Build(render, m_vertexShader);
+		model->GetMesh()->Build(render, vs);
 
 		// -- setup scene 
 		scene = new SceneRes(new Scene());
 
-		m_cameraActor = new Actor();
-		m_cameraActor->SetName("cameraNode");
-		m_cameraActor->AddEntity(camera);
+		cameraActor = new Actor();
+		cameraActor->SetName("cameraNode");
+		cameraActor->AddEntity(camera);
 
 		/* Kocka kozepen */
 		ActorRef modelActor = new Actor(model);
@@ -117,33 +124,42 @@ protected:
 		/*
 		Add cubes to the root
 		*/
-		m_rootActor = new Actor();
-		m_rootActor->SetName("root");
-		m_rootActor->AddChild(m_cameraActor);
-		m_rootActor->AddChild(modelActor);
+		rootActor = new Actor();
+		rootActor->SetName("root");
+		rootActor->AddChild(cameraActor);
+		rootActor->AddChild(modelActor);
 
-		scene->Get()->Initialize(m_rootActor);
+		scene->Get()->Initialize(rootActor);
 
 		scene->Get()->SetActiveCamera(0);
 
 		// add shaders
-		scene->Get()->SetVShader(m_vertexShader);
-		scene->Get()->SetPShader(m_fragmentShader);
+		scene->Get()->SetVShader(vs);
+		scene->Get()->SetPShader(fs);
 
-		m_cameraActor->Matrix().Identity();
-		m_cameraActor->Matrix().LookAtLH(float3(100, 100, 100));
+		cameraActor->Matrix().Identity();
+		cameraActor->Matrix().LookAtLH(float3(100, 100, 100));
+
+		// ps based compute shader mockup
+		liquidCompute = new Compute();
+		liquidCompute->AddChannel("age");
+		liquidCompute->AddChannel("velocity");
+		liquidCompute->AddChannel("speed");
+		liquidCompute->AddChannel("position");
+
+		liquidCompute->Initialize(render, fsLiquid, CUBEW);
 
 		/* ------------------------------------------------------------ */
 
 		this->DoPrecalc();
 
-		scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);
+		scene->Get()->BuildScene(render, vs, fs);
 		scene->Get()->SetActiveCamera(0);
 
 		// --- 
 
-		m_rootActor = scene->Get()->GetRootNode();
-		m_cameraActor = scene->Get()->GetActiveCameraNode();
+		rootActor = scene->Get()->GetRootNode();
+		cameraActor = scene->Get()->GetActiveCameraNode();
 
 		this->t = 0;
 
@@ -172,6 +188,9 @@ protected:
 	struct cube_params_t cube_params;
 
 	int mainloop() {
+
+		liquidCompute->Render(render);
+
 		cube_params.cubew = CUBEW;
 		cube_params.cubeh = CUBEH;
 
@@ -183,7 +202,8 @@ protected:
 
 		this->render.BeginSceneDev();
 		{
-			(*m_vertexShader)->SetParamT(render, "cube_params", cube_params);
+			liquidCompute->BindOutputs(render, (*vs));
+			(*vs)->SetParamT(render, "cube_params", cube_params);
 			scene->Get()->PreRender(render);
 			scene->Get()->Render(render);
 
