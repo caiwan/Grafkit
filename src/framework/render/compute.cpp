@@ -158,5 +158,5 @@ void Grafkit::Compute::SwapBuffers()
 {
 	auto tmp = outputChannels;
 	outputChannels = inputChannels;
-	inputChannels = outputChannels;
+	inputChannels = tmp;
 }

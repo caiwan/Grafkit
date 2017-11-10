@@ -93,7 +93,7 @@ protected:
 		textureSampler->Initialize(render);
 
 		// -- load shader
-		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertexgroups.hlsl", ""));
+		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertexparticle.hlsl", ""));
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
 		fsLiquid = Load<ShaderRes>(new PixelShaderLoader("LiquidCompute", "shaders/liquid.hlsl", "LiquidCompute"));
@@ -142,10 +142,10 @@ protected:
 
 		// ps based compute shader mockup
 		liquidCompute = new Compute();
-		liquidCompute->AddChannel("age");
-		liquidCompute->AddChannel("velocity");
-		liquidCompute->AddChannel("speed");
-		liquidCompute->AddChannel("position");
+		liquidCompute->AddChannel("tex_age");
+		liquidCompute->AddChannel("tex_velocity");
+		liquidCompute->AddChannel("tex_speed");
+		liquidCompute->AddChannel("tex_position");
 
 		liquidCompute->Initialize(render, fsLiquid, CUBEW);
 
@@ -173,37 +173,13 @@ protected:
 	};
 
 	// ==================================================================================================================
-
-	struct cube_params_t {
-		cube_params_t() {}
-		union {
-			struct {
-				int cubew, cubeh;
-			};
-			char _0[16];
-		};
-		float4 p[CUBEW];
-	};
-
-	struct cube_params_t cube_params;
-
 	int mainloop() {
 
 		liquidCompute->Render(render);
 
-		cube_params.cubew = CUBEW;
-		cube_params.cubeh = CUBEH;
-
-		for (int i = 0; i < 64; i++) {
-			cube_params.p[i] = float4(0, 0, 0, 0);
-			cube_params.p[i].x = fbm(float2(t, (float)i / 64.));
-			cube_params.p[i].y = fbm(float2((float)i / 64., t));
-		}
-
 		this->render.BeginSceneDev();
 		{
 			liquidCompute->BindOutputs(render, (*vs));
-			(*vs)->SetParamT(render, "cube_params", cube_params);
 			scene->Get()->PreRender(render);
 			scene->Get()->Render(render);
 
