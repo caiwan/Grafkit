@@ -489,7 +489,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		elem.desc = elementDesc;
 
 		// count elements for numbering if an input array was specified
-		elem.name = input_desc.SemanticName;
+		elem.name = std::string(input_desc.SemanticName); // sor some reason implicit casting fails on some build (on VS15)
 
 		auto elemit = elemcount.find(elem.name);
 		if (elemit == elemcount.end()) {
