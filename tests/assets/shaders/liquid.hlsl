@@ -103,7 +103,7 @@ ModelOutput LiquidCompute(FXPixelInputType input) : SV_TARGET
     output.position = position + output.speed;
     output.position.w = 1;
     
-    age += 1 * .25 * pow(length(output.speed), 2) * 0.0625 * pow(length(output.velocity),4);
+    age += 2 * .25 * pow(length(output.speed), 2) * 0.0625 * pow(length(output.velocity),4);
 
     if (age >= 1000.)
     {		

@@ -56,7 +56,11 @@ public:
 		this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 		// init file loader
+#ifndef LIVE_RELEASE
 		this->m_file_loader = new FileAssetFactory("./../assets/");
+#else
+		this->m_file_loader = new FileAssetFactory("./assets/");
+#endif
 	}
 
 	~Application() {
