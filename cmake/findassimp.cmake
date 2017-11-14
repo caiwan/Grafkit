@@ -22,17 +22,20 @@ if(WIN32)
 	endif(MSVC12)
 	
 	if(MSVC12 OR MSVC14)
-	
+    
+        # WHY THIS CRAP DOES NOT WORK, BUT THE CRAP ABOVE DOES 
+        get_filename_component(ASSIMP_ROOT_DIR ${ASSIMP_INCLUDE_DIR}/../ ABSOLUTE)
+        
 		find_path(ASSIMP_LIBRARY_DIR
 			NAMES
-				assimp-${ASSIMP_MSVC_VERSION}-mt.lib assimp-${ASSIMP_MSVC_VERSION}-mtd.lib
-			HINTS
+				"assimp-${ASSIMP_MSVC_VERSION}-mt.lib" "assimp-${ASSIMP_MSVC_VERSION}-mtd.lib"
+			PATHS
 				${ASSIMP_ROOT_DIR}/lib
 		)
 		
 		find_path(ASSIMP_DLL_DIR
 			NAMES
-				assimp-${ASSIMP_MSVC_VERSION}-mt.dll assimp-${ASSIMP_MSVC_VERSION}-mt.dll 
+				assimp-${ASSIMP_MSVC_VERSION}-mt.dll assimp-${ASSIMP_MSVC_VERSION}-mtd.dll 
 			HINTS
 				${ASSIMP_ROOT_DIR}/bin
 		)

@@ -87,6 +87,8 @@ namespace Grafkit
 		ID3D11RenderTargetView* GetRenderTargetView() const { return this->m_pTargetView; }
 		ID3D11Resource* GetTextureResource() const { return this->m_pTexture; }
 
+		operator ID3D11ShaderResourceView*() const { return this->m_pResourceView; }
+
 		void SetRenderTargetView(Renderer & device, size_t id = 0) const;
 
 		void Update(Renderer & device, const void* data, size_t index = 0);
