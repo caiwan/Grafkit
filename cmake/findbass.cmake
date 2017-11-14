@@ -16,5 +16,5 @@ find_library(BASS_LIBRARY_RELEASE        bass.lib  PATHS ${BASS_ROOT_DIR}/c/${BA
 
 # Copy bass to static && install dest
 function(bass_copy_binaries TARGET_PROJECT TARGET_DIR)
-	file(COPY "${BASS_DLL_DIR}/bass.dll" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+	file(COPY "${BASS_DLL_DIR}/bass.dll" DESTINATION "${TARGET_DIR}")
 endfunction(bass_copy_binaries)

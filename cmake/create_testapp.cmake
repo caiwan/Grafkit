@@ -8,7 +8,10 @@ function(create_testapp _application)
 	include_directories("${CMAKE_SOURCE_DIR}")
 	include_directories("${GK2_INCLUDE_DIR}")
 
-	add_executable(${_application} EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES})
+    set(ASSET_DIR ${CMAKE_BINARY_DIR}/assets)
+    
+	add_executable(${_application} ${SOURCE_FILES} ${HEADER_FILES})
+    set_target_properties(${_application} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${ASSET_DIR}")
 
 	target_link_libraries(${_application} Grafkit2)
 	target_include_directories(${_application} PUBLIC include)
