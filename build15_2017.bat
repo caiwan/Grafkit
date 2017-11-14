@@ -10,5 +10,5 @@ cd ..
 
 python src\tools\sln_disable_shader_compil.py msvc/
 
-cmake --build ./msvc.build --target install
+cmake --build ./msvc.build --target install --config MinSizeRel
 
