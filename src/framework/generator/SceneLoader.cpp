@@ -465,7 +465,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IRes
 			PERSIST_STRING(ar, tx.second);
 
 			if (!ar.IsStoring()) {
-				TextureResRef texture = resman->Get<TextureRes>(tx.first);
+				TextureResRef texture = resman->Get<Texture2DRes>(tx.first);
 				material->AddTexture(texture, tx.second);
 			}
 		}

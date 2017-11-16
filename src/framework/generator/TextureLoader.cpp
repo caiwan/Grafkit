@@ -154,7 +154,7 @@ Grafkit::TextureNoiseMap::TextureNoiseMap(size_t size) : TextureFromBitmap("NOIS
 
 void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
 {
-	TextureResRef dstTexture = dynamic_cast<TextureRes*>(source);
+	TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
 	if (dstTexture.Invalid()) {
 		throw new EX(NullPointerException);
 	}
