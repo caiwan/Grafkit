@@ -44,7 +44,7 @@ Grafkit::TextureFromBitmap::~TextureFromBitmap()
 
 void Grafkit::TextureFromBitmap::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
 {
-	TextureResRef dstTexture = dynamic_cast<TextureRes*>(source);
+	TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
 	if (dstTexture.Invalid()) {
 		throw new EX(NullPointerException);
 	}
@@ -79,7 +79,7 @@ void Grafkit::TextureFromBitmap::Load(Grafkit::IResourceManager * const & resman
 
 IResource * Grafkit::ITextureBuilder::NewResource()
 {
-	return new TextureRes;
+	return new Texture2DRes;
 }
 
 /*
