@@ -8,7 +8,7 @@
 namespace Grafkit {
 
 	class Shader;
-	
+
 	class Vertexshader;
 	class PixelShader;
 	class GemoetryShader;
@@ -21,7 +21,7 @@ namespace Grafkit {
 	// ---
 	class Scene;
 	typedef Ref<Scene> SceneRef;
-	
+
 	typedef Resource<Scene> SceneRes;
 	typedef Ref<SceneRes> SceneResRef;
 
@@ -44,7 +44,7 @@ namespace Grafkit {
 
 	class Entity3D;
 	typedef Ref<Entity3D> Entity3DRef;
-	
+
 	class Camera;
 	typedef Ref<Camera> CameraRef;
 
@@ -53,13 +53,20 @@ namespace Grafkit {
 
 	// ---
 	class Bitmap;
+	class Texture1D;
 	class Texture2D;
-	class Cubemap;
 	class TextureCube;
 
+	typedef Ref<Texture1D> Texture1DRef;
+	typedef Resource<Texture1D> Texture1DRes;
+	typedef Ref<Texture1DRes> Texture1DResRef;
+
+	typedef Ref<Texture2D> Texture2DRef;
+	typedef Resource<Texture2D> Texture2DRes;
+	typedef Ref<Texture2DRes> Texture2DResRef;
+
 	typedef Ref<Texture2D> TextureRef;
-	typedef Resource<Texture2D> TextureRes;
-	typedef Ref<TextureRes> TextureResRef;
+	typedef Ref<Texture2DRes> TextureResRef;
 
 	typedef Ref<TextureCube> TextureCubeRef;
 	typedef Resource<TextureCube> TextureCubeRes;

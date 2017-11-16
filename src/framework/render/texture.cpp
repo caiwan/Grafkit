@@ -152,6 +152,16 @@ void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap, size_t
 
 // ========================================================================================================================
 
+void Grafkit::Texture1D::Initialize(Renderer & device, size_t w)
+{
+	m_w = w;
+	m_h = 0;
+	m_d = 0;
+	m_ch = 1;
+	m_chW = 4;
+	this->CreateTexture(device, DXGI_FORMAT_R32_FLOAT, w, nullptr);
+}
+
 void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, const float * data)
 {
 	m_w = w;
@@ -160,6 +170,16 @@ void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, const float * d
 	m_ch = 1;
 	m_chW = 4;
 	this->CreateTexture(device, DXGI_FORMAT_R32_FLOAT, w, data);
+}
+
+void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, const float4 * data)
+{
+	m_w = w;
+	m_h = 0;
+	m_d = 0;
+	m_ch = 1;
+	m_chW = 4;
+	this->CreateTexture(device, DXGI_FORMAT_R32G32B32A32_FLOAT, w, data);
 }
 
 void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, size_t w, const void * initaldata)
@@ -209,8 +229,6 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 }
-
-
 
 // ========================================================================================================================
 

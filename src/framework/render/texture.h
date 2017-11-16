@@ -127,7 +127,9 @@ namespace Grafkit
 		~Texture1D() {}
 
 		/// inits with 32 bit float 1D texture (array) 
-		void Initialize(Renderer & device, size_t w = 0, const float* data = nullptr);
+		void Initialize(Renderer & device, size_t w);
+		void Initialize(Renderer & device, size_t w, const float* data);
+		void Initialize(Renderer & device, size_t w, const float4* data);
 
 		ID3D11Texture1D* GetTexture1D() { return (ID3D11Texture1D*)this->m_pTexture; }
 
@@ -205,6 +207,7 @@ namespace Grafkit
 		void Shutdown();
 
 		ID3D11SamplerState*	GetSamplerState() { return this->m_pSamplerState; }
+		operator ID3D11SamplerState*() { return this->m_pSamplerState; }
 
 	private:
 		ID3D11SamplerState *m_pSamplerState;

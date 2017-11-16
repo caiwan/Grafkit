@@ -17,26 +17,11 @@
 #include "../utils/exceptions.h"
 #include "../utils/memory.h"
 
-
 #define RENDER_TARGET_MAX 8
 
 using namespace DirectX;
 
 namespace Grafkit {
-
-	class Camera;
-	class Model;
-	class Shader;
-	class Texture2D;
-
-	// typedefs for reference counting
-	typedef Ref<Camera> CameraRef;
-	typedef Ref<Model> ModelRef;
-
-	// class ShaderRef;
-	// typedef Ref<Texture> TextureRef;
-	// class TextureRef;
-
 	/**
 		Core renderer
 		**Hack**: Extended ID3D11Device via reference counting, gives direct access to the deive with `operator ->` .
