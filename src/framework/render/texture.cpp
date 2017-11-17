@@ -38,8 +38,8 @@ namespace {
 Grafkit::ATexture::ATexture() :
 	m_pResourceView(nullptr), m_pTargetView(nullptr), m_pTexture(nullptr),
 	//m_mipSlices(0), m_mipLevels(0), 
-	m_w(0), m_h(0), m_d(0),
-	m_ch(0), m_chW(0)
+	width(0), height(0), depth(0),
+	channels(0), channelWidth(0)
 {
 }
 
@@ -117,9 +117,9 @@ void Grafkit::ATexture::Update(Renderer & device, const void * bitmap, size_t in
 {
 	size_t len = 0;
 	switch (GetDimension()) {
-	case 1:	len = m_ch * m_chW * m_w; break;
-	case 2:	len = m_ch * m_chW * m_w * m_h; break;
-	case 3: len = m_ch * m_chW * m_w * m_h * m_d; break;
+	case 1:	len = channels * channelWidth * width; break;
+	case 2:	len = channels * channelWidth * width * height; break;
+	case 3: len = channels * channelWidth * width * height * depth; break;
 	default:  return;
 	}
 
@@ -145,40 +145,43 @@ void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap, size_t
 	}
 	else
 	{
-		UpdateTexture(device, data, w * h * ch * m_chW, index);
+		UpdateTexture(device, data, w * h * ch * channelWidth, index);
 	}
 
 }
 
 // ========================================================================================================================
 
-void Grafkit::Texture1D::Initialize(Renderer & device, size_t w)
+void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, size_t components)
 {
-	m_w = w;
-	m_h = 0;
-	m_d = 0;
-	m_ch = 1;
-	m_chW = 4;
-	this->CreateTexture(device, DXGI_FORMAT_R32_FLOAT, w, nullptr);
+	this->SetDimm(w, 0, 0, components, 4);
+	
+	DXGI_FORMAT fmt = DXGI_FORMAT_R32_FLOAT;
+	switch (channels)
+	{
+	case 4:
+	case 3:
+		channels = 4;
+		fmt = DXGI_FORMAT_R32G32B32A32_FLOAT; break;
+	case 2:
+		fmt = DXGI_FORMAT_R32G32_FLOAT; break;
+	case 1:
+	default:
+		break;
+	}
+
+	this->CreateTexture(device, fmt, w, nullptr);
 }
 
 void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, const float * data)
 {
-	m_w = w;
-	m_h = 0;
-	m_d = 0;
-	m_ch = 1;
-	m_chW = 4;
+	this->SetDimm(w, 0, 0, 1, 4);
 	this->CreateTexture(device, DXGI_FORMAT_R32_FLOAT, w, data);
 }
 
 void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, const float4 * data)
 {
-	m_w = w;
-	m_h = 0;
-	m_d = 0;
-	m_ch = 1;
-	m_chW = 4;
+	this->SetDimm(w, 0, 0, 4, 4);
 	this->CreateTexture(device, DXGI_FORMAT_R32G32B32A32_FLOAT, w, data);
 }
 
@@ -191,7 +194,7 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	// ... 
 	D3D11_TEXTURE1D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	textureDesc.Width = m_w;
+	textureDesc.Width = width;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = format;
@@ -205,7 +208,7 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	if (initaldata) {
 		// ... 
 		subresData.pSysMem = initaldata;
-		subresData.SysMemPitch = m_w * m_chW;
+		subresData.SysMemPitch = width * channelWidth;
 		subresData.SysMemSlicePitch = 0;
 		pData = &subresData;
 	}
@@ -213,7 +216,8 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	ID3D11Texture1D *ppTex = nullptr;
 	result = device->CreateTexture1D(&textureDesc, pData, &ppTex);
 
-	if (FAILED(result)) throw new EX(TextureCreateException);
+	if (FAILED(result)) 
+		throw new EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;
 
@@ -228,6 +232,10 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	shaderResourceViewDesc.Texture1D.MipLevels = -1;
 
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
+
+	if (FAILED(result))
+		throw new EX_HRESULT(ShaderResourceViewException, result);
+
 }
 
 // ========================================================================================================================
@@ -250,10 +258,10 @@ void Grafkit::Texture2D::Initialize(Renderer & device, int w, int h)
 	DXGI_FORMAT fmt;
 #ifdef USE_SRGB_TEXTURE
 	fmt = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-#else
+#else // USE_SRGB_TEXTURE
 	fmt = DXGI_FORMAT_R8G8B8A8_UNORM;
-#endif
-	//this->CrateTexture(device, fmt, 4, 1, w, h, 0, false, false);
+#endif // USE_SRGB_TEXTURE
+
 	CreateTextureTarget(device, fmt, 4, 1, w, h);
 }
 
@@ -276,28 +284,24 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 {
 	HRESULT result;
 
-	m_ch = channels;
-	m_chW = 1;
-	m_w = w;
-	m_h = h;
-	m_d = 0;
+	this->SetDimm(w, h, 0, channels, 1);
 
-	if (!m_w && !m_h) {
+	if (!width && !height) {
 		int sw = 0, sh = 0;
 		device.GetScreenSize(sw, sh);
-		m_w = sw, m_h = sh;
+		width = sw, height = sh;
 	}
-	else if (!m_w || !m_h || m_w != m_h) {
+	else if (!width || !height || width != height) {
 		DebugBreak();
 		return;
 	}
 
-	int miplevels = floor(log2f(m_w));
+	int miplevels = floor(log2f(width));
 
 	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	textureDesc.Width = m_w;
-	textureDesc.Height = m_h;
+	textureDesc.Width = width;
+	textureDesc.Height = height;
 	textureDesc.MipLevels = miplevels;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = format;
@@ -313,23 +317,23 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	if (initialData) {
 		pData[0].pSysMem = initialData;
 		pData[0].SysMemSlicePitch = 0;
-		if (m_ch == 3) {
-			m_ch = 4;
-			unsigned char *data = new unsigned char[m_w * m_h * m_ch * m_chW];
-			CopyChannel3To4(initialData, data, m_w, m_h);
+		if (channels == 3) {
+			channels = 4;
+			unsigned char *data = new unsigned char[width * height * channels * channelWidth];
+			CopyChannel3To4(initialData, data, width, height);
 			pData[0].pSysMem = data;
 		}
-		pData[0].SysMemPitch = m_w * m_ch;
+		pData[0].SysMemPitch = width * channels;
 
-		size_t s = m_w * m_h * m_ch * m_chW;
-		size_t ww = m_w;
+		size_t s = width * height * channels * channelWidth;
+		size_t ww = width;
 
 		for (int i = 1; i < miplevels; i++) {
 			s = s / 2;
 			ww = ww / 2;
 			unsigned char *data = new unsigned char[s];
 			pData[i].pSysMem = data;
-			pData[i].SysMemPitch = ww*m_chW;
+			pData[i].SysMemPitch = ww*channelWidth;
 			pData[i].SysMemSlicePitch = 0;
 		}
 	}
@@ -356,7 +360,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 
 	if (FAILED(result))
-		throw new EX(ShaderResourceViewException);
+		throw new EX_HRESULT(ShaderResourceViewException, result);
 
 	device.GetDeviceContext()->GenerateMips(m_pResourceView);
 
@@ -369,18 +373,14 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 {
 	HRESULT result;
 
-	m_ch = channels;
-	m_chW = 1;
-	m_w = w;
-	m_h = h;
-	m_d = 0;
+	this->SetDimm(w, h, 0, channels, 1);
 
-	if (!m_w && !m_h) {
+	if (!width && !height) {
 		int sw = 0, sh = 0;
 		device.GetScreenSize(sw, sh);
-		m_w = sw, m_h = sh;
+		width = sw, height = sh;
 	}
-	else if (!m_w || !m_h) {
+	else if (!width || !height) {
 		return;
 	}
 
@@ -389,8 +389,8 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 
 	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	textureDesc.Width = m_w;
-	textureDesc.Height = m_h;
+	textureDesc.Width = width;
+	textureDesc.Height = height;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = format;
@@ -405,7 +405,8 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	ID3D11Texture2D *ppTex = nullptr;
 	result = device->CreateTexture2D(&textureDesc, nullptr, &ppTex);
 
-	if (FAILED(result)) throw new EX(TextureCreateException);
+	if (FAILED(result)) 
+		throw new EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;
 
@@ -421,7 +422,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 
 	if (FAILED(result))
-		throw new EX(ShaderResourceViewException);
+		throw new EX_HRESULT(ShaderResourceViewException, result);
 
 	// RTV
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
@@ -449,15 +450,12 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 	int ch = bitmap->GetCh();
 	DXGI_FORMAT format = bitmapformats[ch % 5];
 
-	m_w = cubemap->GetPosX()->GetX();
-	m_h = cubemap->GetPosX()->GetY();
-	m_ch = (m_ch == 3) ? 4 : ch; // if bitmap has 3 component per pixel, we'll force it to 4 and convert it before creating initial data
-	m_chW = 1;
+	this->SetDimm(cubemap->GetPosX()->GetX(), cubemap->GetPosX()->GetY(), 0, (channels == 3) ? 4 : ch, 1);
 
 	D3D11_TEXTURE2D_DESC textureDesc;
 	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	textureDesc.Width = m_w;
-	textureDesc.Height = m_h;
+	textureDesc.Width = width;
+	textureDesc.Height = height;
 	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 6;
 	textureDesc.Format = format;
@@ -475,11 +473,11 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 		void *inData = cubemap->GetBitmap(i)->GetData();
 		void *outData = inData;
 		if (cubemap->GetBitmap(i)->GetCh() == 3) {
-			outData = new unsigned int[m_w * m_h];
-			CopyChannel3To4(inData, outData, m_w, m_h);
+			outData = new unsigned int[width * height];
+			CopyChannel3To4(inData, outData, width, height);
 		}
 		pData[i].pSysMem = outData;
-		pData[i].SysMemPitch = m_w * 4;
+		pData[i].SysMemPitch = width * 4;
 		pData[i].SysMemSlicePitch = 0;
 	}
 

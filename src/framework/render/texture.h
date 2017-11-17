@@ -107,7 +107,14 @@ namespace Grafkit
 	protected:
 		ID3D11Resource * m_pTexture;
 
-		size_t m_w, m_h, m_d, m_ch, m_chW;
+		void SetDimm(size_t w = 0, size_t h = 0, size_t d = 0, size_t ch = 0, size_t chw = 0) {
+			width = w, height = h, depth = d, channels = ch, channelWidth = chw;
+		}
+
+		// width, height, depth
+		size_t width, height, depth;
+		// number of channels, one channel size in byte
+		size_t channels, channelWidth;
 
 		ID3D11ShaderResourceView * m_pResourceView;
 		ID3D11RenderTargetView * m_pTargetView;
@@ -127,7 +134,7 @@ namespace Grafkit
 		~Texture1D() {}
 
 		/// inits with 32 bit float 1D texture (array) 
-		void Initialize(Renderer & device, size_t w);
+		void Initialize(Renderer & device, size_t w, size_t components = 1);
 		void Initialize(Renderer & device, size_t w, const float* data);
 		void Initialize(Renderer & device, size_t w, const float4* data);
 
