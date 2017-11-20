@@ -76,6 +76,9 @@ namespace Grafkit {
 
 	// ---------------------------------------------------------------------------------------------------
 
+#if 1
+	typedef EffectComposerRef_t EffectComposerRef;
+#else 
 	class EffectComposerRef : public EffectComposerRef_t {
 	public:
 		EffectComposerRef() : EffectComposerRef_t() {}
@@ -84,7 +87,7 @@ namespace Grafkit {
 
 		EffectPassRef operator [] (int id) { return Valid() ? this->ptr->GetEffect(id) : EffectPassRef(); }
 	};
-
+#endif 
 	// ===================================================================================================
 
 	__declspec(align(16)) class EffectPass : virtual public Referencable, public AlignedNew<EffectPass>

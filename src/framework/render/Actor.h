@@ -35,8 +35,8 @@ namespace Grafkit {
 		virtual void serialize(Archive& ar) = 0;
 	};
 
-	class Actor;
-	typedef Ref<Actor> ActorRef;
+	//class Actor;
+	//typedef Ref<Actor> ActorRef;
 
 	/**
 	An actor node - ez a scenegraph es a nodeja
