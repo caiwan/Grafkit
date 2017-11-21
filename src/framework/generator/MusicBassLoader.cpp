@@ -26,6 +26,7 @@ namespace {
 		virtual void Stop();
 		virtual void Pause(bool e);
 		virtual void Update();
+		virtual void ToggleMute();
 
 		virtual unsigned long GetTimeSample();
 		virtual void SetTimeSample(unsigned long t);
@@ -39,11 +40,14 @@ namespace {
 
 		Grafkit::IAssetRef m_asset;
 
+	private:
+		bool m_isMute;
+
 	};
 
 	MusicBass::MusicBass() : Music(),
 		m_stream(0),
-		m_asset()
+		m_asset(), m_isMute(false)
 	{
 	}
 
@@ -83,14 +87,14 @@ namespace {
 		BASS_ChannelGetInfo(m_stream, &info);
 
 		m_length = BASS_ChannelGetLength(m_stream, BASS_POS_BYTE);
-		
+
 		// length in byte -> samples 
-		int sstride = 2; 
+		int sstride = 2;
 		if (info.flags & BASS_SAMPLE_8BITS) sstride = 1; else if (info.flags & BASS_SAMPLE_FLOAT) sstride = 4;
 
 		m_samplePerSec = info.freq * sstride * info.chans;
-	
-		
+
+
 	}
 
 	void MusicBass::Shutdown()
@@ -127,6 +131,15 @@ namespace {
 		BASS_Update(0);
 	}
 
+	void MusicBass::ToggleMute()
+	{
+		if (!m_isMute)
+			BASS_ChannelSetAttribute(m_stream, BASS_ATTRIB_VOL, 0.0f);
+		else
+			BASS_ChannelSetAttribute(m_stream, BASS_ATTRIB_VOL, 1.0f);
+		m_isMute = !m_isMute;
+	}
+
 	unsigned long MusicBass::GetTimeSample()
 	{
 		QWORD pos = BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE);
@@ -150,7 +163,7 @@ namespace {
 
 	// taken from Gargaj 
 	// https://github.com/Gargaj/Bonzomatic/blob/e1aa90ba5c47a6aa61bcf754a634d09e2ef23f81/src/platform_common/FFT.cpp#L28
-	bool MusicBass::GetFFT(float* ptr, int segcount) 
+	bool MusicBass::GetFFT(float* ptr, int segcount)
 	{
 		unsigned int len = 0;
 

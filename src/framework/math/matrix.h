@@ -119,7 +119,6 @@ namespace Grafkit {
 			dxvector cv = XMLoadFloat3(&c);
 			dxvector uv = XMLoadFloat3(&u);
 			mat = DirectX::XMMatrixLookAtLH(ev, cv, uv);
-			//Invert(); // something goez wrong w/ the matrix
 		}
 
 		void LookAtRH(const float3 &e, const float3 &c = float3(), const float3 & u = float3(0, 1, 0)) {
@@ -127,7 +126,6 @@ namespace Grafkit {
 			dxvector cv = XMLoadFloat3(&c);
 			dxvector uv = XMLoadFloat3(&u);
 			mat = DirectX::XMMatrixLookAtRH(ev, cv, uv);
-			//Invert(); // something goez wrong w/ the matrix
 		}
 
 		/// Transpose matrix

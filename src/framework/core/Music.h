@@ -24,6 +24,8 @@ namespace Grafkit {
 		virtual void Pause(bool e) = 0; ///< set pause flag e == true = paused
 		virtual void Update() = 0;
 
+		virtual void ToggleMute() {}
+
 		virtual unsigned long GetTimeSample() = 0;	///< idot visszaadja sampleben
 		virtual void SetTimeSample(unsigned long t) = 0;	///< kurzort samplera allitja
 		virtual void SetLoop(bool e) = 0;	//< loop ki/be
