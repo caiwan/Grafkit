@@ -99,7 +99,7 @@ protected:
 
 	int init() {
 
-		texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
+		texture = this->Load<Texture2DRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
@@ -164,7 +164,7 @@ protected:
 #endif
 		// -- generate some random texture
 
-		noiseMap = Load<TextureRes>(new TextureNoiseMap(256));
+		noiseMap = Load<Texture2DRes>(new TextureNoiseMap(256));
 
 		kernels = new float4[128];
 		Halton3D::HemiSphereDistribution(kernels, 128);

@@ -214,18 +214,15 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 		return;
 
 	render.SetRenderTargetView();
+	render.ApplyRenderTargetView();
 	render.BeginScene();
 
 	m_shaderFullscreenQuad->Bind(render);
 
 	m_shaderCopyScreen->SetShaderResourceView(render, "effectInput", m_pTexRead->GetShaderResourceView());
-
 	m_shaderCopyScreen->Bind(render);
-
 	m_fullscreenquad->RenderMesh(render);
-
 	m_shaderCopyScreen->Unbind(render);
-
 	m_shaderFullscreenQuad->Unbind(render);
 
 	this->FlushBuffers();
