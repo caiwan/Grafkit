@@ -8,7 +8,7 @@ function(create_testapp _application)
 	include_directories("${CMAKE_SOURCE_DIR}")
 	include_directories("${GK2_INCLUDE_DIR}")
 
-    set(ASSET_DIR ${CMAKE_BINARY_DIR}/assets)
+    set(ASSET_DIR ${CMAKE_BINARY_DIR}/tests/assets)
     
 	add_executable(${_application} ${SOURCE_FILES} ${HEADER_FILES})
     set_target_properties(${_application} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${ASSET_DIR}")
