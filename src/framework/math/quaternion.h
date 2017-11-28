@@ -78,16 +78,6 @@ namespace Grafkit {
 			return res;
 		}
 
-		float3 ToEulerAngle() {
-
-			// folytkov https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-
-			dxvector euler (q);
-			float3 res;
-			DirectX::XMStoreFloat3(&res, euler);
-			return res;
-		}
-
 		operator float4() const {
 			float4 res;
 			DirectX::XMStoreFloat4(&res, q);

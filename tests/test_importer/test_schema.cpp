@@ -111,7 +111,9 @@ TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkCoords_then_success)
 	// 
 	ASSERT_FALSE(cube.Invalid());
 
-	// 
+	// TODO: assert cube 
+
+	// --- camera
 	ASSERT_FALSE(camera.Invalid());
 
 	float3 cameraPos;
@@ -120,14 +122,14 @@ TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkCoords_then_success)
 	ASSERT_TRUE(camera->Matrix().Decompose(cameraPos, cameraOirentation, cameraScale));
 	
 	ASSERT_FLOAT3_EQ(float3(7.48113, -6.50764, -5.34367), cameraPos);
-	
-	float3 rotation = cameraOirentation.ToEulerAngle();
-	rotation.x *= RAD_DEG;
-	rotation.y *= RAD_DEG;
-	rotation.z *= RAD_DEG;
-	ASSERT_FLOAT3_EQ(float3(63.559, 0, 46.692), rotation);
 
-	//
+	Quaternion orientation = Quaternion::fromEuler(63.559*DEG_RAD, 0, 46.692*DEG_RAD);
+	float4 orientationVector = orientation.ToAxisAngle();
+	float4 cameraOrientationVector = cameraOirentation.ToAxisAngle();
+
+	ASSERT_FLOAT4_EQ(orientationVector, cameraOrientationVector);
+
+	// --- light
 	ASSERT_FALSE(light.Invalid());
 
 }

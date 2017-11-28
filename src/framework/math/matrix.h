@@ -171,11 +171,11 @@ namespace Grafkit {
 		}
 
 		const bool Decompose(float3 &outTranslation, Quaternion &outOrientation, float3 &outScale) {
-			dxvector loc, rot, scale;
-			bool res = DirectX::XMMatrixDecompose(&scale, &rot, &loc, mat);
-			DirectX::XMStoreFloat3(&outTranslation, loc);
-			outOrientation = Quaternion(scale);
-			DirectX::XMStoreFloat3(&outScale, rot);
+			dxvector translation, orientation, scale;
+			bool res = DirectX::XMMatrixDecompose(&scale, &orientation, &translation, mat);
+			DirectX::XMStoreFloat3(&outTranslation, translation);
+			outOrientation = Quaternion(orientation);
+			DirectX::XMStoreFloat3(&outScale, scale);
 			return res;
 		}
 

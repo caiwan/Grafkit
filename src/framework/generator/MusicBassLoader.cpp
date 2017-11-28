@@ -66,18 +66,26 @@ namespace {
 
 		int res = BASS_Init(-1, 44100, 0, 0, 0);
 
+		bool isNosound = false;
 		if (!res) {
-			// int errcode = BASS_ErrorGetCode();
-			throw new EX(MusicDeviceInitException);
+			
+			// ignore sound if no sound device detected or installed
+			int errcode = BASS_ErrorGetCode();
+			if (errcode == 23) {
+				res = BASS_Init(0, 44100, 0, 0, 0);
+				isNosound = true;
+			}
+			if (!res) 
+				throw new EX(MusicDeviceInitException);
 		}
 
 		m_stream = BASS_StreamCreateFile(TRUE, data, 0, data_size,
-			BASS_STREAM_PRESCAN |
+			BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) |
 			0
 		);
 
 		if (!m_stream) {
-			//int errcode = BASS_ErrorGetCode();
+			int errcode = BASS_ErrorGetCode();
 			throw new EX(MusicDeviceInitException);
 		}
 
@@ -93,7 +101,6 @@ namespace {
 		if (info.flags & BASS_SAMPLE_8BITS) sstride = 1; else if (info.flags & BASS_SAMPLE_FLOAT) sstride = 4;
 
 		m_samplePerSec = info.freq * sstride * info.chans;
-
 
 	}
 
