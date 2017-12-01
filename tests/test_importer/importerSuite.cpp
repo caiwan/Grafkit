@@ -26,8 +26,11 @@ void ImporterSuite::Execute(const char * name)
 #endif
 
 	blender->AddArgument("host", GetHost());
-	if (name)
-		blender->AddArgument("input", name);
+	if (name) {
+		std::string path = TEST_ASSET_ROOT;
+		path = path + "/" + name;
+		blender->AddArgument("input", path);
+	}
 
 	Start();
 	Join();
