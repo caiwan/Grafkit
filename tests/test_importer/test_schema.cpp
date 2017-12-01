@@ -58,7 +58,7 @@ public:
 	ActorRef root;
 };
 
-TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkSchema_then_success)
+TEST_F(ImportSchemaTest, checkCreatedScenegraphObjects)
 {
 	// given
 	// blender default scene
@@ -87,7 +87,7 @@ TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkSchema_then_success)
 }
 
 
-TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkCoords_then_success)
+TEST_F(ImportSchemaTest, checkMatricesOfScenegraph)
 {
 	// given
 	// blender default scene

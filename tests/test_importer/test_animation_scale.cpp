@@ -72,7 +72,7 @@ public:
 	ActorRef root;
 };
 
-TEST_F(ImportAnimationTest, given_Animation_when_scale_then_success)
+TEST_F(ImportAnimationTest, scaling)
 {
 	ASSERT_TRUE(scene.Valid());
 	ASSERT_TRUE(scene->Valid());

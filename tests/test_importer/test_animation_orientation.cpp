@@ -22,16 +22,16 @@ const struct {
 	float key;
 	float3 rotate;
 } keyTable[] = {
-	0.f * KEY, float3(0,0,0),
-	1.f * KEY, float3(45,0,0),
+	0.f * KEY, float3(180 * DEG_RAD, 0, 0),
+	1.f * KEY, float3(180 * DEG_RAD, 45 * DEG_RAD, 0),
 
-	2.f * KEY, float3(0,0,0),
-	3.f * KEY, float3(0,0,45),
+	2.f * KEY, float3(180 * DEG_RAD, 0, 0),
+	3.f * KEY, float3(180 * DEG_RAD, 0, 90 * DEG_RAD),
 
-	4.f * KEY, float3(0,0,0),
-	5.f * KEY, float3(0,45,0),
+	4.f * KEY, float3(180 * DEG_RAD, 0, 0),
+	5.f * KEY, float3(180 * DEG_RAD, 90 * DEG_RAD, 0),
 
-	6.f * KEY, float3(0,0,0),
+	6.f * KEY, float3(180 * DEG_RAD, 0, 0),
 };
 
 using namespace Grafkit;
@@ -48,7 +48,7 @@ public:
 
 	void SetUp() {
 		suite = new ImporterSuite();
-		suite->Execute("models/test_loc.blend");
+		suite->Execute("models/test_rot.blend");
 		suite->Build();
 
 		// decompose 
@@ -72,7 +72,7 @@ public:
 	ActorRef root;
 };
 
-TEST_F(ImportAnimationTest, given_Animation_when_rotate_then_success)
+TEST_F(ImportAnimationTest, orientation)
 {
 	ASSERT_TRUE(scene.Valid());
 	ASSERT_TRUE(scene->Valid());
@@ -94,7 +94,7 @@ TEST_F(ImportAnimationTest, given_Animation_when_rotate_then_success)
 		mat0.Decompose(loc, rot, scale);
 
 		float4 expectedRotAxis = Quaternion::FromEuler(keyTable[i].rotate).ToAxisAngle();
-		float4 actualRotAxis = rot.ToAxisAngle();
+ 		float4 actualRotAxis = rot.ToAxisAngle();
 
 		ASSERT_FLOAT4_EQ(expectedRotAxis, actualRotAxis);
 	}
