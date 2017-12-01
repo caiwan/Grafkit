@@ -68,6 +68,10 @@ namespace Grafkit {
 			return Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(r, p, y));
 		}
 
+		static Quaternion fromEuler(float3 rpy) {
+			return Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(rpy.x, rpy.y, rpy.z));
+		}
+
 		float4 ToAxisAngle() {
 			dxvector axis;
 			float angle = 0;
