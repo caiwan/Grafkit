@@ -26,14 +26,18 @@ int GKimporter::BlenderThread::Run()
 	isRunning = true;
 
 	std::string execCommand = GetExecuteCommand();
+
 	const char * command = execCommand.c_str();
+	
+	Log::Logger().Info("Starting Blender: %s", command);
+
 	std::shared_ptr<FILE> pipe(_popen(command, "r"), _pclose);
 	if (!pipe) {
 		Log::Logger().Error("Could not start Blender. Command: %s", command);
 		return 1;
 	}
 
-	// pump 
+	// pump stdout
 	while (!feof(pipe.get()) && !isTerminate) {
 		if (fgets(buffer.data(), buffer.size(), pipe.get()) != NULL) {
 			Log::Logger().Trace(buffer.data());
@@ -53,8 +57,9 @@ std::string GKimporter::BlenderThread::GetExecuteCommand()
 	cmdLine << "-b -P " << scriptRoot << "/py/exporter.py" << " -- ";
 
 	for (auto argument = arguments.begin(); argument != arguments.end(); ++argument) {
-		cmdLine << "--" << argument->first << " " << argument->second;
+		cmdLine << "--" << argument->first << " " << argument->second << " ";
 	}
+
 
 	cmdLine.put(0);
 	cmdLine.seekp(0);
