@@ -29,6 +29,8 @@ namespace GKimporter {
 		void AddCamera(Grafkit::CameraRef & camera);
 		void AddActor(Grafkit::ActorRef & actor);
 
+		void AddAnimation(Grafkit::AnimationRef & animation);
+
 		void AddEntity(Grafkit::Entity3DRef entity);
 
 		Grafkit::MaterialRef FindMaterial(std::string name);

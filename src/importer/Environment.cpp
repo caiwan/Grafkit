@@ -76,6 +76,11 @@ void GKimporter::SceneBuilder::AddActor(ActorRef & actor)
 	actorList.push_back(actor);
 }
 
+void GKimporter::SceneBuilder::AddAnimation(Grafkit::AnimationRef & animation)
+{
+	scene->Get()->AddAnimation(animation);
+}
+
 Grafkit::MaterialRef GKimporter::SceneBuilder::FindMaterial(std::string name)
 {
 	auto material = materialMap.find(name);

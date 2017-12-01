@@ -69,7 +69,7 @@ namespace Grafkit {
 		void GetAnimations(std::vector<AnimationRef> &animations) { animations.clear(); animations.assign(m_animations.cbegin(), m_animations.cend()); }
 		AnimationRef GetAnimation(int i) { return m_animations[i]; }
 
-		void UpdateAnimation(double t) { m_tAnim = t; }
+		void UpdateAnimation(double t);
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
@@ -163,11 +163,6 @@ namespace Grafkit {
 
 	private:
 		double m_tAnim;
-
-	//private:
-	//	void PrerenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = 1024);
-	//	void Push();
-	//	void Pop();
 
 	private:
 		Grafkit::Matrix m_currentWorldMatrix;

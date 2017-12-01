@@ -70,9 +70,11 @@ namespace Grafkit {
 		Entity3DRef GetEntity(int id = 0) { return m_pEntities[id]; }
 		size_t GetEntityCount(){ return m_pEntities.size(); }
 
+	public:
+		Grafkit::Matrix WorldMatrix() { return m_worldMatrix; }
+	
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
-		Grafkit::Matrix & WorldMatrix() { return m_worldMatrix; }
 
 		Grafkit::Matrix m_viewMatrix;			///< Node tranyyformacioja
 		Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)

@@ -42,7 +42,6 @@ void Grafkit::Scene::Initialize(ActorRef root)
 			stack.push(node->GetChild(i));
 		}
 	}
-
 }
 
 void Grafkit::Scene::Shutdown()
@@ -116,8 +115,10 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef 
  * RENDER
  *****************************************************************************/
 
-void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
+void Grafkit::Scene::UpdateAnimation(double time)
 {
+	m_tAnim = time;
+
 	// --- animation
 
 	for (size_t i = 0; i < m_animations.size(); i++) {
@@ -131,7 +132,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 		ActorRef &parent = actor->GetParent();
 		Matrix &matrix = actor->Matrix();
 		Matrix &transform = actor->Transform();
-		Matrix &world = actor->WorldMatrix();
+		Matrix world = actor->WorldMatrix();
 		if (parent.Invalid())
 			world.Identity();
 		else
@@ -140,7 +141,10 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 		world.Multiply(transform);
 		actor->WorldMatrix(world);
 	}
+}
 
+void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
+{
 	// --- lights
 	m_lightData.lightCount = m_lights.size();
 	for (size_t i = 0; i < m_lights.size(); ++i)

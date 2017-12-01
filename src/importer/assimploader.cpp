@@ -327,50 +327,48 @@ void GKimporter::AssimpLoader::AssimpBuildScenegraph(Environment*& env)
 
 void GKimporter::AssimpLoader::AssimpLoadAnimations(Environment*& env)
 {
-#if 0
-	size_t i = 0, j = 0, k = 0, l = 0;
+#if 1
+	size_t animationIndex = 0, animationChannelIndex = 0, k = 0, l = 0;
 	// --- Animacio kiszedese
 	if (aiscene->HasAnimations()) {
 		LOGGER(Log::Logger().Trace("Animation"));
-		for (i = 0; i < aiscene->mNumAnimations; i++) {
-			aiAnimation *curr_anim = aiscene->mAnimations[i];
+
+		// fetch all animation for each nodes
+		for (animationIndex = 0; animationIndex < aiscene->mNumAnimations; animationIndex++) {
+			aiAnimation *curr_anim = aiscene->mAnimations[animationIndex];
 			aiString name = curr_anim->mName;
 
-			LOGGER(Log::Logger().Trace("- #%d : %s", i, name.C_Str()));
+			LOGGER(Log::Logger().Trace("- #%d : %s", animationIndex, name.C_Str()));
 
-			for (j = 0; j < curr_anim->mNumChannels; j++) {
-				aiNodeAnim * curr_nodeAnim = curr_anim->mChannels[j];
+			// fetch all channels in an animated node 
+			for (animationChannelIndex = 0; animationChannelIndex < curr_anim->mNumChannels; animationChannelIndex++) {
+				aiNodeAnim * curr_nodeAnim = curr_anim->mChannels[animationChannelIndex];
 
-				LOGGER(Log::Logger().Trace("-- #%d : %s", j, curr_nodeAnim->mNodeName.C_Str()));
+				LOGGER(Log::Logger().Trace("-- #%d : %s", animationChannelIndex, curr_nodeAnim->mNodeName.C_Str()));
 
-				auto it = m_resources.actors.find(curr_nodeAnim->mNodeName.C_Str());
-				if (it != m_resources.actors.end()) {
+				//auto it = m_resources.actors.find(curr_nodeAnim->mNodeName.C_Str());
+				ActorRef actor = env->GetBuilder().FindActor(curr_nodeAnim->mNodeName.C_Str());
+
+				if (actor.Valid()) {
 					ActorAnimation* anim = new ActorAnimation();
-					anim->SetActor(it->second);
-
-					float3 f3;
-					float4 f4;
+					anim->SetActor(actor);
 
 					for (k = 0; k < curr_nodeAnim->mNumPositionKeys; k++) {
-						ASSIMP_V3D_F3(curr_nodeAnim->mPositionKeys[k].mValue, f3);
-						anim->AddPositionKey(curr_nodeAnim->mPositionKeys[k].mTime, f3);
+						anim->AddPositionKey(curr_nodeAnim->mPositionKeys[k].mTime, aiVector3DToFloat3(curr_nodeAnim->mPositionKeys[k].mValue));
 					}
 
 					for (k = 0; k < curr_nodeAnim->mNumScalingKeys; k++) {
-						ASSIMP_V3D_F3(curr_nodeAnim->mScalingKeys[k].mValue, f3);
-						anim->AddScalingKey(curr_nodeAnim->mScalingKeys[k].mTime, f3);
+						anim->AddScalingKey(curr_nodeAnim->mScalingKeys[k].mTime, aiVector3DToFloat3(curr_nodeAnim->mPositionKeys[k].mValue));
 					}
 
 					for (k = 0; k < curr_nodeAnim->mNumRotationKeys; k++) {
-						ASSIMP_V4D_F4(curr_nodeAnim->mRotationKeys[k].mValue, f4);
-						float4 lolmi = Quaternion(f4).toAxisAngle(); //dbg
-						anim->AddRotationKey(curr_nodeAnim->mRotationKeys[k].mTime, f4);
+						anim->AddRotationKey(curr_nodeAnim->mRotationKeys[k].mTime, aiQuaternionToFloat4(curr_nodeAnim->mRotationKeys[k].mValue));
 					}
 
 					anim->SetDuration(curr_anim->mDuration);
 					anim->SetName(curr_nodeAnim->mNodeName.C_Str());
 
-					outScene->AddAnimation(anim);
+					env->GetBuilder().AddAnimation(AnimationRef(anim));
 				}
 			}
 
@@ -504,6 +502,11 @@ inline float3 GKimporter::AssimpLoader::aiVector3DToFloat3(aiVector3D &v)
 inline float4 GKimporter::AssimpLoader::aiVector3DToFloat4(aiVector3D &v, float w)
 {
 	return float4(v.x, v.y, v.z, w);
+}
+
+inline float4 GKimporter::AssimpLoader::aiQuaternionToFloat4(aiQuaternion & v)
+{
+	return float4(v.x, v.y, v.z, v.w);
 }
 
 inline float4 GKimporter::AssimpLoader::aiColor3DToFloat4(aiColor3D &c)

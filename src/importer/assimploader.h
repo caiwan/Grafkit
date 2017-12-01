@@ -8,7 +8,7 @@
 
 #include "assimp/vector2.h"
 #include "assimp/vector3.h"
-//#include "assimp/vector4.h"
+#include "assimp/quaternion.h"
 
 #include "utils/exceptions.h"
 
@@ -59,6 +59,7 @@ namespace GKimporter {
 		static inline float2 aiVector3DToFloat2(aiVector3D &v);
 		static inline float3 aiVector3DToFloat3(aiVector3D &v);
 		static inline float4 aiVector3DToFloat4(aiVector3D &v, float w);
+		static inline float4 aiQuaternionToFloat4(aiQuaternion &v);
 		static inline float4 aiColor3DToFloat4(aiColor3D &c);
 
 		static inline float4 aiMatkey4ToFloat4(aiMaterial *&mat, const char* key, int a1, int a2);
