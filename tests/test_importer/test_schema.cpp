@@ -124,7 +124,7 @@ TEST_F(ImportSchemaTest, given_ImportedScenegraph_when_checkCoords_then_success)
 	ASSERT_FLOAT3_EQ(float3(7.48113, -6.50764, -5.34367), cameraPos);
 
 	// Itt a LH-RH konvezyio kicsit furcsa
-	Quaternion orientation = Quaternion::fromEuler(63.559*DEG_RAD, 0, 46.692*DEG_RAD);
+	Quaternion orientation = Quaternion::FromEuler(63.559*DEG_RAD, 0, 46.692*DEG_RAD);
 	float4 orientationVector = orientation.ToAxisAngle();
 	float4 cameraOrientationVector = cameraOirentation.ToAxisAngle();
 

@@ -93,7 +93,10 @@ TEST_F(ImportAnimationTest, given_Animation_when_rotate_then_success)
 
 		mat0.Decompose(loc, rot, scale);
 
-		ASSERT_FLOAT4_EQ((float4)Quaternion::fromEuler(keyTable[i].rotate), (float4)rot);
+		float4 expectedRotAxis = Quaternion::FromEuler(keyTable[i].rotate).ToAxisAngle();
+		float4 actualRotAxis = rot.ToAxisAngle();
+
+		ASSERT_FLOAT4_EQ(expectedRotAxis, actualRotAxis);
 	}
 }
 

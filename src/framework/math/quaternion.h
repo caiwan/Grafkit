@@ -64,11 +64,11 @@ namespace Grafkit {
 			return DirectX::XMMatrixRotationQuaternion(q);
 		}
 
-		static Quaternion fromEuler(float r, float p, float y) {
+		static Quaternion FromEuler(float r, float p, float y) {
 			return Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(r, p, y));
 		}
 
-		static Quaternion fromEuler(float3 rpy) {
+		static Quaternion FromEuler(float3 rpy) {
 			return Quaternion(DirectX::XMQuaternionRotationRollPitchYaw(rpy.x, rpy.y, rpy.z));
 		}
 
