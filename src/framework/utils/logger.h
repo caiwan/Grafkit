@@ -37,7 +37,7 @@ namespace Grafkit {
 		// --- 
 
 		enum logger_msg_type_e {
-			LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR
+			LOG_TRACE, LOG_DEBUG, LOG_INFO, LOG_WARN, LOG_ERROR, _LOG_COUNT
 		};
 
 		struct message_t {
@@ -62,7 +62,7 @@ namespace Grafkit {
 		};
 
 		// Methods, ops
-
+		void SetLogLevel(logger_msg_type_e type, bool isShow) { m_hideMessage[type] = !isShow; }
 		void AddHandler(ILoggerHandler* hdl) { this->m_loggers.insert(hdl);}
 		void RemoveHandler(ILoggerHandler* hdl) { this->m_loggers.erase(this->m_loggers.find(hdl));}
 
@@ -85,6 +85,8 @@ namespace Grafkit {
 		std::set<ILoggerHandler*> m_loggers;
 		char * m_buffer;
 		Grafkit::Mutex *m_mutex;
+
+		bool m_hideMessage[_LOG_COUNT];
 	};
 
 	/*

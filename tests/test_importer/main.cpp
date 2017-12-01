@@ -20,6 +20,11 @@ public:
 		int result = 0;
 
 #ifndef LIVE_RELEASE
+		Log::Logger().SetLogLevel(Logger::LOG_DEBUG, false);
+		Log::Logger().SetLogLevel(Logger::LOG_TRACE, false);
+		Log::Logger().SetLogLevel(Logger::LOG_INFO, false);
+		Log::Logger().SetLogLevel(Logger::LOG_WARN, true);
+		Log::Logger().SetLogLevel(Logger::LOG_ERROR, true);
 		Log::Logger().AddHandler(new LoggerHandler::ConsoleLogger());
 		Log::Logger().AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
 #endif

@@ -17,9 +17,10 @@ Grafkit::Logger::Logger()
 	m_mutex = new Grafkit::Mutex;
 	m_buffer = new char[BUFFER_LEGTH];
 
-	// todo: csak az msvc outra irjon, a tobbi nem kell
-	//this->AddHandler(new LoggerHandler::FileLoggerHandler("log.log", "error.log"));
-	//this->AddHandler(new LoggerHandler::ConsoleLogger());
+	for (size_t i = 0; i < _LOG_COUNT; i++) {
+		m_hideMessage[i] = false;
+	}
+
 	this->AddHandler(new LoggerHandler::MsvcOutLogger());
 }
 
@@ -43,7 +44,12 @@ void Grafkit::Logger::Write(logger_msg_type_e type, const char * const message)
 
 void Grafkit::Logger::Write(logger_msg_type_e type)
 {
-	 size_t len = strlen(m_buffer);
+	// skip if log messahe type was disabled
+	if (m_hideMessage[type])
+		return;
+
+	// do the rest
+	size_t len = strlen(m_buffer);
 
 	// qnd trim cr/lf at the end
 	size_t k = len;
@@ -52,14 +58,14 @@ void Grafkit::Logger::Write(logger_msg_type_e type)
 			if (m_buffer[k] && (m_buffer[k] != '\r' || m_buffer[k] != '\n'))
 				break;
 
-	m_buffer[k+1] = 0;
+	m_buffer[k + 1] = 0;
 
 	Logger::message_t message_pkg;
 	message_pkg.length = k;
 	message_pkg.message = m_buffer;
 	message_pkg.type = type;
 
-	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); it++) 
+	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); it++)
 	{
 		if (*it) (*it)->Write(&message_pkg);
 	}
@@ -73,37 +79,37 @@ void Grafkit::Logger::Write(logger_msg_type_e type)
 	va_end(args); \
 }
 
- void Grafkit::Logger::Trace(const char * const message, ...)
+void Grafkit::Logger::Trace(const char * const message, ...)
 {
 	Grafkit::MutexLocker locker(m_mutex);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_TRACE);
 }
 
- void Grafkit::Logger::Debug(const char * const message, ...)
+void Grafkit::Logger::Debug(const char * const message, ...)
 {
 	Grafkit::MutexLocker locker(m_mutex);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_DEBUG);
 }
 
- void Grafkit::Logger::Info(const char * const message, ...)
+void Grafkit::Logger::Info(const char * const message, ...)
 {
 	Grafkit::MutexLocker locker(m_mutex);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_INFO);
 }
 
- void Grafkit::Logger::Warn(const char * const message, ...)
+void Grafkit::Logger::Warn(const char * const message, ...)
 {
 	Grafkit::MutexLocker locker(m_mutex);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_WARN);
 }
 
- void Grafkit::Logger::Error(const char * const message, ...)
+void Grafkit::Logger::Error(const char * const message, ...)
 {
-	Grafkit::MutexLocker locker(m_mutex); 
+	Grafkit::MutexLocker locker(m_mutex);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_ERROR);
 }
@@ -121,7 +127,7 @@ Grafkit::LoggerHandler::FileLoggerHandler::FileLoggerHandler(const char * filena
 			// ... throw err
 		}
 	}
-	
+
 	if (errfile) {
 		if (!fopen_s(&this->m_stderr, errfile, "wb")) {
 			// ... throw err
@@ -131,8 +137,8 @@ Grafkit::LoggerHandler::FileLoggerHandler::FileLoggerHandler(const char * filena
 
 Grafkit::LoggerHandler::FileLoggerHandler::~FileLoggerHandler()
 {
-	if(this->m_stderr) fflush(this->m_stderr), fclose(this->m_stderr);
-	if(this->m_stdout) fflush(this->m_stdout), fclose(this->m_stdout);
+	if (this->m_stderr) fflush(this->m_stderr), fclose(this->m_stderr);
+	if (this->m_stdout) fflush(this->m_stdout), fclose(this->m_stdout);
 }
 
 void Grafkit::LoggerHandler::FileLoggerHandler::Write(Grafkit::Logger::message_t * const & message)
@@ -148,7 +154,7 @@ void Grafkit::LoggerHandler::FileLoggerHandler::Write(Grafkit::Logger::message_t
 			fprintf_s(this->m_stderr, "%s\n", message->message);
 		}
 	}
-	/*else*/ 
+	/*else*/
 	{
 		if (this->m_stdout) {
 			fprintf_s(this->m_stdout, "%s\n", message->message);
