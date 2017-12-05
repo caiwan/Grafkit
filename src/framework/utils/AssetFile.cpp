@@ -21,25 +21,49 @@
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
- 
+
 #define MAX_DIRS 25
 #define MAX_FILES 255
 #define MAX_BUFFER 4096
 
-IAssetFactory::filelist_t listdir(std::string root, IAssetFactory::filelist_t &dirlist) {
+
+std::string _trimslash(std::string in) {
+	std::string out = "";
+	out.reserve(in.length());
+	size_t left = 0;
+	do {
+		std::string::size_type pos = in.find("//", left);
+		if (pos != std::string::npos) 
+		{
+			out.append(in.substr(left, pos - left));
+			left += pos + 1;
+		}
+		else {
+			out.append(in.substr(left, in.length() - left));
+			break;
+		}
+	} while (left != in.length());
+
+	return out;
+}
+
+IAssetFactory::filelist_t listdir(std::string root, IAssetFactory::filelist_t &dirlist, std::string droot = "./") {
 	DIR *dir;
 	struct dirent *ent;
-	if ((dir = opendir(root.c_str())) != NULL) {
+	std::string path = root + droot;
+	if ((dir = opendir(path.c_str())) != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
 			// skip root and parent
 			if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
 				continue;
 
 			if (ent->d_type & DT_DIR) {
-				listdir(root + ent->d_name + "/", dirlist);
+				listdir(root, dirlist, ent->d_name);
 			}
 			else {
-				dirlist.push_back(root + std::string(ent->d_name));
+				// rm unnesesarry double slashes 
+				std::string in = _trimslash(droot + "/" + std::string(ent->d_name));
+				dirlist.push_back(in);
 			}
 		}
 		closedir(dir);
@@ -89,7 +113,7 @@ namespace LiveReload {
 		}
 
 		~WatchDirectory() {
-			if (m_hDir) 
+			if (m_hDir)
 				CloseHandle(m_hDir);
 		}
 
@@ -106,7 +130,7 @@ namespace LiveReload {
 			} while (true);
 		}
 
-		void Poll(){
+		void Poll() {
 			char buf[8192];
 			DWORD nRet;
 			BOOL result = TRUE;
@@ -131,7 +155,7 @@ namespace LiveReload {
 					FILE_NOTIFY_CHANGE_SIZE |
 					FILE_NOTIFY_CHANGE_LAST_WRITE |
 					//FILE_NOTIFY_CHANGE_LAST_ACCESS |
-					FILE_NOTIFY_CHANGE_CREATION | 
+					FILE_NOTIFY_CHANGE_CREATION |
 					0,
 					&nRet,// number of bytes returned
 					&PollingOverlap,// pointer to structure needed for overlapped I/O
@@ -156,11 +180,11 @@ namespace LiveReload {
 					case FILE_ACTION_ADDED:
 						LOGGER(Log::Logger().Info("The file is added to the directory: [%s] \n", filename));
 						break;
-					
+
 					case FILE_ACTION_REMOVED:
 						LOGGER(Log::Logger().Info("The file is removed from the directory: [%s] \n", filename));
 						break;
-					
+
 					case FILE_ACTION_MODIFIED:
 						LOGGER(Log::Logger().Info("The file is modified. This can be a change in the time stamp or attributes: [%s]", filename));
 						PushFile(filename);
@@ -169,11 +193,11 @@ namespace LiveReload {
 					case FILE_ACTION_RENAMED_OLD_NAME:
 						LOGGER(Log::Logger().Info("The file was renamed and this is the old name: [%s]\n", filename));
 						break;
-					
+
 					case FILE_ACTION_RENAMED_NEW_NAME:
 						LOGGER(Log::Logger().Info("The file was renamed and this is the new name: [%s]\n", filename));
 						break;
-					
+
 					default:
 						LOGGER(Log::Logger().Info("\nDefault error.\n"));
 						break;
@@ -188,13 +212,12 @@ namespace LiveReload {
 
 	};
 
-	
+
 }
 
 #endif /*LIVE_RELEASE*/
 
-FileAssetFactory::FileAssetFactory(std::string root) :
-	m_root(root), m_eventWatcher(nullptr)
+FileAssetFactory::FileAssetFactory(std::string root) : m_root(root), m_eventWatcher(nullptr)
 {
 	listdir(root, m_dirlist);
 
@@ -238,18 +261,19 @@ IAssetRef FileAssetFactory::Get(std::string name)
 	return IAssetRef(new FileAsset(data, size));
 }
 
-std::list<std::string> FileAssetFactory::GetAssetList()
+Grafkit::IAssetFactory::filelist_t FileAssetFactory::GetAssetList()
 {
 	return this->m_dirlist;
 }
 
 
-std::list<std::string> FileAssetFactory::GetAssetList(AssetFileFilter * filter)
+Grafkit::IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter * filter)
 {
 	filelist_t filelist;
 	for (filelist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); it++)
 	{
-		if (filter->isFileInfilter(*it)) filelist.push_back(*it);
+		if (filter->IsFileInfilter(*it))
+			filelist.push_back(*it);
 	}
 
 	return filelist;
@@ -261,7 +285,7 @@ bool Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 	static unsigned char count;
 	if (count == 0) {
 		LiveReload::WatchDirectory* w = ((LiveReload::WatchDirectory*)m_eventWatcher);
-		if (w && w->HasItems()){
+		if (w && w->HasItems()) {
 			do {
 				resman->TriggerReload(w->PopFile());
 			} while (w->HasItems());
@@ -274,7 +298,7 @@ bool Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 #else
 	return false;
 #endif
-}
+	}
 
 
 // ==================================================================================== 

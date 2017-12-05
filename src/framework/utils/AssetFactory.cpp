@@ -46,7 +46,7 @@ int AssetFileFilter::trimpath(std::string fullpath, std::string &path, std::stri
 	return result;
 }
 
-int AssetFileFilter::isFileInfilter(std::string path)
+int AssetFileFilter::IsFileInfilter(std::string path)
 {
 	std::string dummy0, dummy1, ext;
 	AssetFileFilter::trimpath(path, dummy0, dummy1, ext);

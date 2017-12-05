@@ -25,7 +25,7 @@ namespace Grafkit {
 		static int trimpath(std::string fullpath, std::string &path, std::string &filename, std::string &extension);
 
 		/// 
-		int isFileInfilter(std::string path);
+		int IsFileInfilter(std::string path);
 
 	private:
 		typedef std::set<std::string> extFilter_t;
