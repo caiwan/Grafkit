@@ -25,8 +25,10 @@
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
 
-
 using namespace Grafkit;
+
+#include "builtin_data/cube.h"
+
 
 class Application : public System, protected ResourcePreloader, protected ClonableInitializer
 {  
@@ -57,10 +59,17 @@ public:
 
 protected:
 		Renderer render;
-		SceneResRef m_scene;
+		SceneResRef scene;
+		TextureResRef texture;
 
-		TextureSamplerRef m_textureSampler;
+		TextureSamplerRef sampler;
 		ActorRef m_rootActor;
+
+		LightRef light;
+		ActorRef lightActor;
+
+		ActorRef cameraActor;
+		CameraRef camera;
 
 		EffectComposerRef m_postfx;
 		
@@ -80,14 +89,60 @@ protected:
 			m_fxFXAA = Load<ShaderRes>(new PixelShaderLoader("xFXAA", "shaders/fxaa.hlsl", "FXAA"));
 			m_fxFishEye = Load<ShaderRes>(new PixelShaderLoader("xFishEye", "shaders/fisheye.hlsl", "fisheyeProc"));
 
-			m_scene = this->Load<SceneRes>(new SceneLoader("scene", "spheres.scene"));
+#if 0
+			scene = this->Load<SceneRes>(new SceneLoader("scene", "spheres.scene"));
+#else
+			camera = new Camera;
+			camera->SetName("camera");
 
+			ModelRef model = new Model(GrafkitData::CreateCube());
+			model->SetMaterial(new Material());
+			model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
+			model->GetMaterial()->SetName("GridMaterial");
+
+			// -- setup scene 
+			scene = new SceneRes(new Scene());
+
+			cameraActor = new Actor();
+			cameraActor->SetName("cameraNode");
+			cameraActor->AddEntity(camera);
+
+			cameraActor->Matrix().LookAtLH(float3(10, 10, -10));
+
+			ActorRef modelActor = new Actor();
+			modelActor->SetName("center");
+
+#define N 9
+			for (int x = 0; x < N; x++) {
+				for (int y = 0; y < N; y++) {
+					ActorRef actor = new Actor();
+					actor->AddEntity(model);
+
+					float xx = x - N / 2;
+					float yy = y - N / 2;
+					float zz = (float)(rand() % 256) / 256.;
+
+					actor->Matrix().Scale(.5, .5, .5);
+					actor->Matrix().Translate(xx, zz, yy);
+					modelActor->AddChild(actor);
+				}
+			}
+#undef N
+			ActorRef rootActor;
+			rootActor = new Actor();
+			rootActor->SetName("root");
+			rootActor->AddChild(cameraActor);
+			rootActor->AddChild(modelActor);
+
+			(*scene)->Initialize(rootActor);
+
+#endif
 			LoadCache();
 			DoPrecalc();
 
-			m_scene->Get()->BuildScene(render, m_vs, m_fs);
-			m_rootActor = m_scene->Get()->GetRootNode();
-			m_scene->Get()->SetActiveCamera(0);
+			scene->Get()->BuildScene(render, m_vs, m_fs);
+			m_rootActor = (*scene)->GetRootNode();
+			(*scene)->SetActiveCamera(0);
 
 			// -- setup postfx 
 			size_t k = 0;
@@ -127,8 +182,8 @@ protected:
 				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .1);
 				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "zoom", 3);
 
-				m_scene->Get()->PreRender(render);
-				m_scene->Get()->Render(render);
+				(*scene)->PreRender(render);
+				(*scene)->Render(render);
 
 				this->t += 0.01;
 			}
