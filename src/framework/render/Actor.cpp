@@ -2,6 +2,7 @@
 
 #include "Actor.h"
 #include "shader.h"
+#include "scene.h"
 
 using namespace Grafkit;
 
@@ -57,4 +58,26 @@ void Grafkit::Actor::serialize(Archive & ar)
 	PERSIST_FIELD(ar, m_viewMatrix);
 	PERSIST_FIELD(ar, m_transformMatrix);
 
+}
+
+void Grafkit::ActorEventHandler::PushShader(Scene * const & scene)
+{
+	otherPShader = scene->GetPShader();
+	otherVShader = scene->GetPShader();
+	
+	if (myVShader.Invalid() || myPShader.Invalid())
+		return;
+
+	if (myVShader->Invalid() || myPShader->Invalid())
+		return;
+
+	scene->SetPShader(myPShader);
+	scene->SetVShader(myVShader);
+
+}
+
+void Grafkit::ActorEventHandler::PopShader(Scene * const & scene)
+{
+	scene->SetPShader(otherPShader);
+	scene->SetVShader(otherVShader);
 }

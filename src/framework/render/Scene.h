@@ -73,8 +73,8 @@ namespace Grafkit {
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
-		ShaderRef GetVShader() { return this->m_vertexShader->Get(); }
-		ShaderRef GetPShader() { return this->m_pixelShader->Get(); }
+		ShaderResRef GetVShader() { return this->m_vertexShader; }
+		ShaderResRef GetPShader() { return this->m_pixelShader; }
 
 		void SetVShader(ShaderResRef &VS) { this->m_vertexShader = VS; }
 		void SetPShader(ShaderResRef &FS) { this->m_pixelShader = FS; }
