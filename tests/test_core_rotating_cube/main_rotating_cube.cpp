@@ -78,7 +78,7 @@ protected:
 		// -- texture
 
 		TextureFromBitmap *textureLoader = new TextureFromBitmap("normap", "textures/normap.jpg");
-		TextureResRef textureRes = (TextureRes*)textureLoader->NewResource();
+		TextureResRef textureRes = (Texture2DRes*)textureLoader->NewResource();
 		textureLoader->Load(this, textureRes);
 
 		this->texture = textureRes->Get();

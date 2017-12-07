@@ -42,6 +42,7 @@ namespace Grafkit{
 
 		///*float4 &Ambient() { return m_light.ambient; }
 		float4 &Diffuse() { return m_light.color; }
+		void Diffuse(float4 c) { m_light.color = c; }
 		//float4 &Specular() { return m_light.specular; }*/
 
 		float &ConstantAttenuation() { return m_light.ca; }

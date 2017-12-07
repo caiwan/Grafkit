@@ -84,7 +84,7 @@ protected:
 		
 		int init() {
 			m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
-			m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+			m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/pbr.hlsl", ""));
 
 			m_fxFXAA = Load<ShaderRes>(new PixelShaderLoader("xFXAA", "shaders/fxaa.hlsl", "FXAA"));
 			m_fxFishEye = Load<ShaderRes>(new PixelShaderLoader("xFishEye", "shaders/fisheye.hlsl", "fisheyeProc"));
@@ -112,7 +112,7 @@ protected:
 			ActorRef modelActor = new Actor();
 			modelActor->SetName("center");
 
-#define N 9
+#define N 3
 			for (int x = 0; x < N; x++) {
 				for (int y = 0; y < N; y++) {
 					ActorRef actor = new Actor();
@@ -128,9 +128,18 @@ protected:
 				}
 			}
 #undef N
+
+			light = new Light();
+			light->Diffuse(float4(1, 1, 1, 1));
+			lightActor = new Actor(light);
+
+			lightActor->Matrix().Identity();
+			lightActor->Matrix().Translate(0, 40, 0);
+
 			ActorRef rootActor;
 			rootActor = new Actor();
 			rootActor->SetName("root");
+			rootActor->AddChild(lightActor);
 			rootActor->AddChild(cameraActor);
 			rootActor->AddChild(modelActor);
 
@@ -170,11 +179,6 @@ protected:
 			// pre fx-pass
 			this->render.BeginScene();
 			{
-				m_rootActor->Matrix().Identity();
-				m_rootActor->Matrix().RotateRPY(t,0,0);
-
-				//fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
-				
 				float2 res = float2();
 				render.GetViewportSizef(res.x, res.y);
 
@@ -182,8 +186,7 @@ protected:
 				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .1);
 				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "zoom", 3);
 
-				(*scene)->PreRender(render);
-				(*scene)->Render(render);
+				(*scene)->RenderFrame(render, t);
 
 				this->t += 0.01;
 			}

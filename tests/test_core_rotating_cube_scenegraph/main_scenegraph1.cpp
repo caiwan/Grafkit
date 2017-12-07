@@ -80,9 +80,9 @@ protected:
 			camera->SetName("camera");
 
 			// -- texture
-			TextureResRef texture = new TextureRes();
+			TextureResRef texture = new Texture2DRes();
 
-			texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
+			texture = this->Load<Texture2DRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
@@ -210,8 +210,7 @@ protected:
 				m_cameraActor->Transform().Identity();
 				m_cameraActor->Transform().Translate(0,f,0);
 
-				scene->Get()->PreRender(render);
-				scene->Get()->Render(render);
+				scene->Get()->RenderFrame(render, 0.0f);
 
 				this->t += 0.1f;
 			}
