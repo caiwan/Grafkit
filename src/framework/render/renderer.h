@@ -4,6 +4,8 @@
 #ifndef _Renderer_H_
 #define _Renderer_H_
 
+#include <chrono>
+
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -63,8 +65,6 @@ namespace Grafkit {
 		ID3D11DeviceContext * const & GetDeviceContext() { return this->m_deviceContext; }
 		operator ID3D11DeviceContext *&() { return this->m_deviceContext; }
 
-		void GetWorldMatrix(matrix&);
-
 		void GetVideoCardInfo(char* dest);
 
 		void GetScreenSize(int &screenW, int &screenH) { screenW = m_screenW; screenH = m_screenH; }
@@ -76,7 +76,7 @@ namespace Grafkit {
 
 		float GetAspectRatio() {return (float)m_viewport.Width / (float)m_viewport.Height;}
 
-		//float GetViewportAspect();
+		float GetDeltaTime() { return m_lastDeltaTime; }
 
 	protected:
 		bool m_vsync_enabled;
@@ -91,13 +91,14 @@ namespace Grafkit {
 		ID3D11DepthStencilView* m_myDepthStencilView;
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11RasterizerState* m_rasterState;
-		
-		matrix m_worldMatrix;
 
 		DXGI_PRESENT_PARAMETERS m_present;
 		D3D11_VIEWPORT m_viewport;
 		int m_screenW;
 		int m_screenH;
+
+		float m_lastDeltaTime;
+		std::chrono::time_point<std::chrono::system_clock> m_lastTimePoint;
 
 	private:
 		ID3D11DepthStencilState* CreateStencilState(bool isWriteEnabled);
