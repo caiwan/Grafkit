@@ -70,8 +70,8 @@ namespace Grafkit
 				float4 f = h.GetNext();
 				kernels[i].x = 2. * f.x - 1;
 				kernels[i].y = 2. * f.y - 1;
-				kernels[i].z = 2. * f.z - 1;
-				kernels[i].w = 2. * f.w - 1;
+				kernels[i].z = 0;
+				kernels[i].w = 1;
 			}
 		}
 	};
