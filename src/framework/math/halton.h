@@ -49,6 +49,34 @@ namespace Grafkit
 		float m_value, m_inv_base;
 	};
 
+	/* Geneates a 2-component vector of halton series
+	*/
+	class Halton2D {
+	private:
+		Halton x, y;
+
+	public:
+		Halton2D() {
+			x.Number(1, 2); y.Number(2, 3);
+		}
+
+		inline void Next() { x.Next(), y.Next(); }
+		inline float4 Get() { return float4(x.Get(), y.Get(), 0, 1); }
+		inline float4 GetNext() { return float4(x.GetNext(), y.GetNext(), 0, 1); }
+
+		static void Distribution(float4* kernels, size_t len) {
+			Halton2D h;
+			for (int i = 0; i < len; i++) {
+				float4 f = h.GetNext();
+				kernels[i].x = 2. * f.x - 1;
+				kernels[i].y = 2. * f.y - 1;
+				kernels[i].z = 2. * f.z - 1;
+				kernels[i].w = 2. * f.w - 1;
+			}
+		}
+	};
+
+
 	/* Geneates a 3-component vector of halton series
 	*/
 	class Halton3D {
