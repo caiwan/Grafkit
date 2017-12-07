@@ -24,7 +24,7 @@ namespace Grafkit {
 	protected:
 		void _serialize(Archive& ar);
 
-	friend class Actor;
+		friend class Actor;
 	public:
 		Entity3D();
 		virtual ~Entity3D();
@@ -38,13 +38,43 @@ namespace Grafkit {
 	//class Actor;
 	//typedef Ref<Actor> ActorRef;
 
+	class ActorEventHandler {
+	public:
+		virtual void OnBeforeDraw(Grafkit::Renderer& render, Scene * const & scene) { PushShader(scene); }
+		virtual void OnAfterDraw(Grafkit::Renderer& render, Scene * const & scene) { PopShader(scene); }
+
+		void SetPShader(ShaderResRef & ps) { myPShader = ps; }
+		void SetVshader(ShaderResRef & vs) { myVShader = vs; }
+
+	protected:
+		void PushShader(Scene *const & scene) {
+			otherPShader = scene->GetPShader();
+			otherVShader = scene->GetPShader();
+			scene->SetPShader(myPShader);
+			scene->SetVShader(myVShader);
+		}
+		void PopShader(Scene *const & scene) {
+			scene->SetPShader(otherPShader);
+			scene->SetVShader(otherVShader);
+		}
+
+	protected:
+		ShaderResRef myPShader;
+		ShaderResRef myVShader;
+
+	private:
+		ShaderResRef otherPShader;
+		ShaderResRef otherVShader;
+	};
+
+
 	/**
 	An actor node - ez a scenegraph es a nodeja
 	*/
-	__declspec(align(16)) 
-	class Actor : public AlignedNew<Actor>, public Grafkit::IResource, public Persistent
+	__declspec(align(16))
+		class Actor : public AlignedNew<Actor>, public Grafkit::IResource, public Persistent
 	{
-	friend class Scene;
+		friend class Scene;
 	public:
 		Actor();
 		Actor(Ref<Entity3D> entity);
@@ -68,11 +98,11 @@ namespace Grafkit {
 
 		void AddEntity(Ref<Entity3D> entity) { m_pEntities.push_back(entity); }
 		Entity3DRef GetEntity(int id = 0) { return m_pEntities[id]; }
-		size_t GetEntityCount(){ return m_pEntities.size(); }
+		size_t GetEntityCount() { return m_pEntities.size(); }
 
 	public:
 		Grafkit::Matrix WorldMatrix() { return m_worldMatrix; }
-	
+
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
 
