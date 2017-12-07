@@ -22,6 +22,12 @@ using namespace FWdebugExceptions;
 #define GS_VERSION "gs_4_0"
 #define CS_VERSION "cs_4_0"
 
+#ifdef _DEBUG
+#define SHADER_COMPILE_FLAGS (D3DCOMPILE_DEBUG)
+#else //DEBUG
+#define SHADER_COMPILE_FLAGS (0)
+#endif // DEBUG
+
 
 // TODO http://stackoverflow.com/questions/24323281/the-pixel-shader-unit-expects-a-sampler
 
@@ -656,7 +662,7 @@ HRESULT Grafkit::VertexShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_M
 
 HRESULT Grafkit::VertexShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, VS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, VS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS | SHADER_COMPILE_FLAGS, 0, &shaderBuffer, &errorMessage);
 }
 
 
@@ -717,13 +723,13 @@ void Grafkit::PixelShader::ShutdownChild()
 
 HRESULT Grafkit::PixelShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return D3DCompileFromFile(file, pDefines, pInclude, entry, PS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return D3DCompileFromFile(file, pDefines, pInclude, entry, PS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS | SHADER_COMPILE_FLAGS, 0, &shaderBuffer, &errorMessage);
 }
 
 
 HRESULT Grafkit::PixelShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, PS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, PS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS | SHADER_COMPILE_FLAGS, 0, &shaderBuffer, &errorMessage);
 }
 
 
@@ -780,12 +786,12 @@ void Grafkit::GeometryShader::ShutdownChild()
 
 HRESULT Grafkit::GeometryShader::CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return D3DCompileFromFile(file, pDefines, pInclude, entry, GS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return D3DCompileFromFile(file, pDefines, pInclude, entry, GS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS | SHADER_COMPILE_FLAGS, 0, &shaderBuffer, &errorMessage);
 }
 
 HRESULT Grafkit::GeometryShader::CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO * pDefines, ID3DInclude * pInclude, LPCSTR entry, ID3D10Blob *& shaderBuffer, ID3D10Blob *& errorMessage)
 {
-	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, GS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	return  D3DCompile(source, size, sourceName, pDefines, pInclude, entry, GS_VERSION, D3D10_SHADER_ENABLE_STRICTNESS | SHADER_COMPILE_FLAGS, 0, &shaderBuffer, &errorMessage);
 }
 
 void Grafkit::GeometryShader::CreateShader(ID3D11Device *& device, ID3D10Blob * shaderBuffer, ID3D11ClassLinkage * pClassLinkage)
