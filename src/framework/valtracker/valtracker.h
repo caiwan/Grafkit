@@ -11,6 +11,10 @@ struct sync_device;
 typedef const sync_track sync_track_t;
 /* </ ROCKET SPECIFIC> */
 
+namespace Grafkit {
+	class IAssetFactory;
+}
+
 namespace Grafkit{
 	class ValueTracker;
 
@@ -21,14 +25,14 @@ namespace Grafkit{
 			Timer();
 			~Timer();
 
-			void Initialize(Grafkit::MusicResRef music, double lengthMS, double beatPerMin, int rowPerBeat);
+			void Initialize(Grafkit::MusicResRef music, IAssetFactory * const  & assetFactory, double lengthMS, double beatPerMin, int rowPerBeat);
 			void Shutdown();
 
 			/**
 			Csatlakozik a Rockethez.
 			A pathnek leteznie kell `./sync/` kulonben nem mukodik, es nem ad vissza hibat
 			*/
-			void Connect(const char *_ipaddr = NULL);
+			void Connect(const char * basepath, const char *_ipaddr = NULL);
 			void Update();
 
 		// synctracker wrapper

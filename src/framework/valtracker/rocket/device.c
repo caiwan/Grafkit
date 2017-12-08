@@ -1,3 +1,38 @@
+#ifndef SYNC_PLAYER
+
+/* configure socket-stack */
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define USE_GETADDRINFO
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#include <limits.h>
+#elif defined(USE_AMITCP)
+#include <sys/socket.h>
+#include <proto/exec.h>
+#include <proto/socket.h>
+#include <netdb.h>
+#define SOCKET int
+#define INVALID_SOCKET -1
+#define select(n,r,w,e,t) WaitSelect(n,r,w,e,t,0)
+#define closesocket(x) CloseSocket(x)
+#else
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <unistd.h>
+#define SOCKET int
+#define INVALID_SOCKET -1
+#define closesocket(x) close(x)
+#endif
+
+#endif /* !defined(SYNC_PLAYER) */
+
 #include "device.h"
 #include "track.h"
 #include <assert.h>
@@ -5,6 +40,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+
 
 static int find_track(struct sync_device *d, const char *name)
 {
@@ -22,7 +58,7 @@ static const char *path_encode(const char *path)
 	int path_len = (int)strlen(path);
 	for (i = 0; i < path_len; ++i) {
 		int ch = path[i];
-		if (isalnum(ch) || ch == '.' || ch == '_') {
+		if (isprint(ch) || ch == '-' || ch == '.' || ch == '_' || ch == '/' || ch == '\\' || ch == ':') {
 			if (pos >= sizeof(temp) - 1)
 				break;
 
@@ -297,10 +333,17 @@ static int read_track_data(struct sync_device *d, struct sync_track *t)
 
 static int save_track(const struct sync_track *t, const char *path)
 {
-	int i;
-	FILE *fp = fopen(path, "wb");
+	int i = 0, res = 0;
+	FILE *fp = NULL;
+#if 0
+	fp = fopen(path, "wb");
 	if (!fp)
 		return -1;
+#else
+	res = fopen_s(&fp, path, "wb");
+	if (res != 0)
+		return -1;
+#endif
 
 	fwrite(&t->num_keys, sizeof(int), 1, fp);
 	for (i = 0; i < (int)t->num_keys; ++i) {

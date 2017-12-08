@@ -11,11 +11,77 @@
 #include "rocket/track.h"
 
 #include "rocket/sync.h"
+#include "rocket/device.h"
+
+#include "utils/AssetFactory.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+
 //****************************************************************************************//
+// fopen callbackek
+// this qnd solution
+namespace {
+
+	static IAssetFactory * const * myAssetFactory = nullptr;
+
+	class Reader {
+	private:
+		IAssetRef asset;
+		size_t cursor;
+
+	public:
+		Reader() : cursor(0) {}
+
+		int Initialize(const char* name) {
+			if (*myAssetFactory) {
+				this->asset = (*myAssetFactory)->Get(name);
+				return this->asset.Valid();
+			}
+			return 0;
+		}
+
+		size_t Read(void* buf, size_t len) {
+			const uint8_t *data = reinterpret_cast<uint8_t*>(asset->GetData()) + cursor;
+			size_t readBytes = 0;
+			if (cursor + len > asset->GetSize()) {
+				readBytes = len - ((cursor + len) - asset->GetSize());
+			}
+			else {
+				readBytes = len;
+			}
+			memcpy(buf, data, readBytes);
+			cursor += readBytes;
+			return readBytes;
+		}
+
+	};
+
+	void *myFOpen(const char* filename, const char* mode) {
+		Reader * reader = new Reader();
+		if (reader->Initialize(filename))
+			return reader;
+		return nullptr;
+	}
+
+	size_t myFRead(void * buf, size_t size, size_t count, void * handler) {
+		Reader *reader = reinterpret_cast<Reader*>(handler);
+		if (reader) {
+			return reader->Read(buf, size*count);
+		}
+	}
+
+	int myFClose(void * handler) {
+		Reader *reader = reinterpret_cast<Reader*>(handler);
+		if (reader) {
+			delete reader;
+		}
+		return 0;
+	}
+}
+
+//****************************************************************************************/ /
 // timer callbackek
 namespace {
 #ifndef SYNC_PLAYER	
@@ -62,29 +128,37 @@ Timer::~Timer() {
 	this->Shutdown();
 }
 
-void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, double lengthMS, double beatPerMin, int rowPerBeat)
+void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, IAssetFactory * const  & assetFactory, double lengthMS, double beatPerMin, int rowPerBeat)
 {
+	// this qnd solution
+	myAssetFactory = &assetFactory;
+
+	// rest of the stuffz
 	m_music = music;
 	m_bpm = (beatPerMin), m_length = (lengthMS), m_rowPerBeat = (rowPerBeat);
 	m_rowLength = (60000.0) / (m_bpm*m_rowPerBeat);
 }
 
 // Rocket specific stuff // 
-void Timer::Connect(const char *_ipaddr) {
+void Timer::Connect(const char* basepath, const char *_ipaddr) {
 	if (!_ipaddr)
 		strcpy_s(this->m_ipaddress, 32, "127.0.0.1");
 	else
 		strncpy_s(this->m_ipaddress, 32, _ipaddr, 32);
 
 	/* <ROCKET SPECIFIC> */
-	m_rocket = sync_create_device("script/sync");
+	if (basepath)
+		m_rocket = sync_create_device(basepath);
+	else
+		m_rocket = sync_create_device("script/sync");
+
 	if (!m_rocket) throw new EX(NoRocketDeviceException);
 
-#ifndef SYNC_PLAYER
-	//sync_set_callbacks(rocket, &timer_cb, this);
-	//if (sync_connect(rocket, this->ipaddress, SYNC_DEFAULT_PORT))
-	//        throw new NoRocketDeviceException();
+	m_rocket->io_cb.open = myFOpen;
+	m_rocket->io_cb.read = myFRead;
+	m_rocket->io_cb.close = myFClose;
 
+#ifndef SYNC_PLAYER
 	int row = this->GetRowI(); //debugging madorfakor
 	if (sync_update(m_rocket, row, &timer_cb, this))
 		if (sync_connect(m_rocket, this->m_ipaddress, SYNC_DEFAULT_PORT))
