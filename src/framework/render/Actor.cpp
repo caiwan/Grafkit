@@ -24,12 +24,12 @@ Grafkit::Entity3D::~Entity3D()
 PERSISTENT_IMPL(Grafkit::Actor)
 
 Grafkit::Actor::Actor() : Persistent(),
-	m_viewMatrix(), m_transformMatrix()
+	m_viewMatrix(), m_transformMatrix(), m_ishidden(0)
 {
 }
 
 Grafkit::Actor::Actor(Ref<Entity3D> entity) : Persistent(),
-	m_viewMatrix(), m_transformMatrix()
+	m_viewMatrix(), m_transformMatrix(), m_ishidden(0)
 {
 	AddEntity(entity);
 }

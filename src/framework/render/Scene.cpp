@@ -205,9 +205,11 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 		vs->SetParamT(render, vsMatrixId, m_worldMatrices);
 		ps->SetParamT(render, psMatrixId, m_worldMatrices);
 
-		actor->DispatchBeforeRender(render, this);
-		actor->Render(render, this);
-		actor->DispatchAfterRender(render, this);
+		if (!actor->IsHidden()) {
+			actor->DispatchBeforeRender(render, this);
+			actor->Render(render, this);
+			actor->DispatchAfterRender(render, this);
+		}
 	}
 
 	vs->Unbind(render);

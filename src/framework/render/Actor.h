@@ -100,6 +100,11 @@ namespace Grafkit {
 
 		void SetEventHandler(Ref<ActorEventHandler> handler) { myEvtHandler = handler; }
 
+		void Hide() { m_ishidden = 1; }
+		void Show() { m_ishidden = 0; }
+
+		int IsHidden() { return (m_pParent.Invalid()? 0 : m_pParent->IsHidden()) || m_ishidden; }
+
 	public:
 		Grafkit::Matrix WorldMatrix() { return m_worldMatrix; }
 
@@ -128,6 +133,8 @@ namespace Grafkit {
 		std::vector<Ref<Entity3D>> m_pEntities;
 
 		Ref<ActorEventHandler> myEvtHandler;
+
+		int m_ishidden;
 
 	protected:
 		virtual void serialize(Archive& ar);
