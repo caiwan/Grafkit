@@ -338,6 +338,6 @@ float4 ValueTracker::Track::GetFloat4(double t) {
 	res.x = (float)sync_get_val(this->m_tacks[0], d),
 		res.y = (float)sync_get_val(this->m_tacks[1], d),
 		res.z = (float)sync_get_val(this->m_tacks[2], d),
-		res.w = (float)sync_get_val(this->m_tacks[2], d);
+		res.w = (float)sync_get_val(this->m_tacks[3], d);
 	return res;
 }
