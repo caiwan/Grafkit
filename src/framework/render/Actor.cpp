@@ -60,6 +60,18 @@ void Grafkit::Actor::serialize(Archive & ar)
 
 }
 
+
+// ================================================================
+
+Grafkit::ActorEventHandler::ActorEventHandler()
+{
+}
+
+
+Grafkit::ActorEventHandler::~ActorEventHandler()
+{
+}
+
 void Grafkit::ActorEventHandler::PushShader(Scene * const & scene)
 {
 	otherPShader = scene->GetPShader();

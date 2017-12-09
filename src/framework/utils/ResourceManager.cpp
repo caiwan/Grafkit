@@ -53,7 +53,10 @@ void IResourceManager::RemoveAll() {
 
 void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
 {	
-	auto it = m_resources.find(builder->GetName());
+	std::string name = builder->GetName();
+	std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+	auto it = m_resources.find(name);
 	
 	// Ha nincs resource, elotoltjuk. 
 	if (it == m_resources.end()) {

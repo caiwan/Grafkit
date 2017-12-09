@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "shader.h"
+#include "mesh.h"
 #include "texture.h"
 #include "../utils/reference.h"
 

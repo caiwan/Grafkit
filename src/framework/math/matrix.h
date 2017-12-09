@@ -81,7 +81,7 @@ namespace Grafkit {
 		///@}
 
 		/// banana for
-		void Scale(const float3 &v)
+		void Scale(const float3 v)
 		{
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(v.x, v.y, v.z));
 		}
@@ -94,7 +94,7 @@ namespace Grafkit {
 		/** Rotate around a given axis
 			@param v given axis
 			@param phi angle, rad */
-		void Rotate(const float3 &v, float phi)
+		void Rotate(const float3 v, float phi)
 		{
 			dxvector vv;
 			vv = DirectX::XMLoadFloat3(&v);

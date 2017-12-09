@@ -44,6 +44,9 @@ namespace Grafkit {
 		class ActorEventHandler : public AlignedNew<ActorEventHandler>, public Referencable
 	{
 	public:
+		ActorEventHandler();
+		virtual ~ActorEventHandler();
+
 		virtual void OnBeforeRender(Grafkit::Renderer& render, Scene * const & scene) { PushShader(scene); }
 		virtual void OnAfterRender(Grafkit::Renderer& render, Scene * const & scene) { PopShader(scene); }
 
