@@ -14,6 +14,40 @@
 #include "shader.h"
 
 namespace Grafkit {
+
+	__declspec(align(16))
+		class MaterialParameters
+		//: public Grafkit::IResource, public AlignedNew<MaterialParameter>, public Persistent
+	{
+		/* 
+		Todo:
+		Shader parameter framework
+
+		store varoius parameter pointers for ea. node
+		struct ParamRecord{
+			std::string name;
+			int id;
+			size_t len;
+			void *p;
+		}
+
+		- store them separately
+
+		map<> params
+		map<> resources
+		map<> samplers - if needed
+
+		- works as a facade for SetParam, SetResource and SetSampler
+
+		*/
+	public:
+		//MaterialParameter();
+		//~MaterialParameter();
+
+	};
+
+	// =========================================================================================================
+
 	__declspec(align(16))
 		class Material : public Grafkit::IResource, public AlignedNew<Material>, public Persistent
 	{
@@ -107,13 +141,14 @@ namespace Grafkit {
 		PERSISTENT_DECL(Grafkit::Material, 1);
 
 	private:
-		// slight optimalization trick, to avoid bind parameters to shader twice
+		// slight optimalization trick, to avoid bind/set parameters to the same shader twice
 		static Material* g_lastMaterial; 
 		Shader* m_lastVShader;
 		Shader* m_lastPShader;
 
 		int m_colors_id;
 		int m_params_id;
+
 	};
 
 	typedef Ref<Material> MaterialRef;
