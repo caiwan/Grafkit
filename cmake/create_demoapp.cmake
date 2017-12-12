@@ -24,7 +24,7 @@ endif()
     
 	target_include_directories(${_application} PUBLIC include)
 	set_target_properties(${_application} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${ASSET_DIR}")
-
+    
 	msvc_set_win32(${_application})
 
 	assign_source_group("${SOURCE_FILES}")

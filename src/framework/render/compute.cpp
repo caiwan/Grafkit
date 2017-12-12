@@ -7,6 +7,8 @@
 #include "../builtin_data/cube.h"
 #include "../builtin_data/defaultShader.h"
 
+#include "texture.h"
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
@@ -100,7 +102,13 @@ void Grafkit::Compute::AddChannel(std::string name, Texture2DRef inputCondition)
 {
 	inputNames.push_back(name);
 	channels[0].push_back(inputCondition.Valid() ? inputCondition : new Texture2D());
-	channels[1].push_back(new Texture2D());
+	
+	Texture2DRef tex = new Texture2D();
+	channels[1].push_back(tex);
+
+	Texture2DResRef res = new Texture2DRes(tex);
+	res->SetName(name);
+	materialResources.push_back(res);
 }
 
 void Grafkit::Compute::Render(Renderer &render)
@@ -154,9 +162,21 @@ void Grafkit::Compute::BindOutputs(Renderer & render, ShaderRef & shader)
 	}
 }
 
+void Grafkit::Compute::BindMaterial(Renderer & render, MaterialRef & material)
+{
+	for (size_t i = 0; i < outputChannels->size(); i++) {
+		material->SetTexture(materialResources[i], inputNames[i]);
+	}
+}
+
 void Grafkit::Compute::SwapBuffers()
 {
 	auto tmp = outputChannels;
 	outputChannels = inputChannels;
 	inputChannels = tmp;
+
+	// swp
+	for (size_t i = 0; i < materialResources.size(); i++) {
+		materialResources[i]->AssingnRef(outputChannels->at(i));
+	}
 }

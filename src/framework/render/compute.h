@@ -4,6 +4,7 @@
 
 #include "shader.h"
 #include "mesh.h"
+#include "material.h"
 #include "texture.h"
 #include "../utils/reference.h"
 
@@ -30,7 +31,9 @@ namespace Grafkit {
 		void AddChannel(std::string name, Texture2DRef inputCondition = nullptr);
 		void Render(Renderer &render);
 
+		// QnD way to bind results to shaders
 		void BindOutputs(Renderer & render, ShaderRef& shader);
+		void BindMaterial(Renderer & render, MaterialRef &material);
 
 	protected:
 		void SwapBuffers();
@@ -47,6 +50,8 @@ namespace Grafkit {
 		std::vector<Texture2DRef> channels[2];
 		std::vector<Texture2DRef> *inputChannels;
 		std::vector<Texture2DRef> *outputChannels;
+
+		std::vector<Texture2DResRef> materialResources;
 
 		// --- snip 
 		// This should be the responsibility of the texture module 
