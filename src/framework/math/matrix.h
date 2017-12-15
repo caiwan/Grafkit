@@ -86,6 +86,10 @@ namespace Grafkit {
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(v.x, v.y, v.z));
 		}
 
+		void Scale(float s) {
+			Scale(s, s, s);
+		}
+
 		void Scale(float x, float y, float z)
 		{
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(x, y, z));

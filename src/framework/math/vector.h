@@ -32,8 +32,19 @@ namespace Grafkit {
 
 };
 
+inline float3 operator+ (const float3 &a, const float3 &b) { return float3(a.x + b.x, a.y + b.y, a.z + b.z); }
+inline float3 operator- (const float3 &a, const float3 &b) { return float3(a.x - b.x, a.y - b.y, a.z - b.z); }
+
+inline float3 operator+ (const float3 &a, const float &b) { return float3(a.x + b, a.y + b, a.z + b); }
+inline float3 operator+ (const float3 &a, const double &b) { return float3(a.x + b, a.y + b, a.z + b); }
+
+inline float3 operator- (const float3 &a, const float &b) { return float3(a.x - b, a.y - b, a.z - b); }
+inline float3 operator- (const float3 &a, const double &b) { return float3(a.x - b, a.y - b, a.z - b); }
+
 inline float3 operator* (const float3 &a, const float3 &b) { return float3(a.x * b.x, a.y * b.y, a.z * b.z); }
 inline void operator*= (float3 &a, const float3 &b) {a = float3(a.x * b.x, a.y * b.y, a.z * b.z); }
 
 inline float3 operator* (const float3 &a, const float &b) { return float3(a.x * b, a.y * b, a.z * b); }
+inline float3 operator* (const float3 &a, const double &b) { return float3(a.x * b, a.y * b, a.z * b); }
 inline void operator*= (float3 &a, const float &b) { a = float3(a.x * b, a.y * b, a.z * b); }
+inline void operator*= (float3 &a, const double &b) { a = float3(a.x * b, a.y * b, a.z * b); }
