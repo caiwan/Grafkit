@@ -30,6 +30,8 @@ find_package(Bass)
 # find_package(Bullet)
 find_package(GTest)
 
+set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo MinSizeRel CACHE TYPE INTERNAL FORCE)
+
 set(GK2_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/framework")
 set(GK2_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(GK2_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
