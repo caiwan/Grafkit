@@ -1,4 +1,0 @@
-include (${GK2_ROOT_DIR}/cmake/create_demoapp.cmake)
-include (${GK2_ROOT_DIR}/cmake/add_blend_assimpconv.cmake)
-
-subdirs(01_padlizsan)

@@ -5,17 +5,20 @@ set(APPLICATION IT_Importer )
 file(GLOB_RECURSE SOURCE_FILES *.cpp)
 file(GLOB_RECURSE HEADER_FILES *.h)
 
+enable_testing()
+
+find_package(GTest)
+
 # include_directories("${CMAKE_SOURCE_DIR}")
 include_directories("${GK2_INCLUDE_DIR}")
 include_directories("${ASSIMP_INCLUDE_DIR}")
 include_directories("${GTEST_INCLUDE_DIRS}")
 include_directories("${GK2_SRC_DIR}/Importer")
 
-enable_testing()
 add_executable(${APPLICATION} EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES})
 add_test(Tests ${APPLICATION})
 
-target_link_libraries(${APPLICATION} Importer Grafkit2 ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(${APPLICATION} Importer Grafkit2 GTest::Main GTest::GTest)
 target_include_directories(${APPLICATION} PUBLIC include)
 
 set(ASSET_DIR ${CMAKE_BINARY_DIR}/tests/assets)
@@ -25,5 +28,6 @@ ASSIMP_COPY_BINARIES(${APPLICATION} ${ASSET_DIR})
 
 add_definitions(-DIMPORTER_PY_ROOT="${CMAKE_SOURCE_DIR}/src/importer")
 add_definitions(-DTEST_ASSET_ROOT="${ASSET_DIR}")
+# add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
 
 set_target_properties(${APPLICATION} PROPERTIES FOLDER tests)

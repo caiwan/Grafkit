@@ -7,15 +7,12 @@ file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inl)
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${BASS_INCLUDE_DIR}")
-include_directories("${STB_INCLUDE_DIR}")
+# include_directories("${STB_INCLUDE_DIR}")
 
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 
-IF(BUILD_LIVE_RELEASE)
-    ADD_DEFINITIONS(-DLIVE_RELEASE -DSYNC_PLAYER)
-ENDIF(BUILD_LIVE_RELEASE)
-
 add_library(Grafkit2 STATIC ${SOURCE_FILES} ${HEADER_FILES})
+target_link_libraries(Grafkit2 stb::stb)
 target_include_directories(Grafkit2 PUBLIC "${CMAKE_SOURCE_DIR}")
 
 set_target_properties(Grafkit2 PROPERTIES DEBUG_POSTFIX "d")
