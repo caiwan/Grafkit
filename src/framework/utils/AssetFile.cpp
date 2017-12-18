@@ -33,7 +33,7 @@ std::string _trimslash(std::string in) {
 	size_t left = 0;
 	do {
 		std::string::size_type pos = in.find("//", left);
-		if (pos != std::string::npos) 
+		if (pos != std::string::npos)
 		{
 			out.append(in.substr(left, pos - left));
 			left += pos + 1;
@@ -285,20 +285,22 @@ bool Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 	static unsigned char count;
 	if (count == 0) {
 		LiveReload::WatchDirectory* w = ((LiveReload::WatchDirectory*)m_eventWatcher);
+		bool triggered = false;
 		if (w && w->HasItems()) {
 			do {
+				triggered = true;
 				resman->TriggerReload(w->PopFile());
 			} while (w->HasItems());
 		}
 		count = 30;
-		return true;
+		return triggered;
 	}
 	count--;
 	return false;
 #else
 	return false;
 #endif
-	}
+}
 
 
 // ==================================================================================== 

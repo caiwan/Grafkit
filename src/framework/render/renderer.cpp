@@ -17,8 +17,10 @@ Renderer::Renderer() :
 	m_depthStencilView(nullptr),
 	m_rasterState(nullptr),
 	m_screenW(0),
-	m_screenH(0)
+	m_screenH(0),
+	m_lastDeltaTime(0.f)
 {
+	m_lastTimePoint = std::chrono::system_clock::now();
 }
 
 Renderer::~Renderer()
@@ -419,9 +421,12 @@ void Renderer::EndScene()
 		m_swapChain->Present(0, 0);
 	}
 
-	//this->m_device->pre
+	auto timePoint = std::chrono::system_clock::now();
+	auto deltaTime = timePoint - m_lastTimePoint;
 
-	return;
+	// Ref: http://en.cppreference.com/w/cpp/chrono/duration
+	m_lastDeltaTime = (float)(std::chrono::duration_cast<std::chrono::microseconds>(deltaTime).count()) / 1000.f / 1000.f;
+	m_lastTimePoint = timePoint;
 }
 
 

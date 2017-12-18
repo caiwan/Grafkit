@@ -15,6 +15,7 @@ subdirs(test_core_rotating_cube_scenegraph)
 subdirs(test_synctracker)
 subdirs(test_music)
 subdirs(test_particle_cubes)
+subdirs(test_particle_engine)
 subdirs(test_loaderbar)
 subdirs(test_utils)
 

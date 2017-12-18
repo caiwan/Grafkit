@@ -29,9 +29,8 @@ using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-#define CUBEW 64
-#define CUBEH 64
-#define CUBEWH ((CUBEW) * (CUBEH))
+#define PARTICLE_RES 128
+#define PARTICLE_COUNT ((PARTICLE_RES) * (PARTICLE_RES))
 
 class Application : public System, public IResourceManager
 {
@@ -80,8 +79,8 @@ protected:
 	ShaderResRef vs;
 	ShaderResRef fs;
 
-	ComputeRef liquidCompute;
-	ShaderResRef fsLiquid;
+	ComputeRef particleCompute;
+	ShaderResRef fsParticleEngine;
 
 	int init() {
 
@@ -89,8 +88,8 @@ protected:
 		CameraRef camera = new Camera;
 		camera->SetName("camera");
 
-		TextureResRef texture = new TextureRes();
-		texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
+		TextureResRef texture = new Texture2DRes();
+		texture = this->Load<Texture2DRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 		// -- texture sampler
 		textureSampler = new TextureSampler();
@@ -100,13 +99,13 @@ protected:
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertexparticle.hlsl", ""));
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
 
-		fsLiquid = Load<ShaderRes>(new PixelShaderLoader("LiquidCompute", "shaders/liquid.hlsl", "LiquidCompute"));
+		fsParticleEngine = Load<ShaderRes>(new PixelShaderLoader("ParticleCompute", "shaders/particles.hlsl", "ParticleCompute"));
 
 		// -- precalc
 		this->DoPrecalc();
 
 		// -- model 
-		ModelRef model = new Model(GrafkitData::CreateCubes(CUBEWH));
+		ModelRef model = new Model(GrafkitData::CreateCubes(PARTICLE_COUNT));
 		model->SetMaterial(new Material());
 		model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 		model->GetMaterial()->SetName("GridMaterial");
@@ -145,13 +144,13 @@ protected:
 		cameraActor->Matrix().LookAtLH(float3(100, 100, 100));
 
 		// ps based compute shader mockup
-		liquidCompute = new Compute();
-		liquidCompute->AddChannel("tex_age");
-		liquidCompute->AddChannel("tex_velocity");
-		liquidCompute->AddChannel("tex_speed");
-		liquidCompute->AddChannel("tex_position");
+		particleCompute = new Compute();
+		particleCompute->AddChannel("tex_age");
+		particleCompute->AddChannel("tex_velocity");
+		particleCompute->AddChannel("tex_position");
+		particleCompute->AddChannel("tex_color");
 
-		liquidCompute->Initialize(render, fsLiquid, CUBEW);
+		particleCompute->Initialize(render, fsParticleEngine, PARTICLE_RES);
 
 		/* ------------------------------------------------------------ */
 
@@ -165,10 +164,21 @@ protected:
 		rootActor = scene->Get()->GetRootNode();
 		cameraActor = scene->Get()->GetActiveCameraNode();
 
+		ZeroMemory(&sceneParams, sizeof(sceneParams));
+
 		this->t = 0;
 
 		return 0;
 	};
+
+	struct
+	{
+		float globalTime;
+		float lastTime;
+		float deltaTime;
+		float _padding;
+		int frameCount;
+	} sceneParams;
 
 	// ==================================================================================================================
 
@@ -178,21 +188,74 @@ protected:
 
 	// ==================================================================================================================
 	int mainloop() {
+#ifndef LIVE_RELEASE
+		updateTroubleshoot();
+#endif //LIVE_RELEASE
 
-		liquidCompute->Render(render);
+		(*fsParticleEngine)->SetParamT(render, "SceneParams", sceneParams);
+
+		particleCompute->Render(render);
 
 		this->render.BeginSceneDev();
 		{
-			liquidCompute->BindOutputs(render, (*vs));
-			scene->Get()->PreRender(render);
-			scene->Get()->Render(render);
-
-			this->t += 0.1f;
+			particleCompute->BindOutputs(render, (*vs));
+			scene->Get()->RenderFrame(render, t);
 		}
 
 		this->render.EndScene();
-		return 0;
+
+
+		sceneParams.deltaTime = render.GetDeltaTime();
+		sceneParams.globalTime = t;
+		sceneParams.frameCount++;
+		this->t += sceneParams.deltaTime;
+
+		// livereload
+#ifndef  LIVE_RELEASE
+		if (m_file_loader->PollEvents(this)) {
+			sceneParams.frameCount = 0;
+		}
+#endif // ! LIVE_RELEASE
+
+		int res = 0;
+		res |= isEscPressed();
+
+		return res;
 	};
+
+
+#ifndef LIVE_RELEASE
+	struct troubleshootPar_t {
+		troubleshootPar_t() { showMap = 0, showOutput = 0; }
+		union {
+			struct {
+				int showOutput;
+				int showMap;
+			};
+			float4 _;
+		};
+	};
+
+	troubleshootPar_t troubleshootPar;
+
+	void updateTroubleshoot() {
+
+		int key = -1;
+		for (int i = 0; i < 8; i++) {
+			if (m_pInput->IsKeyDown(VK_F1 + i)) {
+				key = i; break;
+			}
+		}
+		if (key != -1) {
+			if (m_pInput->IsKeyDown(VK_SHIFT)) { troubleshootPar.showOutput = key; }
+			else { troubleshootPar.showMap = key; }
+		}
+
+		if (m_pInput->IsKeyDown(VK_SPACE))
+			sceneParams.frameCount = 0;
+	}
+
+#endif //LIVE_RELEASE
 
 private:
 	FileAssetFactory *m_file_loader;

@@ -155,14 +155,14 @@ void Grafkit::Compute::Render(Renderer &render)
 	SwapBuffers();
 }
 
-void Grafkit::Compute::BindOutputs(Renderer & render, ShaderRef & shader)
+void Grafkit::Compute::BindOutputs(Renderer & render, ShaderRef & shader) const
 {
 	for (size_t i = 0; i < outputChannels->size(); i++) {
 		shader->SetShaderResourceView(render, inputNames[i], outputChannels->at(i)->GetShaderResourceView());
 	}
 }
 
-void Grafkit::Compute::BindMaterial(Renderer & render, MaterialRef & material)
+void Grafkit::Compute::BindMaterial(Renderer & render, MaterialRef & material) const
 {
 	for (size_t i = 0; i < outputChannels->size(); i++) {
 		material->SetTexture(materialResources[i], inputNames[i]);

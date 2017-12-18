@@ -32,8 +32,8 @@ namespace Grafkit {
 		void Render(Renderer &render);
 
 		// QnD way to bind results to shaders
-		void BindOutputs(Renderer & render, ShaderRef& shader);
-		void BindMaterial(Renderer & render, MaterialRef &material);
+		void BindOutputs(Renderer & render, ShaderRef& shader) const ;
+		void BindMaterial(Renderer & render, MaterialRef &material) const ;
 
 	protected:
 		void SwapBuffers();

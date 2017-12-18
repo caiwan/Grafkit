@@ -7,6 +7,8 @@ file(GLOB_RECURSE HEADER_FILES *.h)
 
 enable_testing()
 
+set(GTEST_MSVC_SEARCH "MD")
+
 find_package(GTest)
 
 # include_directories("${CMAKE_SOURCE_DIR}")

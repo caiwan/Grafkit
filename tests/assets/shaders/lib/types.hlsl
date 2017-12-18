@@ -14,7 +14,6 @@ struct BoneMatrices
 
 struct Resolution
 {
-
     float2 resolution;
     float aspect;
     float fov;
@@ -78,4 +77,13 @@ struct EffectParamType
 {
     float4 screen;
     float4 viewport;
+};
+
+struct SceneParamType
+{
+    float globalTime;
+    float lastTime;
+    float deltaTime;
+    float _padding;
+    int frameCount;
 };
