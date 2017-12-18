@@ -13,6 +13,7 @@ Texture1D texFFT;
 #define ZERO_POINT (-0.69278611)
 
 Texture2D tex_age; // age, size
+Texture2D tex_acceleration;
 Texture2D tex_velocity;
 Texture2D tex_position;
 Texture2D tex_color;
@@ -47,6 +48,7 @@ cbuffer ParticleEngineParams
 struct ModelOutput
 {
     float4 age;
+    float4 acceleration;
     float4 velocity;
     float4 position;
     float4 color;
@@ -90,20 +92,23 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
     int particleID = particleAddr.x + particleMapDimm.x * particleAddr.y;
 	
     output.age = float4(0, 0, 0, 0);
+    output.acceleration = float4(0, 0, 0, 0);
     output.velocity = float4(0, 0, 0, 0);
-    output.position = float4(0, 0, 0, 0);
+    output.position = float4(0, 0, 0, 1);
     output.color = float4(0, 0, 0, 0);
 
-    float speed = 5;
+    float speed = 5.;
     float size = .25;
+    float4 acceleration = tex_acceleration.Sample(SampleType, uv);
     float4 velocity = tex_velocity.Sample(SampleType, uv);
     float4 pos = tex_position.Sample(SampleType, uv);
 
-    float brownianSpeed = 5;
-    float3 brownian = ComputeCurl3(pos.xyz * .001);
+    float brownianSpeed = 3;
+    float4 brownian = ComputeCurl3((pos.xyz + float3(0,sceneParams.globalTime,0)) * .001);
 
-    //if (time < 0.001)
-    if (sceneParams.frameCount < 1)
+    float4 sumAccel = float4(0, 0, 0, 0);
+
+    if (sceneParams.frameCount < 2)
     {
         float x = fbm(uv);
         float y = fbm(uv + float2(0, 1));
@@ -113,32 +118,41 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
 
         pos.xyz = normalize(float3(x, y, z)) * (256 + 128 * h);
         age = 0;
+
+        velocity.xyz = float3(0, 0, 0);
+        acceleration.xyz = float3(0, 0, 0);
     }
     else
     {
-        float3 attractorPos = float3(0, 10, 0);
+        float4 attractorPos = float4(0, 400, 0, 1);
 
         age += sceneParams.deltaTime;
 
+        float4 deltaPos = attractorPos - pos;
+        
         float force = .1;
 
-        float3 deltaPos = pos.xyz - attractorPos;
-        float3 direction = normalize(deltaPos) * force;
-        //float3 delataVel = direction - velocity.xyz;
+        float4 direction = normalize(deltaPos);
+        float4 deltaSpeed = direction * force * length(deltaPos);
+        float4 deltaVel = deltaSpeed - velocity;
 
-        float accel = 1.;
-        velocity.xyz += direction * force;
+        float accel = 1.25;
+        sumAccel += accel * deltaVel;
     }
-	
-    velocity.xyz = velocity.xyz * speed;
+
+    float accelDecay = .002 * sceneParams.deltaTime;
+
+    output.acceleration += accelDecay * acceleration;
+    output.acceleration += sumAccel;
+    output.acceleration.w = 0.;
+
+    output.velocity += (velocity + output.acceleration * speed* sceneParams.deltaTime);
+    output.velocity += brownian * brownianSpeed;
     velocity.w = 0.;
 
-    output.velocity = velocity;
-
-    pos = pos + velocity * sceneParams.deltaTime;
-
-    pos.w = 1.;
-    output.position = pos;
+    output.position += pos;
+    output.position += output.velocity * sceneParams.deltaTime;
+    output.position.w = 1.;
 
     output.age.x = age;
     output.age.y = size;

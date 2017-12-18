@@ -255,12 +255,12 @@ float2 ComputeCurl(float2 p)
 }
 
 
-float3 ComputeCurl3(float3 p)
+float4 ComputeCurl3(float3 p)
 {
     float eps = 1.0 / float(FBM_OCTAVE_MAX);
     float n1, n2, a, b;
     float x = p.x, y = p.y, z = p.z;
-    float3 curl;
+    float4 curl;
 
     n1 = fbm3(float3(p.x, p.y + eps, p.z));
     n2 = fbm3(float3(p.x, p.y - eps, p.z));
@@ -291,6 +291,8 @@ float3 ComputeCurl3(float3 p)
     b = (n1 - n2) / (2 * eps);
 
     curl.z = a - b;
+
+    curl.w = 0.;
 
     return curl;
 }

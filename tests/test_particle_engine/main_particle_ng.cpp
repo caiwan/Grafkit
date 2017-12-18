@@ -40,8 +40,10 @@ public:
 	{
 		int screenWidth, screenHeight;
 
-		screenWidth = 800;
-		screenHeight = 600;
+		//screenWidth = 800;
+		//screenHeight = 600;
+		screenWidth = 1024;
+		screenHeight = 768;
 
 		t = 0;
 
@@ -146,6 +148,7 @@ protected:
 		// ps based compute shader mockup
 		particleCompute = new Compute();
 		particleCompute->AddChannel("tex_age");
+		particleCompute->AddChannel("tex_acceleration");
 		particleCompute->AddChannel("tex_velocity");
 		particleCompute->AddChannel("tex_position");
 		particleCompute->AddChannel("tex_color");
