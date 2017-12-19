@@ -32,8 +32,12 @@ cbuffer SceneParams
 cbuffer ParticleEngineParams
 {
     int dynamicsElemCount;
+
     float dynamicsMaxAge;
     float dynamicsEmitRate;
+
+    float brownianSpeed;
+    float brownianScale;
 
     DynamicElem_t dynamics[24];
 }
@@ -132,6 +136,13 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
         params.position = float4(0, -400, 0, 1);
 
         sumAccel += 5 * 1.25 * attractor(params, particle);
+
+        params.param0 = float4(-.01, 0, 0, 0);
+        params.position = float4(400, 0, 0, 1);
+
+        sumAccel += 5 * 1.25 * attractor(params, particle);
+        params.position = float4(-400, 0, 0, 1);
+		sumAccel += 5 * 1.25 * attractor(params, particle);
 
     }
 
