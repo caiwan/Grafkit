@@ -14,6 +14,9 @@ def print_usage():
 
 
 class EvtHandler(FileSystemEventHandler): 
+
+    SLEEP = .25
+
     def __init__(self, src_dir, dst_dir):
         FileSystemEventHandler.__init__(self)
         self.src = src_dir
@@ -40,20 +43,20 @@ class EvtHandler(FileSystemEventHandler):
                 self.lg.error("fuk {}".format(str(e)))
                 if e.errno == 2:
                     return
-                time.sleep(.5)
+                time.sleep(self.SLEEP)
             pass
         
     def on_created(self, evt):
-        time.sleep(.5)
+        time.sleep(self.SLEEP)
         self.copy(evt)
         
     def on_modified(self, evt):
-        time.sleep(.5)
+        time.sleep(self.SLEEP)
         self.copy(evt)
     pass
     
     def on_moved(self, evt):
-        time.sleep(.5)
+        time.sleep(self.SLEEP)
         self.copy(evt)
     pass
     

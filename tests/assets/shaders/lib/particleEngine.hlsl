@@ -24,16 +24,18 @@ struct Particle
 
 // calculates an attractor 
 // pos - position of attractor
-// param0.x - amunt of force that pushes particles toward
+// param0.x - amunt of acceleration that pushes particles toward
 float4 attractor(DynamicParams_t params, Particle particle)
 {
-    float force = params.param0.x;
-
     float4 deltaPos = params.position - particle.position;
 
+    float distance = length(deltaPos);
     float4 direction = normalize(deltaPos);
-    float4 deltaSpeed = direction * force * length(deltaPos);
-    float4 deltaVel = deltaSpeed - particle.velocity;
 
-    return deltaVel;
+    float forceAmount = params.param0.x * distance;
+
+    float4 force = direction * forceAmount;
+    float4 accel = force - particle.velocity;
+
+    return accel;
 }

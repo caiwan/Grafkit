@@ -8,6 +8,8 @@
 #include "render/Material.h"
 #include "render/shader.h"
 
+#include "render/particle.h"
+
 #include "math/matrix.h"
 
 #include "math/fbm.h"
@@ -40,10 +42,13 @@ public:
 	{
 		int screenWidth, screenHeight;
 
-		//screenWidth = 800;
-		//screenHeight = 600;
+#if 0
+		screenWidth = 800;
+		screenHeight = 600;
+#else
 		screenWidth = 1024;
 		screenHeight = 768;
+#endif
 
 		t = 0;
 
@@ -81,7 +86,9 @@ protected:
 	ShaderResRef vs;
 	ShaderResRef fs;
 
-	ComputeRef particleCompute;
+	Ref<ParticleEngine> particleEngine;
+
+	//ComputeRef particleCompute;
 	ShaderResRef fsParticleEngine;
 
 	int init() {
@@ -145,15 +152,25 @@ protected:
 		cameraActor->Matrix().Identity();
 		cameraActor->Matrix().LookAtLH(float3(100, 100, 100));
 
-		// ps based compute shader mockup
-		particleCompute = new Compute();
-		particleCompute->AddChannel("tex_age");
-		particleCompute->AddChannel("tex_acceleration");
-		particleCompute->AddChannel("tex_velocity");
-		particleCompute->AddChannel("tex_position");
-		particleCompute->AddChannel("tex_color");
+		particleEngine = new ParticleEngine();
+		particleEngine->AddDynamics(new ParticleAttractor(float4(0, 400, 0, 1), 1., 5.25));
+		particleEngine->AddDynamics(new ParticleAttractor(float4(0, -400, 0, 1), 1., 5.25));
+		particleEngine->AddDynamics(new ParticleAttractor(float4(400, 0, 0, 1), 1., 5.25));
+		particleEngine->AddDynamics(new ParticleAttractor(float4(-400, 0, 0, 1), 1., 5.25));
 
-		particleCompute->Initialize(render, fsParticleEngine, PARTICLE_RES);
+
+		auto particleGlobals = particleEngine->GetGlobals();
+		particleGlobals.maxAge = 10;
+		particleGlobals.emitRate = 5;
+		particleGlobals.brownianScale = .001;
+		particleGlobals.brownianSpeed = 8.;
+		particleGlobals.speedScale = 1.;
+
+		particleEngine->SetGlobals(
+			particleGlobals
+		);
+
+		particleEngine->Initialize(render, fsParticleEngine, PARTICLE_RES);
 
 		/* ------------------------------------------------------------ */
 
@@ -197,16 +214,15 @@ protected:
 
 		(*fsParticleEngine)->SetParamT(render, "SceneParams", sceneParams);
 
-		particleCompute->Render(render);
+		particleEngine->Render(render);
 
 		this->render.BeginSceneDev();
 		{
-			particleCompute->BindOutputs(render, (*vs));
+			particleEngine->GetCompute()->BindOutputs(render, (*vs));
 			scene->Get()->RenderFrame(render, t);
 		}
 
 		this->render.EndScene();
-
 
 		sceneParams.deltaTime = render.GetDeltaTime();
 		sceneParams.globalTime = t;

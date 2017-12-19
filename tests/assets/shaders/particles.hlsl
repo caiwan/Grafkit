@@ -10,9 +10,6 @@ Texture1D texFFT;
 #define PI (4 * atan(1))
 #endif
 
-// casefully measured zero point 
-#define ZERO_POINT (-0.69278611)
-
 Texture2D tex_age; // age, size
 Texture2D tex_acceleration;
 Texture2D tex_velocity;
@@ -31,14 +28,18 @@ cbuffer SceneParams
 
 cbuffer ParticleEngineParams
 {
+    struct
+    {
+        float maxAge;
+        float emitRate;
+
+        float brownianSpeed;
+        float brownianScale;
+
+        float speedScale;
+    } globals;
+
     int dynamicsElemCount;
-
-    float dynamicsMaxAge;
-    float dynamicsEmitRate;
-
-    float brownianSpeed;
-    float brownianScale;
-
     DynamicElem_t dynamics[24];
 }
 
@@ -62,7 +63,6 @@ SamplerState SampleType
 
 float ADSR(float attack, float decay, float sustain, float sustain_time, float release, float time)
 {
-	// Attack
     if (attack > 0)
     {
         if (time < attack)
@@ -87,7 +87,7 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
     int2 particleAddr = uv * particleMapDimm;
     int particleID = particleAddr.x + particleMapDimm.x * particleAddr.y;
 	
-    float speed = 5.;
+    //float speed = 5.;
 
     output.age = float4(0, 0, 0, 0);
     output.acceleration = float4(0, 0, 0, 0);
@@ -103,8 +103,8 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
     particle.velocity = tex_velocity.Sample(SampleType, uv);
     particle.position = tex_position.Sample(SampleType, uv);
 
-    float brownianSpeed = 3;
-    float4 brownian = ComputeCurl3((particle.position.xyz + float3(0, sceneParams.globalTime, 0)) * .001);
+    //float brownianSpeed = 3;
+    float4 brownian = ComputeCurl3((particle.position.xyz + float3(0, sceneParams.globalTime, 0)) * globals.brownianScale);
 
     float4 sumAccel = float4(0, 0, 0, 1);
 
@@ -124,26 +124,11 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
     }
     else
     {
-        DynamicParams_t params;
-
-        params.position = float4(0, 400, 0, 1);
-        params.param0 = float4(.1, 0, 0, 0);
-        params.param1 = float4(0, 0, 0, 0);
-        params.param2 = float4(0, 0, 0, 0);
-
-        sumAccel += 5 * 1.25 * attractor(params, particle);
-
-        params.position = float4(0, -400, 0, 1);
-
-        sumAccel += 5 * 1.25 * attractor(params, particle);
-
-        params.param0 = float4(-.01, 0, 0, 0);
-        params.position = float4(400, 0, 0, 1);
-
-        sumAccel += 5 * 1.25 * attractor(params, particle);
-        params.position = float4(-400, 0, 0, 1);
-		sumAccel += 5 * 1.25 * attractor(params, particle);
-
+        for (int i = 0; i < dynamicsElemCount; i++)
+        {
+            DynamicElem_t elem = dynamics[i];
+            sumAccel += elem.weight * attractor(elem.params, particle);
+        }
     }
 
     float accelDecay = .002 * sceneParams.deltaTime;
@@ -153,11 +138,11 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
     output.acceleration.w = 0.;
 
     output.velocity += (particle.velocity + output.acceleration * sceneParams.deltaTime);
-    output.velocity += brownian * brownianSpeed;
+    output.velocity += brownian * globals.brownianSpeed;
     output.velocity.w = 0.;
 
     output.position += particle.position;
-    output.position += output.velocity * speed * sceneParams.deltaTime;
+    output.position += output.velocity * globals.speedScale * sceneParams.deltaTime;
     output.position.w = 1.;
 
     output.age.x = particle.age + sceneParams.deltaTime;

@@ -2,16 +2,16 @@
 
 #include "particle.h"
 
-
 Grafkit::ParticleEngine::ParticleEngine()
 {
+	ZeroMemory(&m_shaderParams, sizeof(m_shaderParams));
 }
 
 Grafkit::ParticleEngine::~ParticleEngine()
 {
 }
 
-void Grafkit::ParticleEngine::AddDynamicElem(ParticleDynamicsRef & elem)
+void Grafkit::ParticleEngine::AddDynamics(ParticleDynamicsRef elem)
 {
 	m_dynamicElements.push_back(elem);
 }
@@ -22,13 +22,12 @@ void Grafkit::ParticleEngine::Initialize(Renderer & render, ShaderResRef engine,
 
 	m_particleCompute = new Compute();
 	m_particleCompute->AddChannel("tex_age");
+	m_particleCompute->AddChannel("tex_acceleration");
 	m_particleCompute->AddChannel("tex_velocity");
-	m_particleCompute->AddChannel("tex_speed");
 	m_particleCompute->AddChannel("tex_position");
+	m_particleCompute->AddChannel("tex_color");
 
 	m_particleCompute->Initialize(render, m_fsParticleEngine, particleRes);
-
-	ZeroMemory(&m_shaderParams, sizeof(engineParams_t));
 }
 
 void Grafkit::ParticleEngine::Render(Renderer & render)
@@ -37,10 +36,31 @@ void Grafkit::ParticleEngine::Render(Renderer & render)
 	paramCount = (PARTICLE_NG_MAX_ELEM < paramCount) ? PARTICLE_NG_MAX_ELEM : paramCount;
 	for (size_t i = 0; i < paramCount; i++) {
 		m_dynamicElements[i]->Calculate();
-		m_shaderParams.params[i] = m_dynamicElements[i]->dynamicParams;
+		m_shaderParams.args[i] = m_dynamicElements[i]->m_params;
 	}
 
-	//(*m_fsParticleEngine);
-
+	m_shaderParams.elemCount = paramCount;
+	(*m_fsParticleEngine)->SetParamT(render, "ParticleEngineParams", m_shaderParams);
 	m_particleCompute->Render(render);
+}
+
+// ========================================================================
+
+Grafkit::ParticleDynamics::ParticleDynamics(float4 position, float weight)
+{
+	ZeroMemory(&m_params, sizeof(m_params));
+	m_params.args.position = position;
+	m_params.weight = weight;
+}
+
+void Grafkit::ParticleDynamics::Calculate()
+{
+	m_params.type = GetType();
+}
+
+// ========================================================================
+
+Grafkit::ParticleAttractor::ParticleAttractor(float4 pos, float weight, float force) : Grafkit::ParticleDynamics(pos, weight)
+{
+	m_params.args.param0.x = force;
 }
