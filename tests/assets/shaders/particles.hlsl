@@ -1,3 +1,4 @@
+#include <particleEngine.hlsl>
 #include <types.hlsl>
 #include <common.hlsl>
 
@@ -34,15 +35,7 @@ cbuffer ParticleEngineParams
     float dynamicsMaxAge;
     float dynamicsEmitRate;
 
-    struct DynamicParams_t
-    {
-        float4 pos;
-        int type;
-        float strength;
-        float _p1, _p2, _p3;
-        float4 param1;
-        float4 param2;
-    } dynamics[24];
+    DynamicElem_t dynamics[24];
 }
 
 struct ModelOutput
@@ -84,29 +77,32 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
     ModelOutput output;
 
     float2 uv = input.tex;
-    float age = tex_age.Sample(SampleType, uv).x;
 	
     int2 particleMapDimm = int2(0, 0);
     tex_age.GetDimensions(particleMapDimm.x, particleMapDimm.y);
     int2 particleAddr = uv * particleMapDimm;
     int particleID = particleAddr.x + particleMapDimm.x * particleAddr.y;
 	
+    float speed = 5.;
+
     output.age = float4(0, 0, 0, 0);
     output.acceleration = float4(0, 0, 0, 0);
     output.velocity = float4(0, 0, 0, 0);
     output.position = float4(0, 0, 0, 1);
     output.color = float4(0, 0, 0, 0);
 
-    float speed = 5.;
-    float size = .25;
-    float4 acceleration = tex_acceleration.Sample(SampleType, uv);
-    float4 velocity = tex_velocity.Sample(SampleType, uv);
-    float4 pos = tex_position.Sample(SampleType, uv);
+    Particle particle;
+
+    particle.age = tex_age.Sample(SampleType, uv).x;
+    particle.size = .25;
+    particle.acceleration = tex_acceleration.Sample(SampleType, uv);
+    particle.velocity = tex_velocity.Sample(SampleType, uv);
+    particle.position = tex_position.Sample(SampleType, uv);
 
     float brownianSpeed = 3;
-    float4 brownian = ComputeCurl3((pos.xyz + float3(0,sceneParams.globalTime,0)) * .001);
+    float4 brownian = ComputeCurl3((particle.position.xyz + float3(0, sceneParams.globalTime, 0)) * .001);
 
-    float4 sumAccel = float4(0, 0, 0, 0);
+    float4 sumAccel = float4(0, 0, 0, 1);
 
     if (sceneParams.frameCount < 2)
     {
@@ -116,46 +112,45 @@ ModelOutput ParticleCompute(FXPixelInputType input) : SV_TARGET
 
         float h = fbm(uv + float2(1, 1));
 
-        pos.xyz = normalize(float3(x, y, z)) * (256 + 128 * h);
-        age = 0;
+        particle.position.xyz = normalize(float3(x, y, z)) * (256 + 128 * h);
+        particle.age = 0;
 
-        velocity.xyz = float3(0, 0, 0);
-        acceleration.xyz = float3(0, 0, 0);
+        particle.velocity = float4(0, 0, 0, 0);
+        particle.acceleration = float4(0, 0, 0, 0);
     }
     else
     {
-        float4 attractorPos = float4(0, 400, 0, 1);
+        DynamicParams_t params;
 
-        age += sceneParams.deltaTime;
+        params.position = float4(0, 400, 0, 1);
+        params.param0 = float4(.1, 0, 0, 0);
+        params.param1 = float4(0, 0, 0, 0);
+        params.param2 = float4(0, 0, 0, 0);
 
-        float4 deltaPos = attractorPos - pos;
-        
-        float force = .1;
+        sumAccel += 5 * 1.25 * attractor(params, particle);
 
-        float4 direction = normalize(deltaPos);
-        float4 deltaSpeed = direction * force * length(deltaPos);
-        float4 deltaVel = deltaSpeed - velocity;
+        params.position = float4(0, -400, 0, 1);
 
-        float accel = 1.25;
-        sumAccel += accel * deltaVel;
+        sumAccel += 5 * 1.25 * attractor(params, particle);
+
     }
 
     float accelDecay = .002 * sceneParams.deltaTime;
 
-    output.acceleration += accelDecay * acceleration;
+    output.acceleration += accelDecay * particle.acceleration;
     output.acceleration += sumAccel;
     output.acceleration.w = 0.;
 
-    output.velocity += (velocity + output.acceleration * speed* sceneParams.deltaTime);
+    output.velocity += (particle.velocity + output.acceleration * sceneParams.deltaTime);
     output.velocity += brownian * brownianSpeed;
-    velocity.w = 0.;
+    output.velocity.w = 0.;
 
-    output.position += pos;
-    output.position += output.velocity * sceneParams.deltaTime;
+    output.position += particle.position;
+    output.position += output.velocity * speed * sceneParams.deltaTime;
     output.position.w = 1.;
 
-    output.age.x = age;
-    output.age.y = size;
+    output.age.x = particle.age + sceneParams.deltaTime;
+    output.age.y = particle.size;
     
 	// ... 
     output.color = float4(uv.x, uv.y, 0, 1);
