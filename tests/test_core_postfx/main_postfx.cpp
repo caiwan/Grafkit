@@ -177,14 +177,14 @@ protected:
 			m_postfx->BindInput(render);
 
 			// pre fx-pass
-			this->render.BeginScene();
+			this->render.BeginSceneDev();
 			{
 				float2 res = float2();
 				render.GetViewportSizef(res.x, res.y);
 
 				m_fxFXAA->Get()->SetParamValueT<float2>(render, "FXAA", "resolution", res);
-				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .1);
-				m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "zoom", 3);
+				//m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "theta", .1);
+				//m_fxFishEye->Get()->SetParamValueT<float>(render, "Fisheye", "zoom", 3);
 
 				(*scene)->RenderFrame(render, t);
 

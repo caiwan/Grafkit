@@ -23,6 +23,7 @@
 #include "generator/SceneLoader.h"
 
 #include "render/compute.h"
+#include "render/effect.h"
 
 #include "generator/TextureLoader.h"
 #include "generator/ShaderLoader.h"
@@ -85,10 +86,12 @@ protected:
 
 	ShaderResRef vs;
 	ShaderResRef fs;
+	ShaderResRef m_fxFXAA;
 
 	Ref<ParticleEngine> particleEngine;
 
-	//ComputeRef particleCompute;
+	EffectComposerRef m_postfx;
+
 	ShaderResRef fsParticleEngine;
 
 	int init() {
@@ -107,6 +110,8 @@ protected:
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertexparticle.hlsl", ""));
 		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+
+		m_fxFXAA = Load<ShaderRes>(new PixelShaderLoader("xFXAA", "shaders/fxaa.hlsl", "FXAA"));
 
 		fsParticleEngine = Load<ShaderRes>(new PixelShaderLoader("ParticleCompute", "shaders/particles.hlsl", "ParticleCompute"));
 
@@ -155,8 +160,8 @@ protected:
 		particleEngine = new ParticleEngine();
 		particleEngine->AddDynamics(new ParticleAttractor(float4(0, 400, 0, 1), 1., 5.25));
 		particleEngine->AddDynamics(new ParticleAttractor(float4(0, -400, 0, 1), 1., 5.25));
-		particleEngine->AddDynamics(new ParticleAttractor(float4(400, 0, 0, 1), 1., 5.25));
-		particleEngine->AddDynamics(new ParticleAttractor(float4(-400, 0, 0, 1), 1., 5.25));
+		particleEngine->AddDynamics(new ParticleAttractor(float4(400, 0, 0, 1), 1., -5.25));
+		particleEngine->AddDynamics(new ParticleAttractor(float4(-400, 0, 0, 1), 1., -5.25));
 
 
 		auto particleGlobals = particleEngine->GetGlobals();
@@ -174,8 +179,6 @@ protected:
 
 		/* ------------------------------------------------------------ */
 
-		this->DoPrecalc();
-
 		scene->Get()->BuildScene(render, vs, fs);
 		scene->Get()->SetActiveCamera(0);
 
@@ -183,6 +186,12 @@ protected:
 
 		rootActor = scene->Get()->GetRootNode();
 		cameraActor = scene->Get()->GetActiveCameraNode();
+
+		//
+		m_postfx = new EffectComposer();
+		m_postfx->AddPass(new EffectPass(m_fxFXAA));
+		m_postfx->Initialize(render);
+
 
 		ZeroMemory(&sceneParams, sizeof(sceneParams));
 
@@ -216,11 +225,15 @@ protected:
 
 		particleEngine->Render(render);
 
+		m_postfx->BindInput(render);
+
 		this->render.BeginSceneDev();
 		{
 			particleEngine->GetCompute()->BindOutputs(render, (*vs));
 			scene->Get()->RenderFrame(render, t);
 		}
+
+		m_postfx->Render(render);
 
 		this->render.EndScene();
 
