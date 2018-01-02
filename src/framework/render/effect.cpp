@@ -119,7 +119,7 @@ void Grafkit::EffectComposer::UnbindInput(Renderer & render)
 		}
 	}
 
-	render.ApplyRenderTargetView(1);
+	render.ApplyRenderTargetView(count);
 }
 
 // ---------------------------------------------------------------------------------------------------
