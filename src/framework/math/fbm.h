@@ -32,6 +32,10 @@ namespace Grafkit {
 		static inline float3 Random3D() {
 			return float3(Random(), Random(), Random());
 		}
+
+		static inline float4 Random4D() {
+			return float4(Random(), Random(), Random(), Random());
+		}
 	};
 
 	// Fractional brownian motion
