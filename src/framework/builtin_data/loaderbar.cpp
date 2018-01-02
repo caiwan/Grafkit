@@ -61,7 +61,7 @@ void GrafkitData::LoaderBar::InitializeLoaderBar(Grafkit::Renderer & renderer)
 	m_ps = CreateShader(renderer);
 	m_loaderbar = new EffectComposer();
 	m_loaderbar->AddPass(new EffectPass(m_ps));
-	m_loaderbar->Initialize(renderer);
+	m_loaderbar->Initialize(renderer, true);
 }
 
 void GrafkitData::LoaderBar::ShutdownLoaderBar()
