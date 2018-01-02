@@ -472,7 +472,7 @@ void Grafkit::Renderer::SetViewportAspect(float aspectW, float aspectH)
 void Grafkit::Renderer::SetRenderTargetView(ID3D11RenderTargetView * pRenderTargetView, size_t n)
 {
 	n = n < RENDER_TARGET_MAX ? n : RENDER_TARGET_MAX;
-	if (pRenderTargetView == nullptr) {
+	if (!n && pRenderTargetView == nullptr) {
 		m_renderTargetViews[0] = m_myRenderTargetView;
 	}
 	else {

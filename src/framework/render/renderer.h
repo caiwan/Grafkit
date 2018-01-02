@@ -19,7 +19,7 @@
 #include "../utils/exceptions.h"
 #include "../utils/memory.h"
 
-#define RENDER_TARGET_MAX 8
+#define RENDER_TARGET_MAX D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT
 
 using namespace DirectX;
 
@@ -36,6 +36,10 @@ namespace Grafkit {
 	{
 	public:
 		Renderer();
+
+		Renderer(Renderer&) = delete;
+		Renderer& operator= (const Renderer&) = delete;
+
 		virtual ~Renderer();
 
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float aspectw = -1, float aspecth = -1);
