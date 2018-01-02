@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 
 #include "compute.h"
@@ -55,8 +57,29 @@ namespace Grafkit
 		ParticleDynamics::DynamicElem_t GetParams() { return m_params; }
 		void SetParams(ParticleDynamics::DynamicElem_t params) { m_params = params; }
 
+		ParticleDynamics::DynamicArguments_t GetArgs() { return m_params.args; }
+		void SetArgs(ParticleDynamics::DynamicArguments_t args) { m_params.args = args; }
+
+	protected:
 		virtual void Calculate();
 		virtual ParticleDynamicsType_e GetType() = 0;
+
+#if 0
+		template<typename T> T GetArgsT() {
+			static_assert(sizeof(T) <= sizeof(m_params.args), "Size of T exceeds parameter size");
+			static_assert(sizeof(T) % 4 != 0, "Size of T does not aligns to 4 byte width");
+			T res;
+			memcpy(&res, &m_params.args, sizeof(T));
+			return res;
+		}
+
+		template<typename T> T SetArgsT(T& in) {
+			static_assert(sizeof(T) <= sizeof(m_params.args), "Size of T exceeds parameter size");
+			static_assert(sizeof(T) % 4 != 0, "Size of T does not aligns to 4 byte width");
+			memcpy(&m_params.args, &in, sizeof(T));
+			return res;
+		}
+#endif
 
 	protected:
 		DynamicElem_t m_params;
@@ -109,6 +132,8 @@ namespace Grafkit
 		ParticleEngine::ParticleGlobalParams_t GetGlobals() { return m_shaderParams.globals; }
 		void SetGlobals(ParticleEngine::ParticleGlobalParams_t globals) { m_shaderParams.globals = globals; }
 
+		// ... 
+
 	protected:
 		ParticleShaderParams_t m_shaderParams;
 
@@ -134,16 +159,7 @@ namespace Grafkit
 		virtual ParticleDynamicsType_e GetType() { return ParticleDynamics::PD_attractor; }
 
 	public:
-		//struct AttractorArgs_t
-		//{
-		//	union {
-		//		float force;
-		//		struct DynamicArguments_t _params;
-		//	};
-		//};
 
-		//AttractorArgs_t& Arguments() { return *reinterpret_cast<AttractorArgs_t*>(&m_params.args); }
-		//AttractorArgs_t GetArgs() {return }
 	};
 
 	// ------------------------------------------------------------------------
