@@ -258,13 +258,9 @@ protected:
 
 #ifndef LIVE_RELEASE
 	struct {
-		union {
-			struct {
-				int showOutput;
-				int showMap;
-			};
-			float4 _;
-		};
+		int showOutput;
+		int showMap;
+		char _[2 * 4];
 	} troubleshootPar;
 #endif LIVE_RELEASE
 

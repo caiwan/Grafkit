@@ -11,6 +11,7 @@
 #include "render/effect.h"
 
 #include "math/matrix.h"
+#include "math/fbm.h"
 
 #include "utils/asset.h"
 #include "utils/AssetFactory.h"
@@ -112,7 +113,7 @@ protected:
 			ActorRef modelActor = new Actor();
 			modelActor->SetName("center");
 
-#define N 3
+#define N 5
 			for (int x = 0; x < N; x++) {
 				for (int y = 0; y < N; y++) {
 					ActorRef actor = new Actor();
@@ -120,7 +121,7 @@ protected:
 
 					float xx = x - N / 2;
 					float yy = y - N / 2;
-					float zz = (float)(rand() % 256) / 256.;
+					float zz = Grafkit::PseudoRandom::Random();
 
 					actor->Matrix().Scale(.5, .5, .5);
 					actor->Matrix().Translate(xx, zz, yy);
