@@ -1,7 +1,6 @@
 include (${GK2_ROOT_DIR}/cmake/create_testapp.cmake)
 
 subdirs(assets)
-# subdirs(shaders)
 
 subdirs(test_animation)
 subdirs(test_animation_load)
@@ -10,6 +9,7 @@ subdirs(test_core_geometry)
 subdirs(test_core_light_material)
 subdirs(test_core_postfx)
 subdirs(test_core_postfx_ssao)
+subdirs(test_core_postfx_dof)
 subdirs(test_core_rotating_cube)
 subdirs(test_core_rotating_cube_scenegraph)
 subdirs(test_synctracker)
