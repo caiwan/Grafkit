@@ -111,8 +111,13 @@ namespace Grafkit
 			float maxAge;
 			float emitRate;
 
-			float brownianSpeed;
-			float brownianScale;
+			union {
+				struct {
+					float brownianSpeed;
+					float brownianScale;
+				};
+				float2 brownianParams;
+			};
 
 			float speedScale;
 		};
