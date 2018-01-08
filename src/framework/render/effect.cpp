@@ -33,6 +33,8 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 		m_pTexBack = m_texOut[1];
 		m_pTexRead = m_texOut[2];
 		m_pTexWrite = m_texOut[3];
+
+		m_pTexLastOutput = NULL;
 	}
 
 
@@ -125,11 +127,18 @@ void Grafkit::EffectComposer::UnbindInput(Renderer & render)
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 {
-	if (m_singlepass)
-		return RenderChain(render);
+	m_pTexLastOutput = NULL;
 
-	UnbindInput(render);
-	RenderChain(render);
+	// this part smells a bit
+
+	if (m_singlepass)
+	{
+		RenderChain(render);
+	}
+	else {
+		UnbindInput(render);
+		RenderChain(render);
+	}
 	if (autoflush)
 		this->Flush(render);
 }

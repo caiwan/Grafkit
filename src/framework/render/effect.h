@@ -29,7 +29,7 @@ namespace Grafkit {
 		void Initialize(Renderer &render, bool singlepass = false);
 		void Shutdown();
 
-		void AddPass(EffectPassRef in_fx) { m_effectChain.push_back(in_fx);}
+		void AddPass(EffectPassRef pass) { m_effectChain.push_back(pass);}
 
 		EffectPassRef GetEffect(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
 
@@ -43,6 +43,8 @@ namespace Grafkit {
 		TextureRef GetInput(size_t bind) { auto it = m_input_map.find(bind); return it == m_input_map.end() ? TextureRef() : it->second; }
 		void ClearInput() { m_input_map.clear(); }
 
+		Texture2DRef GetOutput() { return m_pTexLastOutput; }
+
 	protected:
 		void SwapBuffers();
 		void FlushBuffers();
@@ -50,8 +52,11 @@ namespace Grafkit {
 
 	protected:
 
+		std::vector<Ref<EffectComposer>> m_parentSource;
+
 		TextureRef m_texOut[4];
 		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
+		Texture2D *m_pTexLastOutput; 
 
 		TextureSamplerRef m_textureSampler;
 
@@ -60,11 +65,8 @@ namespace Grafkit {
 		ShaderRef m_shaderCopyScreen;
 
 		std::vector<EffectPassRef> m_effectChain;
-		typedef std::vector<EffectPassRef>::iterator fx_chain_it_t;
-
 		typedef std::map<size_t, TextureRef> bind_map_t;
-		typedef bind_map_t::iterator bind_map_it_t;
-
+		
 		bind_map_t m_input_map;
 
 		struct {
