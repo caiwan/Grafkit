@@ -32,6 +32,8 @@
 #include <vector>
 #include <algorithm>
 
+#undef min
+#undef max
 
 // unnamed namespace only because the implementation is in this
 // header file and we don't want to export symbols to the obj files
@@ -130,21 +132,21 @@ namespace
 		}
 		void band_matrix::resize(int dim, int n_u, int n_l)
 		{
-			assert(dim>0);
+			assert(dim > 0);
 			assert(n_u >= 0);
 			assert(n_l >= 0);
 			m_upper.resize(n_u + 1);
 			m_lower.resize(n_l + 1);
-			for (size_t i = 0; i<m_upper.size(); i++) {
+			for (size_t i = 0; i < m_upper.size(); i++) {
 				m_upper[i].resize(dim);
 			}
-			for (size_t i = 0; i<m_lower.size(); i++) {
+			for (size_t i = 0; i < m_lower.size(); i++) {
 				m_lower[i].resize(dim);
 			}
 		}
 		int band_matrix::dim() const
 		{
-			if (m_upper.size()>0) {
+			if (m_upper.size() > 0) {
 				return m_upper[0].size();
 			}
 			else {
@@ -158,7 +160,7 @@ namespace
 		double & band_matrix::operator () (int i, int j)
 		{
 			int k = j - i;       // what band is the entry
-			assert((i >= 0) && (i<dim()) && (j >= 0) && (j<dim()));
+			assert((i >= 0) && (i < dim()) && (j >= 0) && (j < dim()));
 			assert((-num_lower() <= k) && (k <= num_upper()));
 			// k=0 -> diogonal, k<0 lower left part, k>0 upper right part
 			if (k >= 0)   return m_upper[k][i];
@@ -167,7 +169,7 @@ namespace
 		double band_matrix::operator () (int i, int j) const
 		{
 			int k = j - i;       // what band is the entry
-			assert((i >= 0) && (i<dim()) && (j >= 0) && (j<dim()));
+			assert((i >= 0) && (i < dim()) && (j >= 0) && (j < dim()));
 			assert((-num_lower() <= k) && (k <= num_upper()));
 			// k=0 -> diogonal, k<0 lower left part, k>0 upper right part
 			if (k >= 0)   return m_upper[k][i];
@@ -176,12 +178,12 @@ namespace
 		// second diag (used in LU decomposition), saved in m_lower
 		double band_matrix::saved_diag(int i) const
 		{
-			assert((i >= 0) && (i<dim()));
+			assert((i >= 0) && (i < dim()));
 			return m_lower[0][i];
 		}
 		double & band_matrix::saved_diag(int i)
 		{
-			assert((i >= 0) && (i<dim()));
+			assert((i >= 0) && (i < dim()));
 			return m_lower[0][i];
 		}
 
@@ -194,7 +196,7 @@ namespace
 
 			// preconditioning
 			// normalize column i so that a_ii=1
-			for (int i = 0; i<this->dim(); i++) {
+			for (int i = 0; i < this->dim(); i++) {
 				assert(this->operator()(i, i) != 0.0);
 				this->saved_diag(i) = 1.0 / this->operator()(i, i);
 				j_min = std::max(0, i - this->num_lower());
@@ -206,7 +208,7 @@ namespace
 			}
 
 			// Gauss LR-Decomposition
-			for (int k = 0; k<this->dim(); k++) {
+			for (int k = 0; k < this->dim(); k++) {
 				i_max = std::min(this->dim() - 1, k + this->num_lower());  // num_lower not a mistake!
 				for (int i = k + 1; i <= i_max; i++) {
 					assert(this->operator()(k, k) != 0.0);
@@ -227,10 +229,10 @@ namespace
 			std::vector<double> x(this->dim());
 			int j_start;
 			double sum;
-			for (int i = 0; i<this->dim(); i++) {
+			for (int i = 0; i < this->dim(); i++) {
 				sum = 0;
 				j_start = std::max(0, i - this->num_lower());
-				for (int j = j_start; j<i; j++) sum += this->operator()(i, j)*x[j];
+				for (int j = j_start; j < i; j++) sum += this->operator()(i, j)*x[j];
 				x[i] = (b[i] * this->saved_diag(i)) - sum;
 			}
 			return x;
@@ -287,13 +289,13 @@ namespace
 			const std::vector<double>& y, bool cubic_spline)
 		{
 			assert(x.size() == y.size());
-			assert(x.size()>2);
+			assert(x.size() > 2);
 			m_x = x;
 			m_y = y;
 			int   n = x.size();
 			// TODO: maybe sort x and y, rather than returning an error
-			for (int i = 0; i<n - 1; i++) {
-				assert(m_x[i]<m_x[i + 1]);
+			for (int i = 0; i < n - 1; i++) {
+				assert(m_x[i] < m_x[i + 1]);
 			}
 
 			if (cubic_spline == true) { // cubic spline interpolation
@@ -301,7 +303,7 @@ namespace
 										// for the parameters b[]
 				band_matrix A(n, 1, 1);
 				std::vector<double>  rhs(n);
-				for (int i = 1; i<n - 1; i++) {
+				for (int i = 1; i < n - 1; i++) {
 					A(i, i - 1) = 1.0 / 3.0*(x[i] - x[i - 1]);
 					A(i, i) = 2.0 / 3.0*(x[i + 1] - x[i - 1]);
 					A(i, i + 1) = 1.0 / 3.0*(x[i + 1] - x[i]);
@@ -348,7 +350,7 @@ namespace
 				// calculate parameters a[] and c[] based on b[]
 				m_a.resize(n);
 				m_c.resize(n);
-				for (int i = 0; i<n - 1; i++) {
+				for (int i = 0; i < n - 1; i++) {
 					m_a[i] = 1.0 / 3.0*(m_b[i + 1] - m_b[i]) / (x[i + 1] - x[i]);
 					m_c[i] = (y[i + 1] - y[i]) / (x[i + 1] - x[i])
 						- 1.0 / 3.0*(2.0*m_b[i] + m_b[i + 1])*(x[i + 1] - x[i]);
@@ -358,7 +360,7 @@ namespace
 				m_a.resize(n);
 				m_b.resize(n);
 				m_c.resize(n);
-				for (int i = 0; i<n - 1; i++) {
+				for (int i = 0; i < n - 1; i++) {
 					m_a[i] = 0.0;
 					m_b[i] = 0.0;
 					m_c[i] = (m_y[i + 1] - m_y[i]) / (m_x[i + 1] - m_x[i]);
@@ -389,11 +391,11 @@ namespace
 
 			double h = x - m_x[idx];
 			double interpol;
-			if (x<m_x[0]) {
+			if (x < m_x[0]) {
 				// extrapolation to the left
 				interpol = (m_b0*h + m_c0)*h + m_y[0];
 			}
-			else if (x>m_x[n - 1]) {
+			else if (x > m_x[n - 1]) {
 				// extrapolation to the right
 				interpol = (m_b[n - 1] * h + m_c[n - 1])*h + m_y[n - 1];
 			}
@@ -406,7 +408,7 @@ namespace
 
 		double spline::deriv(int order, double x) const
 		{
-			assert(order>0);
+			assert(order > 0);
 
 			size_t n = m_x.size();
 			// find the closest point m_x[idx] < x, idx=0 even if x<m_x[0]
@@ -416,7 +418,7 @@ namespace
 
 			double h = x - m_x[idx];
 			double interpol;
-			if (x<m_x[0]) {
+			if (x < m_x[0]) {
 				// extrapolation to the left
 				switch (order) {
 				case 1:
@@ -430,7 +432,7 @@ namespace
 					break;
 				}
 			}
-			else if (x>m_x[n - 1]) {
+			else if (x > m_x[n - 1]) {
 				// extrapolation to the right
 				switch (order) {
 				case 1:
@@ -472,3 +474,36 @@ namespace
 } // namespace
 
 #endif /* TK_SPLINE_H */
+
+
+#pragma once
+
+namespace Grafkit {
+
+	typedef tk::spline Spline_t;
+
+	// qnd wrapper
+	struct Spline : virtual public Referencable{
+		Spline_t s;
+		std::vector<double> kv, vv;
+		void Add(double v, double k) { kv.push_back(k), vv.push_back(v); }
+		void Initialize(bool cubic = false) { s.set_points(kv, vv, cubic); }
+		float Get(double t) { return s(t); }
+	};
+
+	// qnd 2D hack
+	struct Spline2 : virtual public Referencable {
+		Spline x, y;
+		void Add(float2 p, double t) { x.Add(p.x, t), y.Add(p.y, t); }
+		void Initialize() { x.Initialize(), y.Initialize(); }
+		float2 Get(double t) { return float2(x.s(t), y.s(t)); }
+	};
+
+	// qnd 4D hack
+	struct Spline4 : virtual public Referencable {
+		Spline x, y, z, w;
+		void Add(float4 p, double t) { x.Add(p.x, t), y.Add(p.y, t), z.Add(p.z, t), w.Add(p.w, t); }
+		void Initialize() { x.Initialize(), y.Initialize(), z.Initialize(), w.Initialize(); }
+		float4 Get(double t) { return float4(x.s(t), y.s(t), z.s(t), w.s(t)); }
+	};
+}
