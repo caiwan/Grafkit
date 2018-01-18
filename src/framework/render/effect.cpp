@@ -2,6 +2,8 @@
 
 #include "effect.h"
 
+#include "shaderparameter.h"
+
 using namespace Grafkit;
 
 Grafkit::EffectComposer::EffectComposer() :
@@ -255,13 +257,17 @@ Grafkit::EffectPass::~EffectPass()
 
 void Grafkit::EffectPass::Initialize(Renderer & render)
 {
-	// ... 
+	ShaderParameter *shaderParameter = new ShaderParameter();
+	shaderParameter->Initialize(render, m_shader);
+
+	m_shaderParameter = shaderParameter;
+
 	LOGGER(Log::Logger().Trace("FX Init pass %s", m_shader->GetName().c_str()));
 }
 
 void Grafkit::EffectPass::Shutdown()
 {
-	// nothing to do
+	m_shaderParameter = nullptr;
 }
 
 // ---------------------------------------------------------------------------------------------------

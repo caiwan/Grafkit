@@ -36,3 +36,7 @@ Ref<RenderParameter> Grafkit::IRenderElement::FindParameter(std::string name)
 	return nullptr;
 }
 
+void Grafkit::IRenderElement::AddTarget(Ref<IRenderParameterTarget> target)
+{
+	m_targetMap[target->m_name] = target;
+}

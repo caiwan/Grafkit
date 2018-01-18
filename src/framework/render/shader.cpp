@@ -213,7 +213,7 @@ int Grafkit::Shader::GetParamId(std::string name)
 // set param
 void Grafkit::Shader::SetParam(ID3D11DeviceContext *& deviceContext, std::string name, const void * const pData, size_t size, size_t offset)
 {
-	int id = GetParamId(deviceContext, name);
+	int id = GetParamId(name);
 	SetParam(deviceContext, id, pData, size, offset);
 }
 

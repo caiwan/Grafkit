@@ -192,8 +192,8 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	vs->Bind(render);
 	ps->Bind(render);
 
-	int vsMatrixId = vs->GetParamId(render, "MatrixBuffer");
-	int psMatrixId = ps->GetParamId(render, "MatrixBuffer");
+	int vsMatrixId = vs->GetParamId("MatrixBuffer");
+	int psMatrixId = ps->GetParamId("MatrixBuffer");
 
 	ps->SetParamT(render, "LightBuffer", m_lightData);
 

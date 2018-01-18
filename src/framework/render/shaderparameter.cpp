@@ -1,12 +1,15 @@
 #include "shaderparameter.h"
 
+#include "renderelement.h"
+#include "renderparameter.h"
+
 using namespace Grafkit;
 
 namespace {
 	class IShaderTarget : public IRenderParameterTarget {
 		friend class ShaderParameter;
 	public:
-		IShaderTarget(int targetid, const char * const name) : IRenderParameterTarget(), m_targetID(target), m_name(name) {}
+		IShaderTarget(int targetID, const char * const name) : IRenderParameterTarget(name), m_targetID(targetID){}
 
 	protected:
 		virtual void Update(ShaderRef &shader) = 0;
@@ -22,20 +25,17 @@ namespace {
 	private:
 		virtual void WriteTarget(Renderer &render, IRenderElement * const & targetElement, const RenderParameter * const & sourceParameter) {
 			if (m_targetID == -1)
-				retun;
+				return;
 
-			ShaderParameter* target = dynamic_cast<ShaderParameter*>(targetElement);
+			ShaderParameter* target = dynamic_cast<ShaderParameter*>(const_cast<IRenderElement*>(targetElement));
 			if (target) {
-				target->GetShader()->SetLofasz(render, m_targetID, sourceParameter->Get());
+				target->GetShader()->SetParam(render, m_targetID, sourceParameter->Get<void*>());
 			}
 		}
 
 		virtual void Update(ShaderRef &shader) {
 			m_targetID = shader->GetParamId(m_name);
 		}
-
-	private:
-
 
 	};
 
@@ -47,46 +47,35 @@ namespace {
 	private:
 		virtual void WriteTarget(Renderer &render, IRenderElement * const & targetElement, const RenderParameter * const & sourceParameter) {
 			if (m_targetID == -1)
-				retun;
+				return;
 
 			ShaderParameter* target = dynamic_cast<ShaderParameter*>(targetElement);
 			if (target) {
-				target->GetShader()->SetLofasz(render, m_targetID, sourceParameter->Get());
+				target->GetShader()->SetBoundedResourcePointer(render, m_targetID, sourceParameter->Get<void*>());
 			}
 		}
 
 		void Update(ShaderRef &shader) {
-			m_targetID = shader->GetBoundedResourceId(m_name)
+			m_targetID = shader->GetBoundedResourceId(m_name);
 		}
 
 	};
 }
 
-Gafkit::ShaderParameter::ShaderParameter() : IRenderElement()
+Grafkit::ShaderParameter::ShaderParameter() : IRenderElement()
 {
 }
 
-Gafkit::ShaderParameter::~ShaderParameter()
+Grafkit::ShaderParameter::~ShaderParameter()
 {
 }
 
-void Gafkit::ShaderParameter::Initialize(Renderer & render, ShaderResRef shader)
+void Grafkit::ShaderParameter::Initialize(Renderer & render, ShaderResRef shader)
 {
 	m_targetShader = shader;
 	m_lastShader = m_targetShader->Get();
-	AddTargets();
-}
 
-void Gafkit::ShaderParameter::OnBeforeBind(Renderer & render)
-{
-	if (m_lastShader.Get() != m_targetShader->Get()) {
-		void UpdateTargets();
-	}
-}
-
-void Gafkit::ShaderParameter::AddTargets()
-{
-	m_lastShader = m_targetShader->Get();
+	// add targets
 
 	// cbuffers
 	size_t paramCount = m_lastShader->GetParamCount();
@@ -102,17 +91,24 @@ void Gafkit::ShaderParameter::AddTargets()
 
 	for (size_t i = 0; i < resourceCount; i++)
 	{
-		auto description = GetBoundedResourceDesc(i);
+		auto description = m_lastShader->GetBoundedResourceDesc(i);
 		AddTarget(new BoundedResourceTarget(i, description.Name));
 	}
-
 }
 
-void Gafkit::ShaderParameter::UpdateTargets()
+void Grafkit::ShaderParameter::OnBeforeBind(Renderer & render)
+{
+	if (m_lastShader.Get() != m_targetShader->Get()) {
+		void UpdateTargets();
+	}
+}
+
+
+void Grafkit::ShaderParameter::UpdateTargets()
 {
 	m_lastShader = m_targetShader->Get();
-	for (auto it = m_targetMap.begin(); it != m_targetMap.end(); i++) {
-		IShaderTarget* target = dynamic_cast<IShaderTarget*>(it->second);
+	for (auto it = m_targetMap.begin(); it != m_targetMap.end(); it++) {
+		IShaderTarget* target = dynamic_cast<IShaderTarget*>(it->second.Get());
 		if (target)
 			target->Update(m_lastShader);
 	}

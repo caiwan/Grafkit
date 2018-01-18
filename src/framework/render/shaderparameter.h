@@ -3,9 +3,9 @@
 #include "renderer.h"
 #include "shader.h"
 
-#include "renderparameter.h"
+#include "renderelement.h"
 
-namespace Gafkit {
+namespace Grafkit {
 
 	class ShaderParameter;
 
@@ -16,11 +16,10 @@ namespace Gafkit {
 
 		void Initialize(Renderer &render, ShaderResRef shader);
 
-		ShaderRef GetShader() { return m_targetShader.Get(); }
+		ShaderRef GetShader() { return m_targetShader->Get(); }
 
 	protected:
 		void OnBeforeBind(Renderer &render);
-		void AddTargets();
 		void UpdateTargets();
 
 	private:
@@ -28,7 +27,5 @@ namespace Gafkit {
 		ShaderRef m_lastShader;
 
 	};
-
-
 
 }

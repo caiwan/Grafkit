@@ -5,11 +5,12 @@
 #include <map>
 
 #include "renderer.h"
+#include "renderparameter.h"
 
 namespace Grafkit {
 
 	class RenderParameter;
-	class IRenderTarget;
+	class IRenderParameterTarget;
 
 	/*
 	Render element is a a container for parameter templates
@@ -32,16 +33,16 @@ namespace Grafkit {
 		Ref<RenderParameter> FindParameter(std::string name);
 
 	protected:
-		void AddTarget(Ref<IRenderParameterTarget> target) { m_targetMap[target->m_name] = target; }
+		void AddTarget(Ref<IRenderParameterTarget> target);
 
-		virtual void OnBeforeBind(Renderer &render){}
-		virtual void OnAfterBind(Renderer &render){}
+		virtual void OnBeforeBind(Grafkit::Renderer &render){}
+		virtual void OnAfterBind(Grafkit::Renderer &render){}
 
 	protected:
 		std::string m_name;
 
 		std::map<std::string, Ref<RenderParameter>> m_parameterMap;
-		std::map<std::string, Ref<IRenderTarget>> m_targetMap;
+		std::map<std::string, Ref<IRenderParameterTarget>> m_targetMap;
 	};
 
 	// An abstract writer for each render type of render element targets

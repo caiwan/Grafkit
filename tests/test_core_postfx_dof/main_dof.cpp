@@ -92,6 +92,15 @@ protected:
 	ShaderResRef fs;
 	ShaderResRef aoFs, blurFs;
 
+	// dof 
+	EffectComposerRef fxPrecalc;
+	EffectComposerRef fxPass[3];
+	EffectComposerRef fxCombine;
+
+	ShaderResRef fsPrecalc;
+	ShaderResRef fsBlur;
+	ShaderResRef fsCombine;
+
 #ifndef LIVE_RELEASE
 	ShaderResRef troubleshootFs;
 #endif // !LIVE_RELEASE

@@ -10,8 +10,12 @@
 #include "shader.h"
 #include "mesh.h"
 
+#include "shaderparameter.h"
+
 namespace Grafkit {
 	
+	class ShaderParameter;
+
 	class EffectComposer;
 	class EffectPass;
 
@@ -119,8 +123,12 @@ namespace Grafkit {
 		TextureRef GetOutput(size_t bind); 
 		TextureRef GetInput(std::string name);
 
+		Ref<IRenderElement> GetParameter() { return m_shaderParameter; }
+
 	private:
 		ShaderResRef m_shader;
+
+		Ref<IRenderElement> m_shaderParameter;
 
 		typedef std::map<size_t, TextureRef> bind_map_t;
 		typedef bind_map_t::iterator bind_map_it_t;
