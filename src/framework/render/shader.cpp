@@ -200,7 +200,7 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 	this->BuildReflection(device, shaderBuffer);
 }
 
-int Grafkit::Shader::GetParamId(ID3D11DeviceContext *& deviceContext, std::string name)
+int Grafkit::Shader::GetParamId(std::string name)
 {
 	auto it = this->m_mapCBuffers.find(name);
 	if (it != m_mapCBuffers.end()) {
@@ -298,6 +298,15 @@ void Shader::UnMapParamBuffer(ID3D11DeviceContext *& deviceContext, size_t id)
 
 
 // ============================================================================================================================================
+
+int Grafkit::Shader::GetBoundedResourceId(std::string name)
+{
+	auto it = this->m_mapBResources.find(name);
+	if (it != m_mapBResources.end()) {
+		return it->second;
+	}
+	return -1;
+}
 
 void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, std::string name, void * ptr)
 {

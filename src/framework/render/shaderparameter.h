@@ -16,6 +16,8 @@ namespace Gafkit {
 
 		void Initialize(Renderer &render, ShaderResRef shader);
 
+		ShaderRef GetShader() { return m_targetShader.Get(); }
+
 	protected:
 		void OnBeforeBind(Renderer &render);
 		void AddTargets();

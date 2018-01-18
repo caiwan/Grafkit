@@ -61,7 +61,7 @@ namespace Grafkit {
 		inline size_t GetParamValueCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
 
 		// get direct id, to spped it up a bit 
-		int GetParamId(ID3D11DeviceContext *& deviceContext, std::string name);
+		int GetParamId(std::string name);
 
 		void SetParam(ID3D11DeviceContext *& deviceContext, std::string name, const void * const pData, size_t size = 0, size_t offset = 0);
 		void SetParam(ID3D11DeviceContext *& deviceContext, int id, const void * const pData, size_t size = 0, size_t offset = 0);
@@ -98,6 +98,8 @@ namespace Grafkit {
 		// set bounded resources
 		size_t GetBoundedResourceCount() { return this->m_bResources.size(); }
 		D3D11_SHADER_INPUT_BIND_DESC GetBoundedResourceDesc(size_t id) { return m_bResources[id].m_desc; }
+
+		int GetBoundedResourceId(std::string name);
 		
 		void SetSamplerSatate(ID3D11DeviceContext *& deviceContext, std::string name, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, name, pSampler); }
 		void SetSamplerSatate(ID3D11DeviceContext *& deviceContext, size_t id, ID3D11SamplerState * pSampler) { SetBoundedResourcePointer(deviceContext, id, pSampler); }
