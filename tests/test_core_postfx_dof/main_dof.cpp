@@ -93,13 +93,32 @@ protected:
 	ShaderResRef aoFs, blurFs;
 
 	// dof 
-	EffectComposerRef fxPrecalc;
-	EffectComposerRef fxPass[3];
-	EffectComposerRef fxCombine;
+	struct {
 
-	ShaderResRef fsPrecalc;
-	ShaderResRef fsBlur;
-	ShaderResRef fsCombine;
+		struct {
+			float Aperture;
+			float Focus;
+			float angle;
+		} blurParam[6];
+
+		struct {
+			//https://en.wikipedia.org/wiki/Circle_of_confusion
+			float Aperture;
+			float Focus; // multiplied with distanceUnit (see above)
+			float Limit; // blur limit, screen space
+		} cocParam;
+
+		Ref<RenderParameter> blurParamPtr[6];
+
+		EffectComposerRef fxPrecalc;
+		EffectComposerRef fxPass[3];
+		EffectComposerRef fxCombine;
+
+		ShaderResRef fsPrecalc;
+		ShaderResRef fsBlur;
+		ShaderResRef fsCombine;
+
+	} dof;
 
 #ifndef LIVE_RELEASE
 	ShaderResRef troubleshootFs;
@@ -116,6 +135,14 @@ protected:
 
 		aoFs = Load<ShaderRes>(new PixelShaderLoader("fxSSAOShader", "shaders/ssao.hlsl", "SSAO"));
 		blurFs = Load<ShaderRes>(new PixelShaderLoader("fxSSAOSmooth", "shaders/ssao.hlsl", "SSAOSmooth"));
+
+		// dof
+		{
+			dof.fsPrecalc = Load<ShaderRes>(new PixelShaderLoader("fxDofCalc", "shaders/ssao.hlsl", "calculateBlurAmount"));
+			dof.fsBlur = Load<ShaderRes>(new PixelShaderLoader("fxDofBlur", "shaders/ssao.hlsl", "blur"));
+			dof.fsCombine = Load<ShaderRes>(new PixelShaderLoader("fxDofcombine", "shaders/ssao.hlsl", "combine"));
+		}
+
 
 #ifndef LIVE_RELEASE
 		troubleshootFs = Load<ShaderRes>(new PixelShaderLoader("fxDebug", "shaders/troubleshoot.hlsl", "debugFx"));
@@ -201,7 +228,50 @@ protected:
 		postfx->SetInput(2, positionMap);
 		postfx->Initialize(render);
 
-		// ...
+		// Depth of field
+		{
+			dof.fxPrecalc = new EffectComposer();
+			dof.fxPrecalc->AddPass(new EffectPass(dof.fsPrecalc));
+			dof.fxPrecalc->Initialize(render);
+
+			ZeroMemory(&dof.cocParam, sizeof(dof.cocParam));
+
+			dof.cocParam.Aperture = 0;
+			dof.cocParam.Focus = 0;
+			dof.cocParam.Limit = 0;
+
+			(*dof.fsBlur)->SetParamT(render, "CircleOfConfusionParams", dof.cocParam);
+
+			for (int i = 0; i < 3; i++) {
+				dof.fxPass[i] = new EffectComposer();
+				dof.fxPass[i]->AddPass(new EffectPass(dof.fsBlur));
+				dof.fxPass[i]->AddPass(new EffectPass(dof.fsBlur));
+				dof.fxPass[i]->Initialize(render);
+
+				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(0)->GetParameter()->FindParameter("BlurParams");
+				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(1)->GetParameter()->FindParameter("BlurParams");
+			}
+
+			const float angles[] = {
+				1., 3., 3., 5., 5., 1.
+			};
+
+			for (int i = 0; i < 6; i++) {
+				dof.blurParamPtr[i]->Set(&dof.blurParam[i]);
+
+				ZeroMemory(&dof.blurParam[i], sizeof(dof.fsBlur[i]));
+
+				dof.blurParam[i].angle = angles[i];
+				dof.blurParam[i].Aperture = 0;
+				dof.blurParam[i].Focus = 0;
+			}
+
+			dof.fxCombine = new EffectComposer();
+			dof.fxCombine->AddPass(new EffectPass(dof.fsCombine));
+			dof.fxCombine->Initialize(render);
+
+		}
+		// 
 
 		(*scene)->BuildScene(render, vs, fs);
 		(*scene)->SetActiveCamera(0);
@@ -316,6 +386,24 @@ protected:
 		(*aoFs)->SetParam(render, "MatrixBuffer", &worldMatrices);
 
 		postfx->Render(render);
+
+		{
+			(*dof.fsPrecalc)->SetShaderResourceView(render, "input", *postfx->GetOutput());
+			(*dof.fsPrecalc)->SetShaderResourceView(render, "depth", *positionMap);
+			dof.fxPrecalc->Render(render);
+
+			(*dof.fsBlur)->SetShaderResourceView(render, "input", *dof.fxPrecalc->GetOutput());
+
+			for (int i = 0; i < 3; i++) {
+				dof.fxPass[i]->Render(render);
+			}
+
+			(*dof.fsCombine)->SetBoundedResourcePointer(render, "input1", dof.fxPass[0]);
+			(*dof.fsCombine)->SetBoundedResourcePointer(render, "input2", dof.fxPass[1]);
+			(*dof.fsCombine)->SetBoundedResourcePointer(render, "input3", dof.fxPass[2]);
+
+			dof.fxCombine->Render(render);
+		}
 
 		this->render.EndScene();
 

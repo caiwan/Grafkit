@@ -301,6 +301,8 @@ void Grafkit::EffectPass::BindFx(Renderer & render)
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
 		m_shader->Get()->SetShaderResourceView(render, it->first, it->second->GetShaderResourceView());
 	}
+
+	m_shaderParameter->BindParameters(render);
 	m_shader->Get()->Bind(render);
 }
 

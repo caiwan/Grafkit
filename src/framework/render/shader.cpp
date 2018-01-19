@@ -308,25 +308,25 @@ int Grafkit::Shader::GetBoundedResourceId(std::string name)
 	return -1;
 }
 
-void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, std::string name, void * ptr)
+void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, std::string name, const void * ptr)
 {
 	auto it = this->m_mapBResources.find(name);
 	if (it != this->m_mapBResources.end())
 		SetBoundedResourcePointer(deviceContext, it->second, ptr);
 }
 
-void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, size_t id, void * ptr)
+void Grafkit::Shader::SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, size_t id, const void * ptr)
 {
 	if (id >= GetBoundedResourceCount())
 		return;
 
-	this->m_bResources[id].m_boundSource = ptr;
+	this->m_bResources[id].m_boundSource = const_cast<void*>(ptr);
 
 	if (m_isBound)
 		SetBoundedResource(deviceContext, id, ptr);
 }
 
-void Grafkit::Shader::SetBoundedResource(ID3D11DeviceContext *& deviceContext, size_t id, void * ptr) {
+void Grafkit::Shader::SetBoundedResource(ID3D11DeviceContext *& deviceContext, size_t id, const void * ptr) {
 
 	BResRecord &brRecord = this->m_bResources[id];
 

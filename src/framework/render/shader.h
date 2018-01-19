@@ -107,11 +107,11 @@ namespace Grafkit {
 		void SetShaderResourceView(ID3D11DeviceContext *& deviceContext, std::string name, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, name, pResView); }
 		void SetShaderResourceView(ID3D11DeviceContext *& deviceContext, size_t id, ID3D11ShaderResourceView* pResView) { SetBoundedResourcePointer(deviceContext, id, pResView); }
 
-		void SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, std::string name, void* ptr);
-		void SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, size_t id, void* ptr);
+		void SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, std::string name, const void* ptr);
+		void SetBoundedResourcePointer(ID3D11DeviceContext *& deviceContext, size_t id, const void* ptr);
 		
 	private:
-		void SetBoundedResource(ID3D11DeviceContext *& deviceContext, size_t id, void* ptr);
+		void SetBoundedResource(ID3D11DeviceContext *& deviceContext, size_t id, const void* ptr);
 
 	public:
 		// ----

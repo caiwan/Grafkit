@@ -67,7 +67,7 @@ cbuffer BlurParams : register(b1)
 }
 
 float getDepth(float2 uv) { //return depth of pixel
-	return depth.Sample(sm, uv).x * 5.0f;
+	return depth.Sample(sm, uv).z;
 }
 
 // p0

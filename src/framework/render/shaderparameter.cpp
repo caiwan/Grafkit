@@ -29,7 +29,7 @@ namespace {
 
 			ShaderParameter* target = dynamic_cast<ShaderParameter*>(const_cast<IRenderElement*>(targetElement));
 			if (target) {
-				target->GetShader()->SetParam(render, m_targetID, sourceParameter->Get<void*>());
+				target->GetShader()->SetParam(render, m_targetID, sourceParameter->Get());
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace {
 
 			ShaderParameter* target = dynamic_cast<ShaderParameter*>(targetElement);
 			if (target) {
-				target->GetShader()->SetBoundedResourcePointer(render, m_targetID, sourceParameter->Get<void*>());
+				target->GetShader()->SetBoundedResourcePointer(render, m_targetID, sourceParameter->Get());
 			}
 		}
 

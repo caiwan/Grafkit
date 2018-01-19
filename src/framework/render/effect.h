@@ -35,7 +35,7 @@ namespace Grafkit {
 
 		void AddPass(EffectPassRef pass) { m_effectChain.push_back(pass);}
 
-		EffectPassRef GetEffect(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
+		EffectPassRef GetPass(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
 
 		void BindInput(Renderer &render);
 		void UnbindInput(Renderer& render);
@@ -91,7 +91,7 @@ namespace Grafkit {
 		EffectComposerRef(EffectComposerRef &other) : EffectComposerRef_t(other) {}
 		EffectComposerRef(EffectComposer *other) : EffectComposerRef_t(other) {}
 
-		EffectPassRef operator [] (int id) { return Valid() ? this->ptr->GetEffect(id) : EffectPassRef(); }
+		EffectPassRef operator [] (int id) { return Valid() ? this->ptr->GetPass(id) : EffectPassRef(); }
 	};
 #endif 
 	// ===================================================================================================
