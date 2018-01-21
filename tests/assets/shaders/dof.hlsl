@@ -35,10 +35,12 @@ Angle values for ea. blur pass ((x*pi) / 3)
    
 */
 
+#include <types.hlsl>
+
 SamplerState sm:register(s1);
 
 Texture2D depth:register(t1); // depth input buffer
-Texture2D input:register(t0); // color input buffer
+Texture2D effectInput:register(t0); // color input buffer
 
 Texture2D input1:register(t0); // result of p2_blur11
 Texture2D input2:register(t1); // result of p4_blur21
@@ -61,9 +63,9 @@ cbuffer CircleOfConfusionParams : register(b1)
 
 cbuffer BlurParams : register(b1)
 {
-	float Aperture;
-	float Focus;
-    float angle;
+	float BlurAperture;
+	float BlurFocus;
+    float BlurAngle;
 }
 
 float getDepth(float2 uv) { //return depth of pixel
@@ -72,9 +74,15 @@ float getDepth(float2 uv) { //return depth of pixel
 
 // p0
 
-float4 calculateBlurAmount(float4 PositionSS : SV_Position, float2 t : TEXCOORD) : SV_TARGET0
+float4 calculateBlurAmount(
+//float4 PositionSS : SV_Position, float2 t : TEXCOORD
+FXPixelInputType input
+) : SV_TARGET0
 {
-	float4 c = input.Sample(sm,t);
+    float4 PositionSS = input.position;
+    float2 t = input.tex;
+
+    float4 c = effectInput.Sample(sm, t);
 	float limit = Limit;
 	float aperture = Aperture*Aperture;
 	limit = limit*limit;
@@ -90,15 +98,21 @@ float4 calculateBlurAmount(float4 PositionSS : SV_Position, float2 t : TEXCOORD)
 
 // p1 .. p6
 
-float4 blur(float4 PositionSS : SV_Position, float2 t : TEXCOORD) : SV_TARGET0
+float4 blur(
+//float4 PositionSS : SV_Position, float2 t : TEXCOORD
+FXPixelInputType input
+) : SV_TARGET0
 {
-	float4 c = input.Sample(sm,t);
+    float4 PositionSS = input.position;
+    float2 t = input.tex;
+
+    float4 c = effectInput.Sample(sm, t);
 	float4 acc = 0;
 
 	for (float i = 0.5; i<sampleCount; i++) {
 		float fi = float(i) / sampleCount;
-		float2 offset = direction*fi;
-		float4 s = input.Sample(sm,t + offset*c.w);
+		float2 offset = direction(BlurAngle)*fi;
+        float4 s = effectInput.Sample(sm, t + offset * c.w);
 		acc += s;
 	}
 	acc /= sampleCount;
@@ -107,8 +121,14 @@ float4 blur(float4 PositionSS : SV_Position, float2 t : TEXCOORD) : SV_TARGET0
 
 // p7 
 
-float4 combine(float4 PositionSS : SV_Position, float2 t : TEXCOORD) : SV_TARGET0
+float4 combine(
+//float4 PositionSS : SV_Position, float2 t : TEXCOORD
+FXPixelInputType input
+) : SV_TARGET0
 {
+    float4 PositionSS = input.position;
+    float2 t = input.tex;
+
 	float4 acc = 0;
 	acc += input1.Sample(sm,t);
 	acc += input2.Sample(sm,t);

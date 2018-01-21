@@ -29,7 +29,8 @@ namespace {
 
 			ShaderParameter* target = dynamic_cast<ShaderParameter*>(const_cast<IRenderElement*>(targetElement));
 			if (target) {
-				target->GetShader()->SetParam(render, m_targetID, sourceParameter->Get());
+				const void * p = sourceParameter->Get();
+				target->GetShader()->SetParam(render, m_targetID, p);
 			}
 		}
 
@@ -62,6 +63,8 @@ namespace {
 	};
 }
 
+/// ----------------------------------------------------------------------------------
+
 Grafkit::ShaderParameter::ShaderParameter() : IRenderElement()
 {
 }
@@ -83,6 +86,9 @@ void Grafkit::ShaderParameter::Initialize(Renderer & render, ShaderResRef shader
 	for (size_t i = 0; i < paramCount; i++)
 	{
 		auto description = m_lastShader->GetCBDescription(i);
+		
+		LOGGER(Log::Logger().Trace("Shader CB Targert %s", description.Name));
+
 		AddTarget(new ConstantBufferTarget(i, description.Name));
 	}
 
@@ -92,6 +98,10 @@ void Grafkit::ShaderParameter::Initialize(Renderer & render, ShaderResRef shader
 	for (size_t i = 0; i < resourceCount; i++)
 	{
 		auto description = m_lastShader->GetBoundedResourceDesc(i);
+
+		LOGGER(Log::Logger().Trace("Shader BR Targert %s", description.Name));
+
+
 		AddTarget(new BoundedResourceTarget(i, description.Name));
 	}
 }

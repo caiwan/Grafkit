@@ -138,9 +138,9 @@ protected:
 
 		// dof
 		{
-			dof.fsPrecalc = Load<ShaderRes>(new PixelShaderLoader("fxDofCalc", "shaders/ssao.hlsl", "calculateBlurAmount"));
-			dof.fsBlur = Load<ShaderRes>(new PixelShaderLoader("fxDofBlur", "shaders/ssao.hlsl", "blur"));
-			dof.fsCombine = Load<ShaderRes>(new PixelShaderLoader("fxDofcombine", "shaders/ssao.hlsl", "combine"));
+			dof.fsPrecalc = Load<ShaderRes>(new PixelShaderLoader("fxDofCalc", "shaders/dof.hlsl", "calculateBlurAmount"));
+			dof.fsBlur = Load<ShaderRes>(new PixelShaderLoader("fxDofBlur", "shaders/dof.hlsl", "blur"));
+			dof.fsCombine = Load<ShaderRes>(new PixelShaderLoader("fxDofcombine", "shaders/dof.hlsl", "combine"));
 		}
 
 
