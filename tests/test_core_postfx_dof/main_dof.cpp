@@ -248,8 +248,8 @@ protected:
 				dof.fxPass[i]->AddPass(new EffectPass(dof.fsBlur));
 				dof.fxPass[i]->Initialize(render);
 
-				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(0)->GetParameter()->FindParameter("BlurParams");
-				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(1)->GetParameter()->FindParameter("BlurParams");
+				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(0)->GetParameter()->FindParameter<ConstantBufferTarget>("BlurParams");
+				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(1)->GetParameter()->FindParameter<ConstantBufferTarget>("BlurParams");
 			}
 
 			const float angles[] = {

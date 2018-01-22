@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include <string>
 #include <map>
+#include <list>
 
 #include "renderer.h"
 #include "renderparameter.h"
@@ -18,39 +19,40 @@ namespace Grafkit {
 	class IRenderElement : public virtual Referencable
 	{
 	public:
-		IRenderElement(){}
-		virtual ~IRenderElement(){}
+		IRenderElement() {}
+		virtual ~IRenderElement() {}
 
 	public:
 		std::string GetName() { return this->m_name; }
 		void SetName(std::string name) { m_name = name; }
 
 		void BindParameters(Renderer &render);
-		
+
 		void SetParameter(Ref<RenderParameter> parameter);
 		void ClearParameter(Ref<RenderParameter> parameter);
 
-		Ref<RenderParameter> FindParameter(std::string name);
+		template <typename T> Ref<RenderParameter> FindParameter(std::string name);
 
 	protected:
 		void AddTarget(Ref<IRenderParameterTarget> target);
 
-		virtual void OnBeforeBind(Grafkit::Renderer &render){}
-		virtual void OnAfterBind(Grafkit::Renderer &render){}
+		virtual void OnBeforeBind(Grafkit::Renderer &render) {}
+		virtual void OnAfterBind(Grafkit::Renderer &render) {}
 
 	protected:
 		std::string m_name;
 
-		std::map<std::string, Ref<RenderParameter>> m_parameterMap;
-		std::map<std::string, Ref<IRenderParameterTarget>> m_targetMap;
+		std::map<std::string, std::list<Ref<RenderParameter>>> m_parameterMap;
+		std::map<std::string, std::list<Ref<IRenderParameterTarget>>> m_targetMap;
 	};
 
+	/// ================================================================================
 	// An abstract writer for each render type of render element targets
 	class IRenderParameterTarget : public virtual Referencable {
 		friend class IRenderElement;
 	public:
-		IRenderParameterTarget(std::string name) : m_name(name){}
-		virtual ~IRenderParameterTarget(){}
+		IRenderParameterTarget(std::string name) : m_name(name) {}
+		virtual ~IRenderParameterTarget() {}
 
 		std::string GetName() { return this->m_name; }
 		void SetName(std::string name) { m_name = name; }
@@ -60,5 +62,20 @@ namespace Grafkit {
 
 		std::string m_name;
 	};
+
+	/// ================================================================================
+	template<typename T>
+	inline Ref<RenderParameter> IRenderElement::FindParameter(std::string name)
+	{
+		auto it = m_targetMap.find(name);
+
+		if (it != m_targetMap.end()) {
+			for (auto sit = it->second.begin(); sit != it->second.end(); sit++) {
+				if (dynamic_cast<T*>(sit->Get()))
+					return new RenderParameter(sit->Get());
+			}
+		}
+		return nullptr;
+	}
 
 }
