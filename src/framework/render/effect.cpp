@@ -36,7 +36,7 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 		m_pTexRead = m_texOut[2];
 		m_pTexWrite = m_texOut[3];
 
-		m_pTexLastOutput = NULL;
+		//m_pTexLastOutput = NULL;
 	}
 
 
@@ -129,10 +129,6 @@ void Grafkit::EffectComposer::UnbindInput(Renderer & render)
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 {
-	m_pTexLastOutput = NULL;
-
-	// this part smells a bit
-
 	if (m_singlepass)
 	{
 		RenderChain(render);
@@ -163,9 +159,15 @@ void Grafkit::EffectComposer::FlushBuffers()
 
 	SwapBuffers();
 
+#if 0
 	auto tmp = m_pTexFront;
 	m_pTexFront = m_pTexBack;
 	m_pTexBack = tmp;
+#else
+	auto tmp = m_pTexWrite;
+	m_pTexWrite = m_pTexBack;
+	m_pTexBack = tmp;
+#endif
 }
 
 void Grafkit::EffectComposer::RenderChain(Renderer & render)

@@ -126,6 +126,7 @@ protected:
 	int init() {
 
 		texture = this->Load<Texture2DRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
+		noiseMap = Load<Texture2DRes>(new TextureNoiseMap(256));
 
 		// -- load shader
 		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
@@ -141,7 +142,6 @@ protected:
 			dof.fsCombine = Load<ShaderRes>(new PixelShaderLoader("fxDofcombine", "shaders/dof.hlsl", "combine"));
 		}
 
-
 #ifndef LIVE_RELEASE
 		troubleshootFs = Load<ShaderRes>(new PixelShaderLoader("fxDebug", "shaders/troubleshoot.hlsl", "debugFx"));
 #endif // !LIVE_RELEASE
@@ -150,6 +150,10 @@ protected:
 #if 0
 		scene = this->Load<SceneRes>(new SceneLoader("scene", "ao.scene"));
 #else
+		// 
+		DoPrecalc();
+		//
+
 		camera = new Camera;
 		camera->SetName("camera");
 
@@ -198,12 +202,9 @@ protected:
 #endif
 		// -- generate some random texture
 
-		noiseMap = Load<Texture2DRes>(new TextureNoiseMap(256));
-
 		kernels = new float4[128];
 		Halton3D::HemiSphereDistribution(kernels, 128);
 
-		DoPrecalc();
 
 		sampler = new TextureSampler();
 		sampler->Initialize(render);
@@ -232,7 +233,7 @@ protected:
 			dof.fxPrecalc->AddPass(new EffectPass(dof.fsPrecalc));
 			dof.fxPrecalc->Initialize(render);
 
-			ZeroMemory(&dof.cocParam, sizeof(dof.cocParam));
+			//ZeroMemory(&dof.cocParam, sizeof(dof.cocParam));
 
 			dof.cocParam.Aperture = 0;
 			dof.cocParam.Focus = 0;
@@ -255,7 +256,7 @@ protected:
 			};
 
 			for (int i = 0; i < 6; i++) {
-				ZeroMemory(&dof.blurParam[i], sizeof(dof.fsBlur[i]));
+				//ZeroMemory(&dof.blurParam[i], sizeof(dof.blurParam[i]));
 
 				dof.blurParam[i].angle = angles[i];
 				dof.blurParam[i].Aperture = 0;
@@ -384,21 +385,21 @@ protected:
 		postfx->Render(render);
 
 		{
-			(*dof.fsPrecalc)->SetShaderResourceView(render, "input", *postfx->GetOutput());
+			(*dof.fsPrecalc)->SetShaderResourceView(render, "color", *postfx->GetOutput());
 			(*dof.fsPrecalc)->SetShaderResourceView(render, "depth", *positionMap);
-			dof.fxPrecalc->Render(render);
+			//dof.fxPrecalc->Render(render);
 
-			(*dof.fsBlur)->SetShaderResourceView(render, "input", *dof.fxPrecalc->GetOutput());
+			//(*dof.fsBlur)->SetShaderResourceView(render, "input", *dof.fxPrecalc->GetOutput());
 
 			for (int i = 0; i < 3; i++) {
-				dof.fxPass[i]->Render(render);
+				//dof.fxPass[i]->Render(render);
 			}
 
-			(*dof.fsCombine)->SetBoundedResourcePointer(render, "input1", dof.fxPass[0]);
-			(*dof.fsCombine)->SetBoundedResourcePointer(render, "input2", dof.fxPass[1]);
-			(*dof.fsCombine)->SetBoundedResourcePointer(render, "input3", dof.fxPass[2]);
+			//(*dof.fsCombine)->SetBoundedResourcePointer(render, "input1", dof.fxPass[0]->GetOutput());
+			//(*dof.fsCombine)->SetBoundedResourcePointer(render, "input2", dof.fxPass[1]->GetOutput());
+			//(*dof.fsCombine)->SetBoundedResourcePointer(render, "input3", dof.fxPass[2]->GetOutput());
 
-			dof.fxCombine->Render(render);
+			//dof.fxCombine->Render(render);
 		}
 
 		this->render.EndScene();

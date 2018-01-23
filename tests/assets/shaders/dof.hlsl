@@ -37,14 +37,15 @@ Angle values for ea. blur pass ((x*pi) / 3)
 
 #include <types.hlsl>
 
-SamplerState sm:register(s1);
+SamplerState sm;
 
-Texture2D depth:register(t1); // depth input buffer
-Texture2D effectInput:register(t0); // color input buffer
+Texture2D depth; // depth input buffer
+Texture2D color; // color input buffer
+Texture2D effectInput; // input buffer
 
-Texture2D input1:register(t0); // result of p2_blur11
-Texture2D input2:register(t1); // result of p4_blur21
-Texture2D input3:register(t2); // result of p6_blur31
+Texture2D input1; // result of p2_blur11
+Texture2D input2; // result of p4_blur21
+Texture2D input3; // result of p6_blur31
 
 #define pi (3.14159265359)
 #define angle(x) (pi/3*(x))
@@ -53,86 +54,82 @@ Texture2D input3:register(t2); // result of p6_blur31
 
 #define distanceUnit (16.0)
 
-cbuffer CircleOfConfusionParams : register(b1)
+cbuffer CircleOfConfusionParams
 {
 	//https://en.wikipedia.org/wiki/Circle_of_confusion
-	float Aperture;
-	float Focus; // multiplied with distanceUnit (see above)
-	float Limit; // blur limit, screen space
+    float Aperture;
+    float Focus; // multiplied with distanceUnit (see above)
+    float Limit; // blur limit, screen space
 }
 
-cbuffer BlurParams : register(b1)
+cbuffer BlurParams
 {
-	float BlurAperture;
-	float BlurFocus;
+    float BlurAperture;
+    float BlurFocus;
     float BlurAngle;
 }
 
-float getDepth(float2 uv) { //return depth of pixel
-	return depth.Sample(sm, uv).z;
+float getDepth(float2 uv)
+{ //return depth of pixel
+    return depth.Sample(sm, uv).z;
 }
 
 // p0
 
 float4 calculateBlurAmount(
-//float4 PositionSS : SV_Position, float2 t : TEXCOORD
 FXPixelInputType input
 ) : SV_TARGET0
 {
-    float4 PositionSS = input.position;
     float2 t = input.tex;
 
-    float4 c = effectInput.Sample(sm, t);
-	float limit = Limit;
-	float aperture = Aperture*Aperture;
-	limit = limit*limit;
+    float4 c = color.Sample(sm, t);
+    float limit = Limit;
+    float aperture = Aperture * Aperture;
+    limit = limit * limit;
 
-	float f = Focus*distanceUnit;
-	float Object = getDepth(t);
-	float Result = aperture*abs(Object - f) / Object;
+    float f = Focus * distanceUnit;
+    float Object = getDepth(t);
+    float Result = aperture * abs(Object - f) / Object;
 
-	c.w = min(Result,limit); //pack color and coc into a pixel
+    c.w = min(Result, limit); //pack color and coc into a pixel
 
-	return c; //send it away to the next pass
+    return c; //send it away to the next pass
 }
 
 // p1 .. p6
 
 float4 blur(
-//float4 PositionSS : SV_Position, float2 t : TEXCOORD
 FXPixelInputType input
 ) : SV_TARGET0
 {
-    float4 PositionSS = input.position;
     float2 t = input.tex;
 
     float4 c = effectInput.Sample(sm, t);
-	float4 acc = 0;
+    float4 acc = 0;
 
-	for (float i = 0.5; i<sampleCount; i++) {
-		float fi = float(i) / sampleCount;
-		float2 offset = direction(BlurAngle)*fi;
+    for (float i = 0.5; i < sampleCount; i++)
+    {
+        float fi = float(i) / sampleCount;
+        float2 offset = direction(BlurAngle) * fi;
         float4 s = effectInput.Sample(sm, t + offset * c.w);
-		acc += s;
-	}
-	acc /= sampleCount;
-	return acc;
+        acc += s;
+    }
+    acc /= sampleCount;
+    return acc;
 }
 
 // p7 
 
 float4 combine(
-//float4 PositionSS : SV_Position, float2 t : TEXCOORD
 FXPixelInputType input
 ) : SV_TARGET0
 {
-    float4 PositionSS = input.position;
     float2 t = input.tex;
 
-	float4 acc = 0;
-	acc += input1.Sample(sm,t);
-	acc += input2.Sample(sm,t);
-	acc += input3.Sample(sm,t);
-	acc *= 0.33;
-	return acc;
+    float4 acc = 0;
+    acc += input1.Sample(sm, t);
+    acc += input2.Sample(sm, t);
+    acc += input3.Sample(sm, t);
+    acc *= 0.33;
+    return acc;
 }

@@ -47,7 +47,7 @@ namespace Grafkit {
 		TextureRef GetInput(size_t bind) { auto it = m_input_map.find(bind); return it == m_input_map.end() ? TextureRef() : it->second; }
 		void ClearInput() { m_input_map.clear(); }
 
-		Texture2DRef GetOutput() { return m_pTexLastOutput; }
+		Texture2DRef GetOutput() { return m_pTexBack; }
 
 	protected:
 		void SwapBuffers();
@@ -60,7 +60,7 @@ namespace Grafkit {
 
 		TextureRef m_texOut[4];
 		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
-		Texture2D *m_pTexLastOutput; 
+		//Texture2D *m_pTexLastOutput; 
 
 		TextureSamplerRef m_textureSampler;
 
@@ -82,18 +82,8 @@ namespace Grafkit {
 
 	// ---------------------------------------------------------------------------------------------------
 
-#if 1
 	typedef EffectComposerRef_t EffectComposerRef;
-#else 
-	class EffectComposerRef : public EffectComposerRef_t {
-	public:
-		EffectComposerRef() : EffectComposerRef_t() {}
-		EffectComposerRef(EffectComposerRef &other) : EffectComposerRef_t(other) {}
-		EffectComposerRef(EffectComposer *other) : EffectComposerRef_t(other) {}
 
-		EffectPassRef operator [] (int id) { return Valid() ? this->ptr->GetPass(id) : EffectPassRef(); }
-	};
-#endif 
 	// ===================================================================================================
 
 	__declspec(align(16)) class EffectPass : virtual public Referencable, public AlignedNew<EffectPass>
