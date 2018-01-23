@@ -1,7 +1,6 @@
-#include "shaderparameter.h"
+#include "stdafx.h"
 
-//#include "renderelement.h"
-//#include "renderparameter.h"
+#include "shaderparameter.h"
 
 using namespace Grafkit;
 
@@ -49,7 +48,7 @@ void Grafkit::ShaderParameter::SetSampler(std::string name, TextureSamplerRef sa
 	m_smaplerMap[name] = smaplerParam;
 }
 
-void Grafkit::ShaderParameter::SetATexture(std::string name, Ref<Resource<ATexture>> texture)
+void Grafkit::ShaderParameter::SetATexture(std::string name, Ref<IResource> texture)
 {
 	int32_t id = -1;
 	if (m_lastShader) {
@@ -75,8 +74,10 @@ void Grafkit::ShaderParameter::BindParameters(Renderer & render)
 	}
 
 	for (auto it = m_textureMap.begin(); it != m_textureMap.end(); it++) {
-		if (it->second.id != -1)
-			m_lastShader->SetShaderResourceView(render, it->second.id, **(it->second.texture));
+		if (it->second.id != -1) {
+			ATexture *texture = dynamic_cast<ATexture*>(dynamic_cast<Resource<ATexture*>*>(it->second.texture.Get()));
+			m_lastShader->SetShaderResourceView(render, it->second.id, *(texture));
+		}
 	}
 
 	for (auto it = m_smaplerMap.begin(); it != m_smaplerMap.end(); it++) {

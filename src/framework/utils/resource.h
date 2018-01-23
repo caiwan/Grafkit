@@ -34,6 +34,8 @@ namespace Grafkit {
 		std::string GetName() { return this->m_name; }
 		void SetName(std::string name) { m_name = name; }
 
+		virtual void* GetRaw() = 0;
+
 	protected:
 		std::string m_name;
 
@@ -57,6 +59,9 @@ namespace Grafkit {
 		operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
 		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
 		operator T& () { return *(this->Get()); }
+
+		virtual void* GetRaw() { return this->Get(); }
+
 	};
 
 }

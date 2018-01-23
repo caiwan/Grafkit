@@ -11,10 +11,7 @@ namespace Grafkit {
 
 	class ShaderParameter;
 
-	class ShaderParameter
-#if 0
-		: public Grafkit::IRenderElement
-#endif
+	class ShaderParameter : virtual public Referencable
 	{
 	public:
 		ShaderParameter();
@@ -36,7 +33,7 @@ namespace Grafkit {
 		void BindParameters(Renderer &render);
 
 	protected:
-		void SetATexture(std::string name, Ref<Resource<ATexture>> texture);
+		void SetATexture(std::string name, Ref<IResource> texture);
 		void UpdateTargets();
 
 	private:
@@ -50,7 +47,7 @@ namespace Grafkit {
 
 		struct Texture_T {
 			int32_t id;
-			Ref<Resource<ATexture>> texture;
+			Ref<IResource> texture;
 		};
 
 		struct Sampler_T {

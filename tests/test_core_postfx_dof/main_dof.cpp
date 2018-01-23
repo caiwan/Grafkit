@@ -108,8 +108,6 @@ protected:
 			float Limit; // blur limit, screen space
 		} cocParam;
 
-		Ref<RenderParameter> blurParamPtr[6];
-
 		EffectComposerRef fxPrecalc;
 		EffectComposerRef fxPass[3];
 		EffectComposerRef fxCombine;
@@ -248,8 +246,8 @@ protected:
 				dof.fxPass[i]->AddPass(new EffectPass(dof.fsBlur));
 				dof.fxPass[i]->Initialize(render);
 
-				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(0)->GetParameter()->FindParameter<ConstantBufferTarget>("BlurParams");
-				dof.blurParamPtr[2 * i + 0] = dof.fxPass[i]->GetPass(1)->GetParameter()->FindParameter<ConstantBufferTarget>("BlurParams");
+				dof.fxPass[i]->GetPass(0)->GetParameter()->SetParam("BlurParams", &dof.blurParam[2 * i + 0]);
+				dof.fxPass[i]->GetPass(1)->GetParameter()->SetParam("BlurParams", &dof.blurParam[2 * i + 1]);
 			}
 
 			const float angles[] = {
@@ -257,8 +255,6 @@ protected:
 			};
 
 			for (int i = 0; i < 6; i++) {
-				dof.blurParamPtr[i]->Set(&dof.blurParam[i]);
-
 				ZeroMemory(&dof.blurParam[i], sizeof(dof.fsBlur[i]));
 
 				dof.blurParam[i].angle = angles[i];
