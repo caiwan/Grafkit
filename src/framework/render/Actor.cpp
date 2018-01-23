@@ -8,7 +8,7 @@ using namespace Grafkit;
 
 void Grafkit::Entity3D::_serialize(Archive & ar)
 {
-	this->IResource::_serialize(ar);
+	PERSIST_STRING(ar, m_name);
 }
 
 Grafkit::Entity3D::Entity3D() //: Grafkit::IResource()
@@ -53,7 +53,7 @@ void Grafkit::Actor::AddChild(Actor* child)
 
 void Grafkit::Actor::serialize(Archive & ar)
 {
-	IResource::_serialize(ar);
+	PERSIST_STRING(ar, m_name);
 
 	PERSIST_FIELD(ar, m_viewMatrix);
 	PERSIST_FIELD(ar, m_transformMatrix);

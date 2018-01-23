@@ -123,12 +123,12 @@ namespace Grafkit {
 		TextureRef GetOutput(size_t bind); 
 		TextureRef GetInput(std::string name);
 
-		Ref<IRenderElement> GetParameter() { return m_shaderParameter; }
+		Ref<ShaderParameter> GetParameter() { return m_shaderParameter; }
 
 	private:
 		ShaderResRef m_shader;
 
-		Ref<IRenderElement> m_shaderParameter;
+		Ref<ShaderParameter> m_shaderParameter;
 
 		typedef std::map<size_t, TextureRef> bind_map_t;
 		typedef bind_map_t::iterator bind_map_it_t;

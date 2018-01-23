@@ -3,13 +3,19 @@
 #include "renderer.h"
 #include "shader.h"
 
+#include "texture.h"
+
 #include "renderelement.h"
 
 namespace Grafkit {
 
 	class ShaderParameter;
 
-	class ShaderParameter : public Grafkit::IRenderElement {
+	class ShaderParameter
+#if 0
+		: public Grafkit::IRenderElement
+#endif
+	{
 	public:
 		ShaderParameter();
 		virtual ~ShaderParameter();
@@ -18,52 +24,45 @@ namespace Grafkit {
 
 		ShaderRef GetShader() { return m_targetShader->Get(); }
 
+		// 
+		void SetParam(std::string name, void *ptr);
+		void SetTexture(std::string name, Texture1DResRef texture) { SetATexture(name, texture); }
+		void SetTexture(std::string name, Texture2DResRef texture) { SetATexture(name, texture); }
+		//void SetTexture(std::string name, Texture3DResRef texture){ SetATexture(name, texture); }
+		void SetTexture(std::string name, TextureCubeResRef texture) { SetATexture(name, texture); }
+		void SetSampler(std::string name, TextureSamplerRef sampler);
+
+		//
+		void BindParameters(Renderer &render);
+
 	protected:
-		void OnBeforeBind(Renderer &render);
+		void SetATexture(std::string name, Ref<Resource<ATexture>> texture);
 		void UpdateTargets();
 
 	private:
 		ShaderResRef m_targetShader;
 		ShaderRef m_lastShader;
-	};
 
+		struct Param_T {
+			int32_t id;
+			void * p;
+		};
 
+		struct Texture_T {
+			int32_t id;
+			Ref<Resource<ATexture>> texture;
+		};
 
-	/// ========================================================================================================================================================
+		struct Sampler_T {
+			int32_t id;
+			TextureSamplerRef sampler;
+		};
 
-	class IShaderTarget : public IRenderParameterTarget {
-		friend class ShaderParameter;
-	public:
-		IShaderTarget(int targetID, const char * const name) : IRenderParameterTarget(name), m_targetID(targetID) {}
+		std::map<std::string, Param_T> m_paramMap;
+		std::map<std::string, Texture_T> m_textureMap;
+		std::map<std::string, Sampler_T> m_smaplerMap;
 
-	protected:
-		virtual void Update(ShaderRef &shader) = 0;
-		int m_targetID;
-	};
-
-	/// ========================================================================================================================================================
-
-	class ConstantBufferTarget : public IShaderTarget {
-		friend class ShaderParameter;
-	public:
-		ConstantBufferTarget(size_t id, const char * const name) : IShaderTarget(id, name) {}
-
-	private:
-		virtual void WriteTarget(Renderer &render, IRenderElement * const & targetElement, const RenderParameter * const & sourceParameter);
-		virtual void Update(ShaderRef &shader);
-	};
-
-	/// ========================================================================================================================================================
-
-	class BoundedResourceTarget : public IShaderTarget {
-		friend class ShaderParameter;
-	public:
-		BoundedResourceTarget(size_t id, const char * const name) : IShaderTarget(id, name) {}
-
-	private:
-		virtual void WriteTarget(Renderer &render, IRenderElement * const & targetElement, const RenderParameter * const & sourceParameter);
-		void Update(ShaderRef &shader);
-
+		bool m_refresh;
 	};
 
 }

@@ -19,7 +19,7 @@ namespace Grafkit {
 
 	class Actor;
 
-	class Entity3D : public Grafkit::IResource, public Persistent
+	class Entity3D : public Persistent, virtual public Referencable
 	{
 	protected:
 		void _serialize(Archive& ar);
@@ -33,6 +33,13 @@ namespace Grafkit {
 		virtual void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
 
 		virtual void serialize(Archive& ar) = 0;
+
+	public:
+		std::string GetName() { return this->m_name; }
+		void SetName(std::string name) { m_name = name; }
+
+	protected:
+		std::string m_name;
 	};
 
 	//class Actor;
@@ -70,7 +77,7 @@ namespace Grafkit {
 	An actor node - ez a scenegraph es a nodeja
 	*/
 	__declspec(align(16))
-		class Actor : public AlignedNew<Actor>, public Grafkit::IResource, public Persistent
+		class Actor : public AlignedNew<Actor>, public Persistent, virtual public Referencable
 	{
 		friend class Scene;
 	public:
@@ -103,10 +110,17 @@ namespace Grafkit {
 		void Hide() { m_ishidden = 1; }
 		void Show() { m_ishidden = 0; }
 
-		int IsHidden() { return (m_pParent.Invalid()? 0 : m_pParent->IsHidden()) || m_ishidden; }
+		int IsHidden() { return (m_pParent.Invalid() ? 0 : m_pParent->IsHidden()) || m_ishidden; }
 
 	public:
 		Grafkit::Matrix WorldMatrix() { return m_worldMatrix; }
+
+	public:
+		std::string GetName() { return this->m_name; }
+		void SetName(std::string name) { m_name = name; }
+
+	protected:
+		std::string m_name;
 
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }

@@ -20,9 +20,6 @@ namespace Grafkit{
 		RenderParameter(Ref<IRenderParameterTarget> target){}
 		~RenderParameter(){}
 
-		//template<typename T> T* Get() const { return ((T*)m_data); }
-		//template<typename T> void Set(T &t) { (T*)m_data = &t; }
-
 		const void* Get() const { return m_data; }
 		void Set(void* p) { m_data = p; }
 

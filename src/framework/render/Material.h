@@ -49,7 +49,7 @@ namespace Grafkit {
 	// =========================================================================================================
 
 	__declspec(align(16))
-		class Material : public Grafkit::IResource, public AlignedNew<Material>, public Persistent
+		class Material : public AlignedNew<Material>, public Persistent, virtual public Referencable
 	{
 	public:
 
@@ -129,6 +129,13 @@ namespace Grafkit {
 		// --- 
 		// persisthez kell
 		bool GetTextureMap(std::map<std::string, TextureResRef> &textureMap);
+
+	public:
+		std::string GetName() { return this->m_name; }
+		void SetName(std::string name) { m_name = name; }
+
+	protected:
+		std::string m_name;
 
 	protected:
 		struct material_color_t m_colors;

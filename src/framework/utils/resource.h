@@ -1,5 +1,5 @@
 /**
-A generator interface for assets 
+A generator interface for assets
 */
 
 #pragma once
@@ -12,7 +12,7 @@ A generator interface for assets
 #include "reference.h"
 #include "exceptions.h"
 
-namespace Grafkit{
+namespace Grafkit {
 
 	class IResource;
 	class IResourceManager;
@@ -21,19 +21,16 @@ namespace Grafkit{
 	///@todo ezt ki kell pucolni teljesen
 
 	/**
-	A base class for collectable render assets for bulk loading and reloading 
+	A base class for collectable render assets for bulk loading and reloading
 	*/
 	class IResource : virtual public Referencable
 	{
 		friend class IResourceManager;
-	protected:
-
-		void _serialize(Archive& ar);
-
 	public:
 		IResource();
 		virtual ~IResource();
 
+	public:
 		std::string GetName() { return this->m_name; }
 		void SetName(std::string name) { m_name = name; }
 
@@ -43,8 +40,8 @@ namespace Grafkit{
 	};
 
 	/**
-	Ebbe csomagoljuk bele a resourceokat, amiket elteszunk; lenyeg, hogy ezzel barmibol 
-	lehet majd resouce-t generalni, ha kell 
+	Ebbe csomagoljuk bele a resourceokat, amiket elteszunk; lenyeg, hogy ezzel barmibol
+	lehet majd resouce-t generalni, ha kell
 	*/
 	template <typename T> class Resource : public IResource, public Ref<T>
 	{
@@ -57,7 +54,7 @@ namespace Grafkit{
 		Resource(Ref<T> tref) : IResource(), Ref<T>(tref) {}
 		Resource(T* tptr) : IResource(), Ref<T>(tptr) {}
 
-		operator Ref<T> () { return Ref<T>(dynamic_cast<T*>(this->Get())); }
+		operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
 		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
 		operator T& () { return *(this->Get()); }
 	};

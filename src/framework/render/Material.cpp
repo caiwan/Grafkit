@@ -33,7 +33,7 @@ namespace {
 
 // ====================================
 
-Grafkit::Material::Material() : IResource(), Persistent()
+Grafkit::Material::Material() : Persistent()
 {
 	ZeroMemory(&m_colors, sizeof(m_colors));
 	ZeroMemory(&m_params, sizeof(m_params));
@@ -141,7 +141,7 @@ bool Grafkit::Material::GetTextureMap(std::map<std::string, TextureResRef>& text
 
 void Grafkit::Material::serialize(Archive & ar)
 {
-	this->IResource::_serialize(ar);
+	PERSIST_STRING(ar, m_name);
 
 	PERSIST_FIELD(ar, m_colors);
 	PERSIST_FIELD(ar, m_params);

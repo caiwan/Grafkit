@@ -9,10 +9,6 @@
 using namespace Grafkit;
 using namespace std::chrono;
 
-void IResource::_serialize(Archive& ar) {
-	PERSIST_STRING(ar, m_name);
-}
-
 Grafkit::IResource::IResource()
 {
 }
