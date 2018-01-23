@@ -95,6 +95,9 @@ protected:
 	// dof 
 	struct {
 
+		TextureRef colorInput;
+		TextureRef blurInput[3];
+
 		struct {
 			float Aperture;
 			float Focus;
@@ -239,6 +242,9 @@ protected:
 			dof.cocParam.Focus = 0;
 			dof.cocParam.Limit = 0;
 
+			dof.colorInput = new Texture2D();
+			dof.colorInput->Initialize(render);
+
 			(*dof.fsBlur)->SetParamT(render, "CircleOfConfusionParams", dof.cocParam);
 
 			for (int i = 0; i < 3; i++) {
@@ -249,6 +255,11 @@ protected:
 
 				dof.fxPass[i]->GetPass(0)->GetParameter()->SetParam("BlurParams", &dof.blurParam[2 * i + 0]);
 				dof.fxPass[i]->GetPass(1)->GetParameter()->SetParam("BlurParams", &dof.blurParam[2 * i + 1]);
+
+				dof.blurInput[i] = new Texture2D();
+				dof.blurInput[i]->Initialize(render);
+
+				dof.fxPass[i]->SetOutput(dof.blurInput[i]);
 			}
 
 			const float angles[] = {
