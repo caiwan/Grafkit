@@ -127,7 +127,7 @@ void Grafkit::Compute::Render(Renderer &render)
 	size_t targetCount = outputChannels->size();
 	for (size_t i = 0; i < targetCount; i++) {
 		Texture2DRef output = outputChannels->at(i);
-		output->SetRenderTargetView(render, i);
+		render.SetRenderTargetView(*output, i);
 	}
 
 	render.ApplyRenderTargetView(targetCount);

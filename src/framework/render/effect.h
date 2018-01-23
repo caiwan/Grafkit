@@ -43,11 +43,11 @@ namespace Grafkit {
 		void Render(Renderer &render, int autoflush = 1);
 		void Flush(Renderer &render);
 
-		void SetInput(size_t bind, TextureRef tex) { m_input_map[bind] = tex; }
-		TextureRef GetInput(size_t bind) { auto it = m_input_map.find(bind); return it == m_input_map.end() ? TextureRef() : it->second; }
-		void ClearInput() { m_input_map.clear(); }
+		void SetInput(size_t bind, TextureRef tex) { m_inputMap[bind] = tex; }
+		TextureRef GetInput(size_t bind) { auto it = m_inputMap.find(bind); return it == m_inputMap.end() ? TextureRef() : it->second; }
+		void ClearInput() { m_inputMap.clear(); }
 
-		Texture2DRef GetOutput() { return m_pTexBack; }
+		void SetOutput(TextureRef tex) { m_chainOutput = tex; }
 
 	protected:
 		void SwapBuffers();
@@ -60,7 +60,8 @@ namespace Grafkit {
 
 		TextureRef m_texOut[4];
 		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
-		//Texture2D *m_pTexLastOutput; 
+
+		Texture2DRef m_chainOutput;
 
 		TextureSamplerRef m_textureSampler;
 
@@ -71,7 +72,7 @@ namespace Grafkit {
 		std::vector<EffectPassRef> m_effectChain;
 		typedef std::map<size_t, TextureRef> bind_map_t;
 		
-		bind_map_t m_input_map;
+		bind_map_t m_inputMap;
 
 		struct {
 			float4 s, v;
@@ -104,11 +105,12 @@ namespace Grafkit {
 
 		ShaderRef GetShader() { return m_shader->Get(); }
 
+		// Ezeknke itt semmi ertelme nincs meg: 
 		void SetOutput(size_t bind, TextureRef tex) {m_output_map[bind] = tex; }
-		void SetInput(std::string name, TextureRef tex) { m_input_map[name] = tex; }
+		void SetInput(std::string name, TextureRef tex) { m_inputMap[name] = tex; }
 
 		void ClearOutputs() { m_output_map.clear();  }
-		void ClearInputs() { m_input_map.clear(); }
+		void ClearInputs() { m_inputMap.clear(); }
 
 		TextureRef GetOutput(size_t bind); 
 		TextureRef GetInput(std::string name);
@@ -126,7 +128,7 @@ namespace Grafkit {
 		typedef name_map_t::iterator name_map_it_t;
 
 		bind_map_t m_output_map;
-		name_map_t m_input_map;
+		name_map_t m_inputMap;
 
 	};
 

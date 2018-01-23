@@ -69,14 +69,15 @@ void Grafkit::ATexture::Shutdown()
 	}
 }
 
-void Grafkit::ATexture::SetRenderTargetView(Renderer & device, size_t id) const
-{
-	if (!m_pTargetView) {
-		throw new EX(NoRenderTargetViewException);
-	}
-
-	device.SetRenderTargetView(m_pTargetView, id);
-}
+// Ezt kurvara ki kell innen baszni
+//void Grafkit::ATexture::SetRenderTargetView(Renderer & device, size_t id) const
+//{
+//	if (!m_pTargetView) {
+//		throw new EX(NoRenderTargetViewException);
+//	}
+//
+//	device.SetRenderTargetView(m_pTargetView, id);
+//}
 
 void Grafkit::ATexture::UpdateTexture(Renderer & device, const void * data, size_t len, size_t subRes, size_t offset)
 {

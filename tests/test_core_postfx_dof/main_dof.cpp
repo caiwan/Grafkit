@@ -385,7 +385,7 @@ protected:
 		postfx->Render(render);
 
 		{
-			(*dof.fsPrecalc)->SetShaderResourceView(render, "color", *postfx->GetOutput());
+			(*dof.fsPrecalc)->SetShaderResourceView(render, "color", nullptr);
 			(*dof.fsPrecalc)->SetShaderResourceView(render, "depth", *positionMap);
 			//dof.fxPrecalc->Render(render);
 
