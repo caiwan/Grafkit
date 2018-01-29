@@ -76,20 +76,19 @@ float getDepth(float2 uv)
 
 // p0
 
-float4 calculateBlurAmount(
-FXPixelInputType input
-) : SV_TARGET0
+float4 calculateBlurAmount( FXPixelInputType input ) : SV_TARGET0
 {
     float2 t = input.tex;
 
-    float4 c = color.Sample(sm, t);
-    float limit = Limit;
-    float aperture = Aperture * Aperture;
+    float4 c = color.Sample(sm, t);	
+	
+	float limit = Limit;
+    float a = Aperture * Aperture;
     limit = limit * limit;
 
     float f = Focus * distanceUnit;
     float Object = getDepth(t);
-    float Result = aperture * abs(Object - f) / Object;
+    float Result = a * abs(Object - f) / Object;
 
     c.w = min(Result, limit); //pack color and coc into a pixel
 
@@ -98,9 +97,7 @@ FXPixelInputType input
 
 // p1 .. p6
 
-float4 blur(
-FXPixelInputType input
-) : SV_TARGET0
+float4 blur( FXPixelInputType input) : SV_TARGET0
 {
     float2 t = input.tex;
 
@@ -120,16 +117,16 @@ FXPixelInputType input
 
 // p7 
 
-float4 combine(
-FXPixelInputType input
-) : SV_TARGET0
+float4 combine( FXPixelInputType input ) : SV_TARGET0
 {
     float2 t = input.tex;
-
     float4 acc = 0;
+
     acc += input1.Sample(sm, t);
     acc += input2.Sample(sm, t);
     acc += input3.Sample(sm, t);
-    acc *= 0.33;
-    return acc;
+    
+	acc *= 0.33;
+    
+	return acc;
 }

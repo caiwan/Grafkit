@@ -71,6 +71,7 @@ protected:
 
 	TextureSamplerRef sampler;
 	TextureRef normalMap;
+	TextureRef colorMap;
 	TextureRef positionMap;
 	TextureResRef noiseMap;
 
@@ -95,7 +96,7 @@ protected:
 	// dof 
 	struct {
 
-		TextureRef colorInput;
+		TextureRef blurCalcMap;
 		TextureRef blurInput[3];
 
 		struct {
@@ -212,6 +213,9 @@ protected:
 		sampler = new TextureSampler();
 		sampler->Initialize(render);
 
+		colorMap = new Texture2D();
+		colorMap->Initialize(render);
+
 		normalMap = new Texture2D();
 		normalMap->InitializeFloatRGBA(render);
 
@@ -223,11 +227,14 @@ protected:
 		postfx->AddPass(new EffectPass(blurFs));
 
 #ifndef LIVE_RELEASE
-		postfx->AddPass(new EffectPass(troubleshootFs));
+		//postfx->AddPass(new EffectPass(troubleshootFs));
 #endif
 
 		postfx->SetInput(1, normalMap);
 		postfx->SetInput(2, positionMap);
+
+		postfx->SetOutput(colorMap);
+
 		postfx->Initialize(render);
 
 		// Depth of field
@@ -242,8 +249,10 @@ protected:
 			dof.cocParam.Focus = 0;
 			dof.cocParam.Limit = 0;
 
-			dof.colorInput = new Texture2D();
-			dof.colorInput->Initialize(render);
+			dof.blurCalcMap = new Texture2D();
+			dof.blurCalcMap->Initialize(render);
+
+			dof.fxPrecalc->SetOutput(dof.blurCalcMap);
 
 			(*dof.fsBlur)->SetParamT(render, "CircleOfConfusionParams", dof.cocParam);
 
@@ -288,7 +297,6 @@ protected:
 		camera = (*scene)->GetActiveCamera();
 
 		setupMaps();
-
 
 		this->t = 0;
 
@@ -376,6 +384,20 @@ protected:
 		// 
 		Scene::WorldMatrices_t worldMatrices;
 
+
+		// set parameters
+		{
+			dof.cocParam.Aperture = 1.;
+			dof.cocParam.Focus = 10;
+			dof.cocParam.Limit - 2.;
+
+			for (int i = 0; i < 6; i++) {
+				dof.blurParam[i].Aperture = dof.cocParam.Aperture;
+				dof.blurParam[i].Focus = dof.cocParam.Focus;
+			}
+			
+		}
+
 		// 
 		postfx->BindInput(render);
 
@@ -396,21 +418,21 @@ protected:
 		postfx->Render(render);
 
 		{
-			(*dof.fsPrecalc)->SetShaderResourceView(render, "color", nullptr);
+			(*dof.fsPrecalc)->SetShaderResourceView(render, "color", *colorMap);
 			(*dof.fsPrecalc)->SetShaderResourceView(render, "depth", *positionMap);
-			//dof.fxPrecalc->Render(render);
+			dof.fxPrecalc->Render(render);
 
-			//(*dof.fsBlur)->SetShaderResourceView(render, "input", *dof.fxPrecalc->GetOutput());
+			(*dof.fsBlur)->SetShaderResourceView(render, "input", *dof.blurCalcMap);
 
 			for (int i = 0; i < 3; i++) {
-				//dof.fxPass[i]->Render(render);
+				dof.fxPass[i]->Render(render);
 			}
 
-			//(*dof.fsCombine)->SetBoundedResourcePointer(render, "input1", dof.fxPass[0]->GetOutput());
-			//(*dof.fsCombine)->SetBoundedResourcePointer(render, "input2", dof.fxPass[1]->GetOutput());
-			//(*dof.fsCombine)->SetBoundedResourcePointer(render, "input3", dof.fxPass[2]->GetOutput());
+			(*dof.fsCombine)->SetShaderResourceView(render, "input1", *dof.blurInput[0]);
+			(*dof.fsCombine)->SetShaderResourceView(render, "input2", *dof.blurInput[1]);
+			(*dof.fsCombine)->SetShaderResourceView(render, "input3", *dof.blurInput[2]);
 
-			//dof.fxCombine->Render(render);
+			dof.fxCombine->Render(render);
 		}
 
 		this->render.EndScene();
