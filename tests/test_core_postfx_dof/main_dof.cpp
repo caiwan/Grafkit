@@ -390,9 +390,9 @@ protected:
 
 		// set parameters
 		{
-			dof.cocParam.Aperture = BOKEH_APERTURE;
-			dof.cocParam.Focus = 90 + 20 * sin(t);
-			dof.cocParam.Limit = 10.;
+			dof.cocParam.Aperture = BOKEH_APERTURE / 2.;
+			dof.cocParam.Focus = 1. + .5* sin(.5*t);
+			dof.cocParam.Limit = .125;
 
 			for (int i = 0; i < 6; i++) {
 				dof.blurParam[i].Aperture = dof.cocParam.Aperture;
