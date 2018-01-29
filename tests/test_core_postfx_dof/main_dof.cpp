@@ -32,6 +32,8 @@ using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
+#define BOKEH_APERTURE 0.37433372
+
 class Application : public Grafkit::System, protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 {
 public:
@@ -254,7 +256,8 @@ protected:
 
 			dof.fxPrecalc->SetOutput(dof.blurCalcMap);
 
-			(*dof.fsBlur)->SetParamT(render, "CircleOfConfusionParams", dof.cocParam);
+			//(*dof.fsBlur)->SetParamT(render, "CircleOfConfusionParams", dof.cocParam);
+			dof.fxPrecalc->GetPass(0)->GetParameter()->SetParam("CircleOfConfusionParams", &dof.cocParam);
 
 			for (int i = 0; i < 3; i++) {
 				dof.fxPass[i] = new EffectComposer();
@@ -387,9 +390,9 @@ protected:
 
 		// set parameters
 		{
-			dof.cocParam.Aperture = 1.;
-			dof.cocParam.Focus = 10;
-			dof.cocParam.Limit - 2.;
+			dof.cocParam.Aperture = BOKEH_APERTURE;
+			dof.cocParam.Focus = 90 + 20 * sin(t);
+			dof.cocParam.Limit = 10.;
 
 			for (int i = 0; i < 6; i++) {
 				dof.blurParam[i].Aperture = dof.cocParam.Aperture;
@@ -425,6 +428,7 @@ protected:
 			(*dof.fsBlur)->SetShaderResourceView(render, "input", *dof.blurCalcMap);
 
 			for (int i = 0; i < 3; i++) {
+				dof.fxPass[i]->SetInput(0, dof.blurCalcMap);
 				dof.fxPass[i]->Render(render);
 			}
 

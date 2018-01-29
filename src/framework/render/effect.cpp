@@ -133,6 +133,11 @@ void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 	}
 	else {
 		UnbindInput(render);
+
+		if (m_inputMap.find(0) != m_inputMap.end()) {
+			m_pTexFront = m_inputMap[0];
+		}
+
 		RenderChain(render);
 	}
 	if (autoflush)
@@ -157,15 +162,10 @@ void Grafkit::EffectComposer::FlushBuffers()
 
 	SwapBuffers();
 
-#if 1
 	auto tmp = m_pTexFront;
 	m_pTexFront = m_pTexBack;
 	m_pTexBack = tmp;
-#else
-	auto tmp = m_pTexWrite;
-	m_pTexWrite = m_pTexBack;
-	m_pTexBack = tmp;
-#endif
+
 }
 
 void Grafkit::EffectComposer::RenderChain(Renderer & render)
