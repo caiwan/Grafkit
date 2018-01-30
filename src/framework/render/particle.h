@@ -60,6 +60,10 @@ namespace Grafkit
 		ParticleDynamics::DynamicArguments_t GetArgs() { return m_params.args; }
 		void SetArgs(ParticleDynamics::DynamicArguments_t args) { m_params.args = args; }
 
+		void SetEnabled(bool isEnabled) {
+			m_enabled = isEnabled;
+		}
+
 	protected:
 		virtual void Calculate();
 		virtual ParticleDynamicsType_e GetType() = 0;
@@ -83,6 +87,7 @@ namespace Grafkit
 
 	protected:
 		DynamicElem_t m_params;
+		bool m_enabled;
 	};
 
 	// ========================================================================

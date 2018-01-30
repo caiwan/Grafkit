@@ -243,7 +243,6 @@ protected:
 		{
 			dof.fxPrecalc = new EffectComposer();
 			dof.fxPrecalc->AddPass(new EffectPass(dof.fsPrecalc));
-			dof.fxPrecalc->Initialize(render);
 
 			//ZeroMemory(&dof.cocParam, sizeof(dof.cocParam));
 
@@ -398,7 +397,6 @@ protected:
 				dof.blurParam[i].Aperture = dof.cocParam.Aperture;
 				dof.blurParam[i].Focus = dof.cocParam.Focus;
 			}
-			
 		}
 
 		// 

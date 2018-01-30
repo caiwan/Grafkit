@@ -34,19 +34,23 @@ void Grafkit::ParticleEngine::Render(Renderer & render)
 {
 	size_t paramCount = m_dynamicElements.size();
 	paramCount = (PARTICLE_NG_MAX_ELEM < paramCount) ? PARTICLE_NG_MAX_ELEM : paramCount;
+	size_t activeParams = 0;
 	for (size_t i = 0; i < paramCount; i++) {
-		m_dynamicElements[i]->Calculate();
-		m_shaderParams.args[i] = m_dynamicElements[i]->m_params;
+		if (m_dynamicElements[i]->m_enabled) {
+			m_dynamicElements[i]->Calculate();
+			m_shaderParams.args[activeParams] = m_dynamicElements[i]->m_params;
+			activeParams++;
+		}
 	}
 
-	m_shaderParams.elemCount = paramCount;
+	m_shaderParams.elemCount = activeParams;
 	(*m_fsParticleEngine)->SetParamT(render, "ParticleEngineParams", m_shaderParams);
 	m_particleCompute->Render(render);
 }
 
 // ========================================================================
 
-Grafkit::ParticleDynamics::ParticleDynamics(float4 position, float weight)
+Grafkit::ParticleDynamics::ParticleDynamics(float4 position, float weight) : m_enabled(true)
 {
 	ZeroMemory(&m_params, sizeof(m_params));
 	m_params.args.position = position;
