@@ -399,7 +399,6 @@ protected:
 			}
 		}
 
-		// 
 		postfx->BindInput(render);
 
 		this->render.BeginScene();
