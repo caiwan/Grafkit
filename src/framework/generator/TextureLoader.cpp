@@ -85,12 +85,12 @@ IResource * Grafkit::ITextureBuilder::NewResource()
 /*
 */
 
-Grafkit::TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name, 
-	std::string source_posx, 
-	std::string source_negx, 
-	std::string source_posy, 
-	std::string source_negy, 
-	std::string source_posz, 
+Grafkit::TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name,
+	std::string source_posx,
+	std::string source_negx,
+	std::string source_posy,
+	std::string source_negy,
+	std::string source_posz,
 	std::string source_negz) : ITextureBuilder(name, "")
 {
 	m_sourceNames[0] = source_posx;
@@ -179,4 +179,36 @@ void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, 
 	}
 
 	dstTexture->AssingnRef(texture);
+}
+
+Grafkit::TextureSamplerGenerator::TextureSamplerGenerator(Grafkit::TextureSamplerGenerator::Type_e type) : IResourceBuilder("", "")
+{
+	switch (type)
+	{
+	case TextureSamplerGenerator::TGG_Clamping:
+		m_name = TS_NAME_CLAMP;
+		m_mode = D3D11_TEXTURE_ADDRESS_CLAMP;
+		break;
+	default:
+		m_name = TS_NAME_WRAP;
+		m_mode = D3D11_TEXTURE_ADDRESS_WRAP;
+		break;
+	}
+}
+
+void Grafkit::TextureSamplerGenerator::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
+{
+	TextureSamplerResRef sampler = dynamic_cast<Resource<TextureSampler>*>(source);
+
+	if (sampler.Invalid()) {
+		throw new EX(NullPointerException);
+	}
+
+	sampler->AssingnRef(new TextureSampler());
+	sampler->Get()->Initialize(resman->GetDeviceContext(), m_mode);
+}
+
+IResource * Grafkit::TextureSamplerGenerator::NewResource()
+{
+	return new Resource<TextureSampler>();
 }

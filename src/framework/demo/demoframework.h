@@ -25,7 +25,7 @@ namespace GKDemo {
 	class DemoApplication :
 		public virtual Grafkit::System,
 		protected virtual Grafkit::ResourcePreloader,
-		private virtual Grafkit::ClonableInitializer,
+		protected virtual Grafkit::ClonableInitializer,
 		protected virtual GrafkitData::LoaderBar
 	{
 	public:
@@ -50,7 +50,7 @@ namespace GKDemo {
 		std::list<Ref<SceneElem>> m_scenes;
 
 	protected:
-		Grafkit::Renderer render;
+		Grafkit::Renderer m_render;
 
 		// traxx
 		Grafkit::MusicResRef music;
@@ -60,12 +60,12 @@ namespace GKDemo {
 	protected:
 		void UpdateLoaderBar(float p);
 
-	private:
-		Grafkit::IAssetFactory *m_file_loader;
+	protected:
+		Grafkit::IAssetFactory *m_loader;
 
 	public:
-		Grafkit::IAssetFactory *GetAssetFactory() { return m_file_loader; }
-		Grafkit::Renderer & GetDeviceContext() { return render; }
+		Grafkit::IAssetFactory *GetAssetFactory() { return m_loader; }
+		Grafkit::Renderer & GetDeviceContext() { return m_render; }
 
 	};
 }

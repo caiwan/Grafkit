@@ -5,8 +5,6 @@
 
 #include "texture.h"
 
-#include "renderelement.h"
-
 namespace Grafkit {
 
 	class ShaderParameter;
@@ -17,7 +15,7 @@ namespace Grafkit {
 		ShaderParameter();
 		virtual ~ShaderParameter();
 
-		void Initialize(Renderer &render, ShaderResRef shader);
+		void Initialize(Renderer &m_render, ShaderResRef shader);
 
 		ShaderRef GetShader() { return m_targetShader->Get(); }
 
@@ -30,7 +28,7 @@ namespace Grafkit {
 		void SetSampler(std::string name, TextureSamplerRef sampler);
 
 		//
-		void BindParameters(Renderer &render);
+		void BindParameters(Renderer &m_render);
 
 	protected:
 		void SetATexture(std::string name, Ref<IResource> texture);

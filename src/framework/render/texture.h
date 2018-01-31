@@ -214,7 +214,7 @@ namespace Grafkit
 		TextureSampler();
 		~TextureSampler();
 
-		void Initialize(Renderer & device);
+		void Initialize(Renderer & device, D3D11_TEXTURE_ADDRESS_MODE mode = D3D11_TEXTURE_ADDRESS_WRAP);
 		void Shutdown();
 
 		ID3D11SamplerState*	GetSamplerState() { return this->m_pSamplerState; }

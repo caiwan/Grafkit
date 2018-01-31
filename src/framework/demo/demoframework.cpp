@@ -1,6 +1,12 @@
 #include "demoframework.h"
 
-GKDemo::DemoApplication::DemoApplication()
+using namespace GKDemo;
+using namespace Grafkit;
+
+GKDemo::DemoApplication::DemoApplication() : 
+	ClonableInitializer(), 
+	System(), 
+	ResourcePreloader(), m_file_loader(nullptr)
 {
 }
 

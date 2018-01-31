@@ -18,10 +18,7 @@ namespace GrafkitData {
 		void ShutdownLoaderBar();
 
 		// --- 
-		//virtual void OnBeginLoad() = 0;
-		//virtual void OnBeforeElemLoad(IResourceBuilder *&builder, IResource *&res) = 0;
 		virtual void OnElemLoad(size_t actual, size_t count) ;
-		//virtual void OnEndLoad() = 0;
 
 	protected:
 		// --- 
@@ -29,7 +26,7 @@ namespace GrafkitData {
 		// without hacking it through the resource loader
 		// (unlike I saw doing it for real at some workplaces)
 		virtual void UpdateLoaderBar(float p) = 0;
-		void DrawLoaderBar(Grafkit::Renderer &render, float p);
+		void DrawLoaderBar(Grafkit::Renderer &m_render, float p);
 
 		// To override ps if needed
 		virtual std::string GetLoaderBarSrc();
@@ -38,9 +35,9 @@ namespace GrafkitData {
 		// Abstract factory to substitude the single shader with other funky things
 		virtual Grafkit::ShaderResRef CreateShader(Grafkit::Renderer & renderer);
 
-	protected:
+	private:
 		Grafkit::EffectComposerRef m_loaderbar;
-		Grafkit::ShaderResRef m_ps;
+		Grafkit::ShaderResRef m_fsLoader;
 	};
 
 }

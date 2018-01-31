@@ -30,18 +30,18 @@ namespace Grafkit {
 		EffectComposer();
 		virtual ~EffectComposer();
 
-		void Initialize(Renderer &render, bool singlepass = false);
+		void Initialize(Renderer &m_render, bool singlepass = false);
 		void Shutdown();
 
 		void AddPass(EffectPassRef pass) { m_effectChain.push_back(pass);}
 
 		EffectPassRef GetPass(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
 
-		void BindInput(Renderer &render);
-		void UnbindInput(Renderer& render);
+		void BindInput(Renderer &m_render);
+		void UnbindInput(Renderer& m_render);
 
-		void Render(Renderer &render, int autoflush = 1);
-		void Flush(Renderer &render);
+		void Render(Renderer &m_render, int autoflush = 1);
+		void Flush(Renderer &m_render);
 
 		void SetInput(size_t bind, TextureRef tex) { m_inputMap[bind] = tex; }
 		TextureRef GetInput(size_t bind) { auto it = m_inputMap.find(bind); return it == m_inputMap.end() ? TextureRef() : it->second; }
@@ -52,7 +52,7 @@ namespace Grafkit {
 	protected:
 		void SwapBuffers();
 		void FlushBuffers();
-		void RenderChain(Renderer &render);
+		void RenderChain(Renderer &m_render);
 
 	protected:
 
@@ -94,14 +94,14 @@ namespace Grafkit {
 		EffectPass(ShaderResRef shader);
 		~EffectPass();
 
-		void Initialize(Renderer &render);
+		void Initialize(Renderer &m_render);
 		void Shutdown();
 
-		size_t BindOutputs(Renderer &render);
-		size_t UnbindOutputs(Renderer &render);
+		size_t BindOutputs(Renderer &m_render);
+		size_t UnbindOutputs(Renderer &m_render);
 
-		void BindFx(Renderer &render);
-		void UnbindFx(Renderer &render);
+		void BindFx(Renderer &m_render);
+		void UnbindFx(Renderer &m_render);
 
 		ShaderRef GetShader() { return m_shader->Get(); }
 

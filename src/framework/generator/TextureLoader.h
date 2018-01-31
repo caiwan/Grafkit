@@ -63,5 +63,26 @@ namespace Grafkit{
 		size_t m_size;
 	};
 
+#define TS_NAME_CLAMP "TextureSamplerClamp"
+#define TS_NAME_WRAP "TextureSamplerWrap"
+
+	class TextureSamplerGenerator : public Grafkit::IResourceBuilder {
+	public:
+		enum Type_e {
+			TGG_Clamping,
+			TGG_Wrapping
+		};
+
+		TextureSamplerGenerator(TextureSamplerGenerator::Type_e type);
+
+		virtual void Load(Grafkit::IResourceManager * const & assman, Grafkit::IResource * source);
+
+		virtual IResource* NewResource(); 
+
+	private:
+		D3D11_TEXTURE_ADDRESS_MODE m_mode;
+
+	};
+
 }
 

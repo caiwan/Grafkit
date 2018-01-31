@@ -58,18 +58,18 @@ GrafkitData::LoaderBar::~LoaderBar()
 
 void GrafkitData::LoaderBar::InitializeLoaderBar(Grafkit::Renderer & renderer)
 {
-	m_ps = CreateShader(renderer);
+	m_fsLoader = CreateShader(renderer);
 	m_loaderbar = new EffectComposer();
-	m_loaderbar->AddPass(new EffectPass(m_ps));
+	m_loaderbar->AddPass(new EffectPass(m_fsLoader));
 	m_loaderbar->Initialize(renderer, true);
 }
 
 void GrafkitData::LoaderBar::ShutdownLoaderBar()
 {
-	if (m_ps.Valid())
-		if (m_ps->Valid()) {
-			m_ps->Get()->Shutdown();
-			m_ps->AssingnRef(nullptr);
+	if (m_fsLoader.Valid())
+		if (m_fsLoader->Valid()) {
+			m_fsLoader->Get()->Shutdown();
+			m_fsLoader->AssingnRef(nullptr);
 		}
 	if (m_loaderbar.Valid()) {
 		m_loaderbar->Shutdown();
@@ -89,7 +89,7 @@ void GrafkitData::LoaderBar::DrawLoaderBar(Grafkit::Renderer & render, float p)
 	par.z = render.GetAspectRatio();
 	par.w = p;
 
-	m_ps->Get()->SetParamT<float4>(render, "LoaderBar", par);
+	m_fsLoader->Get()->SetParamT<float4>(render, "LoaderBar", par);
 
 	//
 	m_loaderbar->BindInput(render);

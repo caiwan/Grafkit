@@ -523,7 +523,9 @@ Grafkit::TextureSampler::~TextureSampler()
 	this->Shutdown();
 }
 
-void Grafkit::TextureSampler::Initialize(Renderer & device)
+
+void Grafkit::TextureSampler::Initialize(Renderer & device, D3D11_TEXTURE_ADDRESS_MODE mode)
+//void Grafkit::TextureSampler::Initialize(Renderer & device)
 {
 	HRESULT result = 0;
 
@@ -534,16 +536,9 @@ void Grafkit::TextureSampler::Initialize(Renderer & device)
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	//samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 
-	/*
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	*/
-
-
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressU = mode;
+	samplerDesc.AddressV = mode;
+	samplerDesc.AddressW = mode;
 
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;
