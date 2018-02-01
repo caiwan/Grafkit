@@ -92,6 +92,12 @@ void CubeScene::OnAfterPreload(Grafkit::Renderer & render, GKDemo::DemoApplicati
 #endif
 }
 
+void CubeScene::OnBeforeRender(Grafkit::Renderer & render, GKDemo::DemoApplication * const & context)
+{
+	(*scene)->UpdateAnimation(0.f);
+	(*scene)->PreRender(render);
+}
+
 void CubeScene::OnRender(Grafkit::Renderer & render, GKDemo::DemoApplication * const & context)
 {
 	(*scene)->Render(render);

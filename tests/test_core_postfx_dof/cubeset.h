@@ -25,6 +25,7 @@ protected:
 	virtual void OnAfterPreload(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context);
 
 public:
+	virtual void OnBeforeRender(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context);
 	virtual void OnRender(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context);
 
 
