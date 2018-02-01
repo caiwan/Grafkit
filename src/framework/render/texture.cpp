@@ -156,7 +156,7 @@ void Grafkit::ATexture::Update(Renderer & device, const BitmapRef bitmap, size_t
 void Grafkit::Texture1D::Initialize(Renderer & device, size_t w, size_t components)
 {
 	this->SetDimm(w, 0, 0, components, 4);
-	
+
 	DXGI_FORMAT fmt = DXGI_FORMAT_R32_FLOAT;
 	switch (channels)
 	{
@@ -217,7 +217,7 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	ID3D11Texture1D *ppTex = nullptr;
 	result = device->CreateTexture1D(&textureDesc, pData, &ppTex);
 
-	if (FAILED(result)) 
+	if (FAILED(result))
 		throw new EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;
@@ -406,7 +406,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	ID3D11Texture2D *ppTex = nullptr;
 	result = device->CreateTexture2D(&textureDesc, nullptr, &ppTex);
 
-	if (FAILED(result)) 
+	if (FAILED(result))
 		throw new EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;

@@ -1,8 +1,13 @@
 #pragma once 
 
+#include "common.h"
+
 #include "render/shader.h"
 #include "render/camera.h"
 #include "render/model.h"
+
+#include "render/texture.h"
+#include "render/light.h"
 
 #include "demo/sceneelem.h"
 #include "demo/demoframework.h"
@@ -13,10 +18,15 @@ public:
 	CubeScene();
 	~CubeScene();
 
-public:
+	virtual void Shutdown();
+
+protected:
 	virtual void OnBeforePreload(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context, Grafkit::IResourceManager * const & resman);
 	virtual void OnAfterPreload(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context);
+
+public:
 	virtual void OnRender(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context);
+
 
 private:
 	Grafkit::SceneResRef scene;
@@ -24,13 +34,13 @@ private:
 	Grafkit::ShaderResRef vs;
 	Grafkit::ShaderResRef fs;
 
-	TextureResRef texture;
+	Grafkit::TextureResRef texture;
 
-	TextureSamplerRef sampler;
+	Grafkit::TextureSamplerResRef sampler;
 
-	LightRef light;
-	ActorRef lightActor;
+	Grafkit::LightRef light;
+	Grafkit::ActorRef lightActor;
 
-	ActorRef cameraActor;
-	CameraRef camera;
+	Grafkit::ActorRef cameraActor;
+	Grafkit::CameraRef camera;
 };

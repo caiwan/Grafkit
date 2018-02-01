@@ -1,5 +1,7 @@
 #include "demo/demoframework.h"
 
+#include "render/renderer.h"
+
 #include "utils/AssetFile.h"
 
 #include "cubeset.h"
@@ -43,16 +45,23 @@ protected:
 	// This will be replaced with a more advanced (mean: less shittycoded) techology (bullshit)
 	virtual void OnSetupResources() {}
 
-	// This is where the fun part comes
-	// Before render anything and/or binding any outputs
-	virtual void OnBeforeRender() {}
+	// 
+	virtual int mainloop() {
+		
+		m_cubes->OnBeforeRender(m_render, this);
+		
+		m_render.BeginScene();
+		m_cubes->OnRender(m_render, this);
+		m_render.EndScene();
 
-	// Render 3D 
-	virtual void OnRender() {}
+		m_cubes->OnAfterRender(m_render, this);
 
-	// Do the tick
-	virtual void OnAfterRender() {}
-
+		return 0;
+	}
+	
+	virtual void Shutdown() {
+	}
+	
 };
 
 // ==================================================================================================================

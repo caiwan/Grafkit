@@ -9,11 +9,23 @@
 
 using namespace Grafkit;
 
+CubeScene::CubeScene()
+{
+}
+
+CubeScene::~CubeScene()
+{
+}
+
+void CubeScene::Shutdown()
+{
+}
+
 void CubeScene::OnBeforePreload(Grafkit::Renderer & render, GKDemo::DemoApplication * const & context, Grafkit::IResourceManager * const & resman)
 {
 	texture = resman->Load<Texture2DRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
-	sampler = resman->Load<TextureSamplerRes>(new TextureSamplerGenerator(TextureSamplerGenerator::TGG_Wrapping));
+	sampler = resman->Load<TextureSamplerRes>(new TextureSamplerBuilder(TextureSamplerBuilder::TGG_Wrapping));
 
 	vs = resman->Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
 	fs = resman->Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
@@ -70,6 +82,12 @@ void CubeScene::OnAfterPreload(Grafkit::Renderer & render, GKDemo::DemoApplicati
 	rootActor->AddChild(modelActor);
 
 	(*scene)->Initialize(rootActor);
+
+	(*scene)->BuildScene(render, vs, fs);
+	(*scene)->SetActiveCamera(0);
+
+	cameraActor = (*scene)->GetActiveCameraNode();
+	camera = (*scene)->GetActiveCamera();
 
 #endif
 }

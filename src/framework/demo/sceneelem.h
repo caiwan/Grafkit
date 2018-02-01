@@ -10,6 +10,7 @@ namespace GKDemo {
 
 	class SceneElem : public Referencable
 	{
+		friend class DemoApplication;
 	public:
 
 		SceneElem() : isActive(1) {
@@ -26,6 +27,8 @@ namespace GKDemo {
 		virtual void OnBeforeRender(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context) {}
 		virtual void OnRender(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context) = 0;
 		virtual void OnAfterRender(Grafkit::Renderer &render, GKDemo::DemoApplication *const& context) {}
+
+		virtual void Shutdown() {}
 
 		int IsActive() { return isActive; }
 		void Enable() { isActive = 1; }

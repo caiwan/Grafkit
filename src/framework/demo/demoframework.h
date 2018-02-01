@@ -1,3 +1,4 @@
+#pragma once
 // A qnd framework to create demos more easily
 
 #include <list>
@@ -15,8 +16,6 @@
 #include "utils/InitializeSerializer.h"
 
 #include "builtin_data/loaderbar.h"
-
-#include "valtracker/valtracker.h"
 
 namespace GKDemo {
 
@@ -37,13 +36,11 @@ namespace GKDemo {
 		virtual void OnAfterPreload() {}
 		virtual void OnDelegateTracks() {}
 		virtual void OnSetupResources() {}
-		virtual void OnBeforeRender() {}
-		virtual void OnRender() {}
-		virtual void OnAfterRender() {}
+
+		virtual void Shutdown(){}
 
 	protected:
 		virtual int init();
-		virtual int mainloop();
 		virtual void release();
 
 	protected:
@@ -51,11 +48,6 @@ namespace GKDemo {
 
 	protected:
 		Grafkit::Renderer m_render;
-
-		// traxx
-		Grafkit::MusicResRef music;
-		Ref<Grafkit::Timer> timer;
-		Ref<Grafkit::ValueTracker> valTracker;
 
 	protected:
 		void UpdateLoaderBar(float p);
@@ -66,6 +58,16 @@ namespace GKDemo {
 	public:
 		Grafkit::IAssetFactory *GetAssetFactory() { return m_loader; }
 		Grafkit::Renderer & GetDeviceContext() { return m_render; }
+
+	private:
+		// qnd enhance loader bar
+		enum LoadPhase_e {
+			Phase_BeforePreload,
+			Phase_AfterPreload,
+			Phase_COUNT
+		};
+
+		enum LoadPhase_e m_activeLoadPhase;
 
 	};
 }

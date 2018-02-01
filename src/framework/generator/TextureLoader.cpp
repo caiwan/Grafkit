@@ -16,14 +16,71 @@ using namespace FWdebugExceptions;
 
 
 // ========================================================================================================================
+// Texture buffer generator
+// ========================================================================================================================
+
+IResource * Grafkit::ITexture1DBuilder::NewResource()
+{
+	return new Texture1DRes;
+}
+
+IResource * Grafkit::ITexture2DBuilder::NewResource()
+{
+	return new Texture2DRes;
+}
+
+// ========================================================================================================================
+// Texture buffer generator
+// ========================================================================================================================
+
+Grafkit::TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureBufferBuilder::Type_E type) : ITexture2DBuilder(name),
+m_w(0), m_h(0), m_type(type)
+{
+}
+
+Grafkit::TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureBufferBuilder::Type_E type, uint16_t w, uint16_t h) : ITexture2DBuilder(name),
+m_w(w), m_h(h), m_type(type)
+{
+}
+
+void Grafkit::TextureBufferBuilder::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
+{
+	TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
+	if (dstTexture.Invalid()) {
+		throw new EX(NullPointerException);
+	}
+
+	TextureRef texture = new Texture2D();
+
+	switch (m_type) {
+	case TB_RGBA:
+		texture->Initialize(resman->GetDeviceContext(), m_w, m_h);
+		break;
+	case TB_RGBA32:
+		texture->InitializeFloatRGBA(resman->GetDeviceContext(), m_w, m_h);
+		break;
+	case TB_Float:
+		texture->InitializeFloat(resman->GetDeviceContext(), m_w, m_h);
+		break;
+	case TB_Depth:
+		texture->InitializeDepth(resman->GetDeviceContext(), m_w, m_h);
+		break;
+	}
+
+	if (dstTexture->Valid()) {
+		dstTexture->Release();
+	}
+
+	dstTexture->AssingnRef(texture);
+}
+
+
+// ========================================================================================================================
 // Texture from bitmap loader
 // ========================================================================================================================
-//Grafkit::TextureFromBitmap::TextureFromBitmap(std::string source_name) : ITextureBuilder(source_name, source_name),
-//	m_w(0), m_h(0)
-//{
-//}
 
-Grafkit::TextureFromBitmap::TextureFromBitmap(std::string name, std::string source_name) : ITextureBuilder(name, source_name), m_w(0), m_h(0)
+Grafkit::TextureFromBitmap::TextureFromBitmap(std::string name, std::string source_name) : ITexture2DBuilder(name, source_name),
+m_w(0), m_h(0)
 {
 }
 
@@ -77,11 +134,6 @@ void Grafkit::TextureFromBitmap::Load(Grafkit::IResourceManager * const & resman
 	dstTexture->AssingnRef(texture);
 }
 
-IResource * Grafkit::ITextureBuilder::NewResource()
-{
-	return new Texture2DRes;
-}
-
 /*
 */
 
@@ -91,7 +143,7 @@ Grafkit::TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name,
 	std::string source_posy,
 	std::string source_negy,
 	std::string source_posz,
-	std::string source_negz) : ITextureBuilder(name, "")
+	std::string source_negz) : ITexture2DBuilder(name, "")
 {
 	m_sourceNames[0] = source_posx;
 	m_sourceNames[1] = source_negx;
@@ -181,11 +233,11 @@ void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, 
 	dstTexture->AssingnRef(texture);
 }
 
-Grafkit::TextureSamplerGenerator::TextureSamplerGenerator(Grafkit::TextureSamplerGenerator::Type_e type) : IResourceBuilder("", "")
+Grafkit::TextureSamplerBuilder::TextureSamplerBuilder(Grafkit::TextureSamplerBuilder::Type_E type) : IResourceBuilder("", "")
 {
 	switch (type)
 	{
-	case TextureSamplerGenerator::TGG_Clamping:
+	case TextureSamplerBuilder::TGG_Clamping:
 		m_name = TS_NAME_CLAMP;
 		m_mode = D3D11_TEXTURE_ADDRESS_CLAMP;
 		break;
@@ -196,7 +248,7 @@ Grafkit::TextureSamplerGenerator::TextureSamplerGenerator(Grafkit::TextureSample
 	}
 }
 
-void Grafkit::TextureSamplerGenerator::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
+void Grafkit::TextureSamplerBuilder::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
 {
 	TextureSamplerResRef sampler = dynamic_cast<Resource<TextureSampler>*>(source);
 
@@ -208,7 +260,9 @@ void Grafkit::TextureSamplerGenerator::Load(Grafkit::IResourceManager * const & 
 	sampler->Get()->Initialize(resman->GetDeviceContext(), m_mode);
 }
 
-IResource * Grafkit::TextureSamplerGenerator::NewResource()
+IResource * Grafkit::TextureSamplerBuilder::NewResource()
 {
 	return new Resource<TextureSampler>();
 }
+
+
