@@ -37,6 +37,10 @@ private:
 
 	Grafkit::TextureResRef texture;
 
+	Grafkit::TextureResRef texColorMap;
+	Grafkit::TextureResRef texViewMap;
+	//Grafkit::TextureResRef viewMap;
+
 	Grafkit::TextureSamplerResRef sampler;
 
 	Grafkit::LightRef light;

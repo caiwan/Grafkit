@@ -27,8 +27,11 @@ void CubeScene::OnBeforePreload(Grafkit::Renderer & render, GKDemo::DemoApplicat
 
 	sampler = resman->Load<TextureSamplerRes>(new TextureSamplerBuilder(TextureSamplerBuilder::TGG_Wrapping));
 
-	vs = resman->Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
-	fs = resman->Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+	vs = resman->Get<ShaderRes>("vShader");
+	fs = resman->Get<ShaderRes>("pShader");
+
+	texViewMap = resman->Get<Texture2DRes>("texViewMap");
+	texColorMap = resman->Get<Texture2DRes>("texColorMap");
 
 #if 0
 	scene = this->Load<SceneRes>(new SceneLoader("scene", "ao.scene"));
@@ -100,5 +103,14 @@ void CubeScene::OnBeforeRender(Grafkit::Renderer & render, GKDemo::DemoApplicati
 
 void CubeScene::OnRender(Grafkit::Renderer & render, GKDemo::DemoApplication * const & context)
 {
+	render.SetRenderTargetView(**texColorMap, 0);
+	render.SetRenderTargetView(**texViewMap, 1);
+	render.ApplyRenderTargetView();
+	render.BeginScene();
+
 	(*scene)->Render(render);
+
+	render.SetRenderTargetView(nullptr, 0);
+	render.SetRenderTargetView(nullptr, 1);
+	render.ApplyRenderTargetView();
 }

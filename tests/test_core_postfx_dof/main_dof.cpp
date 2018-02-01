@@ -2,6 +2,9 @@
 
 #include "render/renderer.h"
 
+#include "generator/TextureLoader.h"
+#include "generator/ShaderLoader.h"
+
 #include "utils/AssetFile.h"
 
 #include "cubeset.h"
@@ -32,9 +35,23 @@ public:
 private:
 	Ref<CubeScene> m_cubes;
 
+	Grafkit::ShaderResRef vs;
+	Grafkit::ShaderResRef fs;
+
+
+	Texture2DResRef texViewMap;
+	Texture2DResRef texColorMap;
+
 protected:
 	// Define your elements here
-	virtual void OnBeforePreload() {}
+	virtual void OnBeforePreload() {
+
+		vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
+		fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+
+		texViewMap = Load<Texture2DRes>(new TextureBufferBuilder("texViewMap", TextureBufferBuilder::TB_RGBA32));
+		texColorMap = Load<Texture2DRes>(new TextureBufferBuilder("texColorMap", TextureBufferBuilder::TB_RGBA32));
+	}
 
 	// Initialize your elements after loadig their resources from disk
 	virtual void OnAfterPreload() {}
