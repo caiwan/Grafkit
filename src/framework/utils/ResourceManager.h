@@ -81,6 +81,8 @@ namespace Grafkit {
 			return nullptr;
 	}
 	
+	template<class T> 
+
 	template<class T> inline Ref<T> IResourceManager::Load(IResourceBuilder* builder) {
 		Load(builder);
 		T* res = Get<T>(builder->GetName());

@@ -13,7 +13,7 @@
 #include "shaderparameter.h"
 
 namespace Grafkit {
-	
+
 	class ShaderParameter;
 
 	class EffectComposer;
@@ -24,6 +24,7 @@ namespace Grafkit {
 
 	// ---------------------------------------------------------------------------------------------------
 
+	// Legacy stuff.
 	__declspec(align(16)) class EffectComposer : virtual public Referencable, public AlignedNew<EffectComposer>
 	{
 	public:
@@ -33,9 +34,9 @@ namespace Grafkit {
 		void Initialize(Renderer &m_render, bool singlepass = false);
 		void Shutdown();
 
-		void AddPass(EffectPassRef pass) { m_effectChain.push_back(pass);}
+		void AddPass(EffectPassRef pass) { m_effectChain.push_back(pass); }
 
-		EffectPassRef GetPass(size_t id) { return id <m_effectChain.size()? m_effectChain[id] : EffectPassRef(); }
+		EffectPassRef GetPass(size_t id) { return id < m_effectChain.size() ? m_effectChain[id] : EffectPassRef(); }
 
 		void BindInput(Renderer &m_render);
 		void UnbindInput(Renderer& m_render);
@@ -56,7 +57,7 @@ namespace Grafkit {
 
 	protected:
 
-		std::vector<Ref<EffectComposer>> m_parentSource;
+		//std::vector<Ref<EffectComposer>> m_parentSource;
 
 		TextureRef m_texOut[4];
 		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
@@ -71,7 +72,7 @@ namespace Grafkit {
 
 		std::vector<EffectPassRef> m_effectChain;
 		typedef std::map<size_t, TextureRef> bind_map_t;
-		
+
 		bind_map_t m_inputMap;
 
 		struct {
@@ -87,10 +88,38 @@ namespace Grafkit {
 
 	// ===================================================================================================
 
+	__declspec(align(16)) class EffectRender : virtual public Referencable, virtual public AlignedNew<EffectComposer>
+	{ 
+	public:
+		EffectRender();
+		~EffectRender();
+
+		void Initialize(Renderer &render);
+		void Shutdown();
+
+		void AddPass(EffectPassRef pass) { m_effects.push_back(pass); }
+		EffectPassRef GetPass(size_t id) { return id < m_effects.size() ? m_effects[id] : EffectPassRef(); }
+
+		void Render(Renderer &m_render, TextureResRef output = nullptr);
+
+	private:
+		std::vector<EffectPassRef> m_effects;
+
+		TextureRef m_texOut[2];
+		Texture2D *m_pTexRead, *m_pTexWrite;
+
+		MeshRef m_fullscreenquad;
+		ShaderRef m_shaderFullscreenQuad;
+		ShaderRef m_shaderCopyScreen;
+	};
+
+
+	// ===================================================================================================
+
 	__declspec(align(16)) class EffectPass : virtual public Referencable, public AlignedNew<EffectPass>
 	{
 		friend class EffectComposer;
-	public :
+	public:
 		EffectPass(ShaderResRef shader);
 		~EffectPass();
 
@@ -106,13 +135,13 @@ namespace Grafkit {
 		ShaderRef GetShader() { return m_shader->Get(); }
 
 		// Ezeknke itt semmi ertelme nincs meg: 
-		void SetOutput(size_t bind, TextureRef tex) {m_output_map[bind] = tex; }
+		void SetOutput(size_t bind, TextureRef tex) { m_output_map[bind] = tex; }
 		void SetInput(std::string name, TextureRef tex) { m_inputMap[name] = tex; }
 
-		void ClearOutputs() { m_output_map.clear();  }
+		void ClearOutputs() { m_output_map.clear(); }
 		void ClearInputs() { m_inputMap.clear(); }
 
-		TextureRef GetOutput(size_t bind); 
+		TextureRef GetOutput(size_t bind);
 		TextureRef GetInput(std::string name);
 
 		Ref<ShaderParameter> GetParameter() { return m_shaderParameter; }

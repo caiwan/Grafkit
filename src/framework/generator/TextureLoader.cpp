@@ -84,6 +84,11 @@ m_w(0), m_h(0)
 {
 }
 
+Grafkit::TextureFromBitmap::TextureFromBitmap(std::string name) : ITexture2DBuilder(name),
+m_w(0), m_h(0)
+{
+}
+
 Grafkit::TextureFromBitmap::~TextureFromBitmap()
 {
 	TextureResRef outTexture = (TextureResRef_t)m_dstResource;
@@ -199,9 +204,14 @@ IResource * Grafkit::TextureCubemapFromBitmap::NewResource()
 	return new TextureCubeRes();
 }
 
-Grafkit::TextureNoiseMap::TextureNoiseMap(size_t size) : TextureFromBitmap("NOISE", ""), m_size(size)
+// -------------------------------------------------------------------------------
+
+Grafkit::TextureNoiseMap::TextureNoiseMap(size_t size) : TextureFromBitmap("NOISE"), m_size(size)
 {
-	m_name = "NOISE"; // ... 
+}
+
+Grafkit::TextureNoiseMap::TextureNoiseMap(std::string name, size_t size) : TextureFromBitmap(name), m_size(size)
+{
 }
 
 void Grafkit::TextureNoiseMap::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)

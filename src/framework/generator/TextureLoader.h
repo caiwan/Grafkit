@@ -67,6 +67,7 @@ namespace Grafkit{
 	public:
 		//TextureFromBitmap(std::string source_name);
 		TextureFromBitmap(std::string name, std::string source_name);
+		TextureFromBitmap(std::string name);
 		~TextureFromBitmap();
 
 		///@todo implement resize
@@ -93,6 +94,7 @@ namespace Grafkit{
 	class TextureNoiseMap : public TextureFromBitmap {
 	public:
 		TextureNoiseMap(size_t size);
+		TextureNoiseMap(std::string name, size_t size);
 		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
 	private:
 		size_t m_size;
