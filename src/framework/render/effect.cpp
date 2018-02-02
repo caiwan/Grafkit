@@ -257,6 +257,107 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 
 // ===================================================================================================
 
+
+Grafkit::EffectRender::EffectRender()
+{
+}
+
+Grafkit::EffectRender::~EffectRender()
+{
+}
+
+void Grafkit::EffectRender::Initialize(Renderer & render)
+{
+	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
+
+	for (int i = 0; i < 2; i++) {
+		m_texOut[i] = new Texture2D();
+		m_texOut[i]->Initialize(render);
+	}
+	m_pTexRead = m_texOut[0];
+	m_pTexWrite = m_texOut[1];
+
+	// -- 
+	m_textureSampler = new TextureSampler();
+	m_textureSampler->Initialize(render);
+
+	// --- 
+	m_shaderFullscreenQuad = new VertexShader();
+	m_shaderFullscreenQuad->LoadFromMemory(
+		render,
+		GrafkitData::effectFullscreenQuadEntry,
+		GrafkitData::effectShader, strlen(GrafkitData::effectShader),
+		"FullscreenQuad"
+	);
+
+	m_shaderCopyScreen = new PixelShader();
+	m_shaderCopyScreen->LoadFromMemory(
+		render,
+		GrafkitData::effectCopyScreenEntry,
+		GrafkitData::effectShader, strlen(GrafkitData::effectShader),
+		"CopyScreen"
+	);
+
+	m_viewportParams.screen = float4(0, 0, 0, 0);
+	m_viewportParams.view = float4(0, 0, 0, 0);
+	render.GetScreenSizef(m_viewportParams.screen.x, m_viewportParams.screen.y);
+	render.GetViewportSizef(m_viewportParams.view.x, m_viewportParams.view.y);
+	m_viewportParams.view.z = render.GetAspectRatio();
+
+
+	m_shaderCopyScreen->SetParam(render, "EffectParams", &m_viewportParams);
+	m_shaderCopyScreen->SetSamplerSatate(render, "SamplerType", m_textureSampler->GetSamplerState());
+
+	// --- 
+	m_fullscreenquad = GrafkitData::CreateQuad();
+	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
+
+	for (auto it = m_effects.begin(); it != m_effects.end(); ++it)
+	{
+		(*it)->Initialize(render);
+		// itt kell meg valamit susmutyolni a parameterekkel
+	}
+
+	LOGGER(Log::Logger().Trace("FX Chain OK"));
+}
+
+void Grafkit::EffectRender::Shutdown()
+{
+	// ... 
+}
+
+void Grafkit::EffectRender::Render(Renderer & render, TextureResRef output)
+{
+	m_shaderFullscreenQuad->Bind(render);
+
+	size_t fxcount = m_effects.size();
+
+	bool firstNode = true;
+	for (size_t fxid = 0; fxid < fxcount; fxid++)
+	{
+		EffectPass *fx = m_effects[fxid].Get();
+
+		render.SetRenderTargetView(*m_pTexWrite);
+		render.ApplyRenderTargetView(1);
+		render.BeginScene();
+
+		if (fx && fx->GetShader().Valid()) 
+			fx->BindFx(render);
+
+		m_fullscreenquad->RenderMesh(render);
+
+		if (fx && fx->GetShader().Valid()) {
+			fx->UnbindFx(render);
+			fx->UnbindOutputs(render);
+		}
+	}
+
+	m_shaderFullscreenQuad->Unbind(render);
+}
+
+
+// ===================================================================================================
+
 Grafkit::EffectPass::EffectPass(ShaderResRef shader) : m_shader(shader)
 {
 }

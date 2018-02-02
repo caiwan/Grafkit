@@ -25,6 +25,7 @@ namespace Grafkit {
 	// ---------------------------------------------------------------------------------------------------
 
 	// Legacy stuff.
+	// Will be thrown out
 	__declspec(align(16)) class EffectComposer : virtual public Referencable, public AlignedNew<EffectComposer>
 	{
 	public:
@@ -88,7 +89,7 @@ namespace Grafkit {
 
 	// ===================================================================================================
 
-	__declspec(align(16)) class EffectRender : virtual public Referencable, virtual public AlignedNew<EffectComposer>
+	__declspec(align(16)) class EffectRender : virtual public Referencable, public AlignedNew<EffectComposer>
 	{ 
 	public:
 		EffectRender();
@@ -100,7 +101,7 @@ namespace Grafkit {
 		void AddPass(EffectPassRef pass) { m_effects.push_back(pass); }
 		EffectPassRef GetPass(size_t id) { return id < m_effects.size() ? m_effects[id] : EffectPassRef(); }
 
-		void Render(Renderer &m_render, TextureResRef output = nullptr);
+		void Render(Renderer &render, TextureResRef output = nullptr);
 
 	private:
 		std::vector<EffectPassRef> m_effects;
@@ -108,9 +109,17 @@ namespace Grafkit {
 		TextureRef m_texOut[2];
 		Texture2D *m_pTexRead, *m_pTexWrite;
 
+		TextureSamplerRef m_textureSampler;
+
 		MeshRef m_fullscreenquad;
 		ShaderRef m_shaderFullscreenQuad;
 		ShaderRef m_shaderCopyScreen;
+
+	private:
+
+		struct {
+			float4 screen, view;
+		} m_viewportParams;
 	};
 
 
