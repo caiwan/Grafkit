@@ -292,7 +292,10 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 		device.GetScreenSize(sw, sh);
 		width = sw, height = sh;
 	}
-	else if (!width || !height || width != height) {
+	else if (!width || !height || false
+		//width != height
+	) 
+	{
 		DebugBreak();
 		return;
 	}

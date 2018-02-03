@@ -1,3 +1,4 @@
 subdirs(framework)
 subdirs(importer)
 subdirs(importerCli)
+subdirs(ShaderEditor)
