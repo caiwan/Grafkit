@@ -4,19 +4,24 @@ Project(Idogep)
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inc)
 file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inl)
 
-set(APPLICATION_NAME Idogep)
+set(APPLICATION Idogep)
 
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${BASS_INCLUDE_DIR}")
 include_directories("${STB_INCLUDE_DIR}")
 
-msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
+# msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 
-add_executable({$APPLICATION_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries({$APPLICATION_NAME})
-target_include_directories({$APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
+add_executable(${APPLICATION} ${SOURCE_FILES} ${HEADER_FILES})
+target_link_libraries(${APPLICATION})
+
+target_link_libraries(${APPLICATION} Grafkit2)
+target_include_directories(${APPLICATION} PUBLIC "${CMAKE_SOURCE_DIR}")
+
+add_definitions(-D_AFXDLL)
+set(CMAKE_MFC_FLAG 1)
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES})
 
-install(TARGETS {$APPLICATION_NAME} DESTINATION bin)
+install(TARGETS ${APPLICATION} DESTINATION bin)
