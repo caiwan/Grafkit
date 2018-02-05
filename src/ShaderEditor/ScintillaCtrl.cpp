@@ -1,3 +1,5 @@
+#ifdef HAVE_SCINTILLA
+
 /*
 Module : ScintillaCtrl.CPP
 Purpose: Defines the implementation for an MFC wrapper class for the Scintilla edit control (www.scintilla.org)
@@ -4390,3 +4392,4 @@ int CScintillaCtrl::GetSubStyleBases(char* styles, BOOL bDirect)
   return static_cast<int>(Call(SCI_GETSUBSTYLEBASES, 0, reinterpret_cast<LPARAM>(styles), bDirect));
 }
 
+#endif 

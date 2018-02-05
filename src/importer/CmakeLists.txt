@@ -12,7 +12,6 @@ include_directories("${STB_INCLUDE_DIR}")
 include_directories("${ASSIMP_INCLUDE_DIR}")
 include_directories("${GK2_INCLUDE_DIR}")
 
-
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 
 IF(BUILD_LIVE_RELEASE)

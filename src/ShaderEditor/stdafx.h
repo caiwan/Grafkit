@@ -19,9 +19,12 @@
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 
-
-// FUCK YOU BITCH 
+#ifdef HAVE_SCINTILLA
 #include <Scintilla.h>
+#endif
+
+
+// ADD GK's common libs here 
 
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls

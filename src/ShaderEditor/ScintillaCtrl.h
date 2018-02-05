@@ -1,3 +1,5 @@
+#ifdef HAVE_SCINTILLA
+
 /*
 Module : ScintillaCtrl.h
 Purpose: Defines the interface for an MFC wrapper class for the Scintilla edit control (www.scintilla.org)
@@ -816,3 +818,5 @@ protected:
 #endif
 
 #endif //__SCINTILLACTRL_H__
+
+#endif

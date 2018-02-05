@@ -1,4 +1,4 @@
-/** 
+/**
 	@file TextureGenerator.cpp : Defines the class behaviors for the application.
 */
 
@@ -13,22 +13,11 @@
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 
+//#define HAVE_SCINTILLA
 
-#define ELPP_THREAD_SAFE
-
-#ifndef _DEBUG
-#define ELPP_DISABLE_DEBUG_LOGS
-#define ELPP_DISABLE_INFO_LOGS
-#define ELPP_DISABLE_VERBOSE_LOGS
-#define ELPP_DISABLE_TRACE_LOGS
-#endif // _DEBUG
-
-#include "easyloggingpp.h"
-
-INITIALIZE_EASYLOGGINGPP
-
-
+#ifdef HAVE_SCINTILLA
 #include <Scintilla.h>
+#endif //HAVE_SCINTILLA
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -44,90 +33,78 @@ BEGIN_MESSAGE_MAP(CEditorApp, CWinAppEx)
 END_MESSAGE_MAP()
 
 
-// CEditorApp construction
-
-CEditorApp::CEditorApp() 
+CEditorApp::CEditorApp()
 {
 	m_bHiColorIcons = TRUE;
 
 	SetAppID(_T("GrafKit.Idogep.TextureGenerator.AppID.NoVersion01")); //@todo nevet es verziot generalni
 
-	/// --- 
-	el::Configurations defaultConf;
-	defaultConf.setToDefault();
-
-#ifdef _DEBUG
-	defaultConf.setGlobally(el::ConfigurationType::Format, "%logger [%levshort]: %msg - at %fbase function %func line %line tid=%thread");
-#else 
-	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
-#endif // _DEBUG
-
-	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
-	el::Loggers::reconfigureLogger("default", defaultConf);
-
-	// LOG(TRACE) << SOMETHING;
+	// TODO 
+	// setup gk logger here 
 }
 
 CEditorApp::~CEditorApp()
 {
 }
 
-// The one and only CEditorApp object
 CEditorApp theApp;
+
+#ifdef HAVE_SCINTILLA
 
 #define SCINTILLA_STATIC_LINK
 
 #ifndef SCINTILLA_STATIC_LINK
 HMODULE CScintillaDemoApp::LoadLibraryFromApplicationDirectory(LPCTSTR lpFileName)
 {
-  //Get the Application diretory
-  TCHAR szFullPath[_MAX_PATH];
-  szFullPath[0] = _T('\0');
-  if (GetModuleFileName(NULL, szFullPath, _countof(szFullPath)) == 0)
-	return NULL;
+	//Get the Application diretory
+	TCHAR szFullPath[_MAX_PATH];
+	szFullPath[0] = _T('\0');
+	if (GetModuleFileName(NULL, szFullPath, _countof(szFullPath)) == 0)
+		return NULL;
 
-  //Form the new path
-  TCHAR szDrive[_MAX_DRIVE];
-  szDrive[0] = _T('\0');
-  TCHAR szDir[_MAX_DIR];
-  szDir[0] = _T('\0');
-  _tsplitpath_s(szFullPath, szDrive, sizeof(szDrive)/sizeof(TCHAR), szDir, sizeof(szDir)/sizeof(TCHAR), NULL, 0, NULL, 0);
-   TCHAR szFname[_MAX_FNAME];
-   szFname[0] = _T('\0');
-   TCHAR szExt[_MAX_EXT];
-   szExt[0] = _T('\0');
-  _tsplitpath_s(lpFileName, NULL, 0, NULL, 0, szFname, sizeof(szFname)/sizeof(TCHAR), szExt, sizeof(szExt)/sizeof(TCHAR));
-  _tmakepath_s(szFullPath, sizeof(szFullPath)/sizeof(TCHAR), szDrive, szDir, szFname, szExt);
+	//Form the new path
+	TCHAR szDrive[_MAX_DRIVE];
+	szDrive[0] = _T('\0');
+	TCHAR szDir[_MAX_DIR];
+	szDir[0] = _T('\0');
+	_tsplitpath_s(szFullPath, szDrive, sizeof(szDrive) / sizeof(TCHAR), szDir, sizeof(szDir) / sizeof(TCHAR), NULL, 0, NULL, 0);
+	TCHAR szFname[_MAX_FNAME];
+	szFname[0] = _T('\0');
+	TCHAR szExt[_MAX_EXT];
+	szExt[0] = _T('\0');
+	_tsplitpath_s(lpFileName, NULL, 0, NULL, 0, szFname, sizeof(szFname) / sizeof(TCHAR), szExt, sizeof(szExt) / sizeof(TCHAR));
+	_tmakepath_s(szFullPath, sizeof(szFullPath) / sizeof(TCHAR), szDrive, szDir, szFname, szExt);
 
-  //Delegate to LoadLibrary    
-  return LoadLibrary(szFullPath);
+	//Delegate to LoadLibrary    
+	return LoadLibrary(szFullPath);
 }
 #else
 #endif
 
-
-// CEditorApp initialization
+#endif // HAVE_SCINTILLA
 
 BOOL CEditorApp::InitInstance()
 {
 
+#ifdef HAVE_SCINTILLA
 #ifndef SCINTILLA_STATIC_LINK
-  m_hSciDLL = LoadLibraryFromApplicationDirectory(_T("SciLexer.dll"));
-  if (m_hSciDLL == NULL)
-  { 
-	AfxMessageBox(_T("Scintilla DLL is not installed, Please download the SciTE editor and copy the SciLexer.dll into this application's directory"));
-	return FALSE;
-  }
+	m_hSciDLL = LoadLibraryFromApplicationDirectory(_T("SciLexer.dll"));
+	if (m_hSciDLL == NULL)
+	{
+		AfxMessageBox(_T("Scintilla DLL is not installed, Please download the SciTE editor and copy the SciLexer.dll into this application's directory"));
+		return FALSE;
+	}
 #else
 #ifdef SCI_LEXER
 	// Scintilla_LinkLexers();
 #endif
 	Scintilla_RegisterClasses(this->m_hInstance);
 #endif
+#endif //HAVE_SCINTILLA
 
 
 	CWinAppEx::InitInstance();
-	
+
 	EnableTaskbarInteraction(FALSE);
 
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
@@ -190,7 +167,7 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// Dialog Data
+	// Dialog Data
 	enum { IDD = IDD_ABOUTBOX };
 
 protected:

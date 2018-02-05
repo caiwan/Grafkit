@@ -6,7 +6,7 @@
 #include "stdafx.h"
 #include "tree.h"
 
-#include "reference.h"
+#include "utils/reference.h"
 
 class TreeBuilder;
 class TreeItemBuilder;
