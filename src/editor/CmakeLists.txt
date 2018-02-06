@@ -1,0 +1,43 @@
+# Grafkit 2 editor - Time machine 
+Project(Idogep)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+
+cmake_policy(SET CMP0020 NEW)
+
+file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inl)
+file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inc)
+file(GLOB_RECURSE RC_FILES *.rc *.rc?)
+file(GLOB_RECURSE UI_FILES *.ui)
+
+set(APPLICATION Idogep)
+
+# Generate code from ui files
+qt5_wrap_ui(UI_HEADERS ${UI_FILES})
+
+# Generate rules for building source files from the resources
+qt5_add_resources(QRCS resources.qrc)
+
+add_executable(${APPLICATION} ${SOURCE_FILES} ${HEADER_FILES} ${UI_HEADERS} ${QRCS})
+
+# msvc_set_win32(${APPLICATION})
+
+include_directories("${CMAKE_SOURCE_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}")
+include_directories("${BASS_INCLUDE_DIR}")
+include_directories("${STB_INCLUDE_DIR}")
+include_directories("${GK2_INCLUDE_DIR}")
+
+# msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
+target_link_libraries(${APPLICATION} Grafkit2 Qt5::Widgets Qt5::WinMain)
+target_include_directories(${APPLICATION} PUBLIC "${CMAKE_SOURCE_DIR}")
+
+assign_source_group(${SOURCE_FILES} ${HEADER_FILES} ${RC_FILES} ${QRCS} ${UI_FILES})
+
+install(TARGETS ${APPLICATION} DESTINATION bin)
