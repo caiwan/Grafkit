@@ -10,7 +10,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 message("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}")
 
 SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-SET(GK2_EXTERNALS "${CMAKE_CURRENT_SOURCE_DIR}/externals")
+# SET(GK2_EXTERNALS "${CMAKE_CURRENT_SOURCE_DIR}/externals")
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/assign_source_group.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_add_pch.cmake)
@@ -28,17 +28,17 @@ find_package(stb REQUIRED)
 find_package(Bass REQUIRED)
 # find_package(Bullet)
 
-
-setup_flags()
+# multiple targets just screws qt up
+# setup_flags()
 
 set(GTEST_MSVC_SEARCH "MD")
 
 set(GK2_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/framework")
-set(GK2_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+# set(GK2_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(GK2_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 add_subdirectory(src)
 
 if (NOT GK_EXCLUDE_TESTS)
-add_subdirectory(tests)
+    add_subdirectory(tests)
 endif()

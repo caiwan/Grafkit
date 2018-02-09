@@ -1,14 +1,21 @@
 #include <qapplication.h>
 #include <qpushbutton.h>
 
+#include "QGrafkitContextWidget.h"
+
 int main( int argc, char **argv )
 {
+	Q_INIT_RESOURCE(resources);
+
     QApplication a( argc, argv );
 
-    QPushButton hello( "Hello world!", 0 );
-    hello.resize( 100, 30 );
+	Grafkit::Renderer renderer;
+	QGrafkitContextWidget *wnd = new QGrafkitContextWidget(renderer);
 
-    //a.setActiveWindow( &hello );
-    hello.show();
+	wnd->setFixedSize(800, 600);
+	wnd->initialize();
+
+	wnd->show();
+
     return a.exec();
 }
