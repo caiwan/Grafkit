@@ -11,13 +11,24 @@ Idogep::MainWindow::MainWindow(EditorApplication *const& app)
 	createActions(app);
 	createStatusBar(app);
 	createDockWindows(app);
+
+	onMainWindowClose += Delegate(app, &EditorApplication::onMainWindowClose);
+}
+
+void Idogep::MainWindow::closeEvent(QCloseEvent * event)
+{
+	QSettings settings;
+	settings.setValue("mainWindowGeometry", saveGeometry());
+	settings.setValue("mainWindowState", saveState());
+
+	onMainWindowClose(event);
 }
 
 void Idogep::MainWindow::createActions(EditorApplication *const& app)
 {
 
 	QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-	QToolBar *fileToolBar = addToolBar(tr("File"));
+	//QToolBar *fileToolBar = addToolBar(tr("File"));
 
 	const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
 	QAction *saveAct = new QAction(saveIcon, tr("&Save..."), this);
@@ -25,7 +36,7 @@ void Idogep::MainWindow::createActions(EditorApplication *const& app)
 	saveAct->setStatusTip(tr("Save the current form letter"));
 	//connect(saveAct, &QAction::triggered, this, &MainWindow::save);
 	fileMenu->addAction(saveAct);
-	fileToolBar->addAction(saveAct);
+	//fileToolBar->addAction(saveAct);
 
 	fileMenu->addSeparator();
 
@@ -34,7 +45,7 @@ void Idogep::MainWindow::createActions(EditorApplication *const& app)
 	quitAct->setStatusTip(tr("Quit the application"));
 
 	QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-	QToolBar *editToolBar = addToolBar(tr("Edit"));
+	//QToolBar *editToolBar = addToolBar(tr("Edit"));
 	const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/undo.png"));
 	QAction *undoAct = new QAction(undoIcon, tr("&Undo"), this);
 	undoAct->setShortcuts(QKeySequence::Undo);
@@ -43,7 +54,7 @@ void Idogep::MainWindow::createActions(EditorApplication *const& app)
 	//connect(undoAct, &QAction::triggered, this, &MainWindow::undo);
 
 	editMenu->addAction(undoAct);
-	editToolBar->addAction(undoAct);
+	//editToolBar->addAction(undoAct);
 
 	viewMenu = menuBar()->addMenu(tr("&View"));
 
@@ -51,12 +62,11 @@ void Idogep::MainWindow::createActions(EditorApplication *const& app)
 
 	QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
-	//QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
-	//aboutAct->setStatusTip(tr("Show the application's About box"));
+	/*QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
+	aboutAct->setStatusTip(tr("Show the application's About box"));*/
 
 	QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
 	aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-
 }
 
 void Idogep::MainWindow::createStatusBar(EditorApplication *const& app)

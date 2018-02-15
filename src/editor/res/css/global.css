@@ -1,0 +1,72 @@
+QWidget {
+	background-color: #727272;
+}
+
+QStatusBar {
+	border: none;
+}
+
+QMenuBar {
+	background-color: #727272;
+	border-bottom: 1px solid #444;
+}
+
+QMenuBar::item {
+	background-color: #727272;
+	padding-left:   4px;
+	padding-right:  4px;
+	padding-top:    2px;
+	padding-bottom: 2px;
+	
+	margin-left:   4px;
+	margin-right:  4px;
+	margin-top:    2px;
+	margin-bottom: 2px;
+	
+	border-radius: 8px;
+}
+
+QMenuBar::item:selected {
+	background-color: #5680c2;
+}
+
+QMenuBar::item:open {
+	background-color: #5680c2;
+	border: 1px solid #3f6091;
+}
+
+QMenuBar::item:open {
+	background-color: #5680c2;
+}
+
+QMenu {
+	background-color: #999;
+	border: none;
+}
+
+QSlider::handle:horizontal {
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(138, 138, 138, 255), stop:1 rgba(207, 207, 207, 255));
+	min-width: 10px;
+	border-radius: 5px;
+	border: 1px solid #333;
+}
+
+QLineEdit {
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(207, 207, 207, 255), stop:1 rgba(138, 138, 138, 255));
+	border: 1px solid #333;
+	border-radius: 10px;
+}
+
+QPushButton {
+    background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(138, 138, 138, 255), stop:1 rgba(207, 207, 207, 255));
+    border: 1px solid #333;
+    border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	padding: 3px 5px 3px 5px;
+}
+
+QPushButton:pressed {
+    background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(207, 207, 207, 255), stop:1 rgba(138, 138, 138, 255));
+}

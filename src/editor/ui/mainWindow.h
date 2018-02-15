@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include "Event.h"
 
 namespace Idogep {
 
@@ -9,6 +10,11 @@ namespace Idogep {
 	class MainWindow : public QMainWindow {
 	public:
 		MainWindow(EditorApplication *const& app);
+
+	private:
+		void closeEvent(QCloseEvent *event);
+
+		Event<QCloseEvent *> onMainWindowClose;
 
 	private:
 		void createActions(EditorApplication *const& app);

@@ -1,5 +1,8 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-
-</qresource>
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>res/css/global.css</file>
+        <file>res/img/splash.jpg</file>
+        <file>res/css/playerwidget.css</file>
+    </qresource>
 </RCC>
