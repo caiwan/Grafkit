@@ -18,12 +18,12 @@ namespace Grafkit {
 namespace Grafkit{
 	class ValueTracker;
 
-	class Timer : public Referencable{
+	class Tracker : public Referencable{
 		friend ValueTracker;
 
 		public:
-			Timer();
-			~Timer();
+			Tracker();
+			~Tracker();
 
 			void Initialize(Grafkit::MusicResRef music, IAssetFactory * const  & assetFactory, double lengthMS, double beatPerMin, int rowPerBeat);
 			void Shutdown();
@@ -106,14 +106,14 @@ namespace Grafkit{
 			};
 
 		public:
-			ValueTracker(Timer* timer);
+			ValueTracker(Tracker* timer);
 			~ValueTracker();
 
-			inline const Timer* getTimer(){return this->m_mainTimer;}
+			inline const Tracker* getTimer(){return this->m_mainTimer;}
 			inline void update(){this->m_mainTimer->Update();}
 
 		private:
-			Timer *m_mainTimer;
+			Tracker *m_mainTimer;
 
 	
 

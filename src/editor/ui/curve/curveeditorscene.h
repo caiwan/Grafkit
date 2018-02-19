@@ -1,64 +1,65 @@
-#if 0
-
 #pragma once 
 
 #include <QtGui>
+#include <qgraphicsscene.h>
 
 #include "curvepointitem.h"
 
-class CurvePointItem;
-class CurveEditorWidget;
+namespace Idogep {
 
-class CurveEditorScene : public QGraphicsScene
-{
-    Q_OBJECT
-public:
-    CurveEditorScene(CurveEditorWidget* pWidget, QObject* parent = NULL);
+	class CurvePointItem;
+	class CurveEditorWidget;
 
-    QSizeF scale() const;
-    QPointF offset() const;
+	class CurveEditorScene : public QGraphicsScene
+	{
+		Q_OBJECT
+	public:
+		CurveEditorScene(CurveEditorWidget* pWidget, QObject* parent = NULL);
 
-    virtual void drawBackground(QPainter* painter, const QRectF& r);
-    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-            void viewResized();
+		QSizeF scale() const;
+		QPointF offset() const;
 
-    void deleteCurvePoint(CurvePointItem* cpi);
+		virtual void drawBackground(QPainter* painter, const QRectF& r);
+		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
+		virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+		void viewResized(QResizeEvent *event);
 
-    void setCurrentCurve(QList<CurvePointItem*>* curve);
-    void setDemoTime(float t);
-    void setFollowTimeBar(bool b);
-    void setDisplayWaveform(bool b);
-    void getNewAudiogram();
+		//void deleteCurvePoint(CurvePointItem* cpi);
 
-    float demoTime() const;
-    QList<CurvePointItem*>* curve() const;
+		//void setCurrentCurve(QList<CurvePointItem*>* curve);
+		//void setDemoTime(float t);
+		//void setFollowTimeBar(bool b);
+		//void setDisplayWaveform(bool b);
+		//void getNewAudiogram();
 
-    float simpleInterpolate(QList<CurvePointItem*>* list, float t);
+		//float demoTime() const;
+		//QList<CurvePointItem*>* curve() const;
 
-    void cutSelectedPoints();
-    void copySelectedPoints();
-    void pasteSelectedPoints();
+		float simpleInterpolate(QList<CurvePointItem*>* list, float t);
 
-private:
-    QList<CurvePointItem*>* _pointItems;
-    QList<CurvePointItem*>* _curCurve;
-    QSizeF _scale;
+		//void cutSelectedPoints();
+		//void copySelectedPoints();
+		//void pasteSelectedPoints();
 
-    CurveEditorWidget* _widget;
+	private:
+		QList<CurvePointItem*>* m_pointItems;
+		QList<CurvePointItem*>* m_curCurve;
+		QSizeF m_scale;
 
-    QPointF _ofs;
-    bool _modifyOfs, _modifyScale, _modifyDemoTime;
-    bool _followTimeBar, _displayWaveform;
+		CurveEditorWidget* m_widget;
 
-    float _demoTime, _demoTimeChanged;
+		QPointF m_ofs;
+		bool m_modifyOfs, m_modifyScale, m_modifyDemoTime;
+		bool m_followTimeBar, m_displayWaveform;
 
-    static QPointF _interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t);
-    void requestAudiogram();
+		float m_demoTime, m_demoTimeChanged;
 
-    QImage* _audiogramImage;
-};
+		static QPointF _interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t);
+		void requestAudiogram();
 
-#endif
+		QImage* m_audiogramImage;
+	};
+
+}

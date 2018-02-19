@@ -87,19 +87,19 @@ namespace {
 #ifndef SYNC_PLAYER	
 	void timer_pause(void *d, int flag)
 	{
-		Timer *dd = (Timer*)d;
+		Tracker *dd = (Tracker*)d;
 		dd->TogglePause(flag);
 	}
 
 	void timer_set_row(void *d, int row)
 	{
-		Timer *dd = (Timer*)d;
+		Tracker *dd = (Tracker*)d;
 		dd->SetRow(row);
 	}
 
 	int timer_is_playing(void *d)
 	{
-		Timer *dd = (Timer*)d;
+		Tracker *dd = (Tracker*)d;
 		return (int)!dd->GetPauseFlag();
 	}
 
@@ -113,7 +113,7 @@ namespace {
 
 //****************************************************************************************//
 
-Grafkit::Timer::Timer() :
+Grafkit::Tracker::Tracker() :
 	m_music(),
 	m_length(0),
 	m_pauseFlag(0),
@@ -124,11 +124,11 @@ Grafkit::Timer::Timer() :
 	strcpy_s(this->m_ipaddress, 32, "127.0.0.1");
 }
 
-Timer::~Timer() {
+Tracker::~Tracker() {
 	this->Shutdown();
 }
 
-void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, IAssetFactory * const  & assetFactory, double lengthMS, double beatPerMin, int rowPerBeat)
+void Grafkit::Tracker::Initialize(Grafkit::MusicResRef music, IAssetFactory * const  & assetFactory, double lengthMS, double beatPerMin, int rowPerBeat)
 {
 	// this qnd solution
 	myAssetFactory = &assetFactory;
@@ -140,7 +140,7 @@ void Grafkit::Timer::Initialize(Grafkit::MusicResRef music, IAssetFactory * cons
 }
 
 // Rocket specific stuff // 
-void Timer::Connect(const char* basepath, const char *_ipaddr) {
+void Tracker::Connect(const char* basepath, const char *_ipaddr) {
 	if (!_ipaddr)
 		strcpy_s(this->m_ipaddress, 32, "127.0.0.1");
 	else
@@ -168,7 +168,7 @@ void Timer::Connect(const char* basepath, const char *_ipaddr) {
 	/* </ROCKET SPECIFIC>*/
 }
 
-void Timer::Update() {
+void Tracker::Update() {
 	/* <ROCKET SPECIFIC> */
 #ifndef SYNC_PLAYER
 	int row = this->GetRowI(); //debugging madorfakor
@@ -180,29 +180,29 @@ void Timer::Update() {
 	/* </ROCKET SPECIFIC>*/
 }
 
-void Timer::Shutdown() {
+void Tracker::Shutdown() {
 	if (this->m_rocket) sync_destroy_device(m_rocket);
 	this->m_rocket = NULL;
 }
 
-void Timer::TogglePause(int flag) {
+void Tracker::TogglePause(int flag) {
 	bool e = (flag != 0);
 	Music()->Pause(e);
 	m_pauseFlag = e;
 }
 
 //****************************************************************************************//
-void Timer::SetRow(int row) const {
+void Tracker::SetRow(int row) const {
 	double d = (float)row * (m_rowLength);
 	Music()->SetTimems(d);
 }
 
-double Timer::GetRowD() const {
+double Tracker::GetRowD() const {
 	double t = this->GetTimems(), d = t / this->m_rowLength;
 	return d; // + 00001; // TODO: scaling
 }
 
-int Timer::GetRowI() const {
+int Tracker::GetRowI() const {
 	//return (int)floor(this->GetRowD());
 	double d = this->GetRowD();
 	int i = (int)floor(d);
@@ -210,12 +210,12 @@ int Timer::GetRowI() const {
 	return i;
 }
 
-double Timer::GetRowD(double t) const {
+double Tracker::GetRowD(double t) const {
 	double d = t / this->m_rowLength;
 	return d; // + 00001; // TODO: scaling
 }
 
-int Timer::GetRowI(double t) const {
+int Tracker::GetRowI(double t) const {
 	//return (int)floor(this->GetRowD());
 	double d = this->GetRowD(t);
 	int i = (int)(d);
@@ -223,7 +223,7 @@ int Timer::GetRowI(double t) const {
 	return i;
 }
 
-int Timer::GetEnd() const {
+int Tracker::GetEnd() const {
 #ifndef SYNC_PLAYER
 	return 0;       // keep goin forever
 #else
@@ -232,7 +232,7 @@ int Timer::GetEnd() const {
 }
 
 //****************************************************************************************//
-ValueTracker::ValueTracker(Timer* timer) : m_mainTimer(timer)
+ValueTracker::ValueTracker(Tracker* timer) : m_mainTimer(timer)
 {
 }
 

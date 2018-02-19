@@ -1,6 +1,9 @@
 #pragma once
 
 #include "../stdafx.h"
+
+#include "timer.h"
+
 #include "../utils/asset.h"
 #include "../utils/resource.h"
 
@@ -10,49 +13,46 @@ Music player interface
 
 namespace Grafkit {
 
-	class Music : virtual public Referencable{
+	class Audiogram  : virtual public Referencable {
 	public:
-		//-- virtualis metodusok, amiket implementalni kell --//
-		Music();
-		virtual ~Music();
+		Audiogram(){}
+		virtual ~Audiogram(){}
+
+		virtual bool GetFFT(float* ptr, int segcount) {}
+		virtual bool GetWaveform(float* ptr, double begin, double end) {}
+	};
+
+	class Music : virtual public Referencable, public Tracker, public Audiogram
+	{
+	public:
+		Music() : Tracker(), Audiogram()
+		{
+		}
+
+		virtual ~Music() {
+		}
 
 		virtual void Initialize(IAssetRef asset) = 0;
 		virtual void Shutdown() = 0;
 
-		virtual void Play() = 0;	///< play stuff
-		virtual void Stop() = 0;	///< stop stuff 
-		virtual void Pause(bool e) = 0; ///< set pause flag e == true = paused
-		virtual void Update() = 0;
+		// Timer
+		//virtual void Play() = 0;
+		//virtual void Stop() = 0;
+		//virtual void Pause(int e) = 0;
+		//virtual void Update() = 0;
+
+		//virtual uint64_t GetTimeSample() = 0;
+		//virtual void SetTimeSample(uint64_t t) = 0;
+		//virtual void SetLoop(int e) = 0;
+		//virtual int IsPlaying() = 0;
+
+		// Audiogram
+		//virtual bool GetFFT(float* ptr, int segcount) = 0;
+		//virtual bool GetWaveform(float* ptr, double startMs, double stopMs) = 0;
 
 		virtual void ToggleMute() {}
 
-		virtual unsigned long GetTimeSample() = 0;	///< idot visszaadja sampleben
-		virtual void SetTimeSample(unsigned long t) = 0;	///< kurzort samplera allitja
-		virtual void SetLoop(bool e) = 0;	//< loop ki/be
-		virtual int IsPlaying() = 0;	///< @return 1: playing 0:stopped/paused
-
-		virtual bool GetFFT(float* ptr, int segcount) = 0;
-
-		/* --- */
-		double GetTime() { return (double)GetTimeSample() / (double)this->m_samplePerSec; }	///< idot visszaadja sec-ban
-		double GetTimems() { return 1000.*GetTime(); }										///< idot visszaadja msec-ban
-		double GetTimeBeat() { return (double)GetTimeSample() / (double)this->m_beatLenSample; } ///< idot visszaadja beat-terben
-
-		void SetTime(double t) { SetTimeSample((unsigned long)(t*(double)m_samplePerSec)); }		///< kurzort allitja
-		void SetTimems(double t) { SetTimeSample((unsigned long)(t*(double)m_samplePerSec / 1000.)); } ///< kurzort allitja
-		void SetTimeBeat(double t) { SetTimeSample((unsigned long)(t*(double)m_beatLenSample)); } ///< kurzort allitja
-
-		double GetBPM() { return m_bpm; }
-		void SetBPM(double f) { m_bpm = f; this->m_beatLenSample = (unsigned int)((m_bpm / 60.) * (double)m_samplePerSec); }
-
-		double GetLength() { return (double)this->m_length / (double)this->m_samplePerSec; }
-		double GetLengthms() { return 1000.*(double)this->m_length / (double)this->m_samplePerSec; }
-
 	protected:
-		double m_bpm;			///<beat per minute
-		unsigned long m_length;	///< hossz sampleben
-		unsigned int m_samplePerSec;		///< savszelesseg
-		unsigned int m_beatLenSample;	///< egy beat hossza szampleben
 	};
 
 	typedef Ref<Music> MusicRef;

@@ -24,24 +24,30 @@ namespace {
 
 		virtual void Play();
 		virtual void Stop();
-		virtual void Pause(bool e);
+		virtual void Pause(int e);
 		virtual void Update();
 		virtual void ToggleMute();
 
-		virtual unsigned long GetTimeSample();
-		virtual void SetTimeSample(unsigned long t);
-		virtual void SetLoop(bool e);
+		virtual uint64_t GetSampleCount() { return m_length; }
+		virtual uint64_t GetSampleCountPerSec() { return m_samplePerSec; }
+
+		virtual uint64_t GetTimeSample();
+		virtual void SetTimeSample(uint64_t t);
+		virtual void SetLoop(int e);
 		virtual int IsPlaying();
 
 		virtual bool GetFFT(float* ptr, int segcount);
+		virtual bool GetWaveform(float* ptr, double startMs, double stopMs);
 
 	protected:
 		HSTREAM m_stream;
-
 		Grafkit::IAssetRef m_asset;
 
 	private:
 		bool m_isMute;
+
+		uint64_t m_length;
+		uint64_t m_samplePerSec;
 
 	};
 
@@ -54,8 +60,6 @@ namespace {
 	MusicBass::~MusicBass(void)
 	{
 		Shutdown();
-		//m_system->close();
-		// Itt elvileg valamikor meg kellene szunnie a tobbi handlernek valamikor
 	}
 
 	void MusicBass::Initialize(IAssetRef asset)
@@ -68,14 +72,14 @@ namespace {
 
 		bool isNosound = false;
 		if (!res) {
-			
+
 			// ignore sound if no sound device detected or installed
 			int errcode = BASS_ErrorGetCode();
 			if (errcode == 23) {
 				res = BASS_Init(0, 44100, 0, 0, 0);
 				isNosound = true;
 			}
-			if (!res) 
+			if (!res)
 				throw new EX(MusicDeviceInitException);
 		}
 
@@ -122,9 +126,9 @@ namespace {
 		BASS_ChannelStop(m_stream);
 	}
 
-	void MusicBass::Pause(bool e)
+	void MusicBass::Pause(int e)
 	{
-		bool b = IsPlaying();
+		int b = IsPlaying();
 		if (!b && !e) {
 			BASS_ChannelPlay(m_stream, 0);
 		}
@@ -147,18 +151,18 @@ namespace {
 		m_isMute = !m_isMute;
 	}
 
-	unsigned long MusicBass::GetTimeSample()
+	uint64_t MusicBass::GetTimeSample()
 	{
 		QWORD pos = BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE);
 		return pos;
 	}
 
-	void MusicBass::SetTimeSample(unsigned long t)
+	void MusicBass::SetTimeSample(uint64_t t)
 	{
 		BASS_ChannelSetPosition(m_stream, t, BASS_POS_BYTE);
 	}
 
-	void MusicBass::SetLoop(bool e)
+	void MusicBass::SetLoop(int e)
 	{
 		BASS_ChannelFlags(m_stream, BASS_SAMPLE_LOOP * e, BASS_SAMPLE_LOOP);
 	}
@@ -210,6 +214,11 @@ namespace {
 
 		return true;
 
+	}
+
+	bool MusicBass::GetWaveform(float* ptr, double begin, double end) {
+		// BASS_DATA_FLOAT
+		return false;
 	}
 
 }
