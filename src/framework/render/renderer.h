@@ -4,6 +4,8 @@
 #ifndef _Renderer_H_
 #define _Renderer_H_
 
+#include "../stdafx.h"
+
 #include <chrono>
 
 #pragma comment(lib, "d3d11.lib")
@@ -12,8 +14,6 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 #include <DXGI1_2.h>
-
-#include "../stdafx.h"
 
 #include "../utils/reference.h"
 #include "../utils/exceptions.h"

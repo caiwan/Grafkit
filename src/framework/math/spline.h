@@ -32,8 +32,12 @@
 #include <vector>
 #include <algorithm>
 
-#undef min
-#undef max
+float cica(float f, float g) {
+	return min(f, g);
+}
+
+//#undef min
+//#undef max
 
 // unnamed namespace only because the implementation is in this
 // header file and we don't want to export symbols to the obj files
@@ -475,6 +479,10 @@ namespace
 
 #endif /* TK_SPLINE_H */
 
+// --- snip 
+// move this to a different file, or tkspline so
+
+#include "utils/reference.h"
 
 #pragma once
 

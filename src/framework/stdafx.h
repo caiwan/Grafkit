@@ -1,5 +1,7 @@
 #pragma once
 
+#define NOMINMAX
+
 #ifdef __cplusplus
 
 // dx datatypes
