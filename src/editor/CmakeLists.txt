@@ -4,6 +4,7 @@ Project(Idogep)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 cmake_policy(SET CMP0020 NEW)
+cmake_policy(SET CMP0071 NEW)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
