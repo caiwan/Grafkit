@@ -568,7 +568,8 @@ void CurveEditorScene::requestAudiogram()
 
 	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) return;
 
-	QImage* img = m_widget->onRequestAudiogram(leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
+	QImage* img = nullptr;
+		m_widget->onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
 	if (!img) return;
 
 	m_audiogramImage = img;

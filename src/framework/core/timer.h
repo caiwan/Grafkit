@@ -3,13 +3,13 @@
 
 namespace Grafkit {
 
-	class Tracker : virtual public Referencable {
+	class Timer : virtual public Referencable {
 
 	public:
-		Tracker() {
+		Timer() {
 		}
 
-		virtual ~Tracker() {
+		virtual ~Timer() {
 		}
 
 		virtual void Play() = 0;

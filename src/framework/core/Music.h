@@ -18,14 +18,14 @@ namespace Grafkit {
 		Audiogram(){}
 		virtual ~Audiogram(){}
 
-		virtual bool GetFFT(float* ptr, int segcount) {}
-		virtual bool GetWaveform(float* ptr, double begin, double end) {}
+		virtual bool GetFFT(float* ptr, int segcount) { return false; }
+		virtual bool GetWaveform(float* ptr, double begin, double end) { return false; }
 	};
 
-	class Music : virtual public Referencable, public Tracker, public Audiogram
+	class Music : virtual public Referencable, public Timer, public Audiogram
 	{
 	public:
-		Music() : Tracker(), Audiogram()
+		Music() : Timer(), Audiogram()
 		{
 		}
 

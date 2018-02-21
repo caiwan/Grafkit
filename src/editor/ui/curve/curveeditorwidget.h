@@ -28,7 +28,7 @@ namespace Idogep {
 		// onCut
 		// onPaste
 		
-		Event<float, float, int, int, QImage*> onRequestAudiogram;
+		Event<QImage**, float, float, int, int> onRequestAudiogram;
 
 	protected:
 		virtual void resizeEvent(QResizeEvent* event);
