@@ -7,6 +7,8 @@ namespace Idogep {
 
 	class EditorApplication;
 
+	class CurveEditorWidget;
+
 	class MainWindow : public QMainWindow {
 	public:
 		MainWindow(EditorApplication *const& app);
@@ -22,6 +24,8 @@ namespace Idogep {
 		void createDockWindows(EditorApplication *const& app);
 
 		QMenu *viewMenu;
+
+		CurveEditorWidget * m_curveEditor;
 	};
 
 }

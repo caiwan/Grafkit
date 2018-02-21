@@ -14,11 +14,16 @@ CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(
     ui->graphicsView->setScene(m_ces);
 
 	// Event map
-	//onResize += Delegate(m_ces, &CurveEditorScene::viewResized);
-	//onResize += Delegate(this, &QWidget::resizeEvent);
+	// .. 
 }
 
 CurveEditorWidget::~CurveEditorWidget()
 {
     delete ui;
+}
+
+void Idogep::CurveEditorWidget::resizeEvent(QResizeEvent * event)
+{
+	m_ces->viewResized(event);
+	QWidget::resizeEvent(event);
 }

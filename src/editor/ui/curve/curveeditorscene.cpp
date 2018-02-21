@@ -254,7 +254,7 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 			//setDemoTime((event->scenePos().x() - m_ofs.x()) / m_scale.width());
 			//m_widget->setMusicTime((event->scenePos().x() - m_ofs.x()) / m_scale.width());
 			// eventet dobjon itt 
-			
+
 			m_modifyDemoTime = true;
 			break;
 		case Qt::MidButton:
@@ -316,9 +316,10 @@ void Idogep::CurveEditorScene::viewResized(QResizeEvent * event)
 //	update();
 //}
 
+// -> GK
 QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t) {
-	float t2 = t*t;
-	float t3 = t2*t;
+	float t2 = t * t;
+	float t3 = t2 * t;
 
 	return (
 		(2.0f*t3 - 3.0f*t2 + 1.0f) * p0 +
@@ -329,46 +330,46 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 }
 
 float CurveEditorScene::simpleInterpolate(QList<CurvePointItem*>* list, float t) {
-	if (!list) return 0.0f;
-	if (list->isEmpty()) return 0.0f;
-	if (list->count() == 1) return list->at(0)->coord().y();
+	//if (!list) return 0.0f;
+	//if (list->isEmpty()) return 0.0f;
+	//if (list->count() == 1) return list->at(0)->coord().y();
 
-	QList<CurvePointItem*> unsortedPointItems;
-	if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*list);
-	QList<CurvePointItem*> sortedPointItems;
-	while (!unsortedPointItems.isEmpty()) {
-		CurvePointItem* minPoint = NULL;
-		float minTime = 9999.0f;
-		for (int i = 0; i < unsortedPointItems.size(); i++) {
-			if (unsortedPointItems[i]->time() < minTime) {
-				minPoint = unsortedPointItems[i];
-				minTime = unsortedPointItems[i]->time();
-			}
-		}
-		sortedPointItems.append(minPoint);
-		unsortedPointItems.removeOne(minPoint);
-	}
+	//QList<CurvePointItem*> unsortedPointItems;
+	//if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*list);
+	//QList<CurvePointItem*> sortedPointItems;
+	//while (!unsortedPointItems.isEmpty()) {
+	//	CurvePointItem* minPoint = NULL;
+	//	float minTime = 9999.0f;
+	//	for (int i = 0; i < unsortedPointItems.size(); i++) {
+	//		if (unsortedPointItems[i]->time() < minTime) {
+	//			minPoint = unsortedPointItems[i];
+	//			minTime = unsortedPointItems[i]->time();
+	//		}
+	//	}
+	//	sortedPointItems.append(minPoint);
+	//	unsortedPointItems.removeOne(minPoint);
+	//}
 
-	for (int i = 0; i < sortedPointItems.size(); i++) {
-		if (!i) {
-			if (t <= sortedPointItems.at(i)->coord().x()) return sortedPointItems.at(i)->coord().y();
-		}
-		else if (i == sortedPointItems.size() - 1) return sortedPointItems.at(i)->coord().y();
+	//for (int i = 0; i < sortedPointItems.size(); i++) {
+	//	if (!i) {
+	//		if (t <= sortedPointItems.at(i)->coord().x()) return sortedPointItems.at(i)->coord().y();
+	//	}
+	//	else if (i == sortedPointItems.size() - 1) return sortedPointItems.at(i)->coord().y();
 
-		if (t > sortedPointItems.at(i)->coord().x() && t <= sortedPointItems.at(i + 1)->coord().x()) {
-			qreal TangentX = sortedPointItems.at(i + 1)->coord().x() - sortedPointItems.at(i)->coord().x();
-			QPointF Tangent0 = QPointF(TangentX, TangentX * sortedPointItems.at(i)->tangent().y() / sortedPointItems.at(i)->tangent().x());
-			QPointF Tangent1 = QPointF(TangentX, TangentX * sortedPointItems.at(i + 1)->tangent().y() / sortedPointItems.at(i + 1)->tangent().x());
+	//	if (t > sortedPointItems.at(i)->coord().x() && t <= sortedPointItems.at(i + 1)->coord().x()) {
+	//		qreal TangentX = sortedPointItems.at(i + 1)->coord().x() - sortedPointItems.at(i)->coord().x();
+	//		QPointF Tangent0 = QPointF(TangentX, TangentX * sortedPointItems.at(i)->tangent().y() / sortedPointItems.at(i)->tangent().x());
+	//		QPointF Tangent1 = QPointF(TangentX, TangentX * sortedPointItems.at(i + 1)->tangent().y() / sortedPointItems.at(i + 1)->tangent().x());
 
-			return _interpolateHermite(
-				sortedPointItems.at(i)->coord(),
-				sortedPointItems.at(i + 1)->coord(),
-				Tangent0,
-				Tangent1,
-				(t - sortedPointItems.at(i)->coord().x()) / (sortedPointItems.at(i + 1)->coord().x() - sortedPointItems.at(i)->coord().x())
-			).y();
-		}
-	}
+	//		return _interpolateHermite(
+	//			sortedPointItems.at(i)->coord(),
+	//			sortedPointItems.at(i + 1)->coord(),
+	//			Tangent0,
+	//			Tangent1,
+	//			(t - sortedPointItems.at(i)->coord().x()) / (sortedPointItems.at(i + 1)->coord().x() - sortedPointItems.at(i)->coord().x())
+	//		).y();
+	//	}
+	//}
 	return 0.0f; // should never happen !
 }
 
@@ -569,7 +570,8 @@ void CurveEditorScene::requestAudiogram()
 	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) return;
 
 	QImage* img = nullptr;
-		m_widget->onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
+	m_widget->onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
+
 	if (!img) return;
 
 	m_audiogramImage = img;

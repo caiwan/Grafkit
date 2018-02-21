@@ -6,6 +6,8 @@
 #include "mainWindow.h"
 #include "main_editor.h"
 
+#include "ui/curve/curveeditorwidget.h"
+
 Idogep::MainWindow::MainWindow(EditorApplication *const& app)
 {
 	createActions(app);
@@ -76,4 +78,7 @@ void Idogep::MainWindow::createStatusBar(EditorApplication *const& app)
 
 void Idogep::MainWindow::createDockWindows(EditorApplication *const& app)
 {
+	m_curveEditor = new CurveEditorWidget(this);
+
+	addDockWidget(Qt::BottomDockWidgetArea, m_curveEditor);
 }

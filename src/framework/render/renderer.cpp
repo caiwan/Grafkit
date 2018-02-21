@@ -65,12 +65,20 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// Get the number of modes that fit the DXGI_FORMAT_R8G8B8A8_UNORM display format for the adapter output (monitor).
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr);
-	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
 
 	// Create a list to hold all the possible display modes for this monitor/video card combination.
+	// ... but when using offscreen surface, like rendering, there will be no exact rendering surface to hook up to
+	// so ignore errors instead
+
+	const int noSurfaceOccured = (result == 0x887a0022);
+
+	if (FAILED(result) && !noSurfaceOccured)
+		throw EX_HRESULT(InitializeRendererException, result);
+
+
 	displayModeList = new DXGI_MODE_DESC[numModes];
-	if (!displayModeList)
+	
+	if (!displayModeList && !noSurfaceOccured)
 	{
 		throw EX_DETAILS(InitializeRendererException, "No display mode list");
 	}
@@ -81,7 +89,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 		throw EX_HRESULT(InitializeRendererException, result);
 
 	// Convert the name of the video card to a character array and store it.
-	error = wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
+	error = wcstombs_s(&stringLength, m_videoCardDescription, 256, adapterDesc.Description, 256);
 	if (error != 0)
 		throw EX_DETAILS(InitializeRendererException, "No wcstombs_s(...)");
 
@@ -89,7 +97,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// Now fill the display mode list structures.
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList);
-	if (FAILED(result))
+	if (FAILED(result) && !noSurfaceOccured)
 		throw EX_HRESULT(InitializeRendererException, result);
 
 	// Now go through all the display modes and find the one that matches the screen width and height.

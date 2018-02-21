@@ -84,7 +84,7 @@ namespace Grafkit {
 
 	protected:
 		bool m_vsync_enabled;
-		char m_videoCardDescription[128];
+		char m_videoCardDescription[256];
 		IDXGISwapChain* m_swapChain;
 		ID3D11Device* m_device;
 		ID3D11DeviceContext* m_deviceContext;
