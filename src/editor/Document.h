@@ -12,7 +12,7 @@ namespace Idogep{
 		EditorDocument();
 
 		Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
-		Ref<Idogep::CurveDocument> curveDocument() { return m_testCurveDocument; }
+		Idogep::CurveDocument * curveDocument() { return m_testCurveDocument; }
 
 		void setDirty() { m_isDirty = true; }
 		bool dirty() { return m_isDirty; }
@@ -21,7 +21,7 @@ namespace Idogep{
 		bool m_isDirty;
 
 		Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
-		Ref<Idogep::CurveDocument> m_testCurveDocument;
+		Idogep::CurveDocument* m_testCurveDocument;
 	};
 
 }

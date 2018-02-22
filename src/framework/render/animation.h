@@ -7,6 +7,8 @@
 #include "../math/matrix.h"
 #include "../math/quaternion.h"
 
+#include "../utils/reference.h"
+
 #include "Actor.h"
 
 namespace Grafkit {
@@ -67,7 +69,7 @@ namespace Grafkit {
 		/**
 			Template for animation track
 		*/
-		template <typename V> class Track {
+		template <typename V> class Track : public Referencable {
 			friend class Animation;
 		public:
 

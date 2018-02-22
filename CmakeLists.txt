@@ -18,6 +18,13 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_set_win32.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy_static_files.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/path_find_in_list.cmake)
 
+# avoiding dev and prod builds from now on 
+# crapshit
+if (MSVC)
+	# set(CMAKE_CXX_FLAGS "/DLIVE_RELEASE /DSYNC_PLAYER /DNOMINMAX")
+	set(CMAKE_CXX_FLAGS "/DNOMINMAX")
+	set(CMAKE_C_FLAGS "${LIVERELEASE_CXX_FLAGS}")
+endif(MSVC)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set (CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/deploy" CACHE PATH "default install path" FORCE )

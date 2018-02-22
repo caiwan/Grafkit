@@ -76,7 +76,7 @@ void Idogep::EditorApplication::onNew()
 {
 	// ablak goez here 
 	m_document = new EditorDocument();
-	m_wnd->SetDocument(m_document);
+	m_wnd->setDocument(m_document);
 }
 
 void Idogep::EditorApplication::mainloop()

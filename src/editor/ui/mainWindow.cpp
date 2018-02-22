@@ -88,5 +88,6 @@ void Idogep::MainWindow::createStatusBar(EditorApplication *const& app)
 
 void Idogep::MainWindow::createDockWindows(EditorApplication *const& app)
 {
+	m_curveEditor = new CurveEditorWidget();
 	addDockWidget(Qt::BottomDockWidgetArea, m_curveEditor);
 }

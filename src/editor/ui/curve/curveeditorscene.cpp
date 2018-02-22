@@ -6,6 +6,7 @@
 #include "curveeditorwidget.h"
 #include "curveeditorscene.h"
 #include "curvepointitem.h"
+#include "curvedoc.h"
 
 //#include "qfmodex.hh"
 
@@ -44,8 +45,7 @@ QPointF CurveEditorScene::offset() const {
 void Idogep::CurveEditorScene::documentChanged(CurveDocument * doc)
 {
 	m_document = doc;
-
-	// redraw shit now 
+	this->update();
 }
 
 void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
@@ -55,9 +55,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 	setSceneRect(views().at(0)->geometry());
 
-	//if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++) {
-	//	m_pointItems->at(i)->recalculatePosition();
-	//}
+	m_document->recalculate();
 
 	if (m_ofs.x() > 0.0f)
 	{
@@ -103,49 +101,35 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setPen(QPen(QColor(144, 144, 144)));
 	painter->drawLine(0.0f, m_ofs.y(), sceneRect().width(), m_ofs.y());
 
-	// 1. Sort points according to time
-	QList<CurvePointItem*> unsortedPointItems;
-
-	//if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*m_pointItems);
+	//// 1. Sort points according to time
 	
-	QList<CurvePointItem*> sortedPointItems;
-	while (!unsortedPointItems.isEmpty()) {
-		CurvePointItem* minPoint = NULL;
-		float minTime = 9999.0f;
-		for (int i = 0; i < unsortedPointItems.size(); i++) {
-			if (unsortedPointItems[i]->time() < minTime) {
-				minPoint = unsortedPointItems[i];
-				minTime = unsortedPointItems[i]->time();
-			}
-		}
-		sortedPointItems.append(minPoint);
-		unsortedPointItems.removeOne(minPoint);
-	}
-	if (!sortedPointItems.isEmpty()) {
+	QList<CurvePointItem*> *points = m_document->getCurvePoints();
+	
+	if (!points->isEmpty()) {
 		// 2. draw the curves.
 		painter->setRenderHint(QPainter::Antialiasing);
 		painter->setPen(QPen(QColor(128, 128, 255)));
-		if (sortedPointItems.at(0)->x() > rect.x())
-			painter->drawLine(0, sortedPointItems.at(0)->pos().y(), sortedPointItems.at(0)->pos().x(), sortedPointItems.at(0)->pos().y());
+		if (points->at(0)->x() > rect.x())
+			painter->drawLine(0, points->at(0)->pos().y(), points->at(0)->pos().x(), points->at(0)->pos().y());
 
-		if (sortedPointItems.last()->pos().x() < rect.x() + rect.width())
-			painter->drawLine(sortedPointItems.last()->pos().x(), sortedPointItems.last()->pos().y(), rect.x() + rect.width(), sortedPointItems.last()->pos().y());
+		if (points->last()->pos().x() < rect.x() + rect.width())
+			painter->drawLine(points->last()->pos().x(), points->last()->pos().y(), rect.x() + rect.width(), points->last()->pos().y());
 
-		for (int i = 0; i < sortedPointItems.size() - 1; i++) {
-			sortedPointItems.at(i)->setVisible(true);
+		for (int i = 0; i < points->size() - 1; i++) {
+			points->at(i)->setVisible(true);
 			// hermite interpolation using those tangents - with a tad of a trick to prevent going back in time. =)
 			int steps = 64;
 			for (int j = 0; j < steps; j++) {
 				float t1 = float(j) / float(steps);
 				float t2 = float(j + 1) / float(steps);
 
-				qreal TangentX = sortedPointItems.at(i + 1)->coord().x() - sortedPointItems.at(i)->coord().x();
-				QPointF Tangent0 = QPointF(TangentX, TangentX * sortedPointItems.at(i)->tangent().y() / sortedPointItems.at(i)->tangent().x());
-				QPointF Tangent1 = QPointF(TangentX, TangentX * sortedPointItems.at(i + 1)->tangent().y() / sortedPointItems.at(i + 1)->tangent().x());
+				qreal TangentX = points->at(i + 1)->coord().x() - points->at(i)->coord().x();
+				QPointF Tangent0 = QPointF(TangentX, TangentX * points->at(i)->tangent().y() / points->at(i)->tangent().x());
+				QPointF Tangent1 = QPointF(TangentX, TangentX * points->at(i + 1)->tangent().y() / points->at(i + 1)->tangent().x());
 
 				QPointF p1 = _interpolateHermite(
-					sortedPointItems.at(i)->coord(),
-					sortedPointItems.at(i + 1)->coord(),
+					points->at(i)->coord(),
+					points->at(i + 1)->coord(),
 					Tangent0,
 					Tangent1,
 					t1
@@ -153,8 +137,8 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 				p1 = QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());
 
 				QPointF p2 = _interpolateHermite(
-					sortedPointItems.at(i)->coord(),
-					sortedPointItems.at(i + 1)->coord(),
+					points->at(i)->coord(),
+					points->at(i + 1)->coord(),
 					Tangent0,
 					Tangent1,
 					t2
@@ -164,14 +148,17 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 				painter->drawLine(p1 + m_ofs, p2 + m_ofs);
 			}
 		}
-		int i = sortedPointItems.size() - 1;
-		sortedPointItems.at(i)->setVisible(true);
+		int i = points->size() - 1;
+		points->at(i)->setVisible(true);
 	}
 
 	// and at the very end, display a big fat green line on top of everything (demo time)
 	painter->setPen(QPen(QColor(48, 224, 48, 96), 2.0, Qt::SolidLine));
 	painter->setBrush(Qt::NoBrush);
 	painter->drawLine((m_demoTime * m_scale.width() + m_ofs.x()), rect.y(), (m_demoTime * m_scale.width() + m_ofs.x()), rect.y() + rect.height());
+
+	// Draw cursor 
+	// ...
 
 	QString strTime;
 	int minutes = int(m_demoTime) / 60;
@@ -217,6 +204,16 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setPen(QColor(255, 255, 255, 96));
 	painter->setBrush(QColor(48, 224, 48, 96));
 	painter->drawText(QRectF(QPointF((m_demoTime * m_scale.width() + m_ofs.x()) + barOffset, rect.height() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
+
+
+	// debug 
+	if (!m_document) {
+		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::red));
+	}
+	else {
+		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::green));
+	}
+
 }
 
 void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
