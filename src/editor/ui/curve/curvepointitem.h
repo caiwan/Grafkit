@@ -27,6 +27,9 @@ namespace Idogep {
 		QPointF tangent() const;
 		void setTangent(QPointF t);
 
+		size_t index() { return m_id; }
+		void setIndex(size_t id) { m_id = id; }
+
 	protected:
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
@@ -39,6 +42,8 @@ namespace Idogep {
 		float m_radix, m_radix2;
 
 		bool m_showTangent;
+
+		size_t m_id;
 	};
 
 }

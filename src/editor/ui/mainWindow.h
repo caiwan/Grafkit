@@ -5,13 +5,17 @@
 
 namespace Idogep {
 
-	class EditorApplication;
+	class EditorDocument;
 
+	class EditorApplication;
 	class CurveEditorWidget;
 
 	class MainWindow : public QMainWindow {
 	public:
 		MainWindow(EditorApplication *const& app);
+
+		void setDocument(EditorDocument* document);
+		Event<EditorDocument*> onDocumentChanged;
 
 	private:
 		void closeEvent(QCloseEvent *event);

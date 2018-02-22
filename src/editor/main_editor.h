@@ -11,6 +11,8 @@ class QCloseEvent;
 
 namespace Idogep {
 
+	class EditorDocument;
+
 	class MainWindow;
 	class QGrafkitContextWidget;
 
@@ -22,6 +24,10 @@ namespace Idogep {
 		int execute();
 
 		void onMainWindowClose(QCloseEvent *event);
+
+		void onNew();
+		//void onSave();
+		//void onOpen();
 
 		private slots:
 		void mainloop();
@@ -38,6 +44,7 @@ namespace Idogep {
 
 		Idogep::QGrafkitContextWidget *m_widget;
 		Idogep::MainWindow *m_wnd;
+		Idogep::EditorDocument * m_document;
 	};
 
 	class LoaderThread : public QThread

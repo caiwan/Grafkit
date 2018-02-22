@@ -3,7 +3,9 @@
 #include "../stdafx.h"
 
 #define WIN32_LEAN_AND_MEAN
+#ifndef NOMINAMX
 #define NOMINMAX
+#endif //NOMINMAX
 #include <windows.h>
 
 #include <iostream>

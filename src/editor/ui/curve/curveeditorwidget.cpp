@@ -14,7 +14,7 @@ CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(
     ui->graphicsView->setScene(m_ces);
 
 	// Event map
-	// .. 
+	onDocumentChanged += Delegate(m_ces, &CurveEditorScene::documentChanged);
 }
 
 CurveEditorWidget::~CurveEditorWidget()

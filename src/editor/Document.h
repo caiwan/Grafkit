@@ -4,21 +4,24 @@
 
 namespace Idogep{
 
+	class EditorDocument;
+	class CurveDocument;
+
 	class EditorDocument {
 	public:
 		EditorDocument();
 
-		Grafkit::Animation::FloatTrack Animation() {
-			return m_testAnimation;
-		}
+		Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
+		Ref<Idogep::CurveDocument> curveDocument() { return m_testCurveDocument; }
 
-		void SetDirty() { m_isDirty = true; }
-		bool IsDirty() { return m_isDirty; }
+		void setDirty() { m_isDirty = true; }
+		bool dirty() { return m_isDirty; }
 
 	private:
 		bool m_isDirty;
 
-		Grafkit::Animation::FloatTrack m_testAnimation;
+		Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
+		Ref<Idogep::CurveDocument> m_testCurveDocument;
 	};
 
 }

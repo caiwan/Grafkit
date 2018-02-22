@@ -2,8 +2,11 @@
 #include <io.h>
 #include <fcntl.h>
 
-#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINAMX
 #define NOMINMAX
+#endif //NOMINMAX
+
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include "stdafx.h"

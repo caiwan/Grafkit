@@ -7,12 +7,16 @@
 
 #include "main_editor.h"
 
+#include "document.h"
+
 #include "ui/splashwidget.h"
 #include "ui/mainWindow.h"
 #include "ui/QGrafkitContextWidget.h"
 
+using namespace Idogep;
+
 Idogep::EditorApplication::EditorApplication(int argc, char **argv) : QObject(nullptr),
-m_qApp(argc, argv)
+m_qApp(argc, argv), m_document(nullptr)
 {
 	QCoreApplication::setOrganizationName("IndustrialRevolutioners");
 	QCoreApplication::setOrganizationDomain("caiwan.github.io");
@@ -48,6 +52,8 @@ int Idogep::EditorApplication::execute()
 
 	m_wnd->setCentralWidget(m_widget);
 
+	onNew();
+
 	return m_qApp.exec();
 }
 
@@ -64,6 +70,13 @@ void Idogep::EditorApplication::onMainWindowClose(QCloseEvent * event)
 	} else {
 		event->accept();
 	}
+}
+
+void Idogep::EditorApplication::onNew()
+{
+	// ablak goez here 
+	m_document = new EditorDocument();
+	m_wnd->SetDocument(m_document);
 }
 
 void Idogep::EditorApplication::mainloop()

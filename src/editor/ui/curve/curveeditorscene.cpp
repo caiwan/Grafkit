@@ -27,9 +27,6 @@ CurveEditorScene::CurveEditorScene(CurveEditorWidget* pWidget, QObject* parent) 
 	m_followTimeBar = true;
 	m_displayWaveform = true;
 
-	m_pointItems = NULL;
-	m_curCurve = NULL;
-
 	m_widget = pWidget;
 
 	m_audiogramImage = NULL;
@@ -44,6 +41,13 @@ QPointF CurveEditorScene::offset() const {
 	return m_ofs;
 }
 
+void Idogep::CurveEditorScene::documentChanged(CurveDocument * doc)
+{
+	m_document = doc;
+
+	// redraw shit now 
+}
+
 void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
 	QGraphicsScene::drawBackground(painter, rect);
@@ -51,9 +55,9 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 	setSceneRect(views().at(0)->geometry());
 
-	if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++) {
-		m_pointItems->at(i)->recalculatePosition();
-	}
+	//if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++) {
+	//	m_pointItems->at(i)->recalculatePosition();
+	//}
 
 	if (m_ofs.x() > 0.0f)
 	{
@@ -101,7 +105,9 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 	// 1. Sort points according to time
 	QList<CurvePointItem*> unsortedPointItems;
-	if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*m_pointItems);
+
+	//if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*m_pointItems);
+	
 	QList<CurvePointItem*> sortedPointItems;
 	while (!unsortedPointItems.isEmpty()) {
 		CurvePointItem* minPoint = NULL;
@@ -215,19 +221,19 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
-	if (!m_pointItems) return;
+	//if (!m_pointItems) return;
 
 	bool thereIsAnItem = false;
-	for (int i = 0; i < m_pointItems->size(); i++) {
-		if (m_pointItems->at(i)->contains(m_pointItems->at(i)->mapFromScene(event->scenePos()))) {
-			thereIsAnItem = true;
-			break;
-		}
-	}
+	//for (int i = 0; i < m_pointItems->size(); i++) {
+	//	if (m_pointItems->at(i)->contains(m_pointItems->at(i)->mapFromScene(event->scenePos()))) {
+	//		thereIsAnItem = true;
+	//		break;
+	//	}
+	//}
 
 	if (!thereIsAnItem) {
 		CurvePointItem* cpi = new CurvePointItem(QPointF((event->scenePos().x() - m_ofs.x()) / m_scale.width(), (event->scenePos().y() - m_ofs.y()) / -m_scale.height()));
-		m_pointItems->append(cpi);
+		//m_pointItems->append(cpi);
 
 		addItem(cpi);
 		cpi->update();
@@ -240,13 +246,14 @@ void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
 void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	bool thereIsAnItem = false;
-	if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++) {
+	/*if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++) 
+	{
 		if (m_pointItems->at(i)->contains(m_pointItems->at(i)->mapFromScene(event->scenePos()))) {
 			thereIsAnItem = true;
 			break;
 		}
 	}
-
+*/
 	if (!thereIsAnItem) {
 		switch (event->button()) {
 		case Qt::LeftButton:

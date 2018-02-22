@@ -13,6 +13,7 @@ namespace Idogep {
 
 	class CurveEditorScene;
 	class CurvePointItem;
+	class CurveDocument;
 
 	class CurveEditorWidget : public QDockWidget
 	{
@@ -27,8 +28,11 @@ namespace Idogep {
 		// onDeletePoint
 		// onCut
 		// onPaste
-		
+
+		void setDocument(CurveDocument* doc) { m_document = doc; onDocumentChanged(doc); }
+
 		Event<QImage**, float, float, int, int> onRequestAudiogram;
+		Event<CurveDocument*> onDocumentChanged;
 
 	protected:
 		virtual void resizeEvent(QResizeEvent* event);
@@ -37,6 +41,9 @@ namespace Idogep {
 	private:
 		Ui::CurveEditorWidget *ui;
 		CurveEditorScene* m_ces;
+
+		CurveDocument *m_document;
+		
 	};
 
 }

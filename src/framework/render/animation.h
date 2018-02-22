@@ -75,16 +75,28 @@ namespace Grafkit {
 
 			Track() {}
 
-			void AddKey(Key<V> key) {
-				m_track.push_back(key);
-			}
+			size_t GetKeyCount() { return m_track.size(); }
 
 			Key<V> GetKey(size_t i) {
 				return m_track[i];
 			}
 
-			size_t GetKeyCount() {
-				return m_track.size();
+			void AddKey(Key<V> key) {
+				m_track.push_back(key);
+			}
+
+			void SetKey(Key<V> key, size_t id) {
+				m_track[id] = key;
+			}
+
+			void InsertKey(Key<V> key, size_t afterId){
+				auto it = m_track.begin() + afterId;
+				m_track.insert(it, key);
+			}
+
+			void DeleteKey(Key<V> key, size_t id) {
+				auto it = m_track.begin() + id;
+				m_track.erase(it);
 			}
 
 			int FindKeyIndex(float t) const {

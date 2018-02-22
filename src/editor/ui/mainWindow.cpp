@@ -3,10 +3,14 @@
 #include <QMenu>
 #include <QStatusBar>
 
+#include "document.h"
+
 #include "mainWindow.h"
 #include "main_editor.h"
 
 #include "ui/curve/curveeditorwidget.h"
+
+using namespace Idogep;
 
 Idogep::MainWindow::MainWindow(EditorApplication *const& app)
 {
@@ -15,6 +19,12 @@ Idogep::MainWindow::MainWindow(EditorApplication *const& app)
 	createDockWindows(app);
 
 	onMainWindowClose += Delegate(app, &EditorApplication::onMainWindowClose);
+	onDocumentChanged += Delegate(this, &MainWindow::setDocument);
+}
+
+void Idogep::MainWindow::setDocument(EditorDocument * document)
+{
+	m_curveEditor->onDocumentChanged(document->curveDocument());
 }
 
 void Idogep::MainWindow::closeEvent(QCloseEvent * event)
@@ -78,7 +88,5 @@ void Idogep::MainWindow::createStatusBar(EditorApplication *const& app)
 
 void Idogep::MainWindow::createDockWindows(EditorApplication *const& app)
 {
-	m_curveEditor = new CurveEditorWidget(this);
-
 	addDockWidget(Qt::BottomDockWidgetArea, m_curveEditor);
 }

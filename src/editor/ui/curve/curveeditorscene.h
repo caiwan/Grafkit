@@ -7,6 +7,8 @@
 
 namespace Idogep {
 
+	class CurveDocument;
+
 	class CurvePointItem;
 	class CurveEditorWidget;
 
@@ -18,6 +20,8 @@ namespace Idogep {
 
 		QSizeF scale() const;
 		QPointF offset() const;
+
+		void documentChanged(CurveDocument * doc);
 
 		virtual void drawBackground(QPainter* painter, const QRectF& r);
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
@@ -44,8 +48,11 @@ namespace Idogep {
 		//void pasteSelectedPoints();
 
 	private:
-		QList<CurvePointItem*>* m_pointItems;
-		QList<CurvePointItem*>* m_curCurve;
+		//QList<CurvePointItem*>* m_pointItems;
+		//QList<CurvePointItem*>* m_curCurve;
+
+		CurveDocument* m_document;
+
 		QSizeF m_scale;
 
 		CurveEditorWidget* m_widget;

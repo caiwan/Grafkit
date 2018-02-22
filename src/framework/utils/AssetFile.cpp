@@ -1,18 +1,10 @@
 #include "stdafx.h"
 
-#include "AssetFile.h"
-#include "ResourceManager.h"
-#include "dirent.h"
-
-#include "../core/livereload.h"
-
-#ifndef LIVE_RELEASE
-
-#include "../core/thread.h"
-
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+
+#ifndef LIVE_RELEASE
 
 #include <algorithm>
 #include <Winbase.h>
@@ -20,7 +12,14 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include "../core/thread.h"
 #endif /*LIVE_RELEASE*/  
+
+#include "AssetFile.h"
+#include "ResourceManager.h"
+#include "dirent.h"
+
+#include "../core/livereload.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -28,7 +27,6 @@ using namespace FWdebugExceptions;
 #define MAX_DIRS 25
 #define MAX_FILES 255
 #define MAX_BUFFER 4096
-
 
 std::string _trimslash(std::string in) {
 	std::string out = "";

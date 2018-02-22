@@ -4,8 +4,11 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINAMX
 #define NOMINMAX
+#endif //NOMINMAX
+
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 /**
