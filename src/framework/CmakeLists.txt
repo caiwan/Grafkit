@@ -9,6 +9,13 @@ include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${BASS_INCLUDE_DIR}")
 include_directories("${STB_INCLUDE_DIR}")
 
+# avoiding dev and prod builds from now on 
+if (MSVC)
+	# set(CMAKE_CXX_FLAGS "/DLIVE_RELEASE /DSYNC_PLAYER /DNOMINMAX")
+	set(CMAKE_CXX_FLAGS "/DNOMINMAX")
+	set(CMAKE_C_FLAGS "${LIVERELEASE_CXX_FLAGS}")
+endif(MSVC)
+
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 
 add_library(Grafkit2 STATIC ${SOURCE_FILES} ${HEADER_FILES})
