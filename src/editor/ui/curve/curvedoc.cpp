@@ -5,8 +5,8 @@
 
 using namespace Idogep;
 
-Idogep::CurveDocument::CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track) : 
-	QObject(parent), m_track(track), m_curve(nullptr), m_parentScene(parent)
+Idogep::CurveDocument::CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track, QObject *parent) : 
+	QObject(parent), m_track(track), m_curve(nullptr)
 {
 	trackChanged();
 }
@@ -50,7 +50,7 @@ void Idogep::CurveDocument::recalculate()
 
 }
 
-void Idogep::CurveDocument::addToScene(CurveEditorScene * parent)
+void Idogep::CurveDocument::addCurveToScene(CurveEditorScene * parent)
 {
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {

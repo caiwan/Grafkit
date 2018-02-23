@@ -3,6 +3,8 @@
 
 #include "qgraphicsview.h"
 
+#include "render/animation.h"
+
 #include "curveeditorwidget.h"
 #include "curveeditorscene.h"
 #include "curvepointitem.h"
@@ -45,7 +47,7 @@ QPointF CurveEditorScene::offset() const {
 void Idogep::CurveEditorScene::documentChanged(CurveDocument * doc)
 {
 	m_document = doc;
-	doc->addToScene(this);
+	doc->addCurveToScene(this);
 	this->update();
 }
 
@@ -105,111 +107,13 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->drawLine(0.0f, m_ofs.y(), sceneRect().width(), m_ofs.y());
 
 	// ---- 
-	// 2. draw the curves.
-	QList<CurvePointItem*> *points = m_document->getCurvePoints();
 
-	if (!points->isEmpty()) {
-		painter->setRenderHint(QPainter::Antialiasing);
-		painter->setPen(QPen(QColor(128, 128, 255)));
-		if (points->at(0)->x() > rect.x())
-			painter->drawLine(0, points->at(0)->pos().y(), points->at(0)->pos().x(), points->at(0)->pos().y());
-
-		if (points->last()->pos().x() < rect.x() + rect.width())
-			painter->drawLine(points->last()->pos().x(), points->last()->pos().y(), rect.x() + rect.width(), points->last()->pos().y());
-
-		for (int i = 0; i < points->size() - 1; i++) {
-			points->at(i)->setVisible(true);
-			// hermite interpolation using those tangents - with a tad of a trick to prevent going back in time. =)
-			int steps = 64;
-			for (int j = 0; j < steps; j++) {
-				float t1 = float(j) / float(steps);
-				float t2 = float(j + 1) / float(steps);
-
-				qreal TangentX = points->at(i + 1)->coord().x() - points->at(i)->coord().x();
-				QPointF Tangent0 = QPointF(TangentX, TangentX * points->at(i)->tangent().y() / points->at(i)->tangent().x());
-				QPointF Tangent1 = QPointF(TangentX, TangentX * points->at(i + 1)->tangent().y() / points->at(i + 1)->tangent().x());
-
-				QPointF p1 = _interpolateHermite(
-					points->at(i)->coord(),
-					points->at(i + 1)->coord(),
-					Tangent0,
-					Tangent1,
-					t1
-				);
-				p1 = QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());
-
-				QPointF p2 = _interpolateHermite(
-					points->at(i)->coord(),
-					points->at(i + 1)->coord(),
-					Tangent0,
-					Tangent1,
-					t2
-				);
-				p2 = QPointF(p2.x() * m_scale.width(), p2.y() * -m_scale.height());
-
-				painter->drawLine(p1 + m_ofs, p2 + m_ofs);
-			}
-		}
-		int i = points->size() - 1;
-		points->at(i)->setVisible(true);
-	}
-
+	drawCurve(painter, rect);
 	// --- 
-
-	// and at the very end, display a big fat green line on top of everything (demo time)
-	painter->setPen(QPen(QColor(48, 224, 48, 96), 2.0, Qt::SolidLine));
-	painter->setBrush(Qt::NoBrush);
-	painter->drawLine((m_demoTime * m_scale.width() + m_ofs.x()), rect.y(), (m_demoTime * m_scale.width() + m_ofs.x()), rect.y() + rect.height());
-
 	// Draw cursor 
-	// ...
+	drawCursor(painter, rect);
 
-	QString strTime;
-	int minutes = int(m_demoTime) / 60;
-	if (minutes < 10) strTime.append("0");
-	strTime.append(QString::number(minutes)).append(":");
-	if (fmod(m_demoTime, 60.0f) < 10.0f) strTime.append("0");
-	strTime.append(QString::number(fmod(m_demoTime, 60.0f), 'f', 3));
-
-	if (m_demoTimeChanged)
-	{
-		m_demoTimeChanged = false;
-		if (m_followTimeBar)
-		{
-			if ((rect.x() + rect.width() - m_ofs.x()) / m_scale.width() < m_demoTime)
-			{
-				while ((rect.x() + rect.width() - m_ofs.x()) / m_scale.width() < m_demoTime)
-					m_ofs.setX(m_ofs.x() - m_scale.width()*2.0f);
-
-				if (m_ofs.x() > 0.0f)  m_ofs.setX(0.0f);
-
-				requestAudiogram();
-			}
-
-			else if ((rect.x() - m_ofs.x()) / m_scale.width() > m_demoTime)
-			{
-				while ((rect.x() - m_ofs.x()) / m_scale.width() > m_demoTime)
-					m_ofs.setX(m_ofs.x() + m_scale.width()*2.0f);
-
-				if (m_ofs.x() > 0.0f)  m_ofs.setX(0.0f);
-
-				requestAudiogram();
-			}
-		}
-	}
-
-	float barOffset = 0.0f;
-	if (abs(rect.x() + rect.width() - (m_demoTime * m_scale.width() + m_ofs.x())) < 128) barOffset = -56.0f;
-
-	painter->setFont(QFont(QString("Sans"), 8));
-	painter->setPen(Qt::NoPen);
-	painter->setBrush(QColor(48, 224, 48, 96));
-	painter->drawRect(QRectF(QPointF((m_demoTime * m_scale.width() + m_ofs.x()) + barOffset, rect.height() - 16.0f), QSizeF(56.0f, 16.0f)));
-	painter->setPen(QColor(255, 255, 255, 96));
-	painter->setBrush(QColor(48, 224, 48, 96));
-	painter->drawText(QRectF(QPointF((m_demoTime * m_scale.width() + m_ofs.x()) + barOffset, rect.height() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
-
-
+#if 0
 	// debug 
 	if (!m_document) {
 		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::red));
@@ -217,7 +121,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	else {
 		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::green));
 	}
-
+#endif
 }
 
 void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
@@ -247,7 +151,7 @@ void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
 void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	bool thereIsAnItem = false;
-	/*if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++) 
+	/*if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++)
 	{
 		if (m_pointItems->at(i)->contains(m_pointItems->at(i)->mapFromScene(event->scenePos()))) {
 			thereIsAnItem = true;
@@ -299,6 +203,7 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 		if (m_scale.width() < 8.0f) m_scale.setWidth(8.0f);
 		if (m_scale.height() < 8.0f) m_scale.setHeight(8.0f);
 	}
+
 	if (!m_modifyOfs && !m_modifyScale) {
 
 		// eventet dobjon itt 
@@ -379,6 +284,201 @@ float CurveEditorScene::simpleInterpolate(QList<CurvePointItem*>* list, float t)
 	//	}
 	//}
 	return 0.0f; // should never happen !
+}
+
+QPointF Idogep::CurveEditorScene::calculatePosition(QPointF point) const
+{
+	return QPointF(
+		point.x() * scale().width() + offset().x(),
+		point.y() * -scale().height() + offset().y()
+	);
+}
+
+void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect)
+{
+	const QColor grey = QColor(192, 192, 192);
+	const QColor red = QColor(255, 128, 128);
+	const QColor blue = QColor(128, 128, 255);
+	const QColor green = QColor(128, 255, 128);
+	const QColor purple = QColor(255, 128, 255);
+
+	// 2. draw the curves.
+	QList<CurvePointItem*> *points = m_document->getCurvePoints();
+	auto track = m_document->getTrack();
+
+	if (!points->isEmpty()) {
+		painter->setRenderHint(QPainter::Antialiasing);
+		painter->setPen(QPen(grey));
+
+		// boundaries
+		double tmin = offset().x();
+		int idmin = track->FindKeyIndex(tmin);
+
+		double tmax = rect.width() / scale().width() - tmin;
+		int idmax = track->FindKeyIndex(tmax) + 1;
+
+
+		if (idmin == 0 && points->at(0)->x() > rect.x())
+			painter->drawLine(
+				0, points->at(0)->pos().y(),
+				points->at(0)->pos().x(), points->at(0)->pos().y()
+			);
+
+		if (idmax == track->GetKeyCount() && points->last()->pos().x() < rect.x() + rect.width())
+			painter->drawLine(
+				points->last()->pos().x(), points->last()->pos().y(),
+				rect.x() + rect.width(), points->last()->pos().y()
+			);
+
+		if (idmax - idmin > 1) {
+			for (int i = idmin; i < idmax - 1; i++)
+			{
+				CurvePointItem *point = points->at(i);
+				points->at(i)->setVisible(true);
+
+				auto k0 = track->GetKey(i);
+				auto k1 = track->GetKey(i + 1);
+
+				int steps = 64;
+				double step = (k1.m_key - k0.m_key) / steps;
+
+				/*
+				switch (k0.m_type) {
+
+				}
+				*/
+
+				for (int j = 0; j < steps; j++) {
+					double t = k0.m_key + j * step;
+					double v = track->GetValue(t);
+
+					QPointF p1(t, track->GetValue(t));
+					p1 = QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());
+
+					QPointF p2(t + step, track->GetValue(t + 1));
+					p2 = QPointF(p2.x() * m_scale.width(), p2.y() * -m_scale.height());
+
+					painter->drawLine(p1 + m_ofs, p2 + m_ofs);
+				}
+			}
+		}
+		else {
+			// ... 
+		}
+
+		int i = points->size() - 1;
+		points->at(i)->setVisible(true);
+	}
+}
+
+void Idogep::CurveEditorScene::drawCurve_old(QPainter * painter, const QRectF & rect)
+{
+	// 2. draw the curves.
+	QList<CurvePointItem*> *points = m_document->getCurvePoints();
+
+	if (!points->isEmpty()) {
+		painter->setRenderHint(QPainter::Antialiasing);
+		painter->setPen(QPen(QColor(128, 128, 255)));
+		if (points->at(0)->x() > rect.x())
+			painter->drawLine(0, points->at(0)->pos().y(), points->at(0)->pos().x(), points->at(0)->pos().y());
+
+		if (points->last()->pos().x() < rect.x() + rect.width())
+			painter->drawLine(points->last()->pos().x(), points->last()->pos().y(), rect.x() + rect.width(), points->last()->pos().y());
+
+		for (int i = 0; i < points->size() - 1; i++) {
+			points->at(i)->setVisible(true);
+			// hermite interpolation using those tangents - with a tad of a trick to prevent going back in time. =)
+			int steps = 64;
+			for (int j = 0; j < steps; j++) {
+				float t1 = float(j) / float(steps);
+				float t2 = float(j + 1) / float(steps);
+
+				qreal TangentX = points->at(i + 1)->coord().x() - points->at(i)->coord().x();
+				QPointF Tangent0 = QPointF(TangentX, TangentX * points->at(i)->tangent().y() / points->at(i)->tangent().x());
+				QPointF Tangent1 = QPointF(TangentX, TangentX * points->at(i + 1)->tangent().y() / points->at(i + 1)->tangent().x());
+
+				QPointF p1 = _interpolateHermite(
+					points->at(i)->coord(),
+					points->at(i + 1)->coord(),
+					Tangent0,
+					Tangent1,
+					t1
+				);
+				p1 = QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());
+
+				QPointF p2 = _interpolateHermite(
+					points->at(i)->coord(),
+					points->at(i + 1)->coord(),
+					Tangent0,
+					Tangent1,
+					t2
+				);
+				p2 = QPointF(p2.x() * m_scale.width(), p2.y() * -m_scale.height());
+
+				painter->drawLine(p1 + m_ofs, p2 + m_ofs);
+			}
+		}
+		int i = points->size() - 1;
+		points->at(i)->setVisible(true);
+	}
+}
+
+void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rect)
+{
+	// and at the very end, display a big fat green line on top of everything (demo time)
+	painter->setPen(QPen(QColor(48, 224, 48, 96), 2.0, Qt::SolidLine));
+	painter->setBrush(Qt::NoBrush);
+	painter->drawLine(
+		(m_demoTime * m_scale.width() + m_ofs.x()), rect.y(),
+		(m_demoTime * m_scale.width() + m_ofs.x()), rect.y() + rect.height()
+	);
+
+
+	QString strTime;
+	int minutes = int(m_demoTime) / 60;
+	if (minutes < 10) strTime.append("0");
+	strTime.append(QString::number(minutes)).append(":");
+	if (fmod(m_demoTime, 60.0f) < 10.0f) strTime.append("0");
+	strTime.append(QString::number(fmod(m_demoTime, 60.0f), 'f', 3));
+
+	if (m_demoTimeChanged)
+	{
+		m_demoTimeChanged = false;
+		if (m_followTimeBar)
+		{
+			if ((rect.x() + rect.width() - m_ofs.x()) / m_scale.width() < m_demoTime)
+			{
+				while ((rect.x() + rect.width() - m_ofs.x()) / m_scale.width() < m_demoTime)
+					m_ofs.setX(m_ofs.x() - m_scale.width()*2.0f);
+
+				if (m_ofs.x() > 0.0f)  m_ofs.setX(0.0f);
+
+				requestAudiogram();
+			}
+
+			else if ((rect.x() - m_ofs.x()) / m_scale.width() > m_demoTime)
+			{
+				while ((rect.x() - m_ofs.x()) / m_scale.width() > m_demoTime)
+					m_ofs.setX(m_ofs.x() + m_scale.width()*2.0f);
+
+				if (m_ofs.x() > 0.0f)  m_ofs.setX(0.0f);
+
+				requestAudiogram();
+			}
+		}
+	}
+
+	float barOffset = 0.0f;
+	if (abs(rect.x() + rect.width() - (m_demoTime * m_scale.width() + m_ofs.x())) < 128) barOffset = -56.0f;
+
+	painter->setFont(QFont(QString("Sans"), 8));
+	painter->setPen(Qt::NoPen);
+	painter->setBrush(QColor(48, 224, 48, 96));
+	painter->drawRect(QRectF(QPointF((m_demoTime * m_scale.width() + m_ofs.x()) + barOffset, rect.height() - 16.0f), QSizeF(56.0f, 16.0f)));
+	painter->setPen(QColor(255, 255, 255, 96));
+	painter->setBrush(QColor(48, 224, 48, 96));
+	painter->drawText(QRectF(QPointF((m_demoTime * m_scale.width() + m_ofs.x()) + barOffset, rect.height() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
+
 }
 
 //void CurveEditorScene::setCurrentCurve(QList<CurvePointItem*>* curve) {

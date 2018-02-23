@@ -21,6 +21,8 @@ namespace Idogep {
 		QSizeF scale() const;
 		QPointF offset() const;
 
+		QPointF calculatePosition(QPointF point) const;
+
 		void documentChanged(CurveDocument * doc);
 
 		virtual void drawBackground(QPainter* painter, const QRectF& r);
@@ -48,8 +50,11 @@ namespace Idogep {
 		//void pasteSelectedPoints();
 
 	private:
-		//QList<CurvePointItem*>* m_pointItems;
-		//QList<CurvePointItem*>* m_curCurve;
+		
+		void drawCurve(QPainter* painter, const QRectF& r);
+		void drawCurve_old(QPainter* painter, const QRectF& r);
+
+		void drawCursor(QPainter* painter, const QRectF& r);
 
 		CurveDocument* m_document;
 

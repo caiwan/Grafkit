@@ -51,19 +51,22 @@ namespace Grafkit {
 			KI_linear,
 			KI_ramp,
 			KI_smooth,
-			KI_catmullRom,
+			KI_hermite,
 			KI_COUNT
 		};
 
 		/** Tamplate for anim keys */
 		template <typename V> struct Key {
 
-			Key() : m_key(0), m_value(), m_type(KI_linear) {}
-			Key(float t, V value) : m_key(t), m_value(value), m_type(KI_linear) {}
+			Key() : m_key(0), m_value(), m_type(KI_linear), m_tangent(0.) {}
+			Key(float t, V value) : m_key(t), m_value(value), m_type(KI_linear), m_tangent(0.) {}
+
+			enum KeyInterpolation_e m_type;
 
 			float m_key;
 			V m_value;
-			enum KeyInterpolation_e m_type;
+			float m_tangent;
+
 		};
 
 		/**
@@ -83,6 +86,43 @@ namespace Grafkit {
 				return m_track[i];
 			}
 
+			V GetValue(float t) {
+				float f = 0.f;
+				Key<V> v0, v1, v;
+				FindKey(t, v0, v1, f);
+
+				switch (v0.m_type) {
+				case KI_step:
+					return v0.m_value;
+				case KI_linear:
+					break;
+				case KI_ramp:
+					t = t * t;
+					break;
+				case KI_smooth:
+					t = t * t * (2 - 2 * t);
+					break;
+				case KI_hermite:
+
+					// itt meg rajon ez:
+					// qreal TangentX = points->at(i + 1)->coord().x() - points->at(i)->coord().x();
+
+					float tangent = v1.m_value - v0.m_value;
+
+					float t2 = t * t;
+					float t3 = t2 * t;
+
+					return (
+						(2.0f*t3 - 3.0f*t2 + 1.0f) * v0.m_value +
+						(-2.0f*t3 + 3.0f*t2) * v1.m_value +
+						(t3 - 2.0f*t2 + t) * v0.m_tangent * tangent +
+						(t3 - t2) * v1.m_tangent * tangent
+						);
+				}
+
+				return v0.m_value * (1. - t) + v1.m_value * t;
+			}
+
 			void AddKey(Key<V> key) {
 				m_track.push_back(key);
 			}
@@ -91,7 +131,7 @@ namespace Grafkit {
 				m_track[id] = key;
 			}
 
-			void InsertKey(Key<V> key, size_t afterId){
+			void InsertKey(Key<V> key, size_t afterId) {
 				auto it = m_track.begin() + afterId;
 				m_track.insert(it, key);
 			}
@@ -105,6 +145,12 @@ namespace Grafkit {
 				size_t count = m_track.size();
 				if (count <= 2)
 					return 0;
+
+				if (m_track[0].m_key > t)
+					return 0;
+				else if (m_track[count - 1].m_key < t)
+					return count - 1;
+
 #if 1
 				size_t u = count - 1, l = 0, m = 0;
 				while (u >= l) {
@@ -138,7 +184,19 @@ namespace Grafkit {
 			/** Finds a key inside the track
 			@return 1 if key found
 			*/
+			// legacy shit 
 			int FindKey(float t, V& v0, V& v1, float &f) const {
+				Key<V> k0, k1;
+				int r = FindKey(t, k0, k1, f);
+				v0 = k0.m_value;
+				v1 = k1.m_value;
+				return r;
+			}
+
+			/** Finds a key inside the track
+			@return 1 if key found
+			*/
+			int FindKey(float t, Key<V>& v0, Key<V>& v1, float &f) const {
 				size_t count = m_track.size();
 				f = 0.f;
 				if (!count) {
@@ -147,14 +205,14 @@ namespace Grafkit {
 
 				if (m_track[0].m_key > t) {
 					f = 0.;
-					v0 = m_track[0].m_value;
-					v1 = m_track[1].m_value;
+					v0 = m_track[0];
+					v1 = m_track[1];
 					return 0;
 				}
 				else if (m_track[count - 1].m_key < t) {
 					f = 1.;
-					v0 = m_track[count - 2].m_value;
-					v1 = m_track[count - 1].m_value;
+					v0 = m_track[count - 2];
+					v1 = m_track[count - 1];
 					return 0;
 				}
 
@@ -166,8 +224,8 @@ namespace Grafkit {
 				float d = m_track[i + 1].m_key - m_track[i].m_key;
 				f = (t - m_track[i].m_key) / d;
 
-				v0 = m_track[i].m_value;
-				v1 = m_track[i + 1].m_value;
+				v0 = m_track[i];
+				v1 = m_track[i + 1];
 
 				return 1;
 			}

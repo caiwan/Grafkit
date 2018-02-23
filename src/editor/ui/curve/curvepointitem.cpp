@@ -43,8 +43,10 @@ QRectF CurvePointItem::boundingRect() const {
 
 void CurvePointItem::recalculatePosition() {
     CurveEditorScene* ces = (CurveEditorScene*)scene();
-    if(m_coord.x() < 0.0f) m_coord.setX(0.0f);
-    setPos(m_coord.x() * ces->scale().width() + ces->offset().x(), m_coord.y() * -ces->scale().height() + ces->offset().y());
+    if(m_coord.x() < 0.0f) 
+		m_coord.setX(0.0f);
+
+	setPos(ces->calculatePosition(m_coord));
 }
 
 void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
