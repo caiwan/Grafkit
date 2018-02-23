@@ -324,14 +324,17 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 				points->at(0)->pos().x(), points->at(0)->pos().y()
 			);
 
-		if (idmax == track->GetKeyCount() && points->last()->pos().x() < rect.x() + rect.width())
+		if (idmax == track->GetKeyCount() && points->last()->pos().x() < rect.x() + rect.width()) {
 			painter->drawLine(
 				points->last()->pos().x(), points->last()->pos().y(),
 				rect.x() + rect.width(), points->last()->pos().y()
 			);
+			idmax--; // avoid max+1 index
+			points->last()->setVisible(true);
+		}
 
-		if (idmax - idmin > 1) {
-			for (int i = idmin; i < idmax - 1; i++)
+		if (idmax - idmin > 1 && idmax) {
+			for (int i = idmin; i < idmax; i++)
 			{
 				CurvePointItem *point = points->at(i);
 				points->at(i)->setVisible(true);
@@ -339,23 +342,20 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 				auto k0 = track->GetKey(i);
 				auto k1 = track->GetKey(i + 1);
 
-				int steps = 64;
-				double step = (k1.m_key - k0.m_key) / steps;
-
-				/*
-				switch (k0.m_type) {
-
-				}
-				*/
+				int steps = 32;
+				double stepWidth = 0.; 
+				// valahogy lehetne optiomalgatni ezt is 
+				steps = 64;
+				stepWidth = (k1.m_key - k0.m_key) / steps;
 
 				for (int j = 0; j < steps; j++) {
-					double t = k0.m_key + j * step;
+					double t = k0.m_key + j * stepWidth;
 					double v = track->GetValue(t);
 
 					QPointF p1(t, track->GetValue(t));
-					p1 = QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());
+					QPointF p2(t + stepWidth, track->GetValue(t + stepWidth));
 
-					QPointF p2(t + step, track->GetValue(t + 1));
+					p1 = QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());
 					p2 = QPointF(p2.x() * m_scale.width(), p2.y() * -m_scale.height());
 
 					painter->drawLine(p1 + m_ofs, p2 + m_ofs);
@@ -366,8 +366,7 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 			// ... 
 		}
 
-		int i = points->size() - 1;
-		points->at(i)->setVisible(true);
+
 	}
 }
 

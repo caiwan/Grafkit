@@ -86,10 +86,10 @@ namespace Grafkit {
 				return m_track[i];
 			}
 
-			V GetValue(float t) {
-				float f = 0.f;
+			V GetValue(float time) {
+				float t = 0.f;
 				Key<V> v0, v1, v;
-				FindKey(t, v0, v1, f);
+				FindKey(time, v0, v1, t);
 
 				switch (v0.m_type) {
 				case KI_step:
@@ -100,17 +100,13 @@ namespace Grafkit {
 					t = t * t;
 					break;
 				case KI_smooth:
-					t = t * t * (2 - 2 * t);
+					t = t * t * (2 - 3 * t);
 					break;
 				case KI_hermite:
+					const float tangent = v1.m_value - v0.m_value;
 
-					// itt meg rajon ez:
-					// qreal TangentX = points->at(i + 1)->coord().x() - points->at(i)->coord().x();
-
-					float tangent = v1.m_value - v0.m_value;
-
-					float t2 = t * t;
-					float t3 = t2 * t;
+					const float t2 = t * t;
+					const float t3 = t2 * t;
 
 					return (
 						(2.0f*t3 - 3.0f*t2 + 1.0f) * v0.m_value +
