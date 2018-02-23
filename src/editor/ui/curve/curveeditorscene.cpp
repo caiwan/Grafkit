@@ -45,6 +45,7 @@ QPointF CurveEditorScene::offset() const {
 void Idogep::CurveEditorScene::documentChanged(CurveDocument * doc)
 {
 	m_document = doc;
+	doc->addToScene(this);
 	this->update();
 }
 
@@ -54,6 +55,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setBrush(Qt::NoBrush);
 
 	setSceneRect(views().at(0)->geometry());
+
 
 	m_document->recalculate();
 
@@ -68,6 +70,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 		painter->drawImage(rect, *m_audiogramImage);
 	}
 
+	// --- 
 	// 0. Draw the axis + subaxis. =)))
 	float sPos = 0.0f;
 	if (rect.x() < 0.0f)
@@ -101,12 +104,11 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setPen(QPen(QColor(144, 144, 144)));
 	painter->drawLine(0.0f, m_ofs.y(), sceneRect().width(), m_ofs.y());
 
-	//// 1. Sort points according to time
-	
+	// ---- 
+	// 2. draw the curves.
 	QList<CurvePointItem*> *points = m_document->getCurvePoints();
-	
+
 	if (!points->isEmpty()) {
-		// 2. draw the curves.
 		painter->setRenderHint(QPainter::Antialiasing);
 		painter->setPen(QPen(QColor(128, 128, 255)));
 		if (points->at(0)->x() > rect.x())
@@ -151,6 +153,8 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 		int i = points->size() - 1;
 		points->at(i)->setVisible(true);
 	}
+
+	// --- 
 
 	// and at the very end, display a big fat green line on top of everything (demo time)
 	painter->setPen(QPen(QColor(48, 224, 48, 96), 2.0, Qt::SolidLine));

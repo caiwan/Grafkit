@@ -1,10 +1,12 @@
 #include "curvedoc.h"
 
+#include "curveeditorscene.h"
 #include "curvepointitem.h"
 
 using namespace Idogep;
 
-Idogep::CurveDocument::CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track) : m_track(track), m_curve(nullptr)
+Idogep::CurveDocument::CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track) : 
+	QObject(parent), m_track(track), m_curve(nullptr), m_parentScene(parent)
 {
 	trackChanged();
 }
@@ -18,6 +20,7 @@ void Idogep::CurveDocument::trackChanged()
 	for (size_t i = 0; i < keyCount; i++) {
 		auto key = m_track->GetKey(i);
 		CurvePointItem *point = new CurvePointItem();
+		//point->
 		point->setTime(key.m_key);
 		point->setValue(key.m_value);
 		m_curve->push_back(point);
@@ -46,3 +49,15 @@ void Idogep::CurveDocument::recalculate()
 	//}
 
 }
+
+void Idogep::CurveDocument::addToScene(CurveEditorScene * parent)
+{
+	if (m_curve) {
+		for (int i = 0; i < m_curve->size(); i++) {
+			auto point = m_curve->at(i);
+			parent->addItem(point);
+			point->recalculatePosition();
+		}
+	}
+}
+
