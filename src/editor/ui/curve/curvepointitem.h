@@ -2,6 +2,8 @@
 #include <QtGui>
 #include <qgraphicsitem.h>
 
+#include "Event.h"
+
 namespace Idogep {
 	class CurvePointItem : public QGraphicsItem
 	{
@@ -29,6 +31,8 @@ namespace Idogep {
 
 		size_t index() { return m_id; }
 		void setIndex(size_t id) { m_id = id; }
+		
+		Event<int*, float, float> onMove; //isAccept, key, value
 
 	protected:
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
@@ -36,6 +40,13 @@ namespace Idogep {
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 		void fakeMouseMoveEvent(QGraphicsSceneMouseEvent* event);
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
+
+		virtual void keyPressEvent(QKeyEvent * event);
+		virtual void keyReleaseEvent(QKeyEvent * event);
+
+		// 
+
+		void toggleTangentEditing();
 
 	private:
 		QPointF m_coord, m_tangent;
