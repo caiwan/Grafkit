@@ -2,10 +2,16 @@
 #include <qthread.h>
 
 #include "render/renderer.h"
+#include "utils/ResourceManager.h"
+#include "utils/InitializeSerializer.h"
 
 #include "Event.h"
 
 class QCloseEvent;
+
+namespace Grafkit{
+	class IAssetFactory;
+}
 
 #define APP_NAME "Idogep"
 
@@ -16,7 +22,9 @@ namespace Idogep {
 	class MainWindow;
 	class QGrafkitContextWidget;
 
-	class EditorApplication : QObject {
+	class EditorApplication : public QObject ,
+		protected Grafkit::IResourceManager, private Grafkit::ClonableInitializer
+	{
 		Q_OBJECT
 	public:
 		EditorApplication(int argc, char **argv);
@@ -33,14 +41,23 @@ namespace Idogep {
 		void mainloop();
 		void loaderFinished();
 
+		// onBeforePreload
+		// onAfterPreload
+
+		virtual Grafkit::Renderer &GetDeviceContext() { return m_render; }
+		virtual Grafkit::IAssetFactory *GetAssetFactory() { return m_file_loader; }
+
 	private:
 		void nextTick();
+
+	protected:
 
 	private:
 		Idogep::Event<> onLoaderFinished;
 
 		QApplication m_qApp;
 		Grafkit::Renderer m_render;
+		Grafkit::IAssetFactory *m_file_loader;
 
 		Idogep::QGrafkitContextWidget *m_widget;
 		Idogep::MainWindow *m_wnd;

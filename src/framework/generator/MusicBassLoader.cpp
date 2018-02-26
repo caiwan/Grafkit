@@ -37,7 +37,7 @@ namespace {
 		virtual int IsPlaying();
 
 		virtual bool GetFFT(float* ptr, int segcount);
-		virtual bool GetWaveform(float* ptr, double startMs, double stopMs);
+		virtual bool GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t& samplePerSec);
 
 	protected:
 		HSTREAM m_stream;
@@ -216,12 +216,37 @@ namespace {
 
 	}
 
-	bool MusicBass::GetWaveform(float* ptr, double begin, double end) {
-		// BASS_DATA_FLOAT
-		return false;
-	}
+	bool MusicBass::GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t &samplePerSec)
+	{
+		length = 0;
+		ptr = nullptr;
+		samplePerSec = 0;
+		BASS_CHANNELINFO channelInfo;
+		if (!BASS_ChannelGetInfo(m_stream, &channelInfo))
+			return false;
 
+		length = m_length;
+		channelCount = channelInfo.chans;
+		samplePerSec = m_samplePerSec;
+
+		ptr = new float[length * channelCount];
+
+		const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
+
+		if (numBytes == -1)
+		{
+			delete ptr;
+			length = 0;
+			ptr = nullptr;
+			samplePerSec = 0;
+			return false;
+		}
+
+		return true;
+	}
 }
+
+
 
 /// ====================================================================================================================================================
 /// Factory class implementation

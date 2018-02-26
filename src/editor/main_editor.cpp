@@ -5,6 +5,8 @@
 #include <qmessagebox.h>
 #include <qevent.h>
 
+#include "utils/AssetFile.h"
+
 #include "main_editor.h"
 
 #include "document.h"
@@ -14,9 +16,13 @@
 #include "ui/QGrafkitContextWidget.h"
 
 using namespace Idogep;
+using namespace Grafkit;
 
-Idogep::EditorApplication::EditorApplication(int argc, char **argv) : QObject(nullptr),
-m_qApp(argc, argv), m_document(nullptr)
+Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
+	QObject(nullptr),
+	Grafkit::ClonableInitializer(),
+	Grafkit::IResourceManager(),
+	m_qApp(argc, argv), m_document(nullptr)
 {
 	QCoreApplication::setOrganizationName("IndustrialRevolutioners");
 	QCoreApplication::setOrganizationDomain("caiwan.github.io");
@@ -24,7 +30,8 @@ m_qApp(argc, argv), m_document(nullptr)
 
 	QFile f(":/res/css/global.css"); f.open(QFile::ReadOnly);
 	m_qApp.setStyleSheet(f.readAll()); f.close();
-
+	
+	m_file_loader = new FileAssetFactory("./");
 }
 
 int Idogep::EditorApplication::execute()
@@ -32,8 +39,7 @@ int Idogep::EditorApplication::execute()
 	m_wnd = new MainWindow(this);
 
 	SplashWidget *sw = new SplashWidget();
-	//sw->deleteLater();
-	
+
 	LoaderThread *loader = new LoaderThread();
 
 	onLoaderFinished += Delegate(sw, &SplashWidget::hide);
@@ -49,6 +55,8 @@ int Idogep::EditorApplication::execute()
 
 	m_widget = new QGrafkitContextWidget(m_render);
 	m_widget->initialize();
+
+	// init stuff here
 
 	m_wnd->setCentralWidget(m_widget);
 
@@ -67,7 +75,8 @@ void Idogep::EditorApplication::onMainWindowClose(QCloseEvent * event)
 
 	if (resBtn != QMessageBox::Yes) {
 		event->ignore();
-	} else {
+	}
+	else {
 		event->accept();
 	}
 }
@@ -77,6 +86,10 @@ void Idogep::EditorApplication::onNew()
 	// ablak goez here 
 	m_document = new EditorDocument();
 	m_wnd->setDocument(m_document);
+
+	m_document->preload(this);
+	DoPrecalc();
+	m_document->preloaded(this);
 }
 
 void Idogep::EditorApplication::mainloop()

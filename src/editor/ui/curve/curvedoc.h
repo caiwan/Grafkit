@@ -2,6 +2,8 @@
 
 #include <qobject.h>
 
+#include "Event.h"
+
 #include "render/animation.h"
 
 namespace Idogep {
@@ -9,12 +11,27 @@ namespace Idogep {
 	class CurvePointItem;
 	class CurveEditorScene;
 
-	class CurveDocument : public QObject
-	{
-
+	class CurveAudiogram {
 	public:
+		CurveAudiogram();
+		virtual ~CurveAudiogram();
 
-		CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track, QObject *parent = nullptr);
+		Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform; // ptr, samplecount, channelcount, samplePerSec
+		void getAudiogram(QImage** image, float startTime, float endTime, int rectWidth, int rectHeight);
+
+	private:
+		float* m_audiogramBuffer;
+		size_t m_audiogramSampleCount;
+
+		size_t m_audiogramChannelCount;
+		size_t m_audiogramSamplePerSec;
+	};
+
+	class CurveDocument : public QObject, public CurveAudiogram
+	{
+		Q_OBJECT
+	public:
+		explicit CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track, QObject *parent = nullptr);
 
 		QList<CurvePointItem*>* getCurvePoints() { return m_curve; }
 		Ref<Grafkit::Animation::FloatTrack> getTrack() { return m_track; }
@@ -22,7 +39,6 @@ namespace Idogep {
 		void setTrack(Ref<Grafkit::Animation::FloatTrack>& track);
 
 		void recalculate();
-
 		void addCurveToScene(CurveEditorScene* parent);
 
 	private:
@@ -34,6 +50,7 @@ namespace Idogep {
 	private:
 		QList<CurvePointItem*>* m_curve;
 		Ref<Grafkit::Animation::FloatTrack> m_track; // todo: multiple fiszfasz
+
 	};
 
 }

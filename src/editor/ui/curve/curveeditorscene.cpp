@@ -72,7 +72,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	if (m_ofs.x() > 0.0f)
 	{
 		m_ofs.setX(0.0f);
-		requestAudiogram();
+		updateAudiogram();
 	}
 
 	if (m_audiogramImage && m_displayWaveform)
@@ -192,7 +192,7 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void CurveEditorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-	if (m_modifyOfs || m_modifyScale) requestAudiogram();
+	if (m_modifyOfs || m_modifyScale) updateAudiogram();
 
 	m_modifyDemoTime = false;
 	m_modifyOfs = false;
@@ -227,7 +227,7 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
 void Idogep::CurveEditorScene::viewResized(QResizeEvent * event)
 {
-	requestAudiogram();
+	updateAudiogram();
 }
 
 //void CurveEditorScene::deleteCurvePoint(CurvePointItem* cpi) {
@@ -461,7 +461,7 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 
 				if (m_ofs.x() > 0.0f)  m_ofs.setX(0.0f);
 
-				requestAudiogram();
+				updateAudiogram();
 			}
 
 			else if ((rect.x() - m_ofs.x()) / m_scale.width() > m_demoTime)
@@ -471,7 +471,7 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 
 				if (m_ofs.x() > 0.0f)  m_ofs.setX(0.0f);
 
-				requestAudiogram();
+				updateAudiogram();
 			}
 		}
 	}
@@ -676,7 +676,7 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 //	update();
 //}
 
-void CurveEditorScene::requestAudiogram()
+void CurveEditorScene::updateAudiogram()
 {
 	if (!m_displayWaveform) return;
 
@@ -686,7 +686,7 @@ void CurveEditorScene::requestAudiogram()
 	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) return;
 
 	QImage* img = nullptr;
-	m_widget->onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
+	m_document->getAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
 
 	if (!img) return;
 

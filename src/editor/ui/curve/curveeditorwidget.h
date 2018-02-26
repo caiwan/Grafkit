@@ -23,15 +23,9 @@ namespace Idogep {
 		explicit CurveEditorWidget(QWidget *parent = 0);
 		~CurveEditorWidget();
 
-		// onAddPoint
-		// onModifyPoint
-		// onDeletePoint
-		// onCut
-		// onPaste
-
 		void setDocument(CurveDocument* doc) { m_document = doc; onDocumentChanged(doc); }
 
-		Event<QImage**, float, float, int, int> onRequestAudiogram;
+		Event<float**, float, float> onRequestAudiogram;
 		Event<CurveDocument*> onDocumentChanged;
 
 	protected:

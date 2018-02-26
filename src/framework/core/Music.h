@@ -13,13 +13,13 @@ Music player interface
 
 namespace Grafkit {
 
-	class Audiogram  : virtual public Referencable {
+	class Audiogram : virtual public Referencable {
 	public:
-		Audiogram(){}
-		virtual ~Audiogram(){}
+		Audiogram() {}
+		virtual ~Audiogram() {}
 
 		virtual bool GetFFT(float* ptr, int segcount) { return false; }
-		virtual bool GetWaveform(float* ptr, double begin, double end) { return false; }
+		virtual bool GetWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec) { return false; }
 	};
 
 	class Music : virtual public Referencable, public Timer, public Audiogram
@@ -48,7 +48,7 @@ namespace Grafkit {
 
 		// Audiogram
 		//virtual bool GetFFT(float* ptr, int segcount) = 0;
-		//virtual bool GetWaveform(float* ptr, double startMs, double stopMs) = 0;
+		//virtual bool GetWaveform(float *&ptr, size_t &length, size_t &samplePerSec) { return false; }
 
 		virtual void ToggleMute() {}
 
