@@ -22,6 +22,10 @@ namespace {
 
 CurvePointItem::CurvePointItem(QPointF coord, QPointF tangent, QGraphicsItem* parent) : QGraphicsItem(parent)
 {
+	m_id = 0, m_subid = 0;
+	m_color = 0; 
+	m_nodeType = 0;
+
 	m_coord = QPointF(coord);
 	m_tangent = QPointF(tangent);
 	m_showTangent = false;
@@ -34,6 +38,10 @@ CurvePointItem::CurvePointItem(QPointF coord, QPointF tangent, QGraphicsItem* pa
 
 CurvePointItem::CurvePointItem(const CurvePointItem& cpi) : QGraphicsItem(cpi.parentItem())
 {
+	m_id = cpi.m_id, m_subid = cpi.m_subid;
+	m_color = cpi.m_color;
+	m_nodeType = cpi.m_nodeType;
+
 	m_coord = QPointF(cpi.m_coord);
 	m_tangent = QPointF(cpi.m_tangent);
 	m_showTangent = false;
@@ -57,7 +65,7 @@ void CurvePointItem::recalculatePosition() {
 	if (m_coord.x() < 0.0f)
 		m_coord.setX(0.0f);
 
-	setPos(ces->calculatePosition(m_coord));
+	setPos(ces->point2Screen(m_coord));
 }
 
 void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
@@ -137,9 +145,14 @@ void CurvePointItem::setTangent(QPointF t) {
 
 void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	switch (event->button()) {
+	case Qt::LeftButton:
+		onStartEdit(this);
+		break;
+
 	case Qt::RightButton:
 		// ... 
 		break;
+
 	default:
 		QGraphicsItem::mousePressEvent(event);
 		break;
@@ -149,9 +162,13 @@ void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 
 void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 	switch (event->button()) {
+	case Qt::LeftButton:
+		onCommitEdit(this);
+
 	case Qt::RightButton:
 		// ... 
 		break;
+
 	default:
 		QGraphicsItem::mouseReleaseEvent(event);
 		break;
@@ -160,44 +177,16 @@ void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 void CurvePointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-	CurveEditorScene* ces = (CurveEditorScene*)scene();
+	const CurveEditorScene* ces = (CurveEditorScene*)scene();
+
 	if (m_showTangent) {
-
-		// todo: ezt ki kell rakni kulon
-
-		m_radix = sqrt(event->pos().x()*event->pos().x() + event->pos().y()*event->pos().y()) / 32.0f;
-		if (m_radix == 0.0f) m_radix = 0.01f;
-		m_radix2 = m_radix;
-
-		float angle = atan2(event->pos().y(), event->pos().x());
-		float epsilon = 0.005f;
-		if (angle < -M_PI / 2.0f + epsilon) angle = -M_PI / 2.0f + epsilon;
-		else if (angle > M_PI / 2.0f - epsilon) angle = M_PI / 2.0f - epsilon;
-
-		m_tangent.setX(cos(angle)*m_radix / ces->scale().width());
-		m_tangent.setY(-sin(angle)*m_radix / ces->scale().height());
-
-		// set tangent here
+		editTangent(event);
 	}
 	else {
-
-		// todo: ezt ki kell rakni kulon
-
-		int result = 0;
-		QPointF pos = QPointF(
-			(event->scenePos().x() - ces->offset().x()) / ces->scale().width(),
-			(event->scenePos().y() - ces->offset().y()) / -ces->scale().height()
-		);
-
-		onMove(&result, pos.x(), pos.y());
-	
-		if (result) {
-			m_coord = pos;
-		}
+		editPosition(event);
 	}
 
-	// ha tobb van kiejolve, akkor azt is mozgatni kell 
-
+	// Ha tobb elem van kijelolve, akkor azokat lehet mozgatni elvileg egyben
 	foreach(QGraphicsItem* it, ces->selectedItems())
 	{
 		CurvePointItem* cpit = dynamic_cast<CurvePointItem*>(it);
@@ -219,24 +208,11 @@ void CurvePointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 
 // ezzel lehet a tobbit mozgatni
 void CurvePointItem::fakeMouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-	CurveEditorScene* ces = (CurveEditorScene*)scene();
 	if (m_showTangent) {
-		m_radix = sqrt(event->pos().x()*event->pos().x() + event->pos().y()*event->pos().y()) / 32.0f;
-		if (m_radix == 0.0f) m_radix = 0.01f;
-		m_radix2 = m_radix;
-
-		float angle = atan2(event->pos().y(), event->pos().x());
-		float epsilon = 0.005f;
-		if (angle < -M_PI / 2.0f + epsilon) angle = -M_PI / 2.0f + epsilon;
-		else if (angle > M_PI / 2.0f - epsilon) angle = M_PI / 2.0f - epsilon;
-		m_tangent.setX(cos(angle)*m_radix / ces->scale().width());
-		m_tangent.setY(sin(angle)*m_radix / ces->scale().height());
+		editTangent(event);
 	}
 	else {
-		m_coord = QPointF(
-			(event->scenePos().x() - ces->offset().x()) / ces->scale().width(),
-			(event->scenePos().y() - ces->offset().y()) / -ces->scale().height()
-		);
+		editPosition(event);
 	}
 
 	scene()->update();
@@ -274,6 +250,35 @@ void Idogep::CurvePointItem::keyReleaseEvent(QKeyEvent * event)
 	else {
 		event->ignore();
 	}
+}
+
+void Idogep::CurvePointItem::editTangent(QGraphicsSceneMouseEvent * event)
+{
+	const CurveEditorScene* ces = (CurveEditorScene*)scene();
+
+	m_radix = sqrt(event->pos().x()*event->pos().x() + event->pos().y()*event->pos().y()) / 32.0f;
+	if (m_radix == 0.0f) 
+		m_radix = 0.01f;
+
+	m_radix2 = m_radix;
+
+	float angle = atan2(event->pos().y(), event->pos().x());
+	float epsilon = 0.005f;
+	if (angle < -M_PI / 2.0f + epsilon) angle = -M_PI / 2.0f + epsilon;
+	else if (angle > M_PI / 2.0f - epsilon) angle = M_PI / 2.0f - epsilon;
+
+	m_tangent.setX(cos(angle)*m_radix / ces->scale().width());
+	m_tangent.setY(-sin(angle)*m_radix / ces->scale().height());
+
+	onMoveTangent(this);
+}
+
+void Idogep::CurvePointItem::editPosition(QGraphicsSceneMouseEvent * event)
+{
+	const CurveEditorScene* ces = (CurveEditorScene*)scene();
+	m_coord = ces->screen2Point(event->scenePos());
+
+	onMovePoint(this);
 }
 
 void Idogep::CurvePointItem::toggleTangentEditing()

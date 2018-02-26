@@ -21,7 +21,8 @@ namespace Idogep {
 		QSizeF scale() const;
 		QPointF offset() const;
 
-		QPointF calculatePosition(QPointF point) const;
+		QPointF point2Screen(QPointF point) const;
+		QPointF screen2Point(QPointF point) const;
 
 		void documentChanged(CurveDocument * doc);
 

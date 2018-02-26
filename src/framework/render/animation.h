@@ -60,11 +60,14 @@ namespace Grafkit {
 
 			Key() : m_key(0), m_value(), m_type(KI_linear), m_tangent(0.) {}
 			Key(float t, V value) : m_key(t), m_value(value), m_type(KI_linear), m_tangent(0.) {}
+			Key(Key<V> const &other) : m_key(other.m_key), m_value(other.m_value), m_type(other.m_type), m_tangent(other.m_tangent) {}
 
 			enum KeyInterpolation_e m_type;
 
 			float m_key;
 			V m_value;
+
+			// lehet nem is kell majd vagy nem igy
 			float m_tangent;
 
 		};
@@ -79,6 +82,12 @@ namespace Grafkit {
 			typedef V value_t;
 
 			Track() {}
+
+			Track(Track<V> &other) {
+				for (size_t i = 0; i < other.m_track.size(); i++) {
+					m_track.push_back(Key<V>(other.m_track.at(i)));
+				}
+			}
 
 			size_t GetKeyCount() { return m_track.size(); }
 

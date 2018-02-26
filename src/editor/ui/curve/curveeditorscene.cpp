@@ -14,6 +14,14 @@
 
 using namespace Idogep;
 
+namespace {
+	const QColor grey = QColor(192, 192, 192);
+	const QColor red = QColor(255, 128, 128);
+	const QColor blue = QColor(128, 128, 255);
+	const QColor green = QColor(128, 255, 128);
+	const QColor purple = QColor(255, 128, 255);
+}
+
 CurveEditorScene::CurveEditorScene(CurveEditorWidget* pWidget, QObject* parent) : QGraphicsScene(parent)
 {
 	setBackgroundBrush(QColor(48, 48, 48));
@@ -286,7 +294,7 @@ float CurveEditorScene::simpleInterpolate(QList<CurvePointItem*>* list, float t)
 	return 0.0f; // should never happen !
 }
 
-QPointF Idogep::CurveEditorScene::calculatePosition(QPointF point) const
+QPointF Idogep::CurveEditorScene::point2Screen(QPointF point) const
 {
 	return QPointF(
 		point.x() * scale().width() + offset().x(),
@@ -294,14 +302,16 @@ QPointF Idogep::CurveEditorScene::calculatePosition(QPointF point) const
 	);
 }
 
+QPointF Idogep::CurveEditorScene::screen2Point(QPointF point) const
+{
+	return QPointF(
+		(point.x() - offset().x()) / scale().width(),
+		(point.y() - offset().y()) / -scale().height()
+	);
+}
+
 void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect)
 {
-	const QColor grey = QColor(192, 192, 192);
-	const QColor red = QColor(255, 128, 128);
-	const QColor blue = QColor(128, 128, 255);
-	const QColor green = QColor(128, 255, 128);
-	const QColor purple = QColor(255, 128, 255);
-
 	// 2. draw the curves.
 	QList<CurvePointItem*> *points = m_document->getCurvePoints();
 	auto track = m_document->getTrack();
@@ -342,9 +352,9 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 				auto k0 = track->GetKey(i);
 				auto k1 = track->GetKey(i + 1);
 
-				int steps = 32;
-				double stepWidth = 0.; 
 				// valahogy lehetne optiomalgatni ezt is 
+				int steps = 32;
+				double stepWidth = 0.;
 				steps = 64;
 				stepWidth = (k1.m_key - k0.m_key) / steps;
 
@@ -353,12 +363,12 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 					double v = track->GetValue(t);
 
 					QPointF p1(t, track->GetValue(t));
+					p1 = this->point2Screen(p1); /*QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());*/
+
 					QPointF p2(t + stepWidth, track->GetValue(t + stepWidth));
+					p2 = this->point2Screen(p2); /*QPointF(p2.x() * m_scale.width(), p2.y() * -m_scale.height());*/
 
-					p1 = QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());
-					p2 = QPointF(p2.x() * m_scale.width(), p2.y() * -m_scale.height());
-
-					painter->drawLine(p1 + m_ofs, p2 + m_ofs);
+					painter->drawLine(p1, p2);
 				}
 			}
 		}
@@ -432,7 +442,6 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 		(m_demoTime * m_scale.width() + m_ofs.x()), rect.y() + rect.height()
 	);
 
-
 	QString strTime;
 	int minutes = int(m_demoTime) / 60;
 	if (minutes < 10) strTime.append("0");
@@ -470,7 +479,7 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 	float barOffset = 0.0f;
 	if (abs(rect.x() + rect.width() - (m_demoTime * m_scale.width() + m_ofs.x())) < 128) barOffset = -56.0f;
 
-	painter->setFont(QFont(QString("Sans"), 8));
+	painter->setFont(QFont(QString("Open Sans"), 8));
 	painter->setPen(Qt::NoPen);
 	painter->setBrush(QColor(48, 224, 48, 96));
 	painter->drawRect(QRectF(QPointF((m_demoTime * m_scale.width() + m_ofs.x()) + barOffset, rect.height() - 16.0f), QSizeF(56.0f, 16.0f)));
