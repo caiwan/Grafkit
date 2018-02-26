@@ -45,3 +45,13 @@ void Idogep::SplashWidget::showEvent(QShowEvent* event)
 {
     QWidget::showEvent(event);
 }
+
+Idogep::AboutDialog::AboutDialog(QWidget * parent) : QDialog(parent)
+{
+	m_widget = new SplashWidget(this);
+	connect(m_widget, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
+Idogep::AboutDialog::~AboutDialog()
+{
+}

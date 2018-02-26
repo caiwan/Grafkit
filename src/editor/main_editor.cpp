@@ -18,20 +18,27 @@
 using namespace Idogep;
 using namespace Grafkit;
 
+
+Idogep::EditorApplication * Idogep::EditorApplication::s_self;
+
 Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	QObject(nullptr),
 	Grafkit::ClonableInitializer(),
 	Grafkit::IResourceManager(),
 	m_qApp(argc, argv), m_document(nullptr)
 {
+	assert(s_self == nullptr);
+
 	QCoreApplication::setOrganizationName("IndustrialRevolutioners");
 	QCoreApplication::setOrganizationDomain("caiwan.github.io");
 	QCoreApplication::setApplicationName(APP_NAME);
 
 	QFile f(":/res/css/global.css"); f.open(QFile::ReadOnly);
 	m_qApp.setStyleSheet(f.readAll()); f.close();
-	
+
 	m_file_loader = new FileAssetFactory("./");
+
+	s_self = this;
 }
 
 int Idogep::EditorApplication::execute()
@@ -83,18 +90,30 @@ void Idogep::EditorApplication::onMainWindowClose(QCloseEvent * event)
 
 void Idogep::EditorApplication::onNew()
 {
-	// ablak goez here 
+	if (m_document && m_document->dirty()) {
+		// ablak goez here 
+		// + save
+		// + return ha nem 
+		onBeforePreload -= Delegate(m_document, &EditorDocument::beforePreload);
+		onAfterPreload -= Delegate(m_document, &EditorDocument::afterPreload);
+		delete m_document;
+		m_document = nullptr;
+	}
+
 	m_document = new EditorDocument();
+
+	onBeforePreload += Delegate(m_document, &EditorDocument::beforePreload);
+	onAfterPreload += Delegate(m_document, &EditorDocument::afterPreload);
+
 	m_wnd->setDocument(m_document);
 
-	m_document->preload(this);
-	DoPrecalc();
-	m_document->preloaded(this);
+	preload();
 }
 
 void Idogep::EditorApplication::mainloop()
 {
 	m_render.BeginSceneDev();
+	// render document
 	m_render.EndScene();
 
 	this->nextTick();
@@ -108,6 +127,13 @@ void Idogep::EditorApplication::loaderFinished()
 void Idogep::EditorApplication::nextTick()
 {
 	QTimer::singleShot(0, this, SLOT(mainloop()));
+}
+
+void Idogep::EditorApplication::preload()
+{
+	onBeforePreload(this);
+	DoPrecalc();
+	onAfterPreload(m_render);
 }
 
 

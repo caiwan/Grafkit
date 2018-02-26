@@ -2,6 +2,7 @@
 
 #include <qobject.h>
 
+#include "render/renderer.h"
 #include "render/animation.h"
 #include "core/Music.h"
 
@@ -30,7 +31,7 @@ namespace Idogep {
 		// TODO: musicChangedEvent
 
 		void getWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec);
-		
+
 	protected:
 		Grafkit::MusicResRef m_music;
 		// ... 
@@ -45,8 +46,8 @@ namespace Idogep {
 		Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
 		Idogep::CurveDocument * curveDocument() { return m_testCurveDocument; }
 
-		// preloadEvents
-		// 
+		void beforePreload(Grafkit::IResourceManager* const & resman);
+		void afterPreload(Grafkit::Renderer & renderer);
 
 		void setDirty() { m_isDirty = true; }
 		bool dirty() { return m_isDirty; }

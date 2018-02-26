@@ -96,3 +96,12 @@ Idogep::EditorDocument::EditorDocument()
 	m_testCurveDocument->onRequestWaveform += Delegate(this, &MusicProxy::getWaveform);
 }
 
+void Idogep::EditorDocument::beforePreload(Grafkit::IResourceManager * const & resman)
+{
+	 // ... 
+}
+
+void Idogep::EditorDocument::afterPreload(Grafkit::Renderer & renderer)
+{
+	// ...
+}

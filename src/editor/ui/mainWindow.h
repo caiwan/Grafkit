@@ -8,7 +8,9 @@ namespace Idogep {
 	class EditorDocument;
 
 	class EditorApplication;
+
 	class CurveEditorWidget;
+	class AboutDialog;
 
 	class MainWindow : public QMainWindow {
 	public:
@@ -30,6 +32,7 @@ namespace Idogep {
 		QMenu *viewMenu;
 
 		CurveEditorWidget * m_curveEditor;
+		AboutDialog *m_aboutDlg;
 	};
 
 }

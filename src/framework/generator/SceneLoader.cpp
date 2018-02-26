@@ -117,7 +117,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		if (actor && entity) {
 			actor->AddEntity(entity);
 
-			LOGGER(Log::Logger().Info("%hu (\"%s\") -> %hu (\"%s\")", key, entity->GetName().c_str()), val, actor->GetName().c_str());
+			LOGGER(Log::Logger().Info("%hu (\"%s\") -> %hu (\"%s\")", key, entity->GetName().c_str(), val, actor->GetName().c_str()));
 		}
 	}
 

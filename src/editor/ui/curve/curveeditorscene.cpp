@@ -251,46 +251,6 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 }
 
 float CurveEditorScene::simpleInterpolate(QList<CurvePointItem*>* list, float t) {
-	//if (!list) return 0.0f;
-	//if (list->isEmpty()) return 0.0f;
-	//if (list->count() == 1) return list->at(0)->coord().y();
-
-	//QList<CurvePointItem*> unsortedPointItems;
-	//if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*list);
-	//QList<CurvePointItem*> sortedPointItems;
-	//while (!unsortedPointItems.isEmpty()) {
-	//	CurvePointItem* minPoint = NULL;
-	//	float minTime = 9999.0f;
-	//	for (int i = 0; i < unsortedPointItems.size(); i++) {
-	//		if (unsortedPointItems[i]->time() < minTime) {
-	//			minPoint = unsortedPointItems[i];
-	//			minTime = unsortedPointItems[i]->time();
-	//		}
-	//	}
-	//	sortedPointItems.append(minPoint);
-	//	unsortedPointItems.removeOne(minPoint);
-	//}
-
-	//for (int i = 0; i < sortedPointItems.size(); i++) {
-	//	if (!i) {
-	//		if (t <= sortedPointItems.at(i)->coord().x()) return sortedPointItems.at(i)->coord().y();
-	//	}
-	//	else if (i == sortedPointItems.size() - 1) return sortedPointItems.at(i)->coord().y();
-
-	//	if (t > sortedPointItems.at(i)->coord().x() && t <= sortedPointItems.at(i + 1)->coord().x()) {
-	//		qreal TangentX = sortedPointItems.at(i + 1)->coord().x() - sortedPointItems.at(i)->coord().x();
-	//		QPointF Tangent0 = QPointF(TangentX, TangentX * sortedPointItems.at(i)->tangent().y() / sortedPointItems.at(i)->tangent().x());
-	//		QPointF Tangent1 = QPointF(TangentX, TangentX * sortedPointItems.at(i + 1)->tangent().y() / sortedPointItems.at(i + 1)->tangent().x());
-
-	//		return _interpolateHermite(
-	//			sortedPointItems.at(i)->coord(),
-	//			sortedPointItems.at(i + 1)->coord(),
-	//			Tangent0,
-	//			Tangent1,
-	//			(t - sortedPointItems.at(i)->coord().x()) / (sortedPointItems.at(i + 1)->coord().x() - sortedPointItems.at(i)->coord().x())
-	//		).y();
-	//	}
-	//}
 	return 0.0f; // should never happen !
 }
 
@@ -316,67 +276,63 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 	QList<CurvePointItem*> *points = m_document->getCurvePoints();
 	auto track = m_document->getTrack();
 
-	if (!points->isEmpty()) {
-		painter->setRenderHint(QPainter::Antialiasing);
-		painter->setPen(QPen(grey));
+	if (points->isEmpty())
+		return;
 
-		// boundaries
-		double tmin = offset().x();
-		int idmin = track->FindKeyIndex(tmin);
+	painter->setRenderHint(QPainter::Antialiasing);
+	painter->setPen(QPen(grey));
 
-		double tmax = rect.width() / scale().width() - tmin;
-		int idmax = track->FindKeyIndex(tmax) + 1;
+	// boundaries
+	QPointF pMin = screen2Point(rect.topLeft());
+	int idmin = track->FindKeyIndex(pMin.x());
 
+	QPointF pMax = screen2Point(rect.bottomRight());
+	int idmax = track->FindKeyIndex(pMax.x()) + 1;
 
-		if (idmin == 0 && points->at(0)->x() > rect.x())
-			painter->drawLine(
-				0, points->at(0)->pos().y(),
-				points->at(0)->pos().x(), points->at(0)->pos().y()
-			);
+	if (idmin == 0 && points->at(0)->x() > rect.x())
+		painter->drawLine(
+			0, points->at(0)->pos().y(),
+			points->at(0)->pos().x(), points->at(0)->pos().y()
+		);
 
-		if (idmax == track->GetKeyCount() && points->last()->pos().x() < rect.x() + rect.width()) {
-			painter->drawLine(
-				points->last()->pos().x(), points->last()->pos().y(),
-				rect.x() + rect.width(), points->last()->pos().y()
-			);
-			idmax--; // avoid max+1 index
-			points->last()->setVisible(true);
+	if (points->last()->pos().x() < rect.x() + rect.width()) {
+		painter->drawLine(
+			points->last()->pos().x(), points->last()->pos().y(),
+			rect.x() + rect.width(), points->last()->pos().y()
+		);
+
+		points->last()->setVisible(true);
+	}
+
+	if (idmax >= track->GetKeyCount() - 1)
+		idmax = track->GetKeyCount() - 1; // avoid max+1 index
+
+	for (int i = idmin; i < idmax; i++)
+	{
+		CurvePointItem *point = points->at(i);
+		points->at(i)->setVisible(true);
+
+		auto k0 = track->GetKey(i);
+		auto k1 = track->GetKey(i + 1);
+
+		// valahogy lehetne optiomalgatni ezt is 
+		int steps = 32;
+		double stepWidth = 0.;
+		steps = 64;
+		stepWidth = (k1.m_key - k0.m_key) / steps;
+
+		for (int j = 0; j < steps; j++) {
+			double t = k0.m_key + j * stepWidth;
+			double v = track->GetValue(t);
+
+			QPointF p1(t, track->GetValue(t));
+			p1 = this->point2Screen(p1);
+
+			QPointF p2(t + stepWidth, track->GetValue(t + stepWidth));
+			p2 = this->point2Screen(p2);
+
+			painter->drawLine(p1, p2);
 		}
-
-		if (idmax - idmin > 1 && idmax) {
-			for (int i = idmin; i < idmax; i++)
-			{
-				CurvePointItem *point = points->at(i);
-				points->at(i)->setVisible(true);
-
-				auto k0 = track->GetKey(i);
-				auto k1 = track->GetKey(i + 1);
-
-				// valahogy lehetne optiomalgatni ezt is 
-				int steps = 32;
-				double stepWidth = 0.;
-				steps = 64;
-				stepWidth = (k1.m_key - k0.m_key) / steps;
-
-				for (int j = 0; j < steps; j++) {
-					double t = k0.m_key + j * stepWidth;
-					double v = track->GetValue(t);
-
-					QPointF p1(t, track->GetValue(t));
-					p1 = this->point2Screen(p1); /*QPointF(p1.x() * m_scale.width(), p1.y() * -m_scale.height());*/
-
-					QPointF p2(t + stepWidth, track->GetValue(t + stepWidth));
-					p2 = this->point2Screen(p2); /*QPointF(p2.x() * m_scale.width(), p2.y() * -m_scale.height());*/
-
-					painter->drawLine(p1, p2);
-				}
-			}
-		}
-		else {
-			// ... 
-		}
-
-
 	}
 }
 

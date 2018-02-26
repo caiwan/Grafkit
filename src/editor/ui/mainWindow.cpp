@@ -9,6 +9,7 @@
 #include "main_editor.h"
 
 #include "ui/curve/curveeditorwidget.h"
+#include "ui/splashwidget.h"
 
 using namespace Idogep;
 
@@ -24,6 +25,7 @@ Idogep::MainWindow::MainWindow(EditorApplication *const& app)
 
 void Idogep::MainWindow::setDocument(EditorDocument * document)
 {
+	// ez nem terljesen jo, disztributalni kell az esemenyeket
 	m_curveEditor->onDocumentChanged(document->curveDocument());
 }
 
@@ -74,8 +76,10 @@ void Idogep::MainWindow::createActions(EditorApplication *const& app)
 
 	QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
-	/*QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
-	aboutAct->setStatusTip(tr("Show the application's About box"));*/
+	m_aboutDlg = new AboutDialog();
+
+	//QAction *aboutAct = helpMenu->addAction(tr("&About"), m_aboutDlg, &QDialog::show);
+	//aboutAct->setStatusTip(tr("Show the application's About box"));
 
 	QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
 	aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));

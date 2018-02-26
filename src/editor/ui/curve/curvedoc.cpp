@@ -111,6 +111,7 @@ void Idogep::CurveDocument::recalculate()
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {
 			m_curve->at(i)->recalculatePosition();
+			m_curve->at(i)->setVisible(false);
 		}
 	}
 }
