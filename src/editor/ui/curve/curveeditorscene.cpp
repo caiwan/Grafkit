@@ -178,10 +178,12 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 			m_modifyDemoTime = true;
 			break;
 		case Qt::MidButton:
-			m_modifyOfs = true;
-			break;
-		case Qt::RightButton:
+			// ctrl vagy shift mod. billre modositsa a masikat
 			m_modifyScale = true;
+			break;
+
+		case Qt::RightButton:
+			m_modifyOfs = true;
 			break;
 		default:
 			break;
@@ -207,7 +209,7 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 	}
 	else if (m_modifyScale) {
 		QPointF p(QPointF(event->scenePos() - event->lastScenePos()));
-		m_scale += QSizeF(p.x(), p.y());
+		m_scale += QSizeF(p.x(), p.y()) / 4.;
 		if (m_scale.width() < 8.0f) m_scale.setWidth(8.0f);
 		if (m_scale.height() < 8.0f) m_scale.setHeight(8.0f);
 	}
@@ -250,9 +252,9 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 		);
 }
 
-float CurveEditorScene::simpleInterpolate(QList<CurvePointItem*>* list, float t) {
-	return 0.0f; // should never happen !
-}
+//float CurveEditorScene::simpleInterpolate(QList<CurvePointItem*>* list, float t) {
+//	return 0.0f; // should never happen !
+//}
 
 QPointF Idogep::CurveEditorScene::point2Screen(QPointF point) const
 {

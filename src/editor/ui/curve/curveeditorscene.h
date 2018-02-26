@@ -44,7 +44,7 @@ namespace Idogep {
 		//float demoTime() const;
 		//QList<CurvePointItem*>* curve() const;
 
-		float simpleInterpolate(QList<CurvePointItem*>* list, float t);
+		//float simpleInterpolate(QList<CurvePointItem*>* list, float t);
 
 		//void cutSelectedPoints();
 		//void copySelectedPoints();
