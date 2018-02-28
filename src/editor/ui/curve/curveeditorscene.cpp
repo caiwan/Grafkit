@@ -159,14 +159,14 @@ void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
 void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	bool thereIsAnItem = false;
-	/*if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++)
-	{
-		if (m_pointItems->at(i)->contains(m_pointItems->at(i)->mapFromScene(event->scenePos()))) {
-			thereIsAnItem = true;
-			break;
-		}
-	}
-*/
+	//if (m_pointItems) for (int i = 0; i < m_pointItems->size(); i++)
+	//{
+	//	if (m_pointItems->at(i)->contains(m_pointItems->at(i)->mapFromScene(event->scenePos()))) {
+	//		thereIsAnItem = true;
+	//		break;
+	//	}
+	//}
+
 	if (!thereIsAnItem) {
 		switch (event->button()) {
 		case Qt::LeftButton:
@@ -232,12 +232,6 @@ void Idogep::CurveEditorScene::viewResized(QResizeEvent * event)
 	updateAudiogram();
 }
 
-//void CurveEditorScene::deleteCurvePoint(CurvePointItem* cpi) {
-//	if (!m_pointItems) return;
-//	removeItem(cpi);
-//	delete m_pointItems->takeAt(m_pointItems->indexOf(cpi));
-//	update();
-//}
 
 // -> GK
 QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t) {
@@ -251,10 +245,6 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 		(t3 - t2) * r1
 		);
 }
-
-//float CurveEditorScene::simpleInterpolate(QList<CurvePointItem*>* list, float t) {
-//	return 0.0f; // should never happen !
-//}
 
 QPointF Idogep::CurveEditorScene::point2Screen(QPointF point) const
 {
@@ -447,192 +437,6 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 
 }
 
-//void CurveEditorScene::setCurrentCurve(QList<CurvePointItem*>* curve) {
-//	m_curCurve = curve;
-//	if (m_pointItems) foreach(CurvePointItem* cpi, *m_pointItems) {
-//		removeItem(cpi);
-//	}
-//
-//	m_pointItems = curve;
-//
-//	foreach(CurvePointItem* cpi, *m_pointItems) {
-//		addItem(cpi);
-//		cpi->update();
-//	}
-//	update();
-//}
-//
-//void CurveEditorScene::setDemoTime(float t)
-//{
-//	m_demoTime = t;
-//	m_demoTimeChanged = true;
-//	m_widget->setDemoTime(t, true);
-//	update();
-//}
-//
-//float CurveEditorScene::demoTime() const
-//{
-//	return m_demoTime;
-//}
-//
-//void CurveEditorScene::setFollowTimeBar(bool b)
-//{
-//	m_followTimeBar = b;
-//}
-//
-//void CurveEditorScene::setDisplayWaveform(bool b)
-//{
-//	m_displayWaveform = b;
-//	update();
-//}
-//
-//void CurveEditorScene::getNewAudiogram()
-//{
-//	requestAudiogram();
-//	update();
-//}
-//
-//QList<CurvePointItem*>* CurveEditorScene::curve() const
-//{
-//	return m_curCurve;
-//}
-
-//void CurveEditorScene::cutSelectedPoints()
-//{
-//	if (!m_pointItems) return;
-//
-//	QClipboard* cb = QApplication::clipboard();
-//	cb->clear();
-//
-//	QString data;
-//
-//	CurvePointItem* firstItem = NULL;
-//
-//	QList<CurvePointItem*> unsortedPointItems;
-//	if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*m_pointItems);
-//	QList<CurvePointItem*> sortedPointItems;
-//	while (!unsortedPointItems.isEmpty()) {
-//		CurvePointItem* minPoint = NULL;
-//		float minTime = 9999.0f;
-//		for (int i = 0; i < unsortedPointItems.size(); i++) {
-//			if (unsortedPointItems[i]->time() < minTime) {
-//				minPoint = unsortedPointItems[i];
-//				minTime = unsortedPointItems[i]->time();
-//			}
-//		}
-//		sortedPointItems.append(minPoint);
-//		unsortedPointItems.removeOne(minPoint);
-//	}
-//
-//	QList<CurvePointItem*> pointsToDelete;
-//
-//	foreach(QGraphicsItem* it, sortedPointItems)
-//	{
-//		CurvePointItem* cpit = dynamic_cast<CurvePointItem*>(it);
-//		if (!cpit) continue;
-//		if (!cpit->isSelected()) continue;
-//		if (!firstItem) firstItem = cpit;
-//		float delta = cpit->coord().x() - firstItem->coord().x();
-//
-//		data.append(QString::number(delta, 'f', 6));
-//		data.append(QString("\t"));
-//		data.append(QString::number(cpit->coord().y(), 'f', 6));
-//		data.append(QString("\t"));
-//		data.append(QString::number(cpit->tangent().x(), 'f', 6));
-//		data.append(QString("\t"));
-//		data.append(QString::number(cpit->tangent().y(), 'f', 6));
-//		data.append(QString("\n"));
-//
-//		pointsToDelete.append(cpit);
-//	}
-//	cb->setText(data.prepend("FRQ_PRDC_DATA\n"));
-//
-//	for (int i = 0; i < pointsToDelete.size(); i++)
-//	{
-//		deleteCurvePoint(pointsToDelete.at(i));
-//	}
-//}
-
-//void CurveEditorScene::copySelectedPoints()
-//{
-//	if (!m_pointItems) return;
-//
-//	QClipboard* cb = QApplication::clipboard();
-//	cb->clear();
-//
-//	QString data;
-//
-//	CurvePointItem* firstItem = NULL;
-//
-//	QList<CurvePointItem*> unsortedPointItems;
-//	if (m_pointItems) unsortedPointItems = QList<CurvePointItem*>(*m_pointItems);
-//	QList<CurvePointItem*> sortedPointItems;
-//	while (!unsortedPointItems.isEmpty()) {
-//		CurvePointItem* minPoint = NULL;
-//		float minTime = 9999.0f;
-//		for (int i = 0; i < unsortedPointItems.size(); i++) {
-//			if (unsortedPointItems[i]->time() < minTime) {
-//				minPoint = unsortedPointItems[i];
-//				minTime = unsortedPointItems[i]->time();
-//			}
-//		}
-//		sortedPointItems.append(minPoint);
-//		unsortedPointItems.removeOne(minPoint);
-//	}
-//
-//	foreach(QGraphicsItem* it, sortedPointItems)
-//	{
-//		CurvePointItem* cpit = dynamic_cast<CurvePointItem*>(it);
-//		if (!cpit) continue;
-//		if (!cpit->isSelected()) continue;
-//		if (!firstItem) firstItem = cpit;
-//		float delta = cpit->coord().x() - firstItem->coord().x();
-//
-//		data.append(QString::number(delta, 'f', 6));
-//		data.append(QString("\t"));
-//		data.append(QString::number(cpit->coord().y(), 'f', 6));
-//		data.append(QString("\t"));
-//		data.append(QString::number(cpit->tangent().x(), 'f', 6));
-//		data.append(QString("\t"));
-//		data.append(QString::number(cpit->tangent().y(), 'f', 6));
-//		data.append(QString("\n"));
-//	}
-//	cb->setText(data.prepend("FRQ_PRDC_DATA\n"));
-//}
-
-//void CurveEditorScene::pasteSelectedPoints()
-//{
-//	if (!m_pointItems) return;
-//
-//	QClipboard* cb = QApplication::clipboard();
-//
-//	QString dataStr = cb->text();
-//	if (dataStr.isEmpty()) return;
-//
-//	QStringList data = dataStr.split("\n");
-//	if (data[0] != QString("FRQ_PRDC_DATA")) return;
-//	data.removeFirst();
-//	data.removeLast();
-//
-//	foreach(QString point, data)
-//	{
-//		QStringList strCoords = point.split("\t");
-//		float cx = m_demoTime + strCoords.at(0).toFloat();
-//		float cy = strCoords.at(1).toFloat();
-//
-//		float tx = m_demoTime + strCoords.at(2).toFloat();
-//		float ty = strCoords.at(3).toFloat();
-//
-//		CurvePointItem* ncpi = new CurvePointItem();
-//		ncpi->setCoord(QPointF(cx, cy));
-//		ncpi->setTangent(QPointF(tx, ty));
-//		m_pointItems->append(ncpi);
-//		m_curCurve->append(ncpi);
-//		addItem(ncpi);
-//	}
-//
-//	update();
-//}
 
 void CurveEditorScene::updateAudiogram()
 {

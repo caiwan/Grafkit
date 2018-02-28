@@ -33,23 +33,6 @@ namespace Idogep {
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 		void viewResized(QResizeEvent *event);
 
-		//void deleteCurvePoint(CurvePointItem* cpi);
-
-		//void setCurrentCurve(QList<CurvePointItem*>* curve);
-		//void setDemoTime(float t);
-		//void setFollowTimeBar(bool b);
-		//void setDisplayWaveform(bool b);
-		//void getNewAudiogram();
-
-		//float demoTime() const;
-		//QList<CurvePointItem*>* curve() const;
-
-		//float simpleInterpolate(QList<CurvePointItem*>* list, float t);
-
-		//void cutSelectedPoints();
-		//void copySelectedPoints();
-		//void pasteSelectedPoints();
-
 	private:
 		
 		void drawCurve(QPainter* painter, const QRectF& r);

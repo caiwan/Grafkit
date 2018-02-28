@@ -48,15 +48,15 @@ namespace Idogep {
 
 	protected:
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
-		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+		//virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 		void fakeMouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
 
-		virtual void keyPressEvent(QKeyEvent * event);
-		virtual void keyReleaseEvent(QKeyEvent * event);
+		//virtual void keyPressEvent(QKeyEvent * event);
+		//virtual void keyReleaseEvent(QKeyEvent * event);
 
 		void editTangent(QGraphicsSceneMouseEvent* event);
 		void editPosition(QGraphicsSceneMouseEvent* event);

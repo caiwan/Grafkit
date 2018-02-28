@@ -145,8 +145,9 @@ void CurvePointItem::setTangent(QPointF t) {
 
 void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	switch (event->button()) {
-	case Qt::LeftButton:
-		onStartEdit(this);
+	//case Qt::LeftButton:
+		//onStartEdit(this);
+		//QGraphicsItem::mousePressEvent(event);
 		break;
 
 	case Qt::RightButton:
@@ -160,21 +161,22 @@ void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	scene()->update();
 }
 
-void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-	switch (event->button()) {
-	case Qt::LeftButton:
-		onCommitEdit(this);
-
-	case Qt::RightButton:
-		// ... 
-		break;
-
-	default:
-		QGraphicsItem::mouseReleaseEvent(event);
-		break;
-	}
-	scene()->update();
-}
+//void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+//	switch (event->button()) {
+//	//case Qt::LeftButton:
+//		//onCommitEdit(this);
+//		//QGraphicsItem::mouseReleaseEvent(event);
+//		//break;
+//	case Qt::RightButton:
+//		// ... 
+//		break;
+//
+//	default:
+//		QGraphicsItem::mouseReleaseEvent(event);
+//		break;
+//	}
+//	scene()->update();
+//}
 
 void CurvePointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 	const CurveEditorScene* ces = (CurveEditorScene*)scene();
@@ -223,34 +225,34 @@ void CurvePointItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) {
 	//ces->deleteCurvePoint(this);
 }
 
-void Idogep::CurvePointItem::keyPressEvent(QKeyEvent * event)
-{
-	// itt csak modosito billnetyuket lenene erdemes 
-	QGraphicsItem::keyPressEvent(event);
-}
-
-void Idogep::CurvePointItem::keyReleaseEvent(QKeyEvent * event)
-{
-	if (isSelected()) {
-		switch (event->key())
-		{
-		case KEY_SET_INTERPOLATION:
-			// set interpolation, toggle 
-			event->accept();
-			break;
-		case KEY_SET_TANGENT:
-			toggleTangentEditing();
-			event->accept();
-			break;
-		default:
-			event->ignore();
-			break;
-		}
-	}
-	else {
-		event->ignore();
-	}
-}
+//void Idogep::CurvePointItem::keyPressEvent(QKeyEvent * event)
+//{
+//	// itt csak modosito billnetyuket lenene erdemes 
+//	QGraphicsItem::keyPressEvent(event);
+//}
+//
+//void Idogep::CurvePointItem::keyReleaseEvent(QKeyEvent * event)
+//{
+//	if (isSelected()) {
+//		switch (event->key())
+//		{
+//		case KEY_SET_INTERPOLATION:
+//			// set interpolation, toggle 
+//			event->accept();
+//			break;
+//		case KEY_SET_TANGENT:
+//			toggleTangentEditing();
+//			event->accept();
+//			break;
+//		default:
+//			event->ignore();
+//			break;
+//		}
+//	}
+//	else {
+//		event->ignore();
+//	}
+//}
 
 void Idogep::CurvePointItem::editTangent(QGraphicsSceneMouseEvent * event)
 {
