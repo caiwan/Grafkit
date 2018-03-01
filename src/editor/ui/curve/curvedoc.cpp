@@ -111,7 +111,7 @@ void Idogep::CurveDocument::recalculate()
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {
 			m_curve->at(i)->recalculatePosition();
-			m_curve->at(i)->setVisible(false);
+			//m_curve->at(i)->setVisible(true);	// if you change this during the drawing it will not recieve any events
 		}
 	}
 }
@@ -123,6 +123,7 @@ void Idogep::CurveDocument::addCurveToScene(CurveEditorScene * parent)
 			auto point = m_curve->at(i);
 			parent->addItem(point);
 			point->recalculatePosition();
+			//m_curve->at(i)->setVisible(true);
 		}
 	}
 }

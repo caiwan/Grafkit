@@ -12,6 +12,8 @@ using namespace Idogep;
 #define KEY_SET_INTERPOLATION (Qt::Key_I)
 #define KEY_SET_TANGENT (Qt::Key_R)
 
+#define RADIX_DEFUALT (1.f/4.f)
+
 namespace {
 	const QColor colorStep;
 	const QColor colorLinar;
@@ -30,7 +32,7 @@ CurvePointItem::CurvePointItem(QPointF coord, QPointF tangent, QGraphicsItem* pa
 	m_tangent = QPointF(tangent);
 	m_showTangent = false;
 
-	m_radix = m_radix2 = 1.0f / 8.0f;
+	m_radix = m_radix2 = RADIX_DEFUALT;
 
 	setFlag(QGraphicsItem::ItemIsMovable);
 	setFlag(QGraphicsItem::ItemIsSelectable);
@@ -47,7 +49,7 @@ CurvePointItem::CurvePointItem(const CurvePointItem& cpi) : QGraphicsItem(cpi.pa
 	m_showTangent = false;
 
 	m_radix = cpi.m_radix;
-	m_radix2 = 1.0f / 8.0f;
+	m_radix2 = RADIX_DEFUALT;
 
 	setFlag(QGraphicsItem::ItemIsMovable);
 	setFlag(QGraphicsItem::ItemIsSelectable);
@@ -145,13 +147,9 @@ void CurvePointItem::setTangent(QPointF t) {
 
 void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	switch (event->button()) {
-	//case Qt::LeftButton:
-		//onStartEdit(this);
-		//QGraphicsItem::mousePressEvent(event);
-		break;
-
 	case Qt::RightButton:
-		// ... 
+		m_showTangent = true;
+		m_radix2 = m_radix;
 		break;
 
 	default:
@@ -161,22 +159,19 @@ void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	scene()->update();
 }
 
-//void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
-//	switch (event->button()) {
-//	//case Qt::LeftButton:
-//		//onCommitEdit(this);
-//		//QGraphicsItem::mouseReleaseEvent(event);
-//		//break;
-//	case Qt::RightButton:
-//		// ... 
-//		break;
-//
-//	default:
-//		QGraphicsItem::mouseReleaseEvent(event);
-//		break;
-//	}
-//	scene()->update();
-//}
+void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+	switch (event->button()) {
+	case Qt::RightButton:
+		m_showTangent = false;
+		m_radix2 = RADIX_DEFUALT;
+		break;
+
+	default:
+		QGraphicsItem::mouseReleaseEvent(event);
+		break;
+	}
+	scene()->update();
+}
 
 void CurvePointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 	const CurveEditorScene* ces = (CurveEditorScene*)scene();
@@ -258,7 +253,10 @@ void Idogep::CurvePointItem::editTangent(QGraphicsSceneMouseEvent * event)
 {
 	const CurveEditorScene* ces = (CurveEditorScene*)scene();
 
-	m_radix = sqrt(event->pos().x()*event->pos().x() + event->pos().y()*event->pos().y()) / 32.0f;
+	m_radix = sqrt(
+		event->pos().x()*event->pos().x() + 
+		event->pos().y()*event->pos().y()) / 32.0f;
+
 	if (m_radix == 0.0f) 
 		m_radix = 0.01f;
 
@@ -266,8 +264,10 @@ void Idogep::CurvePointItem::editTangent(QGraphicsSceneMouseEvent * event)
 
 	float angle = atan2(event->pos().y(), event->pos().x());
 	float epsilon = 0.005f;
-	if (angle < -M_PI / 2.0f + epsilon) angle = -M_PI / 2.0f + epsilon;
-	else if (angle > M_PI / 2.0f - epsilon) angle = M_PI / 2.0f - epsilon;
+	if (angle < -M_PI / 2.0f + epsilon) 
+		angle = -M_PI / 2.0f + epsilon;
+	else if (angle > M_PI / 2.0f - epsilon) 
+		angle = M_PI / 2.0f - epsilon;
 
 	m_tangent.setX(cos(angle)*m_radix / ces->scale().width());
 	m_tangent.setY(-sin(angle)*m_radix / ces->scale().height());

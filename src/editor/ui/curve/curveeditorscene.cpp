@@ -121,13 +121,23 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	// Draw cursor 
 	drawCursor(painter, rect);
 
-#if 0
+#if 1
 	// debug 
-	if (!m_document) {
+	if (selectedItems().empty()) {
 		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::red));
 	}
 	else {
-		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::green));
+		//painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::green));
+	
+		int xx = 0;
+		int yy = 0;
+		for (int i = 0; i < selectedItems().size(); i++) {
+			painter->fillRect(QRect(6 * xx, 6 * yy, 4, 4), QBrush(Qt::green));
+			xx++;
+			if (xx > 16){
+				xx = 0; yy++;
+			}
+	}
 	}
 #endif
 }
@@ -144,15 +154,15 @@ void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 	//	}
 	//}
 
-	if (!thereIsAnItem) {
-		CurvePointItem* cpi = new CurvePointItem(QPointF((event->scenePos().x() - m_ofs.x()) / m_scale.width(), (event->scenePos().y() - m_ofs.y()) / -m_scale.height()));
-		//m_pointItems->append(cpi);
+	//if (!thereIsAnItem) {
+	//	CurvePointItem* cpi = new CurvePointItem(QPointF((event->scenePos().x() - m_ofs.x()) / m_scale.width(), (event->scenePos().y() - m_ofs.y()) / -m_scale.height()));
+	//	//m_pointItems->append(cpi);
 
-		addItem(cpi);
-		cpi->update();
-		update();
-		views().at(0)->update();
-	}
+	//	addItem(cpi);
+	//	cpi->update();
+	//	update();
+	//	views().at(0)->update();
+	//}
 
 	QGraphicsScene::mouseDoubleClickEvent(event);
 }
