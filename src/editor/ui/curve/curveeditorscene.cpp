@@ -302,7 +302,14 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 	for (int i = idmin; i < idmax; i++)
 	{
 		CurvePointItem *point = points->at(i);
-		points->at(i)->setVisible(true);
+		point->setVisible(true);
+
+		// debug stuff
+		{
+			QRectF rekt = point->boundingRect();
+			rekt.moveCenter(point->pos());
+			painter->fillRect(rekt, QBrush(QColor(255, 0, 0), Qt::Dense6Pattern));
+		}
 
 		auto k0 = track->GetKey(i);
 		auto k1 = track->GetKey(i + 1);
@@ -310,7 +317,7 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 		// valahogy lehetne optiomalgatni ezt is 
 		int steps = 32;
 		double stepWidth = 0.;
-		steps = 64;
+		//steps = 64;
 		stepWidth = (k1.m_key - k0.m_key) / steps;
 
 		for (int j = 0; j < steps; j++) {
@@ -425,7 +432,8 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 	}
 
 	float barOffset = 0.0f;
-	if (abs(rect.x() + rect.width() - (m_demoTime * m_scale.width() + m_ofs.x())) < 128) barOffset = -56.0f;
+	if (abs(rect.x() + rect.width() - (m_demoTime * m_scale.width() + m_ofs.x())) < 128)
+		barOffset = -56.0f;
 
 	painter->setFont(QFont(QString("Open Sans"), 8));
 	painter->setPen(Qt::NoPen);
