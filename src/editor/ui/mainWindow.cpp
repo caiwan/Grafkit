@@ -1,3 +1,4 @@
+#include <string>
 
 #include <QtWidgets>
 #include <QMenu>
@@ -9,6 +10,7 @@
 #include "main_editor.h"
 
 #include "ui/curve/curveeditorwidget.h"
+#include "ui/PlaybackOptionDialog.h"
 #include "ui/splashwidget.h"
 
 using namespace Idogep;
@@ -19,14 +21,29 @@ Idogep::MainWindow::MainWindow(EditorApplication *const& app)
 	createStatusBar(app);
 	createDockWindows(app);
 
-	onMainWindowClose += Delegate(app, &EditorApplication::onMainWindowClose);
-	onDocumentChanged += Delegate(this, &MainWindow::setDocument);
+	// events
+	//m_myEventWrapper = new MainWindowEventWrapper(this);
+	//m_myEventWrapper->onDocumentChanged += Delegate(this, &MainWindow::setDocument);
+
+	m_curveEditor->onPlaybackOptions += Delegate(this, &MainWindow::playbackOptions);
+	//onMainWindowClose += Delegate(app, &EditorApplication::onMainWindowClose);
 }
 
 void Idogep::MainWindow::setDocument(EditorDocument * document)
 {
-	// ez nem terljesen jo, disztributalni kell az esemenyeket
-	m_curveEditor->onDocumentChanged(document->curveDocument());
+	m_curveEditor->setTrack(document->track());
+
+
+	// TODO: delegationt le kell venni majd 
+	if (m_document) {
+		m_curveEditor->onRequestWaveform -= Delegate(m_document, &EditorDocument::GetWaveform);
+	}
+
+	m_document = document;
+
+	m_curveEditor->onRequestWaveform += Delegate(m_document, &EditorDocument::GetWaveform);
+
+	m_document->onMusicChanged += Delegate(m_curveEditor, &CurveEditorWidget::musicChanged);
 }
 
 void Idogep::MainWindow::closeEvent(QCloseEvent * event)
@@ -36,6 +53,17 @@ void Idogep::MainWindow::closeEvent(QCloseEvent * event)
 	settings.setValue("mainWindowState", saveState());
 
 	onMainWindowClose(event);
+}
+
+void Idogep::MainWindow::playbackOptions()
+{
+	PlaybackOptionDialog dlg(this);
+	if (dlg.exec())
+	{
+		std::string filename = dlg.fileName().toStdString();
+		m_document->Op
+		//onPlaybackOptionsChanged();
+	}
 }
 
 void Idogep::MainWindow::createActions(EditorApplication *const& app)
@@ -70,7 +98,7 @@ void Idogep::MainWindow::createActions(EditorApplication *const& app)
 	editMenu->addAction(undoAct);
 	//editToolBar->addAction(undoAct);
 
-	viewMenu = menuBar()->addMenu(tr("&View"));
+	m_viewMenu = menuBar()->addMenu(tr("&View"));
 
 	menuBar()->addSeparator();
 
@@ -94,4 +122,6 @@ void Idogep::MainWindow::createDockWindows(EditorApplication *const& app)
 {
 	m_curveEditor = new CurveEditorWidget();
 	addDockWidget(Qt::BottomDockWidgetArea, m_curveEditor);
+
+	//m_playbackOptionsDlg = new PlaybackOptionDialog(this);
 }

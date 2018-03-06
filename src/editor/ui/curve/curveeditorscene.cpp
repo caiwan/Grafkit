@@ -52,11 +52,11 @@ QPointF CurveEditorScene::offset() const {
 	return m_ofs;
 }
 
-void Idogep::CurveEditorScene::documentChanged(CurveDocument * doc)
+void Idogep::CurveEditorScene::setDocument(CurveDocument * doc)
 {
 	m_document = doc;
-	doc->addCurveToScene(this);
-	this->update();
+	//doc->addCurveToScene(this);
+	//this->update();
 }
 
 void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
@@ -65,7 +65,6 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setBrush(Qt::NoBrush);
 
 	setSceneRect(views().at(0)->geometry());
-
 
 	m_document->recalculate();
 
@@ -236,12 +235,6 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 	update();
 	QGraphicsScene::mouseMoveEvent(event);
 }
-
-void Idogep::CurveEditorScene::viewResized(QResizeEvent * event)
-{
-	updateAudiogram();
-}
-
 
 // -> GK
 QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t) {

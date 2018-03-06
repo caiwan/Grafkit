@@ -45,6 +45,11 @@ int Idogep::EditorApplication::execute()
 {
 	m_wnd = new MainWindow(this);
 
+	// setup events
+	m_wnd->onMainWindowClose += Delegate(this, &EditorApplication::onMainWindowClose);
+
+	// --- 
+
 	SplashWidget *sw = new SplashWidget();
 
 	LoaderThread *loader = new LoaderThread();
@@ -62,7 +67,7 @@ int Idogep::EditorApplication::execute()
 
 	m_widget = new QGrafkitContextWidget(m_render);
 	m_widget->initialize();
-
+	
 	// init stuff here
 
 	m_wnd->setCentralWidget(m_widget);

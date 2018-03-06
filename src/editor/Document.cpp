@@ -79,7 +79,7 @@ int Idogep::MusicProxy::IsPlaying()
 // ===================================================================================================================
 
 
-void Idogep::MusicProxy::getWaveform(float *& ptr, size_t & length, size_t & channelCount, size_t & samplePerSec)
+void Idogep::MusicProxy::GetWaveform(float *& ptr, size_t & length, size_t & channelCount, size_t & samplePerSec)
 {
 	if (m_music.Valid() && m_music->Valid())
 		(*m_music)->GetWaveform(ptr, length, channelCount, samplePerSec);
@@ -91,9 +91,6 @@ Idogep::EditorDocument::EditorDocument()
 	for (int i = 0; i < 35; i++) {
 		m_testAnimation->AddKey(Animation::FloatKey(i, PseudoRandom::Random()));
 	}
-
-	m_testCurveDocument = new CurveDocument(m_testAnimation);
-	m_testCurveDocument->onRequestWaveform += Delegate(this, &MusicProxy::getWaveform);
 }
 
 void Idogep::EditorDocument::beforePreload(Grafkit::IResourceManager * const & resman)
@@ -104,4 +101,9 @@ void Idogep::EditorDocument::beforePreload(Grafkit::IResourceManager * const & r
 void Idogep::EditorDocument::afterPreload(Grafkit::Renderer & renderer)
 {
 	// ...
+}
+
+void Idogep::EditorDocument::loadMusic(QString filename)
+{
+
 }

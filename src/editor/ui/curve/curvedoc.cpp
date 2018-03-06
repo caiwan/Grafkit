@@ -14,13 +14,14 @@ Idogep::CurveAudiogram::~CurveAudiogram()
 	delete m_audiogramBuffer;
 }
 
+
 void Idogep::CurveAudiogram::getAudiogram(QImage ** image, float startTime, float endTime, int rectWidth, int rectHeight)
 {
 	*image = nullptr;
 
 	// todo: update when audiogramChanged
 	if (!m_audiogramBuffer) {
-		onRequestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
+		requestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
 	}
 
 	uint32_t offset = uint32_t(startTime * m_audiogramSamplePerSec) * m_audiogramChannelCount;
@@ -69,14 +70,18 @@ void Idogep::CurveAudiogram::getAudiogram(QImage ** image, float startTime, floa
 	*image = img;
 }
 
+void Idogep::CurveAudiogram::clearAudiogram()
+{
+	delete m_audiogramBuffer;
+	m_audiogramBuffer = nullptr;
+}
 
 
-Idogep::CurveDocument::CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track, QObject *parent) :
-	QObject(parent),
+
+Idogep::CurveDocument::CurveDocument() :
 	CurveAudiogram(),
 	m_curve(nullptr)
 {
-	setTrack(track);
 }
 
 void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::FloatTrack>& track)
@@ -100,10 +105,12 @@ void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::FloatTrack>& track)
 		//point->setColor();
 		//point->setNodeType();
 
-		point->onMovePoint += Delegate(this, &CurveDocument::onMovePoint);
+		point->onMovePoint += Delegate(this, &CurveDocument::movePoint);
 
 		m_curve->push_back(point);
 	}
+
+	refreshView();
 }
 
 void Idogep::CurveDocument::recalculate()
@@ -123,12 +130,12 @@ void Idogep::CurveDocument::addCurveToScene(CurveEditorScene * parent)
 			auto point = m_curve->at(i);
 			parent->addItem(point);
 			point->recalculatePosition();
-			//m_curve->at(i)->setVisible(true);
+			//m_curve->at(i)->setVisible(true); 	// if you change this during the drawing it will not recieve any events
 		}
 	}
 }
 
-void Idogep::CurveDocument::onMovePoint(CurvePointItem * item)
+void Idogep::CurveDocument::movePoint(CurvePointItem * item)
 {
 	float itemTime = item->time();
 	uint32_t id = item->index();
@@ -155,17 +162,17 @@ void Idogep::CurveDocument::onMovePoint(CurvePointItem * item)
 	m_track->SetKey(key, id);
 }
 
-void Idogep::CurveDocument::onMoveTangent(CurvePointItem * item)
+void Idogep::CurveDocument::moveTangent(CurvePointItem * item)
 {
 	// ... 
 }
 
-void Idogep::CurveDocument::onStartEdit(CurvePointItem * item)
+void Idogep::CurveDocument::startEdit(CurvePointItem * item)
 {
 	// save current state
 }
 
-void Idogep::CurveDocument::onCommitEdit(CurvePointItem * item)
+void Idogep::CurveDocument::commitEdit(CurvePointItem * item)
 {
 	// add command to commit it 
 }

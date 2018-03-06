@@ -45,6 +45,9 @@ namespace Idogep {
 		void mainloop();
 		void loaderFinished();
 
+		//void playbackOptions();
+
+	private:
 		virtual Grafkit::Renderer &GetDeviceContext() { return m_render; }
 		virtual Grafkit::IAssetFactory *GetAssetFactory() { return m_file_loader; }
 

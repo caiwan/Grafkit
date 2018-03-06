@@ -6,6 +6,14 @@
 #include "render/animation.h"
 #include "core/Music.h"
 
+//#include "utils/ResourceManager.h"
+
+#include "Event.h"
+
+namespace Grafkit {
+	class IResourceManager;
+}
+
 namespace Idogep {
 
 	class EditorDocument;
@@ -14,7 +22,6 @@ namespace Idogep {
 	class MusicProxy : public Grafkit::Timer
 	{
 	public:
-
 		virtual void Play();
 		virtual void Stop();
 		virtual void Pause(int e);
@@ -28,13 +35,12 @@ namespace Idogep {
 		virtual void SetLoop(int e);
 		virtual int IsPlaying();
 
-		// TODO: musicChangedEvent
+		void GetWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec);
 
-		void getWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec);
+		Event<> onMusicChanged;
 
 	protected:
 		Grafkit::MusicResRef m_music;
-		// ... 
 	};
 
 	class EditorDocument : public QObject, public MusicProxy
@@ -44,7 +50,6 @@ namespace Idogep {
 		EditorDocument();
 
 		Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
-		Idogep::CurveDocument * curveDocument() { return m_testCurveDocument; }
 
 		void beforePreload(Grafkit::IResourceManager* const & resman);
 		void afterPreload(Grafkit::Renderer & renderer);
@@ -57,7 +62,6 @@ namespace Idogep {
 		bool m_isDirty;
 
 		Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
-		Idogep::CurveDocument* m_testCurveDocument;
 
 	};
 
