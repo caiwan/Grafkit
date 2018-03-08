@@ -5,9 +5,12 @@
 
 namespace Idogep {
 
-	class EditorDocument;
+	class Editor;
+	class Document;
 
 	class EditorApplication;
+
+	class QGrafkitContextWidget;
 	
 	class CurveEditorWidget;
 
@@ -18,30 +21,31 @@ namespace Idogep {
 
 	class MainWindow : public QMainWindow {
 	public:
-		MainWindow(EditorApplication *const& app);
+		MainWindow();
 
 		// external events (called from outside)
-		void setDocument(EditorDocument* document);
+		//void setDocument(EditorDocument* document);
 
 		// internal events (called from inside)
-		Event<QCloseEvent *> onMainWindowClose;
+		//Event<QCloseEvent *> onMainWindowClose;
 
 	private:
 		void closeEvent(QCloseEvent *event);
 		void playbackOptions();
 
 	private:
-		void createActions(EditorApplication *const& app);
-		void createStatusBar(EditorApplication *const& app);
-		void createDockWindows(EditorApplication *const& app);
+		void createActions();
+		void createStatusBar();
+		void createDockWindows();
+
+		Document * m_document;
 
 		QMenu *m_viewMenu;
 
 		CurveEditorWidget * m_curveEditor;
 		AboutDialog *m_aboutDlg;
 
-		//MainWindowEventWrapper *m_myEventWrapper;
-		EditorDocument* m_document;
+		Editor *m_editor;
 	};
 
 }

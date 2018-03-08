@@ -20,7 +20,7 @@ namespace Idogep {
 		QGrafkitContextWidget(Grafkit::Renderer & render, QWidget * parent = nullptr);
 		~QGrafkitContextWidget();
 
-		void initialize();
+		void Initialize();
 
 		QPaintEngine* paintEngine();
 

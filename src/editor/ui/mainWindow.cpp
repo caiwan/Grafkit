@@ -1,25 +1,25 @@
-#include <string>
+ <string>
 
-#include <QtWidgets>
-#include <QMenu>
-#include <QStatusBar>
+ <QtWidgets>
+ <QMenu>
+ <QStatusBar>
 
-#include "document.h"
+ "document.h"
 
-#include "mainWindow.h"
-#include "main_editor.h"
+ "mainWindow.h"
+ "main_editor.h"
 
-#include "ui/curve/curveeditorwidget.h"
-#include "ui/PlaybackOptionDialog.h"
-#include "ui/splashwidget.h"
+ "ui/curve/curveeditorwidget.h"
+ "ui/PlaybackOptionDialog.h"
+ "ui/splashwidget.h"
 
 using namespace Idogep;
 
-Idogep::MainWindow::MainWindow(EditorApplication *const& app)
+Idogep::MainWindow::MainWindow()
 {
-	createActions(app);
-	createStatusBar(app);
-	createDockWindows(app);
+	createActions();
+	createStatusBar();
+	createDockWindows();
 
 	// events
 	//m_myEventWrapper = new MainWindowEventWrapper(this);
@@ -66,7 +66,7 @@ void Idogep::MainWindow::playbackOptions()
 	}
 }
 
-void Idogep::MainWindow::createActions(EditorApplication *const& app)
+void Idogep::MainWindow::createActions()
 {
 
 	QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -113,12 +113,12 @@ void Idogep::MainWindow::createActions(EditorApplication *const& app)
 	aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
 }
 
-void Idogep::MainWindow::createStatusBar(EditorApplication *const& app)
+void Idogep::MainWindow::createStatusBar()
 {
 	statusBar()->showMessage(tr("Ready"));
 }
 
-void Idogep::MainWindow::createDockWindows(EditorApplication *const& app)
+void Idogep::MainWindow::createDockWindows()
 {
 	m_curveEditor = new CurveEditorWidget();
 	addDockWidget(Qt::BottomDockWidgetArea, m_curveEditor);

@@ -13,7 +13,7 @@ QGrafkitContextWidget::~QGrafkitContextWidget()
 {
 }
 
-void QGrafkitContextWidget::initialize()
+void QGrafkitContextWidget::Initialize()
 {
 	if (!m_isInited) {
 		HWND hWnd = reinterpret_cast<HWND>(winId());

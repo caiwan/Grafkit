@@ -17,7 +17,8 @@ namespace Grafkit{
 
 namespace Idogep {
 
-	class EditorDocument;
+	class Document;
+	class Editor; 
 
 	class MainWindow;
 	class QGrafkitContextWidget;
@@ -37,7 +38,7 @@ namespace Idogep {
 
 		void onMainWindowClose(QCloseEvent *event);
 
-		void onNew();
+		//void onNew();
 		//void onSave();
 		//void onOpen();
 
@@ -66,9 +67,10 @@ namespace Idogep {
 		Grafkit::Renderer m_render;
 		Grafkit::IAssetFactory *m_file_loader;
 
-		Idogep::QGrafkitContextWidget *m_widget;
-		Idogep::MainWindow *m_wnd;
-		Idogep::EditorDocument * m_document;
+		Idogep::QGrafkitContextWidget *m_renderWidget;
+		Idogep::MainWindow *m_mainWindow;
+		
+		Idogep::Editor *m_editor;
 
 	private:
 		static EditorApplication * s_self;

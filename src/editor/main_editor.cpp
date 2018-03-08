@@ -9,15 +9,13 @@
 
 #include "main_editor.h"
 
-#include "document.h"
+#include "editor.h"
 
 #include "ui/splashwidget.h"
 #include "ui/mainWindow.h"
-#include "ui/QGrafkitContextWidget.h"
 
 using namespace Idogep;
 using namespace Grafkit;
-
 
 Idogep::EditorApplication * Idogep::EditorApplication::s_self;
 
@@ -25,7 +23,7 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	QObject(nullptr),
 	Grafkit::ClonableInitializer(),
 	Grafkit::IResourceManager(),
-	m_qApp(argc, argv), m_document(nullptr)
+	m_qApp(argc, argv), m_editor(nullptr)
 {
 	assert(s_self == nullptr);
 
@@ -43,10 +41,10 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 
 int Idogep::EditorApplication::execute()
 {
-	m_wnd = new MainWindow(this);
+	m_mainWindow = new MainWindow(this);
 
 	// setup events
-	m_wnd->onMainWindowClose += Delegate(this, &EditorApplication::onMainWindowClose);
+	//m_wnd->onMainWindowClose += Delegate(this, &EditorApplication::onMainWindowClose);
 
 	// --- 
 
@@ -56,7 +54,7 @@ int Idogep::EditorApplication::execute()
 
 	onLoaderFinished += Delegate(sw, &SplashWidget::hide);
 	onLoaderFinished += Delegate(sw, &SplashWidget::deleteLater);
-	onLoaderFinished += Delegate(m_wnd, &MainWindow::showMaximized);
+	onLoaderFinished += Delegate(m_mainWindow, &MainWindow::showMaximized);
 	onLoaderFinished += Delegate(this, &EditorApplication::nextTick);
 	onLoaderFinished += Delegate(loader, &LoaderThread::deleteLater);
 
@@ -65,14 +63,19 @@ int Idogep::EditorApplication::execute()
 	connect(loader, SIGNAL(finished()), this, SLOT(loaderFinished()));
 	loader->start();
 
-	m_widget = new QGrafkitContextWidget(m_render);
-	m_widget->initialize();
+	m_editor = new Editor(m_render, this, m_mainWindow, m_renderWidget);
+
+	// Argparse??
+	m_editor->NewDocument();
+
+	m_renderWidget = new QGrafkitContextWidget(m_render);
+	m_renderWidget->initialize();
 	
 	// init stuff here
 
-	m_wnd->setCentralWidget(m_widget);
+	//m_wnd->setCentralWidget(m_widget);
 
-	onNew();
+	//onNew();
 
 	return m_qApp.exec();
 }
@@ -80,7 +83,7 @@ int Idogep::EditorApplication::execute()
 void Idogep::EditorApplication::onMainWindowClose(QCloseEvent * event)
 {
 	bool changes = true;
-	QMessageBox::StandardButton resBtn = QMessageBox::question(m_wnd, APP_NAME,
+	QMessageBox::StandardButton resBtn = QMessageBox::question(m_mainWindow, APP_NAME,
 		tr("Are you sure?\n"),
 		QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
 		QMessageBox::Yes);
@@ -117,10 +120,7 @@ void Idogep::EditorApplication::onNew()
 
 void Idogep::EditorApplication::mainloop()
 {
-	m_render.BeginSceneDev();
-	// render document
-	m_render.EndScene();
-
+	this->m_editor->RenderFrame();
 	this->nextTick();
 }
 
