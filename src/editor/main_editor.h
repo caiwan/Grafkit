@@ -3,6 +3,7 @@
 
 #include "render/renderer.h"
 #include "utils/ResourceManager.h"
+#include "utils/ResourcePreloader.h"
 #include "utils/InitializeSerializer.h"
 
 #include "Event.h"
@@ -24,7 +25,7 @@ namespace Idogep {
 	class QGrafkitContextWidget;
 
 	class EditorApplication : public QObject ,
-		protected Grafkit::IResourceManager, private Grafkit::ClonableInitializer
+		protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 	{
 		Q_OBJECT
 
@@ -36,17 +37,9 @@ namespace Idogep {
 
 		int execute();
 
-		void onMainWindowClose(QCloseEvent *event);
-
-		//void onNew();
-		//void onSave();
-		//void onOpen();
-
 		private slots:
 		void mainloop();
 		void loaderFinished();
-
-		//void playbackOptions();
 
 	private:
 		virtual Grafkit::Renderer &GetDeviceContext() { return m_render; }
@@ -60,8 +53,8 @@ namespace Idogep {
 
 	private:
 		Event<> onLoaderFinished;
-		Event<Grafkit::IResourceManager* const &> onBeforePreload;
-		Event<Grafkit::Renderer&> onAfterPreload;
+		//Event<Grafkit::IResourceManager* const &> onBeforePreload;
+		//Event<Grafkit::Renderer&> onAfterPreload;
 
 		QApplication m_qApp;
 		Grafkit::Renderer m_render;

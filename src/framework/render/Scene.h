@@ -4,6 +4,8 @@
 #include <list>
 #include <vector>
 
+#include "common.h"
+
 #include "math/matrix.h"
 
 #include "Light.h"
@@ -11,7 +13,7 @@
 
 #include "renderer.h"
 #include "animation.h"
-#include "predefs.h"
+//#include "predefs.h"
 
 namespace Grafkit {
 	__declspec(align(16))

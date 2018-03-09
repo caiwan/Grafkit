@@ -8,6 +8,7 @@
 
 #include "render/mesh.h"
 #include "render/model.h"
+#include "render/material.h"
 
 #include "render/Light.h"
 #include "render/camera.h"

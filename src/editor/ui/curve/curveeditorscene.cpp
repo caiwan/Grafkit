@@ -122,22 +122,10 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 #if 1
 	// debug 
-	if (selectedItems().empty()) {
+	if (m_document->getCurvePoints() == nullptr ) {
 		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::red));
 	}
-	else {
-		//painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::green));
-	
-		int xx = 0;
-		int yy = 0;
-		for (int i = 0; i < selectedItems().size(); i++) {
-			painter->fillRect(QRect(6 * xx, 6 * yy, 4, 4), QBrush(Qt::green));
-			xx++;
-			if (xx > 16){
-				xx = 0; yy++;
-			}
-	}
-	}
+
 #endif
 }
 
@@ -269,10 +257,12 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 {
 	// 2. draw the curves.
 	QList<CurvePointItem*> *points = m_document->getCurvePoints();
-	auto track = m_document->getTrack();
 
-	if (points->isEmpty())
+	// prevernt crash on NPE
+	if (!points || points->isEmpty())
 		return;
+
+	auto track = m_document->getTrack();
 
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setPen(QPen(grey));

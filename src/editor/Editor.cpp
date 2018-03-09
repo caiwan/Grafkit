@@ -1,3 +1,8 @@
+#include "utils/ResourceManager.h"
+
+#include "render/shader.h"
+#include "render/scene.h"
+
 #include "Editor.h"
 #include "Document.h"
 
@@ -5,9 +10,9 @@
 
 using namespace Idogep;
 
-Idogep::Editor::Editor(Grafkit::Renderer & render, Grafkit::IResourceManager * const & resman) : 
-	m_render(render), 
-	m_resourceManager(resman), m_document(nullptr)
+Idogep::Editor::Editor(Grafkit::Renderer & render, Grafkit::IResourceManager * const & resman) :
+	m_render(render),
+	m_resourceManager(resman), m_document(nullptr), m_reloadRequested(false), m_precalcRequested(false)
 {
 	m_musicProxy = new MusicProxy();
 	m_commandStack = new CommandStack();
@@ -19,9 +24,11 @@ Idogep::Editor::~Editor()
 	delete m_commandStack;
 }
 
-void Idogep::Editor::Initialize()
+void Idogep::Editor::InitializeDocument()
 {
-	// ... 
+	m_document->Preload(m_resourceManager);
+	m_resourceManager->DoPrecalc();
+	m_document->Initialize(m_render);
 }
 
 bool Idogep::Editor::RenderFrame()
@@ -29,19 +36,59 @@ bool Idogep::Editor::RenderFrame()
 	// preload // reload
 	if (m_reloadRequested) {
 		m_reloadRequested = false;
-		//m_resourceManager->Dop //?
-		Initialize(); //?
+		InitializeDocument();
 		return true;
 	}
 
 	if (m_precalcRequested) {
+		m_resourceManager->DoPrecalc();
 		m_precalcRequested = false;
 		return true;
 	}
 
+	// --- 
+
 	m_render.BeginSceneDev();
-	// render things
+
+	if (m_document)
+	{
+		m_document->m_rootActor->Matrix().Identity();
+		m_document->m_rootActor->Matrix().RotateRPY(0, 0, 0);
+
+		m_document->m_cameraActor->Transform().Identity();
+		m_document->m_cameraActor->Transform().Translate(0, 0, 0);
+
+		m_document->m_scenegraph->Get()->RenderFrame(m_render, 0.0f);
+	}
+
 	m_render.EndScene();
 
+	// ---
+	return true; // keep it infinite for now
+}
+
+void Idogep::Editor::NewDocument()
+{
+	// check shit here
+
+	m_document = new Document();
+	m_reloadRequested = true;
+}
+
+void Idogep::Editor::SaveDocument()
+{
+}
+
+void Idogep::Editor::OpenDocument(std::string filename)
+{
+}
+
+Grafkit::IResourceManager * Idogep::Editor::GetResourceManager()
+{
+	return m_resourceManager;
+}
+
+bool Idogep::Editor::DirtyCheck()
+{
 	return false;
 }

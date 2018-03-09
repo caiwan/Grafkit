@@ -21,13 +21,13 @@ namespace Idogep {
 
 	class MainWindow : public QMainWindow {
 	public:
-		MainWindow();
+		MainWindow(Editor * const & editor);
 
 		// external events (called from outside)
-		//void setDocument(EditorDocument* document);
+		// ... 
 
-		// internal events (called from inside)
-		//Event<QCloseEvent *> onMainWindowClose;
+		// internal events (called from inside)		
+		// ...
 
 	private:
 		void closeEvent(QCloseEvent *event);
@@ -45,7 +45,7 @@ namespace Idogep {
 		CurveEditorWidget * m_curveEditor;
 		AboutDialog *m_aboutDlg;
 
-		Editor *m_editor;
+		Editor * const & m_editor;
 	};
 
 }

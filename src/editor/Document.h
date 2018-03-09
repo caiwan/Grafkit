@@ -1,10 +1,9 @@
 #pragma once 
 
-#include <qobject.h>
+#include "common.h"
 
 #include "render/renderer.h"
 #include "render/animation.h"
-
 
 namespace Grafkit {
 	class IResourceManager;
@@ -12,28 +11,37 @@ namespace Grafkit {
 
 namespace Idogep {
 
-	class EditorDocument;
+	class Editor;
+	class Document;
 	class CurveDocument;
 
-	class EditorDocument : public QObject
+	class Document
 	{
-		Q_OBJECT
+		friend class Editor;
 	public:
-		EditorDocument();
+		Document();
+		virtual ~Document();
 
 		Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
 
-		//void beforePreload(Grafkit::IResourceManager* const & resman);
-		//void afterPreload(Grafkit::Renderer & renderer);
+		void Preload(Grafkit::IResourceManager * const & resman);
+		void Initialize(Grafkit::Renderer &render);
+		void Shutdown();
 
-		void setDirty() { m_isDirty = true; }
-		bool dirty() { return m_isDirty; }
+		void SetDirty() { m_isDirty = true; }
+		bool IsDirty() { return m_isDirty; }
 
 	private:
 
 		bool m_isDirty;
 
 		Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
+
+		Grafkit::ShaderResRef m_vs, m_ps;
+		Grafkit::SceneResRef m_scenegraph;
+
+		Grafkit::ActorRef m_rootActor;
+		Grafkit::ActorRef m_cameraActor;
 
 	};
 

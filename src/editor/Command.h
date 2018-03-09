@@ -32,8 +32,7 @@ namespace Idogep{
 	class CommandStack {
 	public:
 		CommandStack(){}
-		CommandStack(){}
-
+		
 		void AddCommand(Ref<Command> &command);
 		void Redo();
 		void Undo();

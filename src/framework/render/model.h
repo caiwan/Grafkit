@@ -6,19 +6,13 @@
 #include <vector>
 #include <array>
 
-#include "utils/memory.h"
-#include "utils/reference.h"
+#include "common.h"
 
-#include "renderer.h"
-#include "dxtypes.h"
-
-#include "predefs.h"
+#include "render/Actor.h"
+#include "render/renderer.h"
 
 #include "mesh.h"
 #include "Material.h"
-#include "shader.h"
-
-#include "render/Actor.h"
 
 namespace Grafkit 
 {

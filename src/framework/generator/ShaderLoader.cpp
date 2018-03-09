@@ -70,8 +70,9 @@ private:
 
 // =============================================================================================================================
 
-Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) : Grafkit::IResourceBuilder(name, sourcename),
-m_entrypoint(entrypoint)
+Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) : 
+	Grafkit::IResourceBuilder(name, sourcename),
+	m_entrypoint(entrypoint)
 {
 }
 

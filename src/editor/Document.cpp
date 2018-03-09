@@ -1,91 +1,25 @@
-#include "math/fbm.h"
-
 #include "Document.h"
 
-#include "ui/curve/curvedoc.h"
+#include "math/fbm.h"
+
+#include "render/shader.h"
+
+#include "render/mesh.h"
+#include "render/model.h"
+#include "render/material.h"
+
+#include "render/scene.h"
+
+#include "generator/ShaderLoader.h"
+
+#include "utils/ResourceManager.h"
 
 using namespace Idogep;
 using namespace Grafkit;
 
-void Idogep::MusicProxy::Play()
-{
-	if (m_music.Valid() && m_music->Valid())
-		(*m_music)->Play();
-}
+#include "builtin_data/cube.h"
 
-void Idogep::MusicProxy::Stop()
-{
-	if (m_music.Valid() && m_music->Valid())
-		(*m_music)->Stop();
-
-}
-
-void Idogep::MusicProxy::Pause(int e)
-{
-	if (m_music.Valid() && m_music->Valid())
-		(*m_music)->Pause(e);
-
-}
-
-void Idogep::MusicProxy::Update()
-{
-	if (m_music.Valid() && m_music->Valid())
-		(*m_music)->Update();
-}
-
-uint64_t Idogep::MusicProxy::GetSampleCount()
-{
-	if (m_music.Valid() && m_music->Valid())
-		return (*m_music)->GetSampleCount();
-	else
-		return 0;
-}
-
-uint64_t Idogep::MusicProxy::GetSampleCountPerSec()
-{
-	if (m_music.Valid() && m_music->Valid())
-		return (*m_music)->GetSampleCountPerSec();
-	else
-		return 0;
-}
-
-uint64_t Idogep::MusicProxy::GetTimeSample()
-{
-	if (m_music.Valid() && m_music->Valid())
-		return (*m_music)->GetTimeSample();
-	else
-		return 0;
-}
-
-void Idogep::MusicProxy::SetTimeSample(uint64_t t)
-{
-	if (m_music.Valid() && m_music->Valid())
-		(*m_music)->SetTimeSample(t);
-}
-
-void Idogep::MusicProxy::SetLoop(int e)
-{
-	return;
-}
-
-int Idogep::MusicProxy::IsPlaying()
-{
-	if (m_music.Valid() && m_music->Valid())
-		return (*m_music)->IsPlaying();
-	else
-		return 0;
-}
-
-// ===================================================================================================================
-
-
-void Idogep::MusicProxy::GetWaveform(float *& ptr, size_t & length, size_t & channelCount, size_t & samplePerSec)
-{
-	if (m_music.Valid() && m_music->Valid())
-		(*m_music)->GetWaveform(ptr, length, channelCount, samplePerSec);
-}
-
-Idogep::EditorDocument::EditorDocument()
+Idogep::Document::Document()
 {
 	m_testAnimation = new Animation::FloatTrack();
 	for (int i = 0; i < 35; i++) {
@@ -93,17 +27,44 @@ Idogep::EditorDocument::EditorDocument()
 	}
 }
 
-void Idogep::EditorDocument::beforePreload(Grafkit::IResourceManager * const & resman)
+Idogep::Document::~Document()
 {
-	 // ... 
 }
 
-void Idogep::EditorDocument::afterPreload(Grafkit::Renderer & renderer)
+void Idogep::Document::Preload(IResourceManager * const & resman)
 {
-	// ...
+	m_vs = resman->Load<ShaderRes>(new VertexShaderLoader("vertexShader", "vertexShader.hlsl", "mainVertex"));
+	m_ps = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "pixelShader.hlsl", "mainPixel"));
 }
 
-void Idogep::EditorDocument::loadMusic(QString filename)
+void Idogep::Document::Initialize(Grafkit::Renderer & render)
 {
+	// --- TEST STUFF ---
 
+	// -- model 
+	ModelRef model = new Model(new Mesh());
+	model->SetMaterial(new Material());
+	//model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
+	model->GetMaterial()->SetName("GridMaterial");
+
+	model->SetName("cube");
+	model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
+	model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
+	model->GetMesh()->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
+	model->GetMesh()->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
+	model->GetMesh()->Build(render, m_vs);
+
+	m_scenegraph = new SceneRes(new Scene());
+	
+	// ... 
+
+	m_scenegraph->Get()->BuildScene(render, m_vs, m_ps);
+	m_scenegraph->Get()->SetActiveCamera(0);
+
+	m_rootActor = m_scenegraph->Get()->GetRootNode();
+	m_cameraActor = m_scenegraph->Get()->GetCamera(0);
+}
+
+void Idogep::Document::Shutdown()
+{
 }

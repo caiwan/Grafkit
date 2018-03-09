@@ -14,6 +14,8 @@
 #include "ui/splashwidget.h"
 #include "ui/mainWindow.h"
 
+#include "ui/QGrafkitContextWidget.h"
+
 using namespace Idogep;
 using namespace Grafkit;
 
@@ -22,7 +24,7 @@ Idogep::EditorApplication * Idogep::EditorApplication::s_self;
 Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	QObject(nullptr),
 	Grafkit::ClonableInitializer(),
-	Grafkit::IResourceManager(),
+	Grafkit::ResourcePreloader(),
 	m_qApp(argc, argv), m_editor(nullptr)
 {
 	assert(s_self == nullptr);
@@ -34,6 +36,9 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	QFile f(":/res/css/global.css"); f.open(QFile::ReadOnly);
 	m_qApp.setStyleSheet(f.readAll()); f.close();
 
+	// ... 
+	// Argparse goez here if needed 
+
 	m_file_loader = new FileAssetFactory("./");
 
 	s_self = this;
@@ -41,12 +46,8 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 
 int Idogep::EditorApplication::execute()
 {
-	m_mainWindow = new MainWindow(this);
-
-	// setup events
-	//m_wnd->onMainWindowClose += Delegate(this, &EditorApplication::onMainWindowClose);
-
-	// --- 
+	m_editor = new Editor(m_render, this);
+	m_mainWindow = new MainWindow(m_editor);
 
 	SplashWidget *sw = new SplashWidget();
 
@@ -63,65 +64,24 @@ int Idogep::EditorApplication::execute()
 	connect(loader, SIGNAL(finished()), this, SLOT(loaderFinished()));
 	loader->start();
 
-	m_editor = new Editor(m_render, this, m_mainWindow, m_renderWidget);
-
-	// Argparse??
-	m_editor->NewDocument();
-
 	m_renderWidget = new QGrafkitContextWidget(m_render);
-	m_renderWidget->initialize();
-	
+	m_renderWidget->Initialize();
+
 	// init stuff here
+	// connect evetns and delegates 
 
-	//m_wnd->setCentralWidget(m_widget);
+	m_mainWindow->setCentralWidget(m_renderWidget);
 
-	//onNew();
+	m_editor->NewDocument();
 
 	return m_qApp.exec();
 }
 
-void Idogep::EditorApplication::onMainWindowClose(QCloseEvent * event)
-{
-	bool changes = true;
-	QMessageBox::StandardButton resBtn = QMessageBox::question(m_mainWindow, APP_NAME,
-		tr("Are you sure?\n"),
-		QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-		QMessageBox::Yes);
-
-	if (resBtn != QMessageBox::Yes) {
-		event->ignore();
-	}
-	else {
-		event->accept();
-	}
-}
-
-void Idogep::EditorApplication::onNew()
-{
-	if (m_document && m_document->dirty()) {
-		// ablak goez here 
-		// + save
-		// + return ha nem 
-		onBeforePreload -= Delegate(m_document, &EditorDocument::beforePreload);
-		onAfterPreload -= Delegate(m_document, &EditorDocument::afterPreload);
-		delete m_document;
-		m_document = nullptr;
-	}
-
-	m_document = new EditorDocument();
-
-	onBeforePreload += Delegate(m_document, &EditorDocument::beforePreload);
-	onAfterPreload += Delegate(m_document, &EditorDocument::afterPreload);
-
-	m_wnd->setDocument(m_document);
-
-	preload();
-}
-
 void Idogep::EditorApplication::mainloop()
 {
-	this->m_editor->RenderFrame();
-	this->nextTick();
+	bool renderNextFrame = this->m_editor->RenderFrame();
+	if (renderNextFrame)
+		this->nextTick();
 }
 
 void Idogep::EditorApplication::loaderFinished()
@@ -136,9 +96,8 @@ void Idogep::EditorApplication::nextTick()
 
 void Idogep::EditorApplication::preload()
 {
-	onBeforePreload(this);
 	DoPrecalc();
-	onAfterPreload(m_render);
+	m_editor->InitializeDocument();
 }
 
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "render/renderer.h"
 
 #include "Event.h"
@@ -19,12 +21,11 @@ namespace Idogep {
 	class MusicProxy;
 
 	class Editor {
-
 	public:
 		Editor(Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
 		~Editor();
 
-		void Initialize();
+		void InitializeDocument();
 
 		bool RenderFrame();
 		
@@ -32,10 +33,18 @@ namespace Idogep {
 		void RequestReload();
 
 		void NewDocument();
-		void SaveDocument(std::string filename);
+		void SaveDocument();
 		void OpenDocument(std::string filename);
 
-		Grafkit::IResourceManager *GetResourceManager() { return m_resourceManager; }
+		void ExitingApp(bool &isPreventExit);
+
+		// ... 
+
+		Event<std::string&> onSaveDialog;
+
+		// ... 
+
+		Grafkit::IResourceManager *GetResourceManager();
 
 		Document * Getdocument() { return m_document; }
 		CommandStack * GetCommandStack() { return m_commandStack; }
@@ -43,6 +52,9 @@ namespace Idogep {
 
 		// Events
 		Event<const Document * const &> onDocumentChanged;
+
+	private:
+		bool DirtyCheck();
 		
 	private:
 		Grafkit::IResourceManager * const & m_resourceManager;

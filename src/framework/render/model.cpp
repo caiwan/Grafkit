@@ -1,10 +1,15 @@
 #include "stdafx.h"
 
-#include "model.h"
-
 #include "mesh.h"
 #include "Material.h"
-#include "Scene.h"
+#include "shader.h"
+#include "scene.h"
+
+#include "Actor.h"
+
+
+#include "model.h"
+
 
 using namespace Grafkit;
 

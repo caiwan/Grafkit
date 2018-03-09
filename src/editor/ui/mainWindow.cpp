@@ -1,49 +1,28 @@
- <string>
+#include "mainWindow.h"
+#include <string>
 
- <QtWidgets>
- <QMenu>
- <QStatusBar>
+#include  <QtWidgets>
+#include  <QMenu>
+#include  <QStatusBar>
 
- "document.h"
+#include  "document.h"
 
- "mainWindow.h"
- "main_editor.h"
+#include  "mainWindow.h"
+#include  "editor.h"
 
- "ui/curve/curveeditorwidget.h"
- "ui/PlaybackOptionDialog.h"
- "ui/splashwidget.h"
+#include  "ui/curve/curveeditorwidget.h"
+#include  "ui/PlaybackOptionDialog.h"
+#include  "ui/splashwidget.h"
 
 using namespace Idogep;
 
-Idogep::MainWindow::MainWindow()
+Idogep::MainWindow::MainWindow(Editor * const & editor) : m_editor(editor)
 {
 	createActions();
 	createStatusBar();
 	createDockWindows();
 
 	// events
-	//m_myEventWrapper = new MainWindowEventWrapper(this);
-	//m_myEventWrapper->onDocumentChanged += Delegate(this, &MainWindow::setDocument);
-
-	m_curveEditor->onPlaybackOptions += Delegate(this, &MainWindow::playbackOptions);
-	//onMainWindowClose += Delegate(app, &EditorApplication::onMainWindowClose);
-}
-
-void Idogep::MainWindow::setDocument(EditorDocument * document)
-{
-	m_curveEditor->setTrack(document->track());
-
-
-	// TODO: delegationt le kell venni majd 
-	if (m_document) {
-		m_curveEditor->onRequestWaveform -= Delegate(m_document, &EditorDocument::GetWaveform);
-	}
-
-	m_document = document;
-
-	m_curveEditor->onRequestWaveform += Delegate(m_document, &EditorDocument::GetWaveform);
-
-	m_document->onMusicChanged += Delegate(m_curveEditor, &CurveEditorWidget::musicChanged);
 }
 
 void Idogep::MainWindow::closeEvent(QCloseEvent * event)
@@ -52,16 +31,16 @@ void Idogep::MainWindow::closeEvent(QCloseEvent * event)
 	settings.setValue("mainWindowGeometry", saveGeometry());
 	settings.setValue("mainWindowState", saveState());
 
-	onMainWindowClose(event);
 }
 
+// ez nem lesz
 void Idogep::MainWindow::playbackOptions()
 {
 	PlaybackOptionDialog dlg(this);
 	if (dlg.exec())
 	{
 		std::string filename = dlg.fileName().toStdString();
-		m_document->Op
+		//m_document->Op
 		//onPlaybackOptionsChanged();
 	}
 }
