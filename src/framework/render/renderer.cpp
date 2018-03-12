@@ -77,7 +77,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 
 	displayModeList = new DXGI_MODE_DESC[numModes];
-	
+
 	if (!displayModeList && !noSurfaceOccured)
 	{
 		throw EX_DETAILS(InitializeRendererException, "No display mode list");
@@ -446,7 +446,6 @@ void Grafkit::Renderer::ToggleDepthWrite(bool isEanbled)
 		m_deviceContext->OMSetDepthStencilState(m_depthStencilStateWriteDisabled, 1);
 }
 
-
 void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int offsetY)
 {
 	// Setup the viewport for rendering.
@@ -543,4 +542,56 @@ ID3D11DepthStencilState* Grafkit::Renderer::CreateStencilState(bool isEnable)
 		throw EX_HRESULT(InitializeRendererException, result);
 
 	return pDSState;
+}
+
+// TODO put this into a spearate test framework or so 
+// because of stb_image implementation
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
+void Grafkit::Renderer::SaveScreenshot(const char * filename)
+{
+	const int &width = m_viewport.Width;
+	const int &height = m_viewport.Height;
+
+	ID3D11Texture2D* pSurface;
+	HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pSurface));
+	if (pSurface)
+	{
+		const size_t size = width * height;
+		uint8_t *captureData = new uint8_t[size * 4];
+
+		ID3D11Texture2D* pNewTexture = NULL;
+
+		D3D11_TEXTURE2D_DESC description;
+		pSurface->GetDesc(&description);
+		description.BindFlags = 0;
+		description.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+		description.Usage = D3D11_USAGE_STAGING;
+
+		HRESULT hr = m_device->CreateTexture2D(&description, NULL, &pNewTexture);
+		if (pNewTexture)
+		{
+			m_deviceContext->CopyResource(pNewTexture, pSurface);
+			D3D11_MAPPED_SUBRESOURCE resource;
+			unsigned int subresource = D3D11CalcSubresource(0, 0, 0);
+			HRESULT hr = m_deviceContext->Map(pNewTexture, subresource, D3D11_MAP_READ_WRITE, 0, &resource);
+
+			const int pitch = width << 2;
+			const unsigned char* source = static_cast<const unsigned char*>(resource.pData);
+			unsigned char* dest = captureData;
+			for (int i = 0; i < height; ++i)
+			{
+				memcpy(dest, source, width * 4);
+				source += resource.RowPitch;
+				dest += pitch;
+			}
+
+			int res = stbi_write_png(filename, width, height, 4, captureData, pitch);
+
+			delete[] captureData;
+
+			return;
+		}
+	}
 }

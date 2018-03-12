@@ -56,6 +56,8 @@ namespace Grafkit {
 
 		void ToggleDepthWrite(bool isEanbled);
 
+		void SaveScreenshot(const char* filename);
+
 		// --- setters
 
 		void ApplyRenderTargetView(size_t count = 1);

@@ -167,7 +167,7 @@ protected:
 			scene->Get()->SetPShader(m_fragmentShader);
 
 			m_cameraActor->Matrix().Identity();
-			m_cameraActor->Matrix().Translate(0, 0, -10);
+			m_cameraActor->Matrix().Translate(0, 0, 10);
 
 			/* ------------------------------------------------------------ */
 
@@ -204,11 +204,11 @@ protected:
 			this->render.BeginScene();
 			{				
 				m_rootActor->Matrix().Identity();
-				m_rootActor->Matrix().RotateRPY(t,0,0);
+				//m_rootActor->Matrix().RotateRPY(t,t/2,t/4);
 		
 				float f = abs(sin(t));
 				m_cameraActor->Transform().Identity();
-				m_cameraActor->Transform().Translate(0,f,0);
+				//m_cameraActor->Transform().Translate(0,f,0);
 
 				scene->Get()->RenderFrame(render, 0.0f);
 
@@ -216,6 +216,9 @@ protected:
 			}
 
 			this->render.EndScene();
+
+			//this->render.SaveScreenshot("hello.png");
+
 			return 0;
 		};
 	
