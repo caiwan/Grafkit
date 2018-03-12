@@ -68,8 +68,8 @@ bool Idogep::Editor::RenderFrame()
 		m_document->m_rootActor->Matrix().Identity();
 		m_document->m_rootActor->Matrix().RotateRPY(0, 0, 0);
 
-		m_document->m_cameraActor->Transform().Identity();
-		m_document->m_cameraActor->Transform().Translate(0, 0, 0);
+		m_document->m_cameraActor->Matrix().Identity();
+		m_document->m_cameraActor->Matrix().Translate(0, 0, 10);
 
 		m_document->m_scenegraph->Get()->RenderFrame(m_render, 0.0f);
 	}
