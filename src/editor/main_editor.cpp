@@ -5,11 +5,16 @@
 #include <qmessagebox.h>
 #include <qevent.h>
 
+#include "common.h"
+//#include "utils/"
+
 #include "utils/AssetFile.h"
 
 #include "main_editor.h"
-
 #include "editor.h"
+
+#include "proxies/AssetFactoryProxy.h"
+#include "proxies/LoggerProxy.h"
 
 #include "ui/splashwidget.h"
 #include "ui/mainWindow.h"
@@ -25,9 +30,12 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	QObject(nullptr),
 	Grafkit::ClonableInitializer(),
 	Grafkit::ResourcePreloader(),
-	m_qApp(argc, argv), m_editor(nullptr)
+	m_qApp(argc, argv), m_editor(nullptr), m_logger(nullptr)
 {
 	assert(s_self == nullptr);
+
+	m_logger = new LoggerQTAdapter();
+	Grafkit::Log::Logger().AddHandler(m_logger);
 
 	QCoreApplication::setOrganizationName("IndustrialRevolutioners");
 	QCoreApplication::setOrganizationDomain("caiwan.github.io");
@@ -39,10 +47,20 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	// ... 
 	// Argparse goez here if needed 
 
-	m_file_loader = new FileAssetFactory("./");
+	m_projectFileLoader = new FileAssetFactory("./");
+	m_assetFactory = new AssetFactoryProxy(m_projectFileLoader);
 
 	s_self = this;
 }
+
+
+Idogep::EditorApplication::~EditorApplication()
+{
+	m_render.Shutdown();
+	delete m_assetFactory;
+	delete m_projectFileLoader;
+}
+
 
 int Idogep::EditorApplication::execute()
 {
@@ -118,6 +136,8 @@ void Idogep::LoaderThread::run()
 int main(int argc, char **argv)
 {
 	Q_INIT_RESOURCE(resources);
+	
+	qInstallMessageHandler(Idogep::myMessageOutput);
 
 	auto app = new Idogep::EditorApplication(argc, argv);
 	return app->execute();

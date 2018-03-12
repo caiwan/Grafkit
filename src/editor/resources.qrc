@@ -1,8 +1,12 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
+<RCC>
     <qresource prefix="/">
         <file>res/css/global.css</file>
         <file>res/img/splash.jpg</file>
         <file>res/css/playerwidget.css</file>
+    </qresource>
+    <qresource prefix="/resources/shaders">
+        <file alias="flat.hlsl">res/shaders/flat.hlsl</file>
+        <file alias="vertex.hlsl">res/shaders/vertex.hlsl</file>
+        <file alias="lib/types.hlsl">res/shaders/lib/types.hlsl</file>
     </qresource>
 </RCC>

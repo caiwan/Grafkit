@@ -6,7 +6,7 @@
 #include "Editor.h"
 #include "Document.h"
 
-#include "MusicProxy.h"
+#include "proxies/MusicProxy.h"
 
 using namespace Idogep;
 
@@ -26,9 +26,22 @@ Idogep::Editor::~Editor()
 
 void Idogep::Editor::InitializeDocument()
 {
-	m_document->Preload(m_resourceManager);
-	m_resourceManager->DoPrecalc();
-	m_document->Initialize(m_render);
+	try {
+		m_document->Preload(m_resourceManager);
+		m_resourceManager->DoPrecalc();
+		m_document->Initialize(m_render);
+	}
+	catch (FWdebug::Exception* ex)
+	{
+		MessageBoxA(NULL, ex->what(), "Exception", 0);
+		//LOGGER(Log::Logger().Error(ex->what()));
+
+		delete m_document;
+		m_document = nullptr;
+
+		delete ex;
+	}
+
 }
 
 bool Idogep::Editor::RenderFrame()

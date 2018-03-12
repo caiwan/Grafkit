@@ -24,6 +24,8 @@ namespace Idogep {
 	class MainWindow;
 	class QGrafkitContextWidget;
 
+	class LoggerQTAdapter;
+
 	class EditorApplication : public QObject ,
 		protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 	{
@@ -34,6 +36,7 @@ namespace Idogep {
 
 	public:
 		EditorApplication(int argc, char **argv);
+		~EditorApplication();
 
 		int execute();
 
@@ -43,7 +46,7 @@ namespace Idogep {
 
 	private:
 		virtual Grafkit::Renderer &GetDeviceContext() { return m_render; }
-		virtual Grafkit::IAssetFactory *GetAssetFactory() { return m_file_loader; }
+		virtual Grafkit::IAssetFactory *GetAssetFactory() { return m_assetFactory; }
 
 	private:
 		void nextTick();
@@ -53,13 +56,13 @@ namespace Idogep {
 
 	private:
 		Event<> onLoaderFinished;
-		//Event<Grafkit::IResourceManager* const &> onBeforePreload;
-		//Event<Grafkit::Renderer&> onAfterPreload;
 
 		QApplication m_qApp;
 		Grafkit::Renderer m_render;
-		Grafkit::IAssetFactory *m_file_loader;
+		Grafkit::IAssetFactory *m_assetFactory;
+		Grafkit::IAssetFactory *m_projectFileLoader;
 
+		Idogep::LoggerQTAdapter *m_logger;
 		Idogep::QGrafkitContextWidget *m_renderWidget;
 		Idogep::MainWindow *m_mainWindow;
 		

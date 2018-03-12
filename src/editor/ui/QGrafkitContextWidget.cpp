@@ -35,6 +35,7 @@ void QGrafkitContextWidget::paintEvent(QPaintEvent * event)
 void QGrafkitContextWidget::resizeEvent(QResizeEvent * event)
 {
 	if (m_isInited) {
-		// ... 
+		QSize size = event->size();
+		m_render.SetViewport(size.width(), size.height());
 	}
 }

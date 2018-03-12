@@ -6,6 +6,8 @@
 
 #ifdef __cplusplus
 
+#include "common.h"
+
 // dx datatypes
 #include "render/dxtypes.h"
 
