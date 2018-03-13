@@ -18,6 +18,7 @@
 
 #include "ui/splashwidget.h"
 #include "ui/mainWindow.h"
+#include "ui/preloader.h"
 
 #include "ui/QGrafkitContextWidget.h"
 
@@ -30,10 +31,13 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	QObject(nullptr),
 	Grafkit::ClonableInitializer(),
 	Grafkit::ResourcePreloader(),
-	m_qApp(argc, argv), m_editor(nullptr), m_logger(nullptr)
+	m_qApp(argc, argv), m_editor(nullptr), m_logger(nullptr), m_preloadWindow(nullptr)
 {
 	assert(s_self == nullptr);
 
+	// connect signals and slots
+
+	// init the rest of the things 
 	m_logger = new LoggerQTAdapter();
 	Grafkit::Log::Logger().AddHandler(m_logger);
 
@@ -66,6 +70,11 @@ int Idogep::EditorApplication::execute()
 {
 	m_editor = new Editor(m_render, this);
 	m_mainWindow = new MainWindow(m_editor);
+
+	m_preloadWindow = new Preloader(m_mainWindow);
+	onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
+
+	SetPreloadListener(m_preloadWindow);
 
 	SplashWidget *sw = new SplashWidget();
 

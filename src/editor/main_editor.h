@@ -10,7 +10,7 @@
 
 class QCloseEvent;
 
-namespace Grafkit{
+namespace Grafkit {
 	class IAssetFactory;
 }
 
@@ -19,14 +19,16 @@ namespace Grafkit{
 namespace Idogep {
 
 	class Document;
-	class Editor; 
+	class Editor;
+
+	class Preloader;
 
 	class MainWindow;
 	class QGrafkitContextWidget;
 
 	class LoggerQTAdapter;
 
-	class EditorApplication : public QObject ,
+	class EditorApplication : public QObject,
 		protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 	{
 		Q_OBJECT
@@ -43,6 +45,7 @@ namespace Idogep {
 		private slots:
 		void mainloop();
 		void loaderFinished();
+		void focusChanged(QWidget*from, QWidget* to) { onFocusChanged(from, to); }
 
 	private:
 		virtual Grafkit::Renderer &GetDeviceContext() { return m_render; }
@@ -52,11 +55,11 @@ namespace Idogep {
 		void nextTick();
 		void preload();
 
-	protected:
+	public:
+		Event<> onLoaderFinished;
+		Event<QWidget* const&, QWidget* const&> onFocusChanged;
 
 	private:
-		Event<> onLoaderFinished;
-
 		QApplication m_qApp;
 		Grafkit::Renderer m_render;
 		Grafkit::IAssetFactory *m_assetFactory;
@@ -65,7 +68,9 @@ namespace Idogep {
 		Idogep::LoggerQTAdapter *m_logger;
 		Idogep::QGrafkitContextWidget *m_renderWidget;
 		Idogep::MainWindow *m_mainWindow;
-		
+
+		Idogep::Preloader *m_preloadWindow;
+
 		Idogep::Editor *m_editor;
 
 	private:
