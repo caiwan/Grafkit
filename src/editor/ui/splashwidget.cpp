@@ -17,9 +17,12 @@
 
 Idogep::SplashWidget::SplashWidget(QWidget* parent) : QWidget(parent)
 {
+	int screenID = QApplication::desktop()->primaryScreen();
+	QRect screenGeometry = QApplication::desktop()->availableGeometry(screenID);
+
     setGeometry(
-        (QApplication::desktop()->width() - WIDTH ) / 2,
-        (QApplication::desktop()->height() - HEIGHT ) / 2,
+        (screenGeometry.width() - WIDTH ) / 2,
+        (screenGeometry.height() - HEIGHT ) / 2,
         WIDTH,
         HEIGHT
     );
