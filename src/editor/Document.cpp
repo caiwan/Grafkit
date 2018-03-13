@@ -35,6 +35,7 @@ void Idogep::Document::Preload(IResourceManager * const & resman)
 {
 	m_vs = resman->Load<ShaderRes>(new VertexShaderLoader("vertexShader", "shaders/vertex.hlsl", ""));
 	m_ps = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/flat.hlsl", ""));
+	m_psShowUv = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/fx/uv.hlsl", ""));
 }
 
 void Idogep::Document::Initialize(Grafkit::Renderer & render)
@@ -47,6 +48,7 @@ void Idogep::Document::Initialize(Grafkit::Renderer & render)
 	//model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 	model->GetMaterial()->SetName("GridMaterial");
 
+	// -- camera
 	CameraRef camera = new Camera();
 	camera->SetName("Camera");
 
@@ -54,14 +56,16 @@ void Idogep::Document::Initialize(Grafkit::Renderer & render)
 	cameraActor->SetName("CameraActor");
 
 	cameraActor->Matrix().Identity();
-	cameraActor->Matrix().Translate(0, 0, -10);
+	cameraActor->Matrix().Translate(0, 0, 10);
 
 	model->SetName("cube");
 	model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
 	model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
 	model->GetMesh()->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
 	model->GetMesh()->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
-	model->GetMesh()->Build(render, m_vs);
+	//model->GetMesh()->Build(render, m_vs); // a scene buildel magatol 
+
+	// -- actors
 
 	ActorRef cubeActor = new Actor(model);
 	cubeActor->SetName("CubeActor");
@@ -71,6 +75,8 @@ void Idogep::Document::Initialize(Grafkit::Renderer & render)
 
 	rootActor->AddChild(cameraActor);
 	rootActor->AddChild(cubeActor);
+
+	// -- scenegraph
 
 	m_scenegraph = new SceneRes(new Scene());
 

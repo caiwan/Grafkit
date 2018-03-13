@@ -203,11 +203,11 @@ protected:
 		int mainloop() {
 			this->render.BeginScene();
 			{				
-				m_rootActor->Matrix().Identity();
+				//m_rootActor->Matrix().Identity();
 				//m_rootActor->Matrix().RotateRPY(t,t/2,t/4);
 		
-				float f = abs(sin(t));
-				m_cameraActor->Transform().Identity();
+				//float f = abs(sin(t));
+				//m_cameraActor->Transform().Identity();
 				//m_cameraActor->Transform().Translate(0,f,0);
 
 				scene->Get()->RenderFrame(render, 0.0f);

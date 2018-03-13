@@ -45,6 +45,8 @@ namespace Grafkit {
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float aspectw = -1, float aspecth = -1);
 		void Shutdown();
 
+		void Resize(int screenW, int screenH);
+
 		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
 		void SetViewportAspect(float aspectW, float aspectH);
 
@@ -56,6 +58,7 @@ namespace Grafkit {
 
 		void ToggleDepthWrite(bool isEanbled);
 
+		// TODO: put this to a different file or module 
 		void SaveScreenshot(const char* filename);
 
 		// --- setters
@@ -105,6 +108,8 @@ namespace Grafkit {
 
 		float m_lastDeltaTime;
 		std::chrono::time_point<std::chrono::system_clock> m_lastTimePoint;
+
+		void CreateDepthStencilView();
 
 	private:
 		ID3D11DepthStencilState* CreateStencilState(bool isWriteEnabled);

@@ -16,10 +16,9 @@ namespace Grafkit {
 
 	class IPreloadEvents {
 	public:
-		//virtual void OnBeginLoad() = 0;
-		//virtual void OnBeforeElemLoad(IResourceBuilder *&builder, IResource *&res) = 0;
-		virtual void OnElemLoad(size_t actual, size_t count) = 0;
-		//virtual void OnEndLoad() = 0;
+		virtual void OnBeginLoad() {}
+		virtual void OnElemLoad(size_t actual, size_t count) {}
+		virtual void OnEndLoad() {}
 	};
 
 	class IResourceManager
@@ -68,7 +67,6 @@ namespace Grafkit {
 
 	template<class T> inline Ref<T> IResourceManager::Get(const std::string &pName) const 
 	{
-		// FUCKING case sensitive Windows filesystem crap shit
 		std::string name = pName;
 		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 

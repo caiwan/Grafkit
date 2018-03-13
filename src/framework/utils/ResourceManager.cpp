@@ -97,7 +97,8 @@ void Grafkit::IResourceManager::DoPrecalc()
 	size_t i = 0;
 	size_t len = m_builders.size();
 
-	// an event before loader
+	if (m_preloadEvents)
+		m_preloadEvents->OnBeginLoad();
 
 	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
 		LOGGER(Log::Logger().Trace("Preloading item %d of %d", i, len));
@@ -108,12 +109,12 @@ void Grafkit::IResourceManager::DoPrecalc()
 
 		if (m_preloadEvents)
 			m_preloadEvents->OnElemLoad(i, len);
-		// event after item had loaded
 		
 		i++;
 	}
 
-	// an event after loader
+	if (m_preloadEvents)
+		m_preloadEvents->OnEndLoad();
 
 	ClearLoadStack();
 }

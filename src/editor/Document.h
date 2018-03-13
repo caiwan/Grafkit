@@ -4,6 +4,7 @@
 
 #include "render/renderer.h"
 #include "render/animation.h"
+#include "render/effect.h"
 
 namespace Grafkit {
 	class IResourceManager;
@@ -39,6 +40,9 @@ namespace Idogep {
 
 		Grafkit::ShaderResRef m_vs, m_ps;
 		Grafkit::SceneResRef m_scenegraph;
+
+		Grafkit::ShaderResRef m_psShowUv;
+		Grafkit::EffectComposerRef m_effect;
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;

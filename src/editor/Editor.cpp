@@ -61,15 +61,20 @@ bool Idogep::Editor::RenderFrame()
 
 	// --- 
 
-	m_render.BeginSceneDev();
+	m_render.BeginScene();
 
 	if (m_document)
 	{
+		static float t;
+		t += .001;
 		m_document->m_rootActor->Matrix().Identity();
-		m_document->m_rootActor->Matrix().RotateRPY(0, 0, 0);
+		//m_document->m_rootActor->Matrix().RotateRPY(0, 0, 0);
+		m_document->m_rootActor->Matrix().Translate(0, 0, 0);
 
 		m_document->m_cameraActor->Matrix().Identity();
-		m_document->m_cameraActor->Matrix().Translate(0, 0, 10);
+		//m_document->m_cameraActor->Matrix().Translate(0, 0, 10 * sin(t));
+		//m_document->m_cameraActor->Matrix().Translate(0, 0, 10 * sin(t));
+		m_document->m_cameraActor->Matrix().LookAtLH(float3(5, 5, 5));
 
 		m_document->m_scenegraph->Get()->RenderFrame(m_render, 0.0f);
 	}

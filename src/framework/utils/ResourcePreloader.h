@@ -5,8 +5,8 @@
 #include <vector>
 #include <string>
 
-#include "../utils/ResourceManager.h"
-#include "../utils/AssetFactory.h"
+#include "ResourceManager.h"
+#include "AssetFactory.h"
 
 #include "../render/renderer.h"
 

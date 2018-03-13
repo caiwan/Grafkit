@@ -8,6 +8,8 @@ QT widget that holds a context for GK Rendering context
 
 #include "render/renderer.h"
 
+#include "Event.h"
+
 class QPaintEngine;
 
 class QResizeEvent;
@@ -26,6 +28,8 @@ namespace Idogep {
 
 		void paintEvent(QPaintEvent *event);
 		void resizeEvent(QResizeEvent *event);
+
+		Event<Grafkit::Renderer &> onResizeSurface;
 
 	private:
 		Grafkit::Renderer &m_render;
