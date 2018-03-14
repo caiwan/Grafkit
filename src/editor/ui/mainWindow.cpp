@@ -11,18 +11,29 @@
 #include  "editor.h"
 
 #include  "ui/curve/curveeditorwidget.h"
-#include  "ui/PlaybackOptionDialog.h"
+//#include  "ui/PlaybackOptionDialog.h"
+#include "ui/treeview/scenegraphviewwidget.h"
+
 #include  "ui/splashwidget.h"
 
 using namespace Idogep;
 
-Idogep::MainWindow::MainWindow(Editor * const & editor) : m_editor(editor)
+Idogep::MainWindow::MainWindow(
+	Editor * const & editor
+)
+//m_editor(editor)
 {
 	createActions();
 	createStatusBar();
 	createDockWindows();
 
-	// events
+	// connect childrens events
+	connectEvents(editor);
+}
+
+void Idogep::MainWindow::documentChanged(Document * const & document)
+{
+	// ... 
 }
 
 void Idogep::MainWindow::closeEvent(QCloseEvent * event)
@@ -31,18 +42,6 @@ void Idogep::MainWindow::closeEvent(QCloseEvent * event)
 	settings.setValue("mainWindowGeometry", saveGeometry());
 	settings.setValue("mainWindowState", saveState());
 
-}
-
-// ez nem lesz
-void Idogep::MainWindow::playbackOptions()
-{
-	PlaybackOptionDialog dlg(this);
-	if (dlg.exec())
-	{
-		std::string filename = dlg.fileName().toStdString();
-		//m_document->Op
-		//onPlaybackOptionsChanged();
-	}
 }
 
 void Idogep::MainWindow::createActions()
@@ -83,11 +82,6 @@ void Idogep::MainWindow::createActions()
 
 	QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
-	m_aboutDlg = new AboutDialog();
-
-	//QAction *aboutAct = helpMenu->addAction(tr("&About"), m_aboutDlg, &QDialog::show);
-	//aboutAct->setStatusTip(tr("Show the application's About box"));
-
 	QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
 	aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
 }
@@ -99,8 +93,15 @@ void Idogep::MainWindow::createStatusBar()
 
 void Idogep::MainWindow::createDockWindows()
 {
-	m_curveEditor = new CurveEditorWidget();
+	m_curveEditor = new CurveEditorWidget(this);
 	addDockWidget(Qt::BottomDockWidgetArea, m_curveEditor);
 
-	//m_playbackOptionsDlg = new PlaybackOptionDialog(this);
+	m_sceneGraphViewer = new SceneGraphViewWidget(this);
+	addDockWidget(Qt::LeftDockWidgetArea, m_sceneGraphViewer);
+
+}
+
+void Idogep::MainWindow::connectEvents(Editor * const & editor)
+{
+	// ... 
 }

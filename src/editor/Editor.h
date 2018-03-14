@@ -40,7 +40,9 @@ namespace Idogep {
 
 		// ... 
 
+		// Events
 		Event<std::string&> onSaveDialog;
+		Event<Document* const &> onDocumentChanged;
 
 		// ... 
 
@@ -49,9 +51,6 @@ namespace Idogep {
 		Document * Getdocument() { return m_document; }
 		CommandStack * GetCommandStack() { return m_commandStack; }
 		MusicProxy * GetMusicProxy() { return m_musicProxy; }
-
-		// Events
-		Event<const Document * const &> onDocumentChanged;
 
 	private:
 		bool DirtyCheck();

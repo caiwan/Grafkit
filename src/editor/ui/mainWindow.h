@@ -11,20 +11,23 @@ namespace Idogep {
 	class EditorApplication;
 
 	class QGrafkitContextWidget;
-	
+
 	class CurveEditorWidget;
+	class SceneGraphViewWidget;
 
 	class PlaybackOptionDialog;
-	class AboutDialog;
+	//class AboutDialog;
 
 	// ---
 
 	class MainWindow : public QMainWindow {
 	public:
-		MainWindow(Editor * const & editor);
+		MainWindow(
+			Editor * const & editor
+		);
 
 		// external events (called from outside)
-		// ... 
+		void documentChanged(Document * const & document);
 
 		// internal events (called from inside)		
 		// ...
@@ -38,14 +41,17 @@ namespace Idogep {
 		void createStatusBar();
 		void createDockWindows();
 
-		Document * m_document;
+		void connectEvents(Editor * const & editor);
 
 		QMenu *m_viewMenu;
 
 		CurveEditorWidget * m_curveEditor;
-		AboutDialog *m_aboutDlg;
+		SceneGraphViewWidget *m_sceneGraphViewer;
 
-		Editor * const & m_editor;
+		//AboutDialog *m_aboutDlg;
+
+		//Document * m_document;
+		//Editor * const & m_editor;
 	};
 
 }
