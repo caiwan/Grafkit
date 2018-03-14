@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>LogWidget</class>
  <widget class="QDockWidget" name="LogWidget">
@@ -10,7 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>DockWidget</string>
+   <string>Log messages</string>
   </property>
  </widget>
+ <resources/>
+ <connections/>
 </ui>
