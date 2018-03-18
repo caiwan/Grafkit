@@ -14,6 +14,7 @@ namespace Idogep {
 
 	class CurveEditorWidget;
 	class SceneGraphViewWidget;
+	class LogWidget;
 
 	class PlaybackOptionDialog;
 	//class AboutDialog;
@@ -27,7 +28,7 @@ namespace Idogep {
 		);
 
 		// external events (called from outside)
-		void documentChanged(Document * const & document);
+		void DocumentChanged(Document * const & document);
 
 		// internal events (called from inside)		
 		// ...
@@ -46,7 +47,9 @@ namespace Idogep {
 		QMenu *m_viewMenu;
 
 		CurveEditorWidget * m_curveEditor;
-		SceneGraphViewWidget *m_sceneGraphViewer;
+		SceneGraphViewWidget *m_outlineViewer;
+
+		LogWidget* m_logWidget;
 
 		//AboutDialog *m_aboutDlg;
 

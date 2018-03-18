@@ -24,11 +24,6 @@ Grafkit::IAssetRef Idogep::AssetFactoryProxy::Get(std::string name)
 	catch (AssetLoadException *ex) {
 		QString filename = QString(":/resources/") + QString::fromStdString(name);
 
-		QDirIterator it(":", QDirIterator::Subdirectories);
-		while (it.hasNext()) {
-			qDebug() << it.next();
-		}
-
 		QFile file(filename);
 		if (file.open(QIODevice::ReadOnly)) {
 			QByteArray data = file.readAll();

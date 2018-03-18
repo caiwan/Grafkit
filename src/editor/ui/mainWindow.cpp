@@ -7,12 +7,19 @@
 
 #include  "document.h"
 
+#include  "main_editor.h"
 #include  "mainWindow.h"
 #include  "editor.h"
 
-#include  "ui/curve/curveeditorwidget.h"
-//#include  "ui/PlaybackOptionDialog.h"
+#include "proxies/LoggerProxy.h"
+
+#include "ui/curve/curveeditorwidget.h"
+
+#include "ui/treeview/scenegraphmodel.h"
 #include "ui/treeview/scenegraphviewwidget.h"
+
+#include "ui/propertyeditor/propertyeditorwidget.h"
+#include "ui/logwidget.h"
 
 #include  "ui/splashwidget.h"
 
@@ -31,9 +38,10 @@ Idogep::MainWindow::MainWindow(
 	connectEvents(editor);
 }
 
-void Idogep::MainWindow::documentChanged(Document * const & document)
+void Idogep::MainWindow::DocumentChanged(Document * const & document)
 {
 	// ... 
+	m_outlineViewer->setModel(document->GetOutlineModel());
 }
 
 void Idogep::MainWindow::closeEvent(QCloseEvent * event)
@@ -96,12 +104,18 @@ void Idogep::MainWindow::createDockWindows()
 	m_curveEditor = new CurveEditorWidget(this);
 	addDockWidget(Qt::BottomDockWidgetArea, m_curveEditor);
 
-	m_sceneGraphViewer = new SceneGraphViewWidget(this);
-	addDockWidget(Qt::LeftDockWidgetArea, m_sceneGraphViewer);
+	m_outlineViewer = new SceneGraphViewWidget(this);
+	addDockWidget(Qt::LeftDockWidgetArea, m_outlineViewer);
 
+	m_logWidget = new LogWidget(this);
+	addDockWidget(Qt::BottomDockWidgetArea, m_logWidget);
+	tabifyDockWidget(m_logWidget, m_curveEditor);
 }
 
 void Idogep::MainWindow::connectEvents(Editor * const & editor)
 {
-	// ... 
+	editor->onDocumentChanged += Delegate(this, &MainWindow::DocumentChanged);
+
+	EditorApplication* app = EditorApplication::Instance();
+	app->GetLoggerProxy()->onUpdateLog += Delegate(m_logWidget, &LogWidget::UpdateLog);
 }

@@ -16,6 +16,9 @@ namespace Idogep {
 	class Document;
 	class CurveDocument;
 
+	class TreeModel;
+	class SceneGraphModel;
+
 	class Document
 	{
 		friend class Editor;
@@ -32,7 +35,11 @@ namespace Idogep {
 		void SetDirty() { m_isDirty = true; }
 		bool IsDirty() { return m_isDirty; }
 
+		//
+		TreeModel * GetOutlineModel();
+
 	private:
+		void InitTestStuff(Grafkit::Renderer & render);
 
 		bool m_isDirty;
 
@@ -46,6 +53,9 @@ namespace Idogep {
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
+
+		Idogep::SceneGraphModel *m_outlineViewModel;
+
 
 	};
 

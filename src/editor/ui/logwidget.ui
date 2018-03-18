@@ -13,6 +13,13 @@
   <property name="windowTitle">
    <string>Log messages</string>
   </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPlainTextEdit" name="textEdit"/>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections/>

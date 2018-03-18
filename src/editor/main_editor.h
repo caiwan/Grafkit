@@ -26,7 +26,7 @@ namespace Idogep {
 	class MainWindow;
 	class QGrafkitContextWidget;
 
-	class LoggerQTAdapter;
+	class LoggerQTProxy;
 
 	class EditorApplication : public QObject,
 		protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
@@ -42,6 +42,9 @@ namespace Idogep {
 
 		int execute();
 
+		LoggerQTProxy* GetLoggerProxy() { return m_logger; }
+
+		// --- 
 		private slots:
 		void mainloop();
 		void loaderFinished();
@@ -65,7 +68,7 @@ namespace Idogep {
 		Grafkit::IAssetFactory *m_assetFactory;
 		Grafkit::IAssetFactory *m_projectFileLoader;
 
-		Idogep::LoggerQTAdapter *m_logger;
+		Idogep::LoggerQTProxy *m_logger;
 		Idogep::QGrafkitContextWidget *m_renderWidget;
 		Idogep::MainWindow *m_mainWindow;
 

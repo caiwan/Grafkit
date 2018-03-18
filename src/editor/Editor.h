@@ -19,6 +19,10 @@ namespace Idogep {
 	class Document;
 
 	class MusicProxy;
+	//class  LoggerProxy;
+
+	class TreeModel;
+	class SceneGraphModel;
 
 	class Editor {
 	public:
@@ -51,7 +55,7 @@ namespace Idogep {
 		Document * Getdocument() { return m_document; }
 		CommandStack * GetCommandStack() { return m_commandStack; }
 		MusicProxy * GetMusicProxy() { return m_musicProxy; }
-
+		
 	private:
 		bool DirtyCheck();
 		
@@ -62,7 +66,7 @@ namespace Idogep {
 		CommandStack* m_commandStack;
 		Document * m_document;
 		MusicProxy *m_musicProxy;
-
+		
 		bool m_precalcRequested;
 		bool m_reloadRequested;
 

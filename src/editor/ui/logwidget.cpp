@@ -1,14 +1,24 @@
 #include "logwidget.h"
 #include "ui_logwidget.h"
 
-LogWidget::LogWidget(QWidget *parent) :
+#include <qscrollbar.h>
+
+using namespace Idogep;
+
+Idogep::LogWidget::LogWidget(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::LogWidget)
 {
     ui->setupUi(this);
 }
 
-LogWidget::~LogWidget()
+Idogep::LogWidget::~LogWidget()
 {
     delete ui;
+}
+
+void Idogep::LogWidget::UpdateLog(QString log)
+{
+	ui->textEdit->appendPlainText(log);
+	ui->textEdit->verticalScrollBar()->setValue(ui->textEdit->verticalScrollBar()->maximum());
 }

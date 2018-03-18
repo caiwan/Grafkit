@@ -4,19 +4,24 @@
 #include <QDockWidget>
 
 namespace Ui {
-class LogWidget;
+	class LogWidget;
 }
 
-class LogWidget : public QDockWidget
-{
-    Q_OBJECT
+namespace Idogep {
+	class LogWidget : public QDockWidget
+	{
+		Q_OBJECT
 
-public:
-    explicit LogWidget(QWidget *parent = 0);
-    ~LogWidget();
+	public:
+		explicit LogWidget(QWidget *parent = 0);
+		~LogWidget();
 
-private:
-    Ui::LogWidget *ui;
-};
+		void UpdateLog(QString log);
+
+
+	private:
+		Ui::LogWidget *ui;
+	};
+}
 
 #endif // LOGWIDGET_H

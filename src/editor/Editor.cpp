@@ -8,6 +8,7 @@
 
 #include "proxies/MusicProxy.h"
 
+
 using namespace Idogep;
 
 Idogep::Editor::Editor(Grafkit::Renderer & render, Grafkit::IResourceManager * const & resman) :
@@ -30,6 +31,8 @@ void Idogep::Editor::InitializeDocument()
 		m_document->Preload(m_resourceManager);
 		m_resourceManager->DoPrecalc();
 		m_document->Initialize(m_render);
+
+		onDocumentChanged(m_document);
 	}
 	catch (FWdebug::Exception* ex)
 	{

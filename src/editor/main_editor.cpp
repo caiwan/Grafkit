@@ -38,7 +38,7 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	// connect signals and slots
 
 	// init the rest of the things 
-	m_logger = new LoggerQTAdapter();
+	m_logger = new LoggerQTProxy();
 	Grafkit::Log::Logger().AddHandler(m_logger);
 
 	QCoreApplication::setOrganizationName("IndustrialRevolutioners");

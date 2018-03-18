@@ -14,17 +14,15 @@
 
 #include "utils/ResourceManager.h"
 
+#include "ui/treeview/scenegraphmodel.h"
+
 using namespace Idogep;
 using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-Idogep::Document::Document()
+Idogep::Document::Document() : m_outlineViewModel(nullptr)
 {
-	m_testAnimation = new Animation::FloatTrack();
-	for (int i = 0; i < 35; i++) {
-		m_testAnimation->AddKey(Animation::FloatKey(i, PseudoRandom::Random()));
-	}
 }
 
 Idogep::Document::~Document()
@@ -40,8 +38,31 @@ void Idogep::Document::Preload(IResourceManager * const & resman)
 
 void Idogep::Document::Initialize(Grafkit::Renderer & render)
 {
-	// --- TEST STUFF ---
+	InitTestStuff(render);
 
+	// ------- 
+	// OUTLINE 
+	delete m_outlineViewModel;
+	m_outlineViewModel = new SceneGraphModel();
+	m_outlineViewModel->AddScene(m_scenegraph);
+	m_outlineViewModel->BuildModel();
+}
+
+void Idogep::Document::Shutdown()
+{
+	delete m_outlineViewModel;
+	m_outlineViewModel = nullptr;
+}
+
+TreeModel * Idogep::Document::GetOutlineModel()
+{
+	return m_outlineViewModel;
+}
+
+// in-dev-things
+// --- TEST STUFF ---
+void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
+{
 	// -- model 
 	ModelRef model = new Model(new Mesh());
 	model->SetMaterial(new Material());
@@ -79,6 +100,7 @@ void Idogep::Document::Initialize(Grafkit::Renderer & render)
 	// -- scenegraph
 
 	m_scenegraph = new SceneRes(new Scene());
+	m_scenegraph->SetName("Scene");
 
 	m_scenegraph->Get()->Initialize(rootActor);
 
@@ -87,8 +109,11 @@ void Idogep::Document::Initialize(Grafkit::Renderer & render)
 
 	m_rootActor = m_scenegraph->Get()->GetRootNode();
 	m_cameraActor = m_scenegraph->Get()->GetCamera(0);
-}
 
-void Idogep::Document::Shutdown()
-{
+	// --- test aimation
+	m_testAnimation = new Animation::FloatTrack();
+	for (int i = 0; i < 35; i++) {
+		m_testAnimation->AddKey(Animation::FloatKey(i, PseudoRandom::Random()));
+	}
+
 }

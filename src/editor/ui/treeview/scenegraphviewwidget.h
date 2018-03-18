@@ -8,6 +8,9 @@ namespace Ui {
 }
 
 namespace Idogep {
+
+	class TreeModel;
+
 	class SceneGraphViewWidget : public QDockWidget
 	{
 		Q_OBJECT
@@ -15,6 +18,8 @@ namespace Idogep {
 	public:
 		explicit SceneGraphViewWidget(QWidget *parent = 0);
 		~SceneGraphViewWidget();
+
+		void setModel(TreeModel* model);
 
 	private:
 		Ui::SceneGraphViewWidget *ui;

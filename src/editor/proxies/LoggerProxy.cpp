@@ -36,22 +36,15 @@ namespace {
 	};
 }
 
-void Idogep::LoggerQTAdapter::Write(Grafkit::Logger::message_t * const & message)
+void Idogep::LoggerQTProxy::Write(Grafkit::Logger::message_t * const & message)
 {
 	if (!message)
 		return;
 
+	if (message->type == Grafkit::Logger::LOG_DEBUG)
+		return;
+
 	QString line = QString::fromUtf8(logTexts[message->type]) + QString::fromUtf8(message->message);
-	m_list.push_back(line);
-
-	while (m_list.size() > LOG_ROLL_SIZE)
-		m_list.pop_front();
-
-	QString logText;
-	for (size_t i = 0; i < m_list.size(); i++) {
-		logText += m_list.at(i) + "\r\n";
-	}
-
-	onUpdateLog(logText);
+	onUpdateLog(line);
 
 }

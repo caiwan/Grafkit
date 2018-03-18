@@ -16,17 +16,17 @@ namespace Idogep {
 	extern void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 	// delegate toward log messages to QT components
-	class LoggerQTAdapter : public Grafkit::Logger::ILoggerHandler
+	class LoggerQTProxy : public Grafkit::Logger::ILoggerHandler
 	{
 	public:
-		LoggerQTAdapter() {}
-		virtual ~LoggerQTAdapter() {}
+		LoggerQTProxy() {}
+		virtual ~LoggerQTProxy() {}
 		virtual void Write(Grafkit::Logger::message_t * const & message);
 
 		Event<QString> onUpdateLog;
 
 	private:
-		QList<QString> m_list;
+		//QList<QString> m_list;
 
 	};
 
