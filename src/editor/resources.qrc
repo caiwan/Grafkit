@@ -2,11 +2,18 @@
     <qresource prefix="/">
         <file>res/css/global.css</file>
         <file>res/img/splash.jpg</file>
-        <file>res/css/playerwidget.css</file>
     </qresource>
     <qresource prefix="/resources/shaders">
         <file alias="flat.hlsl">res/shaders/flat.hlsl</file>
         <file alias="vertex.hlsl">res/shaders/vertex.hlsl</file>
         <file alias="lib/types.hlsl">res/shaders/lib/types.hlsl</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="scene.png">res/img/icons/globe.png</file>
+        <file alias="node.png">res/img/icons/robot.png</file>
+        <file alias="model.png">res/img/icons/3d-scale.png</file>
+        <file alias="camera.png">res/img/icons/documentary.png</file>
+        <file alias="light.png">res/img/icons/light.png</file>
+        <file alias="mesh.png">res/img/icons/polygon.png</file>
     </qresource>
 </RCC>
