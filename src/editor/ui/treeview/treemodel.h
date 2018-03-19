@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <qabstractitemmodel.h>
-
+#include <qitemselectionmodel.h>
 #include "Event.h"
 
 namespace Idogep {

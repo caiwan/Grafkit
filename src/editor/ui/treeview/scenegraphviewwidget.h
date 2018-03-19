@@ -3,6 +3,8 @@
 
 #include <qdockwidget.h>
 
+#include "Event.h"
+
 namespace Ui {
 	class SceneGraphViewWidget;
 }
@@ -10,6 +12,7 @@ namespace Ui {
 namespace Idogep {
 
 	class TreeModel;
+	class TreeItem;
 
 	class SceneGraphViewWidget : public QDockWidget
 	{
@@ -20,6 +23,13 @@ namespace Idogep {
 		~SceneGraphViewWidget();
 
 		void setModel(TreeModel* model);
+
+		Event<TreeItem*> onItemSelected;
+		//Event<TreeItem*> onItemHighlighted;
+
+	private slots:
+		void itemClickedSlot(const QModelIndex &index);
+		void itemDoubleClickedSlot(const QModelIndex &index);
 
 	private:
 		Ui::SceneGraphViewWidget *ui;

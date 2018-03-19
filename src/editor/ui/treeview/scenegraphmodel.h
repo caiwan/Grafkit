@@ -45,10 +45,14 @@ namespace Idogep {
 		~SceneGraphModel();
 
 		void AddScene(Grafkit::SceneResRef &scene);
+		//void SceneChanged(Grafkit::SceneResRef &scene);
 
 	private:
 		virtual QStringList Header();
 		virtual	void Build(TreeItem * parentItem);
+
+		void BuildActor(TreeItem * parentItem, Grafkit::ActorRef parentActor, int maxDepth = 4096);
+		void BuildEntity(TreeItem * parentItem, Grafkit::Entity3DRef entity);
 
 		std::list<Grafkit::SceneResRef> m_scenes;
 	};

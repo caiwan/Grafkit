@@ -19,12 +19,19 @@ QVariant Idogep::TreeModel::data(const QModelIndex & index, int role) const
 	if (!index.isValid())
 		return QVariant();
 
-	if (role != Qt::DisplayRole)
-		return QVariant();
-
 	TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
 
-	return item->data(index.column());
+	switch (role) {
+	case Qt::DisplayRole:
+		return item->data(index.column());
+
+	case Qt::DecorationRole:
+		return item->icon();
+
+	default:
+		return QVariant();
+	}
+
 }
 
 Qt::ItemFlags Idogep::TreeModel::flags(const QModelIndex & index) const
@@ -37,10 +44,8 @@ Qt::ItemFlags Idogep::TreeModel::flags(const QModelIndex & index) const
 
 QVariant Idogep::TreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-	if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-		qDebug() << m_rootItem->data(section);
+	if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
 		return m_rootItem->data(section);
-	}
 
 	return QVariant();
 }
@@ -107,7 +112,7 @@ int Idogep::TreeModel::columnCount(const QModelIndex & parent) const
 
 void Idogep::TreeModel::BuildModel()
 {
-	if (m_rootItem) 
+	if (m_rootItem)
 		delete m_rootItem;
 
 	const QStringList headerString = Header();

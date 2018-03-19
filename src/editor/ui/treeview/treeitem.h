@@ -2,6 +2,7 @@
 
 #include <qlist.h>
 #include <qvariant.h>
+#include <qicon.h>
 
 namespace Idogep {
 
@@ -23,10 +24,14 @@ namespace Idogep {
 		TreeItem *parentItem() { return m_parentItem; }
 		void setParentItem(TreeItem * parentItem) { m_parentItem = parentItem; }
 
+		QPixmap icon() { return m_icon; }
+		void setIcon(QPixmap icon) { m_icon = icon; }
+
 	protected:
 		QList<TreeItem*> m_childItems;
 		QList<QVariant> m_itemData;
 		TreeItem *m_parentItem;
+		QPixmap m_icon;
 	};
 
 	class TreeHeaderItem  : public TreeItem{
