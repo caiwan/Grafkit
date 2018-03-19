@@ -19,10 +19,10 @@ namespace Grafkit {
 	typedef Ref<ShaderRes> ShaderResRef;
 
 	// ---
-	class Scene;
-	typedef Ref<Scene> SceneRef;
+	class SceneGraph;
+	typedef Ref<SceneGraph> SceneRef;
 
-	typedef Resource<Scene> SceneRes;
+	typedef Resource<SceneGraph> SceneRes;
 	typedef Ref<SceneRes> SceneResRef;
 
 	class Animation;

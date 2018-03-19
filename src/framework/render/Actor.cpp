@@ -38,7 +38,7 @@ Grafkit::Actor::~Actor()
 {
 }
 
-void Grafkit::Actor::Render(Grafkit::Renderer & render, Scene * scene)
+void Grafkit::Actor::Render(Grafkit::Renderer & render, SceneGraph * scene)
 {
 	for (size_t i = 0; i < this->m_pEntities.size(); i++) {
 		m_pEntities[i]->Render(render, scene);
@@ -72,7 +72,7 @@ Grafkit::ActorEventHandler::~ActorEventHandler()
 {
 }
 
-void Grafkit::ActorEventHandler::PushShader(Scene * const & scene)
+void Grafkit::ActorEventHandler::PushShader(SceneGraph * const & scene)
 {
 	otherPShader = scene->GetPShader();
 	otherVShader = scene->GetPShader();
@@ -88,7 +88,7 @@ void Grafkit::ActorEventHandler::PushShader(Scene * const & scene)
 
 }
 
-void Grafkit::ActorEventHandler::PopShader(Scene * const & scene)
+void Grafkit::ActorEventHandler::PopShader(SceneGraph * const & scene)
 {
 	scene->SetPShader(otherPShader);
 	scene->SetVShader(otherVShader);

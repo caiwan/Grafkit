@@ -39,8 +39,8 @@ namespace Grafkit {
 		void Calculate(Renderer& renderer);
 
 		//skip render, nothing to do with it. 
-		virtual void Render(Grafkit::Renderer& deviceContext, Scene* const & scene) {}
-		virtual void Build(Grafkit::Renderer& deviceContext, Scene* const & scene){}
+		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph* const & scene) {}
+		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene){}
 
 		Matrix& GetViewMatrix() { return m_viewMatrix; }
 		Matrix& GetPerspectiveMatrix() { return m_perspectiveMatrix; }

@@ -2,7 +2,7 @@
 
 #include "SceneLoader.h"
 
-#include "render/animation.h"
+#include "animation/animation.h"
 #include "render/Scene.h"
 #include "render/model.h"
 #include "render/texture.h"

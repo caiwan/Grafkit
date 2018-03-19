@@ -32,8 +32,8 @@ namespace Grafkit
 		MaterialRef GetMaterial() const		{ return this->m_material; }
 		void SetMaterial(MaterialRef material) { this->m_material = material; }
 
-		virtual void Render(Grafkit::Renderer& deviceContext, Scene* const & scene);
-		virtual void Build(Grafkit::Renderer& deviceContext, Scene* const & scene);
+		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph* const & scene);
+		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene);
 
 		void SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; }
 		ShaderResRef GetGeometryShader() { return m_geometryShader; }

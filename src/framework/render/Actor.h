@@ -15,7 +15,7 @@
 
 namespace Grafkit {
 
-	class Scene;
+	class SceneGraph;
 
 	class Actor;
 
@@ -29,8 +29,8 @@ namespace Grafkit {
 		Entity3D();
 		virtual ~Entity3D();
 
-		virtual void Render(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
-		virtual void Build(Grafkit::Renderer& deviceContext, Scene * const & scene) = 0;
+		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph * const & scene) = 0;
+		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph * const & scene) = 0;
 
 		virtual void serialize(Archive& ar) = 0;
 
@@ -54,15 +54,15 @@ namespace Grafkit {
 		ActorEventHandler();
 		virtual ~ActorEventHandler();
 
-		virtual void OnBeforeRender(Grafkit::Renderer& render, Scene * const & scene) { PushShader(scene); }
-		virtual void OnAfterRender(Grafkit::Renderer& render, Scene * const & scene) { PopShader(scene); }
+		virtual void OnBeforeRender(Grafkit::Renderer& render, SceneGraph * const & scene) { PushShader(scene); }
+		virtual void OnAfterRender(Grafkit::Renderer& render, SceneGraph * const & scene) { PopShader(scene); }
 
 		void SetPShader(ShaderResRef & ps) { myPShader = ps; }
 		void SetVshader(ShaderResRef & vs) { myVShader = vs; }
 
 	protected:
-		void PushShader(Scene *const & scene);
-		void PopShader(Scene *const & scene);
+		void PushShader(SceneGraph *const & scene);
+		void PopShader(SceneGraph *const & scene);
 
 	protected:
 		ShaderResRef myPShader;
@@ -79,7 +79,7 @@ namespace Grafkit {
 	__declspec(align(16))
 		class Actor : public AlignedNew<Actor>, public Persistent, virtual public Referencable
 	{
-		friend class Scene;
+		friend class SceneGraph;
 	public:
 		Actor();
 		Actor(Ref<Entity3D> entity);
@@ -92,7 +92,7 @@ namespace Grafkit {
 		Grafkit::Matrix& Matrix() { return m_viewMatrix; }
 		Grafkit::Matrix& Transform() { return m_transformMatrix; }
 
-		virtual void Render(Grafkit::Renderer &render, Scene* scene);
+		virtual void Render(Grafkit::Renderer &render, SceneGraph* scene);
 
 		/// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
 		Ref<Actor> GetParent() { return m_pParent; }
@@ -125,13 +125,13 @@ namespace Grafkit {
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
 
-		void DispatchBeforeRender(Grafkit::Renderer& render, Scene * const & scene) {
+		void DispatchBeforeRender(Grafkit::Renderer& render, SceneGraph * const & scene) {
 			if (m_pParent.Valid())
 				m_pParent->DispatchBeforeRender(render, scene);
 			if (myEvtHandler.Valid())
 				myEvtHandler->OnBeforeRender(render, scene);
 		}
-		void DispatchAfterRender(Grafkit::Renderer& render, Scene * const & scene) {
+		void DispatchAfterRender(Grafkit::Renderer& render, SceneGraph * const & scene) {
 			if (m_pParent.Valid())
 				m_pParent->DispatchAfterRender(render, scene);
 			if (myEvtHandler.Valid())

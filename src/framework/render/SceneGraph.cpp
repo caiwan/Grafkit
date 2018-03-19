@@ -12,9 +12,9 @@ using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 
-PERSISTENT_IMPL(Grafkit::Scene);
+PERSISTENT_IMPL(Grafkit::SceneGraph);
 
-Grafkit::Scene::Scene() :
+Grafkit::SceneGraph::SceneGraph() :
 	m_root(nullptr),
 	m_tStart(0.0f),
 	m_tEnd(10.0f)
@@ -22,11 +22,11 @@ Grafkit::Scene::Scene() :
 }
 
 
-Grafkit::Scene::~Scene()
+Grafkit::SceneGraph::~SceneGraph()
 {
 }
 
-void Grafkit::Scene::Initialize(ActorRef root)
+void Grafkit::SceneGraph::Initialize(ActorRef root)
 {
 	m_root = root;
 
@@ -44,7 +44,7 @@ void Grafkit::Scene::Initialize(ActorRef root)
 	}
 }
 
-void Grafkit::Scene::Shutdown()
+void Grafkit::SceneGraph::Shutdown()
 {
 	m_nodeMap.clear();
 
@@ -69,14 +69,14 @@ void Grafkit::Scene::Shutdown()
 
 }
 
-void Grafkit::Scene::SetActiveCamera(std::string name)
+void Grafkit::SceneGraph::SetActiveCamera(std::string name)
 {
 	auto it = m_cameraMap.find(name);
 	if (it != m_cameraMap.end())
 		m_activeCamera = it->second;
 }
 
-ActorRef Grafkit::Scene::GetCamera(std::string name)
+ActorRef Grafkit::SceneGraph::GetCamera(std::string name)
 {
 	auto it = m_cameraMap.find(name);
 	if (it != m_cameraMap.end())
@@ -84,7 +84,7 @@ ActorRef Grafkit::Scene::GetCamera(std::string name)
 	return ActorRef();
 }
 
-ActorRef Grafkit::Scene::GetLight(std::string name)
+ActorRef Grafkit::SceneGraph::GetLight(std::string name)
 {
 	auto it = m_lightMap.find(name);
 	if (it != m_lightMap.end())
@@ -92,12 +92,12 @@ ActorRef Grafkit::Scene::GetLight(std::string name)
 	return ActorRef();
 }
 
-void Grafkit::Scene::AddAnimation(AnimationRef anim)
+void Grafkit::SceneGraph::AddAnimation(AnimationRef anim)
 {
 	m_animations.push_back(anim);
 }
 
-void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps)
+void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps)
 {
 	if (vs.Valid())
 		m_vertexShader = vs;
@@ -115,7 +115,7 @@ void Grafkit::Scene::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef 
  * RENDER
  *****************************************************************************/
 
-void Grafkit::Scene::UpdateAnimation(double time)
+void Grafkit::SceneGraph::UpdateAnimation(double time)
 {
 	m_tAnim = time;
 
@@ -143,7 +143,7 @@ void Grafkit::Scene::UpdateAnimation(double time)
 	}
 }
 
-void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
+void Grafkit::SceneGraph::PreRender(Grafkit::Renderer & render)
 {
 	// --- lights
 	m_lightData.lightCount = m_lights.size();
@@ -182,7 +182,7 @@ void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 	m_worldMatrices.projectionMatrix = XMMatrixTranspose(m_cameraProjectionMatrix.Get());
 }
 
-void Grafkit::Scene::Render(Grafkit::Renderer & render)
+void Grafkit::SceneGraph::Render(Grafkit::Renderer & render)
 {
 	m_currentWorldMatrix.Identity();
 
@@ -216,7 +216,7 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	ps->Unbind(render);
 }
 
-void Grafkit::Scene::AddNode(ActorRef & node)
+void Grafkit::SceneGraph::AddNode(ActorRef & node)
 {
 	if (node.Invalid())
 		return;
@@ -261,7 +261,7 @@ void Grafkit::Scene::AddNode(ActorRef & node)
 
 }
 
-ActorRef Grafkit::Scene::GetNode(std::string name)
+ActorRef Grafkit::SceneGraph::GetNode(std::string name)
 {
 	auto it = m_nodeMap.find(name);
 	if (it != m_nodeMap.end())
@@ -269,7 +269,7 @@ ActorRef Grafkit::Scene::GetNode(std::string name)
 	return nullptr;
 }
 
-void Grafkit::Scene::serialize(Archive & ar)
+void Grafkit::SceneGraph::serialize(Archive & ar)
 {
 	PERSIST_FIELD(ar, m_tStart);
 	PERSIST_FIELD(ar, m_tEnd);

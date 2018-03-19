@@ -22,7 +22,7 @@ Light::~Light()
 {
 }
 
-void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, Scene * const & scene, Matrix &nodeMatrix)
+void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, SceneGraph * const & scene, Matrix &nodeMatrix)
 {
 	m_position.w = 1.;
 	//m_direction.w = 0.;
@@ -45,7 +45,7 @@ void Grafkit::Light::serialize(Archive & ar)
 	PERSIST_FIELD(ar, m_light);
 }
 
-void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, Scene * const & scene)
+void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, SceneGraph * const & scene)
 {
 }
 
