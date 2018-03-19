@@ -139,7 +139,7 @@ protected:
 		(*scene)->SetActiveCamera(0);
 
 		cameraActor = (*scene)->GetActiveCamera();
-		camera = dynamic_cast<Camera*>(cameraActor->GetEntities()[0].Get());
+		camera = dynamic_cast<Camera*>(cameraActor.Get());
 
 		// -- add lights
 		/*light = new PointLight();

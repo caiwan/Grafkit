@@ -69,7 +69,7 @@ TEST(Persistent_Animation, given_AnimationKey_when_persist_then_Load) {
 	TestArchiver ar(256, true);
 
 	// given
-	Animation::FloatKey floatKey; D_TEST_KEY(floatKey, D_TEST_FLOAT(.1), D_TEST_FLOAT(.1), Animation::KI_catmullRom);
+	Animation::FloatKey floatKey; D_TEST_KEY(floatKey, D_TEST_FLOAT(.1), D_TEST_FLOAT(.1), Animation::KI_hermite);
 	Animation::Vector2Key float2Key; D_TEST_KEY(float2Key, D_TEST_FLOAT(.1), D_TEST_FLOAT2(.1), Animation::KI_ramp);
 	Animation::Vector3Key float3Key; D_TEST_KEY(float3Key, D_TEST_FLOAT(.1), D_TEST_FLOAT3(.1), Animation::KI_smooth);
 	Animation::Vector4Key float4Key; D_TEST_KEY(float4Key, D_TEST_FLOAT(.1), D_TEST_FLOAT4(.1), Animation::KI_step);
@@ -123,7 +123,7 @@ TEST(Persistent_Animation, given_AnimationTrack_when_persist_then_Load) {
 
 	for (int i = 0; i < 256; ++i) {
 		float f = 1. / i;
-		Animation::FloatKey floatKey; D_TEST_KEY(floatKey, D_TEST_FLOAT(f), D_TEST_FLOAT(f), Animation::KI_catmullRom);
+		Animation::FloatKey floatKey; D_TEST_KEY(floatKey, D_TEST_FLOAT(f), D_TEST_FLOAT(f), Animation::KI_hermite);
 		Animation::Vector2Key vector2Key; D_TEST_KEY(vector2Key, D_TEST_FLOAT(f), D_TEST_FLOAT2(f), Animation::KI_ramp);
 		Animation::Vector3Key vector3Key; D_TEST_KEY(vector3Key, D_TEST_FLOAT(f), D_TEST_FLOAT3(f), Animation::KI_smooth);
 		Animation::Vector4Key vector4Key; D_TEST_KEY(vector4Key, D_TEST_FLOAT(f), D_TEST_FLOAT4(f), Animation::KI_step);

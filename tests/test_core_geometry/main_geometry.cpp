@@ -84,9 +84,8 @@ protected:
 		camera->SetName("camera");
 
 		// -- texture
-		TextureResRef texture = new TextureRes();
-
-		texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
+		TextureResRef texture;
+		texture = this->Load<Texture2DRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 		// -- texture sampler
 		m_textureSampler = new TextureSampler();
@@ -103,17 +102,19 @@ protected:
 
 		// -- model 
 		ModelRef model = new Model(new Mesh());
-		model->SetMaterial(new Material(Material::MT_flat));
+		model->SetMaterial(new Material());
 		model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
 		model->GetMaterial()->SetName("GridMaterial");
 
 		model->SetGeometryShader(m_geometryShader);
 
-		model->SetName("cube");
-		model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
-		model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
-		model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
-		model->GetMesh()->Build(render, m_vertexShader);
+		//model->SetName("cube");
+		//model->GetMesh()->AddPointer("POSITION", sizeof(GrafkitData::cubeVertices[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeVertices);
+		//model->GetMesh()->AddPointer("TEXCOORD", sizeof(GrafkitData::cubeTextureUVs[0]) * 4 * GrafkitData::cubeVertexLength, GrafkitData::cubeTextureUVs);
+		//model->GetMesh()->SetIndices(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices);
+		//model->GetMesh()->Build(render, m_vertexShader);
+
+		model = GrafkitData::CreateCube();
 
 		// -- setup scene 
 		scene = new SceneRes(new Scene());

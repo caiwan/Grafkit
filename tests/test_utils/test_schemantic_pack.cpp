@@ -10,6 +10,12 @@ using namespace FWdebugExceptions;
 
 TEST(InputSchemantic, given_input_schemantic_when_pack_then_ok) 
 {
+	int p[] = {
+		0,0,0,0,
+		0,0,0,0,
+		0,0,0,0,
+		0,0,0,0 };
+
 	StructPack packer;
 
 	int id_position = packer.addField(16);
@@ -26,19 +32,19 @@ TEST(InputSchemantic, given_input_schemantic_when_pack_then_ok)
 	int id_weight2  = packer.addField(4);
 	int id_weight4  = packer.addField(4);
 
-	packer.addPointer(id_position  , 0, 0, 16);
-	packer.addPointer(id_normal	   , 0, 0, 16);
-	packer.addPointer(id_tangent   , 0, 0, 16);
-	packer.addPointer(id_binormal  , 0, 0, 16);
-	packer.addPointer(id_tex	   , 0, 0, 8);
-	packer.addPointer(id_group0	   , 0, 0, 2);
-	packer.addPointer(id_group1	   , 0, 0, 2);
-	packer.addPointer(id_group2	   , 0, 0, 2);
-	packer.addPointer(id_group3	   , 0, 0, 2);
-	packer.addPointer(id_weight0   , 0, 0, 4);
-	packer.addPointer(id_weight1   , 0, 0, 4);
-	packer.addPointer(id_weight2   , 0, 0, 4);
-	packer.addPointer(id_weight4   , 0, 0, 4);
+	packer.addPointer(id_position  , p, 0, 16);
+	packer.addPointer(id_normal	   , p, 0, 16);
+	packer.addPointer(id_tangent   , p, 0, 16);
+	packer.addPointer(id_binormal  , p, 0, 16);
+	packer.addPointer(id_tex	   , p, 0, 8);
+	packer.addPointer(id_group0	   , p, 0, 2);
+	packer.addPointer(id_group1	   , p, 0, 2);
+	packer.addPointer(id_group2	   , p, 0, 2);
+	packer.addPointer(id_group3	   , p, 0, 2);
+	packer.addPointer(id_weight0   , p, 0, 4);
+	packer.addPointer(id_weight1   , p, 0, 4);
+	packer.addPointer(id_weight2   , p, 0, 4);
+	packer.addPointer(id_weight4   , p, 0, 4);
 
 	void * result = packer(0);
 

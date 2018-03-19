@@ -66,10 +66,7 @@ namespace Grafkit {
 
 			float m_key;
 			V m_value;
-
-			// lehet nem is kell majd vagy nem igy
 			float m_tangent;
-
 		};
 
 		/**

@@ -88,16 +88,16 @@ protected:
 		
 		float a = M_1_PI / 2;
 
-		cameraAnimation->AddRotationKey(0.0, Quaternion::fromEuler(0, 0, 0));
-		cameraAnimation->AddRotationKey(1.0, Quaternion::fromEuler(a, 0, 0));
-		cameraAnimation->AddRotationKey(2.0, Quaternion::fromEuler(a, a, 0));
+		cameraAnimation->AddRotationKey(0.0, Quaternion::FromEuler(0, 0, 0));
+		cameraAnimation->AddRotationKey(1.0, Quaternion::FromEuler(a, 0, 0));
+		cameraAnimation->AddRotationKey(2.0, Quaternion::FromEuler(a, a, 0));
 
-		cameraAnimation->AddRotationKey(3.0, Quaternion::fromEuler(a, a, a));
-		cameraAnimation->AddRotationKey(4.0, Quaternion::fromEuler(0, a, a));
-		cameraAnimation->AddRotationKey(5.0, Quaternion::fromEuler(0, 0, a));
-		cameraAnimation->AddRotationKey(6.0, Quaternion::fromEuler(0, 0, 0));
+		cameraAnimation->AddRotationKey(3.0, Quaternion::FromEuler(a, a, a));
+		cameraAnimation->AddRotationKey(4.0, Quaternion::FromEuler(0, a, a));
+		cameraAnimation->AddRotationKey(5.0, Quaternion::FromEuler(0, 0, a));
+		cameraAnimation->AddRotationKey(6.0, Quaternion::FromEuler(0, 0, 0));
 		
-		cameraAnimation->SetActor(m_scene->Get()->GetActiveCamera());
+		cameraAnimation->SetActor(m_scene->Get()->GetActiveCameraNode());
 
 		m_scene->Get()->AddAnimation(cameraAnimation);
 

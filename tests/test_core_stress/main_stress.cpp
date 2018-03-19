@@ -80,9 +80,8 @@ protected:
 			camera->SetName("camera");
 
 			// -- texture
-			TextureResRef texture = new TextureRes();
-
-			texture = this->Load<TextureRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
+			Texture2DResRef texture;
+			texture = this->Load<Texture2DRes>(new TextureFromBitmap("Untitled.png", "textures/Untitled.png"));
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();

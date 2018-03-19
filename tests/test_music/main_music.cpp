@@ -103,7 +103,7 @@ protected:
 		}
 
 		// render fx chain 
-		(*m_fxFFTVisu)->SetShaderResourceView("fftTex", m_FFTTTex->GetShaderResourceView());
+		(*m_fxFFTVisu)->SetShaderResourceView(render, "fftTex", m_FFTTTex->GetShaderResourceView());
 
 		m_postfx->Render(render);
 

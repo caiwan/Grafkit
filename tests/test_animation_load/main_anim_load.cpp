@@ -115,7 +115,7 @@ protected:
 		//scene->Get()->SetActiveCamera("MainCamera");
 
 		currCameraActor = scene->Get()->GetActiveCamera();
-		camera = dynamic_cast<Camera*>(currCameraActor->GetEntities()[0].Get());
+		camera = dynamic_cast<Camera*>(currCameraActor.Get());
 		if (camera.Valid()) {
 			//c->SetUp(0, 0, 1);
 			//c->SetLookTo(0, -1, 0);
