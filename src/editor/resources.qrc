@@ -16,4 +16,21 @@
         <file alias="light.png">res/img/icons/light.png</file>
         <file alias="mesh.png">res/img/icons/polygon.png</file>
     </qresource>
+    <qresource prefix="/svg">
+        <file alias="checkbox_checked.svg">res/img/svg/checkbox_checked.svg</file>
+        <file alias="checkbox_checked_disabled.svg">res/img/svg/checkbox_checked_disabled.svg</file>
+        <file alias="checkbox_checked_focus.svg">res/img/svg/checkbox_checked_focus.svg</file>
+        <file alias="checkbox_indeterminate.svg">res/img/svg/checkbox_indeterminate.svg</file>
+        <file alias="checkbox_indeterminate_disabled.svg">res/img/svg/checkbox_indeterminate_disabled.svg</file>
+        <file alias="heckbox_indeterminate_focus.svg">res/img/svg/checkbox_indeterminate_focus.svg</file>
+        <file alias="checkbox_unchecked.svg">res/img/svg/checkbox_unchecked.svg</file>
+        <file alias="checkbox_unchecked_disabled.svg">res/img/svg/checkbox_unchecked_disabled.svg</file>
+        <file alias="checkbox_unchecked_focus.svg">res/img/svg/checkbox_unchecked_focus.svg</file>
+        <file alias="radio_checked.svg">res/img/svg/radio_checked.svg</file>
+        <file alias="radio_checked_disabled.svg">res/img/svg/radio_checked_disabled.svg</file>
+        <file alias="/radio_checked_focus.svg">res/img/svg/radio_checked_focus.svg</file>
+        <file alias="radio_unchecked.svg">res/img/svg/radio_unchecked.svg</file>
+        <file alias="radio_unchecked_disabled.svg">res/img/svg/radio_unchecked_disabled.svg</file>
+        <file alias="radio_unchecked_focus.svg">res/img/svg/radio_unchecked_focus.svg</file>
+    </qresource>
 </RCC>
