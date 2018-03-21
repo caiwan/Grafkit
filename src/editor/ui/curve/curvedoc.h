@@ -4,7 +4,7 @@
 
 #include "Event.h"
 
-#include "render/animation.h"
+#include "animation/animation.h"
 
 namespace Idogep {
 
@@ -46,9 +46,9 @@ namespace Idogep {
 		CurveDocument();
 
 		QList<CurvePointItem*>* getCurvePoints() { return m_curve; }
-		Ref<Grafkit::Animation::FloatTrack> getTrack() { return m_track; }
+		Ref<Grafkit::Animation::Track> getTrack() { return m_track; }
 
-		void setTrack(Ref<Grafkit::Animation::FloatTrack>& track);
+		void setTrack(Ref<Grafkit::Animation::Track>& track);
 
 	protected:
 		void recalculate();
@@ -64,7 +64,7 @@ namespace Idogep {
 
 	private:
 		QList<CurvePointItem*>* m_curve;
-		Ref<Grafkit::Animation::FloatTrack> m_track; // todo: multiple fiszfasz
+		Ref<Grafkit::Animation::Track> m_track; // todo: multiple fiszfasz
 
 		// TODO:
 		//CurveCursor *m_crsrPlayback;

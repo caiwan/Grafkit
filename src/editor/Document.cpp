@@ -8,7 +8,8 @@
 #include "render/model.h"
 #include "render/material.h"
 
-#include "render/scene.h"
+#include "render/SceneGraph.h"
+#include "animation/scene.h"
 
 #include "generator/ShaderLoader.h"
 
@@ -99,21 +100,24 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 
 	// -- scenegraph
 
-	m_scenegraph = new SceneRes(new Scene());
+#if 0
+
+	//m_scenegraph = new SceneRes(new Scene());
 	m_scenegraph->SetName("Scene");
 
 	m_scenegraph->Get()->Initialize(rootActor);
 
 	m_scenegraph->Get()->BuildScene(render, m_vs, m_ps);
-	m_scenegraph->Get()->SetActiveCamera(0);
+	//m_scenegraph->Get()->SetActiveCamera(0);
 
 	m_rootActor = m_scenegraph->Get()->GetRootNode();
-	m_cameraActor = m_scenegraph->Get()->GetCamera(0);
+	//m_cameraActor = m_scenegraph->Get()->GetCamera(0);
 
-	// --- test aimation
-	m_testAnimation = new Animation::FloatTrack();
-	for (int i = 0; i < 35; i++) {
-		m_testAnimation->AddKey(Animation::FloatKey(i, PseudoRandom::Random()));
-	}
+	//// --- test aimation
+	//m_testAnimation = new Animation::FloatTrack();
+	//for (int i = 0; i < 35; i++) {
+	//	m_testAnimation->AddKey(Animation::FloatKey(i, PseudoRandom::Random()));
+	//}
 
+#endif 
 }

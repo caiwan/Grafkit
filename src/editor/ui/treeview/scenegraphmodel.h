@@ -2,7 +2,7 @@
 
 #include <list>
 
-#include "render/Scene.h"
+#include "animation/Scene.h"
 
 #include "treeitem.h"
 #include "treemodel.h"

@@ -3,8 +3,9 @@
 #include "common.h"
 
 #include "render/renderer.h"
-#include "render/animation.h"
 #include "render/effect.h"
+
+#include "animation/scene.h"
 
 namespace Grafkit {
 	class IResourceManager;
@@ -26,7 +27,7 @@ namespace Idogep {
 		Document();
 		virtual ~Document();
 
-		Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
+		//Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
 
 		void Preload(Grafkit::IResourceManager * const & resman);
 		void Initialize(Grafkit::Renderer &render);
@@ -43,7 +44,7 @@ namespace Idogep {
 
 		bool m_isDirty;
 
-		Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
+		//Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
 
 		Grafkit::ShaderResRef m_vs, m_ps;
 		Grafkit::SceneResRef m_scenegraph;

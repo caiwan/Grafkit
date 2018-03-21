@@ -3,7 +3,7 @@
 
 #include "qgraphicsview.h"
 
-#include "render/animation.h"
+#include "animation/animation.h"
 
 #include "curveeditorwidget.h"
 #include "curveeditorscene.h"

@@ -10,6 +10,8 @@
 #include "render/light.h"
 #include "render/SceneGraph.h"
 
+#include "animation.h"
+
 namespace Grafkit {
 
 	class SceneRenderBuffers;

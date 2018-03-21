@@ -84,9 +84,9 @@ Idogep::CurveDocument::CurveDocument() :
 {
 }
 
-void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::FloatTrack>& track)
+void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::Track>& track)
 {
-	m_track = new Grafkit::Animation::FloatTrack(track);
+	m_track = new Grafkit::Animation::Track(track);
 
 	// clear?
 	delete 	m_curve;
