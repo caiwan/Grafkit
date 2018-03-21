@@ -75,7 +75,7 @@ protected:
 		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
 
 		// -- model 
-		m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
+		//m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 
 		DoPrecalc();
 		

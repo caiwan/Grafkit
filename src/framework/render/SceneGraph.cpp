@@ -154,4 +154,6 @@ ActorRef Grafkit::SceneGraph::GetNode(std::string name)
 
 void Grafkit::SceneGraph::serialize(Archive & ar)
 {
+	// actorok, entityk exportja, importja goez here 
+	// a regi scene loaderbol ki kell szedni es ide be kell rakosgatni
 }
