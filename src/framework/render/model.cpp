@@ -3,10 +3,9 @@
 #include "mesh.h"
 #include "Material.h"
 #include "shader.h"
-#include "scene.h"
+#include "SceneGraph.h"
 
 #include "Actor.h"
-
 
 #include "model.h"
 

@@ -1,8 +1,5 @@
 #include "stdafx.h"
-
 #include "animation.h"
-
-#include "camera.h"
 
 using namespace Grafkit;
 

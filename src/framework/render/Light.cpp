@@ -2,7 +2,7 @@
 
 #include "Light.h"
 
-#include "Scene.h"
+#include "SceneGraph.h"
 
 using namespace Grafkit;
 
@@ -22,8 +22,13 @@ Light::~Light()
 {
 }
 
-void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, SceneGraph * const & scene, Matrix &nodeMatrix)
+void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, ActorRef parent)
 {
+	if (parent.Invalid())
+		return;
+
+	Matrix &nodeMatrix = parent->WorldMatrix();
+
 	m_position.w = 1.;
 	//m_direction.w = 0.;
 	m_light.position = nodeMatrix.Transfrom(m_position);

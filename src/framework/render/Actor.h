@@ -29,6 +29,7 @@ namespace Grafkit {
 		Entity3D();
 		virtual ~Entity3D();
 
+		virtual void Calculate(Renderer& renderer, ActorRef parent = nullptr) = 0;
 		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph * const & scene) = 0;
 		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph * const & scene) = 0;
 
@@ -42,36 +43,38 @@ namespace Grafkit {
 		std::string m_name;
 	};
 
+	// Probaly we don!t need this thing below:
+
 	//class Actor;
 	//typedef Ref<Actor> ActorRef;
 
 	// an event handler to do some special before and after entering each node in the graph
 	// it helps to interchange shaders on the fly
-	__declspec(align(16))
-		class ActorEventHandler : public AlignedNew<ActorEventHandler>, public Referencable
-	{
-	public:
-		ActorEventHandler();
-		virtual ~ActorEventHandler();
+	//__declspec(align(16))
+	//	class ActorEventHandler : public AlignedNew<ActorEventHandler>, public Referencable
+	//{
+	//public:
+	//	ActorEventHandler();
+	//	virtual ~ActorEventHandler();
 
-		virtual void OnBeforeRender(Grafkit::Renderer& render, SceneGraph * const & scene) { PushShader(scene); }
-		virtual void OnAfterRender(Grafkit::Renderer& render, SceneGraph * const & scene) { PopShader(scene); }
+	//	virtual void OnBeforeRender(Grafkit::Renderer& render, SceneGraph * const & scene) { PushShader(scene); }
+	//	virtual void OnAfterRender(Grafkit::Renderer& render, SceneGraph * const & scene) { PopShader(scene); }
 
-		void SetPShader(ShaderResRef & ps) { myPShader = ps; }
-		void SetVshader(ShaderResRef & vs) { myVShader = vs; }
+	//	void SetPShader(ShaderResRef & ps) { myPShader = ps; }
+	//	void SetVshader(ShaderResRef & vs) { myVShader = vs; }
 
-	protected:
-		void PushShader(SceneGraph *const & scene);
-		void PopShader(SceneGraph *const & scene);
+	//protected:
+	//	void PushShader(SceneGraph *const & scene);
+	//	void PopShader(SceneGraph *const & scene);
 
-	protected:
-		ShaderResRef myPShader;
-		ShaderResRef myVShader;
+	//protected:
+	//	ShaderResRef myPShader;
+	//	ShaderResRef myVShader;
 
-	private:
-		ShaderResRef otherPShader;
-		ShaderResRef otherVShader;
-	};
+	//private:
+	//	ShaderResRef otherPShader;
+	//	ShaderResRef otherVShader;
+	//};
 
 	/**
 	An actor node - ez a scenegraph es a nodeja
@@ -105,7 +108,7 @@ namespace Grafkit {
 		Entity3DRef GetEntity(int id = 0) { return m_pEntities[id]; }
 		size_t GetEntityCount() { return m_pEntities.size(); }
 
-		void SetEventHandler(Ref<ActorEventHandler> handler) { myEvtHandler = handler; }
+		//void SetEventHandler(Ref<ActorEventHandler> handler) { myEvtHandler = handler; }
 
 		void Hide() { m_ishidden = 1; }
 		void Show() { m_ishidden = 0; }
@@ -113,6 +116,7 @@ namespace Grafkit {
 		int IsHidden() { return (m_pParent.Invalid() ? 0 : m_pParent->IsHidden()) || m_ishidden; }
 
 	public:
+		// calculated matrix for internal use
 		Grafkit::Matrix WorldMatrix() { return m_worldMatrix; }
 
 	public:
@@ -125,18 +129,19 @@ namespace Grafkit {
 	protected:
 		void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
 
-		void DispatchBeforeRender(Grafkit::Renderer& render, SceneGraph * const & scene) {
-			if (m_pParent.Valid())
-				m_pParent->DispatchBeforeRender(render, scene);
-			if (myEvtHandler.Valid())
-				myEvtHandler->OnBeforeRender(render, scene);
-		}
-		void DispatchAfterRender(Grafkit::Renderer& render, SceneGraph * const & scene) {
-			if (m_pParent.Valid())
-				m_pParent->DispatchAfterRender(render, scene);
-			if (myEvtHandler.Valid())
-				myEvtHandler->OnAfterRender(render, scene);
-		}
+		//// Probaly we don!t need this thing 
+		//void DispatchBeforeRender(Grafkit::Renderer& render, SceneGraph * const & scene) {
+		//	if (m_pParent.Valid())
+		//		m_pParent->DispatchBeforeRender(render, scene);
+		//	if (myEvtHandler.Valid())
+		//		myEvtHandler->OnBeforeRender(render, scene);
+		//}
+		//void DispatchAfterRender(Grafkit::Renderer& render, SceneGraph * const & scene) {
+		//	if (m_pParent.Valid())
+		//		m_pParent->DispatchAfterRender(render, scene);
+		//	if (myEvtHandler.Valid())
+		//		myEvtHandler->OnAfterRender(render, scene);
+		//}
 
 		Grafkit::Matrix m_viewMatrix;			///< Node tranyyformacioja
 		Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
@@ -146,7 +151,7 @@ namespace Grafkit {
 		std::vector<Ref<Actor>> m_pChildren;
 		std::vector<Ref<Entity3D>> m_pEntities;
 
-		Ref<ActorEventHandler> myEvtHandler;
+		//Ref<ActorEventHandler> myEvtHandler;
 
 		int m_ishidden;
 

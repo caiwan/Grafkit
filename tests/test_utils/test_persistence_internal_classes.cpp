@@ -11,9 +11,9 @@ TCs for internal classes such as scene and so on
 
 #include "Assert.h"
 
-#include "render/Scene.h"
+#include "render/SceneGraph.h"
 #include "render/Model.h"
-#include "render/Animation.h"
+#include "animation/animation.h"
 
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
@@ -42,7 +42,7 @@ using namespace ArchivePersistent;
 		ASSERT_TRUE(object.Get() != object_read.Get());\
 	}
 
-DEFINE_PREGNANCY_TEST(Scene)
+DEFINE_PREGNANCY_TEST(SceneGraph)
 DEFINE_PREGNANCY_TEST(Actor)
 DEFINE_PREGNANCY_TEST(Material)
 DEFINE_PREGNANCY_TEST(Mesh)
@@ -53,10 +53,6 @@ DEFINE_PREGNANCY_TEST(Model)
 */
 
 #define D_TEST_FLOAT(f) (f)
-#define D_TEST_FLOAT2(f) (float2((f), (f)))
-#define D_TEST_FLOAT3(f) (float3((f), (f), (f)))
-#define D_TEST_FLOAT4(f) (float4((f), (f), (f), (f)))
-#define D_TEST_QUATERNION(f) (Quaternion::fromEuler((f), (f), (f)))
 
 #define D_TEST_KEY(in, key, value, type)\
 	in.m_key = key; in.m_type = type; in.m_value = value
@@ -69,44 +65,23 @@ TEST(Persistent_Animation, given_AnimationKey_when_persist_then_Load) {
 	TestArchiver ar(256, true);
 
 	// given
-	Animation::FloatKey floatKey; D_TEST_KEY(floatKey, D_TEST_FLOAT(.1), D_TEST_FLOAT(.1), Animation::KI_hermite);
-	Animation::Vector2Key float2Key; D_TEST_KEY(float2Key, D_TEST_FLOAT(.1), D_TEST_FLOAT2(.1), Animation::KI_ramp);
-	Animation::Vector3Key float3Key; D_TEST_KEY(float3Key, D_TEST_FLOAT(.1), D_TEST_FLOAT3(.1), Animation::KI_smooth);
-	Animation::Vector4Key float4Key; D_TEST_KEY(float4Key, D_TEST_FLOAT(.1), D_TEST_FLOAT4(.1), Animation::KI_step);
-
+	Animation::Key key; D_TEST_KEY(key, D_TEST_FLOAT(.1), D_TEST_FLOAT(.1), Animation::KI_hermite);
+	
 	//when
-	PERSIST_FIELD(ar, floatKey);
-	PERSIST_FIELD(ar, float2Key);
-	PERSIST_FIELD(ar, float3Key);
-	PERSIST_FIELD(ar, float4Key);
-
+	PERSIST_FIELD(ar, key);
+	
 	//then
 	ar.ResetCrsr();
 	ar.SetDirection(false);
 
-	Animation::FloatKey test_floatKey;
-	Animation::Vector2Key test_float2Key;
-	Animation::Vector3Key test_float3Key;
-	Animation::Vector4Key test_float4Key;
-
-	PERSIST_FIELD(ar, test_floatKey);
-	PERSIST_FIELD(ar, test_float2Key);
-	PERSIST_FIELD(ar, test_float3Key);
-	PERSIST_FIELD(ar, test_float4Key);
-
-	ASSERT_KEY_EQ(floatKey, test_floatKey);
-	ASSERT_FLOAT_EQ(floatKey.m_value, test_floatKey.m_value);
-
-	ASSERT_KEY_EQ(float2Key,test_float2Key);
-	ASSERT_FLOAT2_EQ(float2Key.m_value, test_float2Key.m_value);
+	Animation::Key test_key;
 	
-	ASSERT_KEY_EQ(float3Key, test_float3Key);
-	ASSERT_FLOAT3_EQ(float3Key.m_value, test_float3Key.m_value);
-	
-	ASSERT_KEY_EQ(float4Key, test_float4Key);
-	ASSERT_FLOAT4_EQ(float4Key.m_value, test_float4Key.m_value);
+	PERSIST_FIELD(ar, test_key);
+
+	ASSERT_KEY_EQ(key, test_key);
+	ASSERT_FLOAT_EQ(key.m_value, test_key.m_value);
+
 }
-
 
 /*
 	Tests if every used animation track types could've been persisted
@@ -116,72 +91,35 @@ TEST(Persistent_Animation, given_AnimationTrack_when_persist_then_Load) {
 	TestArchiver ar(16*4096, true);
 
 	// given
-	Animation::FloatTrack floatTrack;
-	Animation::Vector2Track vector2Track;
-	Animation::Vector3Track vector3Track;
-	Animation::Vector4Track vector4Track;
+	Animation::Track track;
 
 	for (int i = 0; i < 256; ++i) {
 		float f = 1. / i;
-		Animation::FloatKey floatKey; D_TEST_KEY(floatKey, D_TEST_FLOAT(f), D_TEST_FLOAT(f), Animation::KI_hermite);
-		Animation::Vector2Key vector2Key; D_TEST_KEY(vector2Key, D_TEST_FLOAT(f), D_TEST_FLOAT2(f), Animation::KI_ramp);
-		Animation::Vector3Key vector3Key; D_TEST_KEY(vector3Key, D_TEST_FLOAT(f), D_TEST_FLOAT3(f), Animation::KI_smooth);
-		Animation::Vector4Key vector4Key; D_TEST_KEY(vector4Key, D_TEST_FLOAT(f), D_TEST_FLOAT4(f), Animation::KI_step);
+		Animation::Key key; D_TEST_KEY(key, D_TEST_FLOAT(f), D_TEST_FLOAT(f), Animation::KI_hermite);
 
-		floatTrack.AddKey(floatKey);
-		vector2Track.AddKey(vector2Key);
-		vector3Track.AddKey(vector3Key);
-		vector4Track.AddKey(vector4Key);
+		track.AddKey(key);
 	}
 	
 	//when
-	floatTrack.serialize(ar);
-	vector2Track.serialize(ar);
-	vector3Track.serialize(ar);
-	vector4Track.serialize(ar);
+	track.serialize(ar);
 
 	//then
 	ar.ResetCrsr();
 	ar.SetDirection(false);
 
-	Animation::FloatTrack test_floatTrack;
-	Animation::Vector2Track test_vector2Track;
-	Animation::Vector3Track test_vector3Track;
-	Animation::Vector4Track test_vector4Track;
+	Animation::Track test_track;
+	test_track.serialize(ar);
 
-	test_floatTrack.serialize(ar);
-	test_vector2Track.serialize(ar);
-	test_vector3Track.serialize(ar);
-	test_vector4Track.serialize(ar);
-
-	ASSERT_EQ(floatTrack.GetKeyCount(), test_floatTrack.GetKeyCount());
-	ASSERT_EQ(vector2Track.GetKeyCount(), test_vector2Track.GetKeyCount());
-	ASSERT_EQ(vector3Track.GetKeyCount(), test_vector3Track.GetKeyCount());
-	ASSERT_EQ(vector4Track.GetKeyCount(), test_vector4Track.GetKeyCount());
+	ASSERT_EQ(track.GetKeyCount(), test_track.GetKeyCount());
 
 	for (int i = 0; i < 256; ++i) {
-		Animation::FloatKey floatKey = floatTrack.GetKey(i);
-		Animation::Vector2Key vector2Key = vector2Track.GetKey(i);
-		Animation::Vector3Key vector3Key = vector3Track.GetKey(i);
-		Animation::Vector4Key vector4Key = vector4Track.GetKey(i);
+		Animation::Key key = track.GetKey(i);
+		Animation::Key test_key = test_track.GetKey(i);
 
-		Animation::FloatKey test_floatKey = test_floatTrack.GetKey(i);
-		Animation::Vector2Key test_vector2Key = test_vector2Track.GetKey(i);
-		Animation::Vector3Key test_vector3Key = test_vector3Track.GetKey(i);
-		Animation::Vector4Key test_vector4Key = test_vector4Track.GetKey(i);
-
-		ASSERT_KEY_EQ(floatKey, test_floatKey);
-		ASSERT_FLOAT_EQ(floatKey.m_value, test_floatKey.m_value);
-
-		ASSERT_KEY_EQ(vector2Key, test_vector2Key);
-		ASSERT_FLOAT2_EQ(vector2Key.m_value, test_vector2Key.m_value);
-
-		ASSERT_KEY_EQ(vector3Key, test_vector3Key);
-		ASSERT_FLOAT3_EQ(vector3Key.m_value, test_vector3Key.m_value);
-
-		ASSERT_KEY_EQ(vector4Key, test_vector4Key);
-		ASSERT_FLOAT4_EQ(vector4Key.m_value, test_vector4Key.m_value);
+		ASSERT_KEY_EQ(key, test_key);
+		ASSERT_FLOAT_EQ(key.m_value, test_key.m_value);
 	}
 
 }
 
+// + multitrack

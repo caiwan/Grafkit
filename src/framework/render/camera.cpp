@@ -30,9 +30,8 @@ Camera::~Camera()
 {
 }
 
-void Camera::Calculate(Renderer& renderer)
+void Grafkit::Camera::Calculate(Renderer & renderer, ActorRef parent)
 {
-
 	renderer.GetViewportSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;
 
@@ -62,6 +61,12 @@ void Camera::Calculate(Renderer& renderer)
 
 		m_perspectiveMatrix = XMMatrixPerspectiveFovLH(fov, m_aspect, m_znear, m_zfar);
 		m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
+	}
+
+	m_worldMatrix.Identity();
+	if (parent.Valid()) {
+		m_worldMatrix = m_viewMatrix;
+		m_worldMatrix.Multiply(parent->WorldMatrix());
 	}
 }
 

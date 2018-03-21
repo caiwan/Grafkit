@@ -32,6 +32,7 @@ namespace Grafkit
 		MaterialRef GetMaterial() const		{ return this->m_material; }
 		void SetMaterial(MaterialRef material) { this->m_material = material; }
 
+		virtual void Calculate(Grafkit::Renderer& deviceContext, ActorRef patent = nullptr) {}
 		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph* const & scene);
 		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene);
 

@@ -13,7 +13,7 @@
 #include "render/Light.h"
 #include "render/camera.h"
 
-#include "render/animation.h"
+//#include "render/animation.h"
 
 #define ADD_CLONABLE(_name, _clazzname)\
 	Grafkit::AddClonable _name(#_clazzname, new _clazzname::Factory())
@@ -25,5 +25,5 @@ Grafkit::ClonableInitializer::ClonableInitializer()
 	ADD_CLONABLE(material, Grafkit::Material);
 	ADD_CLONABLE(camera, Grafkit::Camera);
 	ADD_CLONABLE(light, Grafkit::Light);
-	ADD_CLONABLE(actorAnimation, Grafkit::ActorAnimation);
+	//ADD_CLONABLE(actorAnimation, Grafkit::ActorAnimation);
 }

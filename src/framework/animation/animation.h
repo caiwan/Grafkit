@@ -4,13 +4,12 @@
 #include <map>
 #include <string>
 
-#include "../stdafx.h"
-#include "../math/matrix.h"
-#include "../math/quaternion.h"
+#include "math/matrix.h"
+#include "math/quaternion.h"
 
-#include "../utils/reference.h"
+#include "utils/reference.h"
 
-#include "Actor.h"
+#include "render/Actor.h"
 
 namespace Grafkit {
 
@@ -261,8 +260,7 @@ namespace Grafkit {
 		return 1;
 	}
 
-	template<typename V>
-	inline void Animation::Track<V>::serialize(Archive & ar)
+	inline void Animation::Track::serialize(Archive & ar)
 	{
 		size_t len = 0;
 
@@ -276,7 +274,7 @@ namespace Grafkit {
 		PERSIST_FIELD(ar, len);
 
 		for (size_t i = 0; i < len; ++i) {
-			Key<value_t> key;
+			Key key;
 
 			if (ar.IsStoring()) {
 				key = m_track[i];

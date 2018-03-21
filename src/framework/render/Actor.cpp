@@ -2,7 +2,7 @@
 
 #include "Actor.h"
 #include "shader.h"
-#include "scene.h"
+#include "SceneGraph.h"
 
 using namespace Grafkit;
 
@@ -63,33 +63,33 @@ void Grafkit::Actor::serialize(Archive & ar)
 
 // ================================================================
 
-Grafkit::ActorEventHandler::ActorEventHandler()
-{
-}
-
-
-Grafkit::ActorEventHandler::~ActorEventHandler()
-{
-}
-
-void Grafkit::ActorEventHandler::PushShader(SceneGraph * const & scene)
-{
-	otherPShader = scene->GetPShader();
-	otherVShader = scene->GetPShader();
-	
-	if (myVShader.Invalid() || myPShader.Invalid())
-		return;
-
-	if (myVShader->Invalid() || myPShader->Invalid())
-		return;
-
-	scene->SetPShader(myPShader);
-	scene->SetVShader(myVShader);
-
-}
-
-void Grafkit::ActorEventHandler::PopShader(SceneGraph * const & scene)
-{
-	scene->SetPShader(otherPShader);
-	scene->SetVShader(otherVShader);
-}
+//Grafkit::ActorEventHandler::ActorEventHandler()
+//{
+//}
+//
+//
+//Grafkit::ActorEventHandler::~ActorEventHandler()
+//{
+//}
+//
+//void Grafkit::ActorEventHandler::PushShader(SceneGraph * const & scene)
+//{
+//	otherPShader = scene->GetPShader();
+//	otherVShader = scene->GetPShader();
+//	
+//	if (myVShader.Invalid() || myPShader.Invalid())
+//		return;
+//
+//	if (myVShader->Invalid() || myPShader->Invalid())
+//		return;
+//
+//	scene->SetPShader(myPShader);
+//	scene->SetVShader(myVShader);
+//
+//}
+//
+//void Grafkit::ActorEventHandler::PopShader(SceneGraph * const & scene)
+//{
+//	scene->SetPShader(otherPShader);
+//	scene->SetVShader(otherVShader);
+//}

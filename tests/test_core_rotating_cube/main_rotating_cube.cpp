@@ -1,7 +1,7 @@
 #include "core/system.h"
 
 #include "render/renderer.h"
-#include "render/Scene.h"
+#include "render/SceneGraph.h"
 #include "render/camera.h"
 #include "render/model.h"
 #include "render/texture.h"
@@ -154,7 +154,7 @@ protected:
 			Matrix cameraMatrix;
 			camera->Calculate(render);
 			cameraMatrix = camera->GetViewMatrix();
-			cameraMatrix .Translate(0, 0, 10);
+			cameraMatrix.Translate(0, 0, 10);
 
 			Matrix worldMatrix;
 			worldMatrix.Identity();
@@ -197,19 +197,19 @@ protected:
 		}
 
 		this->render.EndScene();
-		return 0;
+		return t >= 1.f;
 	};
 
 private:
-	FileAssetFactory *m_file_loader;
+	FileAssetFactory * m_file_loader;
 
 public:
-	IAssetFactory* GetAssetFactory() { return m_file_loader; };
+	IAssetFactory * GetAssetFactory() { return m_file_loader; };
 	Renderer & GetDeviceContext() { return this->render; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	Application app;
-	return app.execute();
+	app.execute();
 }

@@ -55,9 +55,9 @@ namespace Grafkit{
 		/// Setup the corresponding constant buffer inside the shader
 		//void SetShaderCB(ShaderRef &rPShader);
 
-		void Render(Grafkit::Renderer& deviceContext, SceneGraph * const & scene);
-		void Calculate(Grafkit::Renderer& deviceContext, SceneGraph * const & scene, Matrix &nodeMatrix);
 		void Build(Grafkit::Renderer& deviceContext, SceneGraph * const & scene) {}
+		void Calculate(Grafkit::Renderer& deviceContext, ActorRef parent = nullptr);
+		void Render(Grafkit::Renderer& deviceContext, SceneGraph * const & scene);
 
 	protected:
 

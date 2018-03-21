@@ -78,4 +78,5 @@ namespace Grafkit {
 	typedef Grafkit::Resource<TextureSampler> TextureSamplerRes;
 	typedef Ref<TextureSamplerRes> TextureSamplerResRef;
 
+	// ---
 }

@@ -3,7 +3,7 @@
 #include "SceneLoader.h"
 
 #include "animation/animation.h"
-#include "render/Scene.h"
+#include "animation/scene.h"
 #include "render/model.h"
 #include "render/texture.h"
 #include "render/Material.h"
@@ -140,6 +140,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		}
 	}
 
+#if 0
 	//8, 9 animation -> actor, entity
 	LOGGER(Log::Logger().Info("Animations: %d", m_animation_to_actor.size() + m_animation_to_entity.size()));
 	for (auto it = m_animation_to_actor.cbegin(); it != m_animation_to_actor.cend(); ++it)
@@ -158,6 +159,11 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 
 	}
 
+#endif
+
+
+#if 0
+
 	for (auto it = m_animation_to_entity.cbegin(); it != m_animation_to_entity.cend(); ++it)
 	{
 		USHORT key = it->first;
@@ -174,12 +180,17 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 		}
 
 	}
+#endif
 
 	if (m_actors.empty())
 		throw new EX_DETAILS(SceneLoadException, "Actors are empty for some reason");
 
 	Actor * root = m_actors[0];
+
+#if 0
 	m_scene->Initialize(root);
+#endif
+
 }
 
 // ======================================================================================================================
@@ -193,6 +204,9 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 	m_cMatID = 0;
 	m_cEntityID = 0;
 	m_cActorID = 0;
+
+
+#if 0
 
 	// collect data
 	ActorRef scenegraph = m_scene->GetRootNode();
@@ -230,6 +244,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 
 	BuildActorMap();
 	BuildAnimationMap();
+#endif
 }
 
 // Which texture belong to this exact material, and which shader slot bound to
@@ -305,6 +320,10 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &m
 // which animation affects which entity or actor
 void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 {
+
+
+#if 0
+
 	std::vector<AnimationRef> animations;
 	m_scene->GetAnimations(animations);
 
@@ -334,6 +353,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 			m_Animations.push_back(it->Get());
 		}
 	}
+#endif
 }
 
 // which entity belongs to which actor
@@ -404,6 +424,9 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Save(Archive &ar)
 
 void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceManager * const & resman)
 {
+
+#if 0
+
 	try {
 		// --- persist scene 
 		PERSIST_REFOBJECT(ar, m_scene);
@@ -425,6 +448,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceMan
 	catch (int i) {
 		return;
 	}
+#endif
 }
 
 void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IResourceManager * const & resman)

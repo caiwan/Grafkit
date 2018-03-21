@@ -13,7 +13,7 @@ namespace Grafkit {
 	// 
 
 	/** Basic camera class */
-	__declspec(align(16)) 
+	__declspec(align(16))
 		class Camera : public Entity3D, public AlignedNew<Camera>
 	{
 	public:
@@ -24,11 +24,11 @@ namespace Grafkit {
 
 		void SetAspect(float aspect) { this->m_aspect = aspect; }
 		/// @todo GetAspect()
-		
+
 		/// Horizontal FOV in radian
 		void SetFOV(float fov) { this->m_hFov = fov; }
 		float GetFOV() { return this->m_hFov; }
-		
+
 		void SetClippingPlanes(float znear, float zfar) { this->m_znear = znear, this->m_zfar = zfar; }
 		/// @todo void GetClippingPlanes(float &znear, float &zfar);
 
@@ -36,34 +36,35 @@ namespace Grafkit {
 		/// @todo void GetScreenMetrics(float width, float height) { this->m_screenWidth = width, this->m_screenHeight = height; }
 
 		/** Generate matrices */
-		void Calculate(Renderer& renderer);
+		void Calculate(Renderer& renderer, ActorRef parent = nullptr);
 
 		//skip render, nothing to do with it. 
 		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph* const & scene) {}
-		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene){}
+		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene) {}
 
+		// TODO: rename them
 		Matrix& GetViewMatrix() { return m_viewMatrix; }
 		Matrix& GetPerspectiveMatrix() { return m_perspectiveMatrix; }
 		Matrix& GetOrthoMatrix() { return m_orthoMatrix; }
 
+		Matrix& GetWorldMatrix() { return m_worldMatrix; }
+
 		virtual Matrix& ProjectionMatrix() {
-			switch(m_type){
+			switch (m_type) {
 			case ORTHOGRAPHIC:
 				return m_orthoMatrix;
-			//case PERSPECTIVE:
+				//case PERSPECTIVE:
 			default:
 				return m_perspectiveMatrix;
 			}
 		}
 
-		
-
 		enum camera_mode getMode() {
 			return m_mode;
 		}
-		
+
 		enum camera_type { PERSPECTIVE, ORTHOGRAPHIC };
-		
+
 		virtual void setType(enum camera_type t) {
 			m_type = t;
 		}
@@ -79,8 +80,9 @@ namespace Grafkit {
 
 		enum camera_type m_type; // hack: van, ahol kezzel kell a kamerat atvaltnai perpective/ortho kozott
 		enum camera_mode m_mode;
-	
+
 	protected:
+		Grafkit::Matrix m_worldMatrix;
 		Grafkit::Matrix m_viewMatrix;
 		Grafkit::Matrix m_perspectiveMatrix;
 		Grafkit::Matrix m_orthoMatrix;
