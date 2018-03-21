@@ -11,7 +11,7 @@
 #include "generator/ShaderLoader.h"
 #include "generator/SceneLoader.h"
 
-#include "render/Scene.h"
+#include "animation/scene.h"
 
 #include "math/matrix.h"
 

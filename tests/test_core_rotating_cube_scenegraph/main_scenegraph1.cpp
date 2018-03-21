@@ -1,7 +1,7 @@
 #include "core/system.h"
 
 #include "render/renderer.h"
-#include "render/Scene.h"
+#include "render/SceneGraph.h"
 #include "render/camera.h"
 #include "render/model.h"
 #include "render/texture.h"
@@ -63,6 +63,8 @@ protected:
 		ActorRef m_rootActor;
 		ActorRef m_cameraActor;
 
+		CameraRef m_camera;
+
 		float t;
 
 		ShaderResRef m_vertexShader;
@@ -76,8 +78,8 @@ protected:
 
 			// -- camera
 			/* Az alap kamera origoban van, +z iranyba nez, es +y felfele irany */
-			CameraRef camera = new Camera;
-			camera->SetName("camera");
+			m_camera = new Camera;
+			m_camera->SetName("camera");
 
 			// -- texture
 			TextureResRef texture = new Texture2DRes();
@@ -109,11 +111,11 @@ protected:
 			model->GetMesh()->Build(render, m_vertexShader);
 
 			// -- setup scene 
-			scene = new SceneRes(new Scene());
+			scene = new SceneRes(new SceneGraph());
 			
 			m_cameraActor = new Actor(); 
 			m_cameraActor->SetName("cameraNode");
-			m_cameraActor->AddEntity(camera);
+			m_cameraActor->AddEntity(m_camera);
 			
 			/* Kocka kozepen */
 			ActorRef modelActor = new Actor(); 
@@ -160,7 +162,7 @@ protected:
 
 			scene->Get()->Initialize(m_rootActor);
 
-			scene->Get()->SetActiveCamera(0);
+			//scene->Get()->SetActiveCamera(0);
 
 			// add shaders
 			scene->Get()->SetVShader(m_vertexShader);
@@ -172,7 +174,7 @@ protected:
 			/* ------------------------------------------------------------ */
 
 			/* Export and import stuff to file, then build it */
-#if 1
+#if 0
 			SceneLoader::Save(scene->Get(), "./../assets/hello.scene");
 			scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
 #endif 
@@ -181,12 +183,8 @@ protected:
 
 			scene->Get()->BuildScene(render, m_vertexShader, m_fragmentShader);
 
-			scene->Get()->SetActiveCamera(0);
+			//m_rootActor = scene->Get()->GetRootNode();
 			
-			// --- 
-
-			m_rootActor = scene->Get()->GetRootNode();
-			m_cameraActor = scene->Get()->GetActiveCameraNode();
 
 			this->t = 0;
 
@@ -203,14 +201,9 @@ protected:
 		int mainloop() {
 			this->render.BeginScene();
 			{				
-				//m_rootActor->Matrix().Identity();
-				//m_rootActor->Matrix().RotateRPY(t,t/2,t/4);
-		
-				//float f = abs(sin(t));
-				//m_cameraActor->Transform().Identity();
-				//m_cameraActor->Transform().Translate(0,f,0);
-
-				scene->Get()->RenderFrame(render, 0.0f);
+				scene->Get()->PreRender(render);
+				m_camera->Calculate(render, m_cameraActor);
+				scene->Get()->Render(render, m_camera);
 
 				this->t += 0.1f;
 			}
