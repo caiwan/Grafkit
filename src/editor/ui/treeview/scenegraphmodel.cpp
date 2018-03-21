@@ -4,6 +4,8 @@
 #include "render/model.h"
 #include "render/Light.h"
 
+#include <qdebug.h>
+
 using namespace Grafkit;
 
 Idogep::SceneGraphItem::SceneGraphItem(Grafkit::SceneResRef & scene, TreeItem * parentItem)
@@ -34,6 +36,11 @@ QStringList Idogep::SceneGraphModel::Header()
 void Idogep::SceneGraphModel::Build(TreeItem * parentItem)
 {
 	for (auto scene = m_scenes.begin(); scene != m_scenes.end(); scene++) {
+		if (scene->Invalid() || scene->Get()->Invalid())
+		{
+			qDebug() << "scene == nullptr!";
+			continue;
+		}
 		//SceneGraphItem *item = new SceneGraphItem();
 		QList<QVariant> rowData;
 		rowData << QString::fromStdString(scene->Get()->GetName());

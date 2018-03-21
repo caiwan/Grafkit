@@ -79,6 +79,7 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 
 	cameraActor->Matrix().Identity();
 	cameraActor->Matrix().Translate(0, 0, 10);
+	m_cameraActor = cameraActor;
 
 	model->SetName("cube");
 	model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
@@ -97,6 +98,9 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 
 	rootActor->AddChild(cameraActor);
 	rootActor->AddChild(cubeActor);
+
+	m_rootActor = rootActor;
+
 
 	// -- scenegraph
 
