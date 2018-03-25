@@ -19,15 +19,18 @@ namespace Grafkit {
 		~SceneGraph();
 
 		// Init, shutdown 
-		void Initialize(ActorRef root);
+		void Initialize();
+		void Initialize(ActorRef root); // legacy stuff 
 		void Shutdown();
 
-		void PreRender(Grafkit::Renderer & render);
+		void Update();
 		void Render(Grafkit::Renderer & render, CameraRef & camera);
 
 		// Add / Get node
 		void AddNode(ActorRef& actor);
 		ActorRef GetNode(std::string name);
+
+		void SetRootNode(ActorRef &root) { m_root = root; }
 		ActorRef GetRootNode() { return m_root; }
 
 		size_t GetNodeCount() { return m_nodes.size(); }
@@ -43,7 +46,8 @@ namespace Grafkit {
 		void SetVShader(ShaderResRef &VS) { this->m_vertexShader = VS; }
 		void SetPShader(ShaderResRef &FS) { this->m_pixelShader = FS; }
 
-		void BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps);
+		void BuildScene(Grafkit::Renderer & render);
+		void BuildScene(Grafkit::Renderer & render, ShaderResRef vs, ShaderResRef ps); //legacy stuff
 
 	protected:
 

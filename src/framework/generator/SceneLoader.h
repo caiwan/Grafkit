@@ -34,7 +34,7 @@ namespace Grafkit {
 		*/
 		class SceneLoaderHelper {
 		public:
-			SceneLoaderHelper(Archive &ar, SceneRef &scene);
+			SceneLoaderHelper(Archive &ar, SceneGraphRef &scene);
 			~SceneLoaderHelper();
 
 			void Load(Archive &ar, IResourceManager * const & resman);
@@ -67,7 +67,7 @@ namespace Grafkit {
 			void PersistKeymap(Archive &ar, std::vector<assoc_t> &keymap);
 
 		private:
-			SceneRef &m_scene;
+			SceneGraphRef &m_scene;
 
 			std::vector<Actor*> m_actors;
 			std::vector<Entity3D*> m_entities;

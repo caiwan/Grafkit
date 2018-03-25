@@ -4,12 +4,12 @@
 #include "core/system.h"
 
 #include "render/renderer.h"
-#include "render/camera.h"
-#include "render/Material.h"
 #include "render/shader.h"
 
+#include "testscene.h"
+
 #include "generator/ShaderLoader.h"
-#include "generator/SceneLoader.h"
+//#include "generator/SceneLoader.h"
 
 #include "animation/scene.h"
 
@@ -26,7 +26,7 @@ using namespace Grafkit;
 class Application : public Grafkit::System, protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
 {
 public:
-	Application() : ClonableInitializer(), Grafkit::System(),  ResourcePreloader(),
+	Application() : ClonableInitializer(), Grafkit::System(), ResourcePreloader(),
 		m_file_loader(nullptr)
 	{
 		int screenWidth, screenHeight;
@@ -36,8 +36,6 @@ public:
 
 		// initwindowot is ertelmesebb helyre kell rakni
 		InitializeWindows(screenWidth, screenHeight);
-
-		//this->render = new Renderer();
 
 		// --- ezeket kell osszeszedni egy initwindowban
 		screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
@@ -56,10 +54,10 @@ public:
 
 protected:
 	Renderer render;
-	
+
 	ActorRef m_currCameraActor;
 	CameraRef m_camera;
-	
+
 	SceneResRef m_scene;
 
 	float m_t;
@@ -75,47 +73,13 @@ protected:
 		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/default.hlsl", ""));
 
 		// -- model 
-		//m_scene = this->Load<SceneRes>(new SceneLoader("scene", "hello.scene"));
-
-		DoPrecalc();
-		
-		m_scene->Get()->BuildScene(render, m_vs, m_fs);
-		m_scene->Get()->SetActiveCamera(0);
-
-		// -- add anim tracks
-		ActorAnimation *cameraAnimation = new ActorAnimation();
-		cameraAnimation->AddPositionKey(0, float3(0,0,-10));
-		
-		float a = M_1_PI / 2;
-
-		cameraAnimation->AddRotationKey(0.0, Quaternion::FromEuler(0, 0, 0));
-		cameraAnimation->AddRotationKey(1.0, Quaternion::FromEuler(a, 0, 0));
-		cameraAnimation->AddRotationKey(2.0, Quaternion::FromEuler(a, a, 0));
-
-		cameraAnimation->AddRotationKey(3.0, Quaternion::FromEuler(a, a, a));
-		cameraAnimation->AddRotationKey(4.0, Quaternion::FromEuler(0, a, a));
-		cameraAnimation->AddRotationKey(5.0, Quaternion::FromEuler(0, 0, a));
-		cameraAnimation->AddRotationKey(6.0, Quaternion::FromEuler(0, 0, 0));
-		
-		cameraAnimation->SetActor(m_scene->Get()->GetActiveCameraNode());
-
-		m_scene->Get()->AddAnimation(cameraAnimation);
-
-		//m_scene->Get()->GetActiveCamera()->SetName("puncsostal");
-
-		// -- save and reload
-		SceneLoader::Save(m_scene->Get(), "./../assets/animation.scene");
-		m_scene->Get()->Shutdown();
-		m_scene = this->Load<SceneRes>(new SceneLoader("AnimatedScene", "animation.scene"));
 		DoPrecalc();
 
-		m_scene->Get()->BuildScene(render, m_vs, m_fs);
+		m_scene = new Scene();
+		TestScene::createTestScene(m_scene);
 
-		m_scene->Get()->SetActiveCamera(0);
-		//m_scene->Get()->GetActiveCamera()->SetName("cicavirag");
-		// ((ActorAnimation*)(m_scene->Get()->GetAnimation(0).Get()))->SetActor(m_scene->Get()->GetActiveCamera());
-
-		SceneLoader::Save(m_scene->Get(), "./../assets/animation2.scene");
+		
+		(*m_scene)->Initialize();
 
 		m_t = 0;
 
@@ -130,25 +94,23 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
+
+
+
 			m_t += .01;
-
-			this->m_scene->Get()->UpdateAnimation(fmod(m_t, 10.5));
-			this->m_scene->Get()->PreRender(render);
-			this->m_scene->Get()->Render(render);
-
 		}
 
 		this->render.EndScene();
 
 		//this->GetAssetFactory()->PollEvents(this);
 
-		return 0;
+		return m_t < 2.;
 	};
 
 private:
-	IAssetFactory *m_file_loader;
+	IAssetFactory * m_file_loader;
 public:
-	IAssetFactory *GetAssetFactory() { return m_file_loader; }
+	IAssetFactory * GetAssetFactory() { return m_file_loader; }
 	Renderer & GetDeviceContext() { return render; }
 };
 

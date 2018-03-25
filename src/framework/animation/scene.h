@@ -6,9 +6,11 @@
 
 #include "common.h"
 
-#include "render/camera.h"
-#include "render/light.h"
+#include "render/Actor.h"
 #include "render/SceneGraph.h"
+
+#include "render/Light.h"
+#include "render/Camera.h"
 
 #include "animation.h"
 
@@ -17,129 +19,169 @@ namespace Grafkit {
 	class SceneRenderBuffers;
 	class CameraContainer;
 	class LightContainer;
-	//class GizmoContainer;
 
-	class Scene : virtual public Referencable, public Persistent
+	class EntityContainer {
+	public:
+		EntityContainer() {}
+		virtual ~EntityContainer() {}
+
+		inline void AddEntiy(ActorRef node, Entity3DRef entity);
+		size_t GetCount() { return m_entities.size(); }
+		ActorRef GetActor(size_t id) { return m_entities[id].m_actor; }
+		inline ActorRef GetActor(std::string name);
+
+		Entity3DRef GetEntity(size_t id) { return m_entities[id].m_entity; }
+		inline Entity3DRef GetEntity(std::string name);
+
+		inline size_t GetId(std::string name);
+
+		inline void Calculate(Renderer &render, size_t id);
+		inline void CalculateAll(Renderer &render);
+
+	protected:
+		struct entity_t {
+			entity_t() {}
+			entity_t(ActorRef &actor, Entity3DRef &entity, size_t id) : m_actor(actor), m_entity(entity), m_id(id) {}
+
+			ActorRef m_actor;
+			Entity3DRef m_entity;
+			size_t m_id;
+		};
+
+		std::vector<entity_t> m_entities;
+		std::map<std::string, entity_t> m_entityMap;
+	};
+
+	// --- 
+	// Separate varoius responsibilites of a monolyth class
+	class HasSceneGraphRole {
+	public:
+		HasSceneGraphRole() {}
+		virtual ~HasSceneGraphRole() {}
+
+		void SetSceneGraph(SceneGraphRef &scenegraph) { m_scenegraph = scenegraph; }
+		SceneGraphRef GetSceneGraph() { return m_scenegraph; }
+
+	protected:
+		inline void InitializeSceneGraph();
+		inline void ShutdownSceneGraph();
+
+		inline void UpdateScenegraph();
+		inline void RenderScenegraph(Grafkit::Renderer & render, CameraRef & camera);
+		inline void BuildSceneGraph(Grafkit::Renderer & deviceContext);
+
+	protected:
+		SceneGraphRef m_scenegraph;
+	};
+
+	// --- 
+
+	class HasAnimationsRole {
+
+	public:
+		HasAnimationsRole() {}
+		virtual ~HasAnimationsRole() {}
+
+		void AddAnimation(AnimationRef &animation) { m_animations.push_back(animation); }
+
+	protected:
+		void UpdateAnimations(float t);
+
+		std::vector<AnimationRef> m_animations;
+
+	};
+
+	// --- 
+
+	class HasCamerasRole {
+	public:
+		HasCamerasRole();
+		virtual ~HasCamerasRole();
+
+		inline void AddCamera(ActorRef &actor, CameraRef &camera);
+
+		size_t GetCameraId(std::string name) { m_cameras->GetId(name); }
+
+		void SetActiveCameraId(size_t id) { m_activeCameraId = id; }
+		size_t GetActiveCameraId() { return m_activeCameraId; }
+
+		ActorRef GetActiveCameraActor() { return m_cameras->GetActor(m_activeCameraId); }
+		CameraRef GetActiveCamera() { return dynamic_cast<Camera*>(m_cameras->GetEntity(m_activeCameraId).Get()); }
+
+		ActorRef GetCameraActor(std::string name) { return m_cameras->GetActor(name); }
+		ActorRef GetCameraActor(size_t id) { return m_cameras->GetActor(id); }
+		
+		CameraRef GetCamera(std::string name) { return dynamic_cast<Camera*>(m_cameras->GetEntity(name).Get()); }
+		CameraRef GetCamera(size_t id) { return dynamic_cast<Camera*>(m_cameras->GetEntity(id).Get()); }
+
+		void AddCameraFrame(float time, std::string name);
+		void AddCameraFrame(float time, size_t id);
+
+	protected:
+		void InitializeCameras();
+		void ShutdownCameras();
+
+		void UpdateCamera(Renderer & render);
+
+	protected:
+		EntityContainer * m_cameras;
+		size_t m_activeCameraId;
+	};
+
+	// --- 
+
+	class HasLightsRole {
+	public:
+		void AddLight(ActorRef &actor, LightRef &camera){}
+
+	protected:
+
+		void InitializeLights(){}
+		void ShutdownLights(){}
+
+		void UpdateLights(){}
+
+		EntityContainer * m_lights;
+	};
+
+
+	// ---------------------------------------------------------------------------
+
+	class HasOutputBufferRole {
+	};
+
+	// ---------------------------------------------------------------------------
+
+
+	class /*Scene*/ : virtual public Referencable, public Persistent,
+		public HasSceneGraphRole,
+		public HasAnimationsRole,
+		public HasCamerasRole,
+		public HasLightsRole,
+		public HasOutputBufferRole
 	{
 	public:
 		Scene();
 		~Scene();
 
-		//void Precalc();
-
-		void Initialize(ActorRef root);
+		void Isnitialize();
 		void Shutdown();
 
-		// Render stuff 
+		void Build(Grafkit::Renderer & render);
+		void Build(Grafkit::Renderer & render, ShaderResRef vs, ShaderResRef ps); // legacy stuff
+
+		void UpdateScene(Grafkit::Renderer & render, float time);
+
 		void RenderFrame(Grafkit::Renderer & render, float time);
-
-		//void PreRender(Grafkit::Renderer & render);
 		void Render(Grafkit::Renderer & render, Ref<SceneRenderBuffers> & target);
-		 
-		void AddAnimation(AnimationRef anim);
-		void AddNode(ActorRef& node);
 
-		void GetAnimations(std::vector<AnimationRef> &animations) { animations.clear(); animations.assign(m_animations.cbegin(), m_animations.cend()); }
-		AnimationRef GetAnimation(int i) { return m_animations[i]; }
 
-		void UpdateScene(Grafkit::Renderer & render);
-		void UpdateAnimation(double t);
-
-		//bool IsActive() { return true && (m_tAnim >= m_tStart && m_tAnim < m_tEnd); }
-
-		void Build(Grafkit::Renderer & render, ShaderResRef vs, ShaderResRef ps);
-
+		// -- persistent
 	protected:
-		 std::vector<AnimationRef> m_animations;
-
-		 CameraContainer *m_cameras;
-		 LightContainer *m_lights;
-		 SceneRenderBuffers *m_outputBuffers;
-
-		 SceneGraph *m_scenegraph;
+		virtual void serialize(Archive& ar);
+		PERSISTENT_DECL(Grafkit::Scene, 1);
 	};
 
-	// ---------------------------------------------------------------------------
-	// A helper class to handle multiple cameras within a scene
-	class CameraContainer {
-	public:
-		CameraContainer();
-		~CameraContainer();
-
-		void AddCamera(ActorRef &node, CameraRef &camera);
-		size_t GetCameraCount() { return m_cameras.size(); }
-		ActorRef GetCamera(size_t id) { return m_cameras[id].actor; }
-		ActorRef GetCamera(std::string name);
-
-		// automation track for camera
-		void AddCameraFrame(float t, std::string name);
-
-		void SetActiveCamera(std::string name);
-		void SetActiveCamera(size_t id) { m_activeCamera = m_cameras[id]; }
-
-		ActorRef GetActiveCameraNode() { return m_activeCamera.actor; }
-		CameraRef GetActiveCamera() { return m_activeCamera.camera; }
-
-		void Update(Grafkit::Renderer & render);
-
-	private:
-		struct camera_t {
-			camera_t() {}
-
-			ActorRef actor;
-			CameraRef camera;
-			size_t id;
-		};
-
-		camera_t m_activeCamera;
-
-		std::vector<camera_t> m_cameras;
-		std::map<std::string, camera_t> m_cameraMap;
-	};
-
-	// --- 
-
-	// ---------------------------------------------------------------------------
-	// A helper class to handle multiple light sources within a scene
-
-	class LightContainer {
-	public:
-		LightContainer();
-		~LightContainer();
-
-		void AddLight(ActorRef &node, LightRef &light); 
-
-		size_t GetLightCount() { return this->m_lights.size(); }
-		ActorRef GetLight(int n) { return this->m_lights[n].actor; }
-		ActorRef GetLight(std::string name);
-
-		// tobbi fiszfaszka is kellene majd ide 
-
-		void Update(Grafkit::Renderer & render);
-
-	private:
-
-		struct lightData_t {
-			lightData_t() {}
-
-			union {
-				int lightCount;
-				float4 _;
-			};
-		} m_lightData;
-
-		struct light_t {
-			light_t() {}
-
-			ActorRef actor;
-			LightRef light;
-			size_t id;
-		};
-
-		std::vector<light_t> m_lights;
-		std::map<std::string, light_t> m_lightMap;
-
-	};
 
 	// ---------------------------------------------------------------------------
 	// 
@@ -149,7 +191,7 @@ namespace Grafkit {
 
 		// + Initialize
 		// + Shutdown
-		
+
 		// + bind to render
 		// + bind to shader param
 
@@ -164,3 +206,14 @@ namespace Grafkit {
 	};
 
 }
+
+
+// ---------------------------------------------------------------------------
+// inline implementation
+// ---------------------------------------------------------------------------
+
+#include "EntityContainer.inl"
+
+#include "hasScenegraphRole.inl"
+#include "hasAnimationsRole.inl"
+#include "hasCamerasRole.inl"

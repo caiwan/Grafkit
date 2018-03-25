@@ -26,7 +26,8 @@ Grafkit::SceneLoader::~SceneLoader()
 
 void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
 {
-	SceneResRef dstScene = dynamic_cast<SceneRes*>(source);
+#if 0
+	SceneGraphRef dstScene = dynamic_cast<SceneRes*>(source);
 	if (dstScene.Invalid()) {
 		throw new EX(NullPointerException);
 	}
@@ -35,13 +36,14 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & resman, Graf
 
 	ArchiveMemory ar((BYTE*)asset->GetData(), asset->GetSize());
 
-	SceneRef scene;
+	SceneGraphRef scene;
 
 	LOGGER(Log::Logger().Info("-- LOAD --"));
 	SceneLoader::SceneLoaderHelper loader(ar, scene);
 	loader.Load(ar, resman);
 
 	dstScene->AssingnRef(scene);
+#endif
 }
 
 void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
@@ -53,8 +55,11 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 	ArchiveFile ar(fp, true);
 
 	LOGGER(Log::Logger().Info("-- STORE --"));
+
+#if 0
 	SceneLoader::SceneLoaderHelper loader(ar, scene);
 	loader.Save(ar);
+#endif
 
 	fflush(fp);
 	fclose(fp);
@@ -65,7 +70,7 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 * Scene persist helper
 *************************************************************************************************************************/
 
-Grafkit::SceneLoader::SceneLoaderHelper::SceneLoaderHelper(Archive &ar, SceneRef & scene) : m_scene(scene)
+Grafkit::SceneLoader::SceneLoaderHelper::SceneLoaderHelper(Archive &ar, SceneGraphRef & scene) : m_scene(scene)
 {
 	if (ar.IsStoring()) {
 		BuildObjectMaps();

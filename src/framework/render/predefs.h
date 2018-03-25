@@ -18,17 +18,18 @@ namespace Grafkit {
 	typedef Resource<Shader> ShaderRes;
 	typedef Ref<ShaderRes> ShaderResRef;
 
-	// ---
-	class SceneGraph;
-	typedef Ref<SceneGraph> SceneRef;
-
-	typedef Resource<SceneGraph> SceneRes;
+	// --- 
+	class Scene;
+	typedef Resource<Scene> SceneRes;
 	typedef Ref<SceneRes> SceneResRef;
 
+	// --- 
 	class Animation;
 	typedef Ref<Animation> AnimationRef;
-
-	// --- 
+	
+	// ---
+	class SceneGraph;
+	typedef Ref<SceneGraph> SceneGraphRef;
 
 	class Mesh;
 	typedef Ref<Mesh> MeshRef;

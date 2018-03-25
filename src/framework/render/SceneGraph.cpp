@@ -23,12 +23,11 @@ Grafkit::SceneGraph::~SceneGraph()
 	Shutdown();
 }
 
-void Grafkit::SceneGraph::Initialize(ActorRef root)
+void Grafkit::SceneGraph::Initialize()
 {
-	m_root = root;
 
 	std::stack<ActorRef> stack;
-	stack.push(root);
+	stack.push(m_root);
 
 	while (!stack.empty()) {
 		ActorRef node = stack.top(); stack.pop();
@@ -39,6 +38,12 @@ void Grafkit::SceneGraph::Initialize(ActorRef root)
 			stack.push(node->GetChild(i));
 		}
 	}
+}
+
+void Grafkit::SceneGraph::Initialize(ActorRef root)
+{
+	m_root = root;
+	Initialize();
 }
 
 void Grafkit::SceneGraph::Shutdown()
@@ -54,18 +59,22 @@ void Grafkit::SceneGraph::Shutdown()
 
 }
 
+void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & render) {
+	
+	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
+		(*it)->Build(render, this);
+	}
+}
 
-void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & deviceContext, ShaderResRef vs, ShaderResRef ps)
+void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & render, ShaderResRef vs, ShaderResRef ps)
 {
 	if (vs.Valid())
 		m_vertexShader = vs;
 
 	if (ps.Valid())
 		m_pixelShader = ps;
+	BuildScene(render);
 
-	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
-		(*it)->Build(deviceContext, this);
-	}
 
 }
 
@@ -73,7 +82,7 @@ void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & deviceContext, ShaderRe
  * RENDER
  *****************************************************************************/
 
-void Grafkit::SceneGraph::PreRender(Grafkit::Renderer & render)
+void Grafkit::SceneGraph::Update()
 {
 	for (size_t i = 0; i < m_nodes.size(); i++) {
 		const ActorRef &actor = m_nodes[i];
@@ -119,9 +128,7 @@ void Grafkit::SceneGraph::Render(Grafkit::Renderer & render, CameraRef & camera)
 		ps->SetParamT(render, psMatrixId, m_worldMatrices);
 
 		if (!actor->IsHidden()) {
-			//actor->DispatchBeforeRender(render, this);
 			actor->Render(render, this);
-			//actor->DispatchAfterRender(render, this);
 		}
 	}
 
