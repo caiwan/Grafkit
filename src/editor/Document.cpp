@@ -45,7 +45,7 @@ void Idogep::Document::Initialize(Grafkit::Renderer & render)
 	// OUTLINE 
 	delete m_outlineViewModel;
 	m_outlineViewModel = new SceneGraphModel();
-	m_outlineViewModel->AddScene(m_scenegraph);
+	m_outlineViewModel->ScenegraphChanged(m_scene->Get()->GetSceneGraph());
 	m_outlineViewModel->BuildModel();
 }
 
@@ -101,27 +101,14 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 
 	m_rootActor = rootActor;
 
-
 	// -- scenegraph
-
-#if 0
-
-	//m_scenegraph = new SceneRes(new Scene());
+	m_scenegraph = new SceneGraph();
 	m_scenegraph->SetName("Scene");
+	m_scenegraph->SetRootNode(m_rootActor);
 
-	m_scenegraph->Get()->Initialize(rootActor);
-
-	m_scenegraph->Get()->BuildScene(render, m_vs, m_ps);
-	//m_scenegraph->Get()->SetActiveCamera(0);
-
-	m_rootActor = m_scenegraph->Get()->GetRootNode();
-	//m_cameraActor = m_scenegraph->Get()->GetCamera(0);
-
-	//// --- test aimation
-	//m_testAnimation = new Animation::FloatTrack();
-	//for (int i = 0; i < 35; i++) {
-	//	m_testAnimation->AddKey(Animation::FloatKey(i, PseudoRandom::Random()));
-	//}
-
-#endif 
+	// -- scene 
+	m_scene = new SceneRes(new Scene());
+	(*m_scene)->SetSceneGraph(m_scenegraph);
+	(*m_scene)->Initialize();
+	(*m_scene)->Build(render, m_vs, m_ps);
 }

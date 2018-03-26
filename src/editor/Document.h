@@ -47,7 +47,8 @@ namespace Idogep {
 		//Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
 
 		Grafkit::ShaderResRef m_vs, m_ps;
-		Grafkit::SceneResRef m_scenegraph;
+		Grafkit::SceneResRef m_scene;
+		Grafkit::SceneGraphRef m_scenegraph;
 
 		Grafkit::ShaderResRef m_psShowUv;
 		Grafkit::EffectComposerRef m_effect;
@@ -56,8 +57,6 @@ namespace Idogep {
 		Grafkit::ActorRef m_cameraActor;
 
 		Idogep::SceneGraphModel *m_outlineViewModel;
-
-
 	};
 
 }

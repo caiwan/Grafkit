@@ -25,7 +25,6 @@ Grafkit::SceneGraph::~SceneGraph()
 
 void Grafkit::SceneGraph::Initialize()
 {
-
 	std::stack<ActorRef> stack;
 	stack.push(m_root);
 

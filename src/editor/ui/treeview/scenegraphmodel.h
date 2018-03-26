@@ -2,11 +2,13 @@
 
 #include <list>
 
-#include "animation/Scene.h"
+//#include "animation/Scene.h"
+//#include "render/anim"
+
+#include "common.h"
 
 #include "treeitem.h"
 #include "treemodel.h"
-
 
 namespace Idogep {
 
@@ -16,24 +18,39 @@ namespace Idogep {
 
 	// ... 
 
+	class Properties;
+
+	class HasItemPropertiesRole {
+	private:
+		Properties * m_poror;
+	};
+
+	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
+
 	class SceneGraphItem : public TreeItem
 	{
 	public:
-		SceneGraphItem(Grafkit::SceneResRef &scene, TreeItem *parentItem = nullptr);
-		
-	};
+		SceneGraphItem(Grafkit::SceneGraphRef &scene, TreeItem *parentItem = nullptr);
 
-	class SceneItem : public TreeItem
-	{
+		Grafkit::SceneGraphRef GetSceneGraph() { return m_scenegraph; }
 
+	private:
+		Grafkit::SceneGraphRef m_scenegraph;
 	};
 
 	class ActorItem : public TreeItem {
+	public:
+		ActorItem(Grafkit::ActorRef &actor, TreeItem*parentItem);
+	private:
+		Grafkit::ActorRef m_actor;
 
 	};
 
 	class EntityItem : public TreeItem {
-
+	public:
+		EntityItem(Grafkit::Entity3DRef &entity, TreeItem *parentItem);
+	private:
+		Grafkit::Entity3DRef m_entity;
 	};
 
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
@@ -44,7 +61,7 @@ namespace Idogep {
 		SceneGraphModel();
 		~SceneGraphModel();
 
-		void AddScene(Grafkit::SceneResRef &scene);
+		void ScenegraphChanged(Grafkit::SceneGraphRef &scene);
 		//void SceneChanged(Grafkit::SceneResRef &scene);
 
 	private:
@@ -54,7 +71,7 @@ namespace Idogep {
 		void BuildActor(TreeItem * parentItem, Grafkit::ActorRef parentActor, int maxDepth = 4096);
 		void BuildEntity(TreeItem * parentItem, Grafkit::Entity3DRef entity);
 
-		std::list<Grafkit::SceneResRef> m_scenes;
+		Grafkit::SceneGraphRef m_scene;
 	};
 
 }

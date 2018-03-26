@@ -7,7 +7,6 @@
 #include "common.h"
 
 #include "math/matrix.h"
-
 #include "renderer.h"
 
 namespace Grafkit {
@@ -35,6 +34,9 @@ namespace Grafkit {
 
 		size_t GetNodeCount() { return m_nodes.size(); }
 		ActorRef GetNode(size_t id) { return m_nodes[id]; }
+
+		std::string GetName() { return m_name; }
+		void SetName(std::string name) { m_name = name; }
 
 		// --- 
 
@@ -75,6 +77,8 @@ namespace Grafkit {
 		std::map<std::string, ActorRef> m_nodeMap;
 
 		std::set<Entity3D*> m_entities;
+
+		std::string m_name;
 
 	private:
 		double m_tAnim;
