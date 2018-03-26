@@ -81,6 +81,16 @@ protected:
 		(*m_scene)->Initialize();
 		(*m_scene)->Build(render, m_vs, m_fs);
 
+		// add animation
+		//(*m_scene)->
+
+		const float maxTime = 2.;
+		const float keyStep = 1./10.;
+		for (float t = 0; t < maxTime; t += keyStep) {
+			// ... 
+			// let say it works for now
+		}
+
 		m_t = 0;
 
 		return 0;
@@ -97,6 +107,9 @@ protected:
 			(*m_scene)->UpdateScene(render, m_t);
 			(*m_scene)->Render(render);
 			m_t += .01;
+
+			if (m_t > 2.)
+				m_t = 0;
 		}
 
 		this->render.EndScene();
