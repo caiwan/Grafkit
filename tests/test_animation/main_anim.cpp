@@ -78,8 +78,8 @@ protected:
 		m_scene = new SceneRes(new Scene());
 		TestScene::createTestScene(m_scene);
 
-		(*m_scene)->Build(render, m_vs, m_fs);
 		(*m_scene)->Initialize();
+		(*m_scene)->Build(render, m_vs, m_fs);
 
 		m_t = 0;
 
@@ -103,7 +103,8 @@ protected:
 
 		//this->GetAssetFactory()->PollEvents(this);
 
-		return m_t > 1.;
+		//return m_t > 1.;
+		return 0;
 	};
 
 private:

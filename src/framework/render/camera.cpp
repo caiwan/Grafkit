@@ -50,14 +50,13 @@ void Grafkit::Camera::Calculate(Renderer & renderer, ActorRef parent)
 	dxvector U = XMLoadFloat3(&up);			// up vector
 
 	if (m_mode == CAMERA_RH) {
-		m_viewMatrix = XMMatrixLookToRH(E, C, U);
+		m_viewMatrix = XMMatrixLookAtRH(E, C, U);
 
 		m_perspectiveMatrix = XMMatrixPerspectiveFovRH(fov, m_aspect, m_znear, m_zfar);
 		m_orthoMatrix = XMMatrixOrthographicRH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
 	}
 	else {
-		//m_viewMatrix = XMMatrixLookToLH(E, C, U);
-		m_viewMatrix = XMMatrixIdentity();
+		m_viewMatrix = XMMatrixLookAtLH(E, C, U);
 
 		m_perspectiveMatrix = XMMatrixPerspectiveFovLH(fov, m_aspect, m_znear, m_zfar);
 		m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);

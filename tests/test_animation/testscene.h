@@ -31,7 +31,8 @@ public:
 		cameraActor->SetName("CameraActor");
 
 		cameraActor->Matrix().Identity();
-		cameraActor->Matrix().Translate(0, 0, 10);
+		//cameraActor->Matrix().LookAtLH(float3(0, 0, 10));
+		cameraActor->Matrix().Translate(float3(0, 0, 10));
 		//m_cameraActor = cameraActor;
 
 		model->SetName("cube");
