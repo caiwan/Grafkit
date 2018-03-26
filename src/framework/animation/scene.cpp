@@ -16,8 +16,7 @@ using namespace FWdebugExceptions;
 
 Grafkit::Scene::Scene() : HasSceneGraphRole(),
 HasCamerasRole(), HasAnimationsRole(),
-HasLightsRole(),
-HasOutputBufferRole()
+HasLightsRole()
 {
 }
 
@@ -71,12 +70,15 @@ void Grafkit::Scene::Shutdown()
 
 void Grafkit::Scene::RenderFrame(Grafkit::Renderer & render, float time)
 {
+	UpdateScene(render, time);
+	RenderScenegraph(render, GetActiveCamera());
 }
 
 
-void Grafkit::Scene::Render(Grafkit::Renderer & render, Ref<SceneRenderBuffers> & target)
+void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
-	m_scenegraph->Render(render, GetActiveCamera());
+	RenderScenegraph(render, GetActiveCamera());
+	//m_scenegraph->Render(render, GetActiveCamera());
 }
 
 void Grafkit::Scene::serialize(Archive & ar)

@@ -78,6 +78,7 @@ protected:
 		m_scene = new SceneRes(new Scene());
 		TestScene::createTestScene(m_scene);
 
+		(*m_scene)->Build(render, m_vs, m_fs);
 		(*m_scene)->Initialize();
 
 		m_t = 0;
@@ -93,7 +94,8 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
-
+			(*m_scene)->UpdateScene(render, m_t);
+			(*m_scene)->Render(render);
 			m_t += .01;
 		}
 
@@ -101,7 +103,7 @@ protected:
 
 		//this->GetAssetFactory()->PollEvents(this);
 
-		return m_t < 2.;
+		return m_t > 1.;
 	};
 
 private:

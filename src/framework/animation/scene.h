@@ -149,10 +149,6 @@ namespace Grafkit {
 	};
 
 
-	// ---------------------------------------------------------------------------
-
-	class HasOutputBufferRole {
-	};
 
 	// ---------------------------------------------------------------------------
 
@@ -161,8 +157,7 @@ namespace Grafkit {
 		public HasSceneGraphRole,
 		public HasAnimationsRole,
 		public HasCamerasRole,
-		public HasLightsRole,
-		public HasOutputBufferRole
+		public HasLightsRole
 	{
 	public:
 		Scene();
@@ -177,7 +172,7 @@ namespace Grafkit {
 		void UpdateScene(Grafkit::Renderer & render, float time);
 
 		void RenderFrame(Grafkit::Renderer & render, float time);
-		void Render(Grafkit::Renderer & render, Ref<SceneRenderBuffers> & target);
+		void Render(Grafkit::Renderer & render);
 
 
 		// -- persistent
