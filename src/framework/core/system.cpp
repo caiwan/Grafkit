@@ -53,6 +53,8 @@ int System::execute() {
 
 		delete ex;
 
+		this->release();
+
 		return 0;	// who will do the shutdown???
 	}
 

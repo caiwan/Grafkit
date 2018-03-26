@@ -69,16 +69,11 @@ protected:
 		//LoadCache();
 
 		// -- load shader
-		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/vertex.hlsl", ""));
-		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/flat.hlsl", ""));
+		m_vs = Load<ShaderRes>(new VertexShaderLoader("vShader", "shaders/notexistsing.hlsl", ""));
+		m_fs = Load<ShaderRes>(new PixelShaderLoader("pShader", "shaders/notexisting.hlsl", ""));
 
 		// -- model 
 		DoPrecalc();
-
-		m_scene = new SceneRes(new Scene());
-		TestScene::createTestScene(m_scene);
-
-		(*m_scene)->Initialize();
 
 		m_t = 0;
 
@@ -113,8 +108,6 @@ public:
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
-
 	Application app;
 	return app.execute();
 }

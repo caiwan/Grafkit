@@ -20,6 +20,9 @@ IResourceManager::IResourceManager() : m_preloadEvents(nullptr)
 IResourceManager::~IResourceManager()
 {
 	ClearLoadStack();
+	for (auto it = m_resources.begin(); it != m_resources.end(); it++) {
+		it->second.AssingnRef(nullptr);
+	}
 }
 
 void IResourceManager::Add(Ref<IResource> pResource)
@@ -121,7 +124,6 @@ void Grafkit::IResourceManager::DoPrecalc()
 
 void Grafkit::IResourceManager::ClearLoadStack()
 {
-#ifdef LIVE_RELEASE
 	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
 		IResourceBuilder * builder = it->second;
 		if (builder) {
@@ -130,7 +132,6 @@ void Grafkit::IResourceManager::ClearLoadStack()
 }
 
 	m_builders.clear();
-#endif // !LIVE_RELEASE
 }
 
 void Grafkit::IResourceManager::AddResourcePath(std::string resourceType, std::string path)

@@ -3,7 +3,7 @@
 #include "render/camera.h"
 
 
-Grafkit::HasCamerasRole::HasCamerasRole() : m_activeCameraId(0), m_cameras(nullptr)
+inline Grafkit::HasCamerasRole::HasCamerasRole() : m_activeCameraId(0), m_cameras(nullptr)
 {
 }
 
@@ -13,9 +13,8 @@ inline void Grafkit::HasCamerasRole::AddCamera(ActorRef & actor, CameraRef & cam
 }
 
 
-Grafkit::HasCamerasRole::~HasCamerasRole()
+inline Grafkit::HasCamerasRole::~HasCamerasRole()
 {
-	delete m_cameras;
 }
 
 

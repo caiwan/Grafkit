@@ -31,6 +31,7 @@ void Grafkit::Scene::Initialize()
 	if (m_scenegraph.Invalid())
 		return;
 
+	InitializeSceneGraph();
 	InitializeCameras();
 	InitializeLights();
 
@@ -62,9 +63,10 @@ void Grafkit::Scene::Initialize()
 
 void Grafkit::Scene::Shutdown()
 {
-	delete m_cameras;
-	delete m_lights;
-	delete m_scenegraph;
+	ShutdownLights();
+	ShutdownCameras();
+	ShutdownAnimations();
+	ShutdownSceneGraph();
 }
 
 void Grafkit::Scene::RenderFrame(Grafkit::Renderer & render, float time)
@@ -75,6 +77,10 @@ void Grafkit::Scene::RenderFrame(Grafkit::Renderer & render, float time)
 void Grafkit::Scene::Render(Grafkit::Renderer & render, Ref<SceneRenderBuffers> & target)
 {
 	m_scenegraph->Render(render, GetActiveCamera());
+}
+
+void Grafkit::Scene::serialize(Archive & ar)
+{
 }
 
 

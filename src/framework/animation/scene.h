@@ -85,6 +85,10 @@ namespace Grafkit {
 		void AddAnimation(AnimationRef &animation) { m_animations.push_back(animation); }
 
 	protected:
+		void InitializeAnimations() {}
+		void ShutdownAnimations(){}
+
+
 		void UpdateAnimations(float t);
 
 		std::vector<AnimationRef> m_animations;
@@ -153,7 +157,7 @@ namespace Grafkit {
 	// ---------------------------------------------------------------------------
 
 
-	class /*Scene*/ : virtual public Referencable, public Persistent,
+	class Scene : virtual public Referencable, public Persistent,
 		public HasSceneGraphRole,
 		public HasAnimationsRole,
 		public HasCamerasRole,
@@ -162,9 +166,9 @@ namespace Grafkit {
 	{
 	public:
 		Scene();
-		~Scene();
+		virtual ~Scene();
 
-		void Isnitialize();
+		void Initialize();
 		void Shutdown();
 
 		void Build(Grafkit::Renderer & render);
