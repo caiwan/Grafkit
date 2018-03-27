@@ -60,8 +60,6 @@ void Idogep::SceneGraphModel::Build(TreeItem * parentItem)
 
 	// add actors 
 	BuildActor(item, m_scene->GetRootNode());
-
-
 }
 
 void Idogep::SceneGraphModel::BuildActor(TreeItem * parentItem, Grafkit::ActorRef parentActor, int maxDepth)

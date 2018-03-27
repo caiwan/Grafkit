@@ -867,6 +867,7 @@ QTreeView::branch:!has-children:!has-siblings:adjoins-item {
     border-image: url(:/svg/transparent.png);
 }
 
+
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
     image: url(:/svg/branch_closed.png);
