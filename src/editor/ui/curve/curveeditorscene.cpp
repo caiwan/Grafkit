@@ -79,6 +79,8 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 		painter->drawImage(rect, *m_audiogramImage);
 	}
 
+	painter->translate(rect.topLeft());
+
 	// --- 
 	// 0. Draw the axis + subaxis. =)))
 	float sPos = 0.0f;
