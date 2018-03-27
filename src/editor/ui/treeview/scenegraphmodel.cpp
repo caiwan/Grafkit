@@ -21,6 +21,42 @@ Idogep::SceneGraphItem::SceneGraphItem(Grafkit::SceneGraphRef & scenegraph, Tree
 
 // ------------------------------------------------------------------------------------------
 
+Idogep::ActorItem::ActorItem(Grafkit::ActorRef & actor, TreeItem * parentItem)
+{
+	setIcon(QPixmap(":/icons/node.png").scaled(16, 16));
+	m_itemData << QString::fromStdString(actor->GetName());
+}
+
+// ------------------------------------------------------------------------------------------
+
+Idogep::EntityItem::EntityItem(Grafkit::Entity3DRef entity, TreeItem * parentItem) : m_entity(entity)
+{
+	setIcon(QPixmap(":/icons/model.png").scaled(16, 16));
+	m_itemData << QString::fromStdString(entity->GetName());
+
+}
+
+Idogep::ModelItem::ModelItem(Grafkit::ModelRef model, TreeItem * parentItem) :
+	EntityItem(dynamic_cast<Model*>(model.Get()), parentItem)
+{
+	setIcon(QPixmap(":/icons/model.png").scaled(16, 16));
+	m_itemData << QString::fromStdString(model->GetName());
+}
+
+Idogep::CameraItem::CameraItem(Grafkit::CameraRef camera, TreeItem * parentItem) :
+	EntityItem(dynamic_cast<Entity3D*>(camera.Get()), parentItem)
+{
+	setIcon(QPixmap(":/icons/camera.png").scaled(16, 16));
+	m_itemData << QString::fromStdString(camera->GetName());
+
+}
+
+Idogep::LightItem::LightItem(Grafkit::LightRef light, TreeItem * parentItem) :
+	EntityItem(dynamic_cast<Entity3D*>(light.Get()), parentItem)
+{
+	setIcon(QPixmap(":/icons/light.png").scaled(16, 16));
+	m_itemData << QString::fromStdString(light->GetName());
+}
 
 
 // ------------------------------------------------------------------------------------------
@@ -62,47 +98,41 @@ void Idogep::SceneGraphModel::Build(TreeItem * parentItem)
 	BuildActor(item, m_scene->GetRootNode());
 }
 
-void Idogep::SceneGraphModel::BuildActor(TreeItem * parentItem, Grafkit::ActorRef parentActor, int maxDepth)
+void Idogep::SceneGraphModel::BuildActor(TreeItem * parentItem, Grafkit::ActorRef actor, int maxDepth)
 {
-	QList<QVariant> rowData;
-	rowData << QString::fromStdString(parentActor->GetName());
-
-	TreeItem * item = new TreeItem(rowData);
-	item->setIcon(QPixmap(":/icons/node.png").scaled(16, 16));
+	TreeItem * item = new ActorItem(actor, parentItem);
 	parentItem->addChild(item);
 
-	for (int i = 0; i < parentActor->GetChildrenCount(); i++) {
-		BuildActor(item, parentActor->GetChild(i), maxDepth - 1);
+	for (int i = 0; i < actor->GetChildrenCount(); i++) {
+		BuildActor(item, actor->GetChild(i), maxDepth - 1);
 	}
 
-	for (int i = 0; i < parentActor->GetEntityCount(); i++) {
-		BuildEntity(item, parentActor->GetEntity(i));
+	for (int i = 0; i < actor->GetEntityCount(); i++) {
+		BuildEntity(item, actor->GetEntity(i));
 	}
 }
 
 void Idogep::SceneGraphModel::BuildEntity(TreeItem * parentItem, Grafkit::Entity3DRef entity)
 {
 	QList<QVariant> rowData;
-	rowData << QString::fromStdString(entity->GetName());
 
-	TreeItem * item = new TreeItem(rowData);
-	parentItem->addChild(item);
+	TreeItem * item = nullptr;
 
-	if (dynamic_cast<Camera*>(entity.Get()) != nullptr)
-		item->setIcon(QPixmap(":/icons/camera.png").scaled(16, 16));
+	const CameraRef camera = dynamic_cast<Camera*>(entity.Get());
+	const ModelRef model = dynamic_cast<Model*>(entity.Get());
+	const LightRef light = dynamic_cast<Light*>(entity.Get());
 
-	else if (dynamic_cast<Model*>(entity.Get()) != nullptr)
-		item->setIcon(QPixmap(":/icons/model.png").scaled(16, 16));
-
-	else if (dynamic_cast<Light*>(entity.Get()) != nullptr)
-		item->setIcon(QPixmap(":/icons/light.png").scaled(16, 16));
-
+	if (camera) {
+		item = new CameraItem(camera, parentItem);
+	}
+	else if (light) {
+		item = new CameraItem(camera, parentItem);
+	}
+	else if (model) {
+		item = new ModelItem(model, parentItem);
+	}
+	if (item)
+		parentItem->addChild(item);
 }
 
-Idogep::ActorItem::ActorItem(Grafkit::ActorRef & actor, TreeItem * parentItem)
-{
-}
 
-Idogep::EntityItem::EntityItem(Grafkit::Entity3DRef & entity, TreeItem * parentItem)
-{
-}

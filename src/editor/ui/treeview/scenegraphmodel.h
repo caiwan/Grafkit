@@ -46,11 +46,32 @@ namespace Idogep {
 
 	};
 
+	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
+
+
 	class EntityItem : public TreeItem {
 	public:
-		EntityItem(Grafkit::Entity3DRef &entity, TreeItem *parentItem);
+		EntityItem(Grafkit::Entity3DRef entity, TreeItem *parentItem);
 	private:
 		Grafkit::Entity3DRef m_entity;
+	};
+
+	class ModelItem : public EntityItem {
+	public:
+		ModelItem(Grafkit::ModelRef model, TreeItem *parentItem);
+	private:
+		Grafkit::Entity3DRef m_entity;
+	};
+
+	class CameraItem : public EntityItem {
+	public:
+		CameraItem(Grafkit::CameraRef entity, TreeItem *parentItem);
+
+	};
+
+	class LightItem: public EntityItem {
+	public:
+		LightItem(Grafkit::LightRef entity, TreeItem *parentItem);
 	};
 
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
