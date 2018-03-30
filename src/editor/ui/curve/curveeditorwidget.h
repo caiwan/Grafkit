@@ -7,30 +7,67 @@
 
 #include "curvedoc.h"
 
+#include "animation/animation.h"
+
+#include "../treeview/treeitem.h"
+
 namespace Ui {
 	class CurveEditorWidget;
 }
 
+class QTreeView;
+
 namespace Idogep {
+
+	class TreeModel;
+	class TreeItem;
 
 	class CurveEditorScene;
 	class CurvePointItem;
 	class CurveDocument;
 
-	// --- 
-	class CurveEditorWidget : public QDockWidget, public CurveDocument
-	{
-		friend 	class CurveEditorScene;
-		friend class CurvePointItem;
-		friend class CurveDocument;
-		Q_OBJECT
+	class CurveCursor;
 
-	public:
-		explicit CurveEditorWidget(QWidget *parent = 0);
-		~CurveEditorWidget();
+	// ========================================================================================================
 
-		/* EVENTS and OPERATIONS */
+	class AnimationChannelItem : public TreeItem {
 	public:
+		AnimationChannelItem(const QList<QVariant> &data, TreeItem *parentItem = nullptr);
+
+		Ref<Grafkit::Animation::Channel> GetChannel() { return m_channel; }
+		void SetChannel(Ref<Grafkit::Animation::Channel> &channel) { m_channel = channel; }
+
+	private:
+		Ref<Grafkit::Animation::Channel> m_channel;
+	};
+
+	// --------------------------------------------------------------------------------------------------------- 
+
+	class ManageAnimationsRole {
+	public:
+		ManageAnimationsRole();
+
+		void AnimationChangedEvent(Grafkit::AnimationRef animation);
+
+	protected:
+		Event<Ref<Grafkit::Animation::Channel>> onChannelSelected;
+		Event<TreeModel*> onAnimationModelUpdated;
+
+	protected:
+		Grafkit::AnimationRef m_animation;
+
+		TreeModel * m_animationListModel;
+	};
+
+	// ========================================================================================================
+
+	class ManagePlaybackRole {
+	public:
+		// Play pressed
+		// Stop pressed
+
+		// Update cursor from player
+
 		// --- intenral events (triggered from inside)
 		Event<> onPlaybackOptions;
 
@@ -40,10 +77,33 @@ namespace Idogep {
 		Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform; // ptr, samplecount, channelcount, samplePerSec
 
 		// --- external events (triggered from ouitside)
-		void musicChanged() { refreshView(true); }
+		virtual void musicChanged() = 0;
 
-		void playbackChanged(bool isPlaying);
-		void demoTimeChanged(float time);
+		virtual void playbackChanged(bool isPlaying) = 0;
+		virtual void demoTimeChanged(float time) = 0;
+
+	protected:
+		// ... 
+
+	};
+
+	// ========================================================================================================
+
+	class CurveEditorWidget : public QDockWidget, public CurveDocument, public ManageAnimationsRole, public ManagePlaybackRole
+	{
+		Q_OBJECT
+
+	public:
+		explicit CurveEditorWidget(QWidget *parent = 0);
+		~CurveEditorWidget();
+
+		/* EVENTS and OPERATIONS */
+	public:
+
+		virtual void playbackChanged(bool isPlaying);
+		virtual void demoTimeChanged(float time);
+
+		virtual void musicChanged() {}
 
 		/* METHODS */
 	protected:
@@ -51,6 +111,8 @@ namespace Idogep {
 		virtual void refreshView(bool force);
 
 		virtual bool requestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) { onRequestWaveform(p, sampleCount, channelCount, samplePerSec); return sampleCount > 0; }
+
+		void onAnimationModelUpdatedEvent(TreeModel* model);
 
 		protected slots:
 		void playPressedSlot() { onTogglePlayback(); }

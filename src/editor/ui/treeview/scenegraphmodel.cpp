@@ -12,6 +12,37 @@ using namespace Grafkit;
 using namespace Idogep;
 
 
+// ------------------------------------------------------------------------------------------
+
+#include "animation/animation.h"
+
+Idogep::HasItemAnimationsRole::HasItemAnimationsRole()
+{
+}
+
+Idogep::HasItemAnimationsRole::~HasItemAnimationsRole()
+{
+}
+
+void Idogep::HasItemAnimationsRole::SetAnimation(Grafkit::AnimationRef animation)
+{
+	m_animation = animation;
+}
+
+// ------------------------------------------------------------------------------------------
+
+#include "../propertyeditor/property.h"
+
+Idogep::HasItemPropertiesRole::HasItemPropertiesRole()
+{
+}
+
+Idogep::HasItemPropertiesRole::~HasItemPropertiesRole()
+{
+}
+
+// ------------------------------------------------------------------------------------------
+
 Idogep::SceneGraphItem::SceneGraphItem(Grafkit::SceneGraphRef & scenegraph, TreeItem * parentItem) : m_scenegraph(scenegraph)
 {
 	setIcon(QPixmap(":/icons/scene.png").scaled(16, 16));
@@ -134,5 +165,4 @@ void Idogep::SceneGraphModel::BuildEntity(TreeItem * parentItem, Grafkit::Entity
 	if (item)
 		parentItem->addChild(item);
 }
-
 

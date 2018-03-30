@@ -84,9 +84,9 @@ Idogep::CurveDocument::CurveDocument() :
 {
 }
 
-void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::Track>& track)
+void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::Channel>& track)
 {
-	m_track = new Grafkit::Animation::Track(track);
+	m_track = new Grafkit::Animation::Channel(track);
 
 	// clear?
 	delete 	m_curve;
@@ -101,16 +101,16 @@ void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::Track>& track)
 		point->setTime(key.m_key);
 		point->setValue(key.m_value);
 
-		// TODO:  ezt a kettot
+		// TODO:  ezt a kettot majd meg kell oldani egyszer
 		//point->setColor();
 		//point->setNodeType();
 
-		point->onMovePoint += Delegate(this, &CurveDocument::movePoint);
+		//point->onMovePoint += Delegate(this, &CurveDocument::movePoint);
 
-		m_curve->push_back(point);
+		//m_curve->push_back(point);
 	}
 
-	refreshView();
+	//refreshView();
 }
 
 void Idogep::CurveDocument::recalculate()

@@ -2,13 +2,15 @@
 
 #include <list>
 
-//#include "animation/Scene.h"
-//#include "render/anim"
-
 #include "common.h"
 
 #include "treeitem.h"
 #include "treemodel.h"
+
+namespace Grafkit {
+	class Animation;
+	typedef Ref<Animation> AnimationRef ;
+}
 
 namespace Idogep {
 
@@ -16,18 +18,35 @@ namespace Idogep {
 	class EntityItem;
 	class SceneGraphItem;
 
-	// ... 
-
 	class Properties;
 
+	typedef Ref<Properties> PropertiesRef;
+
+	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
+
+	class HasItemAnimationsRole {
+	public :
+		HasItemAnimationsRole();
+		~HasItemAnimationsRole();
+
+		void SetAnimation(Grafkit::AnimationRef animation);
+		Grafkit::AnimationRef GetAnimation() { return m_animation; }
+
+	protected:
+		Grafkit::AnimationRef m_animation;
+	};
+
 	class HasItemPropertiesRole {
-	private:
-		Properties * m_poror;
+	public:
+		HasItemPropertiesRole();
+		~HasItemPropertiesRole();
+	protected:
+		Ref<Properties> m_properties;
 	};
 
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
 
-	class SceneGraphItem : public TreeItem
+	class SceneGraphItem : public TreeItem, public HasItemPropertiesRole
 	{
 	public:
 		SceneGraphItem(Grafkit::SceneGraphRef &scene, TreeItem *parentItem = nullptr);
@@ -38,7 +57,8 @@ namespace Idogep {
 		Grafkit::SceneGraphRef m_scenegraph;
 	};
 
-	class ActorItem : public TreeItem {
+	class ActorItem : public TreeItem , public HasItemAnimationsRole, public HasItemPropertiesRole
+	{
 	public:
 		ActorItem(Grafkit::ActorRef &actor, TreeItem*parentItem);
 	private:
@@ -49,21 +69,24 @@ namespace Idogep {
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
 
 
-	class EntityItem : public TreeItem {
+	class EntityItem : public TreeItem 
+	{
 	public:
 		EntityItem(Grafkit::Entity3DRef entity, TreeItem *parentItem);
 	private:
 		Grafkit::Entity3DRef m_entity;
 	};
 
-	class ModelItem : public EntityItem {
+	class ModelItem : public EntityItem , public HasItemAnimationsRole, public HasItemPropertiesRole
+	{
 	public:
 		ModelItem(Grafkit::ModelRef model, TreeItem *parentItem);
 	private:
 		Grafkit::Entity3DRef m_entity;
 	};
 
-	class CameraItem : public EntityItem {
+	class CameraItem : public EntityItem, public HasItemAnimationsRole, public HasItemPropertiesRole
+	{
 	public:
 		CameraItem(Grafkit::CameraRef entity, TreeItem *parentItem);
 

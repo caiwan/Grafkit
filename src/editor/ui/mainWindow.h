@@ -16,7 +16,7 @@ namespace Idogep {
 	class SceneGraphViewWidget;
 	class LogWidget;
 
-	class PlaybackOptionDialog;
+	class PropertyEditorWidget;
 	//class AboutDialog;
 
 	// ---
@@ -35,7 +35,7 @@ namespace Idogep {
 
 	private:
 		void closeEvent(QCloseEvent *event);
-		void playbackOptions();
+		//void playbackOptions();
 
 	private:
 		void createActions();
@@ -48,13 +48,9 @@ namespace Idogep {
 
 		CurveEditorWidget * m_curveEditor;
 		SceneGraphViewWidget *m_outlineViewer;
+		PropertyEditorWidget *m_propertyVewer;
 
 		LogWidget* m_logWidget;
-
-		//AboutDialog *m_aboutDlg;
-
-		//Document * m_document;
-		//Editor * const & m_editor;
 	};
 
 }

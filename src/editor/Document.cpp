@@ -81,6 +81,8 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 	cameraActor->Matrix().Translate(0, 0, 10);
 	m_cameraActor = cameraActor;
 
+	// Add animation here
+
 	model->SetName("cube");
 	model->GetMesh()->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
 	model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);

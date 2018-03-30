@@ -5,6 +5,8 @@
 
 #include "curveeditorscene.h"
 
+#include "../treeview/treemodel.h"
+
 using namespace Idogep;
 
 CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(new Ui::CurveEditorWidget), CurveDocument()
@@ -46,6 +48,16 @@ void Idogep::CurveEditorWidget::refreshView(bool force)
 	}
 }
 
+void Idogep::CurveEditorWidget::onAnimationModelUpdatedEvent(TreeModel * model)
+{
+	// this will force update
+	ui->treeView->setModel(nullptr);
+	ui->treeView->setModel(model);
+}
+
+// ========================================================================================================
+
+
 void Idogep::CurveEditorWidget::playbackChanged(bool isPlaying)
 {
 	if (isPlaying) {
@@ -61,3 +73,95 @@ void Idogep::CurveEditorWidget::demoTimeChanged(float time)
 	// ...
 	// set cursor here 
 }
+
+
+
+
+
+
+// ========================================================================================================
+
+#include "../treeview/treemodel.h"
+#include "../treeview/treeitem.h"
+
+using namespace Grafkit;
+using namespace Idogep;
+
+Idogep::AnimationChannelItem::AnimationChannelItem(const QList<QVariant>& data, TreeItem * parentItem) : TreeItem(data, parentItem)
+{
+}
+
+Idogep::ManageAnimationsRole::ManageAnimationsRole() : m_animationListModel(nullptr)
+{
+}
+
+// ========================================================================================================
+
+
+namespace {
+	class AnimationTreeModel : public TreeModel {
+	public:
+		AnimationTreeModel(Grafkit::AnimationRef animation);
+
+	protected:
+		virtual QStringList Header();
+		virtual	void Build(TreeItem * parentItem);
+
+	protected:
+		void BuildTrack(TreeItem * const &parentItem, Ref<Animation::Track>& track);
+
+	private:
+		Grafkit::AnimationRef m_animation;
+	};
+	AnimationTreeModel::AnimationTreeModel(Grafkit::AnimationRef animation) : m_animation(animation)
+	{
+	}
+
+	QStringList AnimationTreeModel::Header()
+	{
+		return QStringList() << "Channel";
+	}
+
+	void AnimationTreeModel::Build(TreeItem * parentItem)
+	{
+
+		for (size_t i = 0; i < m_animation->GetTrackCount(); i++) {
+			Ref<Animation::Track> track = m_animation->GetTrack(i);
+			
+			QVariantList data;
+			data << QString::fromStdString(track->GetName());
+			TreeItem *item = new TreeItem(data, parentItem);
+			
+			parentItem->addChild(item);
+			
+			BuildTrack(item, track);
+		}
+	}
+	void AnimationTreeModel::BuildTrack(TreeItem * const & parentItem, Ref<Animation::Track> &track)
+	{
+		for (size_t i = 0; i < track->GetChannelCount(); i++) {
+			Ref<Animation::Channel> channel = track->GetChannel(i);
+			
+			QVariantList data;
+			data << QString::fromStdString(channel->GetName());
+			AnimationChannelItem *item = new AnimationChannelItem(data, parentItem);
+			item->SetChannel(channel);
+
+			parentItem->addChild(item);
+		}
+	}
+}
+
+// ========================================================================================================
+
+void Idogep::ManageAnimationsRole::AnimationChangedEvent(Grafkit::AnimationRef animation)
+{
+	m_animation = animation;
+	TreeModel * oldModel = m_animationListModel;
+	m_animationListModel = new AnimationTreeModel(m_animation);
+	m_animationListModel->BuildModel();
+	onAnimationModelUpdated(m_animationListModel);
+	if (oldModel)
+		delete oldModel;
+}
+

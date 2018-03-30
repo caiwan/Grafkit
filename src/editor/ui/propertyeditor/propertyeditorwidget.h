@@ -7,6 +7,8 @@ namespace Ui {
 class PropertyEditorWidget;
 }
 
+namespace Idogep {
+
 class PropertyEditorWidget : public QDockWidget
 {
     Q_OBJECT
@@ -18,5 +20,6 @@ public:
 private:
     Ui::PropertyEditorWidget *ui;
 };
+}
 
 #endif // PropertyEditorWidget_H

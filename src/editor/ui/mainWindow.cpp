@@ -107,6 +107,10 @@ void Idogep::MainWindow::createDockWindows()
 	m_outlineViewer = new SceneGraphViewWidget(this);
 	addDockWidget(Qt::LeftDockWidgetArea, m_outlineViewer);
 
+	m_propertyVewer = new PropertyEditorWidget(this);
+	addDockWidget(Qt::LeftDockWidgetArea, m_propertyVewer);
+	tabifyDockWidget(m_propertyVewer, m_outlineViewer);
+
 	m_logWidget = new LogWidget(this);
 	addDockWidget(Qt::BottomDockWidgetArea, m_logWidget);
 	tabifyDockWidget(m_logWidget, m_curveEditor);

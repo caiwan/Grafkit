@@ -66,13 +66,13 @@ namespace Grafkit {
 		/**
 			Template for animation track
 		*/
-		class Track : public Referencable {
+		class Channel : public Referencable {
 			friend class Animation;
 		public:
 
-			Track() {}
-			Track(std::string name) : m_name(name) {}
-			Track(Track &other);
+			Channel() {}
+			Channel(std::string name) : m_name(name) {}
+			Channel(Channel &other);
 
 			size_t GetKeyCount() { return m_track.size(); }
 			Key GetKey(size_t i) { return m_track[i]; }
@@ -109,7 +109,7 @@ namespace Grafkit {
 			void serialize(Archive &ar);
 			void Clear() { m_track.clear(); }
 
-			void CopyKey(float t, Track& other);
+			void CopyKey(float t, Channel& other);
 
 
 		protected:
@@ -117,39 +117,54 @@ namespace Grafkit {
 			std::string m_name;
 		};
 
-		/** 
+		/**
 			N-dimension container for multiple tracks
 		*/
-		class MultiTrack {
+		class Track : virtual public Referencable
+		{
 			friend class Animation;
 		public:
-			MultiTrack(std::string name = "") : m_name(name) {}
-			~MultiTrack() {}
+			Track(std::string name = "") : m_name(name) {
+				m_channels.reserve(4);
+			}
 
-			void CreateTrack(size_t subId, std::string name) { m_tracks[subId] = new Track(name); }
-			void InsertTrack(size_t subId, Ref<Track> &track) { m_tracks[subId] = track; }
-			Ref<Track> GetTrack(size_t subId) { return m_tracks[subId]; }
+			~Track() {}
+
+			void CreateChannel(size_t subId, std::string name) { m_channels[subId] = new Channel(name); }
+
+			void SetChannel(size_t subId, Ref<Channel> &track) { m_channels[subId] = track; }
+			Ref<Channel> GetChannel(size_t subId) { return m_channels[subId]; }
+
+			size_t GetChannelCount() { return m_channels.size(); }
+
+			std::string GetName() { return m_name; }
+			void GetName(std::string name) { m_name = name; }
 
 		protected:
 			std::string m_name;
-			Ref<Track> m_tracks[4];
+			std::vector<Ref<Channel>> m_channels;
 		};
 
-		//private:
+	public:
+		Ref<Track> GetTrack(size_t id) { return m_tracks[id]; }
+		size_t GetTrackCount() { return m_tracks.size(); }
+
 	protected:
-		std::map<std::string, Ref<Track>> m_tracks;
+		std::vector<Ref<Track>> m_tracks;
+	
 	};
+
 
 	/* ============================================================================================== */
 
-	inline Animation::Track::Track(Track & other)
+	inline Animation::Channel::Channel(Channel & other)
 	{
 		for (size_t i = 0; i < other.m_track.size(); i++) {
 			m_track.push_back(Key(other.m_track.at(i)));
 		}
 	}
 
-	inline float Animation::Track::GetValue(float time)
+	inline float Animation::Channel::GetValue(float time)
 	{
 		float t = 0.f;
 		Key v0, v1, v;
@@ -183,7 +198,7 @@ namespace Grafkit {
 		return v0.m_value * (1. - t) + v1.m_value * t;
 	}
 
-	inline int Animation::Track::FindKeyIndex(float t) const
+	inline int Animation::Channel::FindKeyIndex(float t) const
 	{
 		size_t count = m_track.size();
 		if (count <= 2)
@@ -225,7 +240,7 @@ namespace Grafkit {
 	}
 
 
-	inline int Animation::Track::FindKey(float t, Key & v0, Key & v1, float & f) const
+	inline int Animation::Channel::FindKey(float t, Key & v0, Key & v1, float & f) const
 	{
 		size_t count = m_track.size();
 		f = 0.f;
@@ -260,7 +275,7 @@ namespace Grafkit {
 		return 1;
 	}
 
-	inline void Animation::Track::serialize(Archive & ar)
+	inline void Animation::Channel::serialize(Archive & ar)
 	{
 		size_t len = 0;
 
@@ -290,7 +305,7 @@ namespace Grafkit {
 		}
 	}
 
-	inline void Animation::Track::CopyKey(float t, Track & other)
+	inline void Animation::Channel::CopyKey(float t, Channel & other)
 	{
 		if (t <= m_track.front().m_key)
 			return other.AddKey(m_track.front());
