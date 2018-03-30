@@ -7,26 +7,22 @@ namespace Grafkit {
 	class ActorAnimation : public Animation {
 
 	public:
+		ActorAnimation();
+		ActorAnimation(ActorRef actor);
 
-		// setActor
-		// getActor
+		ActorRef GetActor() { return m_actor; };
+		void SetActor(ActorRef actor) { m_actor = actor; };
 
-		virtual void Update(double time) = 0;
+
+		virtual void Update(double time);
 
 	private:
-		Ref <
-			Animation::Track
-		> m_position;
-	
+		void CreateTrack();
 
-		Ref <
-			Animation::Track
-		> m_rotation;
-
-
-		Ref <
-			Animation::Track
-		> m_scale;
+	private:
+		Ref <Animation::Track> m_position;
+		Ref <Animation::Track> m_rotation;
+		Ref <Animation::Track > m_scale;
 
 		ActorRef m_actor;
 	};

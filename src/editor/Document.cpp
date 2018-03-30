@@ -10,6 +10,7 @@
 
 #include "render/SceneGraph.h"
 #include "animation/scene.h"
+#include "animation/actoranimation.h"
 
 #include "generator/ShaderLoader.h"
 
@@ -98,6 +99,7 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 	ActorRef rootActor = new Actor();
 	rootActor->SetName("RootActor");
 
+
 	rootActor->AddChild(cameraActor);
 	rootActor->AddChild(cubeActor);
 
@@ -111,6 +113,11 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 	// -- scene 
 	m_scene = new SceneRes(new Scene());
 	(*m_scene)->SetSceneGraph(m_scenegraph);
+
+	(*m_scene)->AddAnimation(new ActorAnimation(rootActor));
+	(*m_scene)->AddAnimation(new ActorAnimation(cameraActor));
+	(*m_scene)->AddAnimation(new ActorAnimation(cubeActor));
+
 	(*m_scene)->Initialize();
 	(*m_scene)->Build(render, m_vs, m_ps);
 }

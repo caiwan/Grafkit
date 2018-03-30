@@ -29,9 +29,6 @@ namespace Grafkit {
 		void SetName(std::string name) { m_name = name; }
 		std::string GetName() const { return m_name; }
 
-		virtual void Clear() = 0;
-		virtual void CopyKey(float t, Animation * const & other) = 0;
-
 	protected:
 		void _serialize(Archive &ar);
 
@@ -150,8 +147,11 @@ namespace Grafkit {
 		size_t GetTrackCount() { return m_tracks.size(); }
 
 	protected:
+		void AddTrack(Ref<Track> track) { m_tracks.push_back(track); }
+
+	protected:
 		std::vector<Ref<Track>> m_tracks;
-	
+
 	};
 
 
