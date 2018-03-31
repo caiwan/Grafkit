@@ -6,6 +6,8 @@
 #include "render/model.h"
 #include "render/Light.h"
 
+#include "animation/actoranimation.h"
+
 #include <qdebug.h>
 
 using namespace Grafkit;
@@ -92,28 +94,25 @@ Idogep::LightItem::LightItem(Grafkit::LightRef light, TreeItem * parentItem) :
 
 // ------------------------------------------------------------------------------------------
 
-Idogep::SceneGraphModel::SceneGraphModel()
-{
-}
+#include "animation/scene.h" 
 
-Idogep::SceneGraphModel::~SceneGraphModel()
-{
-}
-
-void Idogep::SceneGraphModel::ScenegraphChanged(Grafkit::SceneGraphRef & scene)
+Idogep::SceneModel::SceneModel(Grafkit::SceneResRef &scene)
 {
 	m_scene = scene;
 }
 
+Idogep::SceneModel::~SceneModel()
+{
+}
 
-QStringList Idogep::SceneGraphModel::Header()
+QStringList Idogep::SceneModel::Header()
 {
 	return QStringList() << "Node"; //<< "V" << "W" << "Lock";
 }
 
-void Idogep::SceneGraphModel::Build(TreeItem * parentItem)
+void Idogep::SceneModel::Build(TreeItem * parentItem)
 {
-	if (m_scene.Invalid())
+	if (m_scene.Invalid() || m_scene->Invalid())
 	{
 		qDebug() << "scene == nullptr!";
 		return;
@@ -122,16 +121,40 @@ void Idogep::SceneGraphModel::Build(TreeItem * parentItem)
 	// clear children if there are a couple
 	//if (parentItem->child)
 
-	TreeItem * item = new SceneGraphItem(m_scene, parentItem);
+	SceneGraphRef sceneGraph = (*m_scene)->GetSceneGraph();
+
+	TreeItem * item = new SceneGraphItem(sceneGraph, parentItem);
 	parentItem->addChild(item);
 
 	// add actors 
-	BuildActor(item, m_scene->GetRootNode());
+	BuildActor(item, sceneGraph->GetRootNode());
+
+	// Add animation items if any
+
+	for (size_t i = 0; i< (*m_scene)->GetAnimationCount(); i++ )
+	{
+		Animation * animation = (*m_scene)->GetAnimation(i);
+		
+		// --- 
+		ActorAnimation * actorAnimation = dynamic_cast<ActorAnimation*>(animation);
+		if (actorAnimation) {
+			Actor * actor = actorAnimation->GetActor();
+			auto it = m_actorMap.find(actor);
+			if (it != m_actorMap.end()) {
+				it->second->SetAnimation(animation);
+			}
+		}
+
+		// masikra ugyanez:
+		//EntityAnimation * entityAnimation = dynamic_cast<EntityAnimation*>(animation);
+		// if (...) ... ;
+	}
+
 }
 
-void Idogep::SceneGraphModel::BuildActor(TreeItem * parentItem, Grafkit::ActorRef actor, int maxDepth)
+void Idogep::SceneModel::BuildActor(TreeItem * parentItem, Grafkit::ActorRef actor, int maxDepth)
 {
-	TreeItem * item = new ActorItem(actor, parentItem);
+	ActorItem * item = new ActorItem(actor, parentItem);
 	parentItem->addChild(item);
 
 	for (int i = 0; i < actor->GetChildrenCount(); i++) {
@@ -141,13 +164,15 @@ void Idogep::SceneGraphModel::BuildActor(TreeItem * parentItem, Grafkit::ActorRe
 	for (int i = 0; i < actor->GetEntityCount(); i++) {
 		BuildEntity(item, actor->GetEntity(i));
 	}
+
+	m_actorMap.insert_or_assign(actor, item);
 }
 
-void Idogep::SceneGraphModel::BuildEntity(TreeItem * parentItem, Grafkit::Entity3DRef entity)
+void Idogep::SceneModel::BuildEntity(TreeItem * parentItem, Grafkit::Entity3DRef entity)
 {
 	QList<QVariant> rowData;
 
-	TreeItem * item = nullptr;
+	EntityItem * item = nullptr;
 
 	const CameraRef camera = dynamic_cast<Camera*>(entity.Get());
 	const ModelRef model = dynamic_cast<Model*>(entity.Get());
@@ -157,12 +182,15 @@ void Idogep::SceneGraphModel::BuildEntity(TreeItem * parentItem, Grafkit::Entity
 		item = new CameraItem(camera, parentItem);
 	}
 	else if (light) {
+		/*BuildCamera(item, camera);*/
 		item = new CameraItem(camera, parentItem);
 	}
 	else if (model) {
 		item = new ModelItem(model, parentItem);
 	}
-	if (item)
-		parentItem->addChild(item);
-}
 
+	if (item) {
+		parentItem->addChild(item);
+		m_entityMap.insert_or_assign(entity, item);
+	}
+}

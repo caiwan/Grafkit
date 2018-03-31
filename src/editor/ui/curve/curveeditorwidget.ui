@@ -20,14 +20,14 @@
    <string>Curve Editor</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,3">
     <item>
      <widget class="QTreeView" name="treeView"/>
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,4,0,0,0,0,0,0,0,0,0,0">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0,0,0,0,0,0,0,0">
         <item>
          <widget class="QPushButton" name="btn_playbackOptions">
           <property name="text">

@@ -44,10 +44,12 @@ void Idogep::Document::Initialize(Grafkit::Renderer & render)
 
 	// ------- 
 	// OUTLINE 
-	delete m_outlineViewModel;
-	m_outlineViewModel = new SceneGraphModel();
-	m_outlineViewModel->ScenegraphChanged(m_scene->Get()->GetSceneGraph());
+	SceneModel *old = m_outlineViewModel;
+
+	m_outlineViewModel = new SceneModel(m_scene);
 	m_outlineViewModel->BuildModel();
+	
+	delete old;
 }
 
 void Idogep::Document::Shutdown()

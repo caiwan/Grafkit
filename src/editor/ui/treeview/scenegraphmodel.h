@@ -10,6 +10,12 @@
 namespace Grafkit {
 	class Animation;
 	typedef Ref<Animation> AnimationRef ;
+
+	class Scene;
+	typedef Resource<Scene> SceneRes;
+	typedef Ref<SceneRes> SceneResRef;
+
+
 }
 
 namespace Idogep {
@@ -24,6 +30,8 @@ namespace Idogep {
 
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
 
+	// shall we have 
+	// multiple animations maybe?
 	class HasItemAnimationsRole {
 	public :
 		HasItemAnimationsRole();
@@ -99,14 +107,12 @@ namespace Idogep {
 
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
 
-	class SceneGraphModel : public TreeModel
+	
+	class SceneModel : public TreeModel
 	{
 	public:
-		SceneGraphModel();
-		~SceneGraphModel();
-
-		void ScenegraphChanged(Grafkit::SceneGraphRef &scene);
-		//void SceneChanged(Grafkit::SceneResRef &scene);
+		SceneModel(Grafkit::SceneResRef &scene);
+		~SceneModel();
 
 	private:
 		virtual QStringList Header();
@@ -115,7 +121,11 @@ namespace Idogep {
 		void BuildActor(TreeItem * parentItem, Grafkit::ActorRef parentActor, int maxDepth = 4096);
 		void BuildEntity(TreeItem * parentItem, Grafkit::Entity3DRef entity);
 
-		Grafkit::SceneGraphRef m_scene;
+		Grafkit::SceneResRef m_scene;
+
+	private:
+		std::map<Grafkit::Actor*, ActorItem*> m_actorMap;
+		std::map<Grafkit::Entity3D *, EntityItem*> m_entityMap;
 	};
 
 }

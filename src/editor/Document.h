@@ -18,7 +18,7 @@ namespace Idogep {
 	class CurveDocument;
 
 	class TreeModel;
-	class SceneGraphModel;
+	class SceneModel;
 
 	class Document
 	{
@@ -56,7 +56,7 @@ namespace Idogep {
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
 
-		Idogep::SceneGraphModel *m_outlineViewModel;
+		Idogep::SceneModel *m_outlineViewModel;
 	};
 
 }

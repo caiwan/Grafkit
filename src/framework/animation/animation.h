@@ -122,12 +122,11 @@ namespace Grafkit {
 			friend class Animation;
 		public:
 			Track(std::string name = "") : m_name(name) {
-				m_channels.reserve(4);
 			}
 
 			~Track() {}
 
-			void CreateChannel(size_t subId, std::string name) { m_channels[subId] = new Channel(name); }
+			size_t CreateChannel(std::string name) { m_channels.push_back(new Channel(name)); return m_channels.size() - 1; }
 
 			void SetChannel(size_t subId, Ref<Channel> &track) { m_channels[subId] = track; }
 			Ref<Channel> GetChannel(size_t subId) { return m_channels[subId]; }

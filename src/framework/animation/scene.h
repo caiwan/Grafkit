@@ -84,6 +84,9 @@ namespace Grafkit {
 
 		void AddAnimation(AnimationRef animation) { m_animations.push_back(animation); }
 
+		size_t GetAnimationCount() { return m_animations.size(); }
+		AnimationRef GetAnimation(size_t id) { return m_animations[id]; }
+
 	protected:
 		void InitializeAnimations() {}
 		void ShutdownAnimations(){}
