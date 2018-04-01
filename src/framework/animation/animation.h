@@ -49,7 +49,7 @@ namespace Grafkit {
 
 		/** Tamplate for anim keys */
 		struct Key {
-			Key() : m_key(0), m_value(), m_type(KI_linear), m_tangent(0.) {}
+			Key() : m_key(0), m_value(0.), m_type(KI_linear), m_tangent(0.) {}
 			Key(float t, float value) : m_key(t), m_value(value), m_type(KI_linear), m_tangent(0.) {}
 			Key(Key const &other) : m_key(other.m_key), m_value(other.m_value), m_type(other.m_type), m_tangent(other.m_tangent) {}
 
@@ -66,9 +66,8 @@ namespace Grafkit {
 		class Channel : public Referencable {
 			friend class Animation;
 		public:
-
-			Channel() {}
-			Channel(std::string name) : m_name(name) {}
+			Channel(const char* name = "");
+			Channel(std::string name);
 			Channel(Channel &other);
 
 			size_t GetKeyCount() { return m_track.size(); }
@@ -84,18 +83,6 @@ namespace Grafkit {
 			int FindKeyIndex(float t) const;
 
 			std::string GetName() { return m_name; }
-
-			/** Finds a key inside the track
-			@return 1 if key found
-			*/
-			// legacy shit 
-			int FindKey(float t, float& v0, float& v1, float &f) const {
-				Key k0, k1;
-				int r = FindKey(t, k0, k1, f);
-				v0 = k0.m_value;
-				v1 = k1.m_value;
-				return r;
-			}
 
 			/** Finds a key inside the track
 			@return 1 if key found
@@ -121,12 +108,12 @@ namespace Grafkit {
 		{
 			friend class Animation;
 		public:
-			Track(std::string name = "") : m_name(name) {
-			}
-
+			Track(const char* name = nullptr, const char* channelInitals = nullptr);
+			Track(const char* name, const std::vector<std::string> channelNames);
 			~Track() {}
 
-			size_t CreateChannel(std::string name) { m_channels.push_back(new Channel(name)); return m_channels.size() - 1; }
+			size_t CreateChannel(const char* name);
+			size_t CreateChannel(std::string name);
 
 			void SetChannel(size_t subId, Ref<Channel> &track) { m_channels[subId] = track; }
 			Ref<Channel> GetChannel(size_t subId) { return m_channels[subId]; }
@@ -153,8 +140,19 @@ namespace Grafkit {
 
 	};
 
+}
 
-	/* ============================================================================================== */
+/* ============================================================================================== */
+namespace Grafkit {
+	inline Animation::Channel::Channel(const char * name) : m_name(name)
+	{
+		m_track.push_back(Key());
+	}
+
+	inline Animation::Channel::Channel(std::string name) : m_name(name)
+	{
+		m_track.push_back(Key());
+	}
 
 	inline Animation::Channel::Channel(Channel & other)
 	{
