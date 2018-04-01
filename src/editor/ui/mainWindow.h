@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
+
+#include "common.h"
+
 #include "Event.h"
 
 namespace Idogep {
@@ -19,9 +22,21 @@ namespace Idogep {
 	class PropertyEditorWidget;
 	//class AboutDialog;
 
+	class TreeItem;
+	class TreeModel;
+
 	// ---
 
-	class MainWindow : public QMainWindow {
+	class ManageOutlineViewRole {
+	public:
+		ManageOutlineViewRole();
+	public:
+		void ItemSelectedEvent(TreeItem *item);
+		Event<Grafkit::AnimationRef> onAnimationSelected;
+
+	};
+
+	class MainWindow : public QMainWindow, public ManageOutlineViewRole{
 	public:
 		MainWindow(
 			Editor * const & editor

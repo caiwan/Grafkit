@@ -20,6 +20,8 @@ CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(
 	connect(ui->btn_play, SIGNAL(clicked()), this, SLOT(playPressedSlot()));
 	connect(ui->btn_stop, SIGNAL(clicked()), this, SLOT(stopPressedSlot()));
 	connect(ui->btn_playbackOptions, SIGNAL(clicked()), this, SLOT(optionsPressedSlot()));
+
+	//onAnimationModelUpdated +=
 }
 
 CurveEditorWidget::~CurveEditorWidget()
@@ -48,7 +50,7 @@ void Idogep::CurveEditorWidget::refreshView(bool force)
 	}
 }
 
-void Idogep::CurveEditorWidget::onAnimationModelUpdatedEvent(TreeModel * model)
+void Idogep::CurveEditorWidget::UpdateAnimationModel(TreeModel * model)
 {
 	// this will force update
 	ui->treeView->setModel(nullptr);
@@ -160,7 +162,7 @@ void Idogep::ManageAnimationsRole::AnimationChangedEvent(Grafkit::AnimationRef a
 	TreeModel * oldModel = m_animationListModel;
 	m_animationListModel = new AnimationTreeModel(m_animation);
 	m_animationListModel->BuildModel();
-	onAnimationModelUpdated(m_animationListModel);
+	UpdateAnimationModel(m_animationListModel);
 	if (oldModel)
 		delete oldModel;
 }

@@ -335,7 +335,7 @@ void Renderer::Resize(int screenW, int screenH) {
 		m_myRenderTargetView->Release();
 
 
-		hr = m_swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+		hr = m_swapChain->ResizeBuffers(0, m_screenW, m_screenH, DXGI_FORMAT_UNKNOWN, 0);
 		if (FAILED(hr))
 			throw new EX_HRESULT(ResizeRenderSurfaceException, hr);
 		
@@ -356,7 +356,7 @@ void Renderer::Resize(int screenW, int screenH) {
 
 		// ---- 
 		m_myDepthStencilView->Release();
-		m_depthStencilBuffer->Release();
+		//m_depthStencilBuffer->Release();
 		CreateDepthStencilView();
 		// --- 
 		

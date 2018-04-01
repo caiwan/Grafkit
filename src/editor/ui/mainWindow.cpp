@@ -27,7 +27,7 @@ using namespace Idogep;
 
 Idogep::MainWindow::MainWindow(
 	Editor * const & editor
-)
+) : ManageOutlineViewRole()
 //m_editor(editor)
 {
 	createActions();
@@ -122,4 +122,31 @@ void Idogep::MainWindow::connectEvents(Editor * const & editor)
 
 	EditorApplication* app = EditorApplication::Instance();
 	app->GetLoggerProxy()->onUpdateLog += Delegate(m_logWidget, &LogWidget::UpdateLog);
+
+	// animation
+	m_outlineViewer->onItemSelected += Delegate(this, &ManageOutlineViewRole::ItemSelectedEvent);
+	onAnimationSelected += Delegate(m_curveEditor, &CurveEditorWidget::AnimationChangedEvent);
 }
+
+// ------
+
+#include <qabstractitemmodel.h>
+#include "ui/treeview/treeitem.h"
+#include "ui/treeview/scenegraphmodel.h"
+
+Idogep::ManageOutlineViewRole::ManageOutlineViewRole()
+{
+}
+
+void Idogep::ManageOutlineViewRole::ItemSelectedEvent(TreeItem *item)
+{
+	//TreeItem *item = reinterpret_cast<TreeItem*> (index.internalPointer());
+	if (!item)
+		return;
+
+	HasItemAnimationsRole * animationItem = dynamic_cast<HasItemAnimationsRole*>(item);
+	if (animationItem) {
+		onAnimationSelected(animationItem->GetAnimation());
+	}
+}
+

@@ -51,7 +51,9 @@ namespace Idogep {
 
 	protected:
 		Event<Ref<Grafkit::Animation::Channel>> onChannelSelected;
-		Event<TreeModel*> onAnimationModelUpdated;
+		//Event<TreeModel*> onAnimationModelUpdated;
+
+		virtual void UpdateAnimationModel(TreeModel* model) = 0;
 
 	protected:
 		Grafkit::AnimationRef m_animation;
@@ -112,7 +114,9 @@ namespace Idogep {
 
 		virtual bool requestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) { onRequestWaveform(p, sampleCount, channelCount, samplePerSec); return sampleCount > 0; }
 
-		void onAnimationModelUpdatedEvent(TreeModel* model);
+		//void onAnimationModelUpdatedEvent(TreeModel* model);
+		virtual void UpdateAnimationModel(TreeModel* model);
+
 
 		protected slots:
 		void playPressedSlot() { onTogglePlayback(); }
