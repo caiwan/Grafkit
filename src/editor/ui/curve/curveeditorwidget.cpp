@@ -9,7 +9,7 @@
 
 using namespace Idogep;
 
-CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(new Ui::CurveEditorWidget), CurveDocument()
+CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(new Ui::CurveEditorWidget), ManageCurveRole()
 {
 	ui->setupUi(this);
 	m_scene = new CurveEditorScene(this);
@@ -21,7 +21,9 @@ CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(
 	connect(ui->btn_stop, SIGNAL(clicked()), this, SLOT(stopPressedSlot()));
 	connect(ui->btn_playbackOptions, SIGNAL(clicked()), this, SLOT(optionsPressedSlot()));
 
-	//onAnimationModelUpdated +=
+	connect(ui->treeView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(itemClickedSlot(const QModelIndex &)));
+	connect(ui->treeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(itemDoubleClickedSlot(const QModelIndex &)));
+
 }
 
 CurveEditorWidget::~CurveEditorWidget()
@@ -35,17 +37,18 @@ void Idogep::CurveEditorWidget::resizeEvent(QResizeEvent * event)
 	QWidget::resizeEvent(event);
 }
 
-void Idogep::CurveEditorWidget::refreshView(bool force)
+void Idogep::CurveEditorWidget::RefreshView(bool force)
 {
 	if (force) {
 		m_scene->clear();
-		clearAudiogram();
-		addCurveToScene(m_scene);
+		ClearAudiogram();
+		AddCurveToScene(m_scene);
 		// addCursorsToScene(m_scene); // TODO
-		m_scene->refreshView();
+		m_scene->RefreshView();
 	}
 	else {
-		addCurveToScene(m_scene);
+		m_scene->clear();
+		AddCurveToScene(m_scene);
 		m_scene->update();
 	}
 }
@@ -77,8 +80,20 @@ void Idogep::CurveEditorWidget::demoTimeChanged(float time)
 }
 
 
+void Idogep::CurveEditorWidget::itemClickedSlot(const QModelIndex & index)
+{
+	TreeItem * item = reinterpret_cast<TreeItem *> (index.internalPointer());
+	AnimationChannelItem * animationItem = dynamic_cast<AnimationChannelItem*>(item);
+	if (!animationItem)
+		return;
 
+	SetChannel(animationItem->GetChannel());
+	//RefreshView(false);
+}
 
+void Idogep::CurveEditorWidget::itemDoubleClickedSlot(const QModelIndex & index)
+{
+}
 
 
 // ========================================================================================================
@@ -129,13 +144,13 @@ namespace {
 
 		for (size_t i = 0; i < m_animation->GetTrackCount(); i++) {
 			Ref<Animation::Track> track = m_animation->GetTrack(i);
-			
+
 			QVariantList data;
 			data << QString::fromStdString(track->GetName());
 			TreeItem *item = new TreeItem(data, parentItem);
-			
+
 			parentItem->addChild(item);
-			
+
 			BuildTrack(item, track);
 		}
 	}
@@ -143,7 +158,7 @@ namespace {
 	{
 		for (size_t i = 0; i < track->GetChannelCount(); i++) {
 			Ref<Animation::Channel> channel = track->GetChannel(i);
-			
+
 			QVariantList data;
 			data << QString::fromStdString(channel->GetName());
 			AnimationChannelItem *item = new AnimationChannelItem(data, parentItem);
@@ -166,4 +181,3 @@ void Idogep::ManageAnimationsRole::AnimationChangedEvent(Grafkit::AnimationRef a
 	if (oldModel)
 		delete oldModel;
 }
-

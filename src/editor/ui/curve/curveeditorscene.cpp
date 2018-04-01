@@ -52,7 +52,7 @@ QPointF CurveEditorScene::offset() const {
 	return m_ofs;
 }
 
-void Idogep::CurveEditorScene::setDocument(CurveDocument * doc)
+void Idogep::CurveEditorScene::setDocument(ManageCurveRole * doc)
 {
 	m_document = doc;
 	//doc->addCurveToScene(this);
@@ -66,7 +66,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 	setSceneRect(views().at(0)->geometry());
 
-	m_document->recalculate();
+	m_document->Recalculate();
 
 	if (m_ofs.x() > 0.0f)
 	{
@@ -124,7 +124,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 #if 1
 	// debug 
-	if (m_document->getCurvePoints() == nullptr ) {
+	if (m_document->GetCurvePoints() == nullptr ) {
 		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::red));
 	}
 
@@ -258,13 +258,13 @@ QPointF Idogep::CurveEditorScene::screen2Point(QPointF point) const
 void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect)
 {
 	// 2. draw the curves.
-	QList<CurvePointItem*> *points = m_document->getCurvePoints();
+	QList<CurvePointItem*> *points = m_document->GetCurvePoints();
 
 	// prevernt crash on NPE
 	if (!points || points->isEmpty())
 		return;
 
-	auto track = m_document->getTrack();
+	auto track = m_document->GetChannel();
 
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setPen(QPen(grey));
@@ -333,7 +333,7 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 void Idogep::CurveEditorScene::drawCurve_old(QPainter * painter, const QRectF & rect)
 {
 	// 2. draw the curves.
-	QList<CurvePointItem*> *points = m_document->getCurvePoints();
+	QList<CurvePointItem*> *points = m_document->GetCurvePoints();
 
 	if (!points->isEmpty()) {
 		painter->setRenderHint(QPainter::Antialiasing);
@@ -451,7 +451,7 @@ void CurveEditorScene::updateAudiogram()
 	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) return;
 
 	QImage* img = nullptr;
-	m_document->getAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
+	m_document->GetAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
 
 	if (!img) return;
 

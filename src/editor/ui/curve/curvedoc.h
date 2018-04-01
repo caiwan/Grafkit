@@ -14,16 +14,16 @@ namespace Idogep {
 	class CurveCursor;
 
 	// Delegate audiogram rendering functions 
-	class CurveAudiogram {
+	class ManageCurveAudiogramRole {
 	public:
-		CurveAudiogram();
-		virtual ~CurveAudiogram();
+		ManageCurveAudiogramRole();
+		virtual ~ManageCurveAudiogramRole();
 		
-		void getAudiogram(QImage** image, float startTime, float endTime, int rectWidth, int rectHeight);
-		void clearAudiogram();
+		void GetAudiogram(QImage** image, float startTime, float endTime, int rectWidth, int rectHeight);
+		void ClearAudiogram();
 
 	protected:
-		virtual bool requestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
+		virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
 
 	private:
 		float* m_audiogramBuffer;
@@ -35,7 +35,13 @@ namespace Idogep {
 
 	// --- 
 
-	class CurveDocument : /*: public QObject,*/ public CurveAudiogram
+	class ManageCursorRole {
+
+	};
+
+	// --- 
+
+	class ManageCurveRole : /*: public QObject,*/ public ManageCurveAudiogramRole, public ManageCursorRole
 	{
 		friend class CurvePointItem;
 		friend class CurveEditorScene;
@@ -43,24 +49,24 @@ namespace Idogep {
 		//Q_OBJECT
 	public:
 		//explicit CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track, QObject *parent = nullptr);
-		CurveDocument();
+		ManageCurveRole();
 
-		QList<CurvePointItem*>* getCurvePoints() { return m_curve; }
-		Ref<Grafkit::Animation::Channel> getTrack() { return m_track; }
+		QList<CurvePointItem*>* GetCurvePoints() { return m_curve; }
+		Ref<Grafkit::Animation::Channel> GetChannel() { return m_track; }
 
-		void setTrack(Ref<Grafkit::Animation::Channel>& track);
+		void SetChannel(Ref<Grafkit::Animation::Channel>& track);
 
 	protected:
-		void recalculate();
-		void addCurveToScene(CurveEditorScene* parent);
+		void Recalculate();
+		void AddCurveToScene(CurveEditorScene* parent);
 
-		virtual void refreshView(bool force = false) = 0;
+		virtual void RefreshView(bool force = false) = 0;
 
 	private:
-		void movePoint(CurvePointItem *item);
-		void moveTangent(CurvePointItem *item);
-		void startEdit(CurvePointItem *item);
-		void commitEdit(CurvePointItem *item);
+		void MovePoint(CurvePointItem *item);
+		void MoveTangent(CurvePointItem *item);
+		void StartEdit(CurvePointItem *item);
+		void CommitEdit(CurvePointItem *item);
 
 	private:
 		QList<CurvePointItem*>* m_curve;

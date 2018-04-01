@@ -24,7 +24,7 @@ namespace Idogep {
 
 	class CurveEditorScene;
 	class CurvePointItem;
-	class CurveDocument;
+	class ManageCurveRole;
 
 	class CurveCursor;
 
@@ -91,7 +91,7 @@ namespace Idogep {
 
 	// ========================================================================================================
 
-	class CurveEditorWidget : public QDockWidget, public CurveDocument, public ManageAnimationsRole, public ManagePlaybackRole
+	class CurveEditorWidget : public QDockWidget, public ManageCurveRole, public ManageAnimationsRole, public ManagePlaybackRole
 	{
 		Q_OBJECT
 
@@ -110,18 +110,22 @@ namespace Idogep {
 		/* METHODS */
 	protected:
 		virtual void resizeEvent(QResizeEvent* event);
-		virtual void refreshView(bool force);
+		virtual void RefreshView(bool force);
 
-		virtual bool requestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) { onRequestWaveform(p, sampleCount, channelCount, samplePerSec); return sampleCount > 0; }
+		virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) { onRequestWaveform(p, sampleCount, channelCount, samplePerSec); return sampleCount > 0; }
 
 		//void onAnimationModelUpdatedEvent(TreeModel* model);
 		virtual void UpdateAnimationModel(TreeModel* model);
-
 
 		protected slots:
 		void playPressedSlot() { onTogglePlayback(); }
 		void stopPressedSlot() { onStopPlayback(); }
 		void optionsPressedSlot() { onPlaybackOptions(); }
+
+		// ... 
+		void itemClickedSlot(const QModelIndex &index);
+		void itemDoubleClickedSlot(const QModelIndex &index);
+
 
 	private:
 		Ui::CurveEditorWidget *ui;

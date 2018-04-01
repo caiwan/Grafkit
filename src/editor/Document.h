@@ -15,7 +15,7 @@ namespace Idogep {
 
 	class Editor;
 	class Document;
-	class CurveDocument;
+	class ManageCurveRole;
 
 	class TreeModel;
 	class SceneModel;

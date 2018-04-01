@@ -5,23 +5,23 @@
 
 using namespace Idogep;
 
-Idogep::CurveAudiogram::CurveAudiogram() : m_audiogramSampleCount(0), m_audiogramBuffer(nullptr)
+Idogep::ManageCurveAudiogramRole::ManageCurveAudiogramRole() : m_audiogramSampleCount(0), m_audiogramBuffer(nullptr)
 {
 }
 
-Idogep::CurveAudiogram::~CurveAudiogram()
+Idogep::ManageCurveAudiogramRole::~ManageCurveAudiogramRole()
 {
 	delete m_audiogramBuffer;
 }
 
 
-void Idogep::CurveAudiogram::getAudiogram(QImage ** image, float startTime, float endTime, int rectWidth, int rectHeight)
+void Idogep::ManageCurveAudiogramRole::GetAudiogram(QImage ** image, float startTime, float endTime, int rectWidth, int rectHeight)
 {
 	*image = nullptr;
 
 	// todo: update when audiogramChanged
 	if (!m_audiogramBuffer) {
-		requestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
+		RequestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
 	}
 
 	uint32_t offset = uint32_t(startTime * m_audiogramSamplePerSec) * m_audiogramChannelCount;
@@ -70,7 +70,7 @@ void Idogep::CurveAudiogram::getAudiogram(QImage ** image, float startTime, floa
 	*image = img;
 }
 
-void Idogep::CurveAudiogram::clearAudiogram()
+void Idogep::ManageCurveAudiogramRole::ClearAudiogram()
 {
 	delete m_audiogramBuffer;
 	m_audiogramBuffer = nullptr;
@@ -78,13 +78,13 @@ void Idogep::CurveAudiogram::clearAudiogram()
 
 
 
-Idogep::CurveDocument::CurveDocument() :
-	CurveAudiogram(),
+Idogep::ManageCurveRole::ManageCurveRole() :
+	ManageCurveAudiogramRole(),
 	m_curve(nullptr)
 {
 }
 
-void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::Channel>& track)
+void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& track)
 {
 	m_track = new Grafkit::Animation::Channel(track);
 
@@ -113,7 +113,7 @@ void Idogep::CurveDocument::setTrack(Ref<Grafkit::Animation::Channel>& track)
 	//refreshView();
 }
 
-void Idogep::CurveDocument::recalculate()
+void Idogep::ManageCurveRole::Recalculate()
 {
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {
@@ -123,7 +123,7 @@ void Idogep::CurveDocument::recalculate()
 	}
 }
 
-void Idogep::CurveDocument::addCurveToScene(CurveEditorScene * parent)
+void Idogep::ManageCurveRole::AddCurveToScene(CurveEditorScene * parent)
 {
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {
@@ -135,7 +135,7 @@ void Idogep::CurveDocument::addCurveToScene(CurveEditorScene * parent)
 	}
 }
 
-void Idogep::CurveDocument::movePoint(CurvePointItem * item)
+void Idogep::ManageCurveRole::MovePoint(CurvePointItem * item)
 {
 	float itemTime = item->time();
 	uint32_t id = item->index();
@@ -162,17 +162,17 @@ void Idogep::CurveDocument::movePoint(CurvePointItem * item)
 	m_track->SetKey(key, id);
 }
 
-void Idogep::CurveDocument::moveTangent(CurvePointItem * item)
+void Idogep::ManageCurveRole::MoveTangent(CurvePointItem * item)
 {
 	// ... 
 }
 
-void Idogep::CurveDocument::startEdit(CurvePointItem * item)
+void Idogep::ManageCurveRole::StartEdit(CurvePointItem * item)
 {
 	// save current state
 }
 
-void Idogep::CurveDocument::commitEdit(CurvePointItem * item)
+void Idogep::ManageCurveRole::CommitEdit(CurvePointItem * item)
 {
 	// add command to commit it 
 }

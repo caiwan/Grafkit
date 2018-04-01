@@ -7,7 +7,7 @@
 
 namespace Idogep {
 
-	class CurveDocument;
+	class ManageCurveRole;
 
 	class CurvePointItem;
 	class CurveEditorWidget;
@@ -24,7 +24,7 @@ namespace Idogep {
 		QPointF point2Screen(QPointF point) const;
 		QPointF screen2Point(QPointF point) const;
 
-		void setDocument(CurveDocument * doc);
+		void setDocument(ManageCurveRole * doc);
 
 		virtual void drawBackground(QPainter* painter, const QRectF& r);
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
@@ -32,7 +32,7 @@ namespace Idogep {
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 		void viewResized(QResizeEvent *event) {updateAudiogram();}
-		void refreshView() { updateAudiogram(); update(); }
+		void RefreshView() { updateAudiogram(); update(); }
 
 	private:
 		void drawCurve(QPainter* painter, const QRectF& r);
@@ -40,7 +40,7 @@ namespace Idogep {
 
 		void drawCursor(QPainter* painter, const QRectF& r);
 
-		CurveDocument* m_document;
+		ManageCurveRole* m_document;
 
 		QSizeF m_scale;
 
