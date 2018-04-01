@@ -36,7 +36,11 @@ namespace Idogep {
 	// --- 
 
 	class ManageCursorRole {
-
+		// TODO:
+		//CurveCursor *m_crsrPlayback;
+		//CurveCursor *m_crsrHover;
+		//CurveCursor *m_crsrMarkerStart;
+		//CurveCursor *m_crsrMarkerEnd;
 	};
 
 	// --- 
@@ -48,7 +52,6 @@ namespace Idogep {
 
 		//Q_OBJECT
 	public:
-		//explicit CurveDocument(Ref<Grafkit::Animation::FloatTrack>& track, QObject *parent = nullptr);
 		ManageCurveRole();
 
 		QList<CurvePointItem*>* GetCurvePoints() { return m_curve; }
@@ -62,21 +65,20 @@ namespace Idogep {
 
 		virtual void RefreshView(bool force = false) = 0;
 
-	private:
+	protected:
 		void MovePoint(CurvePointItem *item);
 		void MoveTangent(CurvePointItem *item);
 		void StartEdit(CurvePointItem *item);
 		void CommitEdit(CurvePointItem *item);
 
+		void CommitAddPoint(float key, float value);
+		void CommitRemovePoint(float key, float value);
+
 	private:
 		QList<CurvePointItem*>* m_curve;
 		Ref<Grafkit::Animation::Channel> m_track; // todo: multiple fiszfasz
 
-		// TODO:
-		//CurveCursor *m_crsrPlayback;
-		//CurveCursor *m_crsrHover;
-		//CurveCursor *m_crsrMarkerStart;
-		//CurveCursor *m_crsrMarkerEnd;
+
 	};
 
 }

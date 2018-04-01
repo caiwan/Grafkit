@@ -127,7 +127,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 #if 1
 	// debug 
-	if (m_document->GetCurvePoints() == nullptr ) {
+	if (m_document->GetCurvePoints() == nullptr) {
 		painter->fillRect(QRect(0, 0, 16, 16), QBrush(Qt::red));
 	}
 
@@ -136,25 +136,16 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 
 void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
-	//if (!m_pointItems) return;
+	if (!m_document)
+		return;
 
-	bool thereIsAnItem = false;
-	//for (int i = 0; i < m_pointItems->size(); i++) {
-	//	if (m_pointItems->at(i)->contains(m_pointItems->at(i)->mapFromScene(event->scenePos()))) {
-	//		thereIsAnItem = true;
-	//		break;
-	//	}
-	//}
+	CurvePointItem * item = qgraphicsitem_cast<CurvePointItem*>(itemAt(event->scenePos(), QTransform()));
 
-	//if (!thereIsAnItem) {
-	//	CurvePointItem* cpi = new CurvePointItem(QPointF((event->scenePos().x() - m_ofs.x()) / m_scale.width(), (event->scenePos().y() - m_ofs.y()) / -m_scale.height()));
-	//	//m_pointItems->append(cpi);
-
-	//	addItem(cpi);
-	//	cpi->update();
-	//	update();
-	//	views().at(0)->update();
-	//}
+	if (item) {
+	}
+	else {
+		update();
+	}
 
 	QGraphicsScene::mouseDoubleClickEvent(event);
 }
