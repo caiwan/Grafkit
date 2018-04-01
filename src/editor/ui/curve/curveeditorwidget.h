@@ -9,7 +9,7 @@
 
 #include "animation/animation.h"
 
-#include "../treeview/treeitem.h"
+#include "treeitem.h"
 
 namespace Ui {
 	class CurveEditorWidget;

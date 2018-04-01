@@ -5,7 +5,7 @@
 
 #include "curveeditorscene.h"
 
-#include "../treeview/treemodel.h"
+#include "treemodel.h"
 
 using namespace Idogep;
 
@@ -98,8 +98,8 @@ void Idogep::CurveEditorWidget::itemDoubleClickedSlot(const QModelIndex & index)
 
 // ========================================================================================================
 
-#include "../treeview/treemodel.h"
-#include "../treeview/treeitem.h"
+#include "treemodel.h"
+#include "treeitem.h"
 
 using namespace Grafkit;
 using namespace Idogep;

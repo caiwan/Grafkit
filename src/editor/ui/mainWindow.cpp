@@ -15,7 +15,7 @@
 
 #include "ui/curve/curveeditorwidget.h"
 
-#include "ui/treeview/scenegraphmodel.h"
+#include "scenegraphmodel.h"
 #include "ui/treeview/scenegraphviewwidget.h"
 
 #include "ui/propertyeditor/propertyeditorwidget.h"
@@ -131,8 +131,8 @@ void Idogep::MainWindow::connectEvents(Editor * const & editor)
 // ------
 
 #include <qabstractitemmodel.h>
-#include "ui/treeview/treeitem.h"
-#include "ui/treeview/scenegraphmodel.h"
+#include "treeitem.h"
+#include "scenegraphmodel.h"
 
 Idogep::ManageOutlineViewRole::ManageOutlineViewRole()
 {

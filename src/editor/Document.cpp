@@ -16,7 +16,7 @@
 
 #include "utils/ResourceManager.h"
 
-#include "ui/treeview/scenegraphmodel.h"
+#include "scenegraphmodel.h"
 
 using namespace Idogep;
 using namespace Grafkit;
