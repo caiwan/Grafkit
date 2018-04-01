@@ -54,7 +54,7 @@ namespace Idogep {
 
 		float m_demoTime, m_demoTimeChanged;
 
-		static QPointF _interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t);
+		//static QPointF _interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t);
 		void updateAudiogram();
 
 		QImage* m_audiogramImage;

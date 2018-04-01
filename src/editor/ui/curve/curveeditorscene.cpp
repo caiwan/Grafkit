@@ -79,6 +79,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 		painter->drawImage(rect, *m_audiogramImage);
 	}
 
+	// because rect() is relative to the widgets parent
 	painter->translate(rect.topLeft());
 
 	// --- 
@@ -114,6 +115,8 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->drawLine(m_ofs.x(), 0.0f, m_ofs.x(), sceneRect().height());
 	painter->setPen(QPen(QColor(144, 144, 144)));
 	painter->drawLine(0.0f, m_ofs.y(), sceneRect().width(), m_ofs.y());
+
+	painter->restore();
 
 	// ---- 
 
@@ -227,6 +230,7 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 }
 
 // -> GK
+#if 0
 QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0, QPointF r1, float t) {
 	float t2 = t * t;
 	float t3 = t2 * t;
@@ -238,20 +242,21 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 		(t3 - t2) * r1
 		);
 }
+#endif
 
 QPointF Idogep::CurveEditorScene::point2Screen(QPointF point) const
 {
 	return QPointF(
-		point.x() * scale().width() + offset().x(),
-		point.y() * -scale().height() + offset().y()
+		point.x() * scale().width() + offset().x() + sceneRect().topLeft().x(),
+		point.y() * -scale().height() + offset().y() + sceneRect().topLeft().y()
 	);
 }
 
 QPointF Idogep::CurveEditorScene::screen2Point(QPointF point) const
 {
 	return QPointF(
-		(point.x() - offset().x()) / scale().width(),
-		(point.y() - offset().y()) / -scale().height()
+		(point.x() - offset().x() - sceneRect().topLeft().x()) / scale().width(),
+		(point.y() - offset().y() - +sceneRect().topLeft().y()) / -scale().height()
 	);
 }
 
@@ -301,9 +306,9 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 
 		// debug stuff
 		{
-			QRectF rekt = point->boundingRect();
-			rekt.moveCenter(point->pos());
-			painter->fillRect(rekt, QBrush(QColor(255, 0, 0), Qt::Dense6Pattern));
+			QRectF boundingRect = point->boundingRect();
+			boundingRect.moveCenter(point->pos());
+			painter->fillRect(boundingRect, QBrush(QColor(255, 0, 0), Qt::Dense6Pattern));
 		}
 
 		auto k0 = track->GetKey(i);
@@ -387,6 +392,7 @@ void Idogep::CurveEditorScene::drawCurve_old(QPainter * painter, const QRectF & 
 
 void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rect)
 {
+	painter->translate(sceneRect().topLeft());
 	// and at the very end, display a big fat green line on top of everything (demo time)
 	painter->setPen(QPen(QColor(48, 224, 48, 96), 2.0, Qt::SolidLine));
 	painter->setBrush(Qt::NoBrush);
@@ -441,6 +447,7 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 	painter->setBrush(QColor(48, 224, 48, 96));
 	painter->drawText(QRectF(QPointF((m_demoTime * m_scale.width() + m_ofs.x()) + barOffset, rect.height() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
 
+	painter->restore();
 }
 
 
