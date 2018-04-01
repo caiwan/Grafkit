@@ -13,7 +13,7 @@ CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(
 {
 	ui->setupUi(this);
 	m_scene = new CurveEditorScene(this);
-	m_scene->setDocument(this);
+	m_scene->SetDocument(this);
 	ui->graphicsView->setScene(m_scene);
 
 	// slots and signals crap thing 
@@ -88,7 +88,7 @@ void Idogep::CurveEditorWidget::itemClickedSlot(const QModelIndex & index)
 		return;
 
 	SetChannel(animationItem->GetChannel());
-	//RefreshView(false);
+	RefreshView(false);
 }
 
 void Idogep::CurveEditorWidget::itemDoubleClickedSlot(const QModelIndex & index)
@@ -141,6 +141,8 @@ namespace {
 
 	void AnimationTreeModel::Build(TreeItem * parentItem)
 	{
+		if (m_animation.Invalid())
+			return;
 
 		for (size_t i = 0; i < m_animation->GetTrackCount(); i++) {
 			Ref<Animation::Track> track = m_animation->GetTrack(i);

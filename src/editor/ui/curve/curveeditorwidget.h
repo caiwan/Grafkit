@@ -51,8 +51,6 @@ namespace Idogep {
 
 	protected:
 		Event<Ref<Grafkit::Animation::Channel>> onChannelSelected;
-		//Event<TreeModel*> onAnimationModelUpdated;
-
 		virtual void UpdateAnimationModel(TreeModel* model) = 0;
 
 	protected:

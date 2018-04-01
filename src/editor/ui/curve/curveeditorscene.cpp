@@ -52,7 +52,7 @@ QPointF CurveEditorScene::offset() const {
 	return m_ofs;
 }
 
-void Idogep::CurveEditorScene::setDocument(ManageCurveRole * doc)
+void Idogep::CurveEditorScene::SetDocument(ManageCurveRole * doc)
 {
 	m_document = doc;
 	//doc->addCurveToScene(this);
@@ -330,6 +330,7 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 	}
 }
 
+#if 0
 void Idogep::CurveEditorScene::drawCurve_old(QPainter * painter, const QRectF & rect)
 {
 	// 2. draw the curves.
@@ -381,6 +382,8 @@ void Idogep::CurveEditorScene::drawCurve_old(QPainter * painter, const QRectF & 
 		points->at(i)->setVisible(true);
 	}
 }
+
+#endif
 
 void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rect)
 {

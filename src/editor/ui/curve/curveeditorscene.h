@@ -24,7 +24,7 @@ namespace Idogep {
 		QPointF point2Screen(QPointF point) const;
 		QPointF screen2Point(QPointF point) const;
 
-		void setDocument(ManageCurveRole * doc);
+		void SetDocument(ManageCurveRole * doc);
 
 		virtual void drawBackground(QPainter* painter, const QRectF& r);
 		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
@@ -32,12 +32,14 @@ namespace Idogep {
 		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 		void viewResized(QResizeEvent *event) {updateAudiogram();}
+
 		void RefreshView() { updateAudiogram(); update(); }
 
 	private:
 		void drawCurve(QPainter* painter, const QRectF& r);
-		void drawCurve_old(QPainter* painter, const QRectF& r);
+		//void drawCurve_old(QPainter* painter, const QRectF& r);
 
+		// TODO: kivenni innnen mashova
 		void drawCursor(QPainter* painter, const QRectF& r);
 
 		ManageCurveRole* m_document;

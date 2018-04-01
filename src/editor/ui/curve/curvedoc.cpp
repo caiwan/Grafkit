@@ -96,6 +96,8 @@ void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& track
 	for (size_t i = 0; i < keyCount; i++) {
 		auto key = m_track->GetKey(i);
 		CurvePointItem *point = new CurvePointItem();
+		m_curve->push_back(point);
+
 		point->setIndex(i);
 
 		point->setTime(key.m_key);
@@ -109,8 +111,6 @@ void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& track
 
 		//m_curve->push_back(point);
 	}
-
-	//refreshView();
 }
 
 void Idogep::ManageCurveRole::Recalculate()
@@ -118,7 +118,7 @@ void Idogep::ManageCurveRole::Recalculate()
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {
 			m_curve->at(i)->recalculatePosition();
-			//m_curve->at(i)->setVisible(true);	// if you change this during the drawing it will not recieve any events
+			// if you set points visibilityduring the drawing sequence, it will not recieve any events
 		}
 	}
 }
@@ -130,7 +130,7 @@ void Idogep::ManageCurveRole::AddCurveToScene(CurveEditorScene * parent)
 			auto point = m_curve->at(i);
 			parent->addItem(point);
 			point->recalculatePosition();
-			//m_curve->at(i)->setVisible(true); 	// if you change this during the drawing it will not recieve any events
+			// if you set points visibilityduring the drawing sequence, it will not recieve any events
 		}
 	}
 }
