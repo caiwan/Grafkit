@@ -76,9 +76,9 @@ namespace Grafkit {
 			float GetValue(float time);
 
 			void AddKey(Key key) { m_track.push_back(key); }
-			void SetKey(Key key, size_t id) { m_track[id] = key; }
-			void InsertKey(Key key, size_t afterId) { auto it = m_track.begin() + afterId; m_track.insert(it, key); }
-			void DeleteKey(Key key, size_t id) { auto it = m_track.begin() + id; m_track.erase(it); }
+			void SetKey(size_t id, Key key ) { m_track[id] = key; }
+			void InsertKey(size_t afterId, Key key ) { auto it = m_track.begin() + afterId; m_track.insert(it, key); }
+			void DeleteKey(size_t id, Key key) { auto it = m_track.begin() + id; m_track.erase(it); }
 
 			int FindKeyIndex(float t) const;
 

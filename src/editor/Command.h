@@ -6,21 +6,21 @@
 
 #include "Event.h"
 
-namespace Idogep{
+namespace Idogep {
 
 	class CommandStack;
 
 	class Command : public Referencable
 	{
 		friend class CommandStack;
-	public :
-	enum CommandState {
-		DONE, NOT_DONE
-	};
+	public:
+		enum CommandState {
+			DONE, NOT_DONE
+		};
 
 	public:
-		Command(){}
-		virtual ~Command(){}
+		Command() {}
+		virtual ~Command() {}
 
 		virtual void Do() = 0;
 		virtual void Undo() = 0;
@@ -29,10 +29,17 @@ namespace Idogep{
 		CommandState m_status;
 	};
 
+	class EmitsCommandRole {
+	public:
+		Event<Ref<Command>&> onNewCommand;
+	};
+
 	class CommandStack {
 	public:
-		CommandStack(){}
-		
+		CommandStack() {}
+
+		void ConnectEmitter(EmitsCommandRole* emitter);
+
 		void AddCommand(Ref<Command> &command);
 		void Redo();
 		void Undo();
@@ -41,10 +48,12 @@ namespace Idogep{
 		bool HasRedo() { return m_redoStack.empty(); }
 
 		Event<CommandStack * const &> onCommandStackChanged;
+		Event<Ref<Command>> onNewCommand;
 
 	private:
 		std::list<Ref<Command>> m_undoStack;
 		std::list<Ref<Command>> m_redoStack;
 	};
+
 
 }

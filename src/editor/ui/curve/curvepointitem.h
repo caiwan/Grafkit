@@ -18,6 +18,7 @@ namespace Idogep {
 
 		QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
+		// ez itt nem pont ilyen egyszeu lesz: 
 		float time() const;
 		void setTime(float t);
 		float value() const;
@@ -29,11 +30,10 @@ namespace Idogep {
 		QPointF tangent() const;
 		void setTangent(QPointF t);
 
+		// ... 
+
 		uint32_t index() { return m_id; }
 		void setIndex(uint32_t id) { m_id = id; }
-
-		uint32_t subIndex() { return m_subid; }
-		void setSubId(uint32_t sid) { m_subid = sid; }
 
 		uint32_t nodeType() { return m_nodeType; }
 		void setNodeType(uint32_t nt) { m_nodeType = nt; }
@@ -70,7 +70,8 @@ namespace Idogep {
 		bool m_showTangent;
 
 		uint32_t m_id;
-		uint32_t m_subid;
+
+		Grafkit::Animation::Key m_key;
 
 		uint32_t m_nodeType;
 		uint32_t m_color;

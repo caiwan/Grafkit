@@ -1,8 +1,18 @@
 #include "Command.h"
 
+void Idogep::CommandStack::ConnectEmitter(EmitsCommandRole * emitter)
+{
+	if (emitter)
+		emitter->onNewCommand += Delegate(this, &CommandStack::AddCommand);
+}
+
 void Idogep::CommandStack::AddCommand(Ref<Command>& command)
 {
 	m_redoStack.clear();
+
+	// TODO: exception handling 
+	command->Do();
+
 	m_undoStack.push_back(command);
 
 	if (m_undoStack.size() > 1000)

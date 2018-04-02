@@ -2,9 +2,9 @@
 
 #include <qobject.h>
 
-#include "Event.h"
-
 #include "animation/animation.h"
+#include "Event.h"
+#include "Command.h"
 
 namespace Idogep {
 
@@ -45,7 +45,7 @@ namespace Idogep {
 
 	// --- 
 
-	class ManageCurveRole : /*: public QObject,*/ public ManageCurveAudiogramRole, public ManageCursorRole
+	class ManageCurveRole : public ManageCurveAudiogramRole, public ManageCursorRole, public EmitsCommandRole
 	{
 		friend class CurvePointItem;
 		friend class CurveEditorScene;
@@ -68,7 +68,7 @@ namespace Idogep {
 	protected:
 		void MovePoint(CurvePointItem *item);
 		void MoveTangent(CurvePointItem *item);
-		void StartEdit(CurvePointItem *item);
+		//void StartEdit(CurvePointItem *item);
 		void CommitEdit(CurvePointItem *item);
 
 		void CommitAddPoint(float key, float value);

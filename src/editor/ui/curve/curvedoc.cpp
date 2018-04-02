@@ -159,7 +159,7 @@ void Idogep::ManageCurveRole::MovePoint(CurvePointItem * item)
 	auto key = m_track->GetKey(id);
 	key.m_key = item->time();
 	key.m_value = item->value();
-	m_track->SetKey(key, id);
+	m_track->SetKey(id, key);
 }
 
 void Idogep::ManageCurveRole::MoveTangent(CurvePointItem * item)
@@ -167,13 +167,22 @@ void Idogep::ManageCurveRole::MoveTangent(CurvePointItem * item)
 	// ... 
 }
 
-void Idogep::ManageCurveRole::StartEdit(CurvePointItem * item)
-{
-	// save current state
-}
+//void Idogep::ManageCurveRole::StartEdit(CurvePointItem * item)
+//{
+//	// save current state
+//}
 
 void Idogep::ManageCurveRole::CommitEdit(CurvePointItem * item)
 {
-	// add command to commit it 
+	item->index();
+}
+
+void Idogep::ManageCurveRole::
+CommitAddPoint(float key, float value)
+{
+}
+
+void Idogep::ManageCurveRole::CommitRemovePoint(float key, float value)
+{
 }
 
