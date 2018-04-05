@@ -44,6 +44,16 @@ void Idogep::MainWindow::DocumentChanged(Document * const & document)
 	m_outlineViewer->setModel(document->GetOutlineModel());
 }
 
+void Idogep::MainWindow::ToggleUndo(bool enabled)
+{
+	m_undoAct->setEnabled(enabled);
+}
+
+void Idogep::MainWindow::ToggleRedo(bool enabled)
+{
+	m_redoAct->setEnabled(enabled);
+}
+
 void Idogep::MainWindow::closeEvent(QCloseEvent * event)
 {
 	QSettings settings;
@@ -54,40 +64,50 @@ void Idogep::MainWindow::closeEvent(QCloseEvent * event)
 
 void Idogep::MainWindow::createActions()
 {
-
+	// -- File 
 	QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-	//QToolBar *fileToolBar = addToolBar(tr("File"));
 
+	// -- -- Save
 	const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
 	QAction *saveAct = new QAction(saveIcon, tr("&Save..."), this);
 	saveAct->setShortcuts(QKeySequence::Save);
 	saveAct->setStatusTip(tr("Save the current form letter"));
-	//connect(saveAct, &QAction::triggered, this, &MainWindow::save);
+	connect(saveAct, &QAction::triggered, this, &MainWindow::saveSlot);
 	fileMenu->addAction(saveAct);
-	//fileToolBar->addAction(saveAct);
 
+	// -- --
 	fileMenu->addSeparator();
 
+	// -- -- Quit
 	QAction *quitAct = fileMenu->addAction(tr("&Quit"), this, &QWidget::close);
 	quitAct->setShortcuts(QKeySequence::Quit);
 	quitAct->setStatusTip(tr("Quit the application"));
 
+	// -- Edit 
+	// -- -- Undo
 	QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-	//QToolBar *editToolBar = addToolBar(tr("Edit"));
 	const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/undo.png"));
-	QAction *undoAct = new QAction(undoIcon, tr("&Undo"), this);
-	undoAct->setShortcuts(QKeySequence::Undo);
-	undoAct->setStatusTip(tr("Undo the last editing action"));
+	m_undoAct = new QAction(undoIcon, tr("&Undo"), this);
+	m_undoAct->setShortcuts(QKeySequence::Undo);
+	m_undoAct->setStatusTip(tr("Undo the last editing action"));
+	m_undoAct->setEnabled(false);
+	connect(m_undoAct, &QAction::triggered, this, &MainWindow::undoSlot);
+	editMenu->addAction(m_undoAct);
 
-	//connect(undoAct, &QAction::triggered, this, &MainWindow::undo);
+	// -- -- Redo
+	const QIcon redoIcon = QIcon::fromTheme("edit-redo", QIcon(":/images/redo.png"));
+	m_redoAct = new QAction(undoIcon, tr("&Redo"), this);
+	m_redoAct->setShortcuts(QKeySequence::Redo);
+	m_redoAct->setStatusTip(tr("Redo the last editing action"));
+	m_redoAct->setEnabled(false);
+	connect(m_undoAct, &QAction::triggered, this, &MainWindow::redoSlot);
+	editMenu->addAction(m_redoAct);
 
-	editMenu->addAction(undoAct);
-	//editToolBar->addAction(undoAct);
-
+	// -- View
 	m_viewMenu = menuBar()->addMenu(tr("&View"));
-
 	menuBar()->addSeparator();
 
+	// -- Help
 	QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
 	QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
@@ -140,7 +160,6 @@ Idogep::ManageOutlineViewRole::ManageOutlineViewRole()
 
 void Idogep::ManageOutlineViewRole::ItemSelectedEvent(TreeItem *item)
 {
-	//TreeItem *item = reinterpret_cast<TreeItem*> (index.internalPointer());
 	if (!item)
 		return;
 
@@ -150,3 +169,16 @@ void Idogep::ManageOutlineViewRole::ItemSelectedEvent(TreeItem *item)
 	}
 }
 
+// ------
+
+#include "Command.h"
+
+Idogep::ManageCommandsRole::ManageCommandsRole() : m_redoAct(nullptr), m_undoAct(nullptr)
+{
+}
+
+void Idogep::ManageCommandsRole::CommandStackChangedEvent(CommandStack * const & stack)
+{
+	ToggleRedo(stack->HasRedo());
+	ToggleUndo(stack->HasUndo());
+}

@@ -22,6 +22,8 @@ namespace Idogep {
 	class PropertyEditorWidget;
 	//class AboutDialog;
 
+	class CommandStack;
+
 	class TreeItem;
 	class TreeModel;
 
@@ -36,21 +38,45 @@ namespace Idogep {
 
 	};
 
-	class MainWindow : public QMainWindow, public ManageOutlineViewRole{
+	class ManageCommandsRole {
 	public:
-		MainWindow(
-			Editor * const & editor
-		);
+		ManageCommandsRole();
+
+		Event<> onUndo;
+		Event<> onRedo;
+
+		void CommandStackChangedEvent(CommandStack * const & stack);
+
+	protected:
+		virtual void ToggleUndo(bool enabled) = 0;
+		virtual void ToggleRedo(bool enabled) = 0;
+
+	protected:
+		QAction * m_undoAct;
+		QAction * m_redoAct;
+	};
+
+	class MainWindow : public QMainWindow, public ManageOutlineViewRole, public ManageCommandsRole {
+	public:
+		MainWindow(Editor * const & editor);
 
 		// external events (called from outside)
 		void DocumentChanged(Document * const & document);
 
 		// internal events (called from inside)		
-		// ...
+		Event<> onSave;
+
+	protected:
+		virtual void ToggleUndo(bool enabled);
+		virtual void ToggleRedo(bool enabled);
 
 	private:
 		void closeEvent(QCloseEvent *event);
-		//void playbackOptions();
+
+		private slots:
+		void undoSlot() { onUndo(); }
+		void redoSlot() { onRedo(); }
+		void saveSlot() { onSave(); }
 
 	private:
 		void createActions();
