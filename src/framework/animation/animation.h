@@ -49,15 +49,15 @@ namespace Grafkit {
 
 		/** Tamplate for anim keys */
 		struct Key {
-			Key() : m_key(0), m_value(0.), m_type(KI_linear), m_tangent(0.) {}
-			Key(float t, float value) : m_key(t), m_value(value), m_type(KI_linear), m_tangent(0.) {}
-			Key(Key const &other) : m_key(other.m_key), m_value(other.m_value), m_type(other.m_type), m_tangent(other.m_tangent) {}
+			Key() : m_time(0), m_value(0.), m_type(KI_linear), m_tangent(float2(1, 0)) {}
+			Key(float t, float value) : m_time(t), m_value(value), m_type(KI_linear), m_tangent(float2(1, 0)) {}
+			Key(Key const &other) : m_time(other.m_time), m_value(other.m_value), m_type(other.m_type), m_tangent(other.m_tangent) {}
 
 			enum KeyInterpolation_e m_type;
 
-			float m_key;
+			float m_time;
 			float m_value;
-			float m_tangent;
+			float2 m_tangent;
 		};
 
 		/**
@@ -70,15 +70,15 @@ namespace Grafkit {
 			Channel(std::string name);
 			Channel(Channel &other);
 
-			size_t GetKeyCount() { return m_track.size(); }
-			Key GetKey(size_t i) { return m_track[i]; }
+			size_t GetKeyCount() { return m_channel.size(); }
+			Key GetKey(size_t i) { return m_channel[i]; }
 
 			float GetValue(float time);
 
-			void AddKey(Key key) { m_track.push_back(key); }
-			void SetKey(size_t id, Key key ) { m_track[id] = key; }
-			void InsertKey(size_t afterId, Key key ) { auto it = m_track.begin() + afterId; m_track.insert(it, key); }
-			void DeleteKey(size_t id, Key key) { auto it = m_track.begin() + id; m_track.erase(it); }
+			void AddKey(Key key) { m_channel.push_back(key); }
+			void SetKey(size_t id, Key key) { m_channel[id] = key; }
+			void InsertKey(size_t afterId, Key key) { auto it = m_channel.begin() + afterId; m_channel.insert(it, key); }
+			void DeleteKey(size_t id, Key key) { auto it = m_channel.begin() + id; m_channel.erase(it); }
 
 			int FindKeyIndex(float t) const;
 
@@ -91,13 +91,13 @@ namespace Grafkit {
 
 		public:
 			void serialize(Archive &ar);
-			void Clear() { m_track.clear(); }
+			void Clear() { m_channel.clear(); }
 
 			void CopyKey(float t, Channel& other);
 
 
 		protected:
-			std::vector<Key> m_track;
+			std::vector<Key> m_channel;
 			std::string m_name;
 		};
 
@@ -117,6 +117,9 @@ namespace Grafkit {
 
 			void SetChannel(size_t subId, Ref<Channel> &track) { m_channels[subId] = track; }
 			Ref<Channel> GetChannel(size_t subId) { return m_channels[subId]; }
+
+			float3 GetFloat3(float t);
+			float4 GetFloat4(float t);
 
 			size_t GetChannelCount() { return m_channels.size(); }
 
@@ -146,18 +149,18 @@ namespace Grafkit {
 namespace Grafkit {
 	inline Animation::Channel::Channel(const char * name) : m_name(name)
 	{
-		m_track.push_back(Key());
+		m_channel.push_back(Key());
 	}
 
 	inline Animation::Channel::Channel(std::string name) : m_name(name)
 	{
-		m_track.push_back(Key());
+		m_channel.push_back(Key());
 	}
 
 	inline Animation::Channel::Channel(Channel & other)
 	{
-		for (size_t i = 0; i < other.m_track.size(); i++) {
-			m_track.push_back(Key(other.m_track.at(i)));
+		for (size_t i = 0; i < other.m_channel.size(); i++) {
+			m_channel.push_back(Key(other.m_channel.at(i)));
 		}
 	}
 
@@ -187,8 +190,8 @@ namespace Grafkit {
 			return (
 				(2.0f*t3 - 3.0f*t2 + 1.0f) * v0.m_value +
 				(-2.0f*t3 + 3.0f*t2) * v1.m_value +
-				(t3 - 2.0f*t2 + t) * v0.m_tangent * tangent +
-				(t3 - t2) * v1.m_tangent * tangent
+				(t3 - 2.0f*t2 + t) * v0.m_tangent.x * tangent +
+				(t3 - t2) * v1.m_tangent.y * tangent
 				);
 		}
 
@@ -197,21 +200,21 @@ namespace Grafkit {
 
 	inline int Animation::Channel::FindKeyIndex(float t) const
 	{
-		size_t count = m_track.size();
+		size_t count = m_channel.size();
 		if (count <= 2)
 			return 0;
 
-		if (m_track[0].m_key > t)
+		if (m_channel[0].m_time > t)
 			return 0;
-		else if (m_track[count - 1].m_key < t)
+		else if (m_channel[count - 1].m_time < t)
 			return count - 1;
 
 #if 1
 		size_t u = count - 1, l = 0, m = 0;
 		while (u >= l) {
 			m = l + (u - l) / 2;
-			float k0 = m_track[m].m_key;
-			float k1 = m_track[m + 1].m_key;
+			float k0 = m_channel[m].m_time;
+			float k1 = m_channel[m + 1].m_time;
 
 			if (k0 <= t && k1 >= t) {
 				return m;
@@ -227,7 +230,7 @@ namespace Grafkit {
 
 #else 
 		for (size_t i = 0; i < count - 1; i++) {
-			if (m_track[i].m_key <= t && m_track[i + 1].m_key >= t)
+			if (m_channel[i].m_time <= t && m_channel[i + 1].m_time >= t)
 				return i;
 		}
 
@@ -239,22 +242,29 @@ namespace Grafkit {
 
 	inline int Animation::Channel::FindKey(float t, Key & v0, Key & v1, float & f) const
 	{
-		size_t count = m_track.size();
+		size_t count = m_channel.size();
 		f = 0.f;
 		if (!count) {
 			return 0;
 		}
 
-		if (m_track[0].m_key > t) {
+		if (count == 1)
+		{
 			f = 0.;
-			v0 = m_track[0];
-			v1 = m_track[1];
+			v1 = v0 = m_channel[0];
 			return 0;
 		}
-		else if (m_track[count - 1].m_key < t) {
+
+		if (m_channel[0].m_time >= t) {
+			f = 0.;
+			v0 = m_channel[0];
+			v1 = m_channel[1];
+			return 0;
+		}
+		else if (m_channel[count - 1].m_time <= t) {
 			f = 1.;
-			v0 = m_track[count - 2];
-			v1 = m_track[count - 1];
+			v0 = m_channel[count - 2];
+			v1 = m_channel[count - 1];
 			return 0;
 		}
 
@@ -263,11 +273,11 @@ namespace Grafkit {
 		if (i == -1)
 			return 0;
 
-		float d = m_track[i + 1].m_key - m_track[i].m_key;
-		f = (t - m_track[i].m_key) / d;
+		float d = m_channel[i + 1].m_time - m_channel[i].m_time;
+		f = (t - m_channel[i].m_time) / d;
 
-		v0 = m_track[i];
-		v1 = m_track[i + 1];
+		v0 = m_channel[i];
+		v1 = m_channel[i + 1];
 
 		return 1;
 	}
@@ -277,10 +287,10 @@ namespace Grafkit {
 		size_t len = 0;
 
 		if (ar.IsStoring()) {
-			len = m_track.size();
+			len = m_channel.size();
 		}
 		else {
-			m_track.clear();
+			m_channel.clear();
 		}
 
 		PERSIST_FIELD(ar, len);
@@ -289,29 +299,29 @@ namespace Grafkit {
 			Key key;
 
 			if (ar.IsStoring()) {
-				key = m_track[i];
+				key = m_channel[i];
 			}
 
-			PERSIST_FIELD(ar, key.m_key);
+			PERSIST_FIELD(ar, key.m_time);
 			PERSIST_FIELD(ar, key.m_type);
 			PERSIST_FIELD(ar, key.m_value);
 
 			if (!ar.IsStoring()) {
-				m_track.push_back(key);
+				m_channel.push_back(key);
 			}
 		}
 	}
 
 	inline void Animation::Channel::CopyKey(float t, Channel & other)
 	{
-		if (t <= m_track.front().m_key)
-			return other.AddKey(m_track.front());
-		if (t >= m_track.back().m_key)
-			return other.AddKey(m_track.back());
+		if (t <= m_channel.front().m_time)
+			return other.AddKey(m_channel.front());
+		if (t >= m_channel.back().m_time)
+			return other.AddKey(m_channel.back());
 
 		int i = FindKeyIndex(t);
 		if (i > -1) {
-			other.AddKey(m_track[i]);
+			other.AddKey(m_channel[i]);
 		}
 	}
 }

@@ -260,17 +260,17 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 	if (!points || points->isEmpty())
 		return;
 
-	auto track = m_document->GetChannel();
+	auto channel = m_document->GetChannel();
 
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setPen(QPen(grey));
 
 	// boundaries
 	QPointF pMin = screen2Point(rect.topLeft());
-	int idmin = track->FindKeyIndex(pMin.x());
+	int idmin = channel->FindKeyIndex(pMin.x());
 
 	QPointF pMax = screen2Point(rect.bottomRight());
-	int idmax = track->FindKeyIndex(pMax.x()) + 1;
+	int idmax = channel->FindKeyIndex(pMax.x()) + 1;
 
 	if (idmin == 0 && points->at(0)->x() > rect.x())
 		painter->drawLine(
@@ -287,8 +287,8 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 		points->last()->setVisible(true);
 	}
 
-	if (idmax >= track->GetKeyCount() - 1)
-		idmax = track->GetKeyCount() - 1; // avoid max+1 index
+	if (idmax >= channel->GetKeyCount() - 1)
+		idmax = channel->GetKeyCount() - 1; // avoid max+1 index
 
 	for (int i = idmin; i < idmax; i++)
 	{
@@ -302,23 +302,23 @@ void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect
 			painter->fillRect(boundingRect, QBrush(QColor(255, 0, 0), Qt::Dense6Pattern));
 		}
 
-		auto k0 = track->GetKey(i);
-		auto k1 = track->GetKey(i + 1);
+		auto k0 = channel->GetKey(i);
+		auto k1 = channel->GetKey(i + 1);
 
 		// valahogy lehetne optiomalgatni ezt is 
 		int steps = 32;
 		double stepWidth = 0.;
 		//steps = 64;
-		stepWidth = (k1.m_key - k0.m_key) / steps;
+		stepWidth = (k1.m_time - k0.m_time) / steps;
 
 		for (int j = 0; j < steps; j++) {
-			double t = k0.m_key + j * stepWidth;
-			double v = track->GetValue(t);
+			double t = k0.m_time + j * stepWidth;
+			double v = channel->GetValue(t);
 
-			QPointF p1(t, track->GetValue(t));
+			QPointF p1(t, channel->GetValue(t));
 			p1 = this->point2Screen(p1);
 
-			QPointF p2(t + stepWidth, track->GetValue(t + stepWidth));
+			QPointF p2(t + stepWidth, channel->GetValue(t + stepWidth));
 			p2 = this->point2Screen(p2);
 
 			painter->drawLine(p1, p2);
@@ -348,6 +348,8 @@ void Idogep::CurveEditorScene::drawCurve_old(QPainter * painter, const QRectF & 
 			for (int j = 0; j < steps; j++) {
 				float t1 = float(j) / float(steps);
 				float t2 = float(j + 1) / float(steps);
+
+				// ez kell majd meg: 
 
 				qreal TangentX = points->at(i + 1)->coord().x() - points->at(i)->coord().x();
 				QPointF Tangent0 = QPointF(TangentX, TangentX * points->at(i)->tangent().y() / points->at(i)->tangent().x());
@@ -440,7 +442,6 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 
 	painter->restore();
 }
-
 
 void CurveEditorScene::updateAudiogram()
 {

@@ -6,7 +6,7 @@ void Idogep::CommandStack::ConnectEmitter(EmitsCommandRole * emitter)
 		emitter->onNewCommand += Delegate(this, &CommandStack::AddCommand);
 }
 
-void Idogep::CommandStack::AddCommand(Ref<Command>& command)
+void Idogep::CommandStack::AddCommand(Ref<Command> command)
 {
 	m_redoStack.clear();
 

@@ -9,6 +9,8 @@
 
 using namespace Idogep;
 
+using namespace Grafkit;
+
 #define KEY_SET_INTERPOLATION (Qt::Key_I)
 #define KEY_SET_TANGENT (Qt::Key_R)
 
@@ -22,14 +24,12 @@ namespace {
 	const QColor colorHermite;
 }
 
-CurvePointItem::CurvePointItem(QPointF coord, QPointF tangent, QGraphicsItem* parent) : QGraphicsItem(parent)
+Idogep::CurvePointItem::CurvePointItem(QGraphicsItem * parent) : QGraphicsItem(parent), m_key(), m_id(0)
 {
-	m_id = 0, m_subid = 0;
-	m_color = 0; 
+	// todo: rm duplicates
+	m_color = 0;
 	m_nodeType = 0;
 
-	m_coord = QPointF(coord);
-	m_tangent = QPointF(tangent);
 	m_showTangent = false;
 
 	m_radix = m_radix2 = RADIX_DEFUALT;
@@ -38,17 +38,30 @@ CurvePointItem::CurvePointItem(QPointF coord, QPointF tangent, QGraphicsItem* pa
 	setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
-CurvePointItem::CurvePointItem(const CurvePointItem& cpi) : QGraphicsItem(cpi.parentItem())
+CurvePointItem::CurvePointItem(Animation::Key key, size_t index, QGraphicsItem* parent) : QGraphicsItem(parent), m_key(key), m_id(index)
 {
-	m_id = cpi.m_id, m_subid = cpi.m_subid;
-	m_color = cpi.m_color;
-	m_nodeType = cpi.m_nodeType;
+	m_color = 0;
+	m_nodeType = 0;
 
-	m_coord = QPointF(cpi.m_coord);
-	m_tangent = QPointF(cpi.m_tangent);
 	m_showTangent = false;
 
-	m_radix = cpi.m_radix;
+	m_radix = m_radix2 = RADIX_DEFUALT;
+
+	setFlag(QGraphicsItem::ItemIsMovable);
+	setFlag(QGraphicsItem::ItemIsSelectable);
+}
+
+CurvePointItem::CurvePointItem(const CurvePointItem& other) : QGraphicsItem(other.parentItem())
+{
+	m_id = other.m_id;
+	m_color = other.m_color;
+	m_nodeType = other.m_nodeType;
+
+	m_key = other.m_key;
+
+	m_showTangent = false;
+
+	m_radix = other.m_radix;
 	m_radix2 = RADIX_DEFUALT;
 
 	setFlag(QGraphicsItem::ItemIsMovable);
@@ -64,10 +77,11 @@ QRectF CurvePointItem::boundingRect() const {
 
 void CurvePointItem::recalculatePosition() {
 	CurveEditorScene* ces = (CurveEditorScene*)scene();
-	if (m_coord.x() < 0.0f)
-		m_coord.setX(0.0f);
 
-	setPos(ces->point2Screen(m_coord));
+	if (m_key.m_time < 0.f)
+		m_key.m_time = 0.f;
+
+	setPos(ces->point2Screen(coord()));
 }
 
 void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
@@ -94,12 +108,13 @@ void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 	}
 
 	if (m_showTangent) {
+		const QPointF _tangent = tangent();
 		painter->setPen(QPen(QColor(255, 48, 48), 1.0, Qt::DashLine));
 		painter->setBrush(Qt::NoBrush);
 		CurveEditorScene* ces = (CurveEditorScene*)scene();
-		float ScreenTangentX = m_tangent.x() * ces->scale().width();
-		float ScreenTangentY = -m_tangent.y() * ces->scale().height();
-		float n = sqrt(ScreenTangentX*ScreenTangentX + ScreenTangentY * ScreenTangentY);
+		const float ScreenTangentX = _tangent.x() * ces->scale().width();
+		const float ScreenTangentY = -_tangent.y() * ces->scale().height();
+		const float n = sqrt(ScreenTangentX*ScreenTangentX + ScreenTangentY * ScreenTangentY);
 		QPointF vTgt = QPointF(ScreenTangentX / n, ScreenTangentY / n);
 		painter->drawLine(QPointF(0, 0), vTgt*32.0f*m_radix);
 
@@ -113,43 +128,16 @@ QVariant CurvePointItem::itemChange(GraphicsItemChange change, const QVariant &v
 	return QGraphicsItem::itemChange(change, value);
 }
 
-float CurvePointItem::time() const {
-	return m_coord.x();
-}
-
-void CurvePointItem::setTime(float t) {
-	m_coord.setX(t);
-}
-
-float CurvePointItem::value() const {
-	return m_coord.y();
-}
-
-void CurvePointItem::setValue(float v) {
-	m_coord.setY(v);
-}
-
-QPointF CurvePointItem::coord() const {
-	return m_coord;
-}
-
-void CurvePointItem::setCoord(QPointF c) {
-	m_coord = QPointF(c);
-}
-
-QPointF CurvePointItem::tangent() const {
-	return m_tangent;
-}
-
-void CurvePointItem::setTangent(QPointF t) {
-	m_tangent = QPointF(t);
-}
-
 void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	switch (event->button()) {
 	case Qt::RightButton:
 		m_showTangent = true;
 		m_radix2 = m_radix;
+		onStartEdit(this);
+		break;
+	case Qt::LeftButton:
+		onStartEdit(this);
+		QGraphicsItem::mousePressEvent(event);
 		break;
 
 	default:
@@ -164,6 +152,12 @@ void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
 	case Qt::RightButton:
 		m_showTangent = false;
 		m_radix2 = RADIX_DEFUALT;
+		onCommitEdit(this);
+		break;
+
+	case Qt::LeftButton:
+		onCommitEdit(this);
+		QGraphicsItem::mouseReleaseEvent(event);
 		break;
 
 	default:
@@ -254,23 +248,26 @@ void Idogep::CurvePointItem::editTangent(QGraphicsSceneMouseEvent * event)
 	const CurveEditorScene* ces = (CurveEditorScene*)scene();
 
 	m_radix = sqrt(
-		event->pos().x()*event->pos().x() + 
+		event->pos().x()*event->pos().x() +
 		event->pos().y()*event->pos().y()) / 32.0f;
 
-	if (m_radix == 0.0f) 
+	if (m_radix == 0.0f)
 		m_radix = 0.01f;
 
 	m_radix2 = m_radix;
 
 	float angle = atan2(event->pos().y(), event->pos().x());
 	float epsilon = 0.005f;
-	if (angle < -M_PI / 2.0f + epsilon) 
+	if (angle < -M_PI / 2.0f + epsilon)
 		angle = -M_PI / 2.0f + epsilon;
-	else if (angle > M_PI / 2.0f - epsilon) 
+	else if (angle > M_PI / 2.0f - epsilon)
 		angle = M_PI / 2.0f - epsilon;
 
-	m_tangent.setX(cos(angle)*m_radix / ces->scale().width());
-	m_tangent.setY(-sin(angle)*m_radix / ces->scale().height());
+	QPointF tangent;
+	tangent.setX(cos(angle)*m_radix / ces->scale().width());
+	tangent.setY(-sin(angle)*m_radix / ces->scale().height());
+
+	setTangent(tangent);
 
 	onMoveTangent(this);
 }
@@ -278,7 +275,9 @@ void Idogep::CurvePointItem::editTangent(QGraphicsSceneMouseEvent * event)
 void Idogep::CurvePointItem::editPosition(QGraphicsSceneMouseEvent * event)
 {
 	const CurveEditorScene* ces = (CurveEditorScene*)scene();
-	m_coord = ces->screen2Point(event->scenePos());
+	QPointF coord = ces->screen2Point(event->scenePos());
+
+	setCoord(coord);
 
 	onMovePoint(this);
 }

@@ -55,9 +55,9 @@ namespace Idogep {
 		ManageCurveRole();
 
 		QList<CurvePointItem*>* GetCurvePoints() { return m_curve; }
-		Ref<Grafkit::Animation::Channel> GetChannel() { return m_track; }
+		Ref<Grafkit::Animation::Channel> GetChannel() { return m_channel; }
 
-		void SetChannel(Ref<Grafkit::Animation::Channel>& track);
+		void SetChannel(Ref<Grafkit::Animation::Channel>& channel);
 
 	protected:
 		void Recalculate();
@@ -68,7 +68,7 @@ namespace Idogep {
 	protected:
 		void MovePoint(CurvePointItem *item);
 		void MoveTangent(CurvePointItem *item);
-		//void StartEdit(CurvePointItem *item);
+		void StartEdit(CurvePointItem *item);
 		void CommitEdit(CurvePointItem *item);
 
 		void CommitAddPoint(float key, float value);
@@ -76,9 +76,9 @@ namespace Idogep {
 
 	private:
 		QList<CurvePointItem*>* m_curve;
-		Ref<Grafkit::Animation::Channel> m_track; // todo: multiple fiszfasz
-
-
+		Ref<Grafkit::Animation::Channel> m_channel;
+		Grafkit::Animation::Key m_originalKey;
+		Grafkit::Animation::Key m_modifiedKey;
 	};
 
 }

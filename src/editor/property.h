@@ -15,7 +15,7 @@ namespace Idogep{
 	public:
 
 	private:
-		QString m_key;
+		QString m_time;
 		QVariant m_value;
 
 	};

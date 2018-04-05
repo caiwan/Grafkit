@@ -31,7 +31,7 @@ namespace Idogep {
 
 	class EmitsCommandRole {
 	public:
-		Event<Ref<Command>&> onNewCommand;
+		Event<Ref<Command>> onNewCommand;
 	};
 
 	class CommandStack {
@@ -40,7 +40,7 @@ namespace Idogep {
 
 		void ConnectEmitter(EmitsCommandRole* emitter);
 
-		void AddCommand(Ref<Command> &command);
+		void AddCommand(Ref<Command> command);
 		void Redo();
 		void Undo();
 

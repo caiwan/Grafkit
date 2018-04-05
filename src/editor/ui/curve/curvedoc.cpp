@@ -1,5 +1,8 @@
 #include "curvedoc.h"
 
+#include "Command.h"
+#include "commands/curveCommands.h"
+
 #include "curveeditorscene.h"
 #include "curvepointitem.h"
 
@@ -84,32 +87,27 @@ Idogep::ManageCurveRole::ManageCurveRole() :
 {
 }
 
-void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& track)
+void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& channel)
 {
-	m_track = new Grafkit::Animation::Channel(track);
 
-	// clear?
-	delete 	m_curve;
+	m_channel = channel;
+
+	//delete m_curve;
+	if (m_curve)
+		m_curve->clear();
+
 	m_curve = new QList<Idogep::CurvePointItem*>();
 
-	size_t keyCount = m_track->GetKeyCount();
+	size_t keyCount = m_channel->GetKeyCount();
 	for (size_t i = 0; i < keyCount; i++) {
-		auto key = m_track->GetKey(i);
-		CurvePointItem *point = new CurvePointItem();
+		auto key = m_channel->GetKey(i);
+		CurvePointItem *point = new CurvePointItem(key, i);
 		m_curve->push_back(point);
 
-		point->setIndex(i);
-
-		point->setTime(key.m_key);
-		point->setValue(key.m_value);
-
-		// TODO:  ezt a kettot majd meg kell oldani egyszer
-		//point->setColor();
-		//point->setNodeType();
-
-		//point->onMovePoint += Delegate(this, &CurveDocument::movePoint);
-
-		//m_curve->push_back(point);
+		point->onStartEdit += Delegate(this, &ManageCurveRole::StartEdit);
+		point->onCommitEdit += Delegate(this, &ManageCurveRole::CommitEdit);
+		point->onMovePoint += Delegate(this, &ManageCurveRole::MovePoint);
+		point->onMoveTangent += Delegate(this, &ManageCurveRole::MoveTangent);
 	}
 }
 
@@ -139,27 +137,23 @@ void Idogep::ManageCurveRole::MovePoint(CurvePointItem * item)
 {
 	float itemTime = item->time();
 	uint32_t id = item->index();
-	uint32_t sid = item->subIndex();
 
 	if (id > 0) {
-		auto prevKey = m_track->GetKey(id - 1);
-		if (itemTime <= prevKey.m_key)
-			item->setTime(prevKey.m_key + (1. / 120.));
+		auto prevKey = m_channel->GetKey(id - 1);
+		if (itemTime <= prevKey.m_time)
+			item->setTime(prevKey.m_time + (1. / 120.));
 	}
 
-	if (id < m_track->GetKeyCount() - 1) {
-		auto nextKey = m_track->GetKey(id + 1);
-		if (itemTime > nextKey.m_key)
-			item->setTime(nextKey.m_key - (1. / 120.));
+	if (id < m_channel->GetKeyCount() - 1) {
+		auto nextKey = m_channel->GetKey(id + 1);
+		if (itemTime > nextKey.m_time)
+			item->setTime(nextKey.m_time - (1. / 120.));
 	}
 
 	if (itemTime < 0.)
 		item->setTime(0);
 
-	auto key = m_track->GetKey(id);
-	key.m_key = item->time();
-	key.m_value = item->value();
-	m_track->SetKey(id, key);
+	m_channel->SetKey(id, item->GetKey());
 }
 
 void Idogep::ManageCurveRole::MoveTangent(CurvePointItem * item)
@@ -167,18 +161,20 @@ void Idogep::ManageCurveRole::MoveTangent(CurvePointItem * item)
 	// ... 
 }
 
-//void Idogep::ManageCurveRole::StartEdit(CurvePointItem * item)
-//{
-//	// save current state
-//}
+void Idogep::ManageCurveRole::StartEdit(CurvePointItem * item)
+{
+	m_originalKey = item->GetKey();
+}
 
 void Idogep::ManageCurveRole::CommitEdit(CurvePointItem * item)
 {
-	item->index();
+	m_modifiedKey = item->GetKey();
+	CurveKeyChangeCommand * cmd = new CurveKeyChangeCommand(m_channel, item->index(), m_originalKey, m_modifiedKey);
+	cmd->onRefreshView += Delegate(this, &ManageCurveRole::RefreshView);
+	onNewCommand(cmd);
 }
 
-void Idogep::ManageCurveRole::
-CommitAddPoint(float key, float value)
+void Idogep::ManageCurveRole::CommitAddPoint(float key, float value)
 {
 }
 

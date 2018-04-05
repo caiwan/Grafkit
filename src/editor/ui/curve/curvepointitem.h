@@ -2,15 +2,20 @@
 #include <QtGui>
 #include <qgraphicsitem.h>
 
+#include "animation/animation.h"
 #include "Event.h"
+
 
 namespace Idogep {
 	class CurvePointItem : public QGraphicsItem
 	{
 	public:
-		CurvePointItem(QPointF coord = QPointF(0.0, 0.0), QPointF tangent = QPointF(1.0, 0.0), QGraphicsItem* parent = NULL);
-		CurvePointItem(const CurvePointItem& cpi);
+		CurvePointItem(QGraphicsItem* parent = NULL);
+		CurvePointItem(Grafkit::Animation::Key key,  size_t index, QGraphicsItem* parent = NULL);
+		CurvePointItem(const CurvePointItem& other);
+
 		~CurvePointItem();
+		
 		QRectF boundingRect() const;
 		void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
@@ -18,17 +23,21 @@ namespace Idogep {
 
 		QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
-		// ez itt nem pont ilyen egyszeu lesz: 
-		float time() const;
-		void setTime(float t);
-		float value() const;
-		void setValue(float v);
+		// TODO: refactor rendesen ezeket:
+		float time() const { return m_key.m_time; }
+		void setTime(float t) { m_key.m_time = t; }
+		float value() const { return m_key.m_value; }
+		void setValue(float v) { m_key.m_value = v; }
 
-		QPointF coord() const;
-		void setCoord(QPointF c);
+		QPointF coord() const { return QPointF(m_key.m_time, m_key.m_value); }
+		void setCoord(QPointF c) { m_key.m_time = c.x(); m_key.m_value = c.y(); }
 
-		QPointF tangent() const;
-		void setTangent(QPointF t);
+		QPointF tangent() const { return QPointF(m_key.m_tangent.x, m_key.m_tangent.y); }
+		void setTangent(QPointF t) { m_key.m_tangent.x = t.x(); m_key.m_tangent.y = t.y(); }
+		// --- 
+
+		Grafkit::Animation::Key GetKey() const { return m_key; }
+		void SetKey(Grafkit::Animation::Key key) {m_key = key;}
 
 		// ... 
 
@@ -40,7 +49,7 @@ namespace Idogep {
 
 		uint32_t color() { return m_color; }
 		void setColor(uint32_t color) { m_color = color; }
-		
+
 		Event<CurvePointItem*> onMovePoint;
 		Event<CurvePointItem*> onMoveTangent;
 		Event<CurvePointItem*> onStartEdit;
@@ -64,7 +73,7 @@ namespace Idogep {
 		void toggleTangentEditing();
 
 	private:
-		QPointF m_coord, m_tangent;
+		//QPointF m_coord, m_tangent;
 		float m_radix, m_radix2;
 
 		bool m_showTangent;

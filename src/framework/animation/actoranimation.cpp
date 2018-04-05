@@ -17,7 +17,11 @@ Grafkit::ActorAnimation::ActorAnimation(ActorRef actor) : Animation(), m_actor(a
 
 void Grafkit::ActorAnimation::Update(double time)
 {
-	// ... TBD
+	float3 t = m_position->GetFloat3(time);
+	
+	m_actor->Transform().Identity();
+	m_actor->Transform().Translate(t);
+	//m_actor->Matrix().
 }
 
 void Grafkit::ActorAnimation::CreateTrack()
