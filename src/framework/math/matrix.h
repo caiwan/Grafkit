@@ -117,6 +117,10 @@ namespace Grafkit {
 			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw));
 		}
 
+		void RotateRPY(float3 rpy) {
+			this->RotateRPY(rpy.x, rpy.y, rpy.z);
+		}
+
 		// --- lookat
 		void LookAtLH(const float3 &e, const float3 &c = float3(0,0,0), const float3 & u = float3(0, 1, 0)) {
 			dxvector ev = XMLoadFloat3(&e);

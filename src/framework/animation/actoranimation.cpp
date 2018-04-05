@@ -17,11 +17,14 @@ Grafkit::ActorAnimation::ActorAnimation(ActorRef actor) : Animation(), m_actor(a
 
 void Grafkit::ActorAnimation::Update(double time)
 {
-	float3 t = m_position->GetFloat3(time);
+	const float3 t = m_position->GetFloat3(time);
+	const float3 r = m_rotation->GetFloat3(time);
+	const float3 s = m_scale->GetFloat3(time);
 	
 	m_actor->Transform().Identity();
+	m_actor->Transform().RotateRPY(r);
 	m_actor->Transform().Translate(t);
-	//m_actor->Matrix().
+	m_actor->Transform().Scale(s);
 }
 
 void Grafkit::ActorAnimation::CreateTrack()
@@ -34,4 +37,5 @@ void Grafkit::ActorAnimation::CreateTrack()
 
 	m_scale = new Animation::Track("Scaling", "xyz");
 	AddTrack(m_scale);
+	m_scale->SetFloat3(0, float3(1, 1, 1));
 }

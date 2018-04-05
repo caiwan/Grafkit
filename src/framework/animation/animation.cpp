@@ -73,3 +73,18 @@ float4 Grafkit::Animation::Track::GetFloat4(float t)
 	);
 }
 
+void Grafkit::Animation::Track::SetFloat3(size_t id, float3 v)
+{
+	m_channels[0]->SetValue(id, v.x);
+	m_channels[1]->SetValue(id, v.y);
+	m_channels[2]->SetValue(id, v.z);
+}
+
+void Grafkit::Animation::Track::SetFloat4(size_t id, float4 v)
+{
+	m_channels[0]->SetValue(id, v.x);
+	m_channels[1]->SetValue(id, v.y);
+	m_channels[2]->SetValue(id, v.z);
+	m_channels[3]->SetValue(id, v.w);
+}
+
