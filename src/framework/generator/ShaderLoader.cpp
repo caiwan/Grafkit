@@ -13,64 +13,69 @@ using namespace FWdebugExceptions;
 typedef Resource<IAsset> IAssetRes;
 typedef Ref<IAssetRes> IAssetResRef;
 
-class IncludeProvider : public ID3DInclude {
-public:
+namespace {
 
-	IncludeProvider(IResourceManager * const & resman) : m_resman(resman)
-	{
-	}
 
-	HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) {
-		IAssetRef asset;
-		std::string relpath;
-		switch (IncludeType) {
-		case D3D_INCLUDE_LOCAL:
-			relpath = m_resman->GetResourcePath("shaderincludelocal") + pFileName;
-			break;
-		case D3D_INCLUDE_SYSTEM:
-			relpath = m_resman->GetResourcePath("shaderincludesystem") + pFileName;
-			break;
+	class IncludeProvider : public ID3DInclude {
+	public:
 
-		default:
-			return E_FAIL;
+		IncludeProvider(IResourceManager * const & resman) : m_resman(resman)
+		{
 		}
 
-		try {
-			asset = m_resman->GetAssetFactory()->Get(relpath);
-			*ppData = asset->GetData();
-			*pBytes = asset->GetSize();
+		HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) {
+			IAssetRef asset;
+			std::string relpath;
+			switch (IncludeType) {
+			case D3D_INCLUDE_LOCAL:
+				relpath = m_resman->GetResourcePath("shaderincludelocal") + pFileName;
+				break;
+			case D3D_INCLUDE_SYSTEM:
+				relpath = m_resman->GetResourcePath("shaderincludesystem") + pFileName;
+				break;
 
-			// -- resmanhoz hozzaad
+			default:
+				return E_FAIL;
+			}
+
+			try {
+				asset = m_resman->GetAssetFactory()->Get(relpath);
+				*ppData = asset->GetData();
+				*pBytes = asset->GetSize();
+
+				// -- resmanhoz hozzaad
+				char buffer[256];
+				sprintf_s(buffer, "pointer@%d", asset->GetData());
+				IAssetResRef assetRes = new IAssetRes(asset);
+				assetRes->SetName(buffer);
+				m_resman->Add(assetRes);
+
+			}
+			catch (AssetLoadException &e) {
+				LOGGER(Log::Logger().Error(e.what()));
+				return E_FAIL;
+			}
+			return S_OK;
+		}
+
+		HRESULT __stdcall Close(LPCVOID pData) {
+			// -- resmanbol kiszed
 			char buffer[256];
-			sprintf_s(buffer, "pointer@%d", asset->GetData());
-			IAssetResRef assetRes = new IAssetRes(asset);
-			assetRes->SetName(buffer);
-			m_resman->Add(assetRes);
+			sprintf_s(buffer, "pointer@%d", pData);
+			m_resman->Remove(buffer);
 
+			return S_OK;
 		}
-		catch (AssetLoadException &e) {
-			LOGGER(Log::Logger().Error(e.what()));
-			return E_FAIL;
-		}
-		return S_OK;
-	}
 
-	HRESULT __stdcall Close(LPCVOID pData) {
-		// -- resmanbol kiszed
-		char buffer[256];
-		sprintf_s(buffer, "pointer@%d", pData);
-		m_resman->Remove(buffer);
+	private:
+		IResourceManager * const &m_resman;
+	};
 
-		return S_OK;
-	}
-
-private:
-	IResourceManager * const &m_resman;
-};
+}
 
 // =============================================================================================================================
 
-Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) : 
+Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) :
 	Grafkit::IResourceBuilder(name, sourcename),
 	m_entrypoint(entrypoint)
 {
@@ -84,12 +89,12 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 {
 	if (m_entrypoint.empty())
 		m_entrypoint = DefaultEntryPointName();
-	
+
 	ShaderResRef dstShader = (ShaderRes*)source;
 	if (dstShader.Invalid()) {
 		return;
 	}
-	
+
 	try {
 		Grafkit::IAssetRef asset = this->GetSourceAsset(resman);
 		ShaderRef shader = NewShader();
@@ -113,7 +118,8 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 		// 3.
 		dstShader->AssingnRef(shader);
 
-	} catch(ShaderException *&ex){
+	}
+	catch (ShaderException *&ex) {
 		// if we are about to replace an existing shader, but we had a compile error
 		// then toss the error, due it was prompted to stodut
 		// otherwise thow the ex
