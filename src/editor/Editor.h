@@ -4,8 +4,8 @@
 
 #include "render/renderer.h"
 
-#include "Event.h"
-#include "Command.h"
+#include "utils/Event.h"
+#include "utils/Command.h"
 
 namespace Grafkit {
 	class IResourceManager;

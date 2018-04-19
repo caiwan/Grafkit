@@ -15,7 +15,6 @@ class QPlainTextEdit;
 namespace Idogep {
 	extern void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
-	// delegate toward log messages to QT components
 	class LoggerQTProxy : public Grafkit::Logger::ILoggerHandler
 	{
 	public:
@@ -26,8 +25,6 @@ namespace Idogep {
 		Event<QString> onUpdateLog;
 
 	private:
-		//QList<QString> m_list;
-
 	};
 
 }

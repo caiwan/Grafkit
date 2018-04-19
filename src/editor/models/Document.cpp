@@ -58,7 +58,7 @@ void Idogep::Document::Shutdown()
 	m_outlineViewModel = nullptr;
 }
 
-TreeModel * Idogep::Document::GetOutlineModel()
+TreeModel * Idogep::Document::GetOutline()
 {
 	return m_outlineViewModel;
 }

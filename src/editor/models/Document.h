@@ -15,19 +15,27 @@ namespace Idogep {
 
 	class Editor;
 	class Document;
-	class ManageCurveRole;
-
+	
 	class TreeModel;
 	class SceneModel;
 
-	class Document
+	namespace Role {
+		class HasSceneGraphRole {
+		public:
+			virtual Grafkit::SceneGraphRef GetScenegraph() = 0;
+		};
+
+		class HasEffectRole {
+
+		};
+	}
+
+	class Document : public HasSceneGraphRole
 	{
 		friend class Editor;
 	public:
 		Document();
 		virtual ~Document();
-
-		//Ref<Grafkit::Animation::FloatTrack> track() { return m_testAnimation; }
 
 		void Preload(Grafkit::IResourceManager * const & resman);
 		void Initialize(Grafkit::Renderer &render);
@@ -36,8 +44,7 @@ namespace Idogep {
 		void SetDirty() { m_isDirty = true; }
 		bool IsDirty() { return m_isDirty; }
 
-		//
-		TreeModel * GetOutlineModel();
+		virtual Grafkit::SceneGraphRef GetScenegraph() { return m_scenegraph; }
 
 	private:
 		void InitTestStuff(Grafkit::Renderer & render);
@@ -55,8 +62,6 @@ namespace Idogep {
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
-
-		Idogep::SceneModel *m_outlineViewModel;
 	};
 
 }

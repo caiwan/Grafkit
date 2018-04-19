@@ -2,13 +2,14 @@
 
 #include "core/Timer.h"
 #include "core/Music.h"
+#include "models/Music.h"
 #include "Event.h"
 
 namespace Idogep {
 
 	class Editor;
 
-	class MusicProxy : public Grafkit::Timer
+	class MusicProxy : public Music
 	{
 		friend class Editor;
 	public:

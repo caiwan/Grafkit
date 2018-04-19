@@ -43,7 +43,7 @@ Idogep::MainWindow::MainWindow(
 void Idogep::MainWindow::DocumentChanged(Document * const & document)
 {
 	// ... 
-	m_outlineViewer->setModel(document->GetOutlineModel());
+	m_outlineViewer->setModel(document->GetOutline());
 }
 
 void Idogep::MainWindow::ToggleUndo(bool enabled)
