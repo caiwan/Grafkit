@@ -9,7 +9,7 @@
 
 using namespace Idogep;
 
-CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), ui(new Ui::CurveEditorWidget), ManageCurveRole()
+CurveEditorWidget::CurveEditorWidget(QWidget* parent) : View(), QDockWidget(parent), ui(new Ui::CurveEditorWidget), ManageCurveRole()
 {
 	ui->setupUi(this);
 	m_scene = new CurveEditorScene(this);

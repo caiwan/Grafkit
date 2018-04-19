@@ -11,6 +11,8 @@
 #include  "mainWindow.h"
 #include  "editor.h"
 
+#include "Command.h"
+
 #include "proxies/LoggerProxy.h"
 
 #include "ui/curve/curveeditorwidget.h"
@@ -35,7 +37,7 @@ Idogep::MainWindow::MainWindow(
 	createDockWindows();
 
 	// connect childrens events
-	connectEvents(editor);
+	ConnectEvents(editor);
 }
 
 void Idogep::MainWindow::DocumentChanged(Document * const & document)
@@ -136,7 +138,7 @@ void Idogep::MainWindow::createDockWindows()
 	tabifyDockWidget(m_logWidget, m_curveEditor);
 }
 
-void Idogep::MainWindow::connectEvents(Editor * const & editor)
+void Idogep::MainWindow::ConnectEvents(Editor * const & editor)
 {
 	editor->onDocumentChanged += Delegate(this, &MainWindow::DocumentChanged);
 
@@ -146,6 +148,10 @@ void Idogep::MainWindow::connectEvents(Editor * const & editor)
 	// animation
 	m_outlineViewer->onItemSelected += Delegate(this, &ManageOutlineViewRole::ItemSelectedEvent);
 	onAnimationSelected += Delegate(m_curveEditor, &CurveEditorWidget::AnimationChangedEvent);
+
+	// Command Stack
+	ConnectCommandStackEvents(editor->GetCommandStack());
+	editor->GetCommandStack()->ConnectEmitter(m_curveEditor);
 }
 
 // ------
@@ -173,12 +179,17 @@ void Idogep::ManageOutlineViewRole::ItemSelectedEvent(TreeItem *item)
 
 #include "Command.h"
 
-Idogep::ManageCommandsRole::ManageCommandsRole() : m_redoAct(nullptr), m_undoAct(nullptr)
+Idogep::ManageCommandStackRole::ManageCommandStackRole() : m_redoAct(nullptr), m_undoAct(nullptr)
 {
 }
 
-void Idogep::ManageCommandsRole::CommandStackChangedEvent(CommandStack * const & stack)
+void Idogep::ManageCommandStackRole::CommandStackChangedEvent(CommandStack * const & stack)
 {
 	ToggleRedo(stack->HasRedo());
 	ToggleUndo(stack->HasUndo());
+}
+
+void Idogep::ManageCommandStackRole::ConnectCommandStackEvents(CommandStack * const & stack)
+{
+	stack->onCommandStackChanged += Delegate(this, &ManageCommandStackRole::CommandStackChangedEvent);
 }

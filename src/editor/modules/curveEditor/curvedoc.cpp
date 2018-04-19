@@ -169,8 +169,8 @@ void Idogep::ManageCurveRole::StartEdit(CurvePointItem * item)
 void Idogep::ManageCurveRole::CommitEdit(CurvePointItem * item)
 {
 	m_modifiedKey = item->GetKey();
-	CurveKeyChangeCommand * cmd = new CurveKeyChangeCommand(m_channel, item->index(), m_originalKey, m_modifiedKey);
-	cmd->onRefreshView += Delegate(this, &ManageCurveRole::RefreshView);
+	CurveKeyChangeCommand * cmd = new CurveKeyChangeCommand(m_channel, item->index(), m_originalKey, m_modifiedKey, nullptr);
+	//cmd->onRefreshView += Delegate(this, &ManageCurveRole::RefreshView);
 	onNewCommand(cmd);
 }
 

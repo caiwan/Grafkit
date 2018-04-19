@@ -38,9 +38,9 @@ namespace Idogep {
 
 	};
 
-	class ManageCommandsRole {
+	class ManageCommandStackRole {
 	public:
-		ManageCommandsRole();
+		ManageCommandStackRole();
 
 		Event<> onUndo;
 		Event<> onRedo;
@@ -51,12 +51,16 @@ namespace Idogep {
 		virtual void ToggleUndo(bool enabled) = 0;
 		virtual void ToggleRedo(bool enabled) = 0;
 
+		void ConnectCommandStackEvents(CommandStack * const & stack);
+
 	protected:
 		QAction * m_undoAct;
 		QAction * m_redoAct;
 	};
 
-	class MainWindow : public QMainWindow, public ManageOutlineViewRole, public ManageCommandsRole {
+	class MainWindow : public QMainWindow, 
+		public ManageOutlineViewRole, public ManageCommandStackRole 
+	{
 	public:
 		MainWindow(Editor * const & editor);
 
@@ -83,7 +87,7 @@ namespace Idogep {
 		void createStatusBar();
 		void createDockWindows();
 
-		void connectEvents(Editor * const & editor);
+		void ConnectEvents(Editor * const & editor);
 
 		QMenu *m_viewMenu;
 

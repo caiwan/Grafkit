@@ -52,7 +52,7 @@ namespace Idogep {
 
 		Grafkit::IResourceManager *GetResourceManager();
 
-		Document * Getdocument() { return m_document; }
+		Document * GetDocument() { return m_document; }
 		CommandStack * GetCommandStack() { return m_commandStack; }
 		MusicProxy * GetMusicProxy() { return m_musicProxy; }
 		

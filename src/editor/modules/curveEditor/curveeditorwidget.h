@@ -3,13 +3,13 @@
 #include <QtGui>
 #include <qdockwidget.h>
 
-#include "Event.h"
-
-#include "curvedoc.h"
-
 #include "animation/animation.h"
 
 #include "treeitem.h"
+#include "Event.h"
+#include "ui/View.h"
+
+#include "curvedoc.h"
 
 namespace Ui {
 	class CurveEditorWidget;
@@ -89,7 +89,8 @@ namespace Idogep {
 
 	// ========================================================================================================
 
-	class CurveEditorWidget : public QDockWidget, public ManageCurveRole, public ManageAnimationsRole, public ManagePlaybackRole
+	class CurveEditorWidget : public View,
+		public QDockWidget, public ManageCurveRole, public ManageAnimationsRole, public ManagePlaybackRole
 	{
 		Q_OBJECT
 

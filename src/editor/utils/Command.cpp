@@ -10,7 +10,7 @@ void Idogep::CommandStack::AddCommand(Ref<Command> command)
 {
 	m_redoStack.clear();
 
-	// TODO: exception handling 
+	// TODO: exception handling && rollback if needed
 	command->Do();
 
 	m_undoStack.push_back(command);
