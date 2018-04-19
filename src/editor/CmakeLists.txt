@@ -25,7 +25,7 @@ set(CMAKE_AUTOUIC ON)
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 
 # Generate rules for building source files from the resources
-qt5_add_resources(QRCS resources.qrc)
+qt5_add_resources(QRCS res/resources.qrc)
 
 add_executable(${APPLICATION} ${SOURCE_FILES} ${HEADER_FILES} ${UI_HEADERS} ${QRCS})
 
