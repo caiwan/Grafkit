@@ -5,10 +5,9 @@
 #include "animation/scene.h"
 
 #include "Editor.h"
-#include "Document.h"
+#include "models/Document.h"
 
 #include "proxies/MusicProxy.h"
-
 
 using namespace Idogep;
 

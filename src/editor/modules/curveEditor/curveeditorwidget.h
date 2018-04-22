@@ -5,9 +5,9 @@
 
 #include "animation/animation.h"
 
-#include "treeitem.h"
-#include "Event.h"
-#include "ui/View.h"
+#include "utils/tree/treeitem.h"
+#include "utils/Event.h"
+#include "models/ViewModule.h"
 
 #include "curvedoc.h"
 
@@ -89,8 +89,10 @@ namespace Idogep {
 
 	// ========================================================================================================
 
-	class CurveEditorWidget : public View,
-		public QDockWidget, public ManageCurveRole, public ManageAnimationsRole, public ManagePlaybackRole
+	class CurveEditorWidget :
+		public QDockWidget,
+		public View,
+		public ManageCurveRole, public ManageAnimationsRole, public ManagePlaybackRole
 	{
 		Q_OBJECT
 

@@ -1,5 +1,5 @@
 #include "treemodel.h"
-#include "treeitem.h"
+#include "utils/tree/treeitem.h"
 
 #include <qdebug>
 

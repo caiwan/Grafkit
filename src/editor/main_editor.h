@@ -6,7 +6,7 @@
 #include "utils/ResourcePreloader.h"
 #include "utils/InitializeSerializer.h"
 
-#include "Event.h"
+#include "utils/Event.h"
 
 class QCloseEvent;
 

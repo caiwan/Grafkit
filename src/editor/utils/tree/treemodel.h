@@ -2,7 +2,7 @@
 
 #include <qabstractitemmodel.h>
 #include <qitemselectionmodel.h>
-#include "Event.h"
+#include "utils/Event.h"
 
 namespace Idogep {
 

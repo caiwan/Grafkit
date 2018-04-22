@@ -33,7 +33,7 @@ void Idogep::HasItemAnimationsRole::SetAnimation(Grafkit::AnimationRef animation
 
 // ------------------------------------------------------------------------------------------
 
-#include "property.h"
+#include "utils/property/property.h"
 
 Idogep::HasItemPropertiesRole::HasItemPropertiesRole()
 {

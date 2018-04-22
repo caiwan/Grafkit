@@ -3,7 +3,7 @@
 
 #include <qdockwidget.h>
 
-#include "Event.h"
+#include "utils/Event.h"
 
 namespace Ui {
 	class SceneGraphViewWidget;

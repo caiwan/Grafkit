@@ -1,6 +1,6 @@
 #include "curvedoc.h"
 
-#include "Command.h"
+#include "utils/Command.h"
 #include "commands/curveCommands.h"
 
 #include "curveeditorscene.h"

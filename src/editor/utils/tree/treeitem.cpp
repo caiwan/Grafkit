@@ -1,4 +1,4 @@
-#include "treeitem.h"
+#include "utils/tree/treeitem.h"
 
 using namespace Idogep;
 

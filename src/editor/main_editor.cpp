@@ -16,11 +16,10 @@
 #include "proxies/AssetFactoryProxy.h"
 #include "proxies/LoggerProxy.h"
 
-#include "ui/splashwidget.h"
-#include "ui/mainWindow.h"
-#include "ui/preloader.h"
-
-#include "ui/QGrafkitContextWidget.h"
+#include "mainWindow.h"
+#include "modules/splashScreen/splashwidget.h"
+#include "modules/preloaderDialog/preloader.h"
+#include "modules/grafkitContext/QGrafkitContextWidget.h"
 
 using namespace Idogep;
 using namespace Grafkit;

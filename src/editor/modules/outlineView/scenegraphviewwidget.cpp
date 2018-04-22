@@ -1,7 +1,7 @@
 #include "scenegraphviewwidget.h"
 #include "ui_scenegraphviewwidget.h"
 
-#include "treemodel.h"
+#include "utils/tree/treemodel.h"
 
 using namespace Idogep;
 

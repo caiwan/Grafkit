@@ -3,8 +3,8 @@
 #include <qobject.h>
 
 #include "animation/animation.h"
-#include "Event.h"
-#include "Command.h"
+#include "utils/Event.h"
+#include "utils/Command.h"
 
 namespace Idogep {
 

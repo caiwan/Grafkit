@@ -16,14 +16,15 @@
 
 #include "utils/ResourceManager.h"
 
-#include "scenegraphmodel.h"
-
 using namespace Idogep;
 using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-Idogep::Document::Document() : m_outlineViewModel(nullptr)
+Idogep::Document::Document() :
+	Role::HasEffectRole(),
+	Role::HasSceneGraphRole(),
+	Role::HasPlaybackRole()
 {
 }
 
@@ -41,28 +42,13 @@ void Idogep::Document::Preload(IResourceManager * const & resman)
 void Idogep::Document::Initialize(Grafkit::Renderer & render)
 {
 	InitTestStuff(render);
-
-	// ------- 
-	// OUTLINE 
-	SceneModel *old = m_outlineViewModel;
-
-	m_outlineViewModel = new SceneModel(m_scene);
-	m_outlineViewModel->BuildModel();
-	
-	delete old;
 }
 
 void Idogep::Document::Shutdown()
 {
-	delete m_outlineViewModel;
-	m_outlineViewModel = nullptr;
 }
 
-TreeModel * Idogep::Document::GetOutline()
-{
-	return m_outlineViewModel;
-}
-
+// ---------------------------------------------------------------
 // in-dev-things
 // --- TEST STUFF ---
 void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
@@ -91,7 +77,6 @@ void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
 	model->GetMesh()->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
 	model->GetMesh()->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
 	model->GetMesh()->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
-	//model->GetMesh()->Build(render, m_vs); // a scene buildel magatol 
 
 	// -- actors
 

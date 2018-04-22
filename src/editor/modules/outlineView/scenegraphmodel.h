@@ -4,8 +4,8 @@
 
 #include "common.h"
 
-#include "treeitem.h"
-#include "treemodel.h"
+#include "utils/tree/treeitem.h"
+#include "utils/tree/treemodel.h"
 
 namespace Grafkit {
 	class Animation;

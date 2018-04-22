@@ -6,7 +6,7 @@
 
 #include "utils/logger.h"
 
-#include "Event.h"
+#include "utils/Event.h"
 
 class QPlainTextEdit;
 

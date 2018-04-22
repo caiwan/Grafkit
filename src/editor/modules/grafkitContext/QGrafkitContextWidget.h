@@ -8,7 +8,7 @@ QT widget that holds a context for GK Rendering context
 
 #include "render/renderer.h"
 
-#include "Event.h"
+#include "utils/Event.h"
 
 class QPaintEngine;
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Command.h"
-#include "Event.h"
+#include "utils/Command.h"
+#include "utils/Event.h"
 
 #include "animation/animation.h"
 

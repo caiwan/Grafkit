@@ -19,6 +19,8 @@ namespace Idogep {
 	class TreeModel;
 	class SceneModel;
 
+	class Music;
+
 	namespace Role {
 		class HasSceneGraphRole {
 		public:
@@ -26,11 +28,21 @@ namespace Idogep {
 		};
 
 		class HasEffectRole {
+			// ... 
+		};
 
+		class HasPlaybackRole {
+		public:
+			virtual Music * GetMusic() { return m_musicWrapper; }
+		protected:
+			Idogep::Music * m_musicWrapper;
 		};
 	}
 
-	class Document : public HasSceneGraphRole
+	class Document : 
+		public Role::HasSceneGraphRole,
+		public Role::HasEffectRole,
+		public Role::HasPlaybackRole
 	{
 		friend class Editor;
 	public:
@@ -51,8 +63,6 @@ namespace Idogep {
 
 		bool m_isDirty;
 
-		//Ref<Grafkit::Animation::FloatTrack> m_testAnimation;
-
 		Grafkit::ShaderResRef m_vs, m_ps;
 		Grafkit::SceneResRef m_scene;
 		Grafkit::SceneGraphRef m_scenegraph;
@@ -62,6 +72,8 @@ namespace Idogep {
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
+
+
 	};
 
 }

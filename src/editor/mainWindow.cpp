@@ -5,25 +5,25 @@
 #include  <QMenu>
 #include  <QStatusBar>
 
-#include  "document.h"
+#include  "models/document.h"
 
 #include  "main_editor.h"
 #include  "mainWindow.h"
 #include  "editor.h"
 
-#include "Command.h"
+#include "utils/Command.h"
 
 #include "proxies/LoggerProxy.h"
 
-#include "ui/curve/curveeditorwidget.h"
+#include "modules/curveEditor/curveeditorwidget.h"
 
-#include "scenegraphmodel.h"
-#include "ui/treeview/scenegraphviewwidget.h"
+//#include "scenegraphmodel.h"
+#include "modules/outlineView/scenegraphviewwidget.h"
 
-#include "ui/propertyeditor/propertyeditorwidget.h"
-#include "ui/logwidget.h"
+#include "modules/propertyEditor/propertyeditorwidget.h"
+#include "modules/logView/logwidget.h"
 
-#include  "ui/splashwidget.h"
+//#include  ""
 
 using namespace Idogep;
 
@@ -157,7 +157,7 @@ void Idogep::MainWindow::ConnectEvents(Editor * const & editor)
 // ------
 
 #include <qabstractitemmodel.h>
-#include "treeitem.h"
+#include "utils/tree/treeitem.h"
 #include "scenegraphmodel.h"
 
 Idogep::ManageOutlineViewRole::ManageOutlineViewRole()
@@ -177,7 +177,7 @@ void Idogep::ManageOutlineViewRole::ItemSelectedEvent(TreeItem *item)
 
 // ------
 
-#include "Command.h"
+#include "utils/Command.h"
 
 Idogep::ManageCommandStackRole::ManageCommandStackRole() : m_redoAct(nullptr), m_undoAct(nullptr)
 {

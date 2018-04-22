@@ -1,4 +1,4 @@
-#include "Command.h"
+#include "utils/Command.h"
 
 void Idogep::CommandStack::ConnectEmitter(EmitsCommandRole * emitter)
 {
