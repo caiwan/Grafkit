@@ -1,10 +1,15 @@
 #pragma once
 
+#include <functional>
+
 #include <QMainWindow>
 
 #include "common.h"
 
+#include "models/ViewModule.h"
 #include "utils/Event.h"
+
+#include "mediators/EditingMediator.h"
 
 namespace Idogep {
 
@@ -24,42 +29,11 @@ namespace Idogep {
 
 	class CommandStack;
 
-	class TreeItem;
-	class TreeModel;
+	class View;
 
 	// ---
 
-	class ManageOutlineViewRole {
-	public:
-		ManageOutlineViewRole();
-	public:
-		void ItemSelectedEvent(TreeItem *item);
-		Event<Grafkit::AnimationRef> onAnimationSelected;
-
-	};
-
-	class ManageCommandStackRole {
-	public:
-		ManageCommandStackRole();
-
-		Event<> onUndo;
-		Event<> onRedo;
-
-		void CommandStackChangedEvent(CommandStack * const & stack);
-
-	protected:
-		virtual void ToggleUndo(bool enabled) = 0;
-		virtual void ToggleRedo(bool enabled) = 0;
-
-		void ConnectCommandStackEvents(CommandStack * const & stack);
-
-	protected:
-		QAction * m_undoAct;
-		QAction * m_redoAct;
-	};
-
-	class MainWindow : public QMainWindow, 
-		public ManageOutlineViewRole, public ManageCommandStackRole 
+	class MainWindow : public QMainWindow, public Role::ManageCommandStackRole
 	{
 	public:
 		MainWindow(Editor * const & editor);
@@ -94,6 +68,8 @@ namespace Idogep {
 		CurveEditorWidget * m_curveEditor;
 		SceneGraphViewWidget *m_outlineViewer;
 		PropertyEditorWidget *m_propertyVewer;
+
+		Role::MediateOutlineViewRole m_outlineMediator;
 
 		LogWidget* m_logWidget;
 	};

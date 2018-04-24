@@ -1,30 +1,32 @@
+//#include <qtimer.h>
+
 #include "ViewModule.h"
 
 using namespace Idogep;
 
 Idogep::View::View()
 {
-	//m_refreshQueueObject = new ViewRefreshQueue(this);
+	m_refreshQueueObject = new Roles::ViewRefreshQueue(this);
 }
 
 Idogep::View::~View()
 {
-	//delete m_refreshQueueObject;
+	delete m_refreshQueueObject;
 }
 
 void Idogep::View::RequestRefreshView(bool force)
 {
 	// Request immediately
 	if (force) {
-		RefreshView(force);
+		RefreshView(true);
 	}
 	else {
-		// TODO: enclose it into a timer;
-		// to call it later 
-		RefreshView(force);
+		//QTimer. ... 
+		RefreshView(false);
 	}
 }
 
-//void Idogep::ViewRefreshQueue::refreshViewSlot()
-//{
-//}
+void Idogep::Roles::ViewRefreshQueue::refreshViewSlot()
+{
+	//m_view->RefreshView(false);
+}

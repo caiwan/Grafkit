@@ -17,19 +17,18 @@
 
 #include "modules/curveEditor/curveeditorwidget.h"
 
-//#include "scenegraphmodel.h"
+
 #include "modules/outlineView/scenegraphviewwidget.h"
 
 #include "modules/propertyEditor/propertyeditorwidget.h"
 #include "modules/logView/logwidget.h"
 
-//#include  ""
 
 using namespace Idogep;
 
 Idogep::MainWindow::MainWindow(
 	Editor * const & editor
-) : ManageOutlineViewRole()
+) : Role::ManageCommandStackRole()
 //m_editor(editor)
 {
 	createActions();
@@ -42,8 +41,7 @@ Idogep::MainWindow::MainWindow(
 
 void Idogep::MainWindow::DocumentChanged(Document * const & document)
 {
-	// ... 
-	m_outlineViewer->setModel(document->GetOutline());
+	m_outlineViewer->SetModel(document->GetScenegraph());
 }
 
 void Idogep::MainWindow::ToggleUndo(bool enabled)
@@ -145,51 +143,10 @@ void Idogep::MainWindow::ConnectEvents(Editor * const & editor)
 	EditorApplication* app = EditorApplication::Instance();
 	app->GetLoggerProxy()->onUpdateLog += Delegate(m_logWidget, &LogWidget::UpdateLog);
 
-	// animation
-	m_outlineViewer->onItemSelected += Delegate(this, &ManageOutlineViewRole::ItemSelectedEvent);
-	onAnimationSelected += Delegate(m_curveEditor, &CurveEditorWidget::AnimationChangedEvent);
+	m_outlineMediator->
 
-	// Command Stack
-	ConnectCommandStackEvents(editor->GetCommandStack());
+		// Command Stack
+		ConnectCommandStackEvents(editor->GetCommandStack());
 	editor->GetCommandStack()->ConnectEmitter(m_curveEditor);
 }
 
-// ------
-
-#include <qabstractitemmodel.h>
-#include "utils/tree/treeitem.h"
-#include "scenegraphmodel.h"
-
-Idogep::ManageOutlineViewRole::ManageOutlineViewRole()
-{
-}
-
-void Idogep::ManageOutlineViewRole::ItemSelectedEvent(TreeItem *item)
-{
-	if (!item)
-		return;
-
-	HasItemAnimationsRole * animationItem = dynamic_cast<HasItemAnimationsRole*>(item);
-	if (animationItem) {
-		onAnimationSelected(animationItem->GetAnimation());
-	}
-}
-
-// ------
-
-#include "utils/Command.h"
-
-Idogep::ManageCommandStackRole::ManageCommandStackRole() : m_redoAct(nullptr), m_undoAct(nullptr)
-{
-}
-
-void Idogep::ManageCommandStackRole::CommandStackChangedEvent(CommandStack * const & stack)
-{
-	ToggleRedo(stack->HasRedo());
-	ToggleUndo(stack->HasUndo());
-}
-
-void Idogep::ManageCommandStackRole::ConnectCommandStackEvents(CommandStack * const & stack)
-{
-	stack->onCommandStackChanged += Delegate(this, &ManageCommandStackRole::CommandStackChangedEvent);
-}
