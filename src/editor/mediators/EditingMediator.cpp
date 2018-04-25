@@ -1,12 +1,12 @@
 #include "EditingMediator.h"
-#include "models/ViewModule.h"
+#include "ViewModule.h"
 #include "utils/Command.h"
 
 using namespace Idogep;
 
 // ========================================================================================================
 
-Idogep::Roles::ManageCommandStackRole::ManageCommandStackRole() : m_redoAct(nullptr), m_undoAct(nullptr)
+Idogep::Roles::ManageCommandStackRole::ManageCommandStackRole()
 {
 }
 
@@ -21,3 +21,6 @@ void Idogep::Roles::ManageCommandStackRole::ConnectCommandStackEvents(Idogep::Co
 	stack->onCommandStackChanged += Delegate(this, &ManageCommandStackRole::CommandStackChangedEvent);
 }
 
+Idogep::EditorView::EditorView() : View(), Roles::ManageCommandStackRole(), Roles::ManageFileOperationsRole()
+{
+}

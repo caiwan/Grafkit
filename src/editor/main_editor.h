@@ -23,7 +23,6 @@ namespace Idogep {
 
 	class Preloader;
 
-	class MainWindow;
 	class QGrafkitContextWidget;
 
 	class LoggerQTProxy;
@@ -58,6 +57,8 @@ namespace Idogep {
 		void nextTick();
 		void preload();
 
+		void BuildEditorModules();
+
 	public:
 		Event<> onLoaderFinished;
 		Event<QWidget* const&, QWidget* const&> onFocusChanged;
@@ -70,6 +71,7 @@ namespace Idogep {
 
 		Idogep::LoggerQTProxy *m_logger;
 		Idogep::QGrafkitContextWidget *m_renderWidget;
+
 		Idogep::MainWindow *m_mainWindow;
 
 		Idogep::Preloader *m_preloadWindow;

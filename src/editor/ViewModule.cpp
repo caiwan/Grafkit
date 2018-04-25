@@ -4,6 +4,17 @@
 
 using namespace Idogep;
 
+
+Idogep::Module::Module() : m_view(nullptr), m_parent(nullptr)
+{
+}
+
+Idogep::Module::~Module()
+{
+}
+
+// ------------------------------------------------------------------------
+
 Idogep::View::View()
 {
 	m_refreshQueueObject = new Roles::ViewRefreshQueue(this);
@@ -26,7 +37,10 @@ void Idogep::View::RequestRefreshView(bool force)
 	}
 }
 
+// ----------------------------------------------------
+
 void Idogep::Roles::ViewRefreshQueue::refreshViewSlot()
 {
 	//m_view->RefreshView(false);
 }
+

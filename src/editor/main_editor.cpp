@@ -87,14 +87,14 @@ int Idogep::EditorApplication::execute()
 
 	sw->show();
 
+	BuildMainWindow();
+	BuildEditorModules();
+
 	connect(loader, SIGNAL(finished()), this, SLOT(loaderFinished()));
 	loader->start();
 
 	m_renderWidget = new QGrafkitContextWidget(m_render);
 	m_renderWidget->Initialize();
-
-	// init stuff here
-	// connect evetns and delegates 
 
 	m_mainWindow->setCentralWidget(m_renderWidget);
 

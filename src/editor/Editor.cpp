@@ -25,6 +25,11 @@ Idogep::Editor::~Editor()
 	delete m_commandStack;
 }
 
+void Idogep::Editor::Initialize(Ref<Module> parent)
+{
+	InitializeDocument();
+}
+
 void Idogep::Editor::InitializeDocument()
 {
 	try {
