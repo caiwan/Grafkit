@@ -38,10 +38,6 @@ Idogep::MainWindow::MainWindow(
 	ConnectEvents(editor);
 }
 
-void Idogep::MainWindow::SetModel(Ref<Referencable> model)
-{
-}
-
 void Idogep::MainWindow::DocumentChanged(Document * const & document)
 {
 	m_outlineViewer->SetModel(document->GetScenegraph());
@@ -149,7 +145,8 @@ void Idogep::MainWindow::ConnectEvents(Editor * const & editor)
 	//m_outlineMediator->
 
 		// Command Stack
-	ConnectCommandStackEvents(editor->GetCommandStack());
+	CommandStack * commandStack = (editor->GetCommandStack());
+	ConnectCommandStackEvents(commandStack);
 	editor->GetCommandStack()->ConnectEmitter(m_curveEditor);
 }
 

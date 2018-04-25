@@ -9,7 +9,7 @@
 #define IWIDTH 750
 #define IHEIGHT 537
 
-#define IMAGEURL ":/res/img/splash.jpg"
+#define IMAGEURL ":/img/splash.jpg"
 
 #define WIDTH ( (IWIDTH) * (SCALE))
 #define HEIGHT ( (IHEIGHT) * (SCALE))

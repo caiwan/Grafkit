@@ -44,7 +44,7 @@ Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
 	QCoreApplication::setOrganizationDomain("caiwan.github.io");
 	QCoreApplication::setApplicationName(APP_NAME);
 
-	QFile f(":/res/css/global.css"); f.open(QFile::ReadOnly);
+	QFile f(":/css/global.css"); f.open(QFile::ReadOnly);
 	m_qApp.setStyleSheet(f.readAll()); f.close();
 
 	// ... 

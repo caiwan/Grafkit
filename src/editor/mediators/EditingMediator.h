@@ -6,27 +6,13 @@
 
 class QAction;
 
-namespace Idogep{
+namespace Idogep {
 
 	class TreeItem;
+	class CommandStack;
 
 	namespace Roles {
-	
-		class MediateOutlineViewRole : public ViewMediator {
-		public:
-			MediateOutlineViewRole();
-			void MediateViews(View *parent, View *child);
-			void MediateRoles(View *parent);
 
-		public:
-			void ItemSelectedEvent(TreeItem *item);
-			Event<Grafkit::AnimationRef> onAnimationSelected;
-
-		};
-
-		// -------------------------------------------------------
-
-		class CommandStack;
 
 		class ManageCommandStackRole {
 		public:
@@ -47,6 +33,6 @@ namespace Idogep{
 			QAction * m_undoAct;
 			QAction * m_redoAct;
 		};
-	
+
 	}
 }
