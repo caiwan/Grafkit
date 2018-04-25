@@ -15,13 +15,13 @@ Idogep::Editor::Editor(Grafkit::Renderer & render, Grafkit::IResourceManager * c
 	m_render(render),
 	m_resourceManager(resman), m_document(nullptr), m_reloadRequested(false), m_precalcRequested(false)
 {
-	m_musicProxy = new MusicProxy();
+	//m_musicProxy = new MusicProxy();
 	m_commandStack = new CommandStack();
 }
 
 Idogep::Editor::~Editor()
 {
-	delete m_musicProxy;
+	//delete m_musicProxy;
 	delete m_commandStack;
 }
 
@@ -37,7 +37,6 @@ void Idogep::Editor::InitializeDocument()
 	catch (FWdebug::Exception* ex)
 	{
 		MessageBoxA(NULL, ex->what(), "Exception", 0);
-		//LOGGER(Log::Logger().Error(ex->what()));
 
 		delete m_document;
 		m_document = nullptr;

@@ -10,6 +10,7 @@
 #include "utils/Event.h"
 
 #include "mediators/EditingMediator.h"
+#include "mediators/OutlineViewMediator.h"
 
 namespace Idogep {
 
@@ -33,13 +34,17 @@ namespace Idogep {
 
 	// ---
 
-	class MainWindow : public QMainWindow, public Role::ManageCommandStackRole
+	class MainWindow : public QMainWindow, public View,
+		public Roles::ManageCommandStackRole
 	{
 	public:
 		MainWindow(Editor * const & editor);
 
-		// external events (called from outside)
 		void DocumentChanged(Document * const & document);
+		virtual void SetModel(Ref<Referencable> model){}
+
+	protected:
+		virtual void RefreshView(bool force){ /**/ }
 
 		// internal events (called from inside)		
 		Event<> onSave;
@@ -69,7 +74,7 @@ namespace Idogep {
 		SceneGraphViewWidget *m_outlineViewer;
 		PropertyEditorWidget *m_propertyVewer;
 
-		Role::MediateOutlineViewRole m_outlineMediator;
+		Roles::MediateOutlineViewRole m_outlineMediator;
 
 		LogWidget* m_logWidget;
 	};

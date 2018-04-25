@@ -17,7 +17,6 @@
 
 #include "modules/curveEditor/curveeditorwidget.h"
 
-
 #include "modules/outlineView/scenegraphviewwidget.h"
 
 #include "modules/propertyEditor/propertyeditorwidget.h"
@@ -28,7 +27,7 @@ using namespace Idogep;
 
 Idogep::MainWindow::MainWindow(
 	Editor * const & editor
-) : Role::ManageCommandStackRole()
+) : Roles::ManageCommandStackRole()
 //m_editor(editor)
 {
 	createActions();
@@ -37,6 +36,10 @@ Idogep::MainWindow::MainWindow(
 
 	// connect childrens events
 	ConnectEvents(editor);
+}
+
+void Idogep::MainWindow::SetModel(Ref<Referencable> model)
+{
 }
 
 void Idogep::MainWindow::DocumentChanged(Document * const & document)
@@ -143,10 +146,10 @@ void Idogep::MainWindow::ConnectEvents(Editor * const & editor)
 	EditorApplication* app = EditorApplication::Instance();
 	app->GetLoggerProxy()->onUpdateLog += Delegate(m_logWidget, &LogWidget::UpdateLog);
 
-	m_outlineMediator->
+	//m_outlineMediator->
 
 		// Command Stack
-		ConnectCommandStackEvents(editor->GetCommandStack());
+	ConnectCommandStackEvents(editor->GetCommandStack());
 	editor->GetCommandStack()->ConnectEmitter(m_curveEditor);
 }
 
