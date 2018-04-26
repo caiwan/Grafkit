@@ -5,6 +5,10 @@
 #include <qmessagebox.h>
 #include <qevent.h>
 
+#include <qdockwidget.h>
+
+#include <stack>
+
 #include "common.h"
 //#include "utils/"
 
@@ -20,6 +24,8 @@
 #include "modules/splashScreen/splashwidget.h"
 #include "modules/preloaderDialog/preloader.h"
 #include "modules/grafkitContext/QGrafkitContextWidget.h"
+
+#include "modules/logView/LogModule.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -67,8 +73,8 @@ Idogep::EditorApplication::~EditorApplication()
 
 int Idogep::EditorApplication::execute()
 {
-	m_editor = new Editor(m_render, this);
-	m_mainWindow = new MainWindow(m_editor);
+	m_editor = new Editor(nullptr, m_render, this);
+	m_mainWindow = new MainWindow();
 
 	m_preloadWindow = new Preloader(m_mainWindow);
 	onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
@@ -87,8 +93,10 @@ int Idogep::EditorApplication::execute()
 
 	sw->show();
 
-	BuildMainWindow();
+	// this one should put out to a plugin system
 	BuildEditorModules();
+	InitializeModules();
+	BuildDockingWindows();
 
 	connect(loader, SIGNAL(finished()), this, SLOT(loaderFinished()));
 	loader->start();
@@ -124,6 +132,36 @@ void Idogep::EditorApplication::preload()
 {
 	DoPrecalc();
 	m_editor->InitializeDocument();
+}
+
+
+void Idogep::EditorApplication::BuildEditorModules()
+{
+	m_logModule = new LogModule(m_editor);
+}
+
+void Idogep::EditorApplication::InitializeModules() {
+	std::stack<Ref<Module>> stack;
+	stack.push(m_editor);
+	while (!stack.empty()) {
+		Ref<Module> module = stack.top(); stack.pop();
+
+		module->Initialize();
+
+		for (size_t i = 0; i < module->GetChildModuleCount(); i++) {
+			stack.push(module->GetChildModule(i));
+		}
+	}
+}
+
+void Idogep::EditorApplication::BuildDockingWindows()
+{
+	QDockWidget *logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
+	DEBUG_ASSERT(logWidget);
+
+	logWidget->setParent(m_mainWindow);
+	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
+	//m_mainWindow->tabifyDockWidget(m_logWidget, m_curveEditor);
 }
 
 

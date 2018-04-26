@@ -28,6 +28,8 @@ namespace Idogep {
 
 		void Initialize();
 
+		virtual void SetModel(Grafkit::IResource * modelResource){}
+
 	protected:
 		virtual void RefreshView(bool force) { /**/ }
 
@@ -46,7 +48,7 @@ namespace Idogep {
 	private:
 		void createActions();
 		void createStatusBar();
-		void createDockWindows();
+		//void createDockWindows();
 
 		QMenu *m_viewMenu;
 

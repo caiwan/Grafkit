@@ -3,23 +3,21 @@
 
 #include <QDockWidget>
 
-#include "ViewModule.h"
+#include "LogModule.h"
 
 namespace Ui {
 	class LogWidget;
 }
 
 namespace Idogep {
-	class LogWidget : public QDockWidget, public virtual Referencable, public View
+	class LogWidget : public QDockWidget, public virtual Referencable, public LogView
 	{
 		Q_OBJECT
 	public:
 		explicit LogWidget(QWidget *parent = 0);
 		~LogWidget();
 
-		void UpdateLog(QString log);
-
-		virtual void SetModel(Grafkit::IResource * modelResource){}
+		void UpdateLog(std::string log);
 
 	protected:
 		virtual void RefreshView(bool force){}

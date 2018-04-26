@@ -1,6 +1,8 @@
 #include "EditingMediator.h"
 
-#include "models/ViewModule.h"
+#if 0
+
+#include "ViewModule.h"
 #include "modules/outlineView/scenegraphviewwidget.h"
 #include "modules/curveEditor/curveeditorwidget.h"
 #include "OutlineViewMediator.h"
@@ -35,3 +37,5 @@ void Idogep::Roles::MediateOutlineViewRole::ItemSelectedEvent(TreeItem * item)
 {
 	// ... 
 }
+
+#endif

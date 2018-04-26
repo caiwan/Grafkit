@@ -22,25 +22,28 @@ namespace Idogep {
 	class Module : public virtual Referencable {
 	public:
 
-		Module();
+		Module(Ref<Module> parent = nullptr);
 		virtual ~Module();
 
-		virtual void Initialize(Ref<Module> parent = nullptr) = 0;
+		virtual void Initialize() = 0;
 
 		// qnd hack
-		virtual void MediateSiblingModule(Ref<Module> other) = 0;
+		virtual void MediateSiblingModule(Ref<Module> other) {}
 		
 		Ref<View> GetView() { return m_view; }
 		Ref<Module> GetParentModule() { return m_parent; }
 
-		// Get children IMHO is not needed
+		Ref<Module> GetChildModule(size_t id) { return m_children[id]; }
+		size_t GetChildModuleCount() { return m_children.size(); }
+
+		Ref<Module> GetRootModule() { return m_parent ? m_parent->GetRootModule() : this; }
 
 	protected:
 		void SetParentModule(Ref<Module> parent) { m_parent = parent; }
-		void AddChildModule(Ref<Module> child) { m_children.push_back(child);}
+		void AddChildModule(Ref<Module> child) { m_children.push_back(child); child->SetParentModule(this); }
 		void SetView(Ref<View>view) { m_view = view; }
 
-	private:
+	protected:
 		Ref<Module> m_parent;
 		std::vector<Module*> m_children;
 		Ref<View> m_view;
@@ -58,7 +61,7 @@ namespace Idogep {
 
 		void RequestRefreshView(bool force);
 
-		virtual void SetModel(Grafkit::IResource * modelResource) = 0;
+		virtual void SetModel(Grafkit::IResource * modelResource) {};
 
 	protected:
 		virtual void RefreshView(bool force) = 0;

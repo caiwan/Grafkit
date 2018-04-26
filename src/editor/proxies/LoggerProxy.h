@@ -22,7 +22,7 @@ namespace Idogep {
 		virtual ~LoggerQTProxy() {}
 		virtual void Write(Grafkit::Logger::message_t * const & message);
 
-		Event<QString> onUpdateLog;
+		Event<std::string> onUpdateLog;
 
 	private:
 	};

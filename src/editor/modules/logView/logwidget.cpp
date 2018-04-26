@@ -17,8 +17,8 @@ Idogep::LogWidget::~LogWidget()
     delete ui;
 }
 
-void Idogep::LogWidget::UpdateLog(QString log)
+void Idogep::LogWidget::UpdateLog(std::string log)
 {
-	ui->textEdit->appendPlainText(log);
+	ui->textEdit->appendPlainText(QString::fromStdString(log));
 	ui->textEdit->verticalScrollBar()->setValue(ui->textEdit->verticalScrollBar()->maximum());
 }

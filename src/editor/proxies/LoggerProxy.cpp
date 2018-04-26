@@ -44,7 +44,7 @@ void Idogep::LoggerQTProxy::Write(Grafkit::Logger::message_t * const & message)
 	if (message->type == Grafkit::Logger::LOG_DEBUG)
 		return;
 
-	QString line = QString::fromUtf8(logTexts[message->type]) + QString::fromUtf8(message->message);
+	std::string line = std::string(logTexts[message->type]) + std::string(message->message);
 	onUpdateLog(line);
 
 }

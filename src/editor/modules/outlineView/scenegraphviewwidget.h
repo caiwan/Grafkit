@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-#include "models/ViewModule.h"
+#include "ViewModule.h"
 #include "utils/Event.h"
 
 namespace Ui {

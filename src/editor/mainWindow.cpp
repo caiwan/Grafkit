@@ -21,7 +21,7 @@ void Idogep::MainWindow::Initialize()
 {
 	createActions();
 	createStatusBar();
-	createDockWindows();
+	//createDockWindows();
 }
 
 void Idogep::MainWindow::ToggleUndo(bool enabled)
@@ -110,9 +110,7 @@ void Idogep::MainWindow::createStatusBar()
 //	addDockWidget(Qt::LeftDockWidgetArea, m_propertyViewer);
 //	tabifyDockWidget(m_propertyViewer, m_outlineViewer);
 //
-//	m_logWidget = new LogWidget(this);
-//	addDockWidget(Qt::BottomDockWidgetArea, m_logWidget);
-//	tabifyDockWidget(m_logWidget, m_curveEditor);
+
 //}
 
 //void Idogep::MainWindow::ConnectEvents(Editor * const & editor)

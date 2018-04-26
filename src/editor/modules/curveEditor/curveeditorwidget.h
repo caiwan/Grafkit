@@ -7,7 +7,7 @@
 
 #include "utils/tree/treeitem.h"
 #include "utils/Event.h"
-#include "models/ViewModule.h"
+#include "ViewModule.h"
 
 #include "curvedoc.h"
 
