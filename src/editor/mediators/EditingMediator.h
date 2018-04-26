@@ -37,7 +37,7 @@ namespace Idogep {
 		};
 	}
 
-	class EditorView : virtual public Referencable, public View,
+	class EditorView : public View,
 		public Roles::ManageCommandStackRole,
 		public Roles::ManageFileOperationsRole
 	{

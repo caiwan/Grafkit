@@ -6,15 +6,18 @@
 using namespace Idogep;
 
 Idogep::LogWidget::LogWidget(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::LogWidget)
+	QDockWidget(parent),
+	ui(new Ui::LogWidget)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
+
+	const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+	ui->textEdit->setFont(fixedFont);
 }
 
 Idogep::LogWidget::~LogWidget()
 {
-    delete ui;
+	delete ui;
 }
 
 void Idogep::LogWidget::UpdateLog(std::string log)

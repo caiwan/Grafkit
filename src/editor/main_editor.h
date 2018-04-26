@@ -28,7 +28,7 @@ namespace Idogep {
 
 	class QGrafkitContextWidget;
 
-	class LoggerQTProxy;
+	class LoggerProxy;
 	class LogModule;
 
 	class EditorApplication : public QObject,
@@ -88,8 +88,8 @@ namespace Idogep {
 		// modules
 
 		// TODO: merge these two
-		Idogep::LoggerQTProxy *m_logger;
-		Ref<Idogep::LogModule> m_logModule;
+		LoggerProxy *m_logger;
+		Ref<Module> m_logModule;
 
 	private:
 		static EditorApplication * s_self;

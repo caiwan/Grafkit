@@ -2,15 +2,6 @@
 
 /// @file taken from libosmscout: https://github.com/nkostelnik/libosmscout/blob/master/libosmscout/include/osmscout/util/Reference.h
 
-// Turn off assertion. Will lead to unchecked nullptrpointer access
-#define _NOASSERT
-
-#ifndef _NOASSERT
-#include "../debug/test.h"
-#else 
-#define DEBUG_ASSERT(x)
-#endif
-
 /// Safe ptr release
 #define RELEASE(refptr) if(refptr) {refptr->Release(); refptr = nullptr;}
 
@@ -317,7 +308,6 @@ public:
 	   Returns the underlying pointer. Makes the reference behave like a pointer.
 	*/
 	T* operator->() const {
-		DEBUG_ASSERT(Valid()); // Method calling on nullptr pointer is forbidden
 		return ptr;
 	}
 
@@ -328,7 +318,6 @@ public:
 	 like a pointer.
 	*/
 	T& operator*() const {
-		DEBUG_ASSERT(Valid());
 		return *ptr;
 	}
 

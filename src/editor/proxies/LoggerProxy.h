@@ -15,11 +15,11 @@ class QPlainTextEdit;
 namespace Idogep {
 	extern void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
-	class LoggerQTProxy : public Grafkit::Logger::ILoggerHandler
+	class LoggerProxy : public Grafkit::Logger::ILoggerHandler
 	{
 	public:
-		LoggerQTProxy() {}
-		virtual ~LoggerQTProxy() {}
+		LoggerProxy() {}
+		virtual ~LoggerProxy() {}
 		virtual void Write(Grafkit::Logger::message_t * const & message);
 
 		Event<std::string> onUpdateLog;

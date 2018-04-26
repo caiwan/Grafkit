@@ -2,10 +2,10 @@
 
 #include "ViewModule.h"
 
+
 namespace Idogep {
 	class LogView;
 
-	// TODO: bring our beloved loging proxy here 
 
 	class LogView : public View {
 	public:
@@ -13,19 +13,19 @@ namespace Idogep {
 		virtual void SetModel(Grafkit::IResource * modelResource) {};
 	};
 
+	class LoggerProxy;
 
-	class LogModule :public Module {
+	class LogModule : public Module {
 	public:
-		LogModule(Ref<Module> parent);
+		LogModule(Ref<Module> parent, LoggerProxy* const & loggerProxy);
 		~LogModule();
 
 		void Initialize();
 		void MediateSiblingModule(Ref<Module> other);
 
-		void UpdateLog(std::string log) { m_myView->UpdateLog(log); }
-
 	private:
 		Ref<LogView> m_myView;
+		LoggerProxy* m_loggerProxy;
 	};
 
 }

@@ -36,7 +36,7 @@ namespace {
 	};
 }
 
-void Idogep::LoggerQTProxy::Write(Grafkit::Logger::message_t * const & message)
+void Idogep::LoggerProxy::Write(Grafkit::Logger::message_t * const & message)
 {
 	if (!message)
 		return;
