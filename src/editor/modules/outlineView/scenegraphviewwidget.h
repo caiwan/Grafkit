@@ -5,8 +5,7 @@
 
 #include "common.h"
 
-#include "ViewModule.h"
-#include "utils/Event.h"
+#include "outlinemodel.h"
 
 namespace Ui {
 	class SceneGraphViewWidget;
@@ -17,18 +16,13 @@ namespace Idogep {
 	class TreeModel;
 	class TreeItem;
 
-	class SceneGraphViewWidget : public QDockWidget, public View
+	class SceneGraphViewWidget : public QDockWidget, public OutlineView
 	{
 		Q_OBJECT
 
 	public:
 		explicit SceneGraphViewWidget(QWidget *parent = 0);
 		~SceneGraphViewWidget();
-
-		void SetModel(Ref<Referencable> model);
-
-		Event<TreeItem*> onItemSelected;
-		//Event<TreeItem*> onItemHighlighted;
 
 	protected:
 		void RefreshView(bool force);
