@@ -1,4 +1,4 @@
-#include "scenegraphmodel.h"
+#include "outlineTreeModel.h"
 
 #include "render/SceneGraph.h"
 

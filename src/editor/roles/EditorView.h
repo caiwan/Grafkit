@@ -46,7 +46,6 @@ namespace Idogep {
 		// on exit? 
 
 		virtual void Initialize() = 0;
-
 		virtual void SetModel(Grafkit::IResource * modelResource) = 0;
 	};
 }

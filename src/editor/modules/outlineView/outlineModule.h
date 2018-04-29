@@ -10,22 +10,24 @@ namespace Idogep {
 	public:
 		OutlineView();
 
-		void SetModel(Ref<Referencable> model);
+		virtual void SetModel(Grafkit::IResource * modelResource) = 0;
 
 		Event<TreeItem*> onItemSelected;
-		//Event<TreeItem*> onItemHighlighted;
+
 	};
 
 	class OutlineModule : public Module {
 
 	public:
-		OutlineModule();
-		virtual void Initialize() = 0;
+		OutlineModule(Ref<Module> parent);
+		virtual void Initialize();
+
+		// valahol itt kellene epitgetni a treeview-t, majd a vegen atadni a view iranyaba
 
 		virtual void MediateSiblingModule(Ref<Module> other);
 
 	private:
-		OutlineView m_myView;
+		OutlineView *m_myView;
 	};
 
 }

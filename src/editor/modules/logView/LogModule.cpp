@@ -13,7 +13,6 @@ Idogep::LogModule::~LogModule()
 
 void Idogep::LogModule::Initialize()
 {
-
 	assert(m_parent.Valid());
 	assert(m_parent->GetView().Valid());
 	QWidget * parentWidget = dynamic_cast<QWidget*>(m_parent->GetView().Get());

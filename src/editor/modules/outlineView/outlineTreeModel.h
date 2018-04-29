@@ -7,6 +7,8 @@
 #include "utils/tree/treeitem.h"
 #include "utils/tree/treemodel.h"
 
+#include "models/OutlineItems.h"
+
 namespace Grafkit {
 	class Animation;
 	typedef Ref<Animation> AnimationRef ;
@@ -14,8 +16,6 @@ namespace Grafkit {
 	class Scene;
 	typedef Resource<Scene> SceneRes;
 	typedef Ref<SceneRes> SceneResRef;
-
-
 }
 
 namespace Idogep {
@@ -27,30 +27,6 @@ namespace Idogep {
 	class Properties;
 
 	typedef Ref<Properties> PropertiesRef;
-
-	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
-
-	// shall we have 
-	// multiple animations maybe?
-	class HasItemAnimationsRole {
-	public :
-		HasItemAnimationsRole();
-		~HasItemAnimationsRole();
-
-		void SetAnimation(Grafkit::AnimationRef animation);
-		Grafkit::AnimationRef GetAnimation() { return m_animation; }
-
-	protected:
-		Grafkit::AnimationRef m_animation;
-	};
-
-	class HasItemPropertiesRole {
-	public:
-		HasItemPropertiesRole();
-		~HasItemPropertiesRole();
-	protected:
-		Ref<Properties> m_properties;
-	};
 
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
 
