@@ -2,14 +2,14 @@
 
 #include <string>
 
-#include "render/renderer.h"
+#include "common.h"
 
 #include "utils/Event.h"
 #include "utils/Command.h"
 
-#include "ViewModule.h"
+#include "utils/ViewModule.h"
 
-#include "roles/EditorView.h"
+#include "EditorView.h"
 
 namespace Grafkit {
 	class IResourceManager;
@@ -27,8 +27,8 @@ namespace Idogep {
 		Editor(Ref<Module> parent, Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
 		~Editor();
 
-		void Initialize();
-		void MediateSiblingModule(Ref<Module> module);
+		void Initialize() override;
+		//void MediateSiblingModule(Ref<Module> module);
 
 		void InitializeDocument();
 
@@ -46,13 +46,13 @@ namespace Idogep {
 		// ... 
 
 		// Events
-		Event<std::string&> onSaveDialog;
+		//Event<std::string&> onSaveDialog;
 		Event<Document* const &> onDocumentChanged;
 
 		Grafkit::IResourceManager *GetResourceManager();
 
-		Document * const & GetDocument() { return m_document; }
-		CommandStack * GetCommandStack() { return m_commandStack; }
+		Document * const & GetDocument() const { return m_document; }
+		CommandStack * GetCommandStack() const { return m_commandStack; }
 		
 	private:
 		bool DirtyCheck();

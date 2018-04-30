@@ -24,7 +24,7 @@ void Idogep::LogModule::Initialize()
 	m_loggerProxy->onUpdateLog += Delegate(m_myView.Get(), &LogView::UpdateLog);
 }
 
-void Idogep::LogModule::MediateSiblingModule(Ref<Module> other)
-{
-	//...
-}
+//void Idogep::LogModule::MediateSiblingModule(Ref<Module> other)
+//{
+//	//...
+//}

@@ -23,13 +23,15 @@ namespace Idogep {
 	public:
 		SceneGraphViewWidgetModel() : m_model(nullptr) {}
 
-		QAbstractItemModel* GetModel() { return m_model; }
-		void SetModel(QAbstractItemModel* model) {m_model = model; }
+		QAbstractItemModel* GetModel() const { return m_model; }
+		void SetModel(QAbstractItemModel* const & model) {m_model = model; }
 
 	private:
 		QAbstractItemModel *m_model;
 
 	};
+
+    /// ------------------------------------------------------------------
 
 	class SceneGraphViewWidget : public QDockWidget, public OutlineView
 	{
@@ -39,17 +41,20 @@ namespace Idogep {
 		explicit SceneGraphViewWidget(QWidget *parent = 0);
 		~SceneGraphViewWidget();
 
-		virtual void SetModel(Grafkit::IResource * modelResource);
+	    void SetModel(Grafkit::IResource * modelResource) override;
 
 	protected:
-		void RefreshView(bool force);
+		void RefreshView(bool force) override;
 
+        // -- qt specific stuff 
+	    // ReSharper disable CppInconsistentNaming
 	private slots:
 		void itemClickedSlot(const QModelIndex &index);
 		void itemDoubleClickedSlot(const QModelIndex &index);
 
 	private:
 		Ui::SceneGraphViewWidget *ui;
+	    // ReSharper restore CppInconsistentNaming
 	};
 }
 

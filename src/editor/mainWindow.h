@@ -1,13 +1,10 @@
 #pragma once
-
-#include <functional>
-
 #include <QMainWindow>
 
 #include "common.h"
+#include "EditorView.h"
 
-#include "ViewModule.h"
-#include "Editor.h"
+#include "utils/ViewModule.h"
 #include "utils/Event.h"
 
 class QMenu;
@@ -26,33 +23,28 @@ namespace Idogep {
 		MainWindow();
 		~MainWindow();
 
-		void Initialize();
-
-		virtual void SetModel(Grafkit::IResource * modelResource){}
-
 	protected:
-		virtual void RefreshView(bool force) { /**/ }
+		void RefreshView(bool force) override;
 
-	protected:
-		virtual void ToggleUndo(bool enabled);
-		virtual void ToggleRedo(bool enabled);
+	    void ToggleUndo(bool enabled) override;
+	    void ToggleRedo(bool enabled) override;
 
 	private:
-		void closeEvent(QCloseEvent *event);
+		void closeEvent(QCloseEvent *event) override;
 
 		private slots:
+	    // ReSharper disable CppInconsistentNaming
 		void undoSlot() { onUndo(); }
 		void redoSlot() { onRedo(); }
 		void saveSlot() { onSave(); }
+	    // ReSharper restore CppInconsistentNaming
 
 	private:
-		void createActions();
-		void createStatusBar();
-		//void createDockWindows();
+		void CreateActions();
+		void CreateStatusBar();
 
 		QMenu *m_viewMenu;
 
-	private:
 		QAction * m_undoAct;
 		QAction * m_redoAct;
 	};

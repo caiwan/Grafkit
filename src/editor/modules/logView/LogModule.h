@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "ViewModule.h"
+#include "utils/ViewModule.h"
 
 
 namespace Idogep {
@@ -21,7 +21,7 @@ namespace Idogep {
 		~LogModule();
 
 		void Initialize();
-		void MediateSiblingModule(Ref<Module> other);
+		//void MediateSiblingModule(Ref<Module> other);
 
 	private:
 		Ref<LogView> m_myView;

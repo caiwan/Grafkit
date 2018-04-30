@@ -39,10 +39,11 @@ void Idogep::View::RequestRefreshView(bool force)
 	}
 }
 
+
 // ----------------------------------------------------
 
 void Idogep::Roles::ViewRefreshQueue::refreshViewSlot()
 {
-	//m_view->RefreshView(false);
+	m_view->RefreshView(false);
 }
 

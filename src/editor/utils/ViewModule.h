@@ -22,26 +22,23 @@ namespace Idogep {
 	class Module : public Referencable {
 	public:
 
-		Module(Ref<Module> parent = nullptr);
+	    explicit Module(Ref<Module> parent = nullptr);
 		virtual ~Module();
 
 		virtual void Initialize() = 0;
-
-		// qnd hack
-		virtual void MediateSiblingModule(Ref<Module> other) {}
 		
-		Ref<View> GetView() { return m_view; }
-		Ref<Module> GetParentModule() { return m_parent; }
+		Ref<View> GetView() const { return m_view; }
+		Ref<Module> GetParentModule() const { return m_parent; }
 
-		Ref<Module> GetChildModule(size_t id) { return m_children[id]; }
-		size_t GetChildModuleCount() { return m_children.size(); }
+		Ref<Module> GetChildModule(const size_t id) { return m_children[id]; }
+		size_t GetChildModuleCount() const { return m_children.size(); }
 
 		Ref<Module> GetRootModule() { return m_parent ? m_parent->GetRootModule() : this; }
 
-		void SetParentModule(Ref<Module> parent) { m_parent = parent; }
-		void AddChildModule(Ref<Module> child) { m_children.push_back(child);}
+		void SetParentModule(const Ref<Module> parent) { m_parent = parent; }
+		void AddChildModule(const Ref<Module> child) { m_children.push_back(child);}
 
-		void SetView(Ref<View>view) { m_view = view; }
+		void SetView(const Ref<View>view) { m_view = view; }
 
 	protected:
 		Ref<Module> m_parent;

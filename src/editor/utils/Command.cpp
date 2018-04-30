@@ -1,7 +1,9 @@
+#include <cassert>
 #include "utils/Command.h"
 
 void Idogep::CommandStack::ConnectEmitter(EmitsCommandRole * emitter)
 {
+	assert(emitter);
 	if (emitter)
 		emitter->onNewCommand += Delegate(this, &CommandStack::AddCommand);
 }

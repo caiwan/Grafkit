@@ -1,9 +1,7 @@
 #pragma once 
 
-#include "common.h"
 #include "utils/Event.h"
-
-#include "ViewModule.h"
+#include "utils/ViewModule.h"
 
 namespace Idogep {
 
@@ -14,6 +12,7 @@ namespace Idogep {
 		class ManageCommandStackRole {
 		public:
 			ManageCommandStackRole();
+			virtual ~ManageCommandStackRole() = default;
 
 			Event<> onUndo;
 			Event<> onRedo;
@@ -28,7 +27,10 @@ namespace Idogep {
 		};
 
 		class ManageFileOperationsRole {
-		public :
+		public:
+			ManageFileOperationsRole() {}
+			virtual ~ManageFileOperationsRole() = default;
+
 			Event<> onOpen;
 			Event<> onSave;
 			Event<> onNew;
@@ -43,9 +45,9 @@ namespace Idogep {
 	{
 	public:
 		EditorView();
-		// on exit? 
+		virtual ~EditorView();
 
-		virtual void Initialize() = 0;
-		virtual void SetModel(Grafkit::IResource * modelResource) = 0;
+        // ... 
+
 	};
 }

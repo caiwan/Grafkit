@@ -11,25 +11,25 @@ using namespace Idogep;
 Idogep::MainWindow::MainWindow()
 	: m_redoAct(nullptr), m_undoAct(nullptr)
 {
+	CreateActions();
+	CreateStatusBar();
 }
 
 Idogep::MainWindow::~MainWindow()
 {
 }
 
-void Idogep::MainWindow::Initialize()
+void MainWindow::RefreshView(bool force)
 {
-	createActions();
-	createStatusBar();
-	//createDockWindows();
+    // ... 
 }
 
-void Idogep::MainWindow::ToggleUndo(bool enabled)
+void Idogep::MainWindow::ToggleUndo(const bool enabled)
 {
 	m_undoAct->setEnabled(enabled);
 }
 
-void Idogep::MainWindow::ToggleRedo(bool enabled)
+void Idogep::MainWindow::ToggleRedo(const bool enabled)
 {
 	m_redoAct->setEnabled(enabled);
 }
@@ -41,14 +41,14 @@ void Idogep::MainWindow::closeEvent(QCloseEvent * event)
 	settings.setValue("mainWindowState", saveState());
 }
 
-void Idogep::MainWindow::createActions()
+void Idogep::MainWindow::CreateActions()
 {
 	// -- File 
-	QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    auto fileMenu = menuBar()->addMenu(tr("&File"));
 
 	// -- -- Save
-	const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
-	QAction *saveAct = new QAction(saveIcon, tr("&Save..."), this);
+	const auto saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
+    auto saveAct = new QAction(saveIcon, tr("&Save..."), this);
 	saveAct->setShortcuts(QKeySequence::Save);
 	saveAct->setStatusTip(tr("Save the current form letter"));
 	connect(saveAct, &QAction::triggered, this, &MainWindow::saveSlot);
@@ -58,14 +58,14 @@ void Idogep::MainWindow::createActions()
 	fileMenu->addSeparator();
 
 	// -- -- Quit
-	QAction *quitAct = fileMenu->addAction(tr("&Quit"), this, &QWidget::close);
+    auto quitAct = fileMenu->addAction(tr("&Quit"), this, &QWidget::close);
 	quitAct->setShortcuts(QKeySequence::Quit);
 	quitAct->setStatusTip(tr("Quit the application"));
 
 	// -- Edit 
 	// -- -- Undo
-	QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-	const QIcon undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/undo.png"));
+    auto editMenu = menuBar()->addMenu(tr("&Edit"));
+	const auto undoIcon = QIcon::fromTheme("edit-undo", QIcon(":/images/undo.png"));
 	m_undoAct = new QAction(undoIcon, tr("&Undo"), this);
 	m_undoAct->setShortcuts(QKeySequence::Undo);
 	m_undoAct->setStatusTip(tr("Undo the last editing action"));
@@ -74,7 +74,7 @@ void Idogep::MainWindow::createActions()
 	editMenu->addAction(m_undoAct);
 
 	// -- -- Redo
-	const QIcon redoIcon = QIcon::fromTheme("edit-redo", QIcon(":/images/redo.png"));
+	const auto redoIcon = QIcon::fromTheme("edit-redo", QIcon(":/images/redo.png"));
 	m_redoAct = new QAction(undoIcon, tr("&Redo"), this);
 	m_redoAct->setShortcuts(QKeySequence::Redo);
 	m_redoAct->setStatusTip(tr("Redo the last editing action"));
@@ -87,13 +87,13 @@ void Idogep::MainWindow::createActions()
 	menuBar()->addSeparator();
 
 	// -- Help
-	QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    auto helpMenu = menuBar()->addMenu(tr("&Help"));
 
-	QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
+    auto aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
 	aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
 }
 
-void Idogep::MainWindow::createStatusBar()
+void Idogep::MainWindow::CreateStatusBar()
 {
 	statusBar()->showMessage(tr("Ready"));
 }
