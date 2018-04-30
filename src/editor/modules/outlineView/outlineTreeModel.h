@@ -33,7 +33,7 @@ namespace Idogep {
 	class SceneGraphItem : public TreeItem, public HasItemPropertiesRole
 	{
 	public:
-		SceneGraphItem(Grafkit::SceneGraphRef &scene, TreeItem *parentItem = nullptr);
+		SceneGraphItem(Grafkit::SceneGraphRef & scenegraph, TreeItem *parentItem = nullptr);
 
 		Grafkit::SceneGraphRef GetSceneGraph() { return m_scenegraph; }
 
@@ -72,13 +72,13 @@ namespace Idogep {
 	class CameraItem : public EntityItem, public HasItemAnimationsRole, public HasItemPropertiesRole
 	{
 	public:
-		CameraItem(Grafkit::CameraRef entity, TreeItem *parentItem);
+		CameraItem(Grafkit::CameraRef camera, TreeItem *parentItem);
 
 	};
 
 	class LightItem: public EntityItem {
 	public:
-		LightItem(Grafkit::LightRef entity, TreeItem *parentItem);
+		LightItem(Grafkit::LightRef light, TreeItem *parentItem);
 	};
 
 	// -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- -
@@ -87,19 +87,18 @@ namespace Idogep {
 	class SceneModel : public TreeModel
 	{
 	public:
-		SceneModel(Grafkit::SceneResRef &scene);
+	    explicit SceneModel(const Grafkit::SceneResRef & scene);
 		~SceneModel();
 
 	private:
-		virtual QStringList Header();
-		virtual	void Build(TreeItem * parentItem);
+	    QStringList Header() override;
+	    void Build(TreeItem * parentItem) override;
 
-		void BuildActor(TreeItem * parentItem, Grafkit::ActorRef parentActor, int maxDepth = 4096);
+		void BuildActor(TreeItem * parentItem, Grafkit::ActorRef actor, int maxDepth = 4096);
 		void BuildEntity(TreeItem * parentItem, Grafkit::Entity3DRef entity);
 
 		Grafkit::SceneResRef m_scene;
 
-	private:
 		std::map<Grafkit::Actor*, ActorItem*> m_actorMap;
 		std::map<Grafkit::Entity3D *, EntityItem*> m_entityMap;
 	};

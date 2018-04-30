@@ -8,13 +8,15 @@ namespace Idogep {
 	class Document;
 	class TreeItem;
 
+	class TreeModel;
+	
 	class SceneGraphViewWidgetModel;
 
 	class OutlineView : public View {
 	public:
 		OutlineView();
 
-		virtual void SetModel(Grafkit::IResource * modelResource) = 0;
+	    void SetModel(Grafkit::IResource * modelResource) override = 0;
 		Event<TreeItem*> onItemSelected;
 	};
 
@@ -24,13 +26,17 @@ namespace Idogep {
 
 	public:
 	    explicit OutlineModule(Ref<Module> parent);
+		virtual ~OutlineModule();
+		
 	    void Initialize() override;
 
 		void DocumentChangedEvent(Document* const & document);
 
 	private:
 		OutlineView * m_myView;
-		SceneGraphViewWidgetModel * m_myModel;
+		
+		Ref<SceneGraphViewWidgetModel> m_myModel;
+		TreeModel* m_modelBuilder;
 	};
 
 }

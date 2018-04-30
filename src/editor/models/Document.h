@@ -24,7 +24,8 @@ namespace Idogep {
 	namespace Roles {
 		class HasSceneGraphRole : virtual public Referencable {
 		public:
-			virtual Grafkit::SceneGraphRef GetScenegraph() = 0;
+			virtual Grafkit::SceneGraphRef GetScenegraph() const = 0;
+			virtual Grafkit::SceneResRef GetScene() const = 0;
 		};
 
 		class HasEffectRole : virtual public Referencable {
@@ -54,13 +55,15 @@ namespace Idogep {
 		void Shutdown();
 
 		void SetDirty() { m_isDirty = true; }
-		bool IsDirty() { return m_isDirty; }
+		bool IsDirty() const { return m_isDirty; }
 
-		virtual Grafkit::SceneGraphRef GetScenegraph() { return m_scenegraph; }
+	    Grafkit::SceneGraphRef GetScenegraph() const override { return m_scenegraph; }
+		Grafkit::SceneResRef GetScene() const override { return m_scene; }
 
 	private:
 		void InitTestStuff(Grafkit::Renderer & render);
 
+	private:
 		bool m_isDirty;
 
 		Grafkit::ShaderResRef m_vs, m_ps;

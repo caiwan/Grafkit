@@ -96,7 +96,7 @@ Idogep::LightItem::LightItem(Grafkit::LightRef light, TreeItem * parentItem) :
 
 #include "animation/scene.h" 
 
-Idogep::SceneModel::SceneModel(Grafkit::SceneResRef &scene)
+Idogep::SceneModel::SceneModel(const Grafkit::SceneResRef & scene)
 {
 	m_scene = scene;
 }
