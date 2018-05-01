@@ -21,37 +21,34 @@ using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-Idogep::Document::Document() :
-	Roles::HasEffectRole(),
-	Roles::HasSceneGraphRole(),
-	Roles::HasPlaybackRole()
+Document::Document() : m_isDirty(false)
 {
 }
 
-Idogep::Document::~Document()
+Document::~Document()
 {
 }
 
-void Idogep::Document::Preload(IResourceManager * const & resman)
+void Document::Preload(IResourceManager * const & resman)
 {
 	m_vs = resman->Load<ShaderRes>(new VertexShaderLoader("vertexShader", "shaders/vertex.hlsl", ""));
 	m_ps = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/flat.hlsl", ""));
 	m_psShowUv = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/fx/uv.hlsl", ""));
 }
 
-void Idogep::Document::Initialize(Grafkit::Renderer & render)
+void Document::Initialize(Renderer & render)
 {
 	InitTestStuff(render);
 }
 
-void Idogep::Document::Shutdown()
-{
-}
+//void Document::Shutdown()
+//{
+//}
 
 // ---------------------------------------------------------------
 // in-dev-things
 // --- TEST STUFF ---
-void Idogep::Document::InitTestStuff(Grafkit::Renderer & render)
+void Document::InitTestStuff(Renderer & render)
 {
 	// -- model 
 	ModelRef model = new Model(new Mesh());

@@ -21,7 +21,7 @@ namespace Idogep {
 	class EditorApplication;
 
 	class Document;
-
+	
 	class Editor : public Module{
 	public:
 		Editor(Ref<Module> parent, Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
