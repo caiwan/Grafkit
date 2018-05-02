@@ -1,7 +1,5 @@
 #pragma once 
 
-#include <list>
-
 #include "common.h"
 
 #include "utils/tree/treeitem.h"
@@ -35,8 +33,7 @@ namespace Idogep {
 	public:
 		SceneGraphItem(Grafkit::SceneGraphRef & scenegraph, TreeItem *parentItem = nullptr);
 
-		Grafkit::SceneGraphRef GetSceneGraph() { return m_scenegraph; }
-
+		Grafkit::SceneGraphRef GetSceneGraph() const;
 	private:
 		Grafkit::SceneGraphRef m_scenegraph;
 	};

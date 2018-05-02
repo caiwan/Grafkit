@@ -31,6 +31,11 @@ void Idogep::HasItemAnimationsRole::SetAnimation(Grafkit::AnimationRef animation
 	m_animation = animation;
 }
 
+Grafkit::AnimationRef Idogep::HasItemAnimationsRole::GetAnimation() const
+{
+	return m_animation;
+}
+
 // ------------------------------------------------------------------------------------------
 
 #include "utils/property/property.h"
@@ -49,6 +54,11 @@ Idogep::SceneGraphItem::SceneGraphItem(Grafkit::SceneGraphRef & scenegraph, Tree
 {
 	setIcon(QPixmap(":/icons/scene.png").scaled(16, 16));
 	m_itemData << QString::fromStdString(scenegraph->GetName());
+}
+
+Grafkit::SceneGraphRef Idogep::SceneGraphItem::GetSceneGraph() const
+{
+	return m_scenegraph;
 }
 
 
@@ -131,10 +141,10 @@ void Idogep::SceneModel::Build(TreeItem * parentItem)
 
 	// Add animation items if any
 
-	for (size_t i = 0; i< (*m_scene)->GetAnimationCount(); i++ )
+	for (size_t i = 0; i < (*m_scene)->GetAnimationCount(); i++)
 	{
 		Animation * animation = (*m_scene)->GetAnimation(i);
-		
+
 		// --- 
 		ActorAnimation * actorAnimation = dynamic_cast<ActorAnimation*>(animation);
 		if (actorAnimation) {

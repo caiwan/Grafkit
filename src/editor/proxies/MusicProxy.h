@@ -13,22 +13,24 @@ namespace Idogep {
 	{
 		friend class Editor;
 	public:
-		virtual void Play();
-		virtual void Stop();
-		virtual void Pause(int e);
-		virtual void Update();
+	    void Play() override;
+	    void Stop() override;
+	    void Pause(int e) override;
+	    void Update() override;
 
-		virtual uint64_t GetSampleCount();
-		virtual uint64_t GetSampleCountPerSec();
+	    uint64_t GetSampleCount() override;
+	    uint64_t GetSampleCountPerSec() override;
 
-		virtual uint64_t GetTimeSample();
-		virtual void SetTimeSample(uint64_t t);
-		virtual void SetLoop(int e);
-		virtual int IsPlaying();
+	    uint64_t GetTimeSample() override;
+	    void SetTimeSample(uint64_t t) override;
+	    void SetLoop(int e) override;
+	    int IsPlaying() override;
 
-		void GetWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec);
+		void GetWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec) override;
 
 		Event<> onMusicChanged;
+
+		bool HasMusic();
 
 	protected:
 		Grafkit::MusicResRef m_music;

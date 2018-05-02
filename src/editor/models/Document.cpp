@@ -15,6 +15,7 @@
 #include "generator/ShaderLoader.h"
 
 #include "utils/ResourceManager.h"
+#include "generator/MusicBassLoader.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -34,6 +35,8 @@ void Document::Preload(IResourceManager * const & resman)
 	m_vs = resman->Load<ShaderRes>(new VertexShaderLoader("vertexShader", "shaders/vertex.hlsl", ""));
 	m_ps = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/flat.hlsl", ""));
 	m_psShowUv = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/fx/uv.hlsl", ""));
+
+	m_music = resman->Load<MusicRes>(new MusicBassLoader("music/alpha_c_-_euh.ogg"));
 }
 
 void Document::Initialize(Renderer & render)
@@ -41,9 +44,20 @@ void Document::Initialize(Renderer & render)
 	InitTestStuff(render);
 }
 
-//void Document::Shutdown()
-//{
-//}
+SceneGraphRef Document::GetScenegraph() const
+{
+	return m_scenegraph;
+}
+
+SceneResRef Document::GetScene() const
+{
+	return m_scene;
+}
+
+MusicResRef Document::GetMusic() const
+{
+	return m_music;
+}
 
 // ---------------------------------------------------------------
 // in-dev-things

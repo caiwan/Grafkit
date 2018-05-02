@@ -48,9 +48,13 @@ target_link_libraries(${APPLICATION}
     Qt5::Gui 
     Qt5::Widgets 
     Qt5::WinMain
+	${BASS_LIBRARY_RELEASE}
 )
 target_include_directories(${APPLICATION} PUBLIC "${CMAKE_SOURCE_DIR}")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES} ${RC_FILES} ${QRCS} ${UI_FILES})
 
-install(TARGETS ${APPLICATION} DESTINATION bin)
+bass_copy_binaries(${APPLICATION} "${CMAKE_CURRENT_BINARY_DIR}")
+
+install(TARGETS ${APPLICATION} DESTINATION "/")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bass.dll" DESTINATION "/")

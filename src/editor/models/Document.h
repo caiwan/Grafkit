@@ -5,8 +5,6 @@
 #include "render/renderer.h"
 #include "render/effect.h"
 
-#include "animation/scene.h"
-
 namespace Grafkit {
 	class IResourceManager;
 }
@@ -15,7 +13,7 @@ namespace Idogep {
 
 	class Editor;
 	class Document;
-	
+
 	class TreeModel;
 	class SceneModel;
 
@@ -35,13 +33,13 @@ namespace Idogep {
 		void SetDirty() { m_isDirty = true; }
 		bool IsDirty() const { return m_isDirty; }
 
-	    Grafkit::SceneGraphRef GetScenegraph() const { return m_scenegraph; }
-		Grafkit::SceneResRef GetScene() const { return m_scene; }
+		Grafkit::SceneGraphRef GetScenegraph() const;
+		Grafkit::SceneResRef GetScene() const;
+		Grafkit::MusicResRef GetMusic() const;
 
 	private:
 		void InitTestStuff(Grafkit::Renderer & render);
 
-	private:
 		bool m_isDirty;
 
 		Grafkit::ShaderResRef m_vs, m_ps;
@@ -53,6 +51,8 @@ namespace Idogep {
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
+
+		Grafkit::MusicResRef m_music;
 	};
 
 }

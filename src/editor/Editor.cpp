@@ -16,11 +16,12 @@ Idogep::Editor::Editor(Ref<Module> parent, Grafkit::Renderer & render, Grafkit::
 	m_resourceManager(resman), m_document(nullptr), m_reloadRequested(false), m_precalcRequested(false)
 {
 	m_commandStack = new CommandStack();
+	m_musicProxy = new MusicProxy();
 }
 
 Idogep::Editor::~Editor()
 {
-	//delete m_musicProxy;
+	delete m_musicProxy;
 	delete m_commandStack;
 }
 
@@ -37,7 +38,13 @@ void Idogep::Editor::InitializeDocument()
 		m_resourceManager->DoPrecalc();
 		m_document->Initialize(m_render);
 
+		m_musicProxy->m_music = m_document->m_music;
+
 		onDocumentChanged(m_document);
+		m_musicProxy->onMusicChanged();
+
+
+		m_musicProxy->Play();
 	}
 	catch (FWdebug::Exception* ex)
 	{
