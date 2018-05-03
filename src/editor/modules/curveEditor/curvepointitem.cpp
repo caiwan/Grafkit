@@ -24,6 +24,8 @@ namespace {
 	const QColor colorHermite;
 }
 
+#if 0
+
 Idogep::CurvePointItem::CurvePointItem(QGraphicsItem * parent) : QGraphicsItem(parent), m_key(), m_id(0)
 {
 	// todo: rm duplicates
@@ -294,3 +296,5 @@ void Idogep::CurvePointItem::toggleTangentEditing()
 	m_showTangent = !m_showTangent;
 	this->update();
 }
+
+#endif

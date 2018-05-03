@@ -43,8 +43,7 @@ void Idogep::Editor::InitializeDocument()
 		onDocumentChanged(m_document);
 		m_musicProxy->onMusicChanged();
 
-
-		m_musicProxy->Play();
+		//m_musicProxy->Play();
 	}
 	catch (FWdebug::Exception* ex)
 	{

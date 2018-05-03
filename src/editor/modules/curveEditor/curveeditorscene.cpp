@@ -1,5 +1,6 @@
-#include "qgraphicsscene.h"
-#include "qgraphicssceneevent.h"
+#include <QGraphicsScene>
+#include <QGraphicsSceneEvent>
+#include <QPainter>
 
 #include "qgraphicsview.h"
 
@@ -22,6 +23,94 @@ namespace {
 	const QColor purple = QColor(255, 128, 255);
 }
 
+Idogep::CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent),
+m_area(nullptr)
+{
+	m_area = new TimelineArea();
+
+    setBackgroundBrush(QColor(48, 48, 48));
+}
+
+Idogep::CurveEditorScene::~CurveEditorScene()
+{
+}
+
+void Idogep::CurveEditorScene::RefreshView(bool force)
+{
+}
+
+void Idogep::CurveEditorScene::MusicChanged()
+{
+}
+
+void Idogep::CurveEditorScene::PlaybackChanged(bool isPlaying)
+{
+}
+
+void Idogep::CurveEditorScene::DemoTimeChanged(float time)
+{
+}
+
+// ---------------------------------------------------------------------
+// DRAW STUFF 
+
+void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
+{
+	QGraphicsScene::drawBackground(painter, r);
+	painter->setBrush(Qt::NoBrush);
+
+	setSceneRect(views().at(0)->geometry());
+
+	// because rect() is relative to the widgets parent
+	painter->translate(r.topLeft());
+
+	// Draw grid here 
+	painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
+
+	m_area->SetSceneRect(sceneRect());
+	m_area->drawGrid(painter, r);
+
+	// Draw curve 
+
+    // ?? 
+
+
+    //draw cursor ?
+
+     // ??
+}
+
+// ------------------------------------------------------------------
+Idogep::TimelineArea::TimelineArea()
+{
+     // ...
+}
+
+// ReSharper disable CppInconsistentNaming
+QPointF TimelineArea::point2Screen(QPointF point) const
+{
+	return QPointF(
+		point.x() * Scale().width() + Offset().x() + SceneRect().topLeft().x(),
+		point.y() * -Scale().height() + Offset().y() + SceneRect().topLeft().y()
+	);
+}
+
+QPointF TimelineArea::screen2Point(QPointF point) const
+{
+	return QPointF(
+		(point.x() - Offset().x() - SceneRect().topLeft().x()) / Scale().width(),
+		(point.y() - Offset().y() - SceneRect().topLeft().y()) / -Scale().height()
+	);
+}
+
+void Idogep::TimelineArea::drawGrid(QPainter * painter, const QRectF & r)
+{
+}
+// ReSharper restore CppInconsistentNaming
+
+
+#if 0
+
 CurveEditorScene::CurveEditorScene(CurveEditorWidget* pWidget, QObject* parent) : QGraphicsScene(parent)
 {
 	setBackgroundBrush(QColor(48, 48, 48));
@@ -40,7 +129,9 @@ CurveEditorScene::CurveEditorScene(CurveEditorWidget* pWidget, QObject* parent) 
 
 	m_widget = pWidget;
 
-	m_audiogramImage = NULL;
+	m_audiogramImage = nullptr;
+
+	m_document = nullptr;
 }
 
 QSizeF CurveEditorScene::scale() const
@@ -65,6 +156,9 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& rect)
 	painter->setBrush(Qt::NoBrush);
 
 	setSceneRect(views().at(0)->geometry());
+
+	if (!m_document)
+		return;
 
 	m_document->Recalculate();
 
@@ -235,21 +329,24 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 }
 #endif
 
-QPointF Idogep::CurveEditorScene::point2Screen(QPointF point) const
-{
-	return QPointF(
-		point.x() * scale().width() + offset().x() + sceneRect().topLeft().x(),
-		point.y() * -scale().height() + offset().y() + sceneRect().topLeft().y()
-	);
-}
 
-QPointF Idogep::CurveEditorScene::screen2Point(QPointF point) const
-{
-	return QPointF(
-		(point.x() - offset().x() - sceneRect().topLeft().x()) / scale().width(),
-		(point.y() - offset().y() - +sceneRect().topLeft().y()) / -scale().height()
-	);
-}
+// megvan:
+
+//QPointF Idogep::CurveEditorScene::point2Screen(QPointF point) const
+//{
+//	return QPointF(
+//		point.x() * scale().width() + offset().x() + sceneRect().topLeft().x(),
+//		point.y() * -scale().height() + offset().y() + sceneRect().topLeft().y()
+//	);
+//}
+//
+//QPointF Idogep::CurveEditorScene::screen2Point(QPointF point) const
+//{
+//	return QPointF(
+//		(point.x() - offset().x() - sceneRect().topLeft().x()) / scale().width(),
+//		(point.y() - offset().y() - +sceneRect().topLeft().y()) / -scale().height()
+//	);
+//}
 
 void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect)
 {
@@ -459,3 +556,6 @@ void CurveEditorScene::updateAudiogram()
 
 	m_audiogramImage = img;
 }
+
+#endif 
+

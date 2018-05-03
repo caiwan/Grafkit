@@ -12,24 +12,29 @@ using namespace Idogep;
 CurveEditorWidget::CurveEditorWidget(QWidget* parent) : QDockWidget(parent), CurveEditorView(), ui(new Ui::CurveEditorWidget)
 {
 	ui->setupUi(this);
-#if 0
-	m_scene = new CurveEditorScene(this);
-	m_scene->SetDocument(this);
-	ui->graphicsView->setScene(m_scene);
 
-	// slots and signals crap thing 
+	// slots and signals crap thing
 	connect(ui->btn_play, SIGNAL(clicked()), this, SLOT(playPressedSlot()));
+
+#if 0
+	// TODO: implement
 	connect(ui->btn_stop, SIGNAL(clicked()), this, SLOT(stopPressedSlot()));
 	connect(ui->btn_playbackOptions, SIGNAL(clicked()), this, SLOT(optionsPressedSlot()));
+#endif 
 
 	connect(ui->treeView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(itemClickedSlot(const QModelIndex &)));
 	connect(ui->treeView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(itemDoubleClickedSlot(const QModelIndex &)));
-#endif
 }
 
 CurveEditorWidget::~CurveEditorWidget()
 {
 	delete ui;
+}
+
+void CurveEditorWidget::SetGraphicsScene(QGraphicsScene* graphicsScene)
+{
+	assert(graphicsScene);
+	ui->graphicsView->setScene(graphicsScene);
 }
 
 void Idogep::CurveEditorWidget::resizeEvent(QResizeEvent * event)
@@ -43,7 +48,7 @@ void Idogep::CurveEditorWidget::resizeEvent(QResizeEvent * event)
 void Idogep::CurveEditorWidget::RefreshView(bool force)
 {
 #if 0
-  	if (force) {
+	if (force) {
 		m_scene->clear();
 		ClearAudiogram();
 		AddCurveToScene(m_scene);
@@ -69,28 +74,28 @@ void Idogep::CurveEditorWidget::UpdateAnimationModel(TreeModel * model)
 
 // ========================================================================================================
 
-
-void Idogep::CurveEditorWidget::PlaybackChanged(bool isPlaying)
-{
-	if (isPlaying) {
-		ui->btn_play->setText(QApplication::translate("CurveEditorWidget", "Pause", nullptr));
-	}
-	else {
-		ui->btn_play->setText(QApplication::translate("CurveEditorWidget", "Play", nullptr));
-	}
-}
-
-void Idogep::CurveEditorWidget::demoTimeChanged(float time)
-{
-	// ...
-	// set cursor here 
-}
+//
+//void Idogep::CurveEditorWidget::PlaybackChanged(bool isPlaying)
+//{
+//	if (isPlaying) {
+//		ui->btn_play->setText(QApplication::translate("CurveEditorWidget", "Pause", nullptr));
+//	}
+//	else {
+//		ui->btn_play->setText(QApplication::translate("CurveEditorWidget", "Play", nullptr));
+//	}
+//}
+//
+//void Idogep::CurveEditorWidget::DemoTimeChanged(float time)
+//{
+//	// ...
+//	// set cursor here 
+//}
 
 
 void Idogep::CurveEditorWidget::itemClickedSlot(const QModelIndex & index)
 {
 #if 0
-  	TreeItem * item = reinterpret_cast<TreeItem *> (index.internalPointer());
+	TreeItem * item = reinterpret_cast<TreeItem *> (index.internalPointer());
 	AnimationChannelItem * animationItem = dynamic_cast<AnimationChannelItem*>(item);
 	if (!animationItem)
 		return;

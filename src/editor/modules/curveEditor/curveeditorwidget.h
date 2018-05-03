@@ -16,6 +16,7 @@ namespace Ui {
 }
 
 class QTreeView;
+class QGraphicsScene;
 
 namespace Idogep {
 
@@ -33,21 +34,14 @@ namespace Idogep {
 		explicit CurveEditorWidget(QWidget *parent = 0);
 		~CurveEditorWidget();
 
-		/* EVENTS and OPERATIONS */
-	public:
-
-		virtual void PlaybackChanged(bool isPlaying);
-		virtual void demoTimeChanged(float time);
-
-		virtual void MusicChanged() {}
-
 		/* METHODS */
-	protected:
-	    
+		void SetGraphicsScene(QGraphicsScene* graphicsScene);
 
+	protected:
+	 
 	    void RefreshView(bool force) override;
 
-		virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) { onRequestWaveform(p, sampleCount, channelCount, samplePerSec); return sampleCount > 0; }
+		//virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) { onRequestWaveform(p, sampleCount, channelCount, samplePerSec); return sampleCount > 0; }
 
 		//void onAnimationModelUpdatedEvent(TreeModel* model);
 		virtual void UpdateAnimationModel(TreeModel* model);
@@ -57,7 +51,7 @@ namespace Idogep {
 	    // ReSharper disable CppInconsistentNaming
 		void playPressedSlot() { onTogglePlayback(); }
 		void stopPressedSlot() { onStopPlayback(); }
-		void optionsPressedSlot() { onPlaybackOptions(); }
+		//void optionsPressedSlot() { onPlaybackOptions(); }
 
 		// ... 
 		void itemClickedSlot(const QModelIndex &index);
@@ -70,7 +64,7 @@ namespace Idogep {
 
 	private:
 		Ui::CurveEditorWidget *ui;
-		CurveEditorScene* m_scene;
+		//CurveEditorScene* m_scene;
 
 	};
 

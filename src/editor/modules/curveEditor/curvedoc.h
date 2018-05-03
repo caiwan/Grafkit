@@ -13,6 +13,8 @@ namespace Idogep {
 
 	class CurveCursor;
 
+#if 0
+
 	// Delegate audiogram rendering functions 
 	class ManageCurveAudiogramRole {
 	public:
@@ -54,9 +56,10 @@ namespace Idogep {
 	public:
 		ManageCurveRole();
 
+#if 0
 		QList<CurvePointItem*>* GetCurvePoints() { return m_curve; }
 		Ref<Grafkit::Animation::Channel> GetChannel() { return m_channel; }
-
+#endif 
 		void SetChannel(Ref<Grafkit::Animation::Channel>& channel);
 
 	protected:
@@ -75,10 +78,14 @@ namespace Idogep {
 		void CommitRemovePoint(float key, float value);
 
 	private:
+#if 0
 		QList<CurvePointItem*>* m_curve;
 		Ref<Grafkit::Animation::Channel> m_channel;
-		Grafkit::Animation::Key m_originalKey;
+#endif
+	    Grafkit::Animation::Key m_originalKey;
 		Grafkit::Animation::Key m_modifiedKey;
 	};
+
+#endif
 
 }

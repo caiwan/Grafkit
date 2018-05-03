@@ -8,6 +8,8 @@
 
 using namespace Idogep;
 
+#if 0
+
 Idogep::ManageCurveAudiogramRole::ManageCurveAudiogramRole() : m_audiogramSampleCount(0), m_audiogramBuffer(nullptr)
 {
 }
@@ -98,6 +100,8 @@ void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& chann
 
 	m_curve = new QList<Idogep::CurvePointItem*>();
 
+#if 0
+
 	size_t keyCount = m_channel->GetKeyCount();
 	for (size_t i = 0; i < keyCount; i++) {
 		auto key = m_channel->GetKey(i);
@@ -109,20 +113,25 @@ void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& chann
 		point->onMovePoint += Delegate(this, &ManageCurveRole::MovePoint);
 		point->onMoveTangent += Delegate(this, &ManageCurveRole::MoveTangent);
 	}
+
+#endif 
 }
 
 void Idogep::ManageCurveRole::Recalculate()
 {
+#if 0
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {
 			m_curve->at(i)->recalculatePosition();
 			// if you set points visibilityduring the drawing sequence, it will not recieve any events
 		}
 	}
+#endif 
 }
 
 void Idogep::ManageCurveRole::AddCurveToScene(CurveEditorScene * parent)
 {
+#if 0
 	if (m_curve) {
 		for (int i = 0; i < m_curve->size(); i++) {
 			auto point = m_curve->at(i);
@@ -131,10 +140,12 @@ void Idogep::ManageCurveRole::AddCurveToScene(CurveEditorScene * parent)
 			// if you set points visibilityduring the drawing sequence, it will not recieve any events
 		}
 	}
+#endif 
 }
 
 void Idogep::ManageCurveRole::MovePoint(CurvePointItem * item)
 {
+#if 0
 	float itemTime = item->time();
 	uint32_t id = item->index();
 
@@ -154,6 +165,7 @@ void Idogep::ManageCurveRole::MovePoint(CurvePointItem * item)
 		item->setTime(0);
 
 	m_channel->SetKey(id, item->GetKey());
+#endif 
 }
 
 void Idogep::ManageCurveRole::MoveTangent(CurvePointItem * item)
@@ -163,15 +175,19 @@ void Idogep::ManageCurveRole::MoveTangent(CurvePointItem * item)
 
 void Idogep::ManageCurveRole::StartEdit(CurvePointItem * item)
 {
+#if 0
 	m_originalKey = item->GetKey();
+#endif 0
 }
 
 void Idogep::ManageCurveRole::CommitEdit(CurvePointItem * item)
 {
+#if 0
 	m_modifiedKey = item->GetKey();
 	CurveKeyChangeCommand * cmd = new CurveKeyChangeCommand(m_channel, item->index(), m_originalKey, m_modifiedKey, nullptr);
 	//cmd->onRefreshView += Delegate(this, &ManageCurveRole::RefreshView);
 	onNewCommand(cmd);
+#endif
 }
 
 void Idogep::ManageCurveRole::CommitAddPoint(float key, float value)
@@ -182,3 +198,4 @@ void Idogep::ManageCurveRole::CommitRemovePoint(float key, float value)
 {
 }
 
+#endif

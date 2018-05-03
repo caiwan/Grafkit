@@ -40,6 +40,8 @@ namespace Grafkit {
 		double GetLength() { return (double)this->GetSampleCount() / (double)this->GetSampleCountPerSec(); }
 		double GetLengthms() { return 1000.*(double)this->GetSampleCount() / (double)this->GetSampleCountPerSec(); }
 
+		void TogglePlay() { Pause(IsPlaying()); }
+
 	private:
 		double m_bpm;
 		int m_rows;

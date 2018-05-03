@@ -7,7 +7,10 @@
 
 
 namespace Idogep {
-	class CurvePointItem : public QGraphicsItem
+
+#if 0
+
+    class CurvePointItem : public QGraphicsItem
 	{
 	public:
 		CurvePointItem(QGraphicsItem* parent = NULL);
@@ -85,5 +88,7 @@ namespace Idogep {
 		uint32_t m_nodeType;
 		uint32_t m_color;
 	};
+
+#endif
 
 }
