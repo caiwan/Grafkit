@@ -36,8 +36,8 @@ namespace {
 		virtual void SetLoop(int e);
 		virtual int IsPlaying();
 
-		virtual bool GetFFT(float* ptr, int segcount);
-		virtual bool GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t& samplePerSec);
+		virtual void GetFFT(float* ptr, int segcount);
+		virtual void GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t& samplePerSec);
 
 	protected:
 		HSTREAM m_stream;
@@ -174,12 +174,12 @@ namespace {
 
 	// taken from Gargaj 
 	// https://github.com/Gargaj/Bonzomatic/blob/e1aa90ba5c47a6aa61bcf754a634d09e2ef23f81/src/platform_common/FFT.cpp#L28
-	bool MusicBass::GetFFT(float* ptr, int segcount)
+	void MusicBass::GetFFT(float* ptr, int segcount)
 	{
 		unsigned int len = 0;
 
 		if (!IsPlaying())
-			return false;
+			return;
 
 		switch (segcount * 2) // for 256 fft, only 128 values will contain DC in our case
 		{
@@ -205,25 +205,21 @@ namespace {
 			len = BASS_DATA_FFT16384;
 			break;
 		default:
-			return false;
+			return;
 		}
 
-		const int numBytes = BASS_ChannelGetData(m_stream, ptr, len | BASS_DATA_FFT_REMOVEDC);
-		if (numBytes <= 0)
-			return false;
-
-		return true;
+		/*const int numBytes =*/ BASS_ChannelGetData(m_stream, ptr, len | BASS_DATA_FFT_REMOVEDC);
 
 	}
 
-	bool MusicBass::GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t &samplePerSec)
+	void MusicBass::GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t &samplePerSec)
 	{
 		length = 0;
 		ptr = nullptr;
 		samplePerSec = 0;
 		BASS_CHANNELINFO channelInfo;
 		if (!BASS_ChannelGetInfo(m_stream, &channelInfo))
-			return false;
+			return;
 
 		length = m_length;
 		channelCount = channelInfo.chans;
@@ -231,18 +227,18 @@ namespace {
 
 		ptr = new float[length * channelCount];
 
+        // TODO: ez nem jo
 		const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
 
 		if (numBytes == -1)
 		{
-			delete ptr;
+			LOGGER(Log::Logger().Error("Could not read waveform data. BASS ERROR: %d", BASS_ErrorGetCode()));
+
+			delete[] ptr;
 			length = 0;
 			ptr = nullptr;
 			samplePerSec = 0;
-			return false;
 		}
-
-		return true;
 	}
 }
 
@@ -251,13 +247,12 @@ namespace {
 /// ====================================================================================================================================================
 /// Factory class implementation
 /// ====================================================================================================================================================
-Grafkit::MusicBassLoader::MusicBassLoader(std::string source_name) : Grafkit::IResourceBuilder(source_name, source_name)
+Grafkit::MusicBassLoader::MusicBassLoader(const std::string sourceName) : Grafkit::IResourceBuilder(sourceName, sourceName)
 {
 }
 
 Grafkit::MusicBassLoader::~MusicBassLoader()
-{
-}
+= default;
 
 void Grafkit::MusicBassLoader::Load(IResourceManager * const & resman, IResource * source)
 {
@@ -268,7 +263,7 @@ void Grafkit::MusicBassLoader::Load(IResourceManager * const & resman, IResource
 
 	Music* music = new MusicBass();
 
-	IAssetRef asset = this->GetSourceAsset(resman);
+    const IAssetRef asset = this->GetSourceAsset(resman);
 	music->Initialize(asset);
 
 	dest->AssingnRef(music);

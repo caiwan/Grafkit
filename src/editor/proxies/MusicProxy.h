@@ -16,6 +16,10 @@ namespace Idogep
         void Pause(int e) override;
         void Update() override;
 
+        void Initialize(Grafkit::IAssetRef asset) override{}
+        void Shutdown() override{}
+        void ToggleMute() override;
+
         uint64_t GetSampleCount() override;
         uint64_t GetSampleCountPerSec() override;
 
@@ -24,8 +28,8 @@ namespace Idogep
         void SetLoop(int e) override;
         int IsPlaying() override;
 
-        bool GetFFT(float* ptr, int segcount) override;
-        bool GetWaveform(float*& ptr, size_t& length, size_t& channelCount, size_t& samplePerSec) override;
+        void GetFFT(float* ptr, int segcount) override;
+        void GetWaveform(float*& ptr, size_t& length, size_t& channelCount, size_t& samplePerSec) override;
 
         Event<> onMusicChanged;
 
