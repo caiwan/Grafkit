@@ -72,13 +72,21 @@ int Idogep::MusicProxy::IsPlaying()
 // ===================================================================================================================
 
 
-void Idogep::MusicProxy::GetWaveform(float *& ptr, size_t & length, size_t & channelCount, size_t & samplePerSec)
+bool Idogep::MusicProxy::GetFFT(float * ptr, int segcount)
 {
-	if(HasMusic())
-		(*m_music)->GetWaveform(ptr, length, channelCount, samplePerSec);
+	if (HasMusic())
+		return (*m_music)->GetFFT(ptr, segcount);
+    return false;
 }
 
-bool Idogep::MusicProxy::HasMusic()
+bool Idogep::MusicProxy::GetWaveform(float *& ptr, size_t & length, size_t & channelCount, size_t & samplePerSec)
+{
+	if(HasMusic())
+		return (*m_music)->GetWaveform(ptr, length, channelCount, samplePerSec);
+	return false;
+}
+
+bool Idogep::MusicProxy::HasMusic() const
 {
 	return m_music.Valid() && m_music->Valid();
 }

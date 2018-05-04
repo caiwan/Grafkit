@@ -15,26 +15,6 @@ namespace Idogep {
 
 #if 0
 
-	// Delegate audiogram rendering functions 
-	class ManageCurveAudiogramRole {
-	public:
-		ManageCurveAudiogramRole();
-		virtual ~ManageCurveAudiogramRole();
-		
-		void GetAudiogram(QImage** image, float startTime, float endTime, int rectWidth, int rectHeight);
-		void ClearAudiogram();
-
-	protected:
-		virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
-
-	private:
-		float* m_audiogramBuffer;
-		size_t m_audiogramSampleCount;
-
-		size_t m_audiogramChannelCount;
-		size_t m_audiogramSamplePerSec;
-	};
-
 	// --- 
 
 	class ManageCursorRole {

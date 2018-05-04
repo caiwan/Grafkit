@@ -1,98 +1,82 @@
-#pragma once 
+#pragma once
 
-#include <QtGui>
 #include <qgraphicsscene.h>
 
 #include "curvepointitem.h"
 #include "CurveSceneView.h"
+#include "core/Music.h"
 
-namespace Idogep {
+namespace Idogep
+{
+    class ManageCurveRole;
 
-	class ManageCurveRole;
+    class CurvePointItem;
+    class CurveEditorWidget;
 
-	class CurvePointItem;
-	class CurveEditorWidget;
+    class TimelineArea;
+	class AudiogramPainter;
 
-	class TimelineArea;
+    class CurveEditorScene : public QGraphicsScene, public CurveSceneView
+    {
+    public:
+        explicit CurveEditorScene(QObject* parent = nullptr);
+        ~CurveEditorScene();
 
-	class CurveEditorScene : public QGraphicsScene, public CurveSceneView
-	{
-	public:
-		CurveEditorScene(QObject* parent = nullptr);
-		~CurveEditorScene();
+		void MusicChanged() override { UpdateAudiogram(); RequestRefreshView(true); }
+        void PlaybackChanged(bool isPlaying) override;
+        void DemoTimeChanged(float time) override;
 
-		void MusicChanged() override;
-		void PlaybackChanged(bool isPlaying) override;
-		void DemoTimeChanged(float time) override;
+    protected:
+        void RefreshView(bool force) override;
 
-	protected:
-		void RefreshView(bool force) override;
+        // QT stuff
 
-		// QT stuff
+    public:
+        void drawBackground(QPainter* painter, const QRectF& r) override;
+        //virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
+        //virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+        //virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+        //virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
-	public:
-		void drawBackground(QPainter* painter, const QRectF& r) override;
-		//virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
-		//virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
-		//virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
-		//virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    private:
+        TimelineArea* m_area;
+        bool m_displayWaveform;
 
-	private:
-		TimelineArea * m_area;
-	};
+        void UpdateAudiogram();
+		QImage* m_audiogramImage;
+    };
 
 
-	class TimelineArea
-	{
-	public:
+    class TimelineArea
+    {
+    public:
 
-		TimelineArea();
+        TimelineArea();
 
-	    QSizeF Scale() const
-	    {
-	        return m_scale;
-	    }
+        QSizeF Scale() const { return m_scale; }
+        void SetScale(const QSizeF& scale) { m_scale = scale; }
 
-	    void SetScale(const QSizeF& scale)
-	    {
-	        m_scale = scale;
-	    }
+        QPointF Offset() const { return m_offset; }
+        void SetOffset(const QPointF& offset) { m_offset = offset; }
+        
+        QRectF SceneRect() const { return m_sceneRect; }
+        void SetSceneRect(const QRectF& sceneRect) { m_sceneRect = sceneRect; }
 
-	    QPointF Offset() const
-	    {
-	        return m_offset;
-	    }
+        QPointF Point2Screen(QPointF point) const;
+        QPointF Screen2Point(QPointF point) const;
 
-	    void SetOffset(const QPointF& offset)
-	    {
-	        m_offset = offset;
-	    }
+        // QT naming crap
+        // ReSharper disable CppInconsistentNaming
+        void drawGrid(QPainter* painter, const QRectF& r) const;
+        // ReSharper restore CppInconsistentNaming
 
-	    QRectF SceneRect() const
-	    {
-	        return m_sceneRect;
-	    }
+    private:
 
-	    void SetSceneRect(const QRectF& sceneRect)
-	    {
-	        m_sceneRect = sceneRect;
-	    }
+        QSizeF m_scale;
+        QPointF m_offset;
 
-	    // ReSharper disable CppInconsistentNaming
-		QPointF point2Screen(QPointF point) const;
-		QPointF screen2Point(QPointF point) const;
-
-		void drawGrid(QPainter* painter, const QRectF& r);
-	    // ReSharper restore CppInconsistentNaming
-
-	private:
-
-		QSizeF m_scale;
-		QPointF m_offset;
-
-		QRectF m_sceneRect;
-
-	};
+        QRectF m_sceneRect;
+    };
 
 #if 0
 	class CurveEditorScene : public QGraphicsScene
@@ -143,5 +127,5 @@ namespace Idogep {
 
 		QImage* m_audiogramImage;
 	};
-#endif 
+#endif
 }
