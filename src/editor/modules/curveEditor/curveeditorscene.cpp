@@ -42,6 +42,8 @@ CurveEditorScene::~CurveEditorScene()
 
 void CurveEditorScene::RefreshView(bool force)
 {
+	update();
+	// TODO if (force)
 }
 
 void CurveEditorScene::PlaybackChanged(bool isPlaying)
@@ -67,15 +69,18 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 	if (m_displayWaveform)
 	{
+		painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
+
 		UpdateAudiogram();
+
 		if (m_audiogramImage)
 		{
+			painter->fillRect(0, 0, 16, 16, QBrush(QColor(0, 255, 0)));
 			painter->drawImage(r, *m_audiogramImage);
 		}
 	}
 
 	// Draw grid here 
-	painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
 
 	m_area->SetSceneRect(sceneRect());
 	m_area->drawGrid(painter, r);
@@ -96,16 +101,17 @@ void CurveEditorScene::UpdateAudiogram()
 	const float leftTime = -float(offset.x()) / float(scale.width());
 	const float rightTime = leftTime + (float(sceneRect().width()) / float(scale.width()));
 
-	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) return;
+	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) 
+		return;
 
 	QImage* img = nullptr;
 
-	// TODO 
-	//auto m_document;
-	//m_document->GetAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
+	onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
 
-	if (!img) return;
+	if (!img) 
+		return;
 
+	delete m_audiogramImage;
 	m_audiogramImage = img;
 }
 

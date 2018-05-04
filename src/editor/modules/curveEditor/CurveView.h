@@ -50,7 +50,8 @@ namespace  Idogep
 	public:
 		ManagePlaybackRole() {}
 		virtual ~ManagePlaybackRole() = default;
-				Event<> onTogglePlayback;
+		
+	    Event<> onTogglePlayback;
 		Event<> onStopPlayback;
 	};
 

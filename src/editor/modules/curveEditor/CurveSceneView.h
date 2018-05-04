@@ -11,7 +11,7 @@ namespace Idogep
 		{
 		public:
 
-			Event<QImage*, float, float, int, int> onRequestAudiogram; //audiogramImgage, leftTime, rightTime, width, height
+			Event<QImage**, float, float, int, int> onRequestAudiogram; //audiogramImgage, leftTime, rightTime, width, height
 
 			virtual void MusicChanged() = 0;
 
