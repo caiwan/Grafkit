@@ -34,7 +34,7 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 		onRequestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
 	}
 
-    if (!m_audiogramBuffer || m_audiogramChannelCount)
+    if (!m_audiogramBuffer || !m_audiogramSampleCount)
         return;
 
 	const uint32_t offset = uint32_t(startTime * m_audiogramSamplePerSec) * m_audiogramChannelCount;
@@ -50,11 +50,12 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 
 	const float invChannelCount = 1. / m_audiogramChannelCount;
 
-	uint32_t fi = 0;
+	uint32_t x = 0;
 	for (uint32_t i = 0; i < readFrames * 2; i += valueHop * 2)
 	{
-		if (fi >= rectWidth)
+		if (x >= rectWidth)
 			break;
+
 		float vv = 0.0f;
 		for (uint32_t k = 0; k < valueHop * 2; k += 2)
 		{
@@ -69,15 +70,16 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 
 		vv /= float(valueHop) / invChannelCount;
 
-		for (uint32_t j = 0; j < rectHeight; j++)
+		for (uint32_t y = 0; y < rectHeight; y++)
 		{
-			const float cv = fabs((float(j) * 2.0f) / float(rectHeight - 1) - 1.0f);
+			const float cv = fabs((float(y) * 2.0f) / float(rectHeight - 1) - 1.0f);
 			if (vv >= cv)
-				img->setPixel(fi, j, 0xFF3c3c3c);
+				img->setPixel(x, y, 0xFF3c3c3c);
 		}
 
-		fi++;
+		x++;
 	}
+
 	*image = img;
 }
 

@@ -66,7 +66,7 @@ namespace {
 	{
 		m_asset = asset;
 		const void* data = m_asset->GetData();
-		size_t data_size = m_asset->GetSize();
+	    const size_t dataSize = m_asset->GetSize();
 
 		int res = BASS_Init(-1, 44100, 0, 0, 0);
 
@@ -74,16 +74,16 @@ namespace {
 		if (!res) {
 
 			// ignore sound if no sound device detected or installed
-			int errcode = BASS_ErrorGetCode();
-			if (errcode == 23) {
-				res = BASS_Init(0, 44100, 0, 0, 0);
+		    const int errorCode = BASS_ErrorGetCode();
+			if (errorCode == 23) {
+				res = BASS_Init(0, 44100, 0, nullptr, nullptr);
 				isNosound = true;
 			}
 			if (!res)
 				throw new EX(MusicDeviceInitException);
 		}
 
-		m_stream = BASS_StreamCreateFile(TRUE, data, 0, data_size,
+		m_stream = BASS_StreamCreateFile(TRUE, data, 0, dataSize,
 			BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) |
 			0
 		);
@@ -128,7 +128,7 @@ namespace {
 
 	void MusicBass::Pause(int e)
 	{
-		int b = IsPlaying();
+	    const int b = IsPlaying();
 		if (!b && !e) {
 			BASS_ChannelPlay(m_stream, 0);
 		}
@@ -153,8 +153,8 @@ namespace {
 
 	uint64_t MusicBass::GetTimeSample()
 	{
-		QWORD pos = BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE);
-		return pos;
+	    const QWORD position = BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE);
+		return position;
 	}
 
 	void MusicBass::SetTimeSample(uint64_t t)
@@ -225,10 +225,14 @@ namespace {
 		channelCount = channelInfo.chans;
 		samplePerSec = m_samplePerSec;
 
-		ptr = new float[length * channelCount];
+	    const size_t buflen = length * channelCount;
+		ptr = new float[buflen];
 
-        // TODO: ez nem jo
-		const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
+		memset(ptr, 0, buflen * 4);
+
+		// TODO: ez nem jo
+		//const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
+		const int numBytes = BASS_ChannelGetData(m_stream, ptr, buflen * 4 | BASS_DATA_FLOAT);
 
 		if (numBytes == -1)
 		{
@@ -247,7 +251,7 @@ namespace {
 /// ====================================================================================================================================================
 /// Factory class implementation
 /// ====================================================================================================================================================
-Grafkit::MusicBassLoader::MusicBassLoader(const std::string sourceName) : Grafkit::IResourceBuilder(sourceName, sourceName)
+Grafkit::MusicBassLoader::MusicBassLoader(const std::string& sourceName) : Grafkit::IResourceBuilder(sourceName, sourceName)
 {
 }
 
