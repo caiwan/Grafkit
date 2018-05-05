@@ -228,8 +228,11 @@ namespace {
 	    const size_t buflen = length * channelCount;
 		ptr = new float[buflen];
 
-        // TODO: ez nem jo
-		const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
+		memset(ptr, 0, buflen * 4);
+
+		// TODO: ez nem jo
+		//const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
+		const int numBytes = BASS_ChannelGetData(m_stream, ptr, buflen * 4 | BASS_DATA_FLOAT);
 
 		if (numBytes == -1)
 		{
@@ -248,7 +251,7 @@ namespace {
 /// ====================================================================================================================================================
 /// Factory class implementation
 /// ====================================================================================================================================================
-Grafkit::MusicBassLoader::MusicBassLoader(const std::string sourceName) : Grafkit::IResourceBuilder(sourceName, sourceName)
+Grafkit::MusicBassLoader::MusicBassLoader(const std::string& sourceName) : Grafkit::IResourceBuilder(sourceName, sourceName)
 {
 }
 

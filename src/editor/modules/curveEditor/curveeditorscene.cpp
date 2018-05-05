@@ -64,9 +64,6 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 	setSceneRect(views().at(0)->geometry());
 
-	// because rect() is relative to the widgets parent
-	painter->translate(r.topLeft());
-
 	if (m_displayWaveform)
 	{
 		painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
@@ -75,10 +72,12 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 		if (m_audiogramImage)
 		{
-			painter->fillRect(0, 0, 16, 16, QBrush(QColor(0, 255, 0)));
 			painter->drawImage(r, *m_audiogramImage);
 		}
 	}
+
+	// because rect() is relative to the widgets parent
+	painter->translate(r.topLeft());
 
 	// Draw grid here 
 
