@@ -21,6 +21,8 @@ namespace Idogep {
 	};
 
 
+    // TODO Item selected
+
 	class OutlineModule : public Module , public EmitsCommandRole
 	{
 
