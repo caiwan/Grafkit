@@ -23,8 +23,8 @@ void Grafkit::ActorAnimation::Update(double time)
 	
 	m_actor->Transform().Identity();
 	m_actor->Transform().RotateRPY(r);
-	m_actor->Transform().Translate(t);
 	m_actor->Transform().Scale(s);
+	m_actor->Transform().Translate(t);
 }
 
 void Grafkit::ActorAnimation::CreateTrack()
