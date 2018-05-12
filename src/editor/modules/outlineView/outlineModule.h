@@ -9,39 +9,39 @@ namespace Idogep {
 	class TreeItem;
 
 	class TreeModel;
-	
+
 	class SceneGraphViewWidgetModel;
 
 	class OutlineView : public View {
 	public:
 		OutlineView();
 
-	    void SetModel(Grafkit::IResource * modelResource) override = 0;
+		void SetModel(Grafkit::IResource * modelResource) override = 0;
 		Event<TreeItem* const &> onItemSelected;
 	};
 
 
-    // TODO Item selected
+	// TODO Item selected
 
-	class OutlineModule : public Module , public EmitsCommandRole
+	class OutlineModule : public Module, public EmitsCommandRole
 	{
 
 	public:
-	    explicit OutlineModule(Ref<Module> parent);
+		explicit OutlineModule(Ref<Module> parent);
 		virtual ~OutlineModule();
-		
-	    void Initialize() override;
 
-		void DocumentChangedEvent(Document* const & document);
+		void Initialize() override;
 
-		Event<TreeItem* const &> onItemOpened;
-		Event<TreeItem* const &> onItemSelected;
+		void DocumentChangedEvent(Document * const & document);
+
+		Event<TreeItem * const &> onAnimationItemSelected;
+		// TBD the rest which could be delegated somewhere
 
 	private:
-		void ItemSelectedEvent(TreeItem* const & item);
+		void ItemSelectedEvent(TreeItem * const & item);
 	private:
 		OutlineView * m_myView;
-		
+
 		Ref<SceneGraphViewWidgetModel> m_myModel;
 		TreeModel* m_modelBuilder;
 	};

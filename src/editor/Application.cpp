@@ -138,6 +138,9 @@ void Idogep::EditorApplication::BuildEditorModules()
     // --- 
 	m_curveEditor = new CurveEditorModule(m_editor);
 	m_editor->GetCommandStack()->ConnectEmitter(dynamic_cast<EmitsCommandRole*>(m_curveEditor.Get()));
+
+	// 
+	((OutlineModule*)m_outlineViewModule.Get())->onAnimationItemSelected += Delegate((CurveEditorModule*)(m_curveEditor.Get()), &CurveEditorModule::AnimationSelectedEvent);
 }
 
 void Idogep::EditorApplication::InitializeModules() const

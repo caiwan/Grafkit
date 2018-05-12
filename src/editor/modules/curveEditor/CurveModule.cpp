@@ -50,3 +50,8 @@ void CurveEditorModule::Initialize()
 	SetView(m_myView);
 }
 
+void Idogep::CurveEditorModule::AnimationSelectedEvent(TreeItem * const & item)
+{
+	// Kuki
+}
+

@@ -68,3 +68,11 @@ void OutlineModule::DocumentChangedEvent(Document* const& document)
 	m_myView->SetModel(model);
 }
 
+void Idogep::OutlineModule::ItemSelectedEvent(TreeItem  * const & item)
+{
+	auto *animation = dynamic_cast<ItemHasAnimationsRole*>(item);
+	if (animation) {
+		onAnimationItemSelected(item);
+	}
+}
+

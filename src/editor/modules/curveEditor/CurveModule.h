@@ -9,6 +9,8 @@ namespace  Idogep
 	class CurveEditorView;
 	class CurveSceneModule;
 
+	class TreeItem;
+
 	// ========================================================================================================
 
 	class CurveEditorModule : public Module, public EmitsCommandRole
@@ -23,6 +25,8 @@ namespace  Idogep
 
 		Ref<CurveSceneModule> GetCurveSceneMoule() const;  
 		
+		void AnimationSelectedEvent(TreeItem * const& item);
+
 	private:
 		Ref<CurveEditorView> m_myView;
 		Ref<CurveSceneModule> m_curveScene;
