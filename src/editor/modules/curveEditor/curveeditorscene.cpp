@@ -126,6 +126,8 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 
 	auto channel = curveManager->GetChannel();
 
+	curveManager->Recalculate(m_area);
+
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setPen(QPen(grey));
 
@@ -143,17 +145,8 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 			points->at(0)->pos().x(), points->at(0)->pos().y()
 		);
 
-		//debug
-		//{
-		//	painter->fillRect(16, 0, 16, 16, QBrush(QColor(255, 255, 0), Qt::SolidPattern));
-		//}
-
 	}
-	//debug
-	//else
-	//{
-	//	painter->fillRect(16, 0, 16, 16, QBrush(QColor(255, 0, 0), Qt::SolidPattern));
-	//}
+
 
 	// bool debug shit 
 	int a = 0, b = 0;
@@ -165,15 +158,11 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 		);
 
 		// debug stuff
-
-		//a = 255;
 		points->last()->setVisible(true);
 	}
 
 	if (idmax >= channel->GetKeyCount() - 1) {
 		idmax = channel->GetKeyCount() - 1; // avoid max+1 index
-		// debug stuff
-		//b = 255;
 	}
 
 	//if (a || b)
@@ -272,33 +261,39 @@ void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
 	else sPos = fmod(fabs(r.x()), m_scale.width());
 
 	float sc = m_scale.width() / 4.0f;
-	for (float f = fmod(m_offset.x(), sc); f <= m_sceneRect.width() + fmod(m_offset.x(), sc); f += sc) {
+    const float offsetX = m_offset.x();
+    const float offsetY = m_offset.y();
+
+    const float rectWidth = m_sceneRect.width();
+    const float rectHeight = m_sceneRect.height();
+
+    for (float f = fmod(offsetX, sc); f <= rectWidth + fmod(offsetX, sc); f += sc) {
 		painter->setPen(QPen(QColor(56, 56, 56)));
-		painter->drawLine(f, 0.0f, f, m_sceneRect.height());
+		painter->drawLine(f, 0.0f, f, rectHeight);
 	}
 
 	sc = m_scale.width();
-	for (float f = fmod(m_offset.x(), sc); f <= m_sceneRect.width() + fmod(m_offset.x(), sc); f += sc) {
+	for (float f = fmod(offsetX, sc); f <= rectWidth + fmod(offsetX, sc); f += sc) {
 		painter->setPen(QPen(QColor(64, 64, 64)));
-		painter->drawLine(f, 0.0f, f, m_sceneRect.height());
+		painter->drawLine(f, 0.0f, f, rectHeight);
 	}
 
 	sc = m_scale.height() / 4.0f;
-	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y() + r.height() / 2, sc); f += sc) {
+	for (float f = fmod(offsetY, sc); f <= rectHeight + fmod(offsetY + r.height() / 2, sc); f += sc) {
 		painter->setPen(QPen(QColor(56, 56, 56)));
-		painter->drawLine(0.0f, f, m_sceneRect.width(), f);
+		painter->drawLine(0.0f, f, rectWidth, f);
 	}
 
 	sc = m_scale.height();
-	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y() + r.height() / 2, sc); f += sc) {
+	for (float f = fmod(offsetY, sc); f <= rectHeight + fmod(offsetY + r.height() / 2, sc); f += sc) {
 		painter->setPen(QPen(QColor(64, 64, 64)));
-		painter->drawLine(0.0f, f, m_sceneRect.width(), f);
+		painter->drawLine(0.0f, f, rectWidth, f);
 	}
 
 	painter->setPen(QPen(QColor(144, 144, 144)));
-	painter->drawLine(m_offset.x(), 0.0f, m_offset.x(), m_sceneRect.height());
+	painter->drawLine(offsetX, 0.0f, offsetX, rectHeight);
 	painter->setPen(QPen(QColor(144, 144, 144)));
-	painter->drawLine(0.0f, m_offset.y() + r.height() / 2, m_sceneRect.width(), m_offset.y() + r.height() / 2);
+	painter->drawLine(0.0f, offsetY + r.height() / 2, rectWidth, offsetY + r.height() / 2);
 
 	painter->restore();
 

@@ -41,7 +41,7 @@ namespace Idogep
 		void HideAnimationCurves() { m_displayCurve = false; }
 		void ShowAnimationCurves() { m_displayCurve = true; }
 
-		//TODO  hide audiogram
+		// TODO hide audiogram
 		// TODO show audiogram
 
 		virtual void ClearCurvePoints() = 0;

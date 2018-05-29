@@ -40,9 +40,8 @@ namespace Idogep {
 		Ref<Grafkit::Animation::Channel> GetChannel() const { return m_channel; }
 
 		void SetChannel(Ref<Grafkit::Animation::Channel>& channel) { m_channel = channel; Rebuild(); }
-
-		void Recalculate(TimelineArea* drawingSurfaceArea);
-		void AddCurveToScene(CurveSceneView* parent);
+		void AddCurveToScene(CurveSceneView* parent) const;
+	    void Recalculate(TimelineArea* const area) const;
 
 	protected:
 		void Rebuild();

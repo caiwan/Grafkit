@@ -48,22 +48,30 @@ void CurveManager::Rebuild()
 		point->onMoveTangent += Delegate(this, &ManageCurveRole::MoveTangent);
 #endif 
 	}
-}
 
-void CurveManager::Recalculate(TimelineArea* const area)
-{
-
+	// redraw?
 
 }
 
-void CurveManager::AddCurveToScene(CurveSceneView* parent)
+void CurveManager::AddCurveToScene(CurveSceneView* parent) const
 {
 	if (!m_curvePoints)
 		return;
 
 	for (size_t i = 0; i < m_curvePoints->size(); i++)
 	{
-		parent->AddCurvePoint(m_curvePoints->at(i));
+		const auto point = m_curvePoints->at(i);
+		parent->AddCurvePoint(point);
+	}
+	parent->RequestRefreshView(true);
+}
+
+void CurveManager::Recalculate(TimelineArea* const area) const
+{
+	for (size_t i = 0; i < m_curvePoints->size(); i++)
+	{
+		auto point = m_curvePoints->at(i);
+		point->RecalculatePosition(area);
 	}
 }
 

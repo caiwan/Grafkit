@@ -29,6 +29,8 @@ CurvePointItem::CurvePointItem(const Animation::Key key, const size_t index, QGr
 
 	setFlag(ItemIsMovable);
 	setFlag(ItemIsSelectable);
+
+	show();
 }
 
 // TODO: might be useful when copy
