@@ -95,7 +95,7 @@ void Roles::ManageCurveAudiogramRole::ClearAudiogram()
 CurveSceneModule::CurveSceneModule(const Ref<Module>&& parent) : Module(parent), m_manageAudiogram(nullptr)
 {
 	m_manageAudiogram = new Roles::ManageCurveAudiogramRole();
-	m_curveManager = new CurveManager();
+	m_curveManager = new CurveManager(this);
 }
 
 CurveSceneModule::~CurveSceneModule()

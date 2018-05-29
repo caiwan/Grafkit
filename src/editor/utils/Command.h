@@ -31,7 +31,8 @@ namespace Idogep {
 
 	class EmitsCommandRole {
 	public:
-		Event<Ref<Command>> onNewCommand;
+	    virtual ~EmitsCommandRole() = default;
+	    Event<Ref<Command>> onNewCommand;
 	};
 
 	class CommandStack {

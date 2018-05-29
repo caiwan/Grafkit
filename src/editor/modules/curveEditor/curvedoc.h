@@ -4,6 +4,7 @@
 
 #include "animation/animation.h"
 #include "utils/Command.h"
+#include "utils/ViewModule.h"
 
 namespace Idogep {
 
@@ -37,17 +38,21 @@ namespace Idogep {
 		};
 	}
 
-	class CurveManager : public Roles::EditCurveRole
+	class CurveManager : public Roles::EditCurveRole, public Module
 	{
 		friend class CurvePointItem;
 
 	public:
+	    explicit CurveManager(const Ref<Module>& parent);
+
 		QList<CurvePointItem*> const * GetCurvePoints() const { return m_curvePoints; }
 
 		void AddCurveToScene(CurveSceneView* parent) const;
 		void Recalculate(TimelineArea* const area) const;
 
-	protected:
+	    void Initialize() override;
+
+	    protected:
 		void Rebuild() override;
 
 	private:
