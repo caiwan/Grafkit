@@ -48,7 +48,7 @@ size_t Grafkit::Animation::Track::CreateChannel(std::string name)
 	return m_channels.size() - 1;
 }
 
-float3 Grafkit::Animation::Track::GetFloat3(float t)
+float3 Grafkit::Animation::Track::GetFloat3(float t) const 
 {
 	if (m_channels.size() < 3)
 		return float3();
@@ -60,7 +60,7 @@ float3 Grafkit::Animation::Track::GetFloat3(float t)
 	);
 }
 
-float4 Grafkit::Animation::Track::GetFloat4(float t)
+float4 Grafkit::Animation::Track::GetFloat4(float t) const 
 {
 	if (m_channels.size() < 3)
 		return float4();

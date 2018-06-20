@@ -57,15 +57,21 @@ namespace Grafkit {
 
 		/** Tamplate for anim keys */
 		struct Key {
-			Key() : m_time(0), m_value(0.), m_type(KI_linear), m_tangent(float2(1, 0)) {}
-			Key(float t, float value) : m_time(t), m_value(value), m_type(KI_linear), m_tangent(float2(1, 0)) {}
-			Key(Key const &other) : m_time(other.m_time), m_value(other.m_value), m_type(other.m_type), m_tangent(other.m_tangent) {}
+			Key() : m_type(KI_linear), m_time(0), m_value(0.), m_radius(1.), m_tangent(0.){}
+			Key(float t, float value) : m_type(KI_linear), m_time(t), m_value(value), m_radius(1.), m_tangent(0.) {}
+			Key(Key const &other) : m_type(other.m_type)
+		        , m_time(other.m_time)
+		        , m_value(other.m_value)
+		        , m_radius(other.m_radius)
+		        , m_tangent(other.m_tangent) {
+		    }
 
 			KeyInterpolation_e m_type;
 
 			float m_time;
 			float m_value;
-			float2 m_tangent;
+            float m_radius;
+            float m_tangent;
 		};
 
 		/**
@@ -127,17 +133,16 @@ namespace Grafkit {
 			void SetChannel(const size_t subId, Ref<Channel> &track) { m_channels[subId] = track; }
 			Ref<Channel> GetChannel(const size_t subId) { return m_channels[subId]; }
 
-
 			// TODO: independent, generic getter and setter for keys and values
-			float3 GetFloat3(float t);
-			float4 GetFloat4(float t);
+			float3 GetFloat3(float t) const;
+            float4 GetFloat4(float t) const;
 
 			void SetFloat3(size_t id, float3 v);
 			void SetFloat4(size_t id, float4 v);
 
-			size_t GetChannelCount() { return m_channels.size(); }
+			size_t GetChannelCount() const { return m_channels.size(); }
 
-			std::string GetName() { return m_name; }
+			std::string GetName() const { return m_name; }
 			void SetName(std::string name) { m_name = name; }
 
 		protected:
@@ -145,14 +150,12 @@ namespace Grafkit {
 			std::vector<Ref<Channel>> m_channels;
 		};
 
-	public:
 		Ref<Track> GetTrack(size_t id) { return m_tracks[id]; }
-		size_t GetTrackCount() { return m_tracks.size(); }
+		size_t GetTrackCount() const { return m_tracks.size(); }
 
 	protected:
 		void AddTrack(Ref<Track> track) { m_tracks.push_back(track); }
 
-	protected:
 		std::vector<Ref<Track>> m_tracks;
 
 	};
@@ -196,9 +199,10 @@ namespace Grafkit {
 			t = t * t;
 			break;
 		case KI_smooth:
-			t = t * t * (2 - 3 * t);
+			t = t * t * (3 - 2 * t);
 			break;
 		case KI_hermite:
+            // See: https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Interpolation_on_a_single_interval
 			const float tangent = v1.m_value - v0.m_value;
 
 			const float t2 = t * t;
@@ -207,8 +211,8 @@ namespace Grafkit {
 			return (
 				(2.0f*t3 - 3.0f*t2 + 1.0f) * v0.m_value +
 				(-2.0f*t3 + 3.0f*t2) * v1.m_value +
-				(t3 - 2.0f*t2 + t) * v0.m_tangent.x * tangent +
-				(t3 - t2) * v1.m_tangent.y * tangent
+				(t3 - 2.0f*t2 + t) * v0.m_tangent +
+				(t3 - t2) * v1.m_tangent
 				);
 		}
 

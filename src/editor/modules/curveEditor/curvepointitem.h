@@ -15,7 +15,7 @@ namespace Idogep
 
     class CurveSegment;
 
-    class CurvePointItem : public QGraphicsItem , public View
+    class CurvePointItem : public QGraphicsItem, public View
     {
     public:
         //CurvePointItem(QGraphicsItem* parent = nullptr);
@@ -31,32 +31,35 @@ namespace Idogep
         void RecalculatePosition(TimelineArea const* area);
 
         // Properties
-		float GetTime() const { return m_key.m_time; }
-		void SetTime(const float t) { m_key.m_time = t; }
+        float GetTime() const { return m_key.m_time; }
+        void SetTime(const float t) { m_key.m_time = t; }
 
-		float GetValue() const { return m_key.m_value; }
-		void SetValue(const float v) { m_key.m_value = v; }
+        float GetValue() const { return m_key.m_value; }
+        void SetValue(const float v) { m_key.m_value = v; }
 
-		QPointF GetCoord() const { return { m_key.m_time, m_key.m_value }; }
+        QPointF GetCoord() const { return { m_key.m_time, m_key.m_value }; }
 
-		void SetCoord(QPointF c)
-		{
-			m_key.m_time = c.x();
-			m_key.m_value = c.y();
-		}
+        void SetCoord(QPointF c)
+        {
+            m_key.m_time = c.x();
+            m_key.m_value = c.y();
+        }
 
-		QPointF GetTangent() const { return { m_key.m_tangent.x, m_key.m_tangent.y }; }
+        // TODO: take care of it
+        /*QPointF GetTangent() const { return { m_key.m_tangent.x, m_key.m_tangent.y }; }
 
-		void SetTangent(QPointF t)
-		{
-			m_key.m_tangent.x = t.x();
-			m_key.m_tangent.y = t.y();
-		}
+        void SetTangent(QPointF t)
+        {
+            m_key.m_tangent.x = t.x();
+            m_key.m_tangent.y = t.y();
+        }*/
 
-		// --- 
+        QPointF GetTangent() const { return m_tangent; }
+        void SetTangent(const QPointF& tangent) { m_tangent = tangent; }
+        // --- 
 
-		Grafkit::Animation::Key GetKey() const { return m_key; }
-		void SetKey(const Grafkit::Animation::Key& key) { m_key = key; }
+        Grafkit::Animation::Key GetKey() const { return m_key; }
+        void SetKey(const Grafkit::Animation::Key& key) { m_key = key; }
 
         // TODO protected: + Friend CurveEditor
         Grafkit::Animation::Key GetOriginalKey() const { return m_originalKey; }
@@ -94,13 +97,14 @@ namespace Idogep
     private:
         float m_radix, m_radix2;
 
+        QPointF m_tangent; // Will take care of it later
+
         bool m_showTangent;
 
         uint32_t m_id;
 
-		Grafkit::Animation::Key m_key;
-		Grafkit::Animation::Key m_originalKey;
-
+        Grafkit::Animation::Key m_key;
+        Grafkit::Animation::Key m_originalKey;
 
         uint32_t m_nodeType;
         uint32_t m_color;
