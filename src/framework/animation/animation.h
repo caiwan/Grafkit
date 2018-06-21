@@ -57,13 +57,13 @@ namespace Grafkit {
 
 		/** Tamplate for anim keys */
 		struct Key {
-			Key() : m_type(KI_linear), m_time(0), m_value(0.), m_radius(1.), m_tangent(0.){}
-			Key(float t, float value) : m_type(KI_linear), m_time(t), m_value(value), m_radius(1.), m_tangent(0.) {}
+			Key() : m_type(KI_linear), m_time(0), m_value(0.), m_radius(1.), m_angle(0.){}
+			Key(float t, float value) : m_type(KI_linear), m_time(t), m_value(value), m_radius(1.), m_angle(0.) {}
 			Key(Key const &other) : m_type(other.m_type)
 		        , m_time(other.m_time)
 		        , m_value(other.m_value)
 		        , m_radius(other.m_radius)
-		        , m_tangent(other.m_tangent) {
+		        , m_angle(other.m_angle) {
 		    }
 
 			KeyInterpolation_e m_type;
@@ -71,7 +71,7 @@ namespace Grafkit {
 			float m_time;
 			float m_value;
             float m_radius;
-            float m_tangent;
+            float m_angle;
 		};
 
 		/**
@@ -211,8 +211,8 @@ namespace Grafkit {
 			return (
 				(2.0f*t3 - 3.0f*t2 + 1.0f) * v0.m_value +
 				(-2.0f*t3 + 3.0f*t2) * v1.m_value +
-				(t3 - 2.0f*t2 + t) * v0.m_tangent +
-				(t3 - t2) * v1.m_tangent
+				(t3 - 2.0f*t2 + t) * v0.m_angle +
+				(t3 - t2) * v1.m_angle
 				);
 		}
 

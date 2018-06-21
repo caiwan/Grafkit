@@ -31,11 +31,11 @@ namespace Idogep
         void RecalculatePosition(TimelineArea const* area);
 
         // Properties
-        float GetTime() const { return m_key.m_time; }
-        void SetTime(const float t) { m_key.m_time = t; }
+        //float GetTime() const { return m_key.m_time; }
+        //void SetTime(const float t) { m_key.m_time = t; }
 
-        float GetValue() const { return m_key.m_value; }
-        void SetValue(const float v) { m_key.m_value = v; }
+        //float GetValue() const { return m_key.m_value; }
+        //void SetValue(const float v) { m_key.m_value = v; }
 
         QPointF GetCoord() const { return { m_key.m_time, m_key.m_value }; }
 
@@ -45,17 +45,13 @@ namespace Idogep
             m_key.m_value = c.y();
         }
 
-        // TODO: take care of it
-        /*QPointF GetTangent() const { return { m_key.m_tangent.x, m_key.m_tangent.y }; }
+        //float GetRadius();
+        //void SetRadius(float  radius);
+        //float GetAngle();
+        //void SetAngle(float  angle);
+        //void SetTangent(float angle, float radius);
+        //QPointF GetTangent();
 
-        void SetTangent(QPointF t)
-        {
-            m_key.m_tangent.x = t.x();
-            m_key.m_tangent.y = t.y();
-        }*/
-
-        QPointF GetTangent() const { return m_tangent; }
-        void SetTangent(const QPointF& tangent) { m_tangent = tangent; }
         // --- 
 
         Grafkit::Animation::Key GetKey() const { return m_key; }
@@ -87,6 +83,9 @@ namespace Idogep
 
         void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
 
+        void keyReleaseEvent(QKeyEvent* event) override;
+        void keyPressEvent(QKeyEvent* event) override;
+
         void EditPosition(QGraphicsSceneMouseEvent* event);
 
         void ToggleTangentEditing();
@@ -95,9 +94,10 @@ namespace Idogep
         void RefreshView(bool force) override;
 
     private:
-        float m_radix, m_radix2;
+        float m_radix, m_lastRadix;
+        float m_angle, m_lastAngle;
 
-        QPointF m_tangent; // Will take care of it later
+        //QPointF m_angle; // Will take care of it later
 
         bool m_showTangent;
 
@@ -109,7 +109,7 @@ namespace Idogep
         uint32_t m_nodeType;
         uint32_t m_color;
 
-        QSizeF m_scaling;
+        QSizeF m_areaScaling;
 
         Ref<CurveSegment> m_previousSegment;
         Ref<CurveSegment> m_nextSegment;

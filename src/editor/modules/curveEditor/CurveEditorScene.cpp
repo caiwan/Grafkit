@@ -17,34 +17,34 @@ using namespace Idogep;
 using namespace Grafkit;
 
 namespace {
-	const QColor grey = QColor(192, 192, 192);
-	const QColor red = QColor(255, 128, 128);
-	const QColor blue = QColor(128, 128, 255);
-	const QColor green = QColor(128, 255, 128);
-	const QColor purple = QColor(255, 128, 255);
+    const QColor grey = QColor(192, 192, 192);
+    const QColor red = QColor(255, 128, 128);
+    const QColor blue = QColor(128, 128, 255);
+    const QColor green = QColor(128, 255, 128);
+    const QColor purple = QColor(255, 128, 255);
 }
 
 CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent), CurveEditorView()
 , m_area(nullptr)
 , m_audiogramImage(nullptr)
 {
-	m_area = new TimelineArea();
-	setBackgroundBrush(QColor(48, 48, 48));
+    m_area = new TimelineArea();
+    setBackgroundBrush(QColor(48, 48, 48));
 
     connect(this, SIGNAL(selectionChanged()), this, SLOT(SelectionChangedSlot()));
 }
 
 CurveEditorScene::~CurveEditorScene()
 {
-	delete m_area;
-	delete m_audiogramImage;
+    delete m_area;
+    delete m_audiogramImage;
 }
 
 void CurveEditorScene::RefreshView(const bool force)
 {
-	if (force)
-		UpdateAudiogram();
-	update();
+    if (force)
+        UpdateAudiogram();
+    update();
 }
 
 void CurveEditorScene::PlaybackChanged(bool isPlaying)
@@ -57,12 +57,12 @@ void CurveEditorScene::DemoTimeChanged(float time)
 
 void CurveEditorScene::ClearCurvePoints()
 {
-	clear();
+    clear();
 }
 
 void CurveEditorScene::AddCurvePoint(CurvePointItem* pointItem)
 {
-	addItem(pointItem);
+    addItem(pointItem);
 }
 
 // ---------------------------------------------------------------------
@@ -70,152 +70,155 @@ void CurveEditorScene::AddCurvePoint(CurvePointItem* pointItem)
 
 void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 {
-	QGraphicsScene::drawBackground(painter, r);
-	painter->setBrush(Qt::NoBrush);
+    QGraphicsScene::drawBackground(painter, r);
+    painter->setBrush(Qt::NoBrush);
 
-	setSceneRect(views().at(0)->geometry());
-	m_area->SetSceneRect(sceneRect());
+    setSceneRect(views().at(0)->geometry());
+    m_area->SetSceneRect(sceneRect());
 
-	if (m_displayWaveform)
-	{
-		UpdateAudiogram();
+    if (m_displayWaveform)
+    {
+        UpdateAudiogram();
 
-		if (m_audiogramImage)
-		{
-			painter->drawImage(r, *m_audiogramImage);
-			//painter->fillRect(0, 0, 16, 16, QBrush(QColor(0, 255, 0)));
-		}
-		//else
-		//{
-		//	//painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
-		//}
+        if (m_audiogramImage)
+        {
+            painter->drawImage(r, *m_audiogramImage);
+            //painter->fillRect(0, 0, 16, 16, QBrush(QColor(0, 255, 0)));
+        }
+        //else
+        //{
+        //	//painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
+        //}
 
-	}
-	m_area->DrawGrid(painter, r);
+    }
+    m_area->DrawGrid(painter, r);
 
-	if (m_displayCurve)
-		DrawCurve(painter, r);
+    if (m_displayCurve)
+        DrawCurve(painter, r);
 
-	// draw cursors here if needed 
+    // draw cursors here if needed 
 }
 
 void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 {
-	const CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
-	assert(parent);
-
-	//CurvePointEditor* curveManager = parent->();
+    const CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
+    assert(parent);
 
     if (parent->GetChannel().Invalid())
         return;
 
-	// 2. draw the curves.
+    // 2. draw the curves.
 
-	//auto channel = parent->GetChannel()->GetChannel();
     auto channel = parent->GetChannel();
 
-	if (channel.Invalid() || channel->GetKeyCount() == 0)
-		return;
+    if (channel.Invalid() || channel->GetKeyCount() == 0)
+        return;
 
-	parent->Recalculate(m_area);
+    parent->Recalculate(m_area);
 
-	painter->setRenderHint(QPainter::Antialiasing);
-	painter->setPen(QPen(grey, 1.5f));
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setPen(QPen(grey, 1.5f));
 
-	// boundaries
-	QPointF pMin = m_area->Screen2Point(r.topLeft());
-	const int idmin = channel->FindKeyIndex(pMin.x());
+    // boundaries
+    QPointF pMin = m_area->Screen2Point(r.topLeft());
+    const int idmin = channel->FindKeyIndex(pMin.x());
 
-	QPointF pMax = m_area->Screen2Point(r.bottomRight());
-	int idmax = channel->FindKeyIndex(pMax.x()) + 1;
+    QPointF pMax = m_area->Screen2Point(r.bottomRight());
+    int idmax = channel->FindKeyIndex(pMax.x()) + 1;
 
-	// line -inf -> fist point
-	auto firstKey = channel->GetKey(0);
-	QPointF firstPoint = m_area->Point2Screen({ firstKey.m_time, firstKey.m_value });
-	if (idmin == 0 && firstPoint.x() > r.x())
-	{
-		painter->drawLine({ 0, firstPoint.y() }, firstPoint);
-	}
+    // line -inf -> fist point
+    auto firstKey = channel->GetKey(0);
+    QPointF firstPoint = m_area->Point2Screen({ firstKey.m_time, firstKey.m_value });
+    if (idmin == 0 && firstPoint.x() > r.x())
+    {
+        painter->drawLine({ 0, firstPoint.y() }, firstPoint);
+    }
 
-	// line last point -> +inf
-	auto lastKey = channel->GetKey(channel->GetKeyCount() - 1);
-	QPointF lastKeyPoint = m_area->Point2Screen({ lastKey.m_time, lastKey.m_value });
-	if (lastKeyPoint.x() < r.x() + r.width()) {
-		painter->drawLine( lastKeyPoint,  { r.x() + r.width(), lastKeyPoint.y() } );
-	}
+    // line last point -> +inf
+    auto lastKey = channel->GetKey(channel->GetKeyCount() - 1);
+    QPointF lastKeyPoint = m_area->Point2Screen({ lastKey.m_time, lastKey.m_value });
+    if (lastKeyPoint.x() < r.x() + r.width()) {
+        painter->drawLine(lastKeyPoint, { r.x() + r.width(), lastKeyPoint.y() });
+    }
 
-	if (idmax >= channel->GetKeyCount() - 1) {
-		idmax = channel->GetKeyCount() - 1; // avoid max+1 index
-	}
+    if (idmax >= channel->GetKeyCount() - 1) {
+        idmax = channel->GetKeyCount() - 1; // avoid max+1 index
+    }
 
-	// qnd fix for offset
+    // qnd fix for offset
 
-	for (int i = idmin; i < idmax; i++)
-	{
-		const auto k0 = channel->GetKey(i);
-		const auto k1 = channel->GetKey(i + 1);
+    for (int i = idmin; i < idmax; i++)
+    {
+        const auto k0 = channel->GetKey(i);
+        const auto k1 = channel->GetKey(i + 1);
 
-		// there should be a nice way to optimize this 
-		const int stepCount = 32;
-		const double stepWidth = (k1.m_time - k0.m_time) / stepCount;
+        // there should be a nice way to optimize this 
+        const int stepCount = 32;
+        const double stepWidth = (k1.m_time - k0.m_time) / stepCount;
 
-		for (int j = 0; j < stepCount; j++) {
-			const double t = k0.m_time + j * stepWidth;
-			double v = channel->GetValue(t);
+        for (int j = 0; j < stepCount; j++) {
+            const double t = k0.m_time + j * stepWidth;
+            double v = channel->GetValue(t);
 
-			QPointF p1(t, channel->GetValue(t));
-			p1 = this->m_area->Point2Screen(p1);
+            QPointF p1(t, channel->GetValue(t));
+            p1 = this->m_area->Point2Screen(p1);
 
-			QPointF p2(t + stepWidth, channel->GetValue(t + stepWidth));
-			p2 = this->m_area->Point2Screen(p2);
+            QPointF p2(t + stepWidth, channel->GetValue(t + stepWidth));
+            p2 = this->m_area->Point2Screen(p2);
 
-			painter->drawLine(p1, p2);
-		}
-	}
+            painter->drawLine(p1, p2);
+        }
+    }
 
 }
 
-void CurveEditorScene::SelectionChangedSlot() 
-{ 
+void CurveEditorScene::SelectionChangedSlot()
+{
     QList<QGraphicsItem*> items = selectedItems();
     if (!items.empty())
     {
-        CurvePointItem* item =  dynamic_cast<CurvePointItem*>(items.last());
+        CurvePointItem* item = dynamic_cast<CurvePointItem*>(items.last());
         if (item)
         {
             onPointSelected(item->GetId());
+            item->setFocus(Qt::ActiveWindowFocusReason); // to make key events work
+            // or not 
         }
-    } else
+    }
+    else
     {
         onPointDeSelected();
+        setFocus(Qt::ActiveWindowFocusReason); // to make key events work
+        // or not 
+
     }
 }
 
 void CurveEditorScene::UpdateAudiogram()
 {
-	const auto offset = m_area->Offset();
-	const auto scale = m_area->Scale();
+    const auto offset = m_area->Offset();
+    const auto scale = m_area->Scale();
 
-	const float leftTime = -float(offset.x()) / float(scale.width());
-	const float rightTime = leftTime + (float(sceneRect().width()) / float(scale.width()));
+    const float leftTime = -float(offset.x()) / float(scale.width());
+    const float rightTime = leftTime + (float(sceneRect().width()) / float(scale.width()));
 
-	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime)
-		return;
+    if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime)
+        return;
 
-	QImage* img = nullptr;
+    QImage* img = nullptr;
 
-	onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
+    onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
 
-	if (!img)
-		return;
+    if (!img)
+        return;
 
-	delete m_audiogramImage;
-	m_audiogramImage = img;
+    delete m_audiogramImage;
+    m_audiogramImage = img;
 }
 
 
 // ------------------------------------------------------------------
-TimelineArea::TimelineArea(): m_grid(nullptr)
+TimelineArea::TimelineArea() : m_grid(nullptr)
 {
     m_scale = QSizeF(64, 64);
     m_offset = QPointF(0, 0);
@@ -223,18 +226,18 @@ TimelineArea::TimelineArea(): m_grid(nullptr)
 
 QPointF TimelineArea::Point2Screen(QPointF point) const
 {
-	return {
-		(point.x() * m_scale.width() + m_offset.x() + m_sceneRect.topLeft().x()) ,
-		(point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.topLeft().y() + m_sceneRect.height() / 2.)
-	};
+    return {
+        (point.x() * m_scale.width() + m_offset.x() + m_sceneRect.topLeft().x()) ,
+        (point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.topLeft().y() + m_sceneRect.height() / 2.)
+    };
 }
 
 QPointF TimelineArea::Screen2Point(QPointF point) const
 {
-	return {
-		(point.x() - m_offset.x() - m_sceneRect.topLeft().x()) / m_scale.width(),
-		(point.y() - m_offset.y() - m_sceneRect.topLeft().y() - m_sceneRect.height() / 2.) / -m_scale.height()
-	};
+    return {
+        (point.x() - m_offset.x() - m_sceneRect.topLeft().x()) / m_scale.width(),
+        (point.y() - m_offset.y() - m_sceneRect.topLeft().y() - m_sceneRect.height() / 2.) / -m_scale.height()
+    };
 }
 
 void TimelineArea::DrawGrid(QPainter* const &painter, const QRectF &r)
@@ -242,25 +245,25 @@ void TimelineArea::DrawGrid(QPainter* const &painter, const QRectF &r)
     if (!m_grid)
     {
         m_grid = new QPicture();
-        const QPoint topLeft = { 
-            static_cast<int>(r.topLeft().x()), 
-            static_cast<int>(r.topLeft().x()) }, 
-        bottomRight = { 
-            static_cast<int>(r.bottomRight().x()), 
-            static_cast<int>(r.bottomRight().y()) 
+        const QPoint topLeft = {
+            static_cast<int>(r.topLeft().x()),
+            static_cast<int>(r.topLeft().x()) },
+            bottomRight = {
+                static_cast<int>(r.bottomRight().x()),
+                static_cast<int>(r.bottomRight().y())
         };
 
         m_grid->setBoundingRect(QRect(topLeft, bottomRight));
-        
+
         QPainter picturePainter(m_grid);
         DrawGridToPicture(&picturePainter, r);
     }
 
     const QTransform transform = painter->transform();
     painter->translate(r.topLeft());
-    
+
     m_grid->play(painter);
-    
+
     painter->setTransform(transform);
 
 }
