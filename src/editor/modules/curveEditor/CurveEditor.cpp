@@ -16,12 +16,12 @@ using namespace Grafkit;
 
 
 Roles::ManageCurveAudiogramRole::ManageCurveAudiogramRole()
-    : m_audiogramBuffer(nullptr)
-    , m_audiogramSampleCount(0)
-    , m_audiogramChannelCount(0) {
+    : m_agBuffer(nullptr)
+    , m_agSampleCount(0)
+    , m_agChannelCount(0) {
 }
 
-Roles::ManageCurveAudiogramRole::~ManageCurveAudiogramRole() { delete m_audiogramBuffer; }
+Roles::ManageCurveAudiogramRole::~ManageCurveAudiogramRole() { delete m_agBuffer; }
 
 
 void Roles::ManageCurveAudiogramRole::GetAudiogram(
@@ -30,56 +30,48 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 {
     *image = nullptr;
 
-    return;
-
-    if (!m_audiogramBuffer)
+    if (!m_agBuffer)
     {
-        onRequestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
+        onRequestWaveform(m_agBuffer, m_agSampleCount, m_agChannelCount, m_agSamplePerSec);
     }
 
-    if (!m_audiogramBuffer || !m_audiogramSampleCount)
+    if (!m_agBuffer || !m_agSampleCount)
         return;
 
-    const uint32_t offset = std::min(uint32_t(startTime * m_audiogramSamplePerSec) * m_audiogramChannelCount, m_audiogramSampleCount * m_audiogramChannelCount);
-    const uint32_t length = std::min(uint32_t((endTime - startTime) * m_audiogramSamplePerSec) * m_audiogramChannelCount, m_audiogramSampleCount * m_audiogramChannelCount);
-
-    float* buffer = &m_audiogramBuffer[offset];
+    const size_t offset = size_t(startTime * m_agSamplePerSec);
+    const size_t end = size_t(endTime * m_agSamplePerSec);
+    const size_t readFrames = end - offset;
 
     QImage* img = new QImage(QSize(rectWidth, rectHeight), QImage::Format_ARGB32);
     img->fill(0xFF303030);
 
-    const uint32_t readFrames = m_audiogramSampleCount;
-    const uint32_t valueHop = (readFrames / rectWidth) + ((readFrames % rectWidth) % 2);
+    const size_t valueHop = (readFrames / rectWidth) +((readFrames % rectWidth) % m_agChannelCount);
+    const float invFactor = 1. / (m_agChannelCount * valueHop);
 
-    const float invChannelCount = 1. / m_audiogramChannelCount;
-
-    uint32_t x = 0;
-    for (uint32_t i = 0; i < readFrames * 2; i += valueHop * 2)
+    const float* b = &m_agBuffer[offset * m_agChannelCount];
+    
+    size_t x = 0;
+    for (size_t i = 0; i < readFrames; i += valueHop)
     {
         if (x >= rectWidth)
             break;
 
-        float vv = 0.0f;
-        for (uint32_t k = 0; k < valueHop * 2; k += 2)
+        float vSum = 0.0f;
+        const float* p = &b[i * m_agChannelCount];
+        for (size_t k = 0; k < valueHop * m_agChannelCount; k++)
         {
-            float sum = 0.0f;
-            if ((i + (k / 2) + 1) >= length) { sum = 0.; }
-            else
-            {
-                float* p = &buffer[i + (k / 2)];
-                for (uint32_t l = 0; l < m_audiogramChannelCount; l++)
-                {
-                    sum += fabs(p[l]);
-                }
-            }
+            if (offset + i + (k / m_agChannelCount) >= m_agSampleCount)
+                break;
+            
+            vSum += fabs(p[k]);
         }
 
-        vv /= float(valueHop) / invChannelCount;
+        vSum *= invFactor;
 
-        for (uint32_t y = 0; y < rectHeight; y++)
+        for (size_t y = 0; y < rectHeight; y++)
         {
             const float cv = fabs((float(y) * 2.0f) / float(rectHeight - 1) - 1.0f);
-            if (vv >= cv)
+            if (vSum >= cv)
                 img->setPixel(x, y, 0xFF3c3c3c);
         }
 
@@ -91,8 +83,8 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 
 void Roles::ManageCurveAudiogramRole::ClearAudiogram()
 {
-    delete m_audiogramBuffer;
-    m_audiogramBuffer = nullptr;
+    delete m_agBuffer;
+    m_agBuffer = nullptr;
 }
 
 

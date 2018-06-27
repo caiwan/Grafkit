@@ -350,11 +350,13 @@ void CurveEditorScene::SelectionChangedSlot()
 
 void CurveEditorScene::UpdateAudiogram()
 {
-    const auto offset = m_area->GetOffset();
-    const auto scale = m_area->GetScale();
+    assert(m_area);
 
-    const float leftTime = -float(offset.x()) / float(scale.width());
-    const float rightTime = leftTime + (float(sceneRect().width()) / float(scale.width()));
+    QPointF min = m_area->GetMin();
+    QPointF max = m_area->GetMax();
+
+    const float leftTime = min.x();
+    const float rightTime = max.x();
 
     if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime)
         return;

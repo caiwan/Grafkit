@@ -26,11 +26,11 @@ namespace Idogep
 			//virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
 
 		private:
-			float* m_audiogramBuffer;
-			size_t m_audiogramSampleCount;
+			float* m_agBuffer;
+			size_t m_agSampleCount;
 
-			size_t m_audiogramChannelCount;
-			size_t m_audiogramSamplePerSec;
+			size_t m_agChannelCount;
+			size_t m_agSamplePerSec;
 		};
 
 	}
