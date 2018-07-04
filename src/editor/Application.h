@@ -31,7 +31,7 @@ namespace Idogep {
 	class Playback;
 
 	class EditorApplication :
-		protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
+		protected Grafkit::ResourcePreloader, Grafkit::ClonableInitializer
 	{
 	public:
 		static EditorApplication* Instance() { return s_self; }

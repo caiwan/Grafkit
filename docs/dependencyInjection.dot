@@ -1,0 +1,53 @@
+digraph G {
+	fontname = "Bitstream Vera Sans"
+	fontsize = 8
+
+	node [
+		fontname = "Bitstream Vera Sans"
+		fontsize = 8
+		shape = "record"
+	]
+
+	edge [
+		fontname = "Bitstream Vera Sans"
+		fontsize = 8
+	]
+
+
+	subgraph namespaceGrafkit {
+		label = "namespace Grafkit"
+
+		IResourceManager [
+			label = "{IResourceManager
+			||
+				+ virtual IAssetFactory *GetAssetFactory() = 0;\l
+			}"
+		]
+
+		ResourcePreloader [
+			label = "{ResourcePreloader
+			||
+			+ void LoadCache();
+			+ void SaveCache();
+			}"
+		]
+	}
+
+	subgraph namespaceIdogep {
+	label = "namespace Idogep"
+
+	EditorApplication [
+	label = "{EditorApplication
+	|
+	+ name : string\l+ age : int\l
+	|
+	+ die() : void\l
+	}"
+	]
+	}
+
+	edge [ arrowhead = "empty" ]
+
+	ResourcePreloader -> IResourceManager
+	EditorApplication -> ResourcePreloader
+}

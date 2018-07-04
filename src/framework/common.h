@@ -3,11 +3,6 @@
 #include"utils/reference.h"
 #include"utils/resource.h"
 
-#include "utils/logger.h"
-
-#include "render/dxtypes.h"
-#include "render/renderer.h"
-
 // predefine classes to reduce compile time 
 
 namespace Grafkit {
@@ -57,6 +52,11 @@ namespace Grafkit {
 	class Light;
 	typedef Ref<Light> LightRef;
 
+    // ---
+
+    class EffectComposer;
+    typedef Ref<EffectComposer> EffectComposerRef;
+
 	// ---
 	class Bitmap;
 	class Texture1D;
@@ -81,7 +81,7 @@ namespace Grafkit {
 	class TextureSampler;
 
 	typedef Ref<TextureSampler> TextureSamplerRef;
-	typedef Grafkit::Resource<TextureSampler> TextureSamplerRes;
+	typedef Resource<TextureSampler> TextureSamplerRes;
 	typedef Ref<TextureSamplerRes> TextureSamplerResRef;
 
 	// ---

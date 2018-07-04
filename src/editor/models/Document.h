@@ -4,6 +4,7 @@
 
 #include "render/renderer.h"
 #include "render/effect.h"
+#include "utils/ResourcePreloader.h"
 
 namespace Grafkit {
 	class IResourceManager;
@@ -19,14 +20,14 @@ namespace Idogep {
 
 	class Music;
 
-	class Document : virtual public Referencable
+	class Document : virtual public Referencable, public Grafkit::ResourcePreloader
 	{
 		friend class Editor;
 	public:
 		Document();
 		virtual ~Document();
 
-		void Preload(Grafkit::IResourceManager * const & resman);
+		void Preload(IResourceManager * const & resman);
 		void Initialize(Grafkit::Renderer &render);
 		//void Shutdown();
 
@@ -42,15 +43,7 @@ namespace Idogep {
 
 		bool m_isDirty;
 
-		Grafkit::ShaderResRef m_vs, m_ps;
-		Grafkit::SceneResRef m_scene;
-		Grafkit::SceneGraphRef m_scenegraph;
 
-		Grafkit::ShaderResRef m_psShowUv;
-		Grafkit::EffectComposerRef m_effect;
-
-		Grafkit::ActorRef m_rootActor;
-		Grafkit::ActorRef m_cameraActor;
 
 		Grafkit::MusicResRef m_music;
 	};

@@ -1,4 +1,5 @@
 subdirs(player)
+subdirs(demoContext)
 # subdirs(importer)
 # subdirs(importerCli)
 # subdirs(rocketlib)

@@ -1,29 +1,30 @@
 # Grafkit 2 library
-Project(ExperimentalPlayer)
+Project(Gk2Player)
 
-set(APPLICATION_NAME Gk2Player)
+set(APPLICATION_NAME Player)
 
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inc)
 file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inl)
+file(GLOB_RECURSE RC_FILES *.rc)
+
+add_executable(${APPLICATION_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${RC_FILES})
 
 include_directories("${CMAKE_SOURCE_DIR}")
-include_directories("${PROJECT_SOURCE_DIR}")
+include_directories("${GK2_INCLUDE_DIR}")
+include_directories("${GK2_ROOT_DIR}/src/experimental/demoContext/")
 include_directories("${BASS_INCLUDE_DIR}")
 include_directories("${STB_INCLUDE_DIR}")
 
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
+msvc_set_win32(${APPLICATION_NAME})
 
-add_library(${APPLICATION_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(${APPLICATION_NAME})
+target_link_libraries(${APPLICATION_NAME} Grafkit2 DemoContext ${BASS_LIBRARY_RELEASE})
 target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
-
-set_target_properties(${APPLICATION_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES})
 
-install(TARGETS ${APPLICATION_NAME} DESTINATION lib)
-install(DIRECTORY / DESTINATION include FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY / DESTINATION include FILES_MATCHING PATTERN "*.hpp")
-install(DIRECTORY / DESTINATION include FILES_MATCHING PATTERN "*.inl")
-
 set_target_properties(${APPLICATION_NAME} PROPERTIES FOLDER experimental)
+
+bass_copy_binaries(${APPLICATION_NAME} "${APPLICATION_NAME}")
+install(TARGETS ${APPLICATION_NAME} DESTINATION "/")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bass.dll" DESTINATION "/")

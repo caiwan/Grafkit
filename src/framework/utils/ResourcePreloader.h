@@ -1,15 +1,9 @@
 #pragma once
 
-#include "../utils/exceptions.h"
-
 #include <vector>
-#include <string>
 
 #include "ResourceManager.h"
 #include "AssetFactory.h"
-
-#include "../render/renderer.h"
-
 
 namespace Grafkit{
 	/**
@@ -17,10 +11,10 @@ namespace Grafkit{
 	Dirty hack of mine
 	Ide fogom behackelni a livereload managert is 
 	*/
-	class ResourcePreloader : public Grafkit::IResourceManager
+	class ResourcePreloader : public IResourceManager
 	{
 	public:
-		ResourcePreloader(IPreloadEvents* pPreloader = nullptr);
+	    explicit ResourcePreloader(IPreloadEvents* pPreloader = nullptr);
 		virtual ~ResourcePreloader();
 
 		void LoadCache();
