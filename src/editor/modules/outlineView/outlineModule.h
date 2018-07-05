@@ -3,6 +3,12 @@
 #include "utils/Command.h"
 #include "utils/ViewModule.h"
 
+namespace GkDemo
+{
+    class Demo;
+    class Context;
+}
+
 namespace Idogep {
 
 	class Document;
@@ -24,7 +30,7 @@ namespace Idogep {
 
 		void Initialize() override;
 
-		void DocumentChangedEvent(Document * const & document);
+		void DocumentChangedEvent(GkDemo::Demo * const & document);
 
 		Event<TreeItem * const> onItemSelected;
 		

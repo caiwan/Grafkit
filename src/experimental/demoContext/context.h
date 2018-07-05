@@ -10,7 +10,7 @@ namespace GkDemo
     {
     public:
 
-        explicit Context(Grafkit::Renderer render, Grafkit::IAssetFactory* assetFactory, Grafkit::IPreloadEvents* pPreloader);
+        explicit Context(Grafkit::Renderer &render, Grafkit::IAssetFactory* assetFactory);
         ~Context() override;
 
         // -> Editor
@@ -21,8 +21,6 @@ namespace GkDemo
         void Save(std::string filename);
         void Load(Grafkit::IAssetRef assetRef);*/
 
-        Grafkit::MusicResRef GetMusic() const { return m_music; }
-
         Demo* GetDemo() const { return m_demo; }
         void SetDemo(Demo* const demo) { m_demo = demo; }
 
@@ -31,13 +29,13 @@ namespace GkDemo
 
     private:
         Grafkit::Renderer& m_render;
-        Grafkit::MusicResRef m_music;
+        
         Demo* m_demo;
 
         Grafkit::IAssetFactory* m_assetFactory;
     };
 
-    inline Context::Context(Grafkit::Renderer render, Grafkit::IAssetFactory* assetFactory, Grafkit::IPreloadEvents* pPreloader): ResourcePreloader(pPreloader)
+    inline Context::Context(Grafkit::Renderer &render, Grafkit::IAssetFactory* assetFactory): ResourcePreloader()
         , ClonableInitializer()
         , m_render(render)
         , m_demo(nullptr)

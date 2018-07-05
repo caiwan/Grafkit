@@ -9,11 +9,17 @@
 
 #include "utils/Event.h"
 
+#define APP_NAME "Idogep"
+
 namespace Grafkit {
 	class IAssetFactory;
 }
 
-#define APP_NAME "Idogep"
+namespace GkDemo
+{
+    class Context;
+    class Demo;
+}
 
 namespace Idogep {
 
@@ -31,7 +37,7 @@ namespace Idogep {
 	class Playback;
 
 	class EditorApplication :
-		protected Grafkit::ResourcePreloader, Grafkit::ClonableInitializer
+		protected Grafkit::IResourceManager, Grafkit::ClonableInitializer
 	{
 	public:
 		static EditorApplication* Instance() { return s_self; }
@@ -73,7 +79,9 @@ namespace Idogep {
 		Grafkit::IAssetFactory *m_assetFactory;
 		Grafkit::IAssetFactory *m_projectFileLoader;
 
-		QGrafkitContextWidget *m_renderWidget{};
+        GkDemo::Context *m_demoContext;
+
+		QGrafkitContextWidget *m_renderWidget;
 
 		MainWindow *m_mainWindow{};
 		Preloader *m_preloadWindow;

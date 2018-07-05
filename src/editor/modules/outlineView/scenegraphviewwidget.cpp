@@ -5,8 +5,6 @@
 
 #include "ui_scenegraphviewwidget.h"
 
-#include "models/Document.h"
-
 using namespace Idogep;
 using namespace Grafkit;
 

@@ -5,7 +5,8 @@
 #include <stack>
 
 #include "common.h"
-//#include "utils/"
+
+#include "context.h"
 
 #include "utils/AssetFile.h"
 
@@ -26,7 +27,9 @@ using namespace Grafkit;
 EditorApplication* EditorApplication::s_self;
 
 EditorApplication::EditorApplication(int argc, char** argv) :
-    m_preloadWindow(nullptr)
+    m_assetFactory(nullptr)
+    , m_demoContext(nullptr)
+    , m_preloadWindow(nullptr)
     , m_editor(nullptr)
 {
     assert(s_self == nullptr);
@@ -50,12 +53,14 @@ EditorApplication::~EditorApplication()
     m_render.Shutdown();
     delete m_assetFactory;
     delete m_projectFileLoader;
+    delete m_demoContext;
 }
 
 
 int EditorApplication::Execute()
 {
-    m_editor = new Editor(nullptr, m_render, this);
+    m_demoContext = new GkDemo::Context(m_render, m_assetFactory);
+    m_editor = new Editor(m_render, m_demoContext);
     m_mainWindow = new MainWindow();
     m_editor->SetView(m_mainWindow);
 
@@ -65,7 +70,7 @@ int EditorApplication::Execute()
     m_preloadWindow = new Preloader(m_mainWindow);
     onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
 
-    SetPreloadListener(m_preloadWindow);
+    m_demoContext->SetPreloadListener(m_preloadWindow);
 
     SplashWidget* sw = new SplashWidget();
 

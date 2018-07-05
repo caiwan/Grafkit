@@ -1,8 +1,6 @@
 #include "outlineModule.h"
 
-#include <QWidget>
-
-#include "models/Document.h"
+#include "demo.h"
 
 #include "outlineTreeModel.h"
 
@@ -14,16 +12,16 @@ using namespace Grafkit;
 
 // -------------------------------------------------------------------------------------------------------------------
 
-Idogep::OutlineModule::OutlineModule(Ref<Controller> parent) : Controller(parent), m_myView(nullptr), m_myModel(nullptr), m_modelBuilder(nullptr)
+OutlineModule::OutlineModule(Ref<Controller> parent) : Controller(parent), m_myView(nullptr), m_myModel(nullptr), m_modelBuilder(nullptr)
 {
 }
 
-Idogep::OutlineModule::~OutlineModule() {
+OutlineModule::~OutlineModule() {
 	// delete m_myModel;
 	delete m_modelBuilder;
 }
 
-void Idogep::OutlineModule::Initialize()
+void OutlineModule::Initialize()
 {
 	assert(m_parent.Valid());
 	assert(m_parent->GetView().Valid());
@@ -35,7 +33,7 @@ void Idogep::OutlineModule::Initialize()
 	SetView(m_myView);
 }
 
-void OutlineModule::DocumentChangedEvent(Document* const& document)
+void OutlineModule::DocumentChangedEvent(GkDemo::Demo* const& document)
 {
 	assert(m_myView);
 	assert(document);

@@ -1,6 +1,11 @@
 #pragma once 
+
+#include "common.h"
 #include "render/renderer.h"
-#include "render/effect.h"
+
+namespace Grafkit {
+    class IResourceManager;
+}
 
 namespace GkDemo
 {
@@ -9,12 +14,24 @@ namespace GkDemo
     {
     
     public:
-        void Initialize();
+        Demo();
+        ~Demo();
 
-        void PreRender(Grafkit::Renderer &render, float time);
-        void Render(Grafkit::Renderer &render, float time);
+        void Preload(Grafkit::IResourceManager * const & resman);
+        void Initialize(Grafkit::Renderer &render);
+
+        int PreRender(Grafkit::Renderer &render, float time) const;
+        int Render(Grafkit::Renderer& render, float time) const;
+
+        Grafkit::SceneGraphRef GetScenegraph() const;
+        Grafkit::SceneResRef GetScene() const;
+        Grafkit::MusicResRef GetMusic() const;
 
     private:
+        void InitTestStuff(Grafkit::Renderer & render);
+
+        Grafkit::MusicResRef m_music;
+
         Grafkit::ShaderResRef m_vs, m_ps;
         Grafkit::SceneResRef m_scene;
         Grafkit::SceneGraphRef m_scenegraph;

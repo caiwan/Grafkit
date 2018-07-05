@@ -20,7 +20,7 @@ IResourceManager::IResourceManager() : m_preloadEvents(nullptr)
 IResourceManager::~IResourceManager()
 {
 	ClearLoadStack();
-	for (auto it = m_resources.begin(); it != m_resources.end(); it++) {
+	for (auto it = m_resources.begin(); it != m_resources.end(); ++it) {
 		it->second.AssingnRef(nullptr);
 	}
 }
@@ -36,7 +36,7 @@ void IResourceManager::Add(Ref<IResource> pResource)
 		}
 		// FUCKING case sensitive Windows filesystem crap shit
 		std::string name = pResource->GetName();
-		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+		transform(name.begin(), name.end(), name.begin(), tolower);
 
 		m_resources[name] = pResource;
 	}	
@@ -54,10 +54,10 @@ void IResourceManager::RemoveAll() {
 	m_resources.clear();
 }
 
-void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
+void IResourceManager::Load(IResourceBuilder * builder)
 {	
 	std::string name = builder->GetName();
-	std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+	transform(name.begin(), name.end(), name.begin(), tolower);
 
 	auto it = m_resources.find(name);
 	
@@ -67,7 +67,7 @@ void Grafkit::IResourceManager::Load(IResourceBuilder * builder)
 	}
 }
 
-void Grafkit::IResourceManager::TriggerReload(std::string filename)
+void IResourceManager::TriggerReload(std::string filename)
 {
 	// filename => {resource name, builder object}
 	auto it = m_filenamesToBuilder.find(filename);
@@ -83,7 +83,7 @@ void Grafkit::IResourceManager::TriggerReload(std::string filename)
 	}
 }
 
-void Grafkit::IResourceManager::Reload(IResourceBuilder * builder)
+void IResourceManager::Reload(IResourceBuilder * builder)
 {
 	IResource *resource = builder->NewResource();
 	std::string name = builder->GetName();
@@ -95,7 +95,7 @@ void Grafkit::IResourceManager::Reload(IResourceBuilder * builder)
 	}
 }
 
-void Grafkit::IResourceManager::DoPrecalc()
+void IResourceManager::DoPrecalc()
 {
 	size_t i = 0;
 	size_t len = m_builders.size();
@@ -103,7 +103,7 @@ void Grafkit::IResourceManager::DoPrecalc()
 	if (m_preloadEvents)
 		m_preloadEvents->OnBeginLoad();
 
-	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
+	for (auto it = m_builders.begin(); it != m_builders.end(); ++it) {
 		LOGGER(Log::Logger().Trace("Preloading item %d of %d", i, len));
 		IResourceBuilder * builder = it->second;
 		if (builder) {
@@ -122,9 +122,9 @@ void Grafkit::IResourceManager::DoPrecalc()
 	ClearLoadStack();
 }
 
-void Grafkit::IResourceManager::ClearLoadStack()
+void IResourceManager::ClearLoadStack()
 {
-	for (auto it = m_builders.begin(); it != m_builders.end(); it++) {
+	for (auto it = m_builders.begin(); it != m_builders.end(); ++it) {
 		IResourceBuilder * builder = it->second;
 		if (builder) {
 			delete builder;
@@ -134,12 +134,12 @@ void Grafkit::IResourceManager::ClearLoadStack()
 	m_builders.clear();
 }
 
-void Grafkit::IResourceManager::AddResourcePath(std::string resourceType, std::string path)
+void IResourceManager::AddResourcePath(std::string resourceType, std::string path)
 {
 	m_pathMap[resourceType] = path;
 }
 
-std::string Grafkit::IResourceManager::GetResourcePath(std::string resourceClass)
+std::string IResourceManager::GetResourcePath(std::string resourceClass)
 {
 	auto it = m_pathMap.find(resourceClass);
 	if (it != m_pathMap.end())
