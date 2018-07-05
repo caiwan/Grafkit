@@ -8,8 +8,6 @@
 #endif //NOMINMAX
 #include <windows.h>
 
-#include <iostream>
-#include <memory>
 #include <process.h>
 
 namespace Grafkit {

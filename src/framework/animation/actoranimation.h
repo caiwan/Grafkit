@@ -13,7 +13,7 @@ namespace Grafkit {
 		ActorRef GetActor() { return m_actor; };
 		void SetActor(ActorRef actor) { m_actor = actor; };
 
-		virtual void Update(double time);
+	    void Update(double time) override;
 
 	private:
 		void CreateTrack();

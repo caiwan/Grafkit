@@ -1,9 +1,6 @@
 #pragma once
 
-#include "../utils/reference.h"
-
-#include "texture.h"
-
+#include "common.h"
 #include "renderer.h"
 #include "particle.h"
 
@@ -12,7 +9,7 @@ namespace Grafkit {
 	class FontMap;
 
 	typedef Ref<FontMap> FontMapRef;
-
+/*
 	class IFontmapBuilder {
 	public:
 		IFontmapBuilder() {}
@@ -20,11 +17,12 @@ namespace Grafkit {
 
 		virtual FontMapRef operator() (FontMapRef in) = 0;
 	};
-	
+	*/
 	/**
 	A spritesheet for font maps 
 	*/
-	class FontMap {
+	class FontMap : public Referencable
+    {
 	public:
 		char face[256];		///< name of font
 		int fontsize;		///< font size in pt
@@ -50,7 +48,7 @@ namespace Grafkit {
 
 		int maxPages;		///< Number of pages
 
-		std::vector<Grafkit::TextureRef> pages; ///< Pages (Containing textures)
+		std::vector<TextureRef> pages; ///< Pages (Containing textures)
 
 		std::vector<int> charIDMap;	///< Id map to resolve chars
 
@@ -101,10 +99,9 @@ namespace Grafkit {
 		FontMap();
 		~FontMap();
 
-		inline int getPageCount() { return this->pages.size(); }
-		inline Grafkit::TextureRef getPage(int n) { return this->pages[n]; }
-
-
+	    int GetPageCount() const { return this->pages.size(); }
+	    TextureRef GetPage(int n);
 	};
+
 
 };

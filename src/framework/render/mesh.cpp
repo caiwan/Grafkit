@@ -3,6 +3,7 @@
 #include "mesh.h"
 
 #include "texture.h"
+#include "shader.h"
 
 #include "utils/struct_pack.h"
 #include "utils/persistence/persistence.h"
@@ -12,7 +13,7 @@ using namespace FWdebugExceptions;
 
 PERSISTENT_IMPL(Grafkit::Mesh);
 
-void Grafkit::Mesh::_serialize(Archive & ar)
+void Mesh::_serialize(Archive & ar)
 {
 	PERSIST_FIELD(ar, m_vertexCount);
 	PERSIST_VECTOR(ar, m_indices, m_indexCount);
@@ -24,7 +25,7 @@ void Grafkit::Mesh::_serialize(Archive & ar)
 	// store pointer table
 	if (ar.IsStoring()) {
 		for (auto it = m_vertexPointers.begin(); it != m_vertexPointers.end(); ++it) {
-			const UCHAR* ptr = (UCHAR*)it->data;
+			const UCHAR* ptr = static_cast<UCHAR*>(it->data);
 			size_t size = it->length;
 			std::string name = it->name.c_str();
 			PERSIST_STRING(ar, name);
@@ -47,7 +48,7 @@ void Grafkit::Mesh::_serialize(Archive & ar)
 }
 
 // ==================================================================
-Grafkit::Mesh::Mesh() :
+Mesh::Mesh() :
 	m_buffer(),
 	m_indexBuffer(nullptr),
 	m_indexCount(0),
@@ -56,21 +57,21 @@ Grafkit::Mesh::Mesh() :
 {
 }
 
-Grafkit::Mesh::Mesh(const Mesh & mesh)
+Mesh::Mesh(const Mesh & mesh)
 {
 	///@todo TBD
 }
 
-Grafkit::Mesh::~Mesh()
+Mesh::~Mesh()
 {
 	this->Shutdown();
 }
 
-void Grafkit::Mesh::UpdateMesh(double time)
+void Mesh::UpdateMesh(double time)
 {
 }
 
-void Grafkit::Mesh::RenderMesh(ID3D11DeviceContext * dev)
+void Mesh::RenderMesh(ID3D11DeviceContext * dev)
 {
 	dev->IASetVertexBuffers(0, 1, &this->m_buffer.buffer, &this->m_buffer.stride, &this->m_buffer.offset);
 	dev->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -79,7 +80,7 @@ void Grafkit::Mesh::RenderMesh(ID3D11DeviceContext * dev)
 	dev->DrawIndexed(this->m_indexCount, 0, 0);
 }
 
-void Grafkit::Mesh::AddPointer(std::string inputName, size_t length, const void * pointer)
+void Mesh::AddPointer(std::string inputName, size_t length, const void * pointer)
 {
 	// create and copy ptr
 	vertex_pointer_t vertexPointer;
@@ -93,7 +94,7 @@ void Grafkit::Mesh::AddPointer(std::string inputName, size_t length, const void 
 	this->m_mapPtr[inputName] = vertexPointer.data;
 }
 
-void Grafkit::Mesh::SetIndices(size_t vertexCount, size_t indexCount, const int * const indices)
+void Mesh::SetIndices(size_t vertexCount, size_t indexCount, const int * const indices)
 {
 	m_indexCount = indexCount;
 	m_vertexCount = vertexCount;
@@ -102,7 +103,7 @@ void Grafkit::Mesh::SetIndices(size_t vertexCount, size_t indexCount, const int 
 		m_indices[i] = indices[i];
 }
 
-void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
+void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 {
 	HRESULT result = 0;
 
@@ -111,7 +112,7 @@ void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 
 	size_t elem_count = shader->GetILayoutElemCount();
 
-	Grafkit::StructPack packer;
+	StructPack packer;
 
 	if (shader.Invalid()) {
 		throw new EX_DETAILS(NullPointerException, "Nincs shader betoltve");
@@ -196,7 +197,7 @@ void Grafkit::Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	this->m_indexBuffer = indexBuffer;
 }
 
-void Grafkit::Mesh::Shutdown()
+void Mesh::Shutdown()
 {
 	RELEASE(m_indexBuffer);
 	RELEASE(m_buffer.buffer);

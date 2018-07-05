@@ -19,8 +19,6 @@
 #include "ResourceManager.h"
 #include "dirent.h"
 
-#include "../core/livereload.h"
-
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
@@ -124,14 +122,16 @@ namespace LiveReload {
 			m_fileReloadList.push_back(infn);
 		}
 
-		int Run() {
+		int Run() override
+		{
 			LOGGER(Log::Logger().Trace("Thread started"));
 			do {
 				Poll();
 			} while (true);
 		}
 
-		void Poll() {
+		void Poll() override
+		{
 			char buf[8192];
 			DWORD nRet;
 			BOOL result = TRUE;

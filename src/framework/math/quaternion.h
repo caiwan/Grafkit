@@ -1,7 +1,6 @@
 #pragma once 
 
 #include "../render/dxtypes.h"
-#include "matrix.h"
 
 namespace Grafkit {
 	class Quaternion {

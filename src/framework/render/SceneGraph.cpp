@@ -5,8 +5,6 @@
 #include "model.h"
 #include "camera.h"
 #include "Light.h"
-#include "Material.h"
-#include "SceneGraph.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;

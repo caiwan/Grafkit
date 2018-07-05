@@ -2,7 +2,6 @@
 #define __DYNAMICS_H__
 
 #include <map>
-#include <string>
 
 #ifdef DEBUG
 #include "../logger.h"

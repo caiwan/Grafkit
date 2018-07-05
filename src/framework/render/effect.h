@@ -8,7 +8,6 @@
 #include "renderer.h"
 #include "texture.h"
 #include "shader.h"
-#include "mesh.h"
 
 #include "shaderparameter.h"
 

@@ -34,7 +34,7 @@ namespace FWdebug {
 		~Exception();
 
 		inline int getErrorCode() { return this->m_code; }
-		char const* what() const;
+		char const* what() const override;
 	};
 }
 

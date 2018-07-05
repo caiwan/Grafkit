@@ -2,6 +2,8 @@
 
 #include "particle.h"
 
+#include "texture.h"
+
 Grafkit::ParticleEngine::ParticleEngine()
 {
 	ZeroMemory(&m_shaderParams, sizeof(m_shaderParams));

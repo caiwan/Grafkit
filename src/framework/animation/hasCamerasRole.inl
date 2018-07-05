@@ -1,6 +1,4 @@
 #pragma once 
-#include "scene.h"
-#include "render/camera.h"
 
 
 inline Grafkit::HasCamerasRole::HasCamerasRole() : m_cameras(nullptr), m_activeCameraId(0)

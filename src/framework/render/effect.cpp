@@ -1,17 +1,18 @@
 #include "stdafx.h"
 
 #include "effect.h"
+#include "mesh.h"
 
 #include "shaderparameter.h"
 
 using namespace Grafkit;
 
-Grafkit::EffectComposer::EffectComposer() :
+EffectComposer::EffectComposer() :
 	m_pTexRead(nullptr), m_pTexWrite(nullptr), m_pTexBack(nullptr), m_singlepass(false)
 {
 }
 
-Grafkit::EffectComposer::~EffectComposer()
+EffectComposer::~EffectComposer()
 {
 	this->Shutdown();
 }
@@ -19,8 +20,10 @@ Grafkit::EffectComposer::~EffectComposer()
 #include "../builtin_data/cube.h"
 #include "../builtin_data/defaultShader.h"
 
+using namespace GrafkitData;
+
 // ---------------------------------------------------------------------------------------------------
-void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
+void EffectComposer::Initialize(Renderer & render, bool singlepass)
 {
 	m_singlepass = singlepass;
 	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
@@ -46,16 +49,16 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	m_shaderFullscreenQuad = new VertexShader();
 	m_shaderFullscreenQuad->LoadFromMemory(
 		render,
-		GrafkitData::effectFullscreenQuadEntry,
-		GrafkitData::effectShader, strlen(GrafkitData::effectShader),
+		effectFullscreenQuadEntry,
+		effectShader, strlen(effectShader),
 		"FullscreenQuad"
 	);
 
 	m_shaderCopyScreen = new PixelShader();
 	m_shaderCopyScreen->LoadFromMemory(
 		render,
-		GrafkitData::effectCopyScreenEntry,
-		GrafkitData::effectShader, strlen(GrafkitData::effectShader),
+		effectCopyScreenEntry,
+		effectShader, strlen(effectShader),
 		"CopyScreen"
 	);
 
@@ -71,7 +74,7 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	}
 
 	// --- 
-	m_fullscreenquad = GrafkitData::CreateQuad();
+	m_fullscreenquad = CreateQuad();
 	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
 
 	for (auto it = m_effectChain.begin(); it != m_effectChain.end(); ++it) {
@@ -81,14 +84,14 @@ void Grafkit::EffectComposer::Initialize(Renderer & render, bool singlepass)
 	LOGGER(Log::Logger().Trace("FX Chain OK"));
 }
 
-void Grafkit::EffectComposer::Shutdown()
+void EffectComposer::Shutdown()
 {
 	// nothing to do 
 	// a refcounter elviekben megsemmisit mindent
 }
 
 // ---------------------------------------------------------------------------------------------------
-void Grafkit::EffectComposer::BindInput(Renderer & render)
+void EffectComposer::BindInput(Renderer & render)
 {
 	if (m_singlepass)
 		return;
@@ -106,7 +109,7 @@ void Grafkit::EffectComposer::BindInput(Renderer & render)
 	render.ApplyRenderTargetView(count);
 }
 
-void Grafkit::EffectComposer::UnbindInput(Renderer & render)
+void EffectComposer::UnbindInput(Renderer & render)
 {
 	//if (m_singlepass)
 	//	return;
@@ -125,7 +128,7 @@ void Grafkit::EffectComposer::UnbindInput(Renderer & render)
 }
 
 // ---------------------------------------------------------------------------------------------------
-void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
+void EffectComposer::Render(Renderer & render, int autoflush)
 {
 	if (m_singlepass)
 	{
@@ -145,7 +148,7 @@ void Grafkit::EffectComposer::Render(Renderer & render, int autoflush)
 }
 
 // ---------------------------------------------------------------------------------------------------
-void Grafkit::EffectComposer::SwapBuffers()
+void EffectComposer::SwapBuffers()
 {
 	if (m_singlepass)
 		return;
@@ -155,7 +158,7 @@ void Grafkit::EffectComposer::SwapBuffers()
 	m_pTexRead = tmp;
 }
 
-void Grafkit::EffectComposer::FlushBuffers()
+void EffectComposer::FlushBuffers()
 {
 	if (m_singlepass)
 		return;
@@ -168,7 +171,7 @@ void Grafkit::EffectComposer::FlushBuffers()
 
 }
 
-void Grafkit::EffectComposer::RenderChain(Renderer & render)
+void EffectComposer::RenderChain(Renderer & render)
 {
 	m_shaderFullscreenQuad->Bind(render);
 
@@ -214,7 +217,7 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 	m_shaderFullscreenQuad->Unbind(render);
 }
 
-void Grafkit::EffectComposer::Flush(Renderer & render)
+void EffectComposer::Flush(Renderer & render)
 {
 	// present the result 
 	if (m_singlepass)
@@ -258,15 +261,15 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 // ===================================================================================================
 
 
-Grafkit::EffectRender::EffectRender()
+EffectRender::EffectRender()
 {
 }
 
-Grafkit::EffectRender::~EffectRender()
+EffectRender::~EffectRender()
 {
 }
 
-void Grafkit::EffectRender::Initialize(Renderer & render)
+void EffectRender::Initialize(Renderer & render)
 {
 	LOGGER(Log::Logger().Trace("Initializing FX Chain"));
 
@@ -285,16 +288,16 @@ void Grafkit::EffectRender::Initialize(Renderer & render)
 	m_shaderFullscreenQuad = new VertexShader();
 	m_shaderFullscreenQuad->LoadFromMemory(
 		render,
-		GrafkitData::effectFullscreenQuadEntry,
-		GrafkitData::effectShader, strlen(GrafkitData::effectShader),
+		effectFullscreenQuadEntry,
+		effectShader, strlen(effectShader),
 		"FullscreenQuad"
 	);
 
 	m_shaderCopyScreen = new PixelShader();
 	m_shaderCopyScreen->LoadFromMemory(
 		render,
-		GrafkitData::effectCopyScreenEntry,
-		GrafkitData::effectShader, strlen(GrafkitData::effectShader),
+		effectCopyScreenEntry,
+		effectShader, strlen(effectShader),
 		"CopyScreen"
 	);
 
@@ -309,7 +312,7 @@ void Grafkit::EffectRender::Initialize(Renderer & render)
 	m_shaderCopyScreen->SetSamplerSatate(render, "SamplerType", m_textureSampler->GetSamplerState());
 
 	// --- 
-	m_fullscreenquad = GrafkitData::CreateQuad();
+	m_fullscreenquad = CreateQuad();
 	m_fullscreenquad->Build(render, m_shaderFullscreenQuad);
 
 	for (auto it = m_effects.begin(); it != m_effects.end(); ++it)
@@ -321,12 +324,12 @@ void Grafkit::EffectRender::Initialize(Renderer & render)
 	LOGGER(Log::Logger().Trace("FX Chain OK"));
 }
 
-void Grafkit::EffectRender::Shutdown()
+void EffectRender::Shutdown()
 {
 	// ... 
 }
 
-void Grafkit::EffectRender::Render(Renderer & render, TextureResRef output)
+void EffectRender::Render(Renderer & render, TextureResRef output)
 {
 	m_shaderFullscreenQuad->Bind(render);
 
@@ -358,18 +361,18 @@ void Grafkit::EffectRender::Render(Renderer & render, TextureResRef output)
 
 // ===================================================================================================
 
-Grafkit::EffectPass::EffectPass(ShaderResRef shader) : m_shader(shader)
+EffectPass::EffectPass(ShaderResRef shader) : m_shader(shader)
 {
 }
 
-Grafkit::EffectPass::~EffectPass()
+EffectPass::~EffectPass()
 {
 	this->Shutdown();
 }
 
 // ---------------------------------------------------------------------------------------------------
 
-void Grafkit::EffectPass::Initialize(Renderer & render)
+void EffectPass::Initialize(Renderer & render)
 {
 	ShaderParameter *shaderParameter = new ShaderParameter();
 	shaderParameter->Initialize(render, m_shader);
@@ -379,14 +382,14 @@ void Grafkit::EffectPass::Initialize(Renderer & render)
 	LOGGER(Log::Logger().Trace("FX Init pass %s", m_shader->GetName().c_str()));
 }
 
-void Grafkit::EffectPass::Shutdown()
+void EffectPass::Shutdown()
 {
 	m_shaderParameter = nullptr;
 }
 
 // ---------------------------------------------------------------------------------------------------
 
-size_t Grafkit::EffectPass::BindOutputs(Renderer &render)
+size_t EffectPass::BindOutputs(Renderer &render)
 {
 	size_t count = 0;
 	for (auto it = m_output_map.begin(); it != m_output_map.end(); it++) {
@@ -398,7 +401,7 @@ size_t Grafkit::EffectPass::BindOutputs(Renderer &render)
 	return count;
 }
 
-size_t Grafkit::EffectPass::UnbindOutputs(Renderer & render)
+size_t EffectPass::UnbindOutputs(Renderer & render)
 {
 	size_t count = 0;
 	for (auto it = m_output_map.begin(); it != m_output_map.end(); it++) {
@@ -410,7 +413,7 @@ size_t Grafkit::EffectPass::UnbindOutputs(Renderer & render)
 	return count;
 }
 
-void Grafkit::EffectPass::BindFx(Renderer & render)
+void EffectPass::BindFx(Renderer & render)
 {
 	for (auto it = m_inputMap.begin(); it != m_inputMap.end(); it++) {
 		m_shader->Get()->SetShaderResourceView(render, it->first, it->second->GetShaderResourceView());
@@ -420,7 +423,7 @@ void Grafkit::EffectPass::BindFx(Renderer & render)
 	m_shader->Get()->Bind(render);
 }
 
-void Grafkit::EffectPass::UnbindFx(Renderer & render)
+void EffectPass::UnbindFx(Renderer & render)
 {
 	for (auto it = m_inputMap.begin(); it != m_inputMap.end(); it++) {
 		m_shader->Get()->SetShaderResourceView(render, it->first, nullptr);
@@ -428,13 +431,13 @@ void Grafkit::EffectPass::UnbindFx(Renderer & render)
 	m_shader->Get()->Unbind(render);
 }
 
-TextureRef Grafkit::EffectPass::GetOutput(size_t bind)
+TextureRef EffectPass::GetOutput(size_t bind)
 {
 	auto it = m_output_map.find(bind);
 	return it == m_output_map.end() ? TextureRef() : it->second;
 }
 
-TextureRef Grafkit::EffectPass::GetInput(std::string name)
+TextureRef EffectPass::GetInput(std::string name)
 {
 	auto it = m_inputMap.find(name);
 	return it == m_inputMap.end() ? TextureRef() : it->second;

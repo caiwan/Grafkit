@@ -6,7 +6,6 @@
 #include "render/light.h"
 #include "render/camera.h"
 #include "render/model.h"
-#include "animation.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;

@@ -4,13 +4,9 @@ A generator interface for assets
 
 #pragma once
 
-#include <map>
 #include <string>
 
-#include "../utils/persistence/persistence.h"
-
 #include "reference.h"
-#include "exceptions.h"
 
 namespace Grafkit {
 
@@ -60,7 +56,7 @@ namespace Grafkit {
 		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
 		operator T& () { return *(this->Get()); }
 
-		virtual void* GetRaw() { return this->Get(); }
+	    void* GetRaw() override { return this->Get(); }
 
 	};
 

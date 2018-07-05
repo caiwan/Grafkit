@@ -1,22 +1,20 @@
 #pragma once 
 
-#include "../utils/exceptions.h"
-#include "../utils/ResourceBuilder.h"
-#include "../render/text.h"
+#include "utils/exceptions.h"
+#include "render/text.h"
 
+namespace Grafkit {
 
-namespace Grafkit{
+    //class FontMap;
+/*
+    class BMFontParser {
+    public:
+        explicit BMFontParser(FontMap *root);
+        void load();
 
-	class FontMap;
-
-	class BMFontParser{
-		public:
-			BMFontParser(FontMap *root);
-			void load();
-
-		private:
-			FontMap* root;
-	};
+    private:
+        FontMap * root;
+    };*/
 }
 
 DEFINE_EXCEPTION(InvalidBMFVersionException, 301, "Invalid BMF version")

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <list>
-#include <string>
 #include <set>
 
 #include "../stdafx.h"

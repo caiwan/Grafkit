@@ -1,5 +1,4 @@
 #pragma once 
-#include "scene.h"
 #include "render/Actor.h"
 
 inline void Grafkit::EntityContainer::AddEntiy(ActorRef node, Entity3DRef entity)

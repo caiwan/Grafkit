@@ -2,10 +2,9 @@
 
 
 #include "../utils/reference.h"
-#include "../utils/resource.h"
 
 #include "renderer.h"
-#include "predefs.h"
+
 
 #define MULTITEXTURE_MAX 16
 
@@ -147,7 +146,7 @@ namespace Grafkit
 	protected:
 		void CreateTexture(Renderer & device, DXGI_FORMAT format, size_t w, const void * initaldata = nullptr);
 
-		virtual int GetDimension() { return 1; }
+	    int GetDimension() override { return 1; }
 	};
 
 	typedef Ref<Texture1D> Texture1DRef;
@@ -183,7 +182,7 @@ namespace Grafkit
 		void CreateTextureBitmap(Renderer & device, DXGI_FORMAT format, int channels = 4, int w = 0, int h = 0, const void * initialData = nullptr);
 		void CreateTextureTarget(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0);
 
-		virtual int GetDimension() { return 2; }
+	    int GetDimension() override { return 2; }
 
 	};
 
@@ -200,7 +199,7 @@ namespace Grafkit
 		void* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
 
 	protected:
-		virtual int GetDimension() { return 2; }
+	    int GetDimension() override { return 2; }
 		//virtual void CrateTexture(Renderer & device, DXGI_FORMAT format, int channels = 4, int channelWidth = 1, int w = 0, int h = 0, int d = 0, bool isDynamic = true, bool hasMips = true, bool cubemap = false);
 
 		void **m_initial_data;

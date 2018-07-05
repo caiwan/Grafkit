@@ -1,11 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <map>
-#include <string>
 
 #include "math/matrix.h"
-#include "math/quaternion.h"
 
 #include "utils/reference.h"
 

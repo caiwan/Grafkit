@@ -18,7 +18,7 @@ namespace GrafkitData {
 		void ShutdownLoaderBar();
 
 		// --- 
-		virtual void OnElemLoad(size_t actual, size_t count) ;
+	    void OnElemLoad(size_t actual, size_t count) override;
 
 	protected:
 		// --- 

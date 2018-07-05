@@ -89,7 +89,7 @@ namespace Grafkit {
 
 		// -- persistent
 	protected:
-		virtual void serialize(Archive& ar);
+		    void serialize(Archive& ar) override;
 		PERSISTENT_DECL(Grafkit::SceneGraph, 1);
 	};
 }

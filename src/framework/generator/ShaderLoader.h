@@ -2,7 +2,6 @@
 
 #include "../render/shader.h"
 
-#include "../utils/asset.h"
 #include "../utils/resource.h"
 #include "../utils/ResourceManager.h"
 #include "../utils/ResourceBuilder.h"
@@ -14,9 +13,9 @@ namespace Grafkit {
 		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint);
 		~ShaderLoader();
 
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
 
-		virtual IResource* NewResource();
+	    IResource* NewResource() override;
 
 	protected:
 		virtual Shader* NewShader() = 0;
@@ -32,8 +31,8 @@ namespace Grafkit {
 		~VertexShaderLoader(){}
 
 	protected:
-		virtual Shader* NewShader() { return new VertexShader(); }
-		virtual std::string DefaultEntryPointName() { return "mainVertex"; }
+	    Shader* NewShader() override { return new VertexShader(); }
+	    std::string DefaultEntryPointName() override { return "mainVertex"; }
 	};
 
 
@@ -43,8 +42,8 @@ namespace Grafkit {
 			: ShaderLoader(name, sourcename, entrypoint) {}
 		~PixelShaderLoader(){}
 	protected:
-		virtual Shader* NewShader() { return new PixelShader(); }
-		virtual std::string DefaultEntryPointName() { return "mainPixel"; }
+	    Shader* NewShader() override { return new PixelShader(); }
+	    std::string DefaultEntryPointName() override { return "mainPixel"; }
 	};
 
 	class GeometryShaderLoader : public ShaderLoader {
@@ -54,8 +53,8 @@ namespace Grafkit {
 		~GeometryShaderLoader() {}
 
 	protected:
-		virtual Shader* NewShader() { return new GeometryShader(); }
-		virtual std::string DefaultEntryPointName() { return "mainGeometry"; }
+	    Shader* NewShader() override { return new GeometryShader(); }
+	    std::string DefaultEntryPointName() override { return "mainGeometry"; }
 	};
 
 }

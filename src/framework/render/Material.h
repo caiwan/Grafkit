@@ -5,12 +5,10 @@
 
 #include "../utils/persistence/persistence.h"
 
-#include "../utils/resource.h"
 #include "../utils/memory.h"
 
 #include "dxtypes.h"
 #include "renderer.h"
-#include "texture.h"
 #include "shader.h"
 
 namespace Grafkit {
@@ -144,7 +142,7 @@ namespace Grafkit {
 		std::map<std::string, TextureResRef> m_textures;
 
 	protected:
-		void serialize(Archive& ar);
+		void serialize(Archive& ar) override;
 		PERSISTENT_DECL(Grafkit::Material, 1);
 
 	private:

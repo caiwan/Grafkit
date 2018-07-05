@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include <algorithm>
-#include <cstdlib>
 #include <chrono>
 
 #include "resource.h"

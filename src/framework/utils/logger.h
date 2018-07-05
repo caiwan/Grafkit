@@ -14,8 +14,6 @@
 
 #include <cstdio>
 #include <set>
-#include <cstdlib>
-#include <varargs.h>
 
 namespace Grafkit {
 
@@ -116,7 +114,7 @@ namespace Grafkit {
 			FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);
 			~FileLoggerHandler();
 		protected:
-			virtual void Write(Grafkit::Logger::message_t * const & message);
+		    void Write(Grafkit::Logger::message_t * const & message) override;
 		private:
 			FILE* m_stdout;
 			FILE* m_stderr;
@@ -129,7 +127,7 @@ namespace Grafkit {
 			ConsoleLogger();
 			~ConsoleLogger();
 		protected:
-			virtual void Write(Grafkit::Logger::message_t * const & message);
+		    void Write(Grafkit::Logger::message_t * const & message) override;
 
 		private:
 			FILE* m_stdout;
@@ -145,7 +143,7 @@ namespace Grafkit {
 			MsvcOutLogger();
 			~MsvcOutLogger();
 		protected:
-			virtual void Write(Grafkit::Logger::message_t * const & message);
+		    void Write(Grafkit::Logger::message_t * const & message) override;
 		};
 
 	};

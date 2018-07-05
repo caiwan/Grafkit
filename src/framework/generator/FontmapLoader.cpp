@@ -1,16 +1,14 @@
 #include "stdafx.h"
 
-#include <cstring>
-
 #include "FontmapLoader.h"
 
 using namespace FWdebugExceptions;
 using namespace Grafkit;
 
-BMFontParser::BMFontParser(FontMap* _root) : root(_root){
-}
+//BMFontParser::BMFontParser(FontMap* _root) : root(_root){
+//}
 
-void BMFontParser::load(){
+//void BMFontParser::load(){
 //	unsigned char *data = NULL;
 //	size_t len = 0, offset = 0, h = 0,i = 0, j=0 ,k=0;
 //	unsigned int magicnumber = 0, blockSize = 0;
@@ -227,4 +225,4 @@ void BMFontParser::load(){
 //
 //	// fin.
 
-}
+//}

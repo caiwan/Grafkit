@@ -36,11 +36,11 @@ namespace Grafkit {
 		/// @todo void GetScreenMetrics(float width, float height) { this->m_screenWidth = width, this->m_screenHeight = height; }
 
 		/** Generate matrices */
-		void Calculate(Renderer& renderer, ActorRef parent = nullptr);
+		void Calculate(Renderer& renderer, ActorRef parent = nullptr) override;
 
 		//skip render, nothing to do with it. 
-		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph* const & scene) {}
-		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene) {}
+		    void Render(Grafkit::Renderer& deviceContext, SceneGraph* const & scene) override {}
+		    void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene) override {}
 
 		// TODO: rename them
 		Matrix& GetViewMatrix() { return m_viewMatrix; }
@@ -89,6 +89,6 @@ namespace Grafkit {
 
 		PERSISTENT_DECL(Grafkit::Camera, 1);
 	protected:
-		virtual void serialize(Archive& ar);
+		    void serialize(Archive& ar) override;
 	};
 }

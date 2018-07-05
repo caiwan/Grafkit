@@ -2,12 +2,12 @@
 
 #include <vector>
 
+#include "common.h"
+
+#include "texture.h"
 #include "shader.h"
 #include "mesh.h"
 #include "material.h"
-#include "texture.h"
-#include "../utils/reference.h"
-
 
 /** Compute FW w/ support of pixel shaders instead of compute shaders
 */

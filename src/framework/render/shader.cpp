@@ -3,9 +3,6 @@
 #include "stdafx.h"
 
 #include <string>
-#include <fstream>
-#include <streambuf>
-#include <iostream>
 
 #include <cstdio>
 

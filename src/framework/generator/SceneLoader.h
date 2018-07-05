@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <set>
 #include <vector>
 
 #include "utils/exceptions.h"
@@ -12,8 +11,6 @@
 #include "utils/resource.h"
 #include "utils/ResourceBuilder.h"
 			
-#include "render/predefs.h"
-
 namespace Grafkit {
 
 	class SceneLoader : public Grafkit::IResourceBuilder
@@ -22,11 +19,11 @@ namespace Grafkit {
 		SceneLoader(std::string name, std::string source_name);
 		~SceneLoader();
 
-		void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+		void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
 
 		static void Save(SceneRes scene, std::string dst_name);
 
-		virtual IResource* NewResource() { return new SceneRes(); }
+	    IResource* NewResource() override { return new SceneRes(); }
 
 	protected:
 		/* 

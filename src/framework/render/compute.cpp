@@ -1,24 +1,25 @@
+#include "stdafx.h"
 #include "compute.h"
 
 #include "shader.h"
 
-#include "../utils/exceptions.h"
+#include "utils/exceptions.h"
 
-#include "../builtin_data/cube.h"
-#include "../builtin_data/defaultShader.h"
+#include "builtin_data/cube.h"
+#include "builtin_data/defaultShader.h"
 
 #include "texture.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-Grafkit::Compute::Compute()
+Compute::Compute()
 {
 	inputChannels = &channels[0];
 	outputChannels = &channels[1];
 }
 
-void Grafkit::Compute::Initialize(Renderer & render, ShaderResRef shader, size_t samples)
+void Compute::Initialize(Renderer & render, ShaderResRef shader, size_t samples)
 {
 	sampleCount = samples;
 	computePixelShader = shader;
@@ -88,7 +89,7 @@ void Grafkit::Compute::Initialize(Renderer & render, ShaderResRef shader, size_t
 
 }
 
-void Grafkit::Compute::Shutdown()
+void Compute::Shutdown()
 {
 	for (size_t i = 0; i < channels[0].size(); i++) {
 		channels[0][i]->Shutdown();
@@ -98,7 +99,7 @@ void Grafkit::Compute::Shutdown()
 	shaderFullscreenQuad->Shutdown();
 }
 
-void Grafkit::Compute::AddChannel(std::string name, Texture2DRef inputCondition)
+void Compute::AddChannel(std::string name, Texture2DRef inputCondition)
 {
 	inputNames.push_back(name);
 	channels[0].push_back(inputCondition.Valid() ? inputCondition : new Texture2D());
@@ -111,7 +112,7 @@ void Grafkit::Compute::AddChannel(std::string name, Texture2DRef inputCondition)
 	materialResources.push_back(res);
 }
 
-void Grafkit::Compute::Render(Renderer &render)
+void Compute::Render(Renderer &render)
 {
 	ShaderRef shader = computePixelShader->Get();
 	shader->Bind(render);
@@ -155,21 +156,21 @@ void Grafkit::Compute::Render(Renderer &render)
 	SwapBuffers();
 }
 
-void Grafkit::Compute::BindOutputs(Renderer & render, ShaderRef & shader) const
+void Compute::BindOutputs(Renderer & render, ShaderRef & shader) const
 {
 	for (size_t i = 0; i < outputChannels->size(); i++) {
 		shader->SetShaderResourceView(render, inputNames[i], outputChannels->at(i)->GetShaderResourceView());
 	}
 }
 
-void Grafkit::Compute::BindMaterial(Renderer & render, MaterialRef & material) const
+void Compute::BindMaterial(Renderer & render, MaterialRef & material) const
 {
 	for (size_t i = 0; i < outputChannels->size(); i++) {
 		material->SetTexture(materialResources[i], inputNames[i]);
 	}
 }
 
-void Grafkit::Compute::SwapBuffers()
+void Compute::SwapBuffers()
 {
 	auto tmp = outputChannels;
 	outputChannels = inputChannels;

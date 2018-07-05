@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include <cstring>
-#include <cstdio>
 
 #include <comdef.h>
 

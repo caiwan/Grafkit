@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "Asset.h"
 #include "AssetFactory.h"
 #include "core/thread.h"
@@ -49,12 +47,12 @@ namespace Grafkit {
 		FileAssetFactory(std::string root);
 		~FileAssetFactory();
 
-		virtual IAssetRef Get(std::string name);
+	    IAssetRef Get(std::string name) override;
 
-		virtual filelist_t GetAssetList();
-		virtual filelist_t GetAssetList(AssetFileFilter * filter);
+	    filelist_t GetAssetList() override;
+	    filelist_t GetAssetList(AssetFileFilter * filter) override;
 
-		virtual bool PollEvents(IResourceManager *resman);
+	    bool PollEvents(IResourceManager *resman) override;
 
 	private:
 		std::string m_root;
@@ -68,8 +66,8 @@ namespace Grafkit {
 		public:
 			FileAsset() : m_size(0), m_data(nullptr) {}
 			~FileAsset();
-			virtual void* GetData() { return m_data; }
-			virtual size_t GetSize() { return m_size; }
+		    void* GetData() override { return m_data; }
+		    size_t GetSize() override { return m_size; }
 
 		protected:
 			FileAsset(void* data, size_t size) : m_data(data), m_size(size) {}

@@ -52,13 +52,13 @@ namespace Grafkit
 		};
 
 	public:
-		ParticleDynamics(float4 position = float4(0, 0, 0, 1), float weight = 1.f);
+	    explicit ParticleDynamics(float4 position = float4(0, 0, 0, 1), float weight = 1.f);
 
-		ParticleDynamics::DynamicElem_t GetParams() { return m_params; }
-		void SetParams(ParticleDynamics::DynamicElem_t params) { m_params = params; }
+		DynamicElem_t GetParams() const { return m_params; }
+		void SetParams(DynamicElem_t params) { m_params = params; }
 
-		ParticleDynamics::DynamicArguments_t GetArgs() { return m_params.args; }
-		void SetArgs(ParticleDynamics::DynamicArguments_t args) { m_params.args = args; }
+		DynamicArguments_t GetArgs() const { return m_params.args; }
+		void SetArgs(DynamicArguments_t args) { m_params.args = args; }
 
 		void SetEnabled(bool isEnabled) {
 			m_enabled = isEnabled;
@@ -135,8 +135,8 @@ namespace Grafkit
 			ParticleDynamics::DynamicElem_t args[PARTICLE_NG_MAX_ELEM];
 		};
 
-		ParticleEngine::ParticleGlobalParams_t GetGlobals() { return m_shaderParams.globals; }
-		void SetGlobals(ParticleEngine::ParticleGlobalParams_t globals) { m_shaderParams.globals = globals; }
+		ParticleGlobalParams_t GetGlobals() const { return m_shaderParams.globals; }
+		void SetGlobals(ParticleGlobalParams_t globals) { m_shaderParams.globals = globals; }
 
 		// ... 
 
@@ -152,7 +152,7 @@ namespace Grafkit
 
 	class ParticleEmitter : public ParticleDynamics {
 	public:
-		virtual ParticleDynamicsType_e GetType() { return ParticleDynamics::PD_emitter; }
+	    ParticleDynamicsType_e GetType() override { return PD_emitter; }
 	};
 
 	// ------------------------------------------------------------------------
@@ -160,9 +160,9 @@ namespace Grafkit
 
 	class ParticleAttractor : public ParticleDynamics {
 	public:
-		ParticleAttractor(float4 pos = float4(0, 0, 0, 1), float weight = 1., float force = 1.f);
+	    explicit ParticleAttractor(float4 pos = float4(0, 0, 0, 1), float weight = 1., float force = 1.f);
 
-		virtual ParticleDynamicsType_e GetType() { return ParticleDynamics::PD_attractor; }
+	    ParticleDynamicsType_e GetType() override { return PD_attractor; }
 
 	public:
 
@@ -172,14 +172,14 @@ namespace Grafkit
 
 	class ParticleDeflector : public ParticleDynamics {
 	public:
-		virtual ParticleDynamicsType_e GetType() { return ParticleDynamics::PD_deflector; }
+	    ParticleDynamicsType_e GetType() override { return PD_deflector; }
 
 	};
 
 	// ------------------------------------------------------------------------
 	class ParticleReflector : public ParticleDynamics {
 	public:
-		virtual ParticleDynamicsType_e GetType() { return ParticleDynamics::PD_reflector; }
+	    ParticleDynamicsType_e GetType() override { return PD_reflector; }
 
 	};
 

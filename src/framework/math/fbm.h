@@ -1,8 +1,6 @@
 
 #pragma once 
 
-#include <cmath>
-
 #include "../render/dxtypes.h"
 
 /*

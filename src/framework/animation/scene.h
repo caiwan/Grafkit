@@ -1,6 +1,5 @@
 #pragma once 
 
-#include <stack>
 #include <list>
 #include <vector>
 
@@ -9,7 +8,6 @@
 #include "render/Actor.h"
 #include "render/SceneGraph.h"
 
-#include "render/Light.h"
 #include "render/Camera.h"
 
 #include "animation.h"
@@ -175,7 +173,7 @@ namespace Grafkit {
 
 		// -- persistent
 	protected:
-		virtual void serialize(Archive& ar);
+	    void serialize(Archive& ar) override;
 		PERSISTENT_DECL(Grafkit::Scene, 1);
 	};
 

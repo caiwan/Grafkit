@@ -1,15 +1,13 @@
 #pragma once
 
 #include <vector>
-#include <stack>
 
 #include "../utils/reference.h"
-#include "../utils/resource.h"
 
 #include "../math/matrix.h"
 
 #include "renderer.h"
-#include "predefs.h"
+
 
 #include "../utils/persistence/persistence.h"
 
@@ -33,7 +31,7 @@ namespace Grafkit {
 		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph * const & scene) = 0;
 		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph * const & scene) = 0;
 
-		virtual void serialize(Archive& ar) = 0;
+	    void serialize(Archive& ar) override = 0;
 
 	public:
 		std::string GetName() { return this->m_name; }
@@ -156,7 +154,7 @@ namespace Grafkit {
 		int m_ishidden;
 
 	protected:
-		virtual void serialize(Archive& ar);
+		    void serialize(Archive& ar) override;
 		PERSISTENT_DECL(Grafkit::Actor, 1);
 	};
 

@@ -3,16 +3,12 @@
 
 #pragma once
 
-#include <vector>
 #include <array>
 
 #include "common.h"
 
-#include "render/Actor.h"
-#include "render/renderer.h"
-
-#include "mesh.h"
-#include "Material.h"
+#include "Actor.h"
+#include "renderer.h"
 
 namespace Grafkit 
 {
@@ -20,24 +16,26 @@ namespace Grafkit
 	Stores extended data for a mesh, that makes it a model
 	*/
 
-	__declspec(align(16)) class Model : public Grafkit::Entity3D, public AlignedNew<Model>
+	__declspec(align(16)) class Model : public Entity3D, public AlignedNew<Model>
 	{
 	public:
-		Model(MeshRef mesh = nullptr, MaterialRef material = nullptr);
+        Model();
+        explicit Model(MeshRef mesh);
+        explicit Model(MeshRef mesh, MaterialRef material);
 		~Model();
 
-		MeshRef GetMesh() const     { return this->m_mesh; }
-		void SetMesh(MeshRef model) { this->m_mesh = model; }
+	    MeshRef GetMesh() const;
+	    void SetMesh(MeshRef model);
 
-		MaterialRef GetMaterial() const		{ return this->m_material; }
-		void SetMaterial(MaterialRef material) { this->m_material = material; }
+	    MaterialRef GetMaterial() const;
+	    void SetMaterial(MaterialRef material);
 
-		virtual void Calculate(Grafkit::Renderer& deviceContext, ActorRef patent = nullptr) {}
-		virtual void Render(Grafkit::Renderer& deviceContext, SceneGraph* const & scene);
-		virtual void Build(Grafkit::Renderer& deviceContext, SceneGraph* const & scene);
+	    void Calculate(Renderer& deviceContext, ActorRef patent = nullptr) override {}
+	    void Render(Renderer& deviceContext, SceneGraph* const & scene) override;
+	    void Build(Renderer& deviceContext, SceneGraph* const & scene) override;
 
-		void SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; }
-		ShaderResRef GetGeometryShader() { return m_geometryShader; }
+	    void SetGeometryShader(ShaderResRef shader);
+	    ShaderResRef GetGeometryShader() const;
 
 	private:
 		MaterialRef m_material;
@@ -47,7 +45,7 @@ namespace Grafkit
 
 		PERSISTENT_DECL(Grafkit::Model, 1)
 	protected:
-		virtual void serialize(Archive& ar) { _serialize(ar); }
+	    void serialize(Archive& ar) override { _serialize(ar); }
 		void _serialize(Archive& ar);
 
 	};

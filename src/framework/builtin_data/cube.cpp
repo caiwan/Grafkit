@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "cube.h" 
+#include "render/mesh.h"
 
 using namespace Grafkit;
+using namespace GrafkitData;
 
 static const float _triangle[] = {
 	0.0f,  1.0f, -0.1f,
@@ -187,29 +189,29 @@ const size_t GrafkitData::cubeTextureUVsSize = sizeof(_cube_texcoords);
 const size_t GrafkitData::cubeIndicesSize = sizeof(_cube_indices);
 
 
-Grafkit::MeshRef GrafkitData::CreateQuad()
+MeshRef GrafkitData::CreateQuad()
 {
 	MeshRef mesh = new Mesh();
-	mesh->AddPointer("POSITION", sizeof(GrafkitData::quad[0]) * 4 * 4, GrafkitData::quad);
-	mesh->AddPointer("TEXCOORD", sizeof(GrafkitData::quad_texcoord[0]) * 4 * 4, GrafkitData::quad_texcoord);
-	mesh->SetIndices(4, 6, GrafkitData::quadIndices);
+	mesh->AddPointer("POSITION", sizeof(quad[0]) * 4 * 4, quad);
+	mesh->AddPointer("TEXCOORD", sizeof(quad_texcoord[0]) * 4 * 4, quad_texcoord);
+	mesh->SetIndices(4, 6, quadIndices);
 	return mesh;
 }
 
-Grafkit::MeshRef GrafkitData::CreateCube()
+MeshRef GrafkitData::CreateCube()
 {
 	MeshRef mesh = new Mesh();
-	mesh->AddPointer("POSITION", GrafkitData::cubeVertexSize, GrafkitData::cubeVertices);
-	mesh->AddPointer("TEXCOORD", GrafkitData::cubeVertexSize, GrafkitData::cubeTextureUVs);
-	mesh->AddPointer("NORMAL", GrafkitData::cubeVertexSize, GrafkitData::cubeNormals);
-	mesh->SetIndices(GrafkitData::cubeVertexCount, GrafkitData::cubeIndicesCount, GrafkitData::cubeIndices);
+	mesh->AddPointer("POSITION", cubeVertexSize, cubeVertices);
+	mesh->AddPointer("TEXCOORD", cubeVertexSize, cubeTextureUVs);
+	mesh->AddPointer("NORMAL", cubeVertexSize, cubeNormals);
+	mesh->SetIndices(cubeVertexCount, cubeIndicesCount, cubeIndices);
 	return mesh;
 }
 
-Grafkit::MeshRef GrafkitData::CreateCubes(size_t count)
+MeshRef GrafkitData::CreateCubes(size_t count)
 {
-	const size_t &vertlen = GrafkitData::cubeVertexCount;
-	const size_t &indlen = GrafkitData::cubeIndicesCount;
+	const size_t &vertlen = cubeVertexCount;
+	const size_t &indlen = cubeIndicesCount;
 
 	const size_t vertcount = vertlen * count;
 	const size_t indcount = indlen * count;
@@ -227,7 +229,7 @@ Grafkit::MeshRef GrafkitData::CreateCubes(size_t count)
 
 		// copy indices
 		for (size_t j = 0; j < indlen; j++) {
-			indices[faceindex] = i*vertlen + GrafkitData::cubeIndices[j];
+			indices[faceindex] = i*vertlen + cubeIndices[j];
 			faceindex++;
 		}
 
@@ -235,9 +237,9 @@ Grafkit::MeshRef GrafkitData::CreateCubes(size_t count)
 		for (size_t j = 0; j < vertlen; j++) {
 			groups[vertindex] = i;
 
-			vertices[vertindex] = reinterpret_cast<const float4*>(GrafkitData::cubeVertices)[j];
-			texcoords[vertindex] = reinterpret_cast<const float2*>(GrafkitData::cubeTextureUVs)[j];
-			normals[vertindex] = reinterpret_cast<const float4*>(GrafkitData::cubeNormals)[j];
+			vertices[vertindex] = reinterpret_cast<const float4*>(cubeVertices)[j];
+			texcoords[vertindex] = reinterpret_cast<const float2*>(cubeTextureUVs)[j];
+			normals[vertindex] = reinterpret_cast<const float4*>(cubeNormals)[j];
 			vertindex++;
 		}
 	}

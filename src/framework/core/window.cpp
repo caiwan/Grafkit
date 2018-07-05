@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include <vector>
 #include <tchar.h>
 
 #include "window.h"

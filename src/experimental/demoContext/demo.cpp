@@ -18,7 +18,6 @@
 #include "utils/ResourceManager.h"
 #include "generator/MusicBassLoader.h"
 
-
 #include "builtin_data/cube.h"
 
 using namespace GkDemo;

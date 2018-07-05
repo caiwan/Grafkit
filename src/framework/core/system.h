@@ -29,7 +29,7 @@ namespace Grafkit
 		virtual void release() = 0;
 
 
-		LRESULT MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+		LRESULT MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) override;
 
 	protected:
 		void InitializeWindows(int sreenWidth = 800, int screenHeight = 600, int isFullscreen = 0, int resizeable = 0, const char *pTitle = "Grafkit2 Application");

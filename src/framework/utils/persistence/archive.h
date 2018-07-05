@@ -1,7 +1,6 @@
 #ifndef __ARCHIVE_H_
 #define __ARCHIVE_H_
 
-#include "dynamics.h"
 #include "persistence.h"
 
 namespace Grafkit{ 
@@ -15,8 +14,8 @@ namespace Grafkit{
 			ArchiveFile(FILE* stream, bool IsStoring = false);
 			virtual ~ArchiveFile();
 
-			virtual void Write(const void *buffer, size_t length);  
-			virtual void Read (void* buffer, size_t length);
+	    void Write(const void *buffer, size_t length) override;
+	    void Read (void* buffer, size_t length) override;
 	private:
 		FILE * _stream;
 	};
@@ -31,8 +30,8 @@ namespace Grafkit{
 		ArchiveMemory(BYTE* data, size_t length, bool IsStoring = false);
 		virtual ~ArchiveMemory();
 
-		virtual void Write(const void *buffer, size_t length) {}	
-		virtual void Read(void* buffer, size_t length);
+	    void Write(const void *buffer, size_t length) override {}
+	    void Read(void* buffer, size_t length) override;
 
 	private:
 		BYTE* m_data;

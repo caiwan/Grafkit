@@ -1,5 +1,4 @@
 #pragma once 
-#include "scene.h"
 #include "render/SceneGraph.h"
 
 inline void Grafkit::HasSceneGraphRole::InitializeSceneGraph()

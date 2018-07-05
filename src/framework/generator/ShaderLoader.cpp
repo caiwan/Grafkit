@@ -23,7 +23,8 @@ namespace {
 		{
 		}
 
-		HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) {
+		HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) override
+		{
 			IAssetRef asset;
 			std::string relpath;
 			switch (IncludeType) {
@@ -58,7 +59,8 @@ namespace {
 			return S_OK;
 		}
 
-		HRESULT __stdcall Close(LPCVOID pData) {
+		HRESULT __stdcall Close(LPCVOID pData) override
+		{
 			// -- resmanbol kiszed
 			char buffer[256];
 			sprintf_s(buffer, "pointer@%d", pData);

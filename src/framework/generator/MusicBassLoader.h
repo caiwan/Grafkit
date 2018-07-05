@@ -2,7 +2,6 @@
 
 #include "../utils/exceptions.h"
 
-#include "../utils/asset.h"
 #include "../utils/resource.h"
 #include "../utils/ResourceBuilder.h"
 
@@ -14,9 +13,9 @@ namespace Grafkit {
 		MusicBassLoader(const std::string& source_name);
 		~MusicBassLoader();
 
-		virtual void Load(IResourceManager * const & resman, IResource * source);
+	    void Load(IResourceManager * const & resman, IResource * source) override;
 
-		virtual IResource* NewResource();
+	    IResource* NewResource() override;
 	};
 
 }

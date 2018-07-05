@@ -5,10 +5,8 @@
 #include "animation/animation.h"
 #include "animation/scene.h"
 #include "render/model.h"
-#include "render/texture.h"
 #include "render/Material.h"
 
-#include "utils/asset.h"
 #include "utils/persistence/archive.h"
 
 #include "utils/ResourceManager.h"

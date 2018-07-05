@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../render/texture.h"
-
 // #include "../utils/asset.h"
 #include "../utils/resource.h"
 #include "../utils/ResourceBuilder.h"
@@ -21,9 +19,9 @@ namespace Grafkit{
 		ITexture1DBuilder(std::string name) : IResourceBuilder(name) {}
 		virtual ~ITexture1DBuilder() {}
 
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) = 0;
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override = 0;
 
-		virtual IResource* NewResource();
+	    IResource* NewResource() override;
 	};
 
 	class ITexture2DBuilder : public Grafkit::IResourceBuilder
@@ -33,9 +31,9 @@ namespace Grafkit{
 		ITexture2DBuilder(std::string name) : IResourceBuilder(name) {}
 		virtual ~ITexture2DBuilder() {}
 
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) = 0;
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override = 0;
 
-		virtual IResource* NewResource();
+	    IResource* NewResource() override;
 	};
 
 	/*
@@ -53,7 +51,7 @@ namespace Grafkit{
 		TextureBufferBuilder(std::string name, TextureBufferBuilder::Type_E type);
 		TextureBufferBuilder(std::string name, TextureBufferBuilder::Type_E type, uint16_t w, uint16_t h);
 
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
 	
 	private:
 		uint16_t m_w, m_h;
@@ -73,7 +71,7 @@ namespace Grafkit{
 		///@todo implement resize
 		void Resize(int x, int y) { m_w = x, m_h = y; }
 
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
 
 	protected:
 		int m_w, m_h;
@@ -84,9 +82,9 @@ namespace Grafkit{
 		TextureCubemapFromBitmap(std::string name, std::string source_posx, std::string source_negx, std::string source_posy, std::string source_negy, std::string source_posz, std::string source_negz);
 		~TextureCubemapFromBitmap();
 
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
 
-		virtual IResource* NewResource();
+	    IResource* NewResource() override;
 	private:
 		std::string m_sourceNames[6];
 	};
@@ -95,7 +93,7 @@ namespace Grafkit{
 	public:
 		TextureNoiseMap(size_t size);
 		TextureNoiseMap(std::string name, size_t size);
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
 	private:
 		size_t m_size;
 	};
@@ -112,9 +110,9 @@ namespace Grafkit{
 
 		TextureSamplerBuilder(TextureSamplerBuilder::Type_E type);
 
-		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
+	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
 
-		virtual IResource* NewResource(); 
+	    IResource* NewResource() override; 
 
 	private:
 		D3D11_TEXTURE_ADDRESS_MODE m_mode;

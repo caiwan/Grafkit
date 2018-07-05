@@ -13,8 +13,6 @@
 #include "renderer.h"
 #include "dxtypes.h"
 
-#include "shader.h"
-
 namespace Grafkit 
 {
 	/**
@@ -49,7 +47,7 @@ namespace Grafkit
 
 		PERSISTENT_DECL(Grafkit::Mesh, 1);
 	protected:
-		virtual void serialize(Archive& ar) { _serialize(ar); }
+	    void serialize(Archive& ar) override { _serialize(ar); }
 		void _serialize(Archive& ar);
 
 	private:

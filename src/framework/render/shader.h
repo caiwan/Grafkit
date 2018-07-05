@@ -222,20 +222,20 @@ namespace Grafkit {
 		VertexShader();
 		~VertexShader();
 
-		enum ShaderType_e GetShaderType() { return SHADER_VERTEX; }
+		enum ShaderType_e GetShaderType() override { return SHADER_VERTEX; }
 
 	protected:
-		void ShutdownChild();
-		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+		void ShutdownChild() override;
+		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) override;
+		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) override;
+		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr) override;
 		
-		void SetSamplerPtr(ID3D11DeviceContext *& device,UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
-		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
-		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+		void SetSamplerPtr(ID3D11DeviceContext *& device,UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) override;
+		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView) override;
+		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer) override;
 
-		void BindShader(ID3D11DeviceContext *& deviceContext);
-		void UnbindShader(ID3D11DeviceContext *& deviceContext);
+		void BindShader(ID3D11DeviceContext *& deviceContext) override;
+		void UnbindShader(ID3D11DeviceContext *& deviceContext) override;
 		
 
 	private:
@@ -250,20 +250,20 @@ namespace Grafkit {
 		PixelShader();
 		~PixelShader();
 
-		enum ShaderType_e GetShaderType() { return SHADER_PIXEL; }
+		enum ShaderType_e GetShaderType() override { return SHADER_PIXEL; }
 
 	protected:
-		void ShutdownChild();
-		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+		void ShutdownChild() override;
+		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) override;
+		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) override;
+		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr) override;
 
-		void SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
-		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
-		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+		void SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) override;
+		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView) override;
+		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer) override;
 
-		void BindShader(ID3D11DeviceContext *& deviceContext);
-		void UnbindShader(ID3D11DeviceContext *& deviceContext);
+		void BindShader(ID3D11DeviceContext *& deviceContext) override;
+		void UnbindShader(ID3D11DeviceContext *& deviceContext) override;
 	private:
 		ID3D11PixelShader* m_pxShader;
 	};
@@ -276,20 +276,20 @@ namespace Grafkit {
 		GeometryShader();
 		~GeometryShader();
 
-		enum ShaderType_e GetShaderType() { return SHADER_GEOMETRY; }
+		enum ShaderType_e GetShaderType() override { return SHADER_GEOMETRY; }
 
 	protected:
-		void ShutdownChild();
-		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage);
-		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr);
+		void ShutdownChild() override;
+		HRESULT CompileShaderFromFile(LPCWCHAR file, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) override;
+		HRESULT CompileShaderFromSource(LPCSTR source, size_t size, LPCSTR sourceName, D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR entry, ID3D10Blob*& shaderBuffer, ID3D10Blob*& errorMessage) override;
+		void CreateShader(ID3D11Device *& device, ID3D10Blob* shaderBuffer, ID3D11ClassLinkage *pClassLinkage = nullptr) override;
 
-		void SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler);
-		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView);
-		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer);
+		void SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler) override;
+		void SetShaderResources(ID3D11DeviceContext *& deviceContext, UINT bindPoint, UINT bindCount, ID3D11ShaderResourceView *& pResView) override;
+		void SetConstantBuffer(ID3D11DeviceContext *& deviceContext, UINT slot, UINT numBuffers, ID3D11Buffer*& buffer) override;
 
-		void BindShader(ID3D11DeviceContext *& deviceContext);
-		void UnbindShader(ID3D11DeviceContext *& deviceContext);
+		void BindShader(ID3D11DeviceContext *& deviceContext) override;
+		void UnbindShader(ID3D11DeviceContext *& deviceContext) override;
 
 	private:
 		ID3D11GeometryShader* m_gmShader;
