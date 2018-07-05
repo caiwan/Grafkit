@@ -4,8 +4,6 @@
 
 #include <stack>
 
-#include "common.h"
-
 #include "context.h"
 
 #include "utils/AssetFile.h"
@@ -62,7 +60,8 @@ int EditorApplication::Execute()
     m_demoContext = new GkDemo::Context(m_render, m_assetFactory);
     m_editor = new Editor(m_render, m_demoContext);
     m_mainWindow = new MainWindow();
-    m_editor->SetView(m_mainWindow);
+    
+    this->Add(new Resource<View>(m_mainWindow))
 
     // --- 
     // TODO this part should be put out to somewhere later on: 
@@ -143,12 +142,12 @@ void EditorApplication::BuildEditorModules()
     m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
     // --- 
-    m_animationEditor = new AnimationEditorModule(m_editor);
+    m_animationEditor = new AnimationEditor(m_editor);
 
     // 
     dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
-        dynamic_cast<AnimationEditorModule*>(m_animationEditor.Get()),
-        &AnimationEditorModule::AnimationSelectedEvent
+        dynamic_cast<AnimationEditor*>(m_animationEditor.Get()),
+        &AnimationEditor::AnimationSelectedEvent
     );
 }
 

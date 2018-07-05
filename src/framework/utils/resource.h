@@ -14,8 +14,6 @@ namespace Grafkit {
 	class IResourceManager;
 	class IResourceBuilder;
 
-	///@todo ezt ki kell pucolni teljesen
-
 	/**
 	A base class for collectable render assets for bulk loading and reloading
 	*/
@@ -23,18 +21,29 @@ namespace Grafkit {
 	{
 		friend class IResourceManager;
 	public:
-		IResource();
-		virtual ~IResource();
+	    IResource();
 
-	public:
-		std::string GetName() { return this->m_name; }
+	    IResource(const IResource& other);
+
+	    IResource& operator=(const IResource& other);
+
+        explicit IResource(const std::string& name);
+        explicit IResource(const std::string& name, const std::string& uuid);
+
+	    virtual ~IResource();
+
+		std::string GetName() const { return this->m_name; }
 		void SetName(std::string name) { m_name = name; }
 
 		virtual void* GetRaw() = 0;
 
+	    std::string GetUuid() const { return m_uuid; }
+	    void SetUuid(const std::string& uuid) { m_uuid = uuid; }
+        void CreateUuid();
+
 	protected:
 		std::string m_name;
-
+        std::string m_uuid;
 	};
 
 	/**
@@ -46,15 +55,21 @@ namespace Grafkit {
 	public:
 		Resource() : IResource(), Ref<T>() {}
 
-		Resource(Resource* ptr) : IResource(), Ref<T>(ptr) {}
-		Resource(Ref<Resource> ref) : IResource(), Ref<T>(ref) {}
+	    explicit Resource(Resource* ptr) : IResource(ptr), Ref<T>(ptr) {}
+	    explicit Resource(Ref<Resource> ref) : IResource(ref), Ref<T>(ref) {}
 
-		Resource(Ref<T> tref) : IResource(), Ref<T>(tref) {}
-		Resource(T* tptr) : IResource(), Ref<T>(tptr) {}
+	    explicit Resource(Ref<T> tref) : IResource(), Ref<T>(tref) {}
+	    explicit Resource(T* tptr) : IResource(), Ref<T>(tptr) {}
 
-		operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
-		operator T * const & () { return dynamic_cast<T*>(this->Get()); }
-		operator T& () { return *(this->Get()); }
+        explicit Resource(Ref<T> tref, const std::string& name) : IResource(name), Ref<T>(tref) {}
+        explicit Resource(T* tptr, const std::string& name) : IResource(name), Ref<T>(tptr) {}
+
+        explicit Resource(Ref<T> tref, const std::string& name, const std::string& uuid) : IResource(name, uuid), Ref<T>(tref) {}
+        explicit Resource(T* tptr, const std::string& name, const std::string& uuid) : IResource(name, uuid), Ref<T>(tptr) {}
+
+	    explicit operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
+	    explicit operator T * const & () { return dynamic_cast<T*>(this->Get()); }
+	    explicit operator T& () { return *(this->Get()); }
 
 	    void* GetRaw() override { return this->Get(); }
 
