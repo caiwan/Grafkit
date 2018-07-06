@@ -8,7 +8,7 @@ namespace Idogep
 
     class LogView : public View {
     public:
-        explicit LogView(const Ref<Controller>& controller);
+        explicit LogView();
 
         virtual void UpdateLog(std::string log) = 0;
     };

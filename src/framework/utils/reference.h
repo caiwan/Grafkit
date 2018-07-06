@@ -21,7 +21,7 @@ public:
 
 	 **refracted** to have correspondence to [IUnknown::AddRef](https://msdn.microsoft.com/en-us/library/windows/desktop/ms691379(v=vs.85).aspx)
 	*/
-	inline size_t AddRef() { ++_ref_count; return _ref_count; }
+    size_t AddRef() { ++_ref_count; return _ref_count; }
 
 	/**
 	 Remove a reference from this object.
@@ -30,12 +30,12 @@ public:
 
 	 **refracted** to have correspondence to [IUnknown::Release](https://msdn.microsoft.com/en-us/library/windows/desktop/ms682317(v=vs.85).aspx)
 	*/
-	inline size_t Release() { _ref_count--; return _ref_count; }
+    size_t Release() { _ref_count--; return _ref_count; }
 
 	/**
 		Returns the current reference count.
 	*/
-	inline const size_t GetReferenceCount() const { return _ref_count; }
+    const size_t GetReferenceCount() const { return _ref_count; }
 
 private:
 	size_t _ref_count;
@@ -59,7 +59,7 @@ private:
 
 public:
 	/** Default constructor. Creates an empty reference. */
-	inline LazyRef() : ptr(nullptr) { }
+    LazyRef() : ptr(nullptr) { }
 
 	/** Creates an reference holding an instance of T. */
 	LazyRef(T* pointer) : ptr(pointer) {
@@ -71,7 +71,7 @@ public:
 	/**
 	 Copy constructor for the same type of reference.
 	*/
-	inline LazyRef(const LazyRef<T>& other)
+    LazyRef(const LazyRef<T>& other)
 		: ptr(other.ptr)
 	{
 		if (ptr != nullptr) {
@@ -82,7 +82,7 @@ public:
 	/**
 	 Destructor
 	*/
-	inline ~LazyRef()
+    ~LazyRef()
 	{
 		if (ptr != nullptr &&
 			ptr->Release() == 0) {
@@ -159,12 +159,12 @@ public:
 	/**
 	 Default constructor. Creates an empty reference.
 	*/
-	inline Ref() : ptr(nullptr) {}
+    Ref() : ptr(nullptr) {}
 
 	/**
 	 Creates an reference holding an instance of T.
 	*/
-	inline Ref(T* pointer) : ptr(pointer) {
+    Ref(T* pointer) : ptr(pointer) {
 		if (ptr != nullptr) {
 			ptr->AddRef();
 		}
@@ -173,7 +173,7 @@ public:
 	/**
 	 Copy constructor
 	*/
-	inline Ref(const Ref<T>& other) : ptr(other.ptr) {
+    Ref(const Ref<T>& other) : ptr(other.ptr) {
 		if (ptr != nullptr) {
 			ptr->AddRef();
 		}
@@ -185,7 +185,7 @@ public:
 	  Returns the underlying pointer. Note that the object is still
 	  hold by the Reference.
 	 */
-	inline T* Get() const {
+    T* Get() const {
 		return ptr;
 	}
 
@@ -193,7 +193,7 @@ public:
 	 Copy constructor
 	*/
 	template<typename T1>
-	inline Ref(const Ref<T1>& other)
+	Ref(const Ref<T1>& other)
 		: ptr(other.Get())
 	{
 		if (ptr != nullptr) {
@@ -204,7 +204,7 @@ public:
 	/**
 	 Destructor
 	*/
-	inline ~Ref()
+    ~Ref()
 	{
 		if (ptr != nullptr &&
 			ptr->Release() == 0) {
@@ -299,8 +299,8 @@ public:
 	}
 
 
-	inline bool Valid() const { return ptr != nullptr; }
-	inline bool Invalid() const { return ptr == nullptr; }
+    bool Valid() const { return ptr != nullptr; }
+    bool Invalid() const { return ptr == nullptr; }
 
 	/**
 	   arrow operator.

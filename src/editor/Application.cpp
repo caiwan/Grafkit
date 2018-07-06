@@ -60,11 +60,6 @@ int EditorApplication::Execute()
     m_mainWindow = new MainWindow();
     this->Add(new Resource<View>(m_mainWindow, "EditorView", "052de2ba-ae61-4b60-a723-f1259ffd5a32"));
 
-    m_preloadWindow = new Preloader(m_mainWindow);
-    onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
-
-    m_demoContext->SetPreloadListener(m_preloadWindow);
-
     SplashWidget* sw = new SplashWidget();
 
     onLoaderFinished += Delegate(sw, &SplashWidget::hide);
@@ -138,7 +133,15 @@ void EditorApplication::Initialize()
 
 void EditorApplication::BuildEditorModules()
 {
+    // -- setup underlying demo context 
     m_demoContext = new GkDemo::Context(m_render, m_assetFactory);
+    m_preloadWindow = new Preloader(m_mainWindow);
+    onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
+
+    m_demoContext->SetPreloadListener(m_preloadWindow);
+
+    // --- Setup modules
+
     m_editor = new Editor(m_render, m_demoContext);
     this->Add(new Resource<Controller>(m_editor, "Editor", "bcfdd3ee-29cc-455a-a76f-d06fda684dbc"));
 
@@ -169,13 +172,13 @@ void EditorApplication::InitializeModules()
     GetAllResources(resources);
     for (auto resource : resources)
     {
-        Controller* controller = dynamic_cast<Resource<Controller>*>(resource.Get())->Get();
-        if (controller)
+        Ref<Resource<Controller>> controller = dynamic_cast<Resource<Controller>*>(resource.Get());
+        if (controller.Valid() && controller->Valid())
         {
-            qDebug() << "Initialize component " << QString::fromStdString(resource->GetName()) << " uuid=" << QString::fromStdString(resource->GetUuid());
-            controller->Initialize(this);
+            qDebug() << "Initialize component" << QString::fromStdString(resource->GetName()) << "uuid=" << QString::fromStdString(resource->GetUuid());
+            (*controller)->Initialize(this);
 
-            EmitsCommandRole* commandEmitter = dynamic_cast<EmitsCommandRole*>(controller);
+            EmitsCommandRole* commandEmitter = dynamic_cast<EmitsCommandRole*>(controller->Get());
             if (commandEmitter)
                 m_editor->GetCommandStack()->ConnectEmitter(commandEmitter);
         }
@@ -184,6 +187,7 @@ void EditorApplication::InitializeModules()
 
 void EditorApplication::BuildDockingWindows()
 {
+
     //// 
     //QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_animationEditor->GetView().Get());
     //assert(curveEditorWidget);
@@ -191,11 +195,11 @@ void EditorApplication::BuildDockingWindows()
     //m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
 
     ////
-    //QDockWidget* logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
-    //assert(logWidget);
+    QDockWidget* logWidget = dynamic_cast<QDockWidget*>(View::SafeGetView(this, "LogView").Get());
+    assert(logWidget);
 
-    //logWidget->setParent(m_mainWindow);
-    //m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
+    logWidget->setParent(m_mainWindow);
+    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
     //m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
 
     //// 

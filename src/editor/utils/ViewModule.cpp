@@ -6,11 +6,11 @@
 using namespace Idogep;
 using namespace Grafkit;
 
-View* View::SafeGetView(IResourceManager* const& resourceManager, const std::string& name) {
+Ref<View> View::SafeGetView(IResourceManager* const& resourceManager, const std::string& name) {
     Ref<Resource<View>> controller = resourceManager->Get<Resource<View>>(name);
     assert(controller.Valid());
     assert(controller->Valid());
-    return controller->Get();
+    return controller;
 }
 
 View::View() : m_refreshQueueObject(nullptr)
@@ -33,11 +33,11 @@ void View::RequestRefreshView(const bool force)
 
 // ----------------------------------------------------
 
-Controller* Controller::SafeGetController(IResourceManager* const& resourceManager, const std::string& name) {
+Ref<Controller> Controller::SafeGetController(IResourceManager* const& resourceManager, const std::string& name) {
     Ref<Resource<Controller>> controller = resourceManager->Get<Resource<Controller>>(name);
     assert(controller.Valid());
     assert(controller->Valid());
-    return controller->Get();
+    return controller;
 }
 
 Controller::Controller() {

@@ -26,7 +26,7 @@ namespace Idogep
         friend class Roles::ViewRefreshEvent;
         friend class Controller;
     public:
-        static View* SafeGetView(Grafkit::IResourceManager * const&  resourceManager, const std::string &name);
+        static Ref<View> SafeGetView(Grafkit::IResourceManager * const&  resourceManager, const std::string &name);
 
         View();
         virtual ~View();
@@ -45,7 +45,7 @@ namespace Idogep
     class Controller : public Referencable
     {
     public:
-        static Controller* SafeGetController(Grafkit::IResourceManager * const&  resourceManager, const std::string &name);
+        static Ref<Controller> SafeGetController(Grafkit::IResourceManager * const&  resourceManager, const std::string &name);
 
         Controller();
         virtual ~Controller();

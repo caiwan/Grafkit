@@ -59,6 +59,7 @@ IResource::IResource(const std::string& name, const std::string& uuid) :
 IResource::~IResource() {
 }
 
+#pragma comment(lib, "rpcrt4.lib")  // UuidCreate - Minimum supported OS Win 2000
 void IResource::CreateUuid()
 {
     UUID uuid;
