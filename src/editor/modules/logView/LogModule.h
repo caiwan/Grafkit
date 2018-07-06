@@ -1,31 +1,30 @@
-#pragma once 
+#pragma once
 
 #include "utils/ViewModule.h"
 
+namespace Idogep
+{
+    class LogView;
 
-namespace Idogep {
-	class LogView;
+    class LogView : public View {
+    public:
+        explicit LogView(const Ref<Controller>& controller);
 
+        virtual void UpdateLog(std::string log) = 0;
+    };
 
-	class LogView : public View {
-	public:
-		virtual void UpdateLog(std::string log) = 0;
-		virtual void SetModel(Grafkit::IResource * modelResource) {};
-	};
+    class LoggerProxy;
 
-	class LoggerProxy;
+    class LogModule : public Controller
+    {
+    public:
+        explicit LogModule(LoggerProxy* const & loggerProxy);
+        ~LogModule();
 
-	class LogModule : public Controller {
-	public:
-		LogModule(Ref<Controller> parent, LoggerProxy* const & loggerProxy);
-		~LogModule();
+        void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
 
-		void Initialize();
-		//void MediateSiblingModule(Ref<Controller> other);
-
-	private:
-		Ref<LogView> m_myView;
-		LoggerProxy* m_loggerProxy;
-	};
-
+    private:
+        Ref<LogView> m_myView;
+        LoggerProxy* m_loggerProxy;
+    };
 }

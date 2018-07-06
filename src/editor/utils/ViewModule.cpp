@@ -1,25 +1,19 @@
 #include <QTimer>
 
 #include "ViewModule.h"
+#include "utils/ResourceManager.h"
 
 using namespace Idogep;
+using namespace Grafkit;
 
-Controller::Controller(Ref<Controller> parent)
-    : Referencable()
-{
-    if (parent.Valid())
-        parent->AddChildModule(this);
-    m_parent = parent;
+View* View::SafeGetView(IResourceManager* const& resourceManager, const std::string& name) {
+    Ref<Resource<View>> controller = resourceManager->Get<Resource<View>>(name);
+    assert(controller.Valid());
+    assert(controller->Valid());
+    return controller->Get();
 }
 
-Controller::~Controller() {
-}
-
-// ------------------------------------------------------------------------
-
-View::View(Ref<Controller> parentModule)
-    : m_module(parentModule)
-    , m_refreshQueueObject(nullptr)
+View::View() : m_refreshQueueObject(nullptr)
 {
     m_refreshQueueObject = new Roles::ViewRefreshEvent(this);
 }
@@ -37,12 +31,27 @@ void View::RequestRefreshView(const bool force)
     m_refreshQueueObject->QueueRefresh(true);
 }
 
+// ----------------------------------------------------
+
+Controller* Controller::SafeGetController(IResourceManager* const& resourceManager, const std::string& name) {
+    Ref<Resource<Controller>> controller = resourceManager->Get<Resource<Controller>>(name);
+    assert(controller.Valid());
+    assert(controller->Valid());
+    return controller->Get();
+}
+
+Controller::Controller() {
+}
+
+Controller::~Controller() {
+}
+
 
 // ----------------------------------------------------
 
-Roles::ViewRefreshEvent::ViewRefreshEvent(View* const& view): m_view(view)
-    , m_isQueued(false)
-    , m_isSetForce(false) {
+Roles::ViewRefreshEvent::ViewRefreshEvent(View* const& view) : m_view(view)
+, m_isQueued(false)
+, m_isSetForce(false) {
 }
 
 void Roles::ViewRefreshEvent::refreshViewSlot()

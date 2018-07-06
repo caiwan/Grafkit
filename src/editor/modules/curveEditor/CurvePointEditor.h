@@ -24,7 +24,7 @@ namespace Idogep
         friend class CurvePointItem;
 
     public:
-        explicit CurvePointEditor(const Ref<Controller>& parent);
+        explicit CurvePointEditor();
 
         Grafkit::Animation::ChannelRef GetChannel() const { return m_channel; }
 
@@ -36,15 +36,13 @@ namespace Idogep
             Rebuild(); //... Folyt kov.
         }
 
+        void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
+
         void Recalculate(TimelineArea* const area) const;
 
         void UpdateKey(const Grafkit::Animation::ChannelRef& channel, size_t index, const Grafkit::Animation::Key& key);
         void UpdateChannel(const Grafkit::Animation::TrackRef& track, size_t channelId, const Grafkit::Animation::ChannelRef& channel);
-
-        void Initialize(PointEditorView* pointEditorView);
-
-        void Initialize() override;
-
+        
         void Rebuild();
 
         void HidePoints();

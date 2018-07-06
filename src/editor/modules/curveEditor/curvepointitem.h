@@ -15,8 +15,11 @@ namespace Idogep
 
     class CurveSegment;
 
+    class CurvePointEditor;
+
     class CurvePointItem : public QGraphicsItem, public View
     {
+        friend class CurvePointEditor;
     public:
         //CurvePointItem(QGraphicsItem* parent = nullptr);
         explicit CurvePointItem(Grafkit::Animation::Key key, size_t index, QGraphicsItem* parent = nullptr);
@@ -31,11 +34,6 @@ namespace Idogep
         void RecalculatePosition(TimelineArea const* area);
 
         // Properties
-        //float GetTime() const { return m_key.m_time; }
-        //void SetTime(const float t) { m_key.m_time = t; }
-
-        //float GetValue() const { return m_key.m_value; }
-        //void SetValue(const float v) { m_key.m_value = v; }
 
         QPointF GetCoord() const { return { m_key.m_time, m_key.m_value }; }
 
@@ -44,13 +42,6 @@ namespace Idogep
             m_key.m_time = c.x();
             m_key.m_value = c.y();
         }
-
-        //float GetRadius();
-        //void SetRadius(float  radius);
-        //float GetAngle();
-        //void SetAngle(float  angle);
-        //void SetTangent(float angle, float radius);
-        //QPointF GetTangent();
 
         // --- 
 

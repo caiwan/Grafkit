@@ -36,15 +36,18 @@ void SceneGraphViewWidget::RefreshView(bool force)
 // ReSharper disable CppInconsistentNaming
 void SceneGraphViewWidget::itemClickedSlot(const QModelIndex& index) const
 {
-    OutlineModule* controller = dynamic_cast<OutlineModule*>(m_module.Get());
+    assert(0);
+    /*OutlineModule* controller = dynamic_cast<OutlineModule*>(m_module.Get());
     assert(controller);
-    controller->onItemSelected(static_cast<TreeItem*>(index.internalPointer()));
+    controller->onItemSelected(static_cast<TreeItem*>(index.internalPointer()));*/
 }
 
 void SceneGraphViewWidget::itemDoubleClickedSlot(const QModelIndex& index) const
 {
-    OutlineModule* controller = dynamic_cast<OutlineModule*>(m_module.Get());
-    assert(controller);
+    assert(0);
+
+    /*OutlineModule* controller = dynamic_cast<OutlineModule*>(m_module.Get());
+    assert(controller);*/
 
     // TODO Add if needed
 }

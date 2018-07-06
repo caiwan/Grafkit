@@ -25,11 +25,10 @@ namespace Idogep {
 	{
 
 	public:
-		explicit OutlineModule(Ref<Controller> parent);
+		explicit OutlineModule();
 		virtual ~OutlineModule();
 
-		void Initialize() override;
-
+	    void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
 		void DocumentChangedEvent(GkDemo::Demo * const & document);
 
 		Event<TreeItem * const> onItemSelected;

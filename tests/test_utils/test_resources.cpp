@@ -12,15 +12,15 @@
 class ResourceManagerTest : public testing::Test {
 
 public:
-	void SetUp() {
+	void SetUp() override {
 	}
-	
-	void TearDown() {
+
+    void TearDown() override {
 	}   
 };
 
 
-TEST_F(ResourceManagerTest, given_EmptyRes_when_Assign_then_Assigned) {
+TEST_F(ResourceManagerTest, TestAssignment) {
 	ThingResourceRef resource = new ThingResource();
 
 	resource->AssingnRef(new Thing());
@@ -28,7 +28,7 @@ TEST_F(ResourceManagerTest, given_EmptyRes_when_Assign_then_Assigned) {
 	ASSERT_TRUE(resource.Valid() && resource->Valid());
 }
 
-TEST_F(ResourceManagerTest, given_ResourceManager_when_AddResource_then_GetResource) {
+TEST_F(ResourceManagerTest, TestAddAndGet) {
 	MyResourceManager *resman = new MyResourceManager();
 
 	ThingResourceRef resource = new ThingResource();
@@ -50,7 +50,7 @@ TEST_F(ResourceManagerTest, given_ResourceManager_when_AddResource_then_GetResou
 	delete resman;
 }
 
-TEST_F(ResourceManagerTest, given_Resource_when_ReplaceInManager_then_GetResource) {
+TEST_F(ResourceManagerTest, TestReplace) {
 	MyResourceManager *resman = new MyResourceManager();
 
 	ThingResourceRef resource = new ThingResource();
@@ -73,7 +73,7 @@ TEST_F(ResourceManagerTest, given_Resource_when_ReplaceInManager_then_GetResourc
 }
 
 
-TEST_F(ResourceManagerTest, given_Resource_when_RemoveFromManager_then_GetNull ) {
+TEST_F(ResourceManagerTest, TestRemove ) {
 	MyResourceManager *resman = new MyResourceManager();
 
 	ThingResourceRef resource = new ThingResource();
@@ -98,7 +98,7 @@ TEST_F(ResourceManagerTest, given_Resource_when_RemoveFromManager_then_GetNull )
 	delete resman;
 }
 
-TEST_F(ResourceManagerTest, given_ResourceBuilder_when_LoadResource_then_GetResource) {
+TEST_F(ResourceManagerTest, TestLoad) {
 	ThingResourceRef resource;
 	MyResourceManager *resman = new MyResourceManager();
 
@@ -111,7 +111,7 @@ TEST_F(ResourceManagerTest, given_ResourceBuilder_when_LoadResource_then_GetReso
 
 	resman->DoPrecalc();
 
-	// lekeres nelkul is frissulnie kell
+	// it has to be updated without refresh
 	ASSERT_TRUE(resource.Valid());
 	ASSERT_TRUE(resource->Valid());
 
@@ -121,4 +121,21 @@ TEST_F(ResourceManagerTest, given_ResourceBuilder_when_LoadResource_then_GetReso
 	ASSERT_TRUE(resource->Valid());
 
 	delete resman;
+}
+
+
+TEST_F(ResourceManagerTest, TestCasting) {
+    // given
+    MyResourceManager *resman = new MyResourceManager();
+
+    // when
+    resman->Add(new AnotherThingResource(new AnotherThing(), "anotherThing"));
+
+    ThingResourceRef resource = resman->Get<ThingResource>("anotherThing");
+
+    // then
+    ASSERT_FALSE(resource.Valid());
+    ASSERT_FALSE(resource->Valid());
+
+    delete resman;
 }

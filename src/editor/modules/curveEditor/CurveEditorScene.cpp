@@ -110,7 +110,8 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 {
-    CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
+    CurveEditor* parent = nullptr;
+    //CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
     assert(parent);
 
     if (parent->GetChannel().Invalid())

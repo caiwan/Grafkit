@@ -1,30 +1,31 @@
 #include "LogModule.h"
-#include "logwidget.h"
 #include "proxies/LoggerProxy.h"
 
-Idogep::LogModule::LogModule(Ref<Controller> parent, LoggerProxy * const & loggerProxy) : Controller(parent),
-m_myView(nullptr), m_loggerProxy(loggerProxy)
-{
+using namespace Idogep;
+
+LogView::LogView(const Ref<Controller>& controller): View() {
 }
 
-Idogep::LogModule::~LogModule()
-{
+LogModule::LogModule(LoggerProxy* const & loggerProxy) : Controller()
+    , m_myView(nullptr)
+    , m_loggerProxy(loggerProxy) {
 }
 
-void Idogep::LogModule::Initialize()
-{
-	assert(m_parent.Valid());
-	assert(m_parent->GetView().Valid());
-	QWidget * parentWidget = dynamic_cast<QWidget*>(m_parent->GetView().Get());
-	assert(parentWidget);
-	m_myView = new LogWidget(parentWidget);
-	SetView(m_myView);
-	
-	assert(m_loggerProxy);
-	m_loggerProxy->onUpdateLog += Delegate(m_myView.Get(), &LogView::UpdateLog);
+LogModule::~LogModule() {
 }
 
-//void Idogep::LogModule::MediateSiblingModule(Ref<Controller> other)
-//{
-//	//...
-//}
+void LogModule::Initialize(Grafkit::IResourceManager* const& resourceManager) 
+{
+#if 0
+    assert(m_parent.Valid());
+    assert(m_parent->GetView().Valid());
+    QWidget * parentWidget = dynamic_cast<QWidget*>(m_parent->GetView().Get());
+    assert(parentWidget);
+    m_myView = new LogWidget(parentWidget);
+    SetView(m_myView);
+
+    assert(m_loggerProxy);
+    m_loggerProxy->onUpdateLog += Delegate(m_myView.Get(), &LogView::UpdateLog);
+
+#endif
+}

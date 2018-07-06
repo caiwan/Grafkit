@@ -17,13 +17,13 @@ namespace Idogep
 {
     class CurveCursor;
 
-    class AnimationEditorModule;
+    class AnimationEditor;
 
     // ========================================================================================================
 
     class AnimationEditorWidget : public QDockWidget, public AnimationEditorView
     {
-        friend class AnimationEditorModule;
+        friend class AnimationEditor;
         Q_OBJECT
     public:
         explicit AnimationEditorWidget(QWidget* parent = nullptr);

@@ -37,7 +37,7 @@ namespace Idogep {
 	class Playback;
 
 	class EditorApplication :
-		protected Grafkit::IResourceManager, Grafkit::ClonableInitializer
+		public Grafkit::IResourceManager, Grafkit::ClonableInitializer
 	{
 	public:
 		static EditorApplication* Instance() { return s_self; }
@@ -67,8 +67,8 @@ namespace Idogep {
 		void Initialize();
 
 		void BuildEditorModules();
-		void InitializeModules() const;
-		void BuildDockingWindows() const;
+		void InitializeModules();
+		void BuildDockingWindows();
 
 	public:
 		Event<> onLoaderFinished;
@@ -90,6 +90,7 @@ namespace Idogep {
 
 		// --- modules
 		LoggerProxy * m_logger = nullptr;
+
 		Ref<Controller> m_logModule;
 
 		Ref<Controller> m_outlineViewModule;

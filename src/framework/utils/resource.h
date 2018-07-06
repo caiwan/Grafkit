@@ -62,10 +62,10 @@ namespace Grafkit {
 	    explicit Resource(T* tptr) : IResource(), Ref<T>(tptr) {}
 
         explicit Resource(Ref<T> tref, const std::string& name) : IResource(name), Ref<T>(tref) {}
-        explicit Resource(T* tptr, const std::string& name) : IResource(name), Ref<T>(tptr) {}
+        //explicit Resource(T* tptr, const std::string& name) : IResource(name), Ref<T>(tptr) {}
 
         explicit Resource(Ref<T> tref, const std::string& name, const std::string& uuid) : IResource(name, uuid), Ref<T>(tref) {}
-        explicit Resource(T* tptr, const std::string& name, const std::string& uuid) : IResource(name, uuid), Ref<T>(tptr) {}
+        //explicit Resource(T* tptr, const std::string& name, const std::string& uuid) : IResource(name, uuid), Ref<T>(tptr) {}
 
 	    explicit operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
 	    explicit operator T * const & () { return dynamic_cast<T*>(this->Get()); }

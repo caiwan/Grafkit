@@ -10,92 +10,89 @@
 /// http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
 
 namespace Grafkit {
-	class Clonables;
+    class Clonables;
 
-	/**
-	*/
-	class Clonable
-	{
-		friend class Clonables;
-	public:
-		virtual Clonable* createObj() const = 0;
-	};
+    /**
+    */
+    class Clonable
+    {
+        friend class Clonables;
+    public:
+        virtual Clonable* createObj() const = 0;
+    };
 
-	/**
-	*/
-	class Clonables {
-	private:
-		std::map<std::string, const Clonable*> m_clonables;
+    /**
+    */
+    class Clonables {
+        std::map<std::string, const Clonable*> m_clonables;
 
-	private:
-		Clonables() {}
+        Clonables() {}
 
-		Clonables(const Clonables&) = delete;
-		Clonables& operator=(const Clonables&) = delete;
+        Clonables(const Clonables&) = delete;
+        Clonables& operator=(const Clonables&) = delete;
 
-		virtual ~Clonables()
-		{
-			for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
-				const Clonable* clone = it->second;
-				delete clone;
-			}
-			m_clonables.clear();
-		}
+        virtual ~Clonables()
+        {
+            for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
+                const Clonable* clone = it->second;
+                delete clone;
+            }
+            m_clonables.clear();
+        }
 
-	public:
-		static Clonables& Instance()
-		{
-			static Clonables instance;   // Guaranteed to be destroyed.                              
-			return instance;    // Instantiated on first use.
-		}
+    public:
+        static Clonables& Instance()
+        {
+            static Clonables instance;   // Guaranteed to be destroyed.                              
+            return instance;    // Instantiated on first use.
+        }
 
-	public:
-		void addClonable(const char* className, Clonable* clone)
-		{
-			std::string name = className;
+        void addClonable(const char* className, Clonable* clone)
+        {
+            std::string name = className;
 
-			auto it = m_clonables.find(name);
-			if (it == m_clonables.end()) {
-				m_clonables[name] = clone;
-			}
-		}
+            auto it = m_clonables.find(name);
+            if (it == m_clonables.end()) {
+                m_clonables[name] = clone;
+            }
+        }
 
-		const Clonable* find(const char *className)
-		{
-			std::string name = className;
-			auto it = m_clonables.find(name);
-			if (it == m_clonables.end())
-				return NULL;
-			const Clonable* clone = it->second;
-			return clone;
-		}
+        const Clonable* find(const char *className)
+        {
+            std::string name = className;
+            auto it = m_clonables.find(name);
+            if (it == m_clonables.end())
+                return nullptr;
+            const Clonable* clone = it->second;
+            return clone;
+        }
 
-		Clonable* create(const char *className)
-		{
-			const Clonable* clone = find(className);
-			if (clone)
-				return clone->createObj();
-			else
-				return NULL;
-		}
+        Clonable* create(const char *className)
+        {
+            const Clonable* clone = find(className);
+            if (clone)
+                return clone->createObj();
+
+            return nullptr;
+        }
 
 #ifdef DEBUG
-		void dumpClonables() {
-			for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
-				Log::Logger().Debug("- Has Clonable factory of %s", it->first.c_str());
-			}
-		}
+        void dumpClonables() {
+            for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
+                Log::Logger().Debug("- Has Clonable factory of %s", it->first.c_str());
+            }
+        }
 #endif //DEBUG
-	};
+    };
 
-	/**
-	*/
-	class AddClonable {
-	public:
-		AddClonable(const char* className, Clonable* clone) {
-			Clonables::Instance().addClonable(className, clone);
-		}
-	};
+    /**
+    */
+    class AddClonable {
+    public:
+        AddClonable(const char* className, Clonable* clone) {
+            Clonables::Instance().addClonable(className, clone);
+        }
+    };
 
 }
 

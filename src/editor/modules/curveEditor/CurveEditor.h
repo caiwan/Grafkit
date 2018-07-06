@@ -39,10 +39,14 @@ namespace Idogep
     class CurveEditor : public Controller, public EmitsCommandRole
     {
     public:
-        explicit CurveEditor(const Ref<Controller>&& parent);
+        explicit CurveEditor();
 
         ~CurveEditor() override;
-        void Initialize() override;
+        //void Initialize() override;
+
+        //void Initialize(Grafkit::IResourceManager* resourceManager) override;
+        void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
+
 
         void ChannelSelectedEvent(Grafkit::Animation::TrackRef& track, const size_t& trackid, Grafkit::Animation::ChannelRef& channel) const;
         void ChannelDeselectedEvent() const;

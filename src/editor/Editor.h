@@ -33,11 +33,10 @@ namespace Idogep
     class Editor : public Controller
     {
     public:
-        explicit Editor(Grafkit::Renderer& render, /*Grafkit::IResourceManager* const & resman,*/ GkDemo::Context*const& context);
+        explicit Editor(Grafkit::Renderer& render, GkDemo::Context*const& context);
         ~Editor();
 
-        void Initialize() override;
-        //void MediateSiblingModule(Ref<Controller> module);
+        void Initialize(Grafkit::IResourceManager  * const &  resourceManager) override;
 
         void InitializeDocument();
 
@@ -68,15 +67,12 @@ namespace Idogep
         void SetDirty() { m_isDirty = true; }
         bool IsDirty() const { return m_isDirty; }
 
-        //Document * const & GetDocument() const { return m_document; }
         CommandStack* GetCommandStack() const { return m_commandStack; }
-
         MusicProxy* GetMusicProxy() const { return m_musicProxy; }
 
     private:
         bool DirtyCheck() const;
 
-        //Grafkit::IResourceManager* const & m_resourceManager;
         Grafkit::Renderer& m_render;
 
         MusicProxy* m_musicProxy;

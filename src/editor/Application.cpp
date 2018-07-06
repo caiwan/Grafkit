@@ -2,8 +2,6 @@
 
 #include <QDebug>
 
-#include <stack>
-
 #include "context.h"
 
 #include "utils/AssetFile.h"
@@ -19,13 +17,15 @@
 #include "modules/preloaderDialog/preloader.h"
 #include "modules/grafkitContext/QGrafkitContextWidget.h"
 
+
 using namespace Idogep;
 using namespace Grafkit;
 
 EditorApplication* EditorApplication::s_self;
 
-EditorApplication::EditorApplication(int argc, char** argv) :
-    m_assetFactory(nullptr)
+EditorApplication::EditorApplication(int argc, char** argv) : IResourceManager()
+    , ClonableInitializer()
+    , m_assetFactory(nullptr)
     , m_demoContext(nullptr)
     , m_preloadWindow(nullptr)
     , m_editor(nullptr)
@@ -57,14 +57,8 @@ EditorApplication::~EditorApplication()
 
 int EditorApplication::Execute()
 {
-    m_demoContext = new GkDemo::Context(m_render, m_assetFactory);
-    m_editor = new Editor(m_render, m_demoContext);
     m_mainWindow = new MainWindow();
-    
-    this->Add(new Resource<View>(m_mainWindow))
-
-    // --- 
-    // TODO this part should be put out to somewhere later on: 
+    this->Add(new Resource<View>(m_mainWindow, "EditorView", "052de2ba-ae61-4b60-a723-f1259ffd5a32"));
 
     m_preloadWindow = new Preloader(m_mainWindow);
     onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
@@ -109,6 +103,7 @@ void EditorApplication::Mainloop()
 
 void EditorApplication::Preload()
 {
+    assert(0);
     DoPrecalc();
     m_editor->InitializeDocument();
 }
@@ -120,10 +115,20 @@ void EditorApplication::Preload()
 #include "modules/logView/LogModule.h"
 #include "modules/outlineView/outlineModule.h"
 #include "modules/curveEditor/AnimationModule.h"
+#include "modules/curveEditor/CurveEditor.h"
+#include "modules/curveEditor/CurvePointEditor.h"
+
+#include "modules/logView/logwidget.h"
+#include "modules/outlineView/scenegraphviewwidget.h"
+#include "modules/curveEditor/AnimationEditorWidget.h"
+#include "modules/curveEditor/curveeditorscene.h"
+#include "modules/curveEditor/PointEditorWidget.h"
+
 
 // This part should be refactored eventutally:
 // should put out to a plugin system
 
+// TODO We shall put this out to a separate builder / mediator object
 void EditorApplication::Initialize()
 {
     BuildEditorModules();
@@ -131,75 +136,79 @@ void EditorApplication::Initialize()
     BuildDockingWindows();
 }
 
-// TODO We shall put this out to a separate builder / mediator object
 void EditorApplication::BuildEditorModules()
 {
-    m_logModule = new LogModule(m_editor, m_logger);
+    m_demoContext = new GkDemo::Context(m_render, m_assetFactory);
+    m_editor = new Editor(m_render, m_demoContext);
+    this->Add(new Resource<Controller>(m_editor, "Editor", "bcfdd3ee-29cc-455a-a76f-d06fda684dbc"));
+
+    m_logModule = new LogModule(m_logger);
+    this->Add(new Resource<Controller>(m_logModule, "LogModule", "8d23d4f2-a040-4a4e-bc0f-9d9a37977e5b"));
+    this->Add(new Resource<View>(new LogWidget(), "LogView", "5d8e4ef7-5cc6-424f-88c6-063840db1c5b"));
 
     // --- 
-    m_outlineViewModule = new OutlineModule(m_editor);
-
-    m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
+    m_outlineViewModule = new OutlineModule();
+    this->Add(new Resource<Controller>(m_outlineViewModule, "OutlineModule", "585d0fc1-6cf8-435f-aa38-777e4db40f1d"));
+    this->Add(new Resource<View>(new SceneGraphViewWidget(), "OutlineView", "5fbe4ef8-91ca-4cab-99a8-8e811318bcfb"));
 
     // --- 
-    m_animationEditor = new AnimationEditor(m_editor);
+    m_animationEditor = new AnimationEditor();
+    this->Add(new Resource<Controller>(m_animationEditor, "AnimationEditor", "6de072f7-50d4-4b14-82fd-337ccb758f0a"));
+    this->Add(new Resource<View>(new AnimationEditorWidget, "AnimationView", "e1b0d54a-5f5f-4108-8bf8-1927c8d88d66"));
 
-    // 
-    dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
-        dynamic_cast<AnimationEditor*>(m_animationEditor.Get()),
-        &AnimationEditor::AnimationSelectedEvent
-    );
+    this->Add(new Resource<Controller>(new CurveEditor(), "CurveEditor", "e6da51b2-689e-4c18-a889-8ddb2f62ee69"));
+    this->Add(new Resource<View>(new CurveEditorScene(), "CurveEditorView", "71a94299-4151-48ff-97df-f96504a7b4c4"));
+
+    this->Add(new Resource<Controller>(new CurvePointEditor(), "CurvePointEditor", "c54a9d93-91cc-4599-bac4-cfcc199daf1b"));
+    this->Add(new Resource<View>(new PointEditorWidget(), "PointEditorView", "0aad5739-4959-4e6d-bdeb-abadf3de524d"));
 }
 
-void EditorApplication::InitializeModules() const
+void EditorApplication::InitializeModules()
 {
-    std::stack<Ref<Controller>> stack;
-    stack.push(m_editor);
-    while (!stack.empty())
+    std::list<Ref<IResource>> resources;
+    GetAllResources(resources);
+    for (auto resource : resources)
     {
-        auto module = stack.top();
-        stack.pop();
-
-        EmitsCommandRole* commandEmitter = dynamic_cast<EmitsCommandRole*>(module.Get());
-        if (commandEmitter)
+        Controller* controller = dynamic_cast<Resource<Controller>*>(resource.Get())->Get();
+        if (controller)
         {
-            qDebug() << "Connecting command emitter obj=" << reinterpret_cast<void*>(module.Get());
-            m_editor->GetCommandStack()->ConnectEmitter(commandEmitter);
+            qDebug() << "Initialize component " << QString::fromStdString(resource->GetName()) << " uuid=" << QString::fromStdString(resource->GetUuid());
+            controller->Initialize(this);
+
+            EmitsCommandRole* commandEmitter = dynamic_cast<EmitsCommandRole*>(controller);
+            if (commandEmitter)
+                m_editor->GetCommandStack()->ConnectEmitter(commandEmitter);
         }
-
-        module->Initialize();
-
-        for (size_t i = 0; i < module->GetChildModuleCount(); i++) { stack.push(module->GetChildModule(i)); }
     }
 }
 
-void EditorApplication::BuildDockingWindows() const
+void EditorApplication::BuildDockingWindows()
 {
-    // 
-    QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_animationEditor->GetView().Get());
-    assert(curveEditorWidget);
+    //// 
+    //QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_animationEditor->GetView().Get());
+    //assert(curveEditorWidget);
 
-    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
+    //m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
 
-    //
-    QDockWidget* logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
-    assert(logWidget);
+    ////
+    //QDockWidget* logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
+    //assert(logWidget);
 
-    logWidget->setParent(m_mainWindow);
-    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
-    m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
+    //logWidget->setParent(m_mainWindow);
+    //m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
+    //m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
 
-    // 
-    QDockWidget* outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
-    assert(outlineWidget);
+    //// 
+    //QDockWidget* outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
+    //assert(outlineWidget);
 
-    outlineWidget->setParent(m_mainWindow);
-    m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
+    //outlineWidget->setParent(m_mainWindow);
+    //m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
 
-    // connect redo / undo menus
-    m_editor->GetCommandStack()->onCommandStackChanged += Delegate(m_mainWindow, &Roles::ManageCommandStackRole::CommandStackChangedEvent);
-    m_mainWindow->onUndo += Delegate(m_editor->GetCommandStack(), &CommandStack::Undo);
-    m_mainWindow->onRedo += Delegate(m_editor->GetCommandStack(), &CommandStack::Redo);
+    //// connect redo / undo menus
+    //m_editor->GetCommandStack()->onCommandStackChanged += Delegate(m_mainWindow, &Roles::ManageCommandStackRole::CommandStackChangedEvent);
+    //m_mainWindow->onUndo += Delegate(m_editor->GetCommandStack(), &CommandStack::Undo);
+    //m_mainWindow->onRedo += Delegate(m_editor->GetCommandStack(), &CommandStack::Redo);
 }
 
 

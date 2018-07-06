@@ -16,13 +16,13 @@ namespace  Idogep
 
 	// ========================================================================================================
 
-	class AnimationEditorModule : public Controller, public EmitsCommandRole
+	class AnimationEditor : public Controller, public EmitsCommandRole
 	{
 	public:
-		explicit AnimationEditorModule(const Ref<Controller>& parent);
-		~AnimationEditorModule() override;
+		explicit AnimationEditor();
+		~AnimationEditor() override;
 
-		void Initialize() override;
+	    void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
 
 		Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform; // ptr, samplecount, channelcount, samplePerSec
 

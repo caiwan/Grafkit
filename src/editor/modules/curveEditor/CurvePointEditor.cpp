@@ -12,10 +12,30 @@ using namespace Idogep;
 using namespace Grafkit;
 
 
-CurvePointEditor::CurvePointEditor(const Ref<Controller>& parent)
-    : Controller(parent)
+CurvePointEditor::CurvePointEditor()
+    : Controller()
     , m_isCurveChangedFlag(false)
     , m_myView(nullptr) {
+}
+
+void CurvePointEditor::Initialize(Grafkit::IResourceManager* const& resourceManager) 
+{
+#if 0
+    //void CurvePointEditor::Initialize(PointEditorView* pointEditorView)
+    //{
+    //    assert(0);
+    //    m_myView = pointEditorView;
+    //}
+
+    void CurvePointEditor::Initialize(Grafkit::IResourceManager * resourceManager)
+    {
+        assert(0);
+        assert(m_myView);
+        m_myView->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
+        m_myView->onStartEdit += Delegate(this, &CurvePointEditor::StartEditEvent);
+        m_myView->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
+    }
+#endif
 }
 
 void CurvePointEditor::Rebuild()
@@ -36,7 +56,7 @@ void CurvePointEditor::Rebuild()
         point->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
         point->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
 
-        point->SetModule(this);
+        //point->SetController(this);
     }
     
     m_isCurveChangedFlag = true;
@@ -46,6 +66,8 @@ void CurvePointEditor::Rebuild()
 void CurvePointEditor::HidePoints() { for (CurvePointItem* point : m_points) { point->hide(); } }
 
 void CurvePointEditor::ShowPoints() { for (CurvePointItem* point : m_points) { point->show(); } }
+
+
 
 void CurvePointEditor::Recalculate(TimelineArea* const area) const { for (CurvePointItem* point : m_points) { point->RecalculatePosition(area); } }
 
@@ -76,16 +98,8 @@ void CurvePointEditor::UpdateChannel(const Animation::TrackRef & track, size_t c
     Rebuild();
 }
 
-void CurvePointEditor::Initialize(PointEditorView* pointEditorView) { m_myView = pointEditorView; }
 
 
-void CurvePointEditor::Initialize()
-{
-    assert(m_myView);
-    m_myView->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
-    m_myView->onStartEdit += Delegate(this, &CurvePointEditor::StartEditEvent);
-    m_myView->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
-}
 
 // ========================================================================
 

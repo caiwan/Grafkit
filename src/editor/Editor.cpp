@@ -15,11 +15,9 @@ using namespace Idogep;
 using namespace GkDemo;
 using namespace Grafkit;
 
-Editor::Editor(Renderer& render, /*IResourceManager* const& resman,*/ Context* const& context)
-    : Controller(nullptr)
-    //, m_resourceManager(resman)
+Editor::Editor(Renderer& render, Context* const& context)
+    : Controller()
     , m_render(render)
-    //, m_document(nullptr)
     , m_precalcRequested(false)
     , m_reloadRequested(false)
     , m_isDirty(false)
@@ -36,7 +34,7 @@ Editor::~Editor()
     delete m_commandStack;
 }
 
-void Editor::Initialize(/*IResourceManager* const& resman*/)
+void Editor::Initialize(IResourceManager* const& resman)
 {
     NewDocument();
 }

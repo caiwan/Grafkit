@@ -18,7 +18,8 @@ using namespace Grafkit;
 Roles::ManageCurveAudiogramRole::ManageCurveAudiogramRole()
     : m_agBuffer(nullptr)
     , m_agSampleCount(0)
-    , m_agChannelCount(0) {
+    , m_agChannelCount(0)
+    , m_agSamplePerSec(0) {
 }
 
 Roles::ManageCurveAudiogramRole::~ManageCurveAudiogramRole() { delete m_agBuffer; }
@@ -86,10 +87,13 @@ void Roles::ManageCurveAudiogramRole::ClearAudiogram()
 
 // ============================================================================================
 
-CurveEditor::CurveEditor(const Ref<Controller>&& parent) : Controller(parent), m_manageAudiogram(nullptr)
-{
+//CurveEditor::CurveEditor(const Ref<Controller>&& parent) : Controller(parent), m_manageAudiogram(nullptr)
+//{
+//}
+
+CurveEditor::CurveEditor() {
     m_manageAudiogram = new Roles::ManageCurveAudiogramRole();
-    m_pointEditor = new CurvePointEditor(this);
+    //m_pointEditor = new CurvePointEditor();
 }
 
 CurveEditor::~CurveEditor()
@@ -98,8 +102,11 @@ CurveEditor::~CurveEditor()
     delete m_pointEditor;
 }
 
-void CurveEditor::Initialize()
-{
+void CurveEditor::Initialize(Grafkit::IResourceManager* const& resourceManager) {
+//}
+//
+//void CurveEditor::Initialize(IResourceManager* resourceManager) {
+#if 0
     assert(m_parent);
     assert(m_parent->GetView());
 
@@ -124,7 +131,7 @@ void CurveEditor::Initialize()
     assert(musicProxy);
     musicProxy->onMusicChanged += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::ClearAudiogram);
     musicProxy->onMusicChanged += Delegate(ces, &Roles::TimelineSceneViewRole::MusicChangedEvent);
-    
+
     ces->onDemoTimeChanged += Delegate(musicProxy, &MusicProxy::SetTime);
 
     ces->onRequestAudiogram += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::GetAudiogram);
@@ -145,6 +152,7 @@ void CurveEditor::Initialize()
 
     m_myView = ces;
     SetView(m_myView);
+#endif
 }
 
 void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t &trackid, Animation::ChannelRef &channel) const

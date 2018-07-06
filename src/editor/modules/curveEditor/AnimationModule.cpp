@@ -15,21 +15,26 @@
 using namespace Idogep;
 using namespace Grafkit;
 
-// ===========================================================================================
 
-AnimationEditorModule::AnimationEditorModule(const Ref<Controller>& parent)
-    : Controller(parent) {
-    m_curveScene = new CurveEditor(this);
+AnimationEditor::AnimationEditor()
+    : Controller()
+    , m_animationListModel(nullptr) {
 }
 
-AnimationEditorModule::~AnimationEditorModule()
+AnimationEditor::~AnimationEditor()
 = default;
 
-void AnimationEditorModule::Initialize()
-{
+void AnimationEditor::Initialize(IResourceManager* const& resourceManager) {
+#if 0
     // TODO: Put this to Application
     assert(m_parent);
     assert(m_parent->GetView());
+
+    // We need this one too:
+    //m_curveScene = new CurveEditor(this);
+
+    dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(dynamic_cast<AnimationEditor*>(m_animationEditor.Get()), &AnimationEditor::AnimationSelectedEvent);
+
 
     QWidget* parentWidget = dynamic_cast<QWidget *>(m_parent->GetView().Get());
     assert(parentWidget);
@@ -51,16 +56,12 @@ void AnimationEditorModule::Initialize()
     m_myView->onChannelDeselected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelDeselectedEvent);
 
     SetView(m_myView);
+#endif
 }
 
+// ===========================================================================================
 
-// ========================================================================================================
-
-//Ref<CurveEditor> AnimationEditorModule::GetCurveSceneMoule() const
-//{
-//}
-
-void AnimationEditorModule::AnimationSelectedEvent(TreeItem* const item)
+void AnimationEditor::AnimationSelectedEvent(TreeItem* const item)
 {
     ItemHasAnimationsRole* animationItem = dynamic_cast<ItemHasAnimationsRole*>(item);
     if (!animationItem || !animationItem->GetAnimation()) // hide elements

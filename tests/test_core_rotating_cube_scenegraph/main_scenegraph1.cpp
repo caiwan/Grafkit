@@ -3,6 +3,7 @@
 #include "render/renderer.h"
 #include "render/SceneGraph.h"
 #include "render/camera.h"
+#include "render/mesh.h"
 #include "render/model.h"
 #include "render/texture.h"
 #include "render/Material.h"

@@ -33,6 +33,8 @@ namespace Grafkit {
         void Remove(const std::string &pName);
         void RemoveAll();
 
+        void GetAllResources(std::list<Ref<IResource>> &resources) const;
+
         void SetPreloadListener(IPreloadEvents* listener) { m_preloadEvents = listener; }
 
         // preloader
@@ -64,10 +66,11 @@ namespace Grafkit {
         IPreloadEvents* m_preloadEvents;
     };
 
-    template<class T> inline Ref<T> IResourceManager::Get(const std::string &pName) const
+    template<class T>
+    Ref<T> IResourceManager::Get(const std::string &pName) const
     {
         std::string name = pName;
-        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        transform(name.begin(), name.end(), name.begin(), tolower);
 
         auto it = m_resources.find(name);
 
@@ -78,7 +81,8 @@ namespace Grafkit {
         return nullptr;
     }
 
-    template<class T> inline Ref<T> IResourceManager::Load(IResourceBuilder* builder) {
+    template<class T>
+    Ref<T> IResourceManager::Load(IResourceBuilder* builder) {
         Load(builder);
         T* res = Get<T>(builder->GetName());
         return res;
