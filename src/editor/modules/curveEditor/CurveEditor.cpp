@@ -98,8 +98,8 @@ CurveEditor::~CurveEditor()
 }
 
 void CurveEditor::Initialize(IResourceManager* const& resourceManager) {
-    CurveEditorScene *ces = dynamic_cast<CurveEditorScene*>(View::SafeGetView(resourceManager, "CurveEditorView").Get());
-    assert(ces);
+    m_myView = dynamic_cast<CurveEditorScene*>(View::SafeGetView(resourceManager, "CurveEditorView").Get());
+    assert(m_myView.Valid());
 
     Editor* editor = dynamic_cast<Editor*>(SafeGetController(resourceManager, "Editor").Get());
     assert(editor);
@@ -110,14 +110,14 @@ void CurveEditor::Initialize(IResourceManager* const& resourceManager) {
     MusicProxy* musicProxy = editor->GetMusicProxy();
     assert(musicProxy);
     musicProxy->onMusicChanged += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::ClearAudiogram);
-    musicProxy->onMusicChanged += Delegate(ces, &Roles::TimelineSceneViewRole::MusicChangedEvent);
+    musicProxy->onMusicChanged += Delegate(m_myView.Get(), &Roles::TimelineSceneViewRole::MusicChangedEvent);
 
     // -- timeline 
-    ces->onDemoTimeChanged += Delegate(musicProxy, &MusicProxy::SetTime);
-    editor->onDemoTimeChanged += Delegate(ces, &Roles::TimelineSceneViewRole::DemoTimeChangedEvent);
+    m_myView->onDemoTimeChanged += Delegate(musicProxy, &MusicProxy::SetTime);
+    editor->onDemoTimeChanged += Delegate(m_myView.Get(), &Roles::TimelineSceneViewRole::DemoTimeChangedEvent);
     
     // -- audiogram 
-    ces->onRequestAudiogram += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::GetAudiogram);
+    m_myView->onRequestAudiogram += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::GetAudiogram);
     m_manageAudiogram->onRequestWaveform += Delegate(musicProxy, &Audiogram::GetWaveform);
 
     // -- point editor
@@ -125,8 +125,9 @@ void CurveEditor::Initialize(IResourceManager* const& resourceManager) {
     m_pointEditor = dynamic_cast<CurvePointEditor*>(SafeGetController(resourceManager, "CurvePointEditor").Get());
     assert(m_pointEditor);
 
-    ces->onRecalculateCurve += Delegate(m_pointEditor.Get(), &CurvePointEditor::Recalculate);
-
+    m_pointEditor->onInvlaidateCurve += Delegate(m_myView.Get(), &CurveEditorView::Invalidate);
+    m_pointEditor->onUpdateChannel += Delegate(this, &CurveEditor::UpdateChannel);
+    m_myView->onRecalculateCurve += Delegate(m_pointEditor.Get(), &CurvePointEditor::Recalculate);
 }
 
 // ReSharper disable CppMemberFunctionMayBeConst
@@ -171,7 +172,6 @@ void CurveEditor::UpdateChannel()
     AddCurveToScene();
 
     m_myView->ShowAnimationCurves();
-
     m_myView->RequestRefreshView(true);
 }
 // ReSharper restore CppMemberFunctionMayBeConst

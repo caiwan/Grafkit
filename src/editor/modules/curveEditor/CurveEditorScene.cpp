@@ -172,13 +172,17 @@ void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
     if (items().empty())
         return;
 
-    QTransform transformation = QTransform();
-    CurvePointItem* itemAtCrsr = dynamic_cast<CurvePointItem*>(itemAt(event->scenePos(), transformation));
+    QPointF pos = event->scenePos();
+
+    const QTransform transformation = QTransform();
+    CurvePointItem* pointItem = dynamic_cast<CurvePointItem*>(itemAt(pos, transformation));
+    CurvePointItem* curvePointItem = pointItem;
+    const CurvePointItem* itemAtCrsr = curvePointItem;
 
     if (!itemAtCrsr)
     {
-        QPointF p = m_area->Screen2Point(event->screenPos());
-        onCommitAddPointEvent(p.x(), p.y());
+        QPointF unitp = m_area->Screen2Point(pos);
+        onCommitAddPointEvent(unitp.x(), unitp.y());
         update();
     } else
     {

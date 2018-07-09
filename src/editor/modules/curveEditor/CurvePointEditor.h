@@ -64,7 +64,8 @@ namespace Idogep
         void PointSelectedEvent(size_t index);
         void PointDeSelectedEvent();
 
-        bool GetAndClearIsCurveChangedFlag();
+        Event<> onInvlaidateCurve;
+        Event<> onUpdateChannel;
 
     private:
         Grafkit::Animation::Key EditKey(size_t index, Grafkit::Animation::Key key) const;
@@ -76,7 +77,7 @@ namespace Idogep
 
         CurvePointList m_points;
 
-        bool m_isCurveChangedFlag;
+        //bool m_isCurveChangedFlag;
 
         Ref<PointEditorView> m_myView;
     };

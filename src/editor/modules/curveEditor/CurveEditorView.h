@@ -52,7 +52,6 @@ namespace Idogep
         Grafkit::Animation::ChannelRef GetChannel() const { return m_channel; }
         void SetChannel(const Grafkit::Animation::ChannelRef& channel) { m_channel = channel; }
 
-       // TODO: 
         virtual void Invalidate();
 
     protected:

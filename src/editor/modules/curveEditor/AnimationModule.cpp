@@ -28,17 +28,20 @@ AnimationEditor::~AnimationEditor()
 void AnimationEditor::Initialize(IResourceManager* const& resourceManager) 
 {
     m_myView = dynamic_cast<AnimationEditorView*>(View::SafeGetView(resourceManager, "AnimationView").Get());
-    m_curveScene = dynamic_cast<CurveEditor*>(Controller::SafeGetController(resourceManager, "CurveEditor").Get());
+    m_curveScene = dynamic_cast<CurveEditor*>(SafeGetController(resourceManager, "CurveEditor").Get());
+
+    assert(m_myView.Valid());
+    assert(m_curveScene.Valid());
 
     // manage animation role
     m_myView->onChannelSelected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelSelectedEvent);
     m_myView->onChannelDeselected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelDeselectedEvent);
 
-    OutlineModule* outlineModue = dynamic_cast<OutlineModule*>(Controller::SafeGetController(resourceManager, "OutlineModule").Get());
+    OutlineModule* outlineModue = dynamic_cast<OutlineModule*>(SafeGetController(resourceManager, "OutlineModule").Get());
     assert(outlineModue);
     outlineModue->onItemSelected += Delegate(this, &AnimationEditor::AnimationSelectedEvent);
 
-    Ref<Editor> editor = dynamic_cast<Editor*>(Controller::SafeGetController(resourceManager, "Editor").Get());
+    Ref<Editor> editor = dynamic_cast<Editor*>(SafeGetController(resourceManager, "Editor").Get());
     assert(editor);
 
     // manage playback role 

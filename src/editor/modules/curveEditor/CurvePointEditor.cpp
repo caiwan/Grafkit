@@ -14,7 +14,7 @@ using namespace Grafkit;
 
 CurvePointEditor::CurvePointEditor()
     : Controller()
-    , m_isCurveChangedFlag(false)
+    , m_channelId(0)
     , m_myView(nullptr) {
 }
 
@@ -56,7 +56,7 @@ void CurvePointEditor::Rebuild()
         point->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
     }
 
-    m_isCurveChangedFlag = true;
+    onInvlaidateCurve();
 
 }
 
@@ -80,7 +80,7 @@ void CurvePointEditor::UpdateKey(const Animation::ChannelRef& channel, size_t in
         PointSelectedEvent(index);
     }
 
-    m_isCurveChangedFlag = true;
+    onInvlaidateCurve();
 
 }
 
@@ -99,7 +99,8 @@ void CurvePointEditor::StartEditEvent(const size_t& index, const Animation::Key&
 {
     CurvePointItem* point = m_points[index];
     point->SetOriginalKey(key);
-    m_isCurveChangedFlag = true;
+
+    onInvlaidateCurve();
 }
 
 void CurvePointEditor::CommitEditEvent(const size_t& index, const Animation::Key& key)
@@ -115,14 +116,19 @@ void CurvePointEditor::CommitAddPointEvent(const float& key, const float& value)
 {
     Animation::ChannelRef oldChannel = new Animation::Channel(m_channel);
 
-    Animation::Key newKey(m_channel->GetKey(key)); // use previous key as prototype
+    int index = m_channel->FindKeyIndex(key);
+
+    assert(index != -1);
+
+    Animation::Key newKey(m_channel->GetKey(index)); // use previous key as prototype
     newKey.m_time = key, newKey.m_value = value;
 
     m_channel->AddKey(newKey);
 
     Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this);
     onNewCommand(cmd);
-
+    Rebuild();
+    onUpdateChannel();
 }
 
 void CurvePointEditor::CommitRemovePointEvent(const size_t& index)
@@ -133,6 +139,8 @@ void CurvePointEditor::CommitRemovePointEvent(const size_t& index)
 
     Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this);
     onNewCommand(cmd);
+    Rebuild();
+    onUpdateChannel();
 }
 
 void CurvePointEditor::EditKeyEvent(const size_t& index, const Animation::Key& key)
@@ -143,8 +151,7 @@ void CurvePointEditor::EditKeyEvent(const size_t& index, const Animation::Key& k
 
     PointSelectedEvent(index);
     m_myView->RequestRefreshView(false);
-
-    m_isCurveChangedFlag = true;
+    onInvlaidateCurve();
 }
 
 void CurvePointEditor::PointSelectedEvent(size_t index)
@@ -156,19 +163,6 @@ void CurvePointEditor::PointSelectedEvent(size_t index)
 
 void CurvePointEditor::PointDeSelectedEvent() { m_myView->UpdatePointEditor(false); }
 
-bool CurvePointEditor::GetAndClearIsCurveChangedFlag()
-{
-    bool b = m_isCurveChangedFlag;
-    m_isCurveChangedFlag = false;
-    return b;
-}
-
-//bool Idogep::CurvePointEditor::GetAndClearIsEditingPointFlag()
-//{
-//    bool b = m_isEditngFlag;
-//    m_isEditngFlag = false;
-//    return b;
-//}
 
 Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
 {
