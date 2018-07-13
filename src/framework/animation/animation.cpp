@@ -8,13 +8,14 @@ using namespace Grafkit;
 
 /* ============================================================================================== */
 
-Animation::Animation()
+Animation::Animation() : Object()
 //: m_duration(0) 
 {
 }
 
 Animation::~Animation() {
 }
+
 
 /* ============================================================================================== */
 
@@ -116,5 +117,5 @@ void Animation::Track::Serialize(Archive& ar)
 
 void Animation::_Serialize(Archive& ar)
 {
-    PERSIST_STRING(ar, m_name);
+    Object::_Serialize(ar);
 }

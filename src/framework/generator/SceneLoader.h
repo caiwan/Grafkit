@@ -13,13 +13,13 @@
 			
 namespace Grafkit {
 
-	class SceneLoader : public Grafkit::IResourceBuilder
+	class SceneLoader : public IResourceBuilder
 	{
 	public:
 		SceneLoader(std::string name, std::string source_name);
 		~SceneLoader();
 
-		void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
+		void Load(IResourceManager * const & resman, IResource * source) override;
 
 		static void Save(SceneRes scene, std::string dst_name);
 
@@ -37,9 +37,7 @@ namespace Grafkit {
 			void Load(Archive &ar, IResourceManager * const & resman);
 			void Save(Archive &ar);
 
-		public:
-			
-			typedef std::pair<USHORT, USHORT> assoc_t;
+		    typedef std::pair<USHORT, USHORT> assoc_t;
 			typedef std::pair<std::string, std::string> texture_bind_t;
 
 			typedef std::map<UINT, std::vector<texture_bind_t>> texture_assoc_t;
@@ -63,8 +61,8 @@ namespace Grafkit {
 
 			void PersistKeymap(Archive &ar, std::vector<assoc_t> &keymap);
 
-		private:
-			SceneGraphRef &m_scene;
+            // -- 
+		    SceneGraphRef &m_scene;
 
 			std::vector<Actor*> m_actors;
 			std::vector<Entity3D*> m_entities;
@@ -82,6 +80,7 @@ namespace Grafkit {
 			std::vector<assoc_t> m_animation_to_actor;
 			std::vector<assoc_t> m_animation_to_entity;
 			
+            // --- 
 			// used for crsr of the fetch loops
 			int m_cTexID;
 			int m_cMatID;

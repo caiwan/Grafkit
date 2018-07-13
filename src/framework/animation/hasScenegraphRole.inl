@@ -16,12 +16,12 @@ inline void Grafkit::HasSceneGraphRole::UpdateScenegraph()
 	m_scenegraph->Update();
 }
 
-inline void Grafkit::HasSceneGraphRole::RenderScenegraph(Grafkit::Renderer & render, CameraRef & camera)
+inline void Grafkit::HasSceneGraphRole::RenderScenegraph(Renderer & render, CameraRef & camera)
 {
 	m_scenegraph->Render(render, camera);
 }
 
-inline void Grafkit::HasSceneGraphRole::BuildSceneGraph(Grafkit::Renderer & render)
+inline void Grafkit::HasSceneGraphRole::BuildSceneGraph(Renderer & render)
 {
 	m_scenegraph->BuildScene(render);
 }

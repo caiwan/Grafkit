@@ -2,6 +2,7 @@
 
 #include"utils/reference.h"
 #include"utils/resource.h"
+#include"core/Object.h"
 
 // predefine classes to reduce compile time 
 

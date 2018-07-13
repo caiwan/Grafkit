@@ -8,8 +8,8 @@ PERSISTENT_IMPL(Grafkit::Actor)
 
 using namespace Grafkit;
 
-Entity3D::Entity3D() //: Grafkit::IResource()
-{
+Entity3D::Entity3D() :  Object(){
+
 }
 
 Entity3D::~Entity3D() {
@@ -18,19 +18,20 @@ Entity3D::~Entity3D() {
 
 void Entity3D::_Serialize(Archive& ar)
 {
-    PERSIST_STRING(ar, m_name);
+    Object::_Serialize(ar);
 }
 
 // =================================================================
 
 
-Actor::Actor() : Persistent()
+Actor::Actor() : Object()
     , m_viewMatrix()
     , m_transformMatrix()
-    , m_ishidden(0) {
+    , m_ishidden(0) 
+{
 }
 
-Actor::Actor(Ref<Entity3D> entity) : Persistent()
+Actor::Actor(Ref<Entity3D> entity) : Object()
     , m_viewMatrix()
     , m_transformMatrix()
     , m_ishidden(0)
@@ -51,7 +52,7 @@ void Actor::AddChild(Actor* child)
 
 void Actor::Serialize(Archive& ar)
 {
-    PERSIST_STRING(ar, m_name);
+    _Serialize(ar);
 
     PERSIST_FIELD(ar, m_viewMatrix);
     PERSIST_FIELD(ar, m_transformMatrix);

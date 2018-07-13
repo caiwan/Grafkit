@@ -46,7 +46,7 @@ static const float _quad_texcoord[] = {
 	0, 0
 };
 
-static const int _quad_mesh[] = {
+static const uint32_t _quad_mesh[] = {
 	0,3,2,
 	2,1,0
 };
@@ -54,7 +54,7 @@ static const int _quad_mesh[] = {
 const float * const GrafkitData::quad = _quad_vertices;
 const float * const GrafkitData::quad2 = _quad_vertices2;
 const float * const GrafkitData::quad_texcoord = _quad_texcoord;
-const int * const GrafkitData::quadIndices = _quad_mesh;
+const uint32_t * const GrafkitData::quadIndices = _quad_mesh;
 
 // --- Cube 
 
@@ -164,7 +164,7 @@ static const float _cube_vertices[] = {
 	-1.0f, 1.0f, -1.0f ,0.0f,    // Point 4 (Left)
 };
 
-static const int _cube_indices[] = {
+static const uint32_t _cube_indices[] = {
 	0,   1,  2,     2,  3,  0,		// 0
 	4,   5,  6,     6,  7,  4,		// 1
 	8,   9, 10,    10, 11,  8,		// 2
@@ -178,7 +178,7 @@ const float * const GrafkitData::cubeVertices = _cube_vertices;
 const float * const GrafkitData::cubeNormals = _cube_normals;
 ///@todo add tangents also
 const float * const GrafkitData::cubeTextureUVs = _cube_texcoords;
-const   int * const GrafkitData::cubeIndices = _cube_indices;
+const uint32_t * const GrafkitData::cubeIndices = _cube_indices;
 
 const unsigned int GrafkitData::cubeVertexCount = 6 * 4;
 const unsigned int GrafkitData::cubeIndicesCount = 6 * 6;
@@ -216,7 +216,7 @@ MeshRef GrafkitData::CreateCubes(size_t count)
 	const size_t vertcount = vertlen * count;
 	const size_t indcount = indlen * count;
 
-	int *indices = new int[indcount];
+	uint32_t *indices = new uint32_t [indcount];
 
 	uint16_t *groups = new uint16_t[vertcount];
 	float4 * vertices = new float4[vertcount];

@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "../utils/reference.h"
-#include "../utils/memory.h"
+#include "utils/reference.h"
+#include "utils/memory.h"
 
 #include "renderer.h"
 #include "texture.h"
@@ -54,8 +54,6 @@ namespace Grafkit {
 		void SwapBuffers();
 		void FlushBuffers();
 		void RenderChain(Renderer &m_render);
-
-	protected:
 
 		//std::vector<Ref<EffectComposer>> m_parentSource;
 
@@ -114,8 +112,6 @@ namespace Grafkit {
 		ShaderRef m_shaderFullscreenQuad;
 		ShaderRef m_shaderCopyScreen;
 
-	private:
-
 		struct {
 			float4 screen, view;
 		} m_viewportParams;
@@ -128,7 +124,7 @@ namespace Grafkit {
 	{
 		friend class EffectComposer;
 	public:
-		EffectPass(ShaderResRef shader);
+	    explicit EffectPass(ShaderResRef shader);
 		~EffectPass();
 
 		void Initialize(Renderer &m_render);

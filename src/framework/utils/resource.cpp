@@ -26,13 +26,11 @@ U crawl(T in)
 
 // ---- 
 
-IResource::IResource() {
-    CreateUuid();
+IResource::IResource() : Object(){
 }
 
-IResource::IResource(const IResource& other): Referencable(other)
-    , m_name(other.m_name)
-    , m_uuid(other.m_uuid) {
+IResource::IResource(const IResource& other): Referencable(other), Object(other)
+{
 }
 
 IResource& IResource::operator=(const IResource& other)
@@ -45,27 +43,14 @@ IResource& IResource::operator=(const IResource& other)
     return *this;
 }
 
-IResource::IResource(const std::string& name) : m_name(name) 
+IResource::IResource(const std::string& name) : Object(name)
 {
-    CreateUuid();
 }
 
-IResource::IResource(const std::string& name, const std::string& uuid) :
-    m_name(name)
-    , m_uuid(uuid) 
+IResource::IResource(const std::string& name, const std::string& uuid) : Object(name, uuid)
 {
 }
 
 IResource::~IResource() {
 }
 
-#pragma comment(lib, "rpcrt4.lib")  // UuidCreate - Minimum supported OS Win 2000
-void IResource::CreateUuid()
-{
-    UUID uuid;
-    UuidCreate(&uuid);
-    char *str;
-    UuidToStringA(&uuid, reinterpret_cast<RPC_CSTR*>(&str));
-    m_uuid.assign(str);
-    RpcStringFreeA(reinterpret_cast<RPC_CSTR*>(&str));
-}

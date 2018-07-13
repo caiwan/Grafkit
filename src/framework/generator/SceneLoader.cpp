@@ -2,10 +2,11 @@
 
 #include "SceneLoader.h"
 
-#include "animation/animation.h"
-#include "animation/scene.h"
 #include "render/model.h"
+#include "render/texture.h"
 #include "render/Material.h"
+#include "animation/scene.h"
+#include "animation/animation.h"
 
 #include "utils/persistence/archive.h"
 
@@ -14,15 +15,15 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-Grafkit::SceneLoader::SceneLoader(std::string name, std::string source_name) : IResourceBuilder(name, source_name)
+SceneLoader::SceneLoader(std::string name, std::string source_name) : IResourceBuilder(name, source_name)
 {
 }
 
-Grafkit::SceneLoader::~SceneLoader()
+SceneLoader::~SceneLoader()
 {
 }
 
-void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
+void SceneLoader::Load(IResourceManager * const & resman, IResource * source)
 {
 #if 0
 	SceneGraphRef dstScene = dynamic_cast<SceneRes*>(source);
@@ -44,7 +45,7 @@ void Grafkit::SceneLoader::Load(Grafkit::IResourceManager * const & resman, Graf
 #endif
 }
 
-void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
+void SceneLoader::Save(SceneRes scene, std::string dst_name)
 {
 	FILE *fp = nullptr;
 	fopen_s(&fp, dst_name.c_str(), "wb");
@@ -68,14 +69,14 @@ void Grafkit::SceneLoader::Save(SceneRes scene, std::string dst_name)
 * Scene persist helper
 *************************************************************************************************************************/
 
-Grafkit::SceneLoader::SceneLoaderHelper::SceneLoaderHelper(Archive &ar, SceneGraphRef & scene) : m_scene(scene)
+SceneLoader::SceneLoaderHelper::SceneLoaderHelper(Archive &ar, SceneGraphRef & scene) : m_scene(scene)
 {
 	if (ar.IsStoring()) {
 		BuildObjectMaps();
 	}
 }
 
-Grafkit::SceneLoader::SceneLoaderHelper::~SceneLoaderHelper()
+SceneLoader::SceneLoaderHelper::~SceneLoaderHelper()
 {
 }
 
@@ -83,7 +84,7 @@ Grafkit::SceneLoader::SceneLoaderHelper::~SceneLoaderHelper()
 // ======================================================================================================================
 // Load
 
-void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager * const & resman)
+void SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager * const & resman)
 {
 	Persist(ar, resman);
 
@@ -201,7 +202,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager
 // ======================================================================================================================
 
 // Builds map of object relations
-void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
+void SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 {
 	m_cTexID = 0;
 	m_cMatID = 0;
@@ -251,7 +252,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildObjectMaps()
 }
 
 // Which texture belong to this exact material, and which shader slot bound to
-void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef & material)
+void SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef & material)
 {
 	std::map<std::string, TextureResRef> textureMap;
 
@@ -287,7 +288,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildTextureMap(const MaterialRef 
 }
 
 // Which material belongs to which entity if its a model
-void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &model)
+void SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &model)
 {
 	MaterialRef material = model->GetMaterial();
 	USHORT matid = 0;
@@ -321,7 +322,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildMaterialMap(const ModelRef &m
 }
 
 // which animation affects which entity or actor
-void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
+void SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 {
 
 
@@ -360,7 +361,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildAnimationMap()
 }
 
 // which entity belongs to which actor
-void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &actor)
+void SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &actor)
 {
 	int k = actor->GetEntityCount();
 	for (int i = 0; i < k; i++)
@@ -396,7 +397,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildEntityMap(const ActorRef &act
 }
 
 // which actor whose child of
-void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
+void SceneLoader::SceneLoaderHelper::BuildActorMap()
 {
 	for (size_t i = 0; i < m_actors.size(); ++i)
 	{
@@ -419,13 +420,13 @@ void Grafkit::SceneLoader::SceneLoaderHelper::BuildActorMap()
 // Persist 
 // ======================================================================================================================
 
-void Grafkit::SceneLoader::SceneLoaderHelper::Save(Archive &ar)
+void SceneLoader::SceneLoaderHelper::Save(Archive &ar)
 {
 	IResourceManager * const resman = nullptr;
 	Persist(ar, resman);
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceManager * const & resman)
+void SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceManager * const & resman)
 {
 
 #if 0
@@ -454,7 +455,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceMan
 #endif
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IResourceManager * const & resman)
+void SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IResourceManager * const & resman)
 {
 	UINT materialCount = 0;
 	if (ar.IsStoring())
@@ -499,7 +500,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IRes
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IResourceManager * const & resman)
+void SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IResourceManager * const & resman)
 {
 	UINT entityCount = 0;
 	if (ar.IsStoring())
@@ -519,7 +520,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistEntities(Archive &ar, IReso
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResourceManager * const & resman)
+void SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResourceManager * const & resman)
 {
 	UINT actorCount = 0;
 	if (ar.IsStoring())
@@ -540,7 +541,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistActors(Archive &ar, IResour
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IResourceManager * const & resman)
+void SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IResourceManager * const & resman)
 {
 	UINT animationCount = 0;
 	if (ar.IsStoring())
@@ -561,7 +562,7 @@ void Grafkit::SceneLoader::SceneLoaderHelper::PersistAnimations(Archive &ar, IRe
 	}
 }
 
-void Grafkit::SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, std::vector<assoc_t>& keymap)
+void SceneLoader::SceneLoaderHelper::PersistKeymap(Archive & ar, std::vector<assoc_t>& keymap)
 {
 	UINT size = 0;
 	assoc_t pair;

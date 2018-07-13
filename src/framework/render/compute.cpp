@@ -128,7 +128,7 @@ void Compute::Render(Renderer &render)
 	size_t targetCount = outputChannels->size();
 	for (size_t i = 0; i < targetCount; i++) {
 		Texture2DRef output = outputChannels->at(i);
-		render.SetRenderTargetView(*output, i);
+		render.SetRenderTargetView(static_cast<ID3D11RenderTargetView*>(*output), i);
 	}
 
 	render.ApplyRenderTargetView(targetCount);

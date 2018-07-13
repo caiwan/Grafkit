@@ -13,7 +13,8 @@
 
 class Referencable {
 public:
-	Referencable() : _ref_count(0) { }
+    virtual ~Referencable() = default;
+    Referencable() : _ref_count(0) { }
 
 	/**
 	 Add a reference to this object.

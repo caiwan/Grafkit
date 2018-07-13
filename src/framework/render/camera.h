@@ -90,7 +90,6 @@ namespace Grafkit {
 
         PERSISTENT_DECL(Grafkit::Camera, 1);
 
-    public:
         void Serialize(Archive& ar) override;
     };
 }

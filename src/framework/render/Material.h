@@ -3,9 +3,8 @@
 #include <vector>
 #include <map>
 
-#include "../utils/persistence/persistence.h"
-
-#include "../utils/memory.h"
+#include "common.h"
+#include "utils/memory.h"
 
 #include "dxtypes.h"
 #include "renderer.h"
@@ -47,7 +46,7 @@ namespace Grafkit {
     // =========================================================================================================
 
     __declspec(align(16))
-        class Material : public AlignedNew<Material>, public Persistent, virtual public Referencable
+        class Material : public AlignedNew<Material>, public Object
     {
     public:
 
@@ -111,7 +110,7 @@ namespace Grafkit {
         material_color_t& Colors() { return m_colors; }
         material_params_t& Params() { return m_params; }
 
-        TextureResRef GetTexture(std::string bindName);
+        TextureResRef GetTexture(std::string bindName) const;
 
         void SetTexture(TextureResRef texture, std::string bindName);
         void AddTexture(TextureResRef texture, std::string bindName);
@@ -125,13 +124,9 @@ namespace Grafkit {
 
         // --- 
         // persisthez kell
-        bool GetTextureMap(std::map<std::string, TextureResRef> &textureMap);
-
-        std::string GetName() const { return this->m_name; }
-        void SetName(std::string name) { m_name = name; }
+        bool GetTextureMap(std::map<std::string, TextureResRef> &textureMap) const;
 
     protected:
-        std::string m_name;
 
         struct material_color_t m_colors;
         struct material_params_t m_params;

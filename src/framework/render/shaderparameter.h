@@ -2,6 +2,7 @@
 
 #include "renderer.h"
 #include "shader.h"
+#include "texture.h"
 
 namespace Grafkit {
 
@@ -15,7 +16,7 @@ namespace Grafkit {
 
 		void Initialize(Renderer &m_render, ShaderResRef shader);
 
-		ShaderRef GetShader() { return m_targetShader->Get(); }
+		ShaderRef GetShader() const { return m_targetShader->Get(); }
 
 		// 
 		void SetParam(std::string name, void *ptr);
@@ -29,7 +30,7 @@ namespace Grafkit {
 		void BindParameters(Renderer &m_render);
 
 	protected:
-		void SetATexture(std::string name, Ref<IResource> texture);
+        void SetATexture(std::string name, Ref<IResource> texture);
 		void UpdateTargets();
 
 	private:

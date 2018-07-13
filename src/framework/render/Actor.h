@@ -2,14 +2,9 @@
 
 #include <vector>
 
-#include "../utils/reference.h"
-
-#include "../math/matrix.h"
-
+#include "common.h"
 #include "renderer.h"
-
-
-#include "../utils/persistence/persistence.h"
+#include "math/matrix.h"
 
 namespace Grafkit {
 
@@ -17,7 +12,7 @@ namespace Grafkit {
 
     class Actor;
 
-    class Entity3D : public Persistent, virtual public Referencable
+    class Entity3D : public Object
     {
     protected:
 
@@ -30,11 +25,9 @@ namespace Grafkit {
         virtual void Render(Renderer& deviceContext, SceneGraph * const & scene) = 0;
         virtual void Build(Renderer& deviceContext, SceneGraph * const & scene) = 0;
 
-        std::string GetName() const { return this->m_name; }
-        void SetName(std::string name) { m_name = name; }
-
     protected:
         std::string m_name;
+        std::string m_uuid;
 
         void Serialize(Archive& ar) override = 0;
         void _Serialize(Archive& ar);
@@ -45,7 +38,7 @@ namespace Grafkit {
     An actor node - ez a scenegraph es a nodeja
     */
     __declspec(align(16))
-        class Actor : public AlignedNew<Actor>, public Persistent, virtual public Referencable
+        class Actor : public AlignedNew<Actor>, public Object
     {
         friend class SceneGraph;
     public:
@@ -81,12 +74,7 @@ namespace Grafkit {
         // calculated matrix for internal use
         Grafkit::Matrix WorldMatrix() const { return m_worldMatrix; }
 
-        std::string GetName() const { return this->m_name; }
-        void SetName(std::string name) { m_name = name; }
-
-
     protected:
-        std::string m_name;
 
         void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
 
@@ -100,10 +88,8 @@ namespace Grafkit {
 
         int m_ishidden;
 
-        PERSISTENT_DECL(Grafkit::Actor, 1);
-    protected:
         void Serialize(Archive& ar) override;
+        PERSISTENT_DECL(Grafkit::Actor, 1);
     };
 
 }
-

@@ -16,7 +16,7 @@ namespace Grafkit
     /**
     Common anim. interface
     */
-    class Animation : public virtual Referencable, public Persistent
+    class Animation : public Object
     {
     public:
         Animation();
@@ -25,8 +25,6 @@ namespace Grafkit
 
         virtual void Update(double time) = 0;
 
-        void SetName(std::string name) { m_name = name; }
-        std::string GetName() const { return m_name; }
 
         struct Key;
         class Channel;
@@ -36,8 +34,6 @@ namespace Grafkit
         typedef Ref<Track> TrackRef;
 
     protected:
-        std::string m_name;
-
         void Serialize(Archive& ar) override = 0;
         void _Serialize(Archive& ar);
 

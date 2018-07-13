@@ -60,7 +60,7 @@ void Mesh::AddPointer(std::string inputName, size_t length, const void * pointer
 	this->m_mapPtr[inputName] = vertexPointer.data;
 }
 
-void Mesh::SetIndices(size_t vertexCount, size_t indexCount, const int * const indices)
+void Mesh::SetIndices(size_t vertexCount, size_t indexCount, const uint32_t*const indices)
 {
 	m_indexCount = indexCount;
 	m_vertexCount = vertexCount;
@@ -161,6 +161,21 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	}
 
 	this->m_indexBuffer = indexBuffer;
+}
+
+const void* Mesh::GetPointer(std::string inputName) {
+    auto it = m_mapPtr.find(inputName);
+    if (it != m_mapPtr.end())
+    {
+        return it->second;
+    }
+
+    return nullptr;
+
+}
+
+const uint32_t* Mesh::GetIndices() const {
+    return m_indices;
 }
 
 void Mesh::Shutdown()

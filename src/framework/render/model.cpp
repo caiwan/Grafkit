@@ -3,9 +3,10 @@
 #include "mesh.h"
 #include "Material.h"
 #include "shader.h"
-#include "SceneGraph.h"
 
-#include "Actor.h"
+#include"Texture.h" //?
+
+#include "SceneGraph.h"
 
 #include "model.h"
 
@@ -45,9 +46,6 @@ void Model::Render(Renderer& render, SceneGraph* const & scene)
 {
     if (m_material)
     {
-        // bullshit, does not work
-        //if (m_material->GetLayer() != scene->GetLayerID())
-        //return;
         this->m_material->Render(render, scene->GetVShader(), scene->GetPShader());
     }
 
@@ -56,9 +54,6 @@ void Model::Render(Renderer& render, SceneGraph* const & scene)
 
     if (m_mesh)
         this->m_mesh->RenderMesh(render);
-
-    //if (m_geometryShader.Valid() && m_geometryShader->Valid())
-    //	m_geometryShader->Get()->Bind(render);
 }
 
 void Model::Build(Renderer& deviceContext, SceneGraph* const & scene)

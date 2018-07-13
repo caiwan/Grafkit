@@ -8,6 +8,7 @@
 #include "render/mesh.h"
 #include "render/model.h"
 #include "render/material.h"
+#include "render/texture.h"
 
 #include "render/SceneGraph.h"
 #include "animation/scene.h"
@@ -17,6 +18,8 @@
 
 #include "utils/ResourceManager.h"
 #include "generator/MusicBassLoader.h"
+
+#include "core/Music.h"
 
 #include "builtin_data/cube.h"
 

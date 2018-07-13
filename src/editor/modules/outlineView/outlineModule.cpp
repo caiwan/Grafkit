@@ -1,6 +1,8 @@
 #include "outlineModule.h"
 
 #include "demo.h"
+#include "render/SceneGraph.h"
+#include "animation/scene.h"
 
 #include "outlineTreeModel.h"
 
@@ -39,8 +41,9 @@ void OutlineModule::DocumentChangedEvent(GkDemo::Demo* const& demo)
     auto newModel = new SceneGraphViewWidgetModel();
 
     // build stuff
-    const auto scenegraph = demo->GetScene();
-    const auto newModelBuilder = new SceneModel(scenegraph);
+    const SceneResRef scenegraph = demo->GetScene();
+    SceneModel*const newModelBuilder = new SceneModel(scenegraph);
+
     newModelBuilder->BuildModel();
     newModel->SetModel(newModelBuilder);
 

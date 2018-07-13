@@ -1,11 +1,13 @@
 #include "stdafx.h"
 
-#include "persistence/dynamics.h"
 #include "InitializeSerializer.h"
+
+#include "persistence/dynamics.h"
 
 #include "render/mesh.h"
 #include "render/model.h"
 #include "render/material.h"
+#include "render/texture.h" // ? 
 
 #include "render/Light.h"
 #include "render/camera.h"

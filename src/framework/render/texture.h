@@ -19,8 +19,8 @@ namespace Grafkit
 	*/
 	class Bitmap : public Referencable {
 	public:
-		Bitmap() : m_bmsize(0), m_ch(0), m_x(0), m_y(0), m_data(nullptr), m_stride(0) {}
-		Bitmap(void* data, UINT x, UINT y, UINT ch) : m_bmsize(0), m_ch(ch), m_x(x), m_y(y), m_data(data) { m_bmsize = x*y*ch; m_stride = x*ch; }
+		Bitmap() : m_data(nullptr), m_bmsize(0), m_stride(0), m_x(0), m_y(0), m_ch(0) {}
+		Bitmap(void* data, UINT x, UINT y, UINT ch) : m_data(data), m_bmsize(0), m_x(x), m_y(y), m_ch(ch) { m_bmsize = x*y*ch; m_stride = x*ch; }
 		~Bitmap() { free(m_data); }
 
 		virtual void* GetData() const { return m_data; }
@@ -74,7 +74,7 @@ namespace Grafkit
 	quick and dirty solution for generate and update texture objects
 	*/
 
-	class ATexture {
+	class ATexture : virtual public Referencable {
 	public:
 		ATexture();
 		virtual  ~ATexture();
@@ -86,10 +86,10 @@ namespace Grafkit
 		ID3D11RenderTargetView* GetRenderTargetView() const { return this->m_pTargetView; }
 		ID3D11Resource* GetTextureResource() const { return this->m_pTexture; }
 
-		operator ID3D11ShaderResourceView*() const { return this->m_pResourceView; }
+	    explicit operator ID3D11ShaderResourceView*() const { return this->m_pResourceView; }
 
-		operator ID3D11RenderTargetView*() const { return this->m_pTargetView; }
-		operator ID3D11Resource*() const { return this->m_pTexture; }
+	    explicit operator ID3D11RenderTargetView*() const { return this->m_pTargetView; }
+	    explicit operator ID3D11Resource*() const { return this->m_pTexture; }
 
 		// Ezt kurvara ki kell innen baszni
 		//void SetRenderTargetView(Renderer & device, size_t id = 0) const;
@@ -107,8 +107,7 @@ namespace Grafkit
 
 		virtual int GetDimension() = 0;
 
-	protected:
-		ID3D11Resource * m_pTexture;
+	    ID3D11Resource * m_pTexture;
 
 		void SetDimm(size_t w = 0, size_t h = 0, size_t d = 0, size_t ch = 0, size_t chw = 0) {
 			width = w, height = h, depth = d, channels = ch, channelWidth = chw;
@@ -121,8 +120,6 @@ namespace Grafkit
 
 		ID3D11ShaderResourceView * m_pResourceView;
 		ID3D11RenderTargetView * m_pTargetView;
-
-	protected:
 	};
 
 	/**
@@ -130,7 +127,7 @@ namespace Grafkit
 	with 32 bit float values
 	Contains just shortcuts
 	*/
-	__declspec(align(16)) class Texture1D : public ATexture, virtual public Referencable, public AlignedNew<Texture2D>
+	__declspec(align(16)) class Texture1D : public ATexture,  public AlignedNew<Texture2D>
 	{
 	public:
 		Texture1D() : ATexture() {}
@@ -141,7 +138,7 @@ namespace Grafkit
 		void Initialize(Renderer & device, size_t w, const float* data);
 		void Initialize(Renderer & device, size_t w, const float4* data);
 
-		ID3D11Texture1D* GetTexture1D() { return (ID3D11Texture1D*)this->m_pTexture; }
+		ID3D11Texture1D* GetTexture1D() const { return static_cast<ID3D11Texture1D*>(this->m_pTexture); }
 
 	protected:
 		void CreateTexture(Renderer & device, DXGI_FORMAT format, size_t w, const void * initaldata = nullptr);
@@ -155,7 +152,7 @@ namespace Grafkit
 	QnD 2D Texture class
 	Contains just shortcuts
 	*/
-	__declspec(align(16)) class Texture2D : public ATexture, virtual public Referencable, public AlignedNew<Texture2D>
+	__declspec(align(16)) class Texture2D : public ATexture, public AlignedNew<Texture2D>
 	{
 	public:
 		Texture2D() : ATexture() {}
@@ -176,7 +173,7 @@ namespace Grafkit
 		/// Inits depth buffer
 		void InitializeDepth(Renderer & device, int w = 0, int h = 0);
 
-		ID3D11Texture2D* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
+		ID3D11Texture2D* GetTexture2D() const { return static_cast<ID3D11Texture2D*>(this->m_pTexture); }
 
 	protected:
 		void CreateTextureBitmap(Renderer & device, DXGI_FORMAT format, int channels = 4, int w = 0, int h = 0, const void * initialData = nullptr);
@@ -188,7 +185,7 @@ namespace Grafkit
 
 	typedef Ref<Texture2D> Texture2DRef;
 
-	__declspec(align(16)) class TextureCube : public ATexture, virtual public Referencable, public AlignedNew<Texture2D>
+	__declspec(align(16)) class TextureCube : public ATexture, public AlignedNew<Texture2D>
 	{
 	public:
 		TextureCube() : ATexture() {}
@@ -196,7 +193,7 @@ namespace Grafkit
 
 		void Initialize(Renderer &device, CubemapRef cubemap);
 
-		void* GetTexture2D() { return (ID3D11Texture2D*)this->m_pTexture; }
+		void* GetTexture2D() const { return static_cast<ID3D11Texture2D*>(this->m_pTexture); }
 
 	protected:
 	    int GetDimension() override { return 2; }
@@ -216,8 +213,8 @@ namespace Grafkit
 		void Initialize(Renderer & device, D3D11_TEXTURE_ADDRESS_MODE mode = D3D11_TEXTURE_ADDRESS_WRAP);
 		void Shutdown();
 
-		ID3D11SamplerState*	GetSamplerState() { return this->m_pSamplerState; }
-		operator ID3D11SamplerState*() { return this->m_pSamplerState; }
+		ID3D11SamplerState*	GetSamplerState() const { return this->m_pSamplerState; }
+		operator ID3D11SamplerState*() const { return this->m_pSamplerState; }
 
 	private:
 		ID3D11SamplerState *m_pSamplerState;

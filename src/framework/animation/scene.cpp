@@ -6,6 +6,7 @@
 #include "render/light.h"
 #include "render/camera.h"
 #include "render/model.h"
+#include "render/shader.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -100,6 +101,6 @@ void Scene::Build(Renderer& render, ShaderResRef vs, ShaderResRef ps)
 // =============================================================================================
 
 void Scene::Serialize(Archive& ar) {
-    // Hello. 
+    _Serialize(ar);
     assert(0);
 }

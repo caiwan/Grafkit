@@ -11,7 +11,7 @@
 
 namespace Grafkit {
     __declspec(align(16))
-        class SceneGraph : virtual public Referencable, public AlignedNew<SceneGraph>, public Persistent
+        class SceneGraph : public AlignedNew<SceneGraph>, public Object
     {
     public:
         SceneGraph();
@@ -35,8 +35,6 @@ namespace Grafkit {
         size_t GetNodeCount() const { return m_nodes.size(); }
         ActorRef GetNode(size_t id) { return m_nodes[id]; }
 
-        std::string GetName() const { return m_name; }
-        void SetName(std::string name) { m_name = name; }
 
         // --- 
 
@@ -76,8 +74,6 @@ namespace Grafkit {
 
         std::set<Entity3D*> m_entities;
 
-        std::string m_name;
-
     private:
         double m_tAnim;
 
@@ -85,7 +81,7 @@ namespace Grafkit {
         std::stack<Matrix> m_worldMatrixStack;
 
         // -- persistent
-    public:
+    protected:
         void Serialize(Archive& ar) override;
         PERSISTENT_DECL(Grafkit::SceneGraph, 1);
     };
