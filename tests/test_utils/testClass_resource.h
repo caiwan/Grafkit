@@ -73,7 +73,7 @@ public:
         ThingResourceRef dstThing = dynamic_cast<ThingResource*>(source);
         if (dstThing.Invalid()) { return; }
 
-        if (dstThing->Valid()) { dstThing->Release(); }
+        //if (dstThing->Valid()) { dstThing->Release(); }
 
         // 2.
         ThingRef thing = new Thing();

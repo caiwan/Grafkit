@@ -16,7 +16,7 @@ namespace Grafkit
     Stores extended data for a mesh, that makes it a model
     */
 
-    __declspec(align(16)) class Model : public Entity3D, public AlignedNew<Model>
+    __declspec(align(16)) class Model : public AlignedNew<Model>, public Entity3D
     {
     public:
         Model();
@@ -30,7 +30,7 @@ namespace Grafkit
         MaterialRef GetMaterial() const;
         void SetMaterial(MaterialRef material);
 
-        void Calculate(Renderer& deviceContext, ActorRef patent = nullptr) override {}
+        void Calculate(Renderer& deviceContext, ActorRef parent = nullptr) override;
         void Render(Renderer& deviceContext, SceneGraph* const & scene) override;
         void Build(Renderer& deviceContext, SceneGraph* const & scene) override;
 

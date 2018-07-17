@@ -104,7 +104,7 @@ namespace Grafkit {
         };
 
         Material();
-        ~Material() {}
+        ~Material();
 
         // qnd thingy
         material_color_t& Colors() { return m_colors; }

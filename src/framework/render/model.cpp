@@ -42,6 +42,9 @@ void Model::SetMaterial(MaterialRef material) { this->m_material = material; }
 
 // ==================================================================
 
+void Model::Calculate(Renderer& deviceContext, ActorRef parent) {
+}
+
 void Model::Render(Renderer& render, SceneGraph* const & scene)
 {
     if (m_material)
@@ -72,3 +75,5 @@ void Model::_Serialize(Archive& ar)
     _Serialize(ar);
     PERSIST_REFOBJECT(ar, m_mesh);
 }
+
+

@@ -8,6 +8,7 @@ TCs for internal classes such as scene and so on
 
 #include <gtest/gtest.h>
 
+#include "render/Mesh.h"
 #include "render/model.h"
 #include "render/Material.h"
 #include "render/Camera.h"
@@ -81,7 +82,7 @@ TEST(Persistent_Scene, ScenePersistenceTest)
     SceneGraphRef loadedScenegraph = dynamic_cast<SceneGraph*>(Persistent::Load(ar));
     ASSERT_TRUE(loadedScenegraph.Valid());
     EXPECT_STREQ("Scene", loadedScenegraph->GetName().c_str()); // + test All the uuids
-    EXPECT_STREQ(scene->, loadedScenegraph->GetName().c_str());
+    //EXPECT_STREQ(scene->, loadedScenegraph->GetName().c_str());
 
     // -- 
     ActorRef loadedRootActor = loadedScenegraph->GetRootNode();

@@ -15,6 +15,7 @@ TCs for internal classes such as scene and so on
 #include "TestArchiver.h"
 #include "testClass_persistence.h"
 #include "render/model.h"
+#include "render/mesh.h"
 #include "render/Material.h"
 
 #include "builtin_data/cube.h"

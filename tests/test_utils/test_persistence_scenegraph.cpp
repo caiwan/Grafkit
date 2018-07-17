@@ -13,7 +13,6 @@ TCs for internal classes such as scene and so on
 #include "render/Camera.h"
 #include "render/SceneGraph.h"
 
-#include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
 
 #include "TestArchiver.h"

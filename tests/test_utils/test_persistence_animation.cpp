@@ -52,11 +52,36 @@ TEST(Persistent_Animation, AnimationKeyPersistTest)
     ASSERT_FLOAT_EQ(key.m_value, test_key.m_value);
 }
 
+#define KEY_COUNT 256
+
+TEST(Persistent_Animation, AnimationChannelPersistTest)
+{
+    TestArchiver ar(16*256, true);
+    // given
+
+    // when
+
+    // then
+
+}
+
+TEST(Persistent_Animation, AnimationTrackPersistTest)
+{
+    TestArchiver ar(16 * 256, true);
+
+    // given
+    
+    // when
+    
+    // then
+
+}
+
 /*
     Tests if every used animation track types could've been persisted
 */
 
-TEST(Persistent_Animation, TrackPersistTest)
+TEST(Persistent_Animation, ActorAnimationPersistTest)
 {
  
 #if 0

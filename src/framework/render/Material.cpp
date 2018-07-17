@@ -47,6 +47,9 @@ Material::Material() : Object()
     m_colors.diffuse = float4(1, 1, 1, 1);
 }
 
+Material::~Material() {
+}
+
 TextureResRef Material::GetTexture(std::string bindName) const
 {
     auto it = this->m_textures.find(bindName);

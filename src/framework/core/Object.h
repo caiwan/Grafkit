@@ -1,5 +1,7 @@
 #pragma once
 
+#include"utils/reference.h"
+
 #include "utils/persistence/persistence.h"
 
 namespace Grafkit
