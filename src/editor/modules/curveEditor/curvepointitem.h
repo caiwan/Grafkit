@@ -89,8 +89,8 @@ namespace Idogep
         float m_lastAngle;
 
         bool m_showTangent;
-        bool m_snapXAxis;
-        bool m_snapYAxis;
+        /*bool m_snapXAxis;
+        bool m_snapYAxis;*/
 
         uint32_t m_id;
 
@@ -104,6 +104,8 @@ namespace Idogep
 
         Ref<CurveSegment> m_previousSegment;
         Ref<CurveSegment> m_nextSegment;
+
+        bool m_selectionLock;
     };
 
 
