@@ -53,10 +53,10 @@ protected:
         {
             float f = i;
             Animation::Key key(
-                f,
-                rand() / RAND_MAX,
-                rand() / RAND_MAX,
-                rand() / RAND_MAX,
+                float(f),
+                float(rand()) / RAND_MAX,
+                float(rand()) / RAND_MAX,
+                float(rand()) / RAND_MAX,
                 static_cast<Animation::KeyInterpolation_e>(rand() % Animation::KI_COUNT)
             );
 
@@ -158,7 +158,7 @@ const size_t KEY_COUNT = 256;
 
 TEST_F(AnimationPersistenceTest, ChannelTest)
 {
-    TestArchiver ar(16 * 256, true);
+    TestArchiver ar(16 * 4096, true);
     // given
 
     Animation::ChannelRef channel = new Animation::Channel();
@@ -179,7 +179,7 @@ TEST_F(AnimationPersistenceTest, ChannelTest)
 
 TEST_F(AnimationPersistenceTest, TrackTest)
 {
-    TestArchiver ar(16 * 4096, true);
+    TestArchiver ar(64 * 4096, true);
 
     // given
 

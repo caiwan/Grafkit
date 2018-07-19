@@ -47,7 +47,7 @@ TEST_F(PersistentMeshTest, MeshPersistentTest)
     // given
     uint32_t vertexCount = 256;
     float * const vertices = new float[vertexCount * 4];
-    for (uint32_t i = 0; i < vertexCount * 4; i++) { vertices[i] = rand() / RAND_MAX; }
+    for (uint32_t i = 0; i < vertexCount * 4; i++) { vertices[i] = float(rand()) / RAND_MAX; }
 
     uint32_t indexCount = 512;
     uint32_t  * const indices = new uint32_t[indexCount];
