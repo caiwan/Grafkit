@@ -46,7 +46,7 @@ void Mesh::RenderMesh(ID3D11DeviceContext * dev)
 	dev->DrawIndexed(this->m_indexCount, 0, 0);
 }
 
-void Mesh::AddPointer(std::string inputName, size_t length, const void * pointer)
+void Mesh::AddPointer(std::string inputName, uint32_t length, const void * pointer)
 {
 	// create and copy ptr
 	vertex_pointer_t vertexPointer;
@@ -60,13 +60,12 @@ void Mesh::AddPointer(std::string inputName, size_t length, const void * pointer
 	this->m_mapPtr[inputName] = vertexPointer.data;
 }
 
-void Mesh::SetIndices(size_t vertexCount, size_t indexCount, const uint32_t*const indices)
+void Mesh::SetIndices(uint32_t vertexCount, uint32_t indexCount, const uint32_t*const indices)
 {
 	m_indexCount = indexCount;
 	m_vertexCount = vertexCount;
-	m_indices = new UINT[indexCount];
-	for (size_t i = 0; i < indexCount; i++)
-		m_indices[i] = indices[i];
+	m_indices = new uint32_t[indexCount];
+    std::copy(indices, indices + indexCount, m_indices);
 }
 
 void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
@@ -76,7 +75,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	if (m_mapPtr.empty())
 		return;
 
-	size_t elem_count = shader->GetILayoutElemCount();
+	uint32_t elem_count = shader->GetILayoutElemCount();
 
 	StructPack packer;
 
@@ -84,7 +83,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 		throw new EX_DETAILS(NullPointerException, "Nincs shader betoltve");
 	}
 
-	for (size_t i = 0; i < elem_count; ++i)
+	for (uint32_t i = 0; i < elem_count; ++i)
 	{
 		Shader::InputElementRecord record = shader->GetILayoutElem(i);
 		int field_id = packer.addField(record.width);
@@ -205,8 +204,8 @@ void Mesh::_Serialize(Archive & ar)
     // store pointer table
     if (ar.IsStoring()) {
         for (auto it = m_vertexPointers.begin(); it != m_vertexPointers.end(); ++it) {
-            const UCHAR* ptr = static_cast<UCHAR*>(it->data);
-            size_t size = it->length;
+             const uint8_t* ptr = it->data;
+            uint32_t size = it->length;
             std::string name = it->name.c_str();
             PERSIST_STRING(ar, name);
             PERSIST_VECTOR(ar, ptr, size);
@@ -214,9 +213,9 @@ void Mesh::_Serialize(Archive & ar)
     }
     // load pointer table
     else {
-        for (size_t i = 0; i < ptr_count; i++) {
-            UCHAR* ptr = nullptr;
-            size_t size = 0;
+        for (uint32_t i = 0; i < ptr_count; i++) {
+            uint8_t* ptr = nullptr;
+            uint32_t size = 0;
             std::string name;
             PERSIST_STRING(ar, name);
             PERSIST_VECTOR(ar, ptr, size);

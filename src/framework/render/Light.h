@@ -31,7 +31,7 @@ namespace Grafkit {
 
     public:
         Light();
-        Light(light_type_t t);
+        explicit Light(light_type_t t);
         ~Light();
 
         /// @todo ez csak egy QnD Hack, ki kell majd javitani a jovoben

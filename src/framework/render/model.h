@@ -46,8 +46,7 @@ namespace Grafkit
         PERSISTENT_DECL(Grafkit::Model, 1)
 
     protected:
-        void Serialize(Archive& ar) override { _Serialize(ar); }
-        void _Serialize(Archive& ar);
+        void Serialize(Archive& ar) override;
 
     };
 

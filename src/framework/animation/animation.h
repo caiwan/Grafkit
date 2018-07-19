@@ -96,7 +96,8 @@ namespace Grafkit
         {
             friend class Animation;
         public:
-            explicit Channel(const char* name = "");
+            Channel();
+            explicit Channel(const char* name);
             explicit Channel(const std::string& name);
             explicit Channel(const ChannelRef& other);
 
@@ -105,8 +106,8 @@ namespace Grafkit
             size_t GetKeyCount() const { return m_keys.size(); }
             Key GetKey(size_t i) { return m_keys[i]; }
 
-            float GetValue(const float &time) const;
-            void SetValue(const size_t &id, const float &value);
+            float GetValue(const float& time) const;
+            void SetValue(const size_t& id, const float& value);
 
             void AddKey(const Key key) { m_keys.push_back(key); }
             void SetKey(const size_t id, const Key key) { m_keys[id] = key; }
@@ -146,7 +147,8 @@ namespace Grafkit
         {
             friend class Animation;
         public:
-            explicit Track(const char* name = nullptr, const char* channelInitals = nullptr);
+            Track();
+            explicit Track(const char* name, const char* channelInitals);
             explicit Track(const char* name, const std::vector<std::string> channelNames);
             ~Track() = default;
 
@@ -187,14 +189,14 @@ namespace Grafkit
         void AddTrack(Ref<Track> track) { m_tracks.push_back(track); }
 
         std::vector<Ref<Track>> m_tracks;
-
-
     };
 }
 
 /* ============================================================================================== */
 namespace Grafkit
 {
+    inline Animation::Channel::Channel() { m_keys.push_back(Key()); }
+
     inline Animation::Channel::Channel(const char* name) : m_name(name) { m_keys.push_back(Key()); }
 
     inline Animation::Channel::Channel(const std::string& name) : m_name(name) { m_keys.push_back(Key()); }
@@ -203,7 +205,7 @@ namespace Grafkit
 
     inline Animation::Channel::Channel(const ChannelRef& other) : m_name(other->m_name) { for (size_t i = 0; i < other->m_keys.size(); i++) { m_keys.push_back(Key(other->m_keys.at(i))); } }
 
-    inline float Animation::Channel::GetValue(const float &time) const
+    inline float Animation::Channel::GetValue(const float& time) const
     {
         float t = 0.f;
         Key v0, v1, v;
@@ -233,13 +235,13 @@ namespace Grafkit
                 (-2.0f * t3 + 3.0f * t2) * v1.m_value +
                 (t3 - 2.0f * t2 + t) * v0.m_angle * v0.m_radius +
                 (t3 - t2) * v1.m_angle * v1.m_radius
-                );
+            );
         }
 
         return v0.m_value * (1. - t) + v1.m_value * t;
     }
 
-    inline void Animation::Channel::SetValue(const size_t &id, const float &v) { m_keys[id].m_value = v; }
+    inline void Animation::Channel::SetValue(const size_t& id, const float& v) { m_keys[id].m_value = v; }
 
     inline int Animation::Channel::FindKeyIndex(float t) const
     {
@@ -265,7 +267,6 @@ namespace Grafkit
             else { l = m + 1; }
         }
         return -1;
-
     }
 
 

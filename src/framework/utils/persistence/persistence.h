@@ -1,84 +1,109 @@
 #pragma once
 
+#include <vector>
 #include "../exceptions.h"
 #include "dynamics.h"
 
 // http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
 
-namespace Grafkit{
-	class Archive;
+namespace Grafkit {
+    class Archive;
 
-	class Persistent : public Clonable
-	{
-		public:
-            Persistent() {}
-            virtual ~Persistent() {}
+    class Persistent : public Clonable
+    {
+    public:
+        Persistent() {}
+        virtual ~Persistent() {}
 
-			static Persistent* Load(Archive& ar);
-			void Store(Archive& ar);
+        static Persistent* Load(Archive& ar);
+        template <class C> static C* LoadT(Archive& ar) { return dynamic_cast<C*>(Load(ar)); }
+        void Store(Archive& ar);
 
-		protected:
-			virtual void Serialize(Archive& ar) = 0;
+    protected:
+        virtual void Serialize(Archive& ar) = 0;
 
-			///@todo use typeid(T).name() instead, and do the lookup by that;
-			virtual std::string GetClazzName() const = 0; // collision w/ Winapi macro
-			virtual int GetVersion() const { return 0; }
-	};
+        ///@todo use typeid(T).name() instead, and do the lookup by that;
+        virtual std::string GetClazzName() const = 0; // collision w/ Winapi macro
+        virtual int GetVersion() const { return 0; }
+    };
 
-	class Archive
-	{
-		public:
-			explicit Archive(int IsStoring = 0);
-			virtual ~Archive();
+    class Archive
+    {
+    public:
+        explicit Archive(int IsStoring = 0);
+        virtual ~Archive();
 
-			/* IO API */
-		protected:
-			virtual void Write(const void* buffer, size_t length) = 0;
-			virtual void Read(void* buffer, size_t length) = 0;
-	
-			size_t WriteString(const char* input); ///< @return length of written bytes of string
-			size_t ReadString(char*& output);	///< @return length of read bytes of string
+        /* IO API */
+    protected:
+        virtual void Write(const void* buffer, size_t length) = 0;
+        virtual void Read(void* buffer, size_t length) = 0;
 
-		public:
+        size_t WriteString(const char* input); ///< @return length of written bytes of string
+        size_t ReadString(char*& output);	///< @return length of read bytes of string
 
-			template <typename T> void PersistField(T& t) {
-				if (m_isStoring) {
-					Write(&t, sizeof(T));
-				}
-				else {
-					Read(&t, sizeof(T));
-				}
-			}
+    public:
 
-			template <typename T> void PersistVector(T *& v, size_t &count) {
-				UINT u32count = count; //clamp it down to 32 bit
-				if (m_isStoring) {
-					Write(&u32count, sizeof(u32count));
-					Write(v, sizeof(T) * u32count);
-				}
-				else {
-					u32count = 0;
-					Read(&u32count, sizeof(u32count));
+        template <typename T> void PersistField(T& t) {
+            if (m_isStoring) {
+                Write(&t, sizeof(T));
+            }
+            else {
+                Read(&t, sizeof(T));
+            }
+        }
 
-					v = new T[u32count];
-					Read((void*)v, sizeof(T) * u32count);
-					count = u32count;
-				}
-			}
-			
+        template <typename T> void PersistVector(T *& v, uint32_t &count) {
+            if (m_isStoring) {
+                //uint32_t u32count = count; //clamp it down to 32 bit
+                Write(&count, sizeof(count));
+                Write(v, sizeof(T) * count);
+            }
+            else {
+                uint32_t readCount = 0;
+                Read(&readCount, sizeof(readCount));
 
-			void PersistString(const char*& str);
-			void PersistString(std::string & str);
+                void * p = malloc(sizeof(T) * readCount);
+                Read(p, sizeof(T) * readCount);
 
-			void StoreObject(Persistent * object);
-			Persistent* LoadObject();
+                v = reinterpret_cast<T*>(p);
 
-			int IsStoring() const { return m_isStoring; }
-			void SetDirection(bool IsStoring) { m_isStoring = IsStoring; }
+                count = readCount;
+            }
+        }
 
-		private: 
-			int m_isStoring;
-	};
+        template <typename T> void PersistStdVector(std::vector<T> & v) {
+            if (m_isStoring) {
+                uint32_t u32count = v.size(); //clamp it down to 32 bit
+                Write(&u32count, sizeof(u32count));
+                void * p = v.data();
+                Write(p, sizeof(T) * u32count);
+            }
+            else {
+                uint32_t count = 0;
+                Read(&count, sizeof(count));
+
+                void *p = malloc(sizeof(T) * count);
+                Read(p, sizeof(T) * count);
+
+                v.clear();
+                v.assign(static_cast<T*>(p), static_cast<T*>(p) + count);
+
+            }
+        }
+
+
+        void PersistString(const char*& str);
+        void PersistString(std::string & str);
+
+        void StoreObject(Persistent * object);
+        Persistent* LoadObject();
+
+        int IsStoring() const { return m_isStoring; }
+        void SetDirection(bool IsStoring) { m_isStoring = IsStoring; }
+
+    private:
+        int m_isStoring;
+    };
 
 
 }
@@ -105,7 +130,8 @@ public:\
 // --- 
 
 #define PERSIST_FIELD(AR, FIELD) (AR.PersistField<decltype(FIELD)>((FIELD)))
-#define PERSIST_VECTOR(AR, FIELD, COUNT) (AR.PersistVector<std::remove_pointer<decltype(FIELD)>::type>(FIELD, COUNT))
+#define PERSIST_VECTOR(AR, VECTOR, COUNT) (AR.PersistVector<std::remove_pointer<decltype(VECTOR)>::type>(VECTOR, COUNT))
+#define PERSIST_STD_VECTOR(AR, VECTOR) (AR.PersistStdVector<decltype(VECTOR)::value_type>(VECTOR))
 #define PERSIST_STRING(AR, FIELD) (AR.PersistString((FIELD)))
 
 #define _PERSIST_OBJECT(AR, TYPE, IN_FIELD, OUT_FIELD)\

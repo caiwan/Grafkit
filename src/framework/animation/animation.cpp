@@ -33,13 +33,19 @@ void Animation::Channel::DeleteKey(const size_t& id)
 }
 
 void Animation::Channel::Serialize(Archive& ar) {
-    assert(0);
+    PERSIST_STRING(ar, m_name);
+    PERSIST_STD_VECTOR(ar, m_keys);
 }
 
+
 /* ============================================================================================== */
+Animation::Track::Track() {
+}
 
 Animation::Track::Track(const char* name, const std::vector<std::string> channelNames)
-    : m_name(name) { if (!channelNames.empty()) { for (size_t a = 0; a < channelNames.size(); ++a) { CreateChannel(channelNames.at(a)); } } }
+    : m_name(name) {
+    if (!channelNames.empty()) { for (size_t a = 0; a < channelNames.size(); ++a) { CreateChannel(channelNames.at(a)); } }
+}
 
 
 Animation::Track::Track(const char* name, const char* initials)
@@ -119,3 +125,5 @@ void Animation::_Serialize(Archive& ar)
 {
     Object::_Serialize(ar);
 }
+
+

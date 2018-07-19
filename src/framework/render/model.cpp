@@ -47,10 +47,7 @@ void Model::Calculate(Renderer& deviceContext, ActorRef parent) {
 
 void Model::Render(Renderer& render, SceneGraph* const & scene)
 {
-    if (m_material)
-    {
-        this->m_material->Render(render, scene->GetVShader(), scene->GetPShader());
-    }
+    if (m_material) { this->m_material->Render(render, scene->GetVShader(), scene->GetPShader()); }
 
     if (m_geometryShader.Valid() && m_geometryShader->Valid())
         m_geometryShader->Get()->Bind(render);
@@ -70,10 +67,10 @@ void Model::SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; 
 ShaderResRef Model::GetGeometryShader() const { return m_geometryShader; }
 
 
-void Model::_Serialize(Archive& ar)
+void Model::Serialize(Archive& ar)
 {
-    _Serialize(ar);
+    Object::_Serialize(ar);
+    // Materials will be persisted ina separate map
+    //PERSIST_REFOBJECT(ar, m_material);
     PERSIST_REFOBJECT(ar, m_mesh);
 }
-
-

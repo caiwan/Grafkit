@@ -16,6 +16,7 @@ ActorAnimation::ActorAnimation(ActorRef actor) : Animation(), m_actor(actor)
 	CreateTrack();
 }
 
+
 void ActorAnimation::Update(double time)
 {
 	const float3 t = m_position->GetFloat3(time);

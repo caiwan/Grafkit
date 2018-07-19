@@ -30,37 +30,19 @@ TEST(Persistence, PersistFieldTest)
     int test = 0xfacababa;
 
     // When
-    archive.PersistField<decltype(test)>(test);
+    //archive.PersistField<decltype(test)>(test);
+    PERSIST_FIELD(archive, test);
+
 
     // Then
     archive.ResetCrsr();
     archive.SetDirection(false);
 
     int test_read = 0;
-    archive.PersistField<decltype(test)>(test_read);
+    //archive.PersistField<decltype(test)>(test_read);
+    PERSIST_FIELD(archive, test);
 
     ASSERT_EQ(test, test_read);
-}
-
-/// @TODO test with more tzpes to see if it works 
-TEST(Persistence, PersitFieldMacroTest)
-{
-    TestArchiver archive(6, true);
-    // Given
-
-    int test = 0xfacababa;
-
-    // When
-    PERSIST_FIELD(archive, test);
-
-    // Then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    int test_orig = test;
-    PERSIST_FIELD(archive, test);
-
-    ASSERT_EQ(test_orig, test);
 }
 
 TEST(Persistence, NDimensionFloatPersistTest)
@@ -167,9 +149,9 @@ TEST(Persistence, MatrixPersistTest)
 
     PERSIST_FIELD(archive, m);
 
-    for (size_t row = 0; row < 4; row++)
+    for (uint32_t row = 0; row < 4; row++)
     {
-        for (size_t col = 0; col < 4; col++)
+        for (uint32_t col = 0; col < 4; col++)
         {
             ASSERT_LT(abs(m.Get(row, col) - m2.Get(row, col)), 000001);
         }
@@ -181,11 +163,11 @@ TEST(Persistence, VectorPersistTest)
     TestArchiver archive(4096, true);
 
     // given 
-    size_t len = rand() % 1024;
+    uint32_t len = rand() % 1024;
 
     int* test = new int[len];
 
-    for (size_t i = 0; i < len; i++) { test[i] = rand(); }
+    for (uint32_t i = 0; i < len; i++) { test[i] = rand(); }
 
     // when
     archive.PersistVector<std::remove_pointer<decltype(test)>::type>(test, len);
@@ -194,48 +176,75 @@ TEST(Persistence, VectorPersistTest)
     archive.ResetCrsr();
     archive.SetDirection(false);
 
-    int* test_read = nullptr;
-    size_t len_read = 0;
-    archive.PersistVector<std::remove_pointer<decltype(test_read)>::type>(test_read, len_read);
+    int* testRead = nullptr;
+    uint32_t len_read = 0;
+    archive.PersistVector<std::remove_pointer<decltype(testRead)>::type>(testRead, len_read);
 
     ASSERT_EQ(len, len_read);
-    for (size_t i = 0; i < len; i++)
-    ASSERT_EQ(test[i], test_read[i]);
+    for (uint32_t i = 0; i < len; i++)
+    ASSERT_EQ(test[i], testRead[i]);
 
-    delete[] test_read;
+    delete[] testRead;
     delete[] test;
 }
 
-TEST(Persistence, VectorMacroPersistTest)
+TEST(Persistence, StdVectorPersistTest)
 {
     TestArchiver archive(4096, true);
 
-    // given
-    size_t len = rand() % 1024;
-    int* test = new int[len];
+    // given 
+    uint32_t len = 256 + rand() % 1024;
+    std::vector<int> test;
+    for (uint32_t i = 0; i < len; i++) { test.push_back(rand()); }
 
-    // @todo float2,3,4, quaternion, matrix
+    // when
+    //archive.PersistStdVector<decltype(test)::value_type>(test);
+    PERSIST_STD_VECTOR(archive, test);
 
-    for (size_t i = 0; i < len; i++) { test[i] = rand(); }
-
-    PERSIST_VECTOR(archive, test, len);
-
+    //then
     archive.ResetCrsr();
     archive.SetDirection(false);
 
-    size_t len_orig = len;
-    int* test_orig = test;
+    std::vector<int> testRead;
+    //archive.PersistStdVector<decltype(testRead)::value_type>(testRead);
+    PERSIST_STD_VECTOR(archive, test);
 
-    PERSIST_VECTOR(archive, test, len);
+    ASSERT_EQ(test.size(), testRead.size());
+    for (uint32_t i = 0; i < len; i++)
+        ASSERT_EQ(test[i], testRead[i]);
+}
 
-    ASSERT_FALSE(nullptr == test);
 
-    ASSERT_EQ(len_orig, len);
-    for (size_t i = 0; i < len; i++)
-    ASSERT_EQ(test_orig[i], test[i]);
+TEST(Persistence, StdVectorToVectorPersistTest)
+{
+    TestArchiver archive(4096, true);
 
-    delete[] test_orig;
-    delete[] test;
+    // given 
+    uint32_t len = rand() % 1024;
+    std::vector<int> test;
+    for (uint32_t i = 0; i < len; i++) { test.push_back(rand()); }
+
+    // when
+    //archive.PersistStdVector<decltype(test)::value_type>(test);
+    PERSIST_STD_VECTOR(archive, test);
+
+
+    //then
+    archive.ResetCrsr();
+    archive.SetDirection(false);
+
+    int* testRead = nullptr;
+    uint32_t len_read = 0;
+    //archive.PersistVector<std::remove_pointer<decltype(testRead)>::type>(testRead, len_read);
+    //PERSIST_STD_VECTOR(archive, test);
+    PERSIST_VECTOR(archive, testRead, len_read);
+
+    ASSERT_EQ(len, len_read);
+    for (uint32_t i = 0; i < len; i++)
+        ASSERT_EQ(test[i], testRead[i]);
+
+    delete[] testRead;
+
 }
 
 TEST(Persistence, StringPersistTest)
@@ -290,7 +299,7 @@ TEST(Persistence, STDStringToCstringDeserializeTest)
 
     // given
     std::string test = "The quick brown fox jumps over the lazy dog.";
-    const size_t nTest = test.length();
+    const uint32_t nTest = test.length();
 
     // when
     archive.PersistString(test);
@@ -317,7 +326,8 @@ TEST(Persistence, ObjectPersistTest)
     EmptyClass* object = new EmptyClass();
 
     //when
-    archive.StoreObject(object);
+    //archive.StoreObject(object);
+    PERSIST_OBJECT(archive, object);
 
     //then
     archive.ResetCrsr();
@@ -325,7 +335,8 @@ TEST(Persistence, ObjectPersistTest)
 
     EmptyClass* object_test = nullptr;
 
-    object_test = dynamic_cast<decltype(object_test)>(archive.LoadObject());
+    PERSIST_OBJECT(archive, object);
+    //object_test = dynamic_cast<decltype(object_test)>(archive.LoadObject());
 
     ASSERT_TRUE(object_test != nullptr);
     ASSERT_TRUE(object != object_test);
@@ -349,61 +360,15 @@ TEST(Persistence, ObjectReferencePersistTest)
     archive.SetDirection(false);
 
     Ref<EmptyClass> object_test = nullptr;
-    object_test = dynamic_cast<decltype(object_test.Get())>(archive.LoadObject());
+    PERSIST_REFOBJECT(archive, object);
+    //object_test = dynamic_cast<decltype(object_test.Get())>(archive.LoadObject());
 
     ASSERT_TRUE(object_test.Valid());
     ASSERT_TRUE(object_test != object);
     ASSERT_STREQ(object->GetClazzName().c_str(), object_test->GetClazzName().c_str());
 }
 
-TEST(Persistence, ObjectReferenceMacroPeristTest)
-{
-    TestArchiver archive(256, true);
 
-    //given
-    Ref<EmptyClass> object = new EmptyClass();
-
-    //when
-    PERSIST_REFOBJECT(archive, object);
-
-    //then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    Ref<EmptyClass> object_read = nullptr;
-    PERSIST_REFOBJECT(archive, object_read);
-
-    ASSERT_TRUE(object_read.Valid());
-    ASSERT_TRUE(object_read != object);
-    ASSERT_STREQ(object->GetClazzName().c_str(), object_read->GetClazzName().c_str());
-}
-
-
-TEST(Persistence, ObjectMacroPersistTest)
-{
-    TestArchiver archive(256, true);
-
-    //given
-    EmptyClass* object = new EmptyClass();
-
-    //when
-    PERSIST_OBJECT(archive, object);
-
-    //then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    EmptyClass* object_read = nullptr;
-
-    PERSIST_OBJECT(archive, object_read);
-
-
-    ASSERT_TRUE(object_read != nullptr);
-    ASSERT_TRUE(object_read != object);
-    ASSERT_STREQ(object_read->GetClazzName().c_str(), object->GetClazzName().c_str());
-
-    delete object;
-}
 
 TEST(Persistence, ObjectWithFieldsPersistTest)
 {
@@ -424,7 +389,6 @@ TEST(Persistence, ObjectWithFieldsPersistTest)
 
     object = nullptr;
     PERSIST_OBJECT(archive, object);
-
 
     ASSERT_TRUE(object != nullptr);
     ASSERT_TRUE(object != object_original);

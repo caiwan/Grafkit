@@ -48,15 +48,15 @@ TEST(Persistent_Model, ModelPersistenceTest)
     ModelRef loadedModel = dynamic_cast<Model*>(Persistent::Load(ar));
 
     ASSERT_TRUE(loadedModel.Valid());
-    ASSERT_TRUE(loadedModel->GetMaterial().Valid());
     ASSERT_TRUE(loadedModel->GetMesh().Valid());
 
-    EXPECT_EQ("Model", loadedModel->GetName().c_str());
-    EXPECT_EQ(model->GetUuid().c_str(), loadedModel->GetName().c_str());
+    EXPECT_STREQ("Model", loadedModel->GetName().c_str());
+    EXPECT_STREQ(model->GetUuid().c_str(), loadedModel->GetUuid().c_str());
 
-    EXPECT_EQ("Material", loadedModel->GetMaterial()->GetName());
-    EXPECT_EQ(model->GetMaterial()->GetUuid().c_str(), loadedModel->GetMaterial()->GetUuid().c_str());
-    
+    // Materials will be persisted in some other way
+    //ASSERT_TRUE(loadedModel->GetMaterial().Valid());
+    //EXPECT_STREQ("Material", loadedModel->GetMaterial()->GetName().c_str());
+    //EXPECT_STREQ(model->GetMaterial()->GetUuid().c_str(), loadedModel->GetMaterial()->GetUuid().c_str());    
 }
 
 // + multitrack

@@ -28,8 +28,8 @@ namespace Grafkit
         virtual void UpdateMesh(double time);
         void RenderMesh(ID3D11DeviceContext* deviceContext);
 
-        void AddPointer(std::string inputName, size_t length, const void* pointer);
-        void SetIndices(size_t vertexCount, size_t indexCount, const uint32_t* const indices);
+        void AddPointer(std::string inputName, uint32_t length, const void* pointer);
+        void SetIndices(uint32_t vertexCount, uint32_t indexCount, const uint32_t* const indices);
         void Build(ID3D11Device *const& device, ShaderRef &vertexShader);
 
         size_t GetIndexCount() const { return m_indexCount; }
@@ -56,7 +56,7 @@ namespace Grafkit
     private:
         ID3D11Buffer * m_indexBuffer;
         BufferStateDescriptor m_buffer;
-        size_t m_vertexCount, m_indexCount;
+        uint32_t m_vertexCount, m_indexCount;
         uint32_t *m_indices;
 
         std::map<std::string, const void*> m_mapPtr;

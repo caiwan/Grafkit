@@ -82,14 +82,13 @@ namespace Grafkit {
         enum camera_type m_type; // hack: van, ahol kezzel kell a kamerat atvaltnai perpective/ortho kozott
         enum camera_mode m_mode;
 
-    protected:
         Matrix m_worldMatrix;
         Matrix m_viewMatrix;
         Matrix m_perspectiveMatrix;
         Matrix m_orthoMatrix;
 
-        PERSISTENT_DECL(Grafkit::Camera, 1);
-
+    protected:
         void Serialize(Archive& ar) override;
+        PERSISTENT_DECL(Grafkit::Camera, 1);
     };
 }

@@ -8,7 +8,7 @@ TCs for internal classes such as scene and so on
 
 #include <gtest/gtest.h>
 
-#include "animation/animation.h"
+#include "render/Light.h"
 
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
@@ -22,5 +22,15 @@ using namespace ArchivePersistent;
 
 TEST(Persistent_Light, LightPersistenceTest)
 {
+    TestArchiver ar(256, true);
 
+    // given
+    //LightRef light = new Light();
+
+    // when
+
+    //then
+    size_t pos = ar.GetCrsr();
+    ar.ResetCrsr();
+    ar.SetDirection(false);
 }
