@@ -116,7 +116,10 @@ void Animation::Track::SetFloat4(size_t id, float4 v)
 
 void Animation::Track::Serialize(Archive& ar)
 {
+    PERSIST_STRING(ar, m_name);
+
     assert(0);
+    //PERSIST_FIELD(ar, m_)
 }
 
 /* ============================================================================================== */
