@@ -41,7 +41,7 @@ using namespace ArchivePersistent;
 		ASSERT_TRUE(object.Get() != object_read.Get());\
 	}
 
-DEFINE_PREGNANCY_TEST(SceneGraph)
+//DEFINE_PREGNANCY_TEST(SceneGraph)
 DEFINE_PREGNANCY_TEST(Actor)
 DEFINE_PREGNANCY_TEST(Material)
 DEFINE_PREGNANCY_TEST(Mesh)

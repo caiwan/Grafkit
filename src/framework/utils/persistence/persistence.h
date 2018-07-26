@@ -144,8 +144,8 @@ public:\
 	}\
 }
 
-#define PERSIST_OBJECT(AR, FIELD) _PERSIST_OBJECT(AR, decltype(FIELD), FIELD, FIELD)
-#define PERSIST_REFOBJECT(AR, FIELD) _PERSIST_OBJECT(AR, decltype(FIELD.Get()), FIELD.Get(), FIELD)
+#define PERSIST_OBJECT(AR, OBJECT) _PERSIST_OBJECT(AR, decltype(OBJECT), OBJECT, OBJECT)
+#define PERSIST_REFOBJECT(AR, REF) _PERSIST_OBJECT(AR, decltype(REF.Get()), REF.Get(), REF)
 
 
 // --- define exceptions 

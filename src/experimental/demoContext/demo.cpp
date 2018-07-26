@@ -131,6 +131,12 @@ void Demo::InitTestStuff(Renderer& render) {
     (*m_scene)->AddAnimation(new ActorAnimation(cameraActor));
     (*m_scene)->AddAnimation(new ActorAnimation(cubeActor));
 
+    for (size_t i = 0; i < (*m_scene)->GetAnimationCount(); ++i)
+    {
+        AnimationRef animation = (*m_scene)->GetAnimation(i);
+        animation->Initialize();
+    }
+
 #if 0
     for (size_t i = 0; i < (*m_scene)->GetAnimationCount(); ++i)
     {

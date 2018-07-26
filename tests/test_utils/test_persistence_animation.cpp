@@ -209,6 +209,7 @@ TEST_F(AnimationPersistenceTest, ActorAnimationTest)
 
     // given
     Ref<ActorAnimation> animation = new ActorAnimation();
+    animation->Initialize();
     CreateAnimation(animation, KEY_COUNT);
 
     //when

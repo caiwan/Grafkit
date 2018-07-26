@@ -32,7 +32,7 @@ using namespace ArchivePersistent;
 */
 
 
-TEST(Persistent_Scene, ScenePersistenceTest)
+TEST(Persistent_Scene, DISABLED_ScenePersistenceTest)
 {
     TestArchiver ar(256 * 4096, true);
 

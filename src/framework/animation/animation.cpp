@@ -118,8 +118,21 @@ void Animation::Track::Serialize(Archive& ar)
 {
     PERSIST_STRING(ar, m_name);
 
-    assert(0);
-    //PERSIST_FIELD(ar, m_)
+    if (ar.IsStoring()) {
+        uint32_t len = m_channels.size();
+        PERSIST_FIELD(ar, len);
+        for (auto channel : m_channels) {
+            channel->Store(ar);
+        }
+    }
+    else {
+        uint32_t len = 0;
+        PERSIST_FIELD(ar, len);
+        for (uint32_t i = 0; i < len; i++) {
+            auto channel = Persistent::LoadT<Animation::Channel>(ar);
+            m_channels.push_back(channel);
+        }
+    }
 }
 
 /* ============================================================================================== */
@@ -127,6 +140,21 @@ void Animation::Track::Serialize(Archive& ar)
 void Animation::_Serialize(Archive& ar)
 {
     Object::_Serialize(ar);
+
+    if (ar.IsStoring()) {
+        uint32_t len = m_tracks.size();
+        PERSIST_FIELD(ar, len);
+        for (auto channel : m_tracks) {
+            channel->Store(ar);
+        }
+    }
+    else 
+    {
+        uint32_t len = 0;
+        PERSIST_FIELD(ar, len);
+        for (uint32_t i = 0; i < len; i++) {
+            auto track = Persistent::LoadT<Animation::Track>(ar);
+            m_tracks.push_back(track);
+        }
+    }
 }
-
-

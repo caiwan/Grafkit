@@ -28,7 +28,7 @@ using namespace ArchivePersistent;
     Tests if every used animation key types could've been persisted
 */
 
-TEST(Persistent_Scenegraph, ScenegraphPersistenceTestTest)
+TEST(Persistent_Scenegraph, DISABLED_ScenegraphPersistenceTestTest)
 {
     TestArchiver ar(256 * 4096, true);
 

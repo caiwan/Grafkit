@@ -10,13 +10,11 @@
 #include "math/matrix.h"
 #include "math/quaternion.h"
 
-
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
 
 #include "TestArchiver.h"
 #include "testClass_persistence.h"
-
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -30,7 +28,6 @@ TEST(Persistence, PersistFieldTest)
     int test = 0xfacababa;
 
     // When
-    //archive.PersistField<decltype(test)>(test);
     PERSIST_FIELD(archive, test);
 
 
@@ -38,11 +35,10 @@ TEST(Persistence, PersistFieldTest)
     archive.ResetCrsr();
     archive.SetDirection(false);
 
-    int test_read = 0;
-    //archive.PersistField<decltype(test)>(test_read);
-    PERSIST_FIELD(archive, test);
+    int testRead = 0;
+    PERSIST_FIELD(archive, testRead);
 
-    ASSERT_EQ(test, test_read);
+    ASSERT_EQ(test, testRead);
 }
 
 TEST(Persistence, NDimensionFloatPersistTest)
@@ -177,10 +173,10 @@ TEST(Persistence, VectorPersistTest)
     archive.SetDirection(false);
 
     int* testRead = nullptr;
-    uint32_t len_read = 0;
-    archive.PersistVector<std::remove_pointer<decltype(testRead)>::type>(testRead, len_read);
+    uint32_t lenRead = 0;
+    archive.PersistVector<std::remove_pointer<decltype(testRead)>::type>(testRead, lenRead);
 
-    ASSERT_EQ(len, len_read);
+    ASSERT_EQ(len, lenRead);
     for (uint32_t i = 0; i < len; i++)
     ASSERT_EQ(test[i], testRead[i]);
 
@@ -198,7 +194,6 @@ TEST(Persistence, StdVectorPersistTest)
     for (uint32_t i = 0; i < len; i++) { test.push_back(rand()); }
 
     // when
-    //archive.PersistStdVector<decltype(test)::value_type>(test);
     PERSIST_STD_VECTOR(archive, test);
 
     //then
@@ -206,8 +201,7 @@ TEST(Persistence, StdVectorPersistTest)
     archive.SetDirection(false);
 
     std::vector<int> testRead;
-    //archive.PersistStdVector<decltype(testRead)::value_type>(testRead);
-    PERSIST_STD_VECTOR(archive, test);
+    PERSIST_STD_VECTOR(archive, testRead);
 
     ASSERT_EQ(test.size(), testRead.size());
     for (uint32_t i = 0; i < len; i++)
@@ -326,7 +320,6 @@ TEST(Persistence, ObjectPersistTest)
     EmptyClass* object = new EmptyClass();
 
     //when
-    //archive.StoreObject(object);
     PERSIST_OBJECT(archive, object);
 
     //then
@@ -335,8 +328,7 @@ TEST(Persistence, ObjectPersistTest)
 
     EmptyClass* object_test = nullptr;
 
-    PERSIST_OBJECT(archive, object);
-    //object_test = dynamic_cast<decltype(object_test)>(archive.LoadObject());
+    PERSIST_OBJECT(archive, object_test);
 
     ASSERT_TRUE(object_test != nullptr);
     ASSERT_TRUE(object != object_test);
@@ -360,8 +352,7 @@ TEST(Persistence, ObjectReferencePersistTest)
     archive.SetDirection(false);
 
     Ref<EmptyClass> object_test = nullptr;
-    PERSIST_REFOBJECT(archive, object);
-    //object_test = dynamic_cast<decltype(object_test.Get())>(archive.LoadObject());
+    PERSIST_REFOBJECT(archive, object_test);
 
     ASSERT_TRUE(object_test.Valid());
     ASSERT_TRUE(object_test != object);

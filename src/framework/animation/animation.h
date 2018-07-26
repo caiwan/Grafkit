@@ -23,8 +23,8 @@ namespace Grafkit
 
         virtual ~Animation();
 
+        virtual void Initialize() = 0;
         virtual void Update(double time) = 0;
-
 
         struct Key;
         class Channel;

@@ -8,12 +8,12 @@ using namespace Grafkit;
 
 ActorAnimation::ActorAnimation() : Animation()
 {
-	CreateTrack();
+	//CreateTrack();
 }
 
 ActorAnimation::ActorAnimation(ActorRef actor) : Animation(), m_actor(actor)
 {
-	CreateTrack();
+	//CreateTrack();
 }
 
 
@@ -29,7 +29,7 @@ void ActorAnimation::Update(double time)
 	m_actor->Transform().Translate(t);
 }
 
-void ActorAnimation::CreateTrack()
+void ActorAnimation::Initialize()
 {
 	m_position = new Track("Position", "xyz");
 	AddTrack(m_position);
@@ -43,5 +43,5 @@ void ActorAnimation::CreateTrack()
 }
 
 void ActorAnimation::Serialize(Archive& ar) {
-    assert(0);
+    ActorAnimation::_Serialize(ar);
 }
