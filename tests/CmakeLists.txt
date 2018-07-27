@@ -17,6 +17,7 @@ subdirs(assets)
 # subdirs(test_particle_cubes)
 # subdirs(test_particle_engine)
 # subdirs(test_loaderbar)
+subdirs(test_context)
 subdirs(test_utils)
 
 # subdirs(test_importer)
@@ -28,6 +29,7 @@ add_custom_target(check
 	COMMAND ${CMAKE_CTEST_COMMAND} 
 	DEPENDS 
 		UnitTests
+        ContextTest
 		# IT_Importer
 		# test_core_rotating_cube
 		# test_core_rotating_cube_scenegraph

@@ -21,6 +21,8 @@
 
 #include "core/Music.h"
 
+#include "schema.h"
+
 #include "builtin_data/cube.h"
 
 using namespace GkDemo;

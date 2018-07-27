@@ -1,0 +1,22 @@
+enable_testing()
+
+find_package(GTest REQUIRED)
+
+set(APPLICATION_NAME ContextTest)
+
+file(GLOB_RECURSE SOURCE_FILES *.cpp)
+file(GLOB_RECURSE HEADER_FILES *.h)
+
+include_directories("${CMAKE_SOURCE_DIR}")
+include_directories("${GK2_INCLUDE_DIR}")
+include_directories("${GK2_ROOT_DIR}/src/experimental/demoContext/")
+include_directories(${GTEST_INCLUDE_DIRS})
+
+add_executable(${APPLICATION_NAME} EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES})
+add_test(Tests ${APPLICATION_NAME})
+
+target_link_libraries(${APPLICATION_NAME} Grafkit2 DemoContext ${GTEST_BOTH_LIBRARIES})
+
+target_include_directories(${APPLICATION_NAME} PUBLIC include)
+
+set_target_properties(${APPLICATION_NAME} PROPERTIES FOLDER tests)

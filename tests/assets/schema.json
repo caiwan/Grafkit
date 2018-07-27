@@ -1,0 +1,124 @@
+{
+	"demo": {
+		"music": {
+			"filename": "alpha_c_-_euh.ogg"
+		},
+		"scenes": [{
+				"id": 0,
+				"uuid": ""
+			}
+		],
+		"effects": [],
+		"renderPipeline": {
+			"prerender": {},
+			"forward": {},
+			"postrender": {}
+		}
+	},
+	"assets": {
+		"textures": [{
+				"name": "",
+				"uuid": "",
+				"filename": ""
+			}
+		],
+		"meshes": [{
+				"name": "CubeMesh",
+				"uuid": "00751e45-a404-4955-80f4-b17a2c30a027",
+				"generator": "cube"
+			}
+		],
+		"models": [{
+				"name": "Cube",
+				"uuid": "a0f30c19-ecdb-4f22-8cf5-f908c6250af9",
+				"meshes": ["00751e45-a404-4955-80f4-b17a2c30a027"],
+				"material": "733e8988-32c3-411f-b877-dca11c761b08"
+			}
+		],
+		"materials": [{
+				"name": "PBRCubeMaterial",
+				"uuid": "733e8988-32c3-411f-b877-dca11c761b08"
+				"textures": {
+					"diffuse": "",
+					"others": "..."
+				}
+			}
+		],
+		"cameras": [{
+				"name": "Camera01",
+				"uuid": "7e90b629-8499-481f-8887-8de6c5392a1a"
+			}, {
+				"name": "Camera02",
+				"uuid": "54e1f5b3-61e2-4413-8d80-edc46148a976"
+			}
+		],
+		"lights": [{
+				"name": "Light01",
+				"uuid": "2bfbc0bc-f71e-4ed7-9b0a-36c50fab805c"
+			}
+		],
+		"shaders": [{
+				"name": "vertexShader",
+				"uuid": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+				"type": "vs",
+				"filename": "shaders/vertex.hlsl",
+				"entrypoint": ""
+			}, {
+				"name": "pixelShader",
+				"uuid": "98d11dcd-4c2d-449e-bc23-573542180c61",
+				"type": "ps",
+				"filename": "shaders/flat.hlsl",
+				"entrypoint": ""
+			}, {
+				"name": "showUVs",
+				"uuid": "203b6d6b-3cfc-4cf3-b624-2f003fd661ec",
+				"type": "ps",
+				"filename": "shaders/flat.hlsl",
+				"entrypoint": "shaders/fx/uv.hlsl"
+			}
+		]
+	},
+	"sceneGraphs": [{
+			"name": "TestScene",
+			"uuid": "858543a6-bf2d-42b5-93b9-0c73cec79369",
+			"rootActor": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+			"actors": [{
+					"name": "RootActor",
+					"uuid": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+					"parent": "",
+					"entities": []
+				}, {
+					"name": "CameraActor",
+					"uuid": "858543a6-bf2d-42b5-93b9-0c73cec79369",
+					"parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+					"entities": []
+				}, {
+					"name": "Camera01",
+					"uuid": "858543a6-bf2d-42b5-93b9-0c73cec79369",
+					"parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+					"entities": ["7e90b629-8499-481f-8887-8de6c5392a1a"]
+				}, {
+					"name": "Camera02",
+					"uuid": "858543a6-bf2d-42b5-93b9-0c73cec79369",
+					"parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+					"entities": ["54e1f5b3-61e2-4413-8d80-edc46148a976"],
+				}, {
+					"name": "LightActor",
+					"uuid": "f95ceb23-3144-4522-8275-8c1433f50595",
+					"parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+					"entities": ["2bfbc0bc-f71e-4ed7-9b0a-36c50fab805c"]
+				}, {
+					"name": "CubeActor",
+					"uuid": "3bd7e8db-e851-4db2-b333-16e0b3f66019",
+					"parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+					"entities": ["a0f30c19-ecdb-4f22-8cf5-f908c6250af9"]
+				}
+			]
+		}
+	],
+	"effects": [{
+			"name": "",
+			"uuid": ""
+		},{}
+	]
+}
