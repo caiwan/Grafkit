@@ -7,23 +7,23 @@ using namespace FWdebugExceptions;
 
 Thread::Thread(Runnable *r) : m_pRunnable(r) {
 	if(!m_pRunnable)
-		throw new EX_DETAILS(ThreadException, "Runnable *r failed ");
+		THROW_EX_DETAILS(ThreadException, "Runnable *r failed ");
 	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
 	this->m_hThread = CreateThread(nullptr, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	if(!m_hThread)
-		throw new EX_DETAILS(ThreadException, "_beginthreadex failed");
+		THROW_EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
 Thread::Thread() : m_pRunnable(nullptr) {
 	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
 	this->m_hThread = CreateThread(nullptr, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	if(!m_hThread)
-		throw new EX_DETAILS(ThreadException, "_beginthreadex failed");
+		THROW_EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
 DWORD WINAPI Thread::startThreadRunnable(LPVOID pVoid) {
 	if (!pVoid) 
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 
 	Thread* rThread = static_cast<Thread*>(pVoid);
 	rThread->m_lastResult = rThread->m_pRunnable->Run();
@@ -34,7 +34,7 @@ DWORD WINAPI Thread::startThreadRunnable(LPVOID pVoid) {
 
 DWORD WINAPI Thread::startThread(LPVOID pVoid) {
 	if (!pVoid)
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 
 	Thread* aThread = static_cast<Thread*>(pVoid);
 	//aThread->status = TS_run;
@@ -50,7 +50,7 @@ Thread::~Thread() {
 		DWORD rc = CloseHandle(m_hThread);
 /*
 		if(!rc)
-			throw new EX_DETAILS(ThreadException, 5003, "CloseHandle failed");			
+			THROW_EX_DETAILS(ThreadException, 5003, "CloseHandle failed");			
 */
 	}
 }
@@ -58,11 +58,11 @@ Thread::~Thread() {
 void Thread::Start() {
 	//assert(m_hThread);
 	if(!this->m_hThread)
-		throw new EX_DWORD(ThreadException, GetLastError());
+		THROW_EX_DWORD(ThreadException, GetLastError());
 
 	DWORD rc = ResumeThread(m_hThread);
 	if(rc == -1){
-		throw new EX_DWORD(ThreadException, GetLastError());
+		THROW_EX_DWORD(ThreadException, GetLastError());
 	}
 }
 

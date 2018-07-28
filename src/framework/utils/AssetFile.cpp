@@ -249,7 +249,7 @@ IAssetRef FileAssetFactory::Get(std::string name)
 	LOGGER(Log::Logger().Info("Accessin file %s", fullname.c_str()));
 
 	if (!fp) {
-		throw new EX_DETAILS(AssetLoadException, fullname.c_str());
+		THROW_EX_DETAILS(AssetLoadException, fullname.c_str());
 	}
 
 	fseek(fp, 0, SEEK_END);

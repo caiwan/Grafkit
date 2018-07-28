@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include <cstring>
-
+#include <sstream>
 #include <comdef.h>
 
 #include "exceptions.h"
@@ -13,97 +13,84 @@ using namespace FWdebug;
 ///@todo use std::string !!!
 
 FWdebug::Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const char * details)
-	: 
-	m_formattedMessage(NULL),
-	m_line(line),
-	m_function(function),
-	m_file(file),
-	m_message(message),
-	m_code(errorCode),
-	m_details(NULL),
-	std::exception()
+    :
+    m_formattedMessage(),
+    m_line(line),
+    m_function(function),
+    m_file(file),
+    m_message(message),
+    m_code(errorCode),
+    m_details(),
+    std::exception()
 {
-	// copy details message due to constant fuckup
-	if (details) {
-		size_t slen = strlen(details);
-		char* data = new char[slen + 1];
-		strcpy_s(data, slen + 1, details);
-		*(const_cast<char**>(&m_details)) = data;
-	}
+    if (details) {
+        m_details.assign(details);
+    }
 }
 
 FWdebug::Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const HRESULT hresult)
-	:
-	m_formattedMessage(NULL),
-	m_line(line),
-	m_function(function),
-	m_file(file),
-	m_message(message),
-	m_code(errorCode),
-	m_details(NULL),
-	std::exception()
+    :
+    m_formattedMessage(),
+    m_line(line),
+    m_function(function),
+    m_file(file),
+    m_message(message),
+    m_code(errorCode),
+    m_details(),
+    std::exception()
 {
-	_com_error err(hresult);
-	LPCTSTR details = err.ErrorMessage();
+    _com_error err(hresult);
+    LPCTSTR details = err.ErrorMessage();
 
-	size_t slen = strlen(details);
-	char* data = new char[slen + 1];
-	strcpy_s(data, slen + 1, details);
-	*(const_cast<char**>(&m_details)) = data;
+    m_details.assign(details);
 }
 
 FWdebug::Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const DWORD dword)
-	:
-	m_formattedMessage(NULL),
-	m_line(line),
-	m_function(function),
-	m_file(file),
-	m_message(message),
-	m_code(errorCode),
-	m_details(NULL),
-	std::exception()
+    :
+    m_formattedMessage(),
+    m_line(line),
+    m_function(function),
+    m_file(file),
+    m_message(message),
+    m_code(errorCode),
+    m_details(),
+    std::exception()
 {
-	LPVOID lpMsgBuf;
-	LPVOID lpDisplayBuf;
-	DWORD dw = GetLastError();
+    LPVOID lpMsgBuf;
+    DWORD dw = GetLastError();
 
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		dw,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf,
-		0, NULL);
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR)&lpMsgBuf,
+        0, nullptr);
 
-	size_t slen = strlen((const char*)lpMsgBuf);
-	char* data = new char[slen + 1];
-	strcpy_s(data, slen + 1, (const char*)lpMsgBuf);
-	*(const_cast<char**>(&m_details)) = data;
+    m_details.assign((const char*)lpMsgBuf);
 }
 
 
 Exception::~Exception()
 {
-	delete[] this->m_formattedMessage;
-	delete[] * (const_cast<char**>(&m_details)); ///@todo ez valami kulonos formedveny
 }
 
 char const * FWdebug::Exception::what() const
 {
-	if (m_formattedMessage)
-		return m_formattedMessage;
+    if (!m_formattedMessage.empty())
+        return m_formattedMessage.c_str();
 
-	size_t bsize = strlen(this->m_message) + 512;
-	m_formattedMessage = new char[bsize];
-	sprintf_s(
-		this->m_formattedMessage, bsize,
-		"%#x: %s in function %s in file %s, at line %d. %s", 
-		this->m_code, this->m_message, this->m_function, this->m_file, 
-		this->m_line, m_details ? m_details : ""
-	);
+    std::ostringstream stringStream;
+    stringStream << this->m_code << ": " << this->m_message;
+    stringStream << " in function" << this->m_function << "in file " << this->m_file << ", at line " << this->m_line;
 
-	return m_formattedMessage;
+    if (!m_details.empty())
+        stringStream << " " << m_details;
+
+    m_formattedMessage = stringStream.str();
+
+    return m_formattedMessage.c_str();
 }
 

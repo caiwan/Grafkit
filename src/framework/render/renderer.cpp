@@ -51,17 +51,17 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	// Create a DirectX graphics interface factory.
 	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// Use the factory to create an adapter for the primary graphics interface (video card).
 	result = factory->EnumAdapters(0, &adapter);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// Enumerate the primary adapter output (monitor).
 	result = adapter->EnumOutputs(0, &adapterOutput);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// Get the number of modes that fit the DXGI_FORMAT_R8G8B8A8_UNORM display format for the adapter output (monitor).
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr);
@@ -73,32 +73,32 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	const int noSurfaceOccured = (result == 0x887a0022);
 
 	if (FAILED(result) && !noSurfaceOccured)
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 
 	displayModeList = new DXGI_MODE_DESC[numModes];
 
 	if (!displayModeList && !noSurfaceOccured)
 	{
-		throw EX_DETAILS(InitializeRendererException, "No display mode list");
+		THROW_EX_DETAILS(InitializeRendererException, "No display mode list");
 	}
 
 	// Get the adapter (video card) description.
 	result = adapter->GetDesc(&adapterDesc);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// Convert the name of the video card to a character array and store it.
 	error = wcstombs_s(&stringLength, m_videoCardDescription, 256, adapterDesc.Description, 256);
 	if (error != 0)
-		throw EX_DETAILS(InitializeRendererException, "No wcstombs_s(...)");
+		THROW_EX_DETAILS(InitializeRendererException, "No wcstombs_s(...)");
 
 	Log::Logger().Info("\nDisplay adapter: vid: %s", m_videoCardDescription);
 
 	// Now fill the display mode list structures.
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList);
 	if (FAILED(result) && !noSurfaceOccured)
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// Now go through all the display modes and find the one that matches the screen width and height.
 	// When a match is found store the numerator and denominator of the refresh rate for that monitor.
@@ -209,7 +209,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	);
 
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// update our reference
 	this->AssingnRef(m_device);
@@ -221,13 +221,13 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	// Get the pointer to the back buffer.
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// -----------------------------------------------------------------------------
 	// Create the render target view with the back buffer pointer.
 	result = m_device->CreateRenderTargetView(backBufferPtr, nullptr, &m_myRenderTargetView);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// Release pointer to the back buffer as we no longer need it.
 	backBufferPtr->Release();
@@ -285,7 +285,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	// Create the rasterizer state from the description we just filled out.
 	result = m_device->CreateRasterizerState(&rastDesc, &m_rasterState);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	// Now set the rasterizer state.
 	m_deviceContext->RSSetState(m_rasterState);
@@ -337,7 +337,7 @@ void Renderer::Resize(int screenW, int screenH) {
 
 		hr = m_swapChain->ResizeBuffers(0, m_screenW, m_screenH, DXGI_FORMAT_UNKNOWN, 0);
 		if (FAILED(hr))
-			throw new EX_HRESULT(ResizeRenderSurfaceException, hr);
+			THROW_EX_HRESULT(ResizeRenderSurfaceException, hr);
 		
 		ID3D11Texture2D* pBuffer = nullptr;
 
@@ -345,12 +345,12 @@ void Renderer::Resize(int screenW, int screenH) {
 		hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBuffer);
 		
 		if (FAILED(hr))
-			throw new EX_HRESULT(ResizeRenderSurfaceException, hr);
+			THROW_EX_HRESULT(ResizeRenderSurfaceException, hr);
 
 		hr = m_device->CreateRenderTargetView(pBuffer, NULL, &m_myRenderTargetView);
 		
 		if (FAILED(hr))
-			throw new EX_HRESULT(ResizeRenderSurfaceException, hr);
+			THROW_EX_HRESULT(ResizeRenderSurfaceException, hr);
 
 		pBuffer->Release();
 
@@ -537,7 +537,7 @@ void Grafkit::Renderer::CreateDepthStencilView()
 	// Create the texture for the depth buffer using the filled out description.
 	result = m_device->CreateTexture2D(&depthBufferDesc, nullptr, &m_depthStencilBuffer);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	m_depthStencilState = CreateStencilState(true);
 	m_depthStencilStateWriteDisabled = CreateStencilState(false);
@@ -557,7 +557,7 @@ void Grafkit::Renderer::CreateDepthStencilView()
 	// Create the depth stencil view.
 	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_myDepthStencilView);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 }
 
 // folyt kov
@@ -595,7 +595,7 @@ ID3D11DepthStencilState* Grafkit::Renderer::CreateStencilState(bool isEnable)
 	result = m_device->CreateDepthStencilState(&dsDesc, &pDSState);
 
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeRendererException, result);
+		THROW_EX_HRESULT(InitializeRendererException, result);
 
 	return pDSState;
 }

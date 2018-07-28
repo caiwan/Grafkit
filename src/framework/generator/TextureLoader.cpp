@@ -47,7 +47,7 @@ void TextureBufferBuilder::Load(IResourceManager * const & resman, IResource * s
 {
 	TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
 	if (dstTexture.Invalid()) {
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 	}
 
 	TextureRef texture = new Texture2D();
@@ -108,7 +108,7 @@ void TextureFromBitmap::Load(IResourceManager * const & resman, IResource * sour
 {
 	TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
 	if (dstTexture.Invalid()) {
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 	}
 
 	// --- load texture 
@@ -126,7 +126,7 @@ void TextureFromBitmap::Load(IResourceManager * const & resman, IResource * sour
 
 	if (!data)
 	{
-		throw new EX_DETAILS(BitmapLoadException, stbi_failure_reason());
+		THROW_EX_DETAILS(BitmapLoadException, stbi_failure_reason());
 	}
 
 	texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, x, y, ch));
@@ -166,7 +166,7 @@ void TextureCubemapFromBitmap::Load(IResourceManager * const & resman, IResource
 {
 	TextureCubeResRef dstTexture = dynamic_cast<TextureCubeRes*>(source);
 	if (dstTexture.Invalid()) {
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 	}
 
 	BitmapRef bitmaps[6];
@@ -182,7 +182,7 @@ void TextureCubemapFromBitmap::Load(IResourceManager * const & resman, IResource
 
 		if (!data)
 		{
-			throw new EX_DETAILS(BitmapLoadException, stbi_failure_reason());
+			THROW_EX_DETAILS(BitmapLoadException, stbi_failure_reason());
 		}
 
 		bitmaps[i] = new Bitmap(data, x, y, ch);
@@ -218,7 +218,7 @@ void TextureNoiseMap::Load(IResourceManager * const & resman, IResource * source
 {
 	TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
 	if (dstTexture.Invalid()) {
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 	}
 
 	// --- load texture 
@@ -263,7 +263,7 @@ void TextureSamplerBuilder::Load(IResourceManager * const & resman, IResource * 
 	TextureSamplerResRef sampler = dynamic_cast<Resource<TextureSampler>*>(source);
 
 	if (sampler.Invalid()) {
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 	}
 
 	sampler->AssingnRef(new TextureSampler());

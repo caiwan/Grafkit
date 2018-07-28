@@ -80,7 +80,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	StructPack packer;
 
 	if (shader.Invalid()) {
-		throw new EX_DETAILS(NullPointerException, "Nincs shader betoltve");
+		THROW_EX_DETAILS(NullPointerException, "Nincs shader betoltve");
 	}
 
 	for (uint32_t i = 0; i < elem_count; ++i)
@@ -121,7 +121,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	// Now create the vertex buffer.
 	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
 	if (FAILED(result)) {
-		throw new EX(CreateIndevBufferException);
+		THROW_EX(CreateIndevBufferException);
 	}
 
 	packer.dealloc(vertex_buffer_data);
@@ -156,7 +156,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	// Create the index buffer.
 	result = device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
 	if (FAILED(result)) {
-		throw new EX(CreateIndevBufferException);
+		THROW_EX(CreateIndevBufferException);
 	}
 
 	this->m_indexBuffer = indexBuffer;

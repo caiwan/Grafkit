@@ -67,7 +67,7 @@ void Compute::Initialize(Renderer & render, ShaderResRef shader, size_t samples)
 	// Create the texture for the depth buffer using the filled out description.
 	result = render.GetDevice()->CreateTexture2D(&depthBufferDesc, nullptr, &depthStencilBuffer);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeComputeShaderExcepton, result);
+		THROW_EX_HRESULT(InitializeComputeShaderExcepton, result);
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	// Initialize the depth stencil view.
@@ -81,7 +81,7 @@ void Compute::Initialize(Renderer & render, ShaderResRef shader, size_t samples)
 	// Create the depth stencil view.
 	result = render.GetDevice()->CreateDepthStencilView(depthStencilBuffer, &depthStencilViewDesc, &depthStencilView);
 	if (FAILED(result))
-		throw EX_HRESULT(InitializeComputeShaderExcepton, result);
+		THROW_EX_HRESULT(InitializeComputeShaderExcepton, result);
 	
 	// --- snap
 

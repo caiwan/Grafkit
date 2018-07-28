@@ -28,7 +28,7 @@ void SceneLoader::Load(IResourceManager * const & resman, IResource * source)
 #if 0
 	SceneGraphRef dstScene = dynamic_cast<SceneRes*>(source);
 	if (dstScene.Invalid()) {
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 	}
 
 	IAssetRef asset = this->GetSourceAsset(resman);
@@ -49,7 +49,7 @@ void SceneLoader::Save(SceneRes scene, std::string dst_name)
 {
 	FILE *fp = nullptr;
 	fopen_s(&fp, dst_name.c_str(), "wb");
-	if (!fp) throw new EX_DETAILS(SceneLoadException, "cannot serialize object");
+	if (!fp) THROW_EX_DETAILS(SceneLoadException, "cannot serialize object");
 
 	ArchiveFile ar(fp, true);
 
@@ -187,7 +187,7 @@ void SceneLoader::SceneLoaderHelper::Load(Archive &ar, IResourceManager * const 
 #endif
 
 	if (m_actors.empty())
-		throw new EX_DETAILS(SceneLoadException, "Actors are empty for some reason");
+		THROW_EX_DETAILS(SceneLoadException, "Actors are empty for some reason");
 
 	Actor * root = m_actors[0];
 
@@ -436,7 +436,7 @@ void SceneLoader::SceneLoaderHelper::Persist(Archive & ar, IResourceManager * co
 		PERSIST_REFOBJECT(ar, m_scene);
 
 		if (!ar.IsStoring() && m_scene.Invalid())
-			throw new EX(SceneLoadException);
+			THROW_EX(SceneLoadException);
 
 		PersistMaterials(ar, resman);
 		PersistEntities(ar, resman);

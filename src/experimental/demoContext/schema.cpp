@@ -31,37 +31,37 @@ void GkDemo::SchemaBuilder::LoadFromFile(const char * filename)
         fread_s(data, len, 1, len, fp);
         fclose(fp);
 
-        try {
-            Json::parse(data);
-        }
-        catch (json::parse_error &e) {
-            throw new EX_DETAILS(SchemaParseException, e.what());
-        }
-        catch (json::exception &e) {
-            throw new EX_DETAILS(SchemaParseException, e.what());
-        }
-        catch (std::exception &e) {
-            throw new EX_DETAILS(SchemaParseException, e.what());
-        }
-        catch (...) {
-            throw new EX(SchemaParseException);
-        }
+        //try {
+        //    Json::parse(data);
+        //}
+        //catch (json::parse_error &e) {
+        //    THROW_EX_DETAILS(SchemaParseException, e.what());
+        //}
+        //catch (json::exception &e) {
+        //    THROW_EX_DETAILS(SchemaParseException, e.what());
+        //}
+        //catch (std::exception &e) {
+        //    THROW_EX_DETAILS(SchemaParseException, e.what());
+        //}
+        //catch (...) {
+        //    THROW_EX(SchemaParseException);
+        //}
 
-        //Json j;
-        //if (j.accept(data)) {
-        //    Build(j);
-        //}
-        //else {
-        //    j.is_discarded()
-        //    //const char* msg = j.(error);
-        //    throw new EX(SchemaParseException);
-        //}
+        Json j;
+        if (j.accept(data)) {
+            Build(j);
+        }
+        else {
+            j.is_discarded();
+            //const char* msg = j.(error);
+            THROW_EX(SchemaParseException);
+        }
 
         free(data);
     }
     else {
         const char* msg = std::strerror(error);
-        throw new EX_DETAILS(SchemaParseException, msg);
+        THROW_EX_DETAILS(SchemaParseException, msg);
     }
 
 }

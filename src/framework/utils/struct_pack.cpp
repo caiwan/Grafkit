@@ -15,7 +15,7 @@ StructPack::StructPack() :
 int StructPack::addField(size_t width)
 {
 	if (!width)
-		throw EX(ZeroOffsetException);
+		THROW_EX(ZeroOffsetException);
 
 	int id = this->m_elems.size();
 	struct struct_field_t elem;
@@ -32,15 +32,15 @@ int StructPack::addField(size_t width)
 void StructPack::addPointer(int id, const void * pointer, size_t offset, size_t stride)
 {
 	if (m_buffer) 
-		throw EX(InvalidOperationException);
+		THROW_EX(InvalidOperationException);
 	
 	if (!pointer) 
-		throw EX(NullPointerException);
+		THROW_EX(NullPointerException);
 
 	if (!stride) 
-		throw EX(ZeroOffsetException);
+		THROW_EX(ZeroOffsetException);
 
-	if (id >= this->m_elems.size()) throw EX(InvalidIDException);
+	if (id >= this->m_elems.size()) THROW_EX(InvalidIDException);
 
 	struct struct_field_t &elem = this->m_elems[id];
 

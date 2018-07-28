@@ -73,7 +73,7 @@ void Grafkit::ATexture::Shutdown()
 //void Grafkit::ATexture::SetRenderTargetView(Renderer & device, size_t id) const
 //{
 //	if (!m_pTargetView) {
-//		throw new EX(NoRenderTargetViewException);
+//		THROW_EX(NoRenderTargetViewException);
 //	}
 //
 //	device.SetRenderTargetView(m_pTargetView, id);
@@ -218,7 +218,7 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	result = device->CreateTexture1D(&textureDesc, pData, &ppTex);
 
 	if (FAILED(result))
-		throw new EX_HRESULT(TextureCreateException, result);
+		THROW_EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;
 
@@ -235,7 +235,7 @@ void Grafkit::Texture1D::CreateTexture(Renderer & device, DXGI_FORMAT format, si
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 
 	if (FAILED(result))
-		throw new EX_HRESULT(ShaderResourceViewException, result);
+		THROW_EX_HRESULT(ShaderResourceViewException, result);
 
 }
 
@@ -348,7 +348,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	ID3D11Texture2D *ppTex = nullptr;
 	result = device->CreateTexture2D(&textureDesc, pData, &ppTex);
 
-	if (FAILED(result)) throw new EX(TextureCreateException);
+	if (FAILED(result)) THROW_EX(TextureCreateException);
 
 	m_pTexture = ppTex;
 
@@ -364,7 +364,7 @@ void Grafkit::Texture2D::CreateTextureBitmap(Renderer & device, DXGI_FORMAT form
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 
 	if (FAILED(result))
-		throw new EX_HRESULT(ShaderResourceViewException, result);
+		THROW_EX_HRESULT(ShaderResourceViewException, result);
 
 	device.GetDeviceContext()->GenerateMips(m_pResourceView);
 
@@ -410,7 +410,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	result = device->CreateTexture2D(&textureDesc, nullptr, &ppTex);
 
 	if (FAILED(result))
-		throw new EX_HRESULT(TextureCreateException, result);
+		THROW_EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;
 
@@ -426,7 +426,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 
 	if (FAILED(result))
-		throw new EX_HRESULT(ShaderResourceViewException, result);
+		THROW_EX_HRESULT(ShaderResourceViewException, result);
 
 	// RTV
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
@@ -439,7 +439,7 @@ void Grafkit::Texture2D::CreateTextureTarget(Renderer & device, DXGI_FORMAT form
 	result = device->CreateRenderTargetView(m_pTexture, &renderTargetViewDesc, &m_pTargetView);
 
 	if (FAILED(result))
-		throw new EX(RenderTargetViewException);
+		THROW_EX(RenderTargetViewException);
 }
 
 
@@ -494,7 +494,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 			delete pData[i].pSysMem;
 
 	if (FAILED(result))
-		throw new EX_HRESULT(TextureCreateException, result);
+		THROW_EX_HRESULT(TextureCreateException, result);
 
 	m_pTexture = ppTex;
 
@@ -509,7 +509,7 @@ void Grafkit::TextureCube::Initialize(Renderer & device, CubemapRef cubemap)
 
 	result = device->CreateShaderResourceView(m_pTexture, &shaderResourceViewDesc, &m_pResourceView);
 
-	if (FAILED(result)) throw new EX_HRESULT(TextureCreateException, result);
+	if (FAILED(result)) THROW_EX_HRESULT(TextureCreateException, result);
 
 	device.GetDeviceContext()->GenerateMips(m_pResourceView);
 }
@@ -557,7 +557,7 @@ void Grafkit::TextureSampler::Initialize(Renderer & device, D3D11_TEXTURE_ADDRES
 	result = device->CreateSamplerState(&samplerDesc, &m_pSamplerState);
 	if (FAILED(result))
 	{
-		throw new EX(SamplerStateCreateException);
+		THROW_EX(SamplerStateCreateException);
 	}
 }
 

@@ -105,7 +105,7 @@ public:
         ThingRef thing = new Thing();
 
         // oops, something happened intentionally 
-        throw new EX(FWdebugExceptions::NullPointerException);
+        THROW_EX(FWdebugExceptions::NullPointerException);
     }
 };
 

@@ -109,7 +109,7 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 		}
 		else {
 			///@todo load from compiled shader
-			throw EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a forrasbol valo shader betoltes");
+			THROW_EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a forrasbol valo shader betoltes");
 		}
 
 		// 2.
@@ -121,12 +121,12 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 		dstShader->AssingnRef(shader);
 
 	}
-	catch (ShaderException *&ex) {
+	catch (ShaderException &ex) {
 		// if we are about to replace an existing shader, but we had a compile error
 		// then toss the error, due it was prompted to stodut
 		// otherwise thow the ex
 		if (dstShader->Invalid()) {
-			throw ex;
+            throw ex;
 		}
 	}
 }

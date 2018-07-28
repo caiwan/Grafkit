@@ -13,7 +13,7 @@ ArchiveFile::ArchiveFile(FILE* stream, bool IsStoring) :
 	Archive(IsStoring), 
 	_stream(stream)
 {
-	if(!_stream) throw new EX(NullPointerException);
+	if(!_stream) THROW_EX(NullPointerException);
 }
 
 ArchiveFile::~ArchiveFile() {
@@ -22,7 +22,7 @@ ArchiveFile::~ArchiveFile() {
 
 void ArchiveFile::Write(const void* buffer, size_t length)
 {
-	if(!_stream) throw new EX(NullPointerException);
+	if(!_stream) THROW_EX(NullPointerException);
 	
 	//Log::Logger().Debug("Write bytes %d at pos %d", length, ftell(_stream));
 
@@ -31,7 +31,7 @@ void ArchiveFile::Write(const void* buffer, size_t length)
 
 void ArchiveFile::Read(void* buffer, size_t length)
 {
-	if(!_stream) throw new EX(NullPointerException);
+	if(!_stream) THROW_EX(NullPointerException);
 
 	//Log::Logger().Debug("Read bytes %d at pos %d", length, ftell(_stream));
 
@@ -57,7 +57,7 @@ void Grafkit::ArchiveMemory::Read(void * buffer, size_t length)
 #ifdef _DEBUG
 		DebugBreak();
 #endif
-		throw new EX(OutOfBoundsException);
+		THROW_EX(OutOfBoundsException);
 	}
 	//Log::Logger().Debug("Read bytes %d at pos %d", length, m_cursor);
 

@@ -53,10 +53,10 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ID3DIn
 
 	// input checking
 	if (!entry)
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 
 	if (!file)
-		throw new EX(NullPointerException);
+		THROW_EX(NullPointerException);
 
 	result = CompileShaderFromFile(file, pDefines, pInclude, entry, shaderBuffer, errorMessage);
 
@@ -67,7 +67,7 @@ void Shader::LoadFromFile(Renderer & device, LPCSTR entry, LPCWCHAR file, ID3DIn
 			DispatchShaderErrorMessage(errorMessage, file, entry);
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
-			throw new EX_HRESULT(MissingShaderException, result);
+			THROW_EX_HRESULT(MissingShaderException, result);
 	}
 
 	this->CompileShader(device, shaderBuffer);
@@ -85,8 +85,8 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 	ID3D10Blob* shaderBuffer = nullptr;
 
 	// input checking
-	if (!entry) throw new EX(NullPointerException);
-	if (!source) throw new EX(NullPointerException);
+	if (!entry) THROW_EX(NullPointerException);
+	if (!source) THROW_EX(NullPointerException);
 
 	m_name = name;
 
@@ -102,7 +102,7 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			throw new EX(MissingShaderException);
+			THROW_EX(MissingShaderException);
 		}
 	}
 
@@ -274,7 +274,7 @@ void* Shader::MapParamBuffer(ID3D11DeviceContext *& deviceContext, size_t id, in
 	CBRecord & cbRecord = m_cBuffers[id];
 	result = deviceContext->Map(cbRecord.m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbRecord.m_mappedResource);
 	if (FAILED(result))
-		throw new EX_HRESULT(ConstantBufferMapException, result);
+		THROW_EX_HRESULT(ConstantBufferMapException, result);
 
 	return cbRecord.m_mappedResource.pData;
 }
@@ -367,7 +367,7 @@ void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file,
 	errorMessage = 0;
 
 	// @todo add compile errors text 
-	throw new EX_DETAILS(ShaderException, "See logfiles");
+	THROW_EX_DETAILS(ShaderException, "See logfiles");
 }
 
 
@@ -461,7 +461,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	// create reflection interface 
 	result = D3DReflect(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&m_pReflector);
 	if (FAILED(result)) {
-		/// @todo throw new EXception
+		/// @todo THROW_EXception
 		DebugBreak();
 	}
 
@@ -539,7 +539,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		result = device->CreateInputLayout(&elements[0], elements.size(), shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), &this->m_layout);
 
 		if (FAILED(result))
-			throw new EX_HRESULT(InputLayoutCreateException, result);
+			THROW_EX_HRESULT(InputLayoutCreateException, result);
 	}
 	// ----
 	// fetch output desctiptor
@@ -567,7 +567,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		result = pConstBuffer->GetDesc(&cbRecord.m_description);
 
 		if (FAILED(result))
-			throw new EX_HRESULT(ConstantBufferLocateException, result);
+			THROW_EX_HRESULT(ConstantBufferLocateException, result);
 
 		// --- create buffer
 		D3D11_BUFFER_DESC bufferDesc;
@@ -580,7 +580,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 
 		result = device->CreateBuffer(&bufferDesc, nullptr, &cbRecord.m_buffer);
 		if (FAILED(result))
-			throw new EX_HRESULT(ConstantBufferCreateException, result);
+			THROW_EX_HRESULT(ConstantBufferCreateException, result);
 
 		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
 		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
@@ -598,13 +598,13 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 			result = shader_variable->GetDesc(&cbVar.m_var_desc);
 
 			if (FAILED(result))
-				throw new EX_HRESULT(ConstantBufferLocateException, result);
+				THROW_EX_HRESULT(ConstantBufferLocateException, result);
 
 			ID3D11ShaderReflectionType* sr_type = shader_variable->GetType();
 			result = sr_type->GetDesc(&cbVar.m_type_desc);
 
 			if (FAILED(result))
-				throw new EX_HRESULT(ConstantBufferLocateException, result);
+				THROW_EX_HRESULT(ConstantBufferLocateException, result);
 
 			LOGGER(Log::Logger().Trace("---- Variable: \"%s\" [%d], Format = {t:%s, s: %d, o: %d}",
 				cbVar.m_var_desc.Name, j, cbVar.m_type_desc.Name, cbVar.m_var_desc.Size, cbVar.m_var_desc.StartOffset));
@@ -624,7 +624,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		result = this->m_pReflector->GetResourceBindingDesc(i, &brDesc);
 
 		if (FAILED(result))
-			throw new EX_HRESULT(BoundResourceLocateException, result);
+			THROW_EX_HRESULT(BoundResourceLocateException, result);
 
 		BResRecord brRecord;
 
@@ -676,7 +676,7 @@ void Grafkit::VertexShader::CreateShader(ID3D11Device *& device, ID3D10Blob* sha
 {
 	HRESULT result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_vxShader);
 	if (FAILED(result))
-		throw new EX_HRESULT(VSCrerateException, result);
+		THROW_EX_HRESULT(VSCrerateException, result);
 }
 
 
@@ -743,7 +743,7 @@ void Grafkit::PixelShader::CreateShader(ID3D11Device *& device, ID3D10Blob * sha
 {
 	HRESULT result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_pxShader);
 	if (FAILED(result))
-		throw new EX_HRESULT(PSCrerateException, result);
+		THROW_EX_HRESULT(PSCrerateException, result);
 }
 
 
@@ -804,7 +804,7 @@ void Grafkit::GeometryShader::CreateShader(ID3D11Device *& device, ID3D10Blob * 
 {
 	HRESULT result = device->CreateGeometryShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), pClassLinkage, &m_gmShader);
 	if (FAILED(result))
-		throw new EX_HRESULT(PSCrerateException, result);
+		THROW_EX_HRESULT(PSCrerateException, result);
 }
 
 void Grafkit::GeometryShader::SetSamplerPtr(ID3D11DeviceContext *& device, UINT bindPoint, UINT bindCount, ID3D11SamplerState *& pSampler)

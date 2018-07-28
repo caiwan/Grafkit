@@ -151,7 +151,7 @@ namespace nlohmann
 
 // allow to disable exceptions
 #if (defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)) && !defined(JSON_NOEXCEPTION)
-#define JSON_THROW(exception) throw exception
+#define JSON_THROW(exception) THROW_EXception
 #define JSON_TRY try
 #define JSON_CATCH(exception) catch(exception)
 #else
@@ -3707,7 +3707,7 @@ namespace nlohmann
             bool errored = false;
             /// possible reason for the syntax error
             token_type expected = token_type::uninitialized;
-            /// whether to throw exceptions in case of errors
+            /// whether to THROW_EXceptions in case of errors
             const bool allow_exceptions = true;
         };
     }
@@ -15659,7 +15659,7 @@ namespace nlohmann
         @param[in] cb  a parser callback function of type @ref parser_callback_t
         which is used to control the deserialization by filtering unwanted values
         (optional)
-        @param[in] allow_exceptions  whether to throw exceptions in case of a
+        @param[in] allow_exceptions  whether to THROW_EXceptions in case of a
         parse error (optional, true by default)
 
         @return result of the deserialization

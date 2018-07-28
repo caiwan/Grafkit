@@ -2,6 +2,7 @@
 #define __EXCEPTIONS_H__
 
 #include <exception>
+#include <string>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -24,14 +25,14 @@ namespace FWdebug {
 	{
 	private:
 		int m_code, m_line;
-		const char *m_message, *m_file, *m_function, *m_details;
-		mutable char *m_formattedMessage;
+		std::string m_message, m_file, m_function, m_details;
+		mutable std::string m_formattedMessage;
 		
 	public:
 		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const char* deatils=NULL);
 		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const HRESULT hresult);
 		Exception(int errorCode, const char* message, const char* file, const char* function, int line, const DWORD dword);
-		~Exception();
+		virtual ~Exception();
 
 		inline int getErrorCode() { return this->m_code; }
 		char const* what() const override;
@@ -50,8 +51,8 @@ namespace FWdebug {
 #define EX_WHERE __WFILE__ , __WFUNCTION__, __LINE__
 
 // wrapper for exception
-#define EX(x) x(EX_WHERE)
-#define EX_DETAILS(x, details) x(EX_WHERE, details)
+#define THROW_EX(x) x(EX_WHERE)
+#define THROW_EX_DETAILS(x, details) x(EX_WHERE, details)
 
 #else
 
@@ -60,10 +61,10 @@ namespace FWdebug {
 #define EX_WHERE __FILE__ , __FUNCTION__, __LINE__
 
 // wrapper for exception
-#define EX(x) x(EX_WHERE)
-#define EX_DETAILS(x, details) x(EX_WHERE, details)
-#define EX_HRESULT(x, hresult) x(EX_WHERE, hresult)
-#define EX_DWORD(x, dword) x(EX_WHERE, dword)
+#define THROW_EX(x) throw x(EX_WHERE)
+#define THROW_EX_DETAILS(x, details) throw x(EX_WHERE, details)
+#define THROW_EX_HRESULT(x, hresult) throw x(EX_WHERE, hresult)
+#define THROW_EX_DWORD(x, dword) throw x(EX_WHERE, dword)
 
 # endif // temporaly takeout 
 
@@ -81,6 +82,7 @@ namespace FWdebugExceptions {\
 		public:\
 			_class_ (const char* file, const char* function, int line, const char* details = nullptr) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line, details) {} \
 			_class_ (const char* file, const char* function, int line, const HRESULT hresult) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line, hresult) {} \
+			_class_ (const char* file, const char* function, int line, const DWORD dword) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line, dword) {} \
 	};\
 }
 
@@ -96,8 +98,8 @@ DEFINE_EXCEPTION(OutOfBoundsException, 7, "Index out of bounds");
 DEFINE_EXCEPTION(NotImplementedMethodException, 8, "Method that being called has no implementation");
 
 #ifndef LIVE_RELEASE
-#define ASSERT(EXP) if ((EXP) != 0) throw new EX(FWdebugExceptions::AssertFailException)
-#define ASSERT_DETAILS(EXP, REASON) if ((EXP) != 0) throw new EX_DETAILS(FWdebugExceptions::AssertFailException, REASON)
+#define ASSERT(EXP) if ((EXP) != 0) throw new THROW_EX(FWdebugExceptions::AssertFailException)
+#define ASSERT_DETAILS(EXP, REASON) if ((EXP) != 0) throw new THROW_EX_DETAILS(FWdebugExceptions::AssertFailException, REASON)
 #else //LIVE_RELEASE
 #define ASSERT(EXP) 
 #define ASSERT_DETAILS(EXP, REASON) 

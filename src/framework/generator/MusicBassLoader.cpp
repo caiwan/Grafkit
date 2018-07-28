@@ -86,7 +86,7 @@ namespace {
                 isNosound = true;
             }
             if (!res)
-                throw new EX(MusicDeviceInitException);
+                THROW_EX(MusicDeviceInitException);
         }
 
         m_sample = BASS_SampleLoad(true, data, 0, dataSize, 1, BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) | 0);
@@ -99,7 +99,7 @@ namespace {
         if (!m_sample) {
             int errcode = BASS_ErrorGetCode();
             LOGGER(Log::Logger().Error("Failed to laod music. BASS Error code: %d", errcode));
-            throw new EX(MusicDeviceInitException);
+            THROW_EX(MusicDeviceInitException);
         }
 
         BASS_Start();
@@ -295,7 +295,7 @@ void Grafkit::MusicBassLoader::Load(IResourceManager * const & resman, IResource
 {
     MusicResRef dest = dynamic_cast<MusicRes*>(source);
     if (dest.Invalid()) {
-        throw new EX(NullPointerException);
+        THROW_EX(NullPointerException);
     }
 
     Music* music = new MusicBass();

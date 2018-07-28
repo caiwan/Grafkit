@@ -21,7 +21,7 @@ Grafkit::IAssetRef Idogep::AssetFactoryProxy::Get(std::string name)
 	try {
 		asset = m_parentFactory->Get(name);
 	}
-	catch (AssetLoadException *ex) {
+    catch (AssetLoadException &ex) {
 		QString filename = QString(":/resources/") + QString::fromStdString(name);
 
 		QFile file(filename);
@@ -30,7 +30,7 @@ Grafkit::IAssetRef Idogep::AssetFactoryProxy::Get(std::string name)
 			asset = new QResourceAsset(data);
 		}
 		else {
-			throw ex;	// eh, ezt lehet nem igy kell majd itt kezelni
+            throw ex;	// eh, ezt lehet nem igy kell majd itt kezelni
 		}
 	}
 

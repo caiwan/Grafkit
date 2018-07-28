@@ -30,7 +30,7 @@ void IResourceManager::Add(Ref<IResource> pResource)
     if (pResource.Valid())
     {
         Ref<IResource> i_ref = this->Get<IResource>(pResource->GetName());
-        if (i_ref.Valid()) { if (i_ref.Get() != pResource.Get()) { throw new EX_DETAILS(UpdateResourceExcpetion, "(A resource pointerek nem egyformak. Geteld ki elobb, aztan frissits.)"); } }
+        if (i_ref.Valid()) { if (i_ref.Get() != pResource.Get()) { THROW_EX_DETAILS(UpdateResourceExcpetion, "(A resource pointerek nem egyformak. Geteld ki elobb, aztan frissits.)"); } }
         // case sensitive Windows filesystem crap shit
         std::string name = pResource->GetName();
         transform(name.begin(), name.end(), name.begin(), tolower);

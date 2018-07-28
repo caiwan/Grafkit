@@ -77,7 +77,7 @@ void GKimporter::AssimpLoader::Evaluate(Environment *& env, nlohmann::json json)
 	);
 
 	if (!aiscene)
-		throw new EX_DETAILS(AssimpParseException, importer.GetErrorString());
+		throw new THROW_EX_DETAILS(AssimpParseException, importer.GetErrorString());
 
 	AssimpLoadMaterials(env);
 	AssimpLoadMeshes(env);
@@ -462,7 +462,7 @@ std::string GKimporter::AssimpLoader::GetMaterialName(int index)
 inline Grafkit::Matrix GKimporter::AssimpLoader::ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 {
 	if (!m)
-		throw new EX(NullPointerException);
+		throw new THROW_EX(NullPointerException);
 
 	return Grafkit::Matrix(
 		m->a1, m->b1, m->c1, m->d1,

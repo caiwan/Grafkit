@@ -8,7 +8,7 @@
 using namespace FWdebugExceptions;
 
 void throw_nullpointer_exception() {
-	throw EX(NullPointerException);
+	THROW_EX(NullPointerException);
 }
 
 TEST(Exception, given_ThrownException)
@@ -17,7 +17,7 @@ TEST(Exception, given_ThrownException)
 }
 
 void throw_nullpointer_exception_details(const char *what) {
-	throw EX_DETAILS(NullPointerException, what);
+	THROW_EX_DETAILS(NullPointerException, what);
 }
 
 TEST(Exception, given_ThrownExceptionWithDetails)
