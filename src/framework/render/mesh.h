@@ -18,7 +18,7 @@ namespace Grafkit
     /**
     Stores basic data for a piece of mesh
     */
-    class Mesh : public virtual Referencable, public Persistent
+    class Mesh : public Object
     {
     public:
         Mesh();

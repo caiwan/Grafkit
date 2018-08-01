@@ -194,6 +194,8 @@ void Mesh::Shutdown()
 
 void Mesh::_Serialize(Archive & ar)
 {
+    Object::_Serialize(ar);
+
     PERSIST_FIELD(ar, m_vertexCount);
     PERSIST_VECTOR(ar, m_indices, m_indexCount);
 

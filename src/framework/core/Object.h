@@ -32,7 +32,7 @@ namespace Grafkit
         std::string m_name;
         std::string m_uuid;
 
-        void _Serialize(Archive& ar);
+        virtual void _Serialize(Archive& ar);
     };
 
 

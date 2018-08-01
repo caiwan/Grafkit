@@ -10,7 +10,7 @@ namespace Grafkit {
 namespace GkDemo
 {
 
-    class Demo
+    class Demo : public Referencable
     {
     
     public:
@@ -29,6 +29,9 @@ namespace GkDemo
 
     private:
         void InitTestStuff(Grafkit::Renderer & render);
+
+        void InitAdvancedTestStuff(Grafkit::Renderer & render);
+
 
         Grafkit::MusicResRef m_music;
 

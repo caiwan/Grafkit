@@ -175,3 +175,6 @@ void Demo::InitTestStuff(Renderer& render) {
     (*m_scene)->Initialize();
     (*m_scene)->Build(render, m_vs, m_ps);
 }
+
+void Demo::InitAdvancedTestStuff(Grafkit::Renderer& render) {
+}
