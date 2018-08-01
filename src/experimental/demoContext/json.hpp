@@ -151,7 +151,7 @@ namespace nlohmann
 
 // allow to disable exceptions
 #if (defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)) && !defined(JSON_NOEXCEPTION)
-#define JSON_THROW(exception) THROW_EXception
+#define JSON_THROW(exception) throw exception
 #define JSON_TRY try
 #define JSON_CATCH(exception) catch(exception)
 #else
@@ -288,7 +288,7 @@ namespace nlohmann
 
         template<std::size_t... I1, std::size_t... I2>
         struct merge_and_renumber<index_sequence<I1...>, index_sequence<I2...>>
-            : index_sequence < I1..., (sizeof...(I1)+I2)... > {};
+            : index_sequence < I1..., (sizeof...(I1) + I2)... > {};
 
         template<std::size_t N>
         struct make_index_sequence
@@ -3707,7 +3707,7 @@ namespace nlohmann
             bool errored = false;
             /// possible reason for the syntax error
             token_type expected = token_type::uninitialized;
-            /// whether to THROW_EXceptions in case of errors
+            /// whether to throw exceptions in case of errors
             const bool allow_exceptions = true;
         };
     }
@@ -4795,7 +4795,7 @@ namespace nlohmann
             }
 
         private:
-            StringType& str;
+            StringType & str;
         };
 
         template<typename CharType, typename StringType = std::basic_string<CharType>>
@@ -7388,7 +7388,7 @@ namespace nlohmann
                 // Determine w- = m- such that e_(w-) = e_(w+).
                 const diyfp w_minus = diyfp::normalize_to(m_minus, w_plus.e);
 
-                return{ diyfp::normalize(v), w_minus, w_plus };
+                return { diyfp::normalize(v), w_minus, w_plus };
             }
 
             // Given normalized diyfp w, Grisu needs to find a (normalized) cached
@@ -7522,84 +7522,84 @@ namespace nlohmann
                 static constexpr cached_power kCachedPowers[] =
                 {
                     { 0xAB70FE17C79AC6CA, -1060, -300 },
-                    { 0xFF77B1FCBEBCDC4F, -1034, -292 },
-                    { 0xBE5691EF416BD60C, -1007, -284 },
-                    { 0x8DD01FAD907FFC3C,  -980, -276 },
-                    { 0xD3515C2831559A83,  -954, -268 },
-                    { 0x9D71AC8FADA6C9B5,  -927, -260 },
-                    { 0xEA9C227723EE8BCB,  -901, -252 },
-                    { 0xAECC49914078536D,  -874, -244 },
-                    { 0x823C12795DB6CE57,  -847, -236 },
-                    { 0xC21094364DFB5637,  -821, -228 },
-                    { 0x9096EA6F3848984F,  -794, -220 },
-                    { 0xD77485CB25823AC7,  -768, -212 },
-                    { 0xA086CFCD97BF97F4,  -741, -204 },
-                    { 0xEF340A98172AACE5,  -715, -196 },
-                    { 0xB23867FB2A35B28E,  -688, -188 },
-                    { 0x84C8D4DFD2C63F3B,  -661, -180 },
-                    { 0xC5DD44271AD3CDBA,  -635, -172 },
-                    { 0x936B9FCEBB25C996,  -608, -164 },
-                    { 0xDBAC6C247D62A584,  -582, -156 },
-                    { 0xA3AB66580D5FDAF6,  -555, -148 },
-                    { 0xF3E2F893DEC3F126,  -529, -140 },
-                    { 0xB5B5ADA8AAFF80B8,  -502, -132 },
-                    { 0x87625F056C7C4A8B,  -475, -124 },
-                    { 0xC9BCFF6034C13053,  -449, -116 },
-                    { 0x964E858C91BA2655,  -422, -108 },
-                    { 0xDFF9772470297EBD,  -396, -100 },
-                    { 0xA6DFBD9FB8E5B88F,  -369,  -92 },
-                    { 0xF8A95FCF88747D94,  -343,  -84 },
-                    { 0xB94470938FA89BCF,  -316,  -76 },
-                    { 0x8A08F0F8BF0F156B,  -289,  -68 },
-                    { 0xCDB02555653131B6,  -263,  -60 },
-                    { 0x993FE2C6D07B7FAC,  -236,  -52 },
-                    { 0xE45C10C42A2B3B06,  -210,  -44 },
-                    { 0xAA242499697392D3,  -183,  -36 },
-                    { 0xFD87B5F28300CA0E,  -157,  -28 },
-                    { 0xBCE5086492111AEB,  -130,  -20 },
-                    { 0x8CBCCC096F5088CC,  -103,  -12 },
-                    { 0xD1B71758E219652C,   -77,   -4 },
-                    { 0x9C40000000000000,   -50,    4 },
-                    { 0xE8D4A51000000000,   -24,   12 },
-                    { 0xAD78EBC5AC620000,     3,   20 },
-                    { 0x813F3978F8940984,    30,   28 },
-                    { 0xC097CE7BC90715B3,    56,   36 },
-                    { 0x8F7E32CE7BEA5C70,    83,   44 },
-                    { 0xD5D238A4ABE98068,   109,   52 },
-                    { 0x9F4F2726179A2245,   136,   60 },
-                    { 0xED63A231D4C4FB27,   162,   68 },
-                    { 0xB0DE65388CC8ADA8,   189,   76 },
-                    { 0x83C7088E1AAB65DB,   216,   84 },
-                    { 0xC45D1DF942711D9A,   242,   92 },
-                    { 0x924D692CA61BE758,   269,  100 },
-                    { 0xDA01EE641A708DEA,   295,  108 },
-                    { 0xA26DA3999AEF774A,   322,  116 },
-                    { 0xF209787BB47D6B85,   348,  124 },
-                    { 0xB454E4A179DD1877,   375,  132 },
-                    { 0x865B86925B9BC5C2,   402,  140 },
-                    { 0xC83553C5C8965D3D,   428,  148 },
-                    { 0x952AB45CFA97A0B3,   455,  156 },
-                    { 0xDE469FBD99A05FE3,   481,  164 },
-                    { 0xA59BC234DB398C25,   508,  172 },
-                    { 0xF6C69A72A3989F5C,   534,  180 },
-                    { 0xB7DCBF5354E9BECE,   561,  188 },
-                    { 0x88FCF317F22241E2,   588,  196 },
-                    { 0xCC20CE9BD35C78A5,   614,  204 },
-                    { 0x98165AF37B2153DF,   641,  212 },
-                    { 0xE2A0B5DC971F303A,   667,  220 },
-                    { 0xA8D9D1535CE3B396,   694,  228 },
-                    { 0xFB9B7CD9A4A7443C,   720,  236 },
-                    { 0xBB764C4CA7A44410,   747,  244 },
-                    { 0x8BAB8EEFB6409C1A,   774,  252 },
-                    { 0xD01FEF10A657842C,   800,  260 },
-                    { 0x9B10A4E5E9913129,   827,  268 },
-                    { 0xE7109BFBA19C0C9D,   853,  276 },
-                    { 0xAC2820D9623BF429,   880,  284 },
-                    { 0x80444B5E7AA7CF85,   907,  292 },
-                    { 0xBF21E44003ACDD2D,   933,  300 },
-                    { 0x8E679C2F5E44FF8F,   960,  308 },
-                    { 0xD433179D9C8CB841,   986,  316 },
-                    { 0x9E19DB92B4E31BA9,  1013,  324 },
+                { 0xFF77B1FCBEBCDC4F, -1034, -292 },
+                { 0xBE5691EF416BD60C, -1007, -284 },
+                { 0x8DD01FAD907FFC3C,  -980, -276 },
+                { 0xD3515C2831559A83,  -954, -268 },
+                { 0x9D71AC8FADA6C9B5,  -927, -260 },
+                { 0xEA9C227723EE8BCB,  -901, -252 },
+                { 0xAECC49914078536D,  -874, -244 },
+                { 0x823C12795DB6CE57,  -847, -236 },
+                { 0xC21094364DFB5637,  -821, -228 },
+                { 0x9096EA6F3848984F,  -794, -220 },
+                { 0xD77485CB25823AC7,  -768, -212 },
+                { 0xA086CFCD97BF97F4,  -741, -204 },
+                { 0xEF340A98172AACE5,  -715, -196 },
+                { 0xB23867FB2A35B28E,  -688, -188 },
+                { 0x84C8D4DFD2C63F3B,  -661, -180 },
+                { 0xC5DD44271AD3CDBA,  -635, -172 },
+                { 0x936B9FCEBB25C996,  -608, -164 },
+                { 0xDBAC6C247D62A584,  -582, -156 },
+                { 0xA3AB66580D5FDAF6,  -555, -148 },
+                { 0xF3E2F893DEC3F126,  -529, -140 },
+                { 0xB5B5ADA8AAFF80B8,  -502, -132 },
+                { 0x87625F056C7C4A8B,  -475, -124 },
+                { 0xC9BCFF6034C13053,  -449, -116 },
+                { 0x964E858C91BA2655,  -422, -108 },
+                { 0xDFF9772470297EBD,  -396, -100 },
+                { 0xA6DFBD9FB8E5B88F,  -369,  -92 },
+                { 0xF8A95FCF88747D94,  -343,  -84 },
+                { 0xB94470938FA89BCF,  -316,  -76 },
+                { 0x8A08F0F8BF0F156B,  -289,  -68 },
+                { 0xCDB02555653131B6,  -263,  -60 },
+                { 0x993FE2C6D07B7FAC,  -236,  -52 },
+                { 0xE45C10C42A2B3B06,  -210,  -44 },
+                { 0xAA242499697392D3,  -183,  -36 },
+                { 0xFD87B5F28300CA0E,  -157,  -28 },
+                { 0xBCE5086492111AEB,  -130,  -20 },
+                { 0x8CBCCC096F5088CC,  -103,  -12 },
+                { 0xD1B71758E219652C,   -77,   -4 },
+                { 0x9C40000000000000,   -50,    4 },
+                { 0xE8D4A51000000000,   -24,   12 },
+                { 0xAD78EBC5AC620000,     3,   20 },
+                { 0x813F3978F8940984,    30,   28 },
+                { 0xC097CE7BC90715B3,    56,   36 },
+                { 0x8F7E32CE7BEA5C70,    83,   44 },
+                { 0xD5D238A4ABE98068,   109,   52 },
+                { 0x9F4F2726179A2245,   136,   60 },
+                { 0xED63A231D4C4FB27,   162,   68 },
+                { 0xB0DE65388CC8ADA8,   189,   76 },
+                { 0x83C7088E1AAB65DB,   216,   84 },
+                { 0xC45D1DF942711D9A,   242,   92 },
+                { 0x924D692CA61BE758,   269,  100 },
+                { 0xDA01EE641A708DEA,   295,  108 },
+                { 0xA26DA3999AEF774A,   322,  116 },
+                { 0xF209787BB47D6B85,   348,  124 },
+                { 0xB454E4A179DD1877,   375,  132 },
+                { 0x865B86925B9BC5C2,   402,  140 },
+                { 0xC83553C5C8965D3D,   428,  148 },
+                { 0x952AB45CFA97A0B3,   455,  156 },
+                { 0xDE469FBD99A05FE3,   481,  164 },
+                { 0xA59BC234DB398C25,   508,  172 },
+                { 0xF6C69A72A3989F5C,   534,  180 },
+                { 0xB7DCBF5354E9BECE,   561,  188 },
+                { 0x88FCF317F22241E2,   588,  196 },
+                { 0xCC20CE9BD35C78A5,   614,  204 },
+                { 0x98165AF37B2153DF,   641,  212 },
+                { 0xE2A0B5DC971F303A,   667,  220 },
+                { 0xA8D9D1535CE3B396,   694,  228 },
+                { 0xFB9B7CD9A4A7443C,   720,  236 },
+                { 0xBB764C4CA7A44410,   747,  244 },
+                { 0x8BAB8EEFB6409C1A,   774,  252 },
+                { 0xD01FEF10A657842C,   800,  260 },
+                { 0x9B10A4E5E9913129,   827,  268 },
+                { 0xE7109BFBA19C0C9D,   853,  276 },
+                { 0xAC2820D9623BF429,   880,  284 },
+                { 0x80444B5E7AA7CF85,   907,  292 },
+                { 0xBF21E44003ACDD2D,   933,  300 },
+                { 0x8E679C2F5E44FF8F,   960,  308 },
+                { 0xD433179D9C8CB841,   986,  316 },
+                { 0x9E19DB92B4E31BA9,  1013,  324 },
                 };
 
                 // This computation gives exactly the same results for k as
@@ -9852,7 +9852,7 @@ namespace nlohmann
         using value_type = basic_json;
 
         /// the type of an element reference
-        using reference = value_type&;
+        using reference = value_type & ;
         /// the type of an element const reference
         using const_reference = const value_type&;
 
@@ -14541,7 +14541,7 @@ namespace nlohmann
             it.m_it.object_iterator = res.first;
 
             // return pair of iterator and boolean
-            return{ it, res.second };
+            return { it, res.second };
         }
 
         /*!
@@ -15524,7 +15524,7 @@ namespace nlohmann
         @since version 1.0.0; deprecated since version 3.0.0
         */
         JSON_DEPRECATED
-            friend std::ostream& operator >> (const basic_json& j, std::ostream& o)
+            friend std::ostream& operator>>(const basic_json& j, std::ostream& o)
         {
             return o << j;
         }
@@ -15659,7 +15659,7 @@ namespace nlohmann
         @param[in] cb  a parser callback function of type @ref parser_callback_t
         which is used to control the deserialization by filtering unwanted values
         (optional)
-        @param[in] allow_exceptions  whether to THROW_EXceptions in case of a
+        @param[in] allow_exceptions  whether to throw exceptions in case of a
         parse error (optional, true by default)
 
         @return result of the deserialization
@@ -15712,7 +15712,7 @@ namespace nlohmann
         JSON_DEPRECATED
             friend std::istream& operator<<(basic_json& j, std::istream& i)
         {
-            return operator >> (i, j);
+            return operator>>(i, j);
         }
 
         /*!
@@ -15740,7 +15740,7 @@ namespace nlohmann
 
         @since version 1.0.0
         */
-        friend std::istream& operator >> (std::istream& i, basic_json& j)
+        friend std::istream& operator>>(std::istream& i, basic_json& j)
         {
             parser(detail::input_adapter(i)).parse(false, j);
             return i;
@@ -16987,9 +16987,9 @@ namespace nlohmann
             {
                 // different types: replace value
                 result.push_back(
-                {
-                    { "op", "replace" },{ "path", path },{ "value", target }
-                });
+                    {
+                        { "op", "replace" },{ "path", path },{ "value", target }
+                    });
             }
             else
             {
@@ -17017,10 +17017,10 @@ namespace nlohmann
                         // add operations in reverse order to avoid invalid
                         // indices
                         result.insert(result.begin() + end_index, object(
-                        {
-                            { "op", "remove" },
+                            {
+                                { "op", "remove" },
                             { "path", path + "/" + std::to_string(i) }
-                        }));
+                            }));
                         ++i;
                     }
 
@@ -17028,11 +17028,11 @@ namespace nlohmann
                     while (i < target.size())
                     {
                         result.push_back(
-                        {
-                            { "op", "add" },
+                            {
+                                { "op", "add" },
                             { "path", path + "/" + std::to_string(i) },
                             { "value", target[i] }
-                        });
+                            });
                         ++i;
                     }
 
@@ -17057,9 +17057,9 @@ namespace nlohmann
                         {
                             // found a key that is not in o -> remove it
                             result.push_back(object(
-                            {
-                                { "op", "remove" },{ "path", path + "/" + key }
-                            }));
+                                {
+                                    { "op", "remove" },{ "path", path + "/" + key }
+                                }));
                         }
                     }
 
@@ -17071,10 +17071,10 @@ namespace nlohmann
                             // found a key that is not in this -> add it
                             const auto key = json_pointer::escape(it.key());
                             result.push_back(
-                            {
-                                { "op", "add" },{ "path", path + "/" + key },
+                                {
+                                    { "op", "add" },{ "path", path + "/" + key },
                                 { "value", it.value() }
-                            });
+                                });
                         }
                     }
 
@@ -17085,9 +17085,9 @@ namespace nlohmann
                 {
                     // both primitive type: replace value
                     result.push_back(
-                    {
-                        { "op", "replace" },{ "path", path },{ "value", target }
-                    });
+                        {
+                            { "op", "replace" },{ "path", path },{ "value", target }
+                        });
                     break;
                 }
                 }

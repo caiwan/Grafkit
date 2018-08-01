@@ -37,7 +37,7 @@
 		],
 		"materials": [{
 				"name": "PBRCubeMaterial",
-				"uuid": "733e8988-32c3-411f-b877-dca11c761b08"
+				"uuid": "733e8988-32c3-411f-b877-dca11c761b08",
 				"textures": {
 					"diffuse": "",
 					"others": "..."
@@ -78,7 +78,7 @@
 			}
 		]
 	},
-	"sceneGraphs": [{
+	"scenegraphs": [{
 			"name": "TestScene",
 			"uuid": "858543a6-bf2d-42b5-93b9-0c73cec79369",
 			"rootActor": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
@@ -101,7 +101,7 @@
 					"name": "Camera02",
 					"uuid": "858543a6-bf2d-42b5-93b9-0c73cec79369",
 					"parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
-					"entities": ["54e1f5b3-61e2-4413-8d80-edc46148a976"],
+					"entities": ["54e1f5b3-61e2-4413-8d80-edc46148a976"]
 				}, {
 					"name": "LightActor",
 					"uuid": "f95ceb23-3144-4522-8275-8c1433f50595",
