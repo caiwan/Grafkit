@@ -25,7 +25,7 @@ public:
     size_t AddRef() { ++_ref_count; return _ref_count; }
 
 	/**
-	 Remove a reference from this object.
+	 RemoveByName a reference from this object.
 
 	 Decrements the internal reference counter.
 

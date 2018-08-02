@@ -64,7 +64,7 @@ namespace {
 			// -- resmanbol kiszed
 			char buffer[256];
 			sprintf_s(buffer, "pointer@%d", pData);
-			m_resman->Remove(buffer);
+			m_resman->RemoveByName(buffer);
 
 			return S_OK;
 		}

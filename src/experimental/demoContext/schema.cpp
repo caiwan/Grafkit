@@ -32,27 +32,27 @@ SchemaBuilder::~SchemaBuilder()
 void SchemaBuilder::LoadFromAsset(const IAssetRef& asset, IResourceManager* resourceManager) {
 
     Json j;
-#if 0
+    const char * dataPtr = static_cast<const char*>(asset->GetData());
+    std::string data(dataPtr, dataPtr + asset->GetSize());
+#if 1
 
     try {
         j = Json::parse(data);
+        Build(j, resourceManager);
     }
     catch (std::exception &e) {
-        free(data);
         THROW_EX_DETAILS(SchemaParseException, e.what());
     }
 #else
-    const char * dataPtr = static_cast<const char*>(asset->GetData());
-    std::string data(dataPtr, dataPtr + asset->GetSize());
 
     if (!j.accept(data))
     //j.is_discarded()) 
     {
         THROW_EX_DETAILS(SchemaParseException, "Failed to parse json, check syntax");
     }
+    Build(j, resourceManager);
 #endif
 
-    Build(j, resourceManager);
 }
 
 void SchemaBuilder::Initialize() const {
@@ -70,33 +70,33 @@ void SchemaBuilder::Build(const Json& json, IResourceManager*& resourceManager) 
     //else
         //THROW_EX_DETAILS(SchemaParseException, "No assets");
 
-    Json scenegraphs = json["scenegraphs"];
-    if (!scenegraphs.empty())
-        BuildSceneGraphs(scenegraphs, resourceManager);
-    else
-        THROW_EX_DETAILS(SchemaParseException, "No scenegraphs");
+    //Json scenegraphs = json["scenegraphs"];
+    //if (!scenegraphs.empty())
+    //    BuildSceneGraphs(scenegraphs, resourceManager);
+    //else
+    //    THROW_EX_DETAILS(SchemaParseException, "No scenegraphs");
 
-    Json effects = json["effects"];
-    if (!effects.empty())
-        BuildEffects(effects, resourceManager);
-    else
-        THROW_EX_DETAILS(SchemaParseException, "no effects");
+    //Json effects = json["effects"];
+    //if (!effects.empty())
+    //    BuildEffects(effects, resourceManager);
+    //else
+    //    THROW_EX_DETAILS(SchemaParseException, "no effects");
 
-    // DAMN
-    Json demo = json["demo"];
-    if (!effects.empty())
-    {
-        // Do the magic
-    }
-    else
-        THROW_EX_DETAILS(SchemaParseException, "Failed to parse json, check syntax");
+    //// DAMN
+    //Json demo = json["demo"];
+    //if (!effects.empty())
+    //{
+    //    // Do the magic
+    //}
+    //else
+    //    THROW_EX_DETAILS(SchemaParseException, "Failed to parse json, check syntax");
 
 }
 
 void SchemaBuilder::BuildObject(const Json& j, const Ref<Grafkit::Object>& ref) {
     ref->SetName(j.at("name").get<std::string>());
-    ref->SetName(j.at("uuid").get<std::string>());
-    LOGGER(Log::Logger().Info("Object %s uuid=%s", j.at("name"), j.at("uuid")));
+    ref->SetUuid(j.at("uuid").get<std::string>());
+    LOGGER(Log::Logger().Info("Object %s uuid=%s", ref->GetName().c_str(), ref->GetUuid().c_str()));
 }
 
 void SchemaBuilder::BuildAssets(const Json& assets, IResourceManager*& resourceManager) {

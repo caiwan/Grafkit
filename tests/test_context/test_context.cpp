@@ -18,7 +18,7 @@ class ContextPregnancyTest : public testing::Test
 public:
     ContextPregnancyTest(): m_context(nullptr)
         , m_assetFactory(nullptr) {
-        m_assetFactory = new Grafkit::FileAssetFactory("../assets/");
+        m_assetFactory = new Grafkit::FileAssetFactory("tests/assets/");
     }
 
     void SetUp() override {

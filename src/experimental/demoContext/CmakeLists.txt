@@ -13,6 +13,9 @@ include_directories("${STB_INCLUDE_DIR}")
 
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+# message("CFLAGS = ${CMAKE_CXX_FLAGS}")
+
 add_library(${APPLICATION_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(${APPLICATION_NAME} Grafkit2)
 target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")

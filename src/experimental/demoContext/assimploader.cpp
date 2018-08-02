@@ -348,7 +348,7 @@ void GKimporter::AssimpLoader::AssimpLoadAnimations(Environment*& env)
 
 				LOGGER(Log::Logger().Trace("-- #%d : %s", animationChannelIndex, curr_nodeAnim->mNodeName.C_Str()));
 
-				//auto it = m_resources.actors.find(curr_nodeAnim->mNodeName.C_Str());
+				//auto it = m_nameMap.actors.find(curr_nodeAnim->mNodeName.C_Str());
 				ActorRef actor = env->GetBuilder().FindActor(curr_nodeAnim->mNodeName.C_Str());
 
 				if (actor.Valid()) {

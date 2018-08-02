@@ -15,6 +15,10 @@ include_directories(${GTEST_INCLUDE_DIRS})
 add_executable(${APPLICATION_NAME} EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES})
 add_test(Tests ${APPLICATION_NAME})
 
+if ( MSVC )
+    set_target_properties( ${APPLICATION_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY  "${CMAKE_BINARY_DIR}" )
+endif ( MSVC )
+
 target_link_libraries(${APPLICATION_NAME} Grafkit2 DemoContext ${GTEST_BOTH_LIBRARIES})
 
 target_include_directories(${APPLICATION_NAME} PUBLIC include)

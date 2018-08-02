@@ -32,16 +32,14 @@ add_executable(${APPLICATION} ${SOURCE_FILES} ${HEADER_FILES} ${UI_HEADERS} ${QR
 msvc_set_win32(${APPLICATION})
 
 # include_directories("${CMAKE_SOURCE_DIR}")
-
 # include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${BASS_INCLUDE_DIR}")
 include_directories("${STB_INCLUDE_DIR}")
 include_directories("${GK2_INCLUDE_DIR}")
 include_directories("${GK2_ROOT_DIR}/src/experimental/demoContext")
 
-# msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
-
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+# message("CFLAGS = ${CMAKE_CXX_FLAGS}")
 
 target_link_libraries(${APPLICATION} 
     Grafkit2 
