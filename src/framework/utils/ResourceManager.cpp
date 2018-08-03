@@ -4,6 +4,7 @@
 #include "ResourceBuilder.h"
 
 #include <iterator>
+#include <sstream>
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -34,14 +35,21 @@ void IResourceManager::Add(Ref<IResource> pResource)
         {
             if (i_ref.Get() != pResource.Get())
             {
-                THROW_EX_DETAILS(UpdateResourceExcpetion, "(A resource pointerek nem egyformak. Geteld ki elobb, aztan frissits.)");
+                std::ostringstream msg;
+                msg << "(A resource pointerek nem egyformak, vangy nem egyedi a UUID.Geteld ki elobb, aztan frissits.)";
+                msg << " requested ref uuid = " << pResource->GetUuid();
+                msg << " stored ref uuid = " << i_ref->GetUuid();
+                THROW_EX_DETAILS(UpdateResourceExcpetion, msg.str().c_str());
             }
         }
+        std::string uuid = pResource->GetUuid();
+
         // case sensitive Windows filesystem crap shit
         std::string name = pResource->GetName();
         transform(name.begin(), name.end(), name.begin(), tolower);
 
         m_nameMap[name] = pResource;
+        m_uuidMap[uuid] = pResource;
     }
 }
 
@@ -53,7 +61,7 @@ void IResourceManager::RemoveByName(const std::string& pName)
     if (it != m_nameMap.end())
     {
         std::string uuid = it->second->GetUuid();
-        
+
         m_nameMap.erase(it);
 
         auto it2 = m_uuidMap.find(name);
@@ -66,9 +74,9 @@ void IResourceManager::RemoveByUuid(const std::string& uuid) {
     if (it != m_uuidMap.end())
     {
         std::string name = it->second->GetName();
-        
+
         m_uuidMap.erase(it);
-        
+
         transform(name.begin(), name.end(), name.begin(), tolower);
 
         auto it2 = m_nameMap.find(name);

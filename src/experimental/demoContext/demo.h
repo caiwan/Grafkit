@@ -23,6 +23,12 @@ namespace GkDemo
         int PreRender(Grafkit::Renderer &render, float time) const;
         int Render(Grafkit::Renderer& render, float time) const;
 
+        Grafkit::ShaderResRef GetVs() const;
+        void SetVs(const Grafkit::ShaderResRef& resource);
+
+        Grafkit::ShaderResRef GetPs() const;
+        void SetPs(const Grafkit::ShaderResRef& resource);
+
         Grafkit::SceneGraphRef GetScenegraph() const;
         Grafkit::SceneResRef GetScene() const;
         Grafkit::MusicResRef GetMusic() const;

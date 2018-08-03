@@ -23,6 +23,7 @@ namespace Grafkit
 
         virtual ~Animation();
 
+        // Avoid call Initialization when you deserialize 
         virtual void Initialize() = 0;
         virtual void Update(double time) = 0;
 

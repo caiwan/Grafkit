@@ -90,7 +90,7 @@ namespace Grafkit {
         auto it = m_uuidMap.find(uuid);
 
         if (it != m_uuidMap.end()) {
-            return Ref<T>(dynamic_cast<T*>(it->second.Get()));
+             return Ref<T>(dynamic_cast<T*>(it->second.Get()));
         }
 
         return nullptr;

@@ -74,6 +74,10 @@ int Demo::Render(Renderer& render, float time) const
     return 0;
 }
 
+ShaderResRef Demo::GetPs() const { return m_ps; }
+
+void Demo::SetPs(const ShaderResRef& resource) { m_ps = resource; }
+
 SceneGraphRef Demo::GetScenegraph() const { return m_scenegraph; }
 
 SceneResRef Demo::GetScene() const { return m_scene; }
@@ -176,5 +180,9 @@ void Demo::InitTestStuff(Renderer& render) {
     (*m_scene)->Build(render, m_vs, m_ps);
 }
 
-void Demo::InitAdvancedTestStuff(Grafkit::Renderer& render) {
+void Demo::InitAdvancedTestStuff(Renderer& render) {
 }
+
+ShaderResRef Demo::GetVs() const { return m_vs; }
+
+void Demo::SetVs(const ShaderResRef& resource) { m_vs = resource; }

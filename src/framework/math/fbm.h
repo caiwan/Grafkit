@@ -3,41 +3,41 @@
 
 #include "../render/dxtypes.h"
 
-/*
-QND reverse-engineered Fractional Brownian motion
-Avoid using it, and please rely on shaders
-*/
 
-// tu make sure it will genrate the same on each run
+// to make sure it will genrate the same on each run
 #define SEED 0xe4d07f97 
 
 namespace Grafkit {
-	class PseudoRandom {
-	public:
-		static inline float Random() {
-			static int inited = 0;
-			if (!inited) {
-				srand(SEED);
-				inited = 1;
-			}
-			return (float)rand() / (float)RAND_MAX;
-		}
+    class PseudoRandom {
+    public:
+        static float Random() {
+            static int inited = 0;
+            if (!inited) {
+                srand(SEED);
+                inited = 1;
+            }
+            return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        }
 
-		static inline float2 Random2D() {
-			return float2(Random(), Random());
-		}
+        static float2 Random2D() {
+            return float2(Random(), Random());
+        }
 
-		static inline float3 Random3D() {
-			return float3(Random(), Random(), Random());
-		}
+        static float3 Random3D() {
+            return float3(Random(), Random(), Random());
+        }
 
-		static inline float4 Random4D() {
-			return float4(Random(), Random(), Random(), Random());
-		}
-	};
+        static float4 Random4D() {
+            return float4(Random(), Random(), Random(), Random());
+        }
+    };
 
-	// Fractional brownian motion
-	class FBM {
+    /*
+    QND reverse-engineered Fractional Brownian motion
+    Avoid using it, and please rely on shaders
+    */
+    // Fractional brownian motion
+    class FBM {
 
-	};
+    };
 }

@@ -1,20 +1,22 @@
-#pragma once 
+#pragma once
+
+#include "json_fwd.hpp"
 
 #include "utils/reference.h"
 #include "utils/exceptions.h"
-#include "json_fwd.hpp"
 #include "utils/Asset.h"
-#include "json.hpp"
 
 using Json = nlohmann::json;
 
-namespace GkDemo {
-class Demo;
+namespace GkDemo
+{
+    class Demo;
 
-typedef Ref<Demo> DemoRef;
+    typedef Ref<Demo> DemoRef;
 
-    class SchemaBuilder {
-    public :
+    class SchemaBuilder
+    {
+    public:
         SchemaBuilder();
         ~SchemaBuilder();
 
@@ -24,11 +26,20 @@ typedef Ref<Demo> DemoRef;
         Ref<Demo> GetDemo() const;
 
     protected:
-        void Build(const Json &json, Grafkit::IResourceManager*& resourceManager);
-        static void BuildObject(const Json &json, const Ref<Grafkit::Object>& ref);
-        //void BuildObject(const Json &json, const Ref<Grafkit::Object> &ref);
-        static void BuildAssets(const Json &assets, Grafkit::IResourceManager*& resourceManager);
-        void BuildSceneGraphs(const Json & scenegraphs, Grafkit::IResourceManager*& resourceManager);
+        void Build(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        void BuildResources(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+
+        void BuildAssets(Grafkit::IResourceManager*const& resourceManager, const Json& assets);
+        void AssignModel(::Grafkit::IResourceManager*const& resourceManager, const Json& json);
+
+        void AssignAssets(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+
+        void ExtractActorParent(::Grafkit::IResourceManager*const& resourceManager, const Json& json, const Grafkit::ActorRef& actorRef);
+        void ExtractEntities(::Grafkit::IResourceManager*const& resourceManager, const Json& json, Grafkit::ActorRef& actorRef);
+
+        void BuildObject(const Json& json, const Ref<Grafkit::Object>& ref);
+        void BuildMesh(::Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        void BuildSceneGraphs(::Grafkit::IResourceManager*const& resourceManager, const Json& json);
         void BuildEffects(const Json& effects, Grafkit::IResourceManager*& resourceManager);
 
     private:
@@ -36,4 +47,4 @@ typedef Ref<Demo> DemoRef;
     };
 }
 
-DEFINE_EXCEPTION(SchemaParseException, 4100, "Could not load Demo schemantic");
+DEFINE_EXCEPTION(SchemaParseException, 4100, "Could not load Demo project");

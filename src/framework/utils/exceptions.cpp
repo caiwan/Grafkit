@@ -82,9 +82,9 @@ char const * FWdebug::Exception::what() const
     if (!m_formattedMessage.empty())
         return m_formattedMessage.c_str();
 
-    std::ostringstream stringStream;
+    ostringstream stringStream;
     stringStream << this->m_code << ": " << this->m_message;
-    stringStream << " in function" << this->m_function << "in file " << this->m_file << ", at line " << this->m_line;
+    stringStream << " in function " << this->m_function << "in file " << this->m_file << ", at line " << this->m_line;
 
     if (!m_details.empty())
         stringStream << " " << m_details;

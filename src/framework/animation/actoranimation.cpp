@@ -8,14 +8,11 @@ using namespace Grafkit;
 
 ActorAnimation::ActorAnimation() : Animation()
 {
-	//CreateTrack();
 }
 
 ActorAnimation::ActorAnimation(ActorRef actor) : Animation(), m_actor(actor)
 {
-	//CreateTrack();
 }
-
 
 void ActorAnimation::Update(double time)
 {
