@@ -7,14 +7,36 @@
       "forward": {
         "vs": "43ae2c7a-b8e7-4eb0-a888-7ce1c2fa90a1",
         "ps": "5f72e9aa-93f5-4d86-ada8-9543b625337e"
-      } 
-    }, 
+      }
+    },
     "scenes": [
       {
         "id": 0,
-        "name":  "TesrScene" ,
+        "name": "TestScene",
         "uuid": "dd0900ab-d654-4d65-9960-42c0633c535e",
-        "scene": "858543a6-bf2d-42b5-93b9-0c73cec79369"
+        "scene": "858543a6-bf2d-42b5-93b9-0c73cec79369",
+        "animations": [
+          {
+            "name": "",
+            "uuid": "",
+            "type": "actor",
+            "target": ""
+          },
+          {
+            "name": "",
+            "uuid": "",
+            "type": "camera",
+            "target": ""
+          }
+        ]
+      }
+    ],
+    "animations": [
+      {
+        "name": "",
+        "uuid": "",
+        "type": "actor",
+        "target": ""
       }
     ]
   },
@@ -93,7 +115,7 @@
   },
   "scenegraphs": [
     {
-      "name": "TestScene",
+      "name": "TestSceneGraph",
       "uuid": "858543a6-bf2d-42b5-93b9-0c73cec79369",
       "rootActor": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
       "actors": [
@@ -112,13 +134,13 @@
         {
           "name": "Camera01",
           "uuid": "0b61b7d6-c144-42e9-aceb-e9dbf683f9f7",
-          "parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+          "parent": "1e57c5da-0d9c-4b3a-b257-643d5b2c994a",
           "entities": [ "7e90b629-8499-481f-8887-8de6c5392a1a" ]
         },
         {
           "name": "Camera02",
           "uuid": "f8b9000d-c87e-4805-ae2e-70529c94797d",
-          "parent": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5",
+          "parent": "1e57c5da-0d9c-4b3a-b257-643d5b2c994a",
           "entities": [ "54e1f5b3-61e2-4413-8d80-edc46148a976" ]
         },
         {
@@ -134,20 +156,6 @@
           "entities": [ "a0f30c19-ecdb-4f22-8cf5-f908c6250af9" ]
         }
       ]
-    }
-  ],
-  "animations": [
-    {
-      "name": "",
-      "uuid": "",
-      "type": "actor",
-      "target": ""
-    },
-    {
-      "name": "",
-      "uuid": "",
-      "type": "camera",
-      "target": ""
     }
   ],
   "effects": [

@@ -7,23 +7,30 @@
 #include "context.h"
 #include "schema.h"
 
+#include "render/actor.h"
+
+#include "render/material.h"
+#include "render/mesh.h"
+#include "render/model.h"
+#include "render/camera.h"
+#include "render/light.h"
+
+#include "core/Music.h"
+
 // --- 
 
 using namespace GkDemo;
+using namespace Grafkit;
 
 #define JSON_PATH "schema.json"
 
 class ContextPregnancyTest : public testing::Test
 {
 public:
-    ContextPregnancyTest(): m_context(nullptr)
-        , m_assetFactory(nullptr) {
-        m_assetFactory = new Grafkit::FileAssetFactory("tests/assets/");
-    }
+    ContextPregnancyTest() : m_context(nullptr)
+        , m_assetFactory(nullptr) { m_assetFactory = new FileAssetFactory("tests/assets/"); }
 
-    void SetUp() override {
-        m_context = new Context(m_render, m_assetFactory);
-    }
+    void SetUp() override { m_context = new Context(m_render, m_assetFactory); }
 
     void TearDown() override {
     }
@@ -33,7 +40,7 @@ public:
         try
         {
             SchemaBuilder builder;
-            builder.LoadFromAsset(m_assetFactory->Get(JSON_PATH), dynamic_cast<Grafkit::IResourceManager*>(m_context));
+            builder.LoadFromAsset(m_assetFactory->Get(JSON_PATH), dynamic_cast<IResourceManager*>(m_context));
             m_demo = builder.GetDemo();
         }
         catch (std::exception& e)
@@ -42,19 +49,369 @@ public:
         }
     }
 
-private:
-    Ref<Demo> m_demo; 
-    Context *m_context;
-    Grafkit::Renderer m_render;
-    Grafkit::IAssetFactory *m_assetFactory;
+    template <class T>
+    Ref<T> SafeGetObject(const char* uuid)
+    {
+        assert(uuid);
+        IResourceManager* resman = dynamic_cast<IResourceManager*>(m_context);
+        assert(resman);
+        Ref<Resource<T>> tResource = resman->GetByUuid<Resource<T>>(uuid);
+        if (!tResource)
+            return nullptr;
+        if (!*tResource)
+            return nullptr;
+        return tResource->Get();
+    }
+
+    template <class T>
+    Ref<Resource<T>> SafeGetResource(const char* uuid)
+    {
+        assert(uuid);
+        Ref<Resource<T>> tResource = m_context->GetByUuid<Resource<T>>(uuid);
+        if (!tResource)
+            return nullptr;
+        return tResource;
+    }
+
+protected:
+    Ref<Demo> m_demo;
+    Context* m_context;
+    Renderer m_render;
+    IAssetFactory* m_assetFactory;
 };
 
-TEST_F(ContextPregnancyTest, TestJsonLoad)
+// ============================================================================================
+
+
+TEST_F(ContextPregnancyTest, JsonLoad)
+{
+    // given: context
+    // when
+    this->BuildDemo();
+    // then
+    ASSERT_TRUE(m_demo.Valid());
+    ASSERT_EQ(1, m_demo->GetSceneCount());
+    ASSERT_TRUE(m_demo->GetScene(0));
+    ASSERT_TRUE(m_demo->GetMusic());
+    ASSERT_EQ(1, m_demo->GetAnimationCount());
+    ASSERT_TRUE(m_demo->GetAnimation(0));
+}
+
+// ============================================================================================
+
+
+namespace Uuids
+{
+    const char* modelUuid = "a0f30c19-ecdb-4f22-8cf5-f908c6250af9";
+    const char* meshUuid = "00751e45-a404-4955-80f4-b17a2c30a027";
+    const char* materialUuid = "733e8988-32c3-411f-b877-dca11c761b08";
+
+    const char* camera1Uuid = "7e90b629-8499-481f-8887-8de6c5392a1a";
+    const char* camera2Uuid = "54e1f5b3-61e2-4413-8d80-edc46148a976";
+
+    const char* lightUuid = "2bfbc0bc-f71e-4ed7-9b0a-36c50fab805c";
+
+    const char* vsUuid = "43ae2c7a-b8e7-4eb0-a888-7ce1c2fa90a1";
+    const char* psUuid = "5f72e9aa-93f5-4d86-ada8-9543b625337e";
+}
+
+TEST_F(ContextPregnancyTest, AssetMaterialLoadTest)
+{
+    // given: 
+    this->BuildDemo();
+
+    // when
+    MaterialRef material = SafeGetObject<Material>(Uuids::materialUuid);
+
+    // then
+    ASSERT_TRUE(material);
+    ASSERT_STREQ("PBRCubeMaterial", material->GetName().c_str());
+}
+
+TEST_F(ContextPregnancyTest, AssetMeshLoadTest)
+{
+    // given: context and ... 
+    this->BuildDemo();
+
+    // when
+    MeshRef mesh = SafeGetObject<Mesh>(Uuids::meshUuid);
+
+    // then
+    ASSERT_TRUE(mesh);
+    ASSERT_STREQ("CubeMesh", mesh->GetName().c_str());
+
+    ASSERT_NE(nullptr, mesh->GetPointer("POSITION"));
+    ASSERT_NE(nullptr, mesh->GetPointer("TEXCOORD"));
+    ASSERT_NE(nullptr, mesh->GetPointer("NORMAL"));
+    ASSERT_EQ(6 * 6, mesh->GetIndexCount());
+    ASSERT_NE(nullptr, mesh->GetIndices());
+}
+
+TEST_F(ContextPregnancyTest, AssetModelLoadTest)
+{
+    // given: context and ... 
+    this->BuildDemo();
+
+    // when
+    ModelRef model = SafeGetObject<Model>(Uuids::modelUuid);
+    MeshRef mesh = SafeGetObject<Mesh>(Uuids::meshUuid);
+    MaterialRef material = SafeGetObject<Material>(Uuids::materialUuid);
+
+    // then
+    ASSERT_TRUE(model);
+    ASSERT_STREQ("Cube", model->GetName().c_str());
+    ASSERT_EQ(mesh, model->GetMesh());
+    ASSERT_EQ(material, model->GetMaterial());
+}
+
+TEST_F(ContextPregnancyTest, AssetCameraLoadTest)
+{
+    // given: context and ... 
+    this->BuildDemo();
+
+    // when
+    CameraRef camera1 = SafeGetObject<Camera>(Uuids::camera1Uuid);
+    CameraRef camera2 = SafeGetObject<Camera>(Uuids::camera2Uuid);
+
+    // then
+    ASSERT_TRUE(camera1);
+    ASSERT_TRUE(camera2);
+    ASSERT_NE(camera1, camera2);
+
+    ASSERT_STREQ("Camera01", camera1->GetName().c_str());
+    ASSERT_STREQ("Camera02", camera1->GetName().c_str());
+}
+
+TEST_F(ContextPregnancyTest, AssetLightLoadTest)
+{
+    // given: context and ... 
+    this->BuildDemo();
+
+    // when
+    LightRef light = SafeGetObject<Light>(Uuids::lightUuid);
+
+    // then
+    ASSERT_TRUE(light);
+    ASSERT_STREQ("Light01", light->GetName().c_str());
+}
+
+TEST_F(ContextPregnancyTest, AssetVShaderLoadTest)
+{
+    // given: context and ... 
+    this->BuildDemo();
+
+    // when
+    ShaderResRef shader = SafeGetResource<Shader>(Uuids::vsUuid);
+
+    // then
+    ASSERT_TRUE(shader);
+    ASSERT_STREQ("vertexShader", shader->GetName().c_str());
+}
+
+TEST_F(ContextPregnancyTest, AssetPShaderLoadTest)
+{
+    // given: context and ... 
+    this->BuildDemo();
+
+    // when
+    ShaderResRef shader = SafeGetResource<Shader>(Uuids::psUuid);
+
+    // then
+    ASSERT_TRUE(shader);
+    ASSERT_STREQ("pixelShader", shader->GetName().c_str());
+}
+
+// ============================================================================================
+
+namespace Uuids
+{
+    const char* rootActorUuid = "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5";
+    const char* cameraActorUuid = "1e57c5da-0d9c-4b3a-b257-643d5b2c994a";
+    const char* camera1ActorUuid = "0b61b7d6-c144-42e9-aceb-e9dbf683f9f7";
+    const char* camera2ActorUuid = "f8b9000d-c87e-4805-ae2e-70529c94797d";
+    const char* lightActorUuid = "f95ceb23-3144-4522-8275-8c1433f50595";
+    const char* cubeActorUuid = "3bd7e8db-e851-4db2-b333-16e0b3f66019";
+}
+
+
+TEST_F(ContextPregnancyTest, ActorMeshTest)
 {
     // given
     this->BuildDemo();
 
+    //when
+    ActorRef cubeActor = SafeGetObject<Actor>(Uuids::cubeActorUuid);
+    ModelRef model = SafeGetObject<Model>(Uuids::modelUuid);
+
+    // then 
+    ASSERT_TRUE(cubeActor);
+    ASSERT_TRUE(model);
+
+    ASSERT_STREQ("CubeActor", cubeActor->GetName().c_str());
+
+    ASSERT_EQ(1, cubeActor->GetEntityCount());
+
+    ASSERT_EQ(model.Get(), cubeActor->GetEntity(0).Get());
+}
+
+TEST_F(ContextPregnancyTest, ActorCameraTest)
+{
+    // given
+    this->BuildDemo();
+
+    //when
+    ActorRef cameraActor = SafeGetObject<Actor>(Uuids::cameraActorUuid);
+
+    ActorRef camera1Actor = SafeGetObject<Actor>(Uuids::camera1ActorUuid);
+    ActorRef camera2Actor = SafeGetObject<Actor>(Uuids::camera1ActorUuid);
+    CameraRef camera1 = SafeGetObject<Camera>(Uuids::camera1Uuid);
+    CameraRef camera2 = SafeGetObject<Camera>(Uuids::camera2Uuid);
+
+    // then 
+    ASSERT_TRUE(cameraActor);
+    ASSERT_STREQ("CameraActor", cameraActor->GetName().c_str());
+
+    ASSERT_EQ(2, cameraActor->GetChildrenCount());
+
+    ASSERT_TRUE(camera1Actor);
+    ASSERT_TRUE(camera2Actor);
+
+    ASSERT_EQ(camera1Actor, cameraActor->GetChild(0));
+    ASSERT_EQ(camera2Actor, cameraActor->GetChild(1));
+
+    ASSERT_TRUE(camera1);
+    ASSERT_TRUE(camera2);
+
+    ASSERT_NE(camera1Actor, camera2Actor);
+
+    ASSERT_STREQ("Camera01", camera1Actor->GetName().c_str());
+    ASSERT_STREQ("Camera02", camera1Actor->GetName().c_str());
+
+    ASSERT_EQ(1, camera1Actor->GetEntityCount());
+    ASSERT_EQ(1, camera2Actor->GetEntityCount());
+
+    ASSERT_EQ(camera1.Get(), camera1Actor->GetEntity(0).Get());
+    ASSERT_EQ(camera2.Get(), camera2Actor->GetEntity(0).Get());
+}
+
+TEST_F(ContextPregnancyTest, ActorLightTest)
+{
+    // given
+    this->BuildDemo();
+
+    //when
+    ActorRef lightActor = SafeGetObject<Actor>(Uuids::lightActorUuid);
+    LightRef light = SafeGetObject<Light>(Uuids::lightUuid);
+
+    // then 
+    ASSERT_TRUE(lightActor);
+    ASSERT_STREQ("LightActor", lightActor->GetName().c_str());
+
+    ASSERT_TRUE(light);
+
+    ASSERT_EQ(light.Get(), lightActor->GetEntity(0).Get());
+}
+
+/*
+ * RootActor -> CameraActor
+ * RootActor -> LightActor
+ * RootActor -> CubeActor
+ *
+ * CameraActor -> Camera01
+ * CameraActor -> Camera02
+ */
+
+TEST_F(ContextPregnancyTest, ActorSchemaTest)
+{
+    // given
+    BuildDemo();
+
     // when
+    ActorRef rootActor = SafeGetObject<Actor>(Uuids::rootActorUuid);
+    ActorRef cameraActor = SafeGetObject<Actor>(Uuids::cameraActorUuid);
+    ActorRef lightActor = SafeGetObject<Actor>(Uuids::lightActorUuid);
+    ActorRef cubeActor = SafeGetObject<Actor>(Uuids::cubeActorUuid);
 
     // then
+    ASSERT_TRUE(rootActor);
+    ASSERT_STREQ("RootActor", rootActor->GetName().c_str());
+
+    // the names for the rest are already checked
+    ASSERT_TRUE(cameraActor);
+    ASSERT_TRUE(lightActor);
+    ASSERT_TRUE(cubeActor);
+
+    ASSERT_EQ(3, rootActor->GetChildrenCount());
+    ASSERT_EQ(cameraActor, rootActor->GetChild(0));
+    ASSERT_EQ(lightActor, rootActor->GetChild(1));
+    ASSERT_EQ(cubeActor, rootActor->GetChild(2));
 }
+
+// ============================================================================================
+
+namespace Uuids
+{
+    const char* sceneGraphUuid = "858543a6-bf2d-42b5-93b9-0c73cec79369";
+    const char* sceneUuid = "dd0900ab-d654-4d65-9960-42c0633c535e";
+}
+
+TEST_F(ContextPregnancyTest, DemoSceneTest)
+{
+    // given
+    BuildDemo();
+
+    // when
+    SceneResRef sceneRes = SafeGetResource<Scene>(Uuids::sceneUuid);
+    SceneGraphRef sceneGraph = SafeGetObject<SceneGraph>(Uuids::sceneGraphUuid);
+    ActorRef rootActor = SafeGetObject<Actor>(Uuids::rootActorUuid);
+
+    // then
+    ASSERT_TRUE(sceneRes);
+    ASSERT_TRUE(*sceneRes);
+
+    ASSERT_TRUE(sceneGraph);
+    ASSERT_TRUE(rootActor);
+
+    ASSERT_EQ(sceneRes, m_demo->GetScene(0));
+
+    ASSERT_STREQ("TestScene", (*sceneRes)->GetName().c_str());
+    ASSERT_STREQ("TestSceneGraph", sceneGraph->GetName().c_str());
+
+    ASSERT_EQ(sceneGraph, (*sceneRes)->GetSceneGraph());
+    ASSERT_EQ(rootActor, sceneGraph->GetRootNode());
+}
+
+
+TEST_F(ContextPregnancyTest, DemoPShaderTest)
+{
+    // given
+    BuildDemo();
+
+    // when
+    ShaderResRef shader = SafeGetResource<Shader>(Uuids::psUuid);
+
+    // then
+    ASSERT_TRUE(shader);
+
+    ASSERT_EQ(shader, m_demo->GetPs());
+}
+
+TEST_F(ContextPregnancyTest, DemoVShaderTest)
+{
+    // given
+    BuildDemo();
+
+    // when
+    SceneResRef sceneRes = SafeGetResource<Scene>(Uuids::sceneUuid);
+    ShaderResRef shader = SafeGetResource<Shader>(Uuids::vsUuid);
+
+    // then
+    ASSERT_TRUE(sceneRes);
+    ASSERT_TRUE(*sceneRes);
+    ASSERT_TRUE(shader);
+
+    ASSERT_EQ(shader, m_demo->GetVs());
+}
+
+// ============================================================================================
+

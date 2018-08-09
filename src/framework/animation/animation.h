@@ -240,14 +240,14 @@ namespace Grafkit
             );
         }
 
-        return v0.m_value * (1. - t) + v1.m_value * t;
+        return v0.m_value * (1.f - t) + v1.m_value * t;
     }
 
     inline void Animation::Channel::SetValue(const size_t& id, const float& v) { m_keys[id].m_value = v; }
 
     inline int Animation::Channel::FindKeyIndex(float t) const
     {
-        const size_t count = m_keys.size();
+        const int count = m_keys.size();
         if (count == 0)
             return -1;
 
@@ -257,7 +257,7 @@ namespace Grafkit
         if (m_keys[count - 1].m_time <= t)
             return count - 1;
 
-        size_t u = count - 1, l = 0, m = 0;
+        int u = count - 1, l = 0, m = 0;
         while (u >= l)
         {
             m = l + (u - l) / 2;
