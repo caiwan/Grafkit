@@ -27,7 +27,7 @@ namespace GkDemo
         Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory; }
         void CreateTestStuff();
 
-    private:
+    protected:
         Grafkit::Renderer& m_render;
         
         Demo* m_demo;

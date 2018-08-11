@@ -23,7 +23,6 @@ namespace GkDemo
 
         void Preload(Grafkit::IResourceManager* const & resman);
         void Initialize(Grafkit::Renderer& render);
-        void InitTestStuff(Grafkit::Renderer& render);
 
         int PreRender(Grafkit::Renderer& render, float time) const;
         Grafkit::SceneResRef GetActiveScene() const;

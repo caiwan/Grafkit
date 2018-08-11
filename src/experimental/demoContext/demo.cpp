@@ -100,13 +100,6 @@ void Demo::AddScene(uint32_t id, const SceneResRef& ref)
     m_scenes[id] = ref;
 }
 
-// This thing serves testing purposes for the editor.
-void Demo::InitTestStuff(Renderer& render)
-{
-    assert(0);
-}
-
-
 // ============================================================================================
 
 PERSISTENT_IMPL(GkDemo::DemoAnimation);

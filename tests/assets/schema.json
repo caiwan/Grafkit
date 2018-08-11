@@ -17,15 +17,63 @@
         "scene": "858543a6-bf2d-42b5-93b9-0c73cec79369",
         "animations": [
           {
-            "name": "",
-            "uuid": "",
+            "name": "RootActorAnimation",
+            "uuid": "6d7728b3-8a45-46e5-b1c3-324c1cb0ffe7",
             "type": "actor",
+            "target": "1c3ee37b-74ed-4147-9cf1-0df6de5fc0e5"
+          },
+          {
+            "name": "CameraActorAnimation",
+            "uuid": "d1471390-c4cd-4951-a2f0-5880090198c0",
+            "type": "actor",
+            "target": "1e57c5da-0d9c-4b3a-b257-643d5b2c994a"
+          },
+          {
+            "name": "Camera01ActorAnimation",
+            "uuid": "4d10043a-acae-4ae0-ab57-4206086a3bd5",
+            "type": "actor",
+            "target": "0b61b7d6-c144-42e9-aceb-e9dbf683f9f7"
+          },
+          {
+            "name": "Camera02ActorAnimation",
+            "uuid": "a21af9fb-8092-47d1-82fe-24b79c3308d6",
+            "type": "actor",
+            "target": "f8b9000d-c87e-4805-ae2e-70529c94797d"
+          },
+          {
+            "name": "LightAnimation",
+            "uuid": "a032826c-e13b-43f6-a4c7-f02fd2751b61",
+            "type": "actor",
+            "target": "f95ceb23-3144-4522-8275-8c1433f50595"
+          },
+          {
+            "name": "CubeActorAnimation",
+            "uuid": "0be018f4-0608-457d-96e5-9252a2ad065b",
+            "type": "actor",
+            "target": "3bd7e8db-e851-4db2-b333-16e0b3f66019"
+          },
+          {
+            "name": "Camera01Animation",
+            "uuid": "",
+            "type": "camera",
+            "target": ""
+          },
+          {
+            "name": "Camera02Animation",
+            "uuid": "",
+            "type": "camera",
             "target": ""
           },
           {
             "name": "",
             "uuid": "",
-            "type": "camera",
+            "type": "light",
+            "target": ""
+          },
+          {
+            "name": "",
+            "uuid": "",
+            "type": "scene",
             "target": ""
           }
         ]

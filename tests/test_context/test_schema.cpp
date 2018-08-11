@@ -24,15 +24,24 @@ using namespace Grafkit;
 
 #define JSON_PATH "schema.json"
 
-class ContextPregnancyTest : public testing::Test
+class SchemaTest : public testing::Test
 {
 public:
-    ContextPregnancyTest() : m_context(nullptr)
-        , m_assetFactory(nullptr) { m_assetFactory = new FileAssetFactory("tests/assets/"); }
+    SchemaTest() : m_context(nullptr)
+        , m_assetFactory(nullptr)
+    {
+        m_assetFactory = new FileAssetFactory("tests/assets/");
+    }
+
+    ~SchemaTest()
+    {
+        delete m_assetFactory;
+    }
 
     void SetUp() override { m_context = new Context(m_render, m_assetFactory); }
 
     void TearDown() override {
+        delete m_context;
     }
 
     void BuildDemo()
@@ -83,7 +92,7 @@ protected:
 // ============================================================================================
 
 
-TEST_F(ContextPregnancyTest, JsonLoad)
+TEST_F(SchemaTest, JsonLoad)
 {
     // given: context
     // when
@@ -115,7 +124,7 @@ namespace Uuids
     const char* psUuid = "5f72e9aa-93f5-4d86-ada8-9543b625337e";
 }
 
-TEST_F(ContextPregnancyTest, AssetMaterialLoadTest)
+TEST_F(SchemaTest, AssetMaterialLoadTest)
 {
     // given: 
     this->BuildDemo();
@@ -128,7 +137,7 @@ TEST_F(ContextPregnancyTest, AssetMaterialLoadTest)
     ASSERT_STREQ("PBRCubeMaterial", material->GetName().c_str());
 }
 
-TEST_F(ContextPregnancyTest, AssetMeshLoadTest)
+TEST_F(SchemaTest, AssetMeshLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -147,7 +156,7 @@ TEST_F(ContextPregnancyTest, AssetMeshLoadTest)
     ASSERT_NE(nullptr, mesh->GetIndices());
 }
 
-TEST_F(ContextPregnancyTest, AssetModelLoadTest)
+TEST_F(SchemaTest, AssetModelLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -164,7 +173,7 @@ TEST_F(ContextPregnancyTest, AssetModelLoadTest)
     ASSERT_EQ(material, model->GetMaterial());
 }
 
-TEST_F(ContextPregnancyTest, AssetCameraLoadTest)
+TEST_F(SchemaTest, AssetCameraLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -182,7 +191,7 @@ TEST_F(ContextPregnancyTest, AssetCameraLoadTest)
     ASSERT_STREQ("Camera02", camera1->GetName().c_str());
 }
 
-TEST_F(ContextPregnancyTest, AssetLightLoadTest)
+TEST_F(SchemaTest, AssetLightLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -195,7 +204,7 @@ TEST_F(ContextPregnancyTest, AssetLightLoadTest)
     ASSERT_STREQ("Light01", light->GetName().c_str());
 }
 
-TEST_F(ContextPregnancyTest, AssetVShaderLoadTest)
+TEST_F(SchemaTest, AssetVShaderLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -208,7 +217,7 @@ TEST_F(ContextPregnancyTest, AssetVShaderLoadTest)
     ASSERT_STREQ("vertexShader", shader->GetName().c_str());
 }
 
-TEST_F(ContextPregnancyTest, AssetPShaderLoadTest)
+TEST_F(SchemaTest, AssetPShaderLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -234,7 +243,7 @@ namespace Uuids
 }
 
 
-TEST_F(ContextPregnancyTest, ActorMeshTest)
+TEST_F(SchemaTest, ActorMeshTest)
 {
     // given
     this->BuildDemo();
@@ -254,7 +263,7 @@ TEST_F(ContextPregnancyTest, ActorMeshTest)
     ASSERT_EQ(model.Get(), cubeActor->GetEntity(0).Get());
 }
 
-TEST_F(ContextPregnancyTest, ActorCameraTest)
+TEST_F(SchemaTest, ActorCameraTest)
 {
     // given
     this->BuildDemo();
@@ -294,7 +303,7 @@ TEST_F(ContextPregnancyTest, ActorCameraTest)
     ASSERT_EQ(camera2.Get(), camera2Actor->GetEntity(0).Get());
 }
 
-TEST_F(ContextPregnancyTest, ActorLightTest)
+TEST_F(SchemaTest, ActorLightTest)
 {
     // given
     this->BuildDemo();
@@ -321,7 +330,7 @@ TEST_F(ContextPregnancyTest, ActorLightTest)
  * CameraActor -> Camera02
  */
 
-TEST_F(ContextPregnancyTest, ActorSchemaTest)
+TEST_F(SchemaTest, ActorSchemaTest)
 {
     // given
     BuildDemo();
@@ -355,7 +364,7 @@ namespace Uuids
     const char* sceneUuid = "dd0900ab-d654-4d65-9960-42c0633c535e";
 }
 
-TEST_F(ContextPregnancyTest, DemoSceneTest)
+TEST_F(SchemaTest, DemoSceneTest)
 {
     // given
     BuildDemo();
@@ -382,7 +391,7 @@ TEST_F(ContextPregnancyTest, DemoSceneTest)
 }
 
 
-TEST_F(ContextPregnancyTest, DemoPShaderTest)
+TEST_F(SchemaTest, DemoPShaderTest)
 {
     // given
     BuildDemo();
@@ -396,7 +405,7 @@ TEST_F(ContextPregnancyTest, DemoPShaderTest)
     ASSERT_EQ(shader, m_demo->GetPs());
 }
 
-TEST_F(ContextPregnancyTest, DemoVShaderTest)
+TEST_F(SchemaTest, DemoVShaderTest)
 {
     // given
     BuildDemo();
