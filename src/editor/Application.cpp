@@ -58,7 +58,7 @@ EditorApplication::~EditorApplication()
 int EditorApplication::Execute()
 {
     m_mainWindow = new MainWindow();
-    this->Add(new Resource<View>(m_mainWindow, "EditorView", "052de2ba-ae61-4b60-a723-f1259ffd5a32"));
+    this->Add(new Resource<View>(m_mainWindow, "EditorView", "EditorView"));
 
     SplashWidget* sw = new SplashWidget();
 
@@ -139,29 +139,29 @@ void EditorApplication::BuildEditorModules()
     // --- Setup modules
 
     m_editor = new Editor(m_render, m_demoContext);
-    this->Add(new Resource<Controller>(m_editor, "Editor", "bcfdd3ee-29cc-455a-a76f-d06fda684dbc"));
+    this->Add(new Resource<Controller>(m_editor, "Editor", "Editor"));
 
     m_logModule = new LogModule(m_logger);
-    this->Add(new Resource<Controller>(m_logModule, "LogModule", "8d23d4f2-a040-4a4e-bc0f-9d9a37977e5b"));
-    this->Add(new Resource<View>(new LogWidget(), "LogView", "5d8e4ef7-5cc6-424f-88c6-063840db1c5b"));
+    this->Add(new Resource<Controller>(m_logModule, "LogModule", "LogModule"));
+    this->Add(new Resource<View>(new LogWidget(), "LogView", "LogView"));
 
     // --- 
     m_outlineViewModule = new OutlineModule();
-    this->Add(new Resource<Controller>(m_outlineViewModule, "OutlineModule", "585d0fc1-6cf8-435f-aa38-777e4db40f1d"));
-    this->Add(new Resource<View>(new SceneGraphViewWidget(), "OutlineView", "5fbe4ef8-91ca-4cab-99a8-8e811318bcfb"));
+    this->Add(new Resource<Controller>(m_outlineViewModule, "OutlineModule", "OutlineModule"));
+    this->Add(new Resource<View>(new SceneGraphViewWidget(), "OutlineView", "OutlineView"));
 
     m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
     // --- 
     m_animationEditor = new AnimationEditor();
-    this->Add(new Resource<Controller>(m_animationEditor, "AnimationEditor", "6de072f7-50d4-4b14-82fd-337ccb758f0a"));
-    this->Add(new Resource<View>(new AnimationEditorWidget, "AnimationView", "e1b0d54a-5f5f-4108-8bf8-1927c8d88d66"));
+    this->Add(new Resource<Controller>(m_animationEditor, "AnimationEditor", "AnimationEditor"));
+    this->Add(new Resource<View>(new AnimationEditorWidget, "AnimationView", "AnimationView"));
 
-    this->Add(new Resource<Controller>(new CurveEditor(), "CurveEditor", "e6da51b2-689e-4c18-a889-8ddb2f62ee69"));
-    this->Add(new Resource<View>(new CurveEditorScene(), "CurveEditorView", "71a94299-4151-48ff-97df-f96504a7b4c4"));
+    this->Add(new Resource<Controller>(new CurveEditor(), "CurveEditor", "CurveEditor"));
+    this->Add(new Resource<View>(new CurveEditorScene(), "CurveEditorView", "CurveEditorView"));
 
-    this->Add(new Resource<Controller>(new CurvePointEditor(), "CurvePointEditor", "c54a9d93-91cc-4599-bac4-cfcc199daf1b"));
-    this->Add(new Resource<View>(new PointEditorWidget(), "PointEditorView", "0aad5739-4959-4e6d-bdeb-abadf3de524d"));
+    this->Add(new Resource<Controller>(new CurvePointEditor(), "CurvePointEditor", "CurvePointEditor"));
+    this->Add(new Resource<View>(new PointEditorWidget(), "PointEditorView", "PointEditorView"));
 }
 
 void EditorApplication::InitializeModules()

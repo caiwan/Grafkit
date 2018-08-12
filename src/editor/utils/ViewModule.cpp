@@ -9,7 +9,7 @@ using namespace Idogep;
 using namespace Grafkit;
 
 Ref<View> View::SafeGetView(IResourceManager* const& resourceManager, const std::string& name) {
-    Ref<Resource<View>> controller = resourceManager->GetByName<Resource<View>>(name);
+    Ref<Resource<View>> controller = resourceManager->GetByUuid<Resource<View>>(name);
     assert(controller.Valid());
     assert(controller->Valid());
     return static_cast<Ref<View>>(*controller);
@@ -36,7 +36,7 @@ void View::RequestRefreshView(const bool force)
 // ----------------------------------------------------
 
 Ref<Controller> Controller::SafeGetController(IResourceManager* const& resourceManager, const std::string& name) {
-    Ref<Resource<Controller>> controller = resourceManager->GetByName<Resource<Controller>>(name);
+    Ref<Resource<Controller>> controller = resourceManager->GetByUuid<Resource<Controller>>(name);
     assert(controller.Valid());
     assert(controller->Valid());
     return static_cast<Ref<Controller>>(*controller);

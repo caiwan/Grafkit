@@ -16,6 +16,7 @@
 #include "render/light.h"
 
 #include "core/Music.h"
+#include <iso646.h>
 
 // --- 
 
@@ -188,7 +189,7 @@ TEST_F(SchemaTest, AssetCameraLoadTest)
     ASSERT_NE(camera1, camera2);
 
     ASSERT_STREQ("Camera01", camera1->GetName().c_str());
-    ASSERT_STREQ("Camera02", camera1->GetName().c_str());
+    ASSERT_STREQ("Camera02", camera2->GetName().c_str());
 }
 
 TEST_F(SchemaTest, AssetLightLoadTest)
@@ -272,7 +273,7 @@ TEST_F(SchemaTest, ActorCameraTest)
     ActorRef cameraActor = SafeGetObject<Actor>(Uuids::cameraActorUuid);
 
     ActorRef camera1Actor = SafeGetObject<Actor>(Uuids::camera1ActorUuid);
-    ActorRef camera2Actor = SafeGetObject<Actor>(Uuids::camera1ActorUuid);
+    ActorRef camera2Actor = SafeGetObject<Actor>(Uuids::camera2ActorUuid);
     CameraRef camera1 = SafeGetObject<Camera>(Uuids::camera1Uuid);
     CameraRef camera2 = SafeGetObject<Camera>(Uuids::camera2Uuid);
 
@@ -294,7 +295,7 @@ TEST_F(SchemaTest, ActorCameraTest)
     ASSERT_NE(camera1Actor, camera2Actor);
 
     ASSERT_STREQ("Camera01", camera1Actor->GetName().c_str());
-    ASSERT_STREQ("Camera02", camera1Actor->GetName().c_str());
+    ASSERT_STREQ("Camera02", camera2Actor->GetName().c_str());
 
     ASSERT_EQ(1, camera1Actor->GetEntityCount());
     ASSERT_EQ(1, camera2Actor->GetEntityCount());
@@ -424,3 +425,51 @@ TEST_F(SchemaTest, DemoVShaderTest)
 
 // ============================================================================================
 
+namespace Uuids
+{
+    const char* rootActorAnimationUuid = "f7793948-3fdc-4182-bca6-c58917de46d7";
+    const char* cameraActorAnimationUuid = "e069b70d-ddf7-471e-84ac-ac30e1cd4f94";
+    const char* camera1ActorAnimationUuid = "f1932797-1119-43a0-89c3-d0c08f4b8288";
+    const char* camera2ActorAnimationUuid = "ad29899f-5424-49dd-b821-3a9644dfd41a";
+    const char* lightActorAnimationUuid = "19ff02df-04d5-49a4-a091-bd92f185316b";
+    const char* cubeActorAnimationUuid = "353732c5-de20-4180-831c-481b0d3caa460";
+
+}
+
+
+TEST_F(SchemaTest, ActorAnimations)
+{
+    // given
+    BuildDemo();
+
+    // when
+    ActorRef rootActor = SafeGetObject<Actor>(Uuids::rootActorUuid);
+    ActorRef cameraActor = SafeGetObject<Actor>(Uuids::cameraActorUuid);
+    ActorRef camera1Actor = SafeGetObject<Actor>(Uuids::camera1ActorUuid);
+    ActorRef camera2Actor = SafeGetObject<Actor>(Uuids::camera2ActorUuid);
+    ActorRef lightActor = SafeGetObject<Actor>(Uuids::lightActorUuid);
+    ActorRef cubeActor = SafeGetObject<Actor>(Uuids::cubeActorUuid);
+
+    AnimationRef rootActorAnimation = SafeGetObject<Animation>(Uuids::rootActorAnimationUuid);
+    AnimationRef cameraActorAnimation = SafeGetObject<Animation>(Uuids::cameraActorAnimationUuid);
+    AnimationRef camera1ActorAnimation = SafeGetObject<Animation>(Uuids::camera1ActorAnimationUuid);
+    AnimationRef camera2ActorAnimation = SafeGetObject<Animation>(Uuids::camera2ActorAnimationUuid);
+    AnimationRef lightActorAnimation = SafeGetObject<Animation>(Uuids::lightActorAnimationUuid);
+    AnimationRef cubeActorAnimation = SafeGetObject<Animation>(Uuids::cubeActorAnimationUuid);
+
+    // then
+    ASSERT_TRUE(rootActor);
+    ASSERT_TRUE(cameraActor);
+    ASSERT_TRUE(camera1Actor);
+    ASSERT_TRUE(camera2Actor);
+    ASSERT_TRUE(lightActor);
+    ASSERT_TRUE(cubeActor);
+
+    ASSERT_TRUE(rootActorAnimation);
+    ASSERT_TRUE(cameraActorAnimation);
+    ASSERT_TRUE(camera1ActorAnimation);
+    ASSERT_TRUE(camera2ActorAnimation);
+    ASSERT_TRUE(lightActorAnimation);
+    ASSERT_TRUE(cubeActorAnimation);
+
+}

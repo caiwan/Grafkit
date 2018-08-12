@@ -41,7 +41,7 @@ TEST_F(ResourceManagerTest, TestAddAndGet) {
     
 	resman->Add(resource);
 
-	ThingResourceRef retresource = resman->GetByName<ThingResource>("theThing");
+	ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
 
 	ASSERT_TRUE(retresource.Valid() && retresource->Valid());
 
@@ -60,7 +60,7 @@ TEST_F(ResourceManagerTest, TestReplace) {
 
 	resman->Add(resource);
 
-	ThingResourceRef retresource = resman->GetByName<ThingResource>("theThing");
+	ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
 	ASSERT_TRUE(retresource.Valid() && retresource->Valid());
 
 	ThingRef newThing = new Thing();
@@ -87,12 +87,12 @@ TEST_F(ResourceManagerTest, TestRemove ) {
 
 	ThingResourceRef retresource;
 	
-	retresource = resman->GetByName<ThingResource>("theThing");
+	retresource = resman->GetByUuid<ThingResource>("theThing");
 	ASSERT_TRUE(retresource.Valid() && retresource->Valid());
 
-	resman->RemoveByName("theThing");
+	resman->RemoveByUuid("theThing");
 
-	retresource = resman->GetByName<ThingResource>("theThing");
+	retresource = resman->GetByUuid<ThingResource>("theThing");
 	ASSERT_TRUE(retresource.Invalid());
 
 	delete resman;
@@ -104,7 +104,7 @@ TEST_F(ResourceManagerTest, TestLoad) {
 
 	resman->Load(new ThingLoader("theLoadedThing"));
 
-	resource = resman->GetByName<ThingResource>("theLoadedThing");
+	resource = resman->GetByUuid<ThingResource>("theLoadedThing");
 
 	ASSERT_TRUE(resource.Valid());
 	ASSERT_TRUE(resource->Invalid());
@@ -115,7 +115,7 @@ TEST_F(ResourceManagerTest, TestLoad) {
 	ASSERT_TRUE(resource.Valid());
 	ASSERT_TRUE(resource->Valid());
 
-	resource = resman->GetByName<ThingResource>("theLoadedThing");
+	resource = resman->GetByUuid<ThingResource>("theLoadedThing");
 
 	ASSERT_TRUE(resource.Valid());
 	ASSERT_TRUE(resource->Valid());
@@ -131,7 +131,7 @@ TEST_F(ResourceManagerTest, TestCasting) {
     // when
     resman->Add(new AnotherThingResource(new AnotherThing(), "anotherThing"));
 
-    ThingResourceRef resource = resman->GetByName<ThingResource>("anotherThing");
+    ThingResourceRef resource = resman->GetByUuid<ThingResource>("anotherThing");
 
     // then
     ASSERT_FALSE(resource.Valid());

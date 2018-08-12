@@ -10,7 +10,7 @@ namespace Grafkit {
 
 	class ShaderLoader : public IResourceBuilder{
 	public:
-		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint);
+		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, std::string uuid="");
 		~ShaderLoader();
 
 	    void Load(IResourceManager * const & resman, IResource * source) override;
@@ -26,8 +26,8 @@ namespace Grafkit {
 
 	class VertexShaderLoader : public ShaderLoader {
 	public:
-		VertexShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "")
-			: ShaderLoader(name, sourcename, entrypoint){}
+		VertexShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "", std::string uuid = "")
+			: ShaderLoader(name, sourcename, entrypoint, uuid){}
 		~VertexShaderLoader(){}
 
 	protected:
@@ -38,8 +38,8 @@ namespace Grafkit {
 
 	class PixelShaderLoader : public ShaderLoader {
 	public:
-		PixelShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "")
-			: ShaderLoader(name, sourcename, entrypoint) {}
+		PixelShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "", std::string uuid = "")
+			: ShaderLoader(name, sourcename, entrypoint, uuid) {}
 		~PixelShaderLoader(){}
 	protected:
 	    Shader* NewShader() override { return new PixelShader(); }
@@ -48,8 +48,8 @@ namespace Grafkit {
 
 	class GeometryShaderLoader : public ShaderLoader {
 	public:
-		GeometryShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "")
-			: ShaderLoader(name, sourcename, entrypoint) {}
+		GeometryShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "", std::string uuid = "")
+			: ShaderLoader(name, sourcename, entrypoint, uuid) {}
 		~GeometryShaderLoader() {}
 
 	protected:

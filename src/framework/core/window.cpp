@@ -13,7 +13,7 @@ typedef LRWAPI windowCallBackProc_t(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 namespace {
 	LRWAPI window_callback_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
-	static Window* window;
+    Window* window;
 
 	LRWAPI window_callback_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 	{
@@ -54,7 +54,7 @@ namespace {
 // Windowmaker class
 //============================================================================================================
 
-Window::Window(Window::WindowHandler *_handler)
+Window::Window(WindowHandler *_handler)
 	:handler(_handler)
 {
 	window = this;
@@ -63,7 +63,7 @@ Window::Window(Window::WindowHandler *_handler)
 
 }
 
-Window::Window(Window::WindowHandler *_handler, TCHAR *title)
+Window::Window(WindowHandler *_handler, TCHAR *title)
 	: handler(_handler)
 {
 	window = this;
@@ -80,9 +80,9 @@ void Window::init() {
 	this->r_width = 0;
 	this->fullscreen = 0;
 
-	this->hWnd = 0;
-	this->hDc = 0;
-	this->hRc = 0;
+	this->hWnd = nullptr;
+	this->hDc = nullptr;
+	this->hRc = nullptr;
 
 	this->isWindShown = false;
 
@@ -91,10 +91,10 @@ void Window::init() {
 	ZeroMemory(&windowClass, sizeof(WNDCLASSEX));
 	windowClass.cbSize = sizeof(WNDCLASSEX);
 	windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	windowClass.lpfnWndProc = (WNDPROC)(&window_callback_proc);
-	windowClass.hInstance = GetModuleHandle(NULL);
-	windowClass.hbrBackground = (HBRUSH)(COLOR_APPWORKSPACE);
-	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+	windowClass.lpfnWndProc = static_cast<WNDPROC>(&window_callback_proc);
+	windowClass.hInstance = GetModuleHandle(nullptr);
+	windowClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_APPWORKSPACE);
+	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	windowClass.lpszClassName = "Engine";
 	if (RegisterClassEx(&windowClass) == 0)
 	{
@@ -106,7 +106,7 @@ void Window::init() {
 Window::~Window(){
 	this->destructEverything();
 //	unregisterHwnd(this);
-	window = NULL;
+	window = nullptr;
 }
 
 void Window::createWindow(int sx, int sy, int isfullscreen){
@@ -133,7 +133,7 @@ void Window::createWindow(int sx, int sy, int isfullscreen){
 		if( reso != DISP_CHANGE_SUCCESSFUL ) {
 			//char asda[512];
 
-			MessageBox( 0, _T(""), _T("Could not initialize fullscreen window."), MB_OK );
+			MessageBox( nullptr, _T(""), _T("Could not initialize fullscreen window."), MB_OK );
 			exit(1);
 		}
 		windowFrame = NULL;
@@ -143,9 +143,9 @@ void Window::createWindow(int sx, int sy, int isfullscreen){
 		windowFrame = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU ;
 	}
 
-	this->hWnd = CreateWindowEx(windowExStyle, _T("Engine"), this->wndtitle, windowStyle | windowFrame, windowRect.top, windowRect.left, windowRect.right, windowRect.bottom, NULL, NULL, GetModuleHandle( 0 ), NULL );
+	this->hWnd = CreateWindowEx(windowExStyle, _T("Engine"), this->wndtitle, windowStyle | windowFrame, windowRect.top, windowRect.left, windowRect.right, windowRect.bottom, nullptr, nullptr, GetModuleHandle( nullptr ), nullptr );
 
-	if( hWnd == NULL ){
+	if( hWnd == nullptr ){
 		MessageBox (HWND_DESKTOP, _T("Cannot create window"), _T("Error"), MB_OK | MB_ICONEXCLAMATION);
 		exit(1);
 	}
@@ -174,24 +174,26 @@ void Window::hideWindow(){
 
 void Window::destructEverything()
 {
-	Window::peekWindowMessage();
-	if (this->hWnd != 0)
+	peekWindowMessage();
+	if (this->hWnd != nullptr)
 	{
-		if (this->hDc != 0)
+		if (this->hDc != nullptr)
 		{
 			ReleaseDC (this->hWnd, this->hDc);
-			this->hDc = 0;
+			this->hDc = nullptr;
 		}
 		DestroyWindow (this->hWnd);
-		this->hWnd = 0;
+		this->hWnd = nullptr;
 	}
 
 	if (this->fullscreen)
 	{
-		ChangeDisplaySettings (NULL,0);
+		ChangeDisplaySettings (nullptr,0);
 		ShowCursor (TRUE);
 	}
-	Window::peekWindowMessage();
+	peekWindowMessage();
+
+    UnregisterClass("Engine", nullptr);
 }
 
 void Window::destroyWindow(){
@@ -208,7 +210,7 @@ void Window::recreateWindow(){
 bool Window::peekWindowMessage(){
 	MSG uMsg;
 	bool quit = false;
-	while (PeekMessage( &uMsg, NULL, 0, 0, PM_REMOVE)) { 
+	while (PeekMessage( &uMsg, nullptr, 0, 0, PM_REMOVE)) { 
 		TranslateMessage( &uMsg ); 
 		DispatchMessage( &uMsg ); 
 		if (uMsg.message == WM_QUIT) quit = true;

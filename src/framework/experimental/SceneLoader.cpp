@@ -493,7 +493,7 @@ void SceneLoader::SceneLoaderHelper::PersistMaterials(Archive &ar, IResourceMana
 			PERSIST_STRING(ar, tx.second);
 
 			if (!ar.IsStoring()) {
-				TextureResRef texture = resman->GetByName<Texture2DRes>(tx.first);
+				TextureResRef texture = resman->GetByUuid<Texture2DRes>(tx.first);
 				material->AddTexture(texture, tx.second);
 			}
 		}

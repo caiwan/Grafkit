@@ -18,10 +18,14 @@
 #include "render/model.h"
 #include "render/material.h"
 
+#include "render/light.h"
+#include "render/camera.h"
+
 #include "render/actor.h"
 #include "render/SceneGraph.h"
 
 #include "experimental/scene.h"
+#include "experimental/AnimationLoader.h"
 
 #include "core/Music.h"
 #include "generator/MusicBassLoader.h"
@@ -40,7 +44,6 @@ SchemaBuilder::SchemaBuilder() : m_demo(nullptr) {
 
 SchemaBuilder::~SchemaBuilder() {
 }
-
 
 void SchemaBuilder::LoadFromAsset(const IAssetRef& asset, IResourceManager* resourceManager)
 {
@@ -75,17 +78,16 @@ void SchemaBuilder::AssignShader(IResourceManager* const& resourceManager, Json 
     std::string vsUuid = sceneJson.at("vs").get<std::string>();
     std::string psUuid = sceneJson.at("ps").get<std::string>();
 
-    ShaderResRef ps = resourceManager->GetByUuid<ShaderRes>(vsUuid);
-    ShaderResRef vs = resourceManager->GetByUuid<ShaderRes>(psUuid);
+    ShaderResRef ps = resourceManager->GetByUuid<ShaderRes>(psUuid);
+    ShaderResRef vs = resourceManager->GetByUuid<ShaderRes>(vsUuid);
 
     if (ps && vs) // threst will be preloaded
     {
-        LOGGER(Log::Logger().Info("--- VS %s uuid=%s ", vs->GetName().c_str(), vs->GetUuid().c_str()));
         LOGGER(Log::Logger().Info("--- PS %s uuid=%s", ps->GetName().c_str(), ps->GetUuid().c_str()));
-
         m_demo->SetPs(ps);
-        m_demo->SetVs(vs);
 
+        LOGGER(Log::Logger().Info("--- VS %s uuid=%s ", vs->GetName().c_str(), vs->GetUuid().c_str()));
+        m_demo->SetVs(vs);
     }
     else
     {
@@ -94,44 +96,53 @@ void SchemaBuilder::AssignShader(IResourceManager* const& resourceManager, Json 
     }
 }
 
-void SchemaBuilder::BuildScenes(IResourceManager* const& resourceManager, const Json &demo) {
-    const Json scenes = demo.at("scenes");
-    LOGGER(Log::Logger().Info("- Loading Scenes"));
-    for (Json::const_iterator scenesIt = scenes.begin(); scenesIt != scenes.end(); ++scenesIt)
-    {
-        Json sceneJson = *scenesIt;
+void SchemaBuilder::AssignAnimations(IResourceManager* const& resourceManager, Json sceneJson) {
+}
 
-        std::string uuid = sceneJson.at("uuid");
+void SchemaBuilder::BuildScene(IResourceManager* const& resourceManager, const Json &sceneJson) {
 
-        // ids
-        uint32_t id = sceneJson.at("id").get<uint32_t>();
-        std::string sceneUuid = sceneJson.at("scene");
+    std::string uuid = sceneJson.at("uuid");
 
-        LOGGER(Log::Logger().Info("-- Scene id=%d uuid=%s", id, uuid.c_str()));
+    // ids
+    uint32_t id = sceneJson.at("id").get<uint32_t>();
+    std::string sceneUuid = sceneJson.at("scene");
 
-        Ref<Resource<SceneGraph>> sceneResource = resourceManager->GetByUuid<Resource<SceneGraph>>(sceneUuid);
-        if (sceneResource.Valid(), sceneResource->Valid()) {
-            SceneGraphRef sceneGraph = sceneResource->Get();
+    LOGGER(Log::Logger().Info("-- Scene id=%d uuid=%s", id, uuid.c_str()));
 
-            LOGGER(Log::Logger().Info("--- SceneGraph %s uuid=%s",
-                sceneResource->GetName().c_str(),
-                sceneResource->GetUuid().c_str()
-            ));
+    Ref<Resource<SceneGraph>> sceneResource = resourceManager->GetByUuid<Resource<SceneGraph>>(sceneUuid);
+    if (sceneResource.Valid(), sceneResource->Valid()) {
+        SceneGraphRef sceneGraph = sceneResource->Get();
 
-            // TODO add scene here 
-            SceneRef scene = new Scene();
-            BuildObject(sceneJson, scene);
-            scene->SetSceneGraph(sceneResource);
-            // It will build itself later on
+        LOGGER(Log::Logger().Info("--- SceneGraph %s uuid=%s",
+            sceneResource->GetName().c_str(),
+            sceneResource->GetUuid().c_str()
+        ));
 
-            resourceManager->Add(new SceneRes(scene, scene->GetName(), scene->GetUuid()));
-        }
-        else
-        {
-            // TODO: throw
-            THROW_EX_DETAILS(SchemaParseException, "Nincs Scene");
-        }
+        // TODO add scene here 
+        SceneRef scene = new Scene();
+        BuildObject(sceneJson, scene);
+        scene->SetSceneGraph(sceneResource);
+        // It will build itself later on
+
+        resourceManager->Add(new SceneRes(scene, scene->GetName(), scene->GetUuid()));
     }
+    else
+    {
+        // TODO: throw
+        THROW_EX_DETAILS(SchemaParseException, "Nincs Scene");
+    }
+}
+
+
+void SchemaBuilder::BuildAnimation(IResourceManager * const & resourceManager, const Json & animationJson) {
+    Ref<Resource<Animation>> animation;
+
+    std::string type = animationJson.at("tpye");
+    if (type.compare("actor"))
+    {
+        //animation = resourceManager->Load<Resource<Animation>>(new ActorAnimationLoader());
+    }
+
 }
 
 void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& json)
@@ -165,24 +176,43 @@ void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& j
     LOGGER(Log::Logger().Info("- Music: %s", musicFilename.c_str()));
     MusicResRef music = resourceManager->Load<MusicRes>(new MusicBassLoader(musicFilename));
 
+    m_demo->SetMusic(music);
+
     // build scenes
-    BuildScenes(resourceManager, demo);
+
+    const Json scenes = demo.at("scenes");
+    LOGGER(Log::Logger().Info("- Loading Scenes"));
+    for (Json::const_iterator scenesIt = scenes.begin(); scenesIt != scenes.end(); ++scenesIt)
+    {
+        const Json sceneJson = *scenesIt;
+        BuildScene(resourceManager, sceneJson);
+
+        const Json animationsJson = sceneJson["animations"];
+        if (!animationsJson.empty())
+        {
+            LOGGER(Log::Logger().Info("- Loading Animations"));
+            for (Json::const_iterator animationIt = animationsJson.begin(); animationIt != animationsJson.end(); ++animationIt)
+            {
+                const Json animationJson = *animationIt;
+                BuildAnimation(resourceManager, animationJson);
+            }
+        }
+    }
 
     // add scenes
-    const Json scenes = demo.at("scenes");
     LOGGER(Log::Logger().Info("- Loading Scenes"));
     for (Json::const_iterator scenesIt = scenes.begin(); scenesIt != scenes.end(); ++scenesIt)
     {
         const Json sceneJson = *scenesIt;
         std::string uuid = sceneJson.at("uuid");
         uint32_t id = sceneJson.at("id").get<uint32_t>();
-    
-        SceneResRef scene = 
-        resourceManager->GetByUuid<SceneRes>(uuid);
+
+        SceneResRef scene = resourceManager->GetByUuid<SceneRes>(uuid);
 
         if (scene && scene->Valid())
         {
             m_demo->AddScene(id, scene);
+            // + assign animation
         }
     }
 
@@ -236,19 +266,14 @@ void SchemaBuilder::BuildShader(IResourceManager*const& resourceManager, const J
 
     if (type.compare("ps") == 0) {
         LOGGER(Log::Logger().Info("--- PixelShader %s uuid=%s", name.c_str(), uuid.c_str()));
-        shaderRes = resourceManager->Load<ShaderRes>(new PixelShaderLoader(name, filename, entrypoint));
+        shaderRes = resourceManager->Load<ShaderRes>(new PixelShaderLoader(name, filename, entrypoint, uuid));
     }
     else if (type.compare("vs") == 0) {
         LOGGER(Log::Logger().Info("--- VertexSahder %s uuid=%s", name.c_str(), uuid.c_str()));
-        shaderRes = resourceManager->Load<ShaderRes>(new VertexShaderLoader(name, filename, entrypoint));
+        shaderRes = resourceManager->Load<ShaderRes>(new VertexShaderLoader(name, filename, entrypoint, uuid));
     }
 
     shaderRes->SetName(name);
-
-    // a hack to update the resourse pointer w/ the uuid provided 
-    resourceManager->GetByName<ShaderRes>(name);
-    shaderRes->SetUuid(uuid);
-    resourceManager->Add(shaderRes);
 }
 
 void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const Json& json)
@@ -256,11 +281,37 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
     LOGGER(Log::Logger().Info("- Loading json"));
 
     // --- 
-    const Json meshes = json["meshes"];
-    if (!meshes.empty())
+    const Json meshJson = json["meshes"];
+    if (!meshJson.empty())
     {
         LOGGER(Log::Logger().Info("-- Loading meshes"));
-        for (Json::const_iterator meshIt = meshes.begin(); meshIt != meshes.end(); ++meshIt) { BuildMesh(resourceManager, *meshIt); }
+        for (Json::const_iterator meshIt = meshJson.begin(); meshIt != meshJson.end(); ++meshIt) { BuildMesh(resourceManager, *meshIt); }
+    }
+
+    // --- 
+
+    const Json camerasJson = json["cameras"];
+    if (!camerasJson.empty())
+    {
+        LOGGER(Log::Logger().Info("-- Loading camseras"));
+        for (Json::const_iterator cameraIt = camerasJson.begin(); cameraIt != camerasJson.end(); ++cameraIt)
+        {
+            CameraRef camera = new Camera();
+            BuildObject(*cameraIt, camera);
+            resourceManager->Add(new Resource<Camera>(camera, camera->GetName(), camera->GetUuid()));
+        }
+    }
+
+    const Json lightsJson = json["lights"];
+    if (!lightsJson.empty())
+    {
+        LOGGER(Log::Logger().Info("-- Loading lights"));
+        for (Json::const_iterator lightIt = lightsJson.begin(); lightIt != lightsJson.end(); ++lightIt)
+        {
+            LightRef light = new Light();
+            BuildObject(*lightIt, light);
+            resourceManager->Add(new Resource<Light>(light, light->GetName(), light->GetUuid()));
+        }
     }
 
     // --- 

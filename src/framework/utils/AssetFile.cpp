@@ -240,7 +240,7 @@ IAssetRef FileAssetFactory::Get(std::string name)
 	std::string fullname = m_root + name;
 	fopen_s(&fp, fullname.c_str(), "rb");
 
-	LOGGER(Log::Logger().Info("Accessin file %s", fullname.c_str()));
+	LOGGER(Log::Logger().Info("Accessing file %s", fullname.c_str()));
 
 	if (!fp) {
 		THROW_EX_DETAILS(AssetLoadException, fullname.c_str());

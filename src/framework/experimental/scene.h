@@ -34,11 +34,12 @@ namespace Grafkit
 
         inline void AddEntiy(ActorRef node, Entity3DRef entity);
         size_t GetCount() const { return m_entities.size(); }
-        ActorRef GetActor(size_t id) { return m_entities[id].m_actor; }
-        inline ActorRef GetActor(std::string name);
 
-        Entity3DRef GetEntity(size_t id) { return m_entities[id].m_entity; }
-        inline Entity3DRef GetEntity(std::string name);
+        ActorRef GetActor(size_t id) const { return m_entities.at(id).m_actor; }
+        inline ActorRef GetActor(std::string name) const;
+
+        Entity3DRef GetEntity(size_t id) const { return m_entities.at(id).m_entity; }
+        inline Entity3DRef GetEntity(std::string name) const;
 
         inline size_t GetId(std::string name);
 
@@ -123,6 +124,8 @@ namespace Grafkit
 
         size_t GetCameraId(std::string name) const { return m_cameras->GetId(name); }
 
+        size_t GetCameraCount() const { return m_cameras->GetCount(); }
+
         void SetActiveCameraId(size_t id) { m_activeCameraId = id; }
         size_t GetActiveCameraId() const { return m_activeCameraId; }
 
@@ -153,22 +156,41 @@ namespace Grafkit
     class HasLightsRole
     {
     public:
-        void AddLight(ActorRef& actor, LightRef& camera) {
-            //assert(0);
+
+        explicit HasLightsRole()
+            : m_lights(nullptr) {
         }
+
+        void AddLight(ActorRef& actor, LightRef& light) { m_lights->AddEntiy(actor, light); }
+
+        size_t GetLightCount() const { return m_lights->GetCount(); };
+
+        LightRef GetLight(size_t id) const { return dynamic_cast<Light*>(m_lights->GetEntity(id).Get()); }
+        LightRef GetLight(std::string name) const { return dynamic_cast<Light*>(m_lights->GetEntity(name).Get()); }
+
+        ActorRef GetLightActor(size_t id) const { return m_lights->GetActor(id); }
+        ActorRef GetLightActor(std::string name) const { return m_lights->GetActor(name); }
+
+        size_t GetLightId(std::string name) const { return m_lights->GetId(name); }
+
+        // Anything else ???
 
     protected:
 
-        void InitializeLights() {
-            //assert(0);
+        void InitializeLights() { m_lights = new EntityContainer(); }
+
+        void ShutdownLights()
+        {
+            if (m_lights)
+            {
+                delete m_lights;
+                m_lights = nullptr;
+            }
         }
 
-        void ShutdownLights() {
-            //assert(0);
-        }
-
-        void UpdateLights() {
-            //assert(0);
+        void UpdateLights()
+        {
+            assert(0);
         }
 
         EntityContainer* m_lights;
@@ -178,7 +200,7 @@ namespace Grafkit
     // ---------------------------------------------------------------------------
 
 
-    class Scene : public Object, 
+    class Scene : public Object,
         public HasSceneGraphRole,
         public HasAnimationsRole,
         public HasCamerasRole,

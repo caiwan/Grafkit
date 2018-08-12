@@ -15,69 +15,73 @@ typedef Ref<IAssetRes> IAssetResRef;
 
 namespace {
 
-
 	class IncludeProvider : public ID3DInclude {
 	public:
+	    explicit IncludeProvider(IResourceManager* const & resman);
+	    virtual ~IncludeProvider() = default;
 
-		IncludeProvider(IResourceManager * const & resman) : m_resman(resman)
-		{
-		}
+	    HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
 
-		HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) override
-		{
-		    std::string relpath;
-			switch (IncludeType) {
-			case D3D_INCLUDE_LOCAL:
-				relpath = m_resman->GetResourcePath("shaderincludelocal") + pFileName;
-				break;
-			case D3D_INCLUDE_SYSTEM:
-				relpath = m_resman->GetResourcePath("shaderincludesystem") + pFileName;
-				break;
-
-			default:
-				return E_FAIL;
-			}
-
-			try {
-				IAssetRef asset = m_resman->GetAssetFactory()->Get(relpath);
-				*ppData = asset->GetData();
-				*pBytes = asset->GetSize();
-
-				// -- resmanhoz hozzaad
-				char buffer[256];
-				sprintf_s(buffer, "pointer@%d", asset->GetData());
-				IAssetResRef assetRes = new IAssetRes(asset);
-				assetRes->SetName(buffer);
-				m_resman->Add(assetRes);
-
-			}
-			catch (AssetLoadException &e) {
-				LOGGER(Log::Logger().Error(e.what()));
-				return E_FAIL;
-			}
-			return S_OK;
-		}
-
-		HRESULT __stdcall Close(LPCVOID pData) override
-		{
-			// -- resmanbol kiszed
-			char buffer[256];
-			sprintf_s(buffer, "pointer@%d", pData);
-			m_resman->RemoveByName(buffer);
-
-			return S_OK;
-		}
+	    HRESULT __stdcall Close(LPCVOID pData) override;
 
 	private:
 		IResourceManager * const &m_resman;
 	};
 
+    IncludeProvider::IncludeProvider(IResourceManager* const& resman): m_resman(resman) {
+    }
+
+    HRESULT IncludeProvider::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+    {
+        std::string relpath;
+        switch (IncludeType)
+        {
+        case D3D_INCLUDE_LOCAL:
+            relpath = m_resman->GetResourcePath("shaderincludelocal") + pFileName;
+            break;
+        case D3D_INCLUDE_SYSTEM:
+            relpath = m_resman->GetResourcePath("shaderincludesystem") + pFileName;
+            break;
+
+        default:
+            return E_FAIL;
+        }
+
+        try
+        {
+            IAssetRef asset = m_resman->GetAssetFactory()->Get(relpath);
+            *ppData = asset->GetData();
+            *pBytes = asset->GetSize();
+
+            // -- resmanhoz hozzaad
+            char buffer[256];
+            sprintf_s(buffer, "rawdata@%d", asset->GetData());
+            IAssetResRef assetRes = new IAssetRes(asset);
+            assetRes->SetName(buffer);
+            m_resman->Add(assetRes);
+        }
+        catch (AssetLoadException& e)
+        {
+            LOGGER(Log::Logger().Error(e.what()));
+            return E_FAIL;
+        }
+        return S_OK;
+    }
+
+    HRESULT IncludeProvider::Close(LPCVOID pData)
+    {
+        // -- resmanbol kiszed
+        char buffer[256];
+        sprintf_s(buffer, "rawdata@%d", pData);
+        m_resman->RemoveByUuid(buffer);
+
+        return S_OK;
+    }
 }
 
 // =============================================================================================================================
 
-ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) :
-	IResourceBuilder(name, sourcename),
+ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, std::string uuid): IResourceBuilder(name, sourcename, uuid) ,
 	m_entrypoint(entrypoint)
 {
 }
@@ -135,3 +139,5 @@ IResource * ShaderLoader::NewResource()
 	ShaderRes* res = new ShaderRes();
 	return res;
 }
+
+

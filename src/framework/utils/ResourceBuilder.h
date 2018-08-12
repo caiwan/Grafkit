@@ -1,5 +1,5 @@
-/** 
-	Resource builder interface
+/**
+    Resource builder interface
 */
 #pragma once 
 
@@ -8,34 +8,31 @@
 
 namespace Grafkit {
 
-	class IResourceManager;
+    class IResourceManager;
 
-	/**
-	Ezt gyujti be a preloader, es gyartja le a megfelelo asseteket
-	src -> dst
-	*/
-	class IResourceBuilder
-	{
-		public:
-			IResourceBuilder(std::string name, std::string sourcename) : m_name(name), m_srcName(sourcename) {}
-			IResourceBuilder(std::string name) : m_name(name), m_srcName() {}
+    class IResourceBuilder
+    {
+    public:
+        //explicit IResourceBuilder(std::string name) : m_name(name), m_srcName(), m_uuid() {}
+        explicit IResourceBuilder(std::string name, std::string sourcename = "", std::string uuid = "") : m_name(name), m_srcName(sourcename), m_uuid(uuid) {}
 
-			virtual ~IResourceBuilder() {}
+        virtual ~IResourceBuilder() {}
 
-			std::string GetName() { return m_name; }
-			std::string GetSourceName() { return m_srcName; }
+        std::string GetName() const { return m_name; }
+        std::string GetUuid() const { return m_uuid; }
+        std::string GetSourceName() const { return m_srcName; }
 
-			// pure virtuals 
-			virtual IResource* NewResource() = 0;
+        // pure virtuals 
+        virtual IResource* NewResource() = 0;
 
-			virtual void Load(IResourceManager * const & resman, IResource * source) = 0;
+        virtual void Load(IResourceManager * const & resman, IResource * source) = 0;
 
-	protected:
-		IAssetRef GetSourceAsset(IResourceManager * const & assman);
-		IAssetRef GetAsset(IResourceManager * const & assman, std::string asset);
+    protected:
+        IAssetRef GetSourceAsset(IResourceManager * const & assman) const;
 
-		std::string m_name;
-		std::string m_srcName;
-	};
+        std::string m_name;
+        std::string m_srcName;
+        std::string m_uuid;
+    };
 
 }

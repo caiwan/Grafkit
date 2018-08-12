@@ -16,6 +16,8 @@ namespace Grafkit {
 
     class IPreloadEvents {
     public:
+        virtual ~IPreloadEvents() = default;
+
         virtual void OnBeginLoad() {}
         virtual void OnElemLoad(size_t actual, size_t count) {}
         virtual void OnEndLoad() {}
@@ -27,11 +29,11 @@ namespace Grafkit {
         IResourceManager();
         virtual ~IResourceManager();
 
-        template<class T> Ref<T> GetByName(const std::string &pName) const;
+        //template<class T> Ref<T> GetByName(const std::string &pName) const;
         template<class T> Ref<T> GetByUuid(const std::string &uuid) const;
 
         void Add(Ref<IResource> pResource);
-        void RemoveByName(const std::string &name);
+        //void RemoveByName(const std::string &name);
         void RemoveByUuid(const std::string &uuid);
         void RemoveAll();
 
@@ -61,7 +63,7 @@ namespace Grafkit {
 
     protected:
         std::map<std::string, std::string> m_pathMap;
-        std::map<std::string, Ref<IResource>> m_nameMap;
+        //std::map<std::string, Ref<IResource>> m_nameMap;
         std::map<std::string, Ref<IResource>> m_uuidMap;
         std::map<std::string, IResourceBuilder*> m_builders;
         std::map<std::string, std::pair<std::string, IResourceBuilder*>> m_filenamesToBuilder;
@@ -69,20 +71,20 @@ namespace Grafkit {
         IPreloadEvents* m_preloadEvents;
     };
 
-    template<class T>
-    Ref<T> IResourceManager::GetByName(const std::string &pName) const
-    {
-        std::string name = pName;
-        transform(name.begin(), name.end(), name.begin(), tolower);
+    //template<class T>
+    //Ref<T> IResourceManager::GetByName(const std::string &pName) const
+    //{
+    //    std::string name = pName;
+    //    transform(name.begin(), name.end(), name.begin(), tolower);
 
-        auto it = m_nameMap.find(name);
+    //    auto it = m_nameMap.find(name);
 
-        if (it != m_nameMap.end()) {
-            return Ref<T>(dynamic_cast<T*>(it->second.Get()));
-        }
+    //    if (it != m_nameMap.end()) {
+    //        return Ref<T>(dynamic_cast<T*>(it->second.Get()));
+    //    }
 
-        return nullptr;
-    }
+    //    return nullptr;
+    //}
 
     template<class T>
     Ref<T> IResourceManager::GetByUuid(const std::string &uuid) const
@@ -99,7 +101,8 @@ namespace Grafkit {
     template<class T>
     Ref<T> IResourceManager::Load(IResourceBuilder* builder) {
         Load(builder);
-        T* res = GetByName<T>(builder->GetName());
+        //T* res = GetByName<T>(builder->GetName());
+        T* res = GetByUuid<T>(builder->GetUuid());
         return res;
     }
 

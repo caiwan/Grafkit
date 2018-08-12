@@ -29,12 +29,11 @@ namespace Grafkit {
         void AddNode(ActorRef& actor);
         ActorRef GetNode(std::string name);
 
-        void SetRootNode(ActorRef &root) { m_root = root; }
-        ActorRef GetRootNode() const { return m_root; }
+        void SetRootNode(ActorRef &root) { m_root = root; } //TODO: rename node->actor
+        ActorRef GetRootNode() const { return m_root; } //TODO: rename node->actor
 
-        size_t GetNodeCount() const { return m_nodes.size(); }
-        ActorRef GetNode(size_t id) { return m_nodes[id]; }
-
+        size_t GetNodeCount() const { return m_nodes.size(); } //TODO: rename node->actor
+        ActorRef GetNode(size_t id) { return m_nodes.at(id); } //TODO: rename node->actor
 
         // --- 
 

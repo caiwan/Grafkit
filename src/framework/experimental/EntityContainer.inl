@@ -10,7 +10,7 @@ inline void Grafkit::EntityContainer::AddEntiy(ActorRef node, Entity3DRef entity
 	m_entityMap[node->GetName()] = record;
 }
 
-inline Grafkit::ActorRef Grafkit::EntityContainer::GetActor(std::string name)
+inline Grafkit::ActorRef Grafkit::EntityContainer::GetActor(std::string name) const 
 {
 	auto it = m_entityMap.find(name);
 	if (it != m_entityMap.end())
@@ -18,7 +18,7 @@ inline Grafkit::ActorRef Grafkit::EntityContainer::GetActor(std::string name)
     return nullptr;
 }
 
-inline Grafkit::Entity3DRef Grafkit::EntityContainer::GetEntity(std::string name)
+inline Grafkit::Entity3DRef Grafkit::EntityContainer::GetEntity(std::string name) const
 {
 	auto it = m_entityMap.find(name);
 	if (it != m_entityMap.end())

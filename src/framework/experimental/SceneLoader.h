@@ -1,15 +1,15 @@
 #pragma once
 
-#include <map>
-#include <vector>
+    #include <map>
+    #include <vector>
 
-#include "utils/exceptions.h"
+    #include "utils/exceptions.h"
 
-#include "utils/persistence/persistence.h"
+    #include "utils/persistence/persistence.h"
 
-#include "utils/asset.h"
-#include "utils/resource.h"
-#include "utils/ResourceBuilder.h"
+    #include "utils/asset.h"
+    #include "utils/resource.h"
+    #include "utils/ResourceBuilder.h"
 			
 namespace Grafkit {
 

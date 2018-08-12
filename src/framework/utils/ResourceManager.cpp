@@ -23,7 +23,7 @@ IResourceManager::IResourceManager() : m_preloadEvents(nullptr)
 IResourceManager::~IResourceManager()
 {
     ClearLoadStack();
-    for (auto it = m_nameMap.begin(); it != m_nameMap.end(); ++it) { it->second.AssingnRef(nullptr); }
+    for (auto it = m_uuidMap.begin(); it != m_uuidMap.end(); ++it) { it->second.AssingnRef(nullptr); }
 }
 
 void IResourceManager::Add(Ref<IResource> pResource)
@@ -48,24 +48,8 @@ void IResourceManager::Add(Ref<IResource> pResource)
         std::string name = pResource->GetName();
         transform(name.begin(), name.end(), name.begin(), tolower);
 
-        m_nameMap[name] = pResource;
+        //m_nameMap[name] = pResource;
         m_uuidMap[uuid] = pResource;
-    }
-}
-
-void IResourceManager::RemoveByName(const std::string& pName)
-{
-    std::string name = pName;
-    transform(name.begin(), name.end(), name.begin(), tolower);
-    auto it = m_nameMap.find(name);
-    if (it != m_nameMap.end())
-    {
-        std::string uuid = it->second->GetUuid();
-
-        m_nameMap.erase(it);
-
-        auto it2 = m_uuidMap.find(name);
-        if (it2 != m_uuidMap.end()) { m_uuidMap.erase(it2); }
     }
 }
 
@@ -79,16 +63,12 @@ void IResourceManager::RemoveByUuid(const std::string& uuid)
         m_uuidMap.erase(it);
 
         transform(name.begin(), name.end(), name.begin(), tolower);
-
-        auto it2 = m_nameMap.find(name);
-        if (it2 != m_nameMap.end()) { m_nameMap.erase(it2); }
     }
 }
 
 void IResourceManager::RemoveAll()
 {
     m_uuidMap.clear();
-    m_nameMap.clear();
 }
 
 // STL components p115
@@ -97,17 +77,17 @@ struct get_second : std::unary_function<std::map<std::string, Ref<IResource>>::v
     Ref<IResource> operator()(const std::map<std::string, Ref<IResource>>::value_type& value) const { return value.second; }
 };
 
-void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const { transform(m_nameMap.begin(), m_nameMap.end(), back_inserter(target), get_second()); }
+void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const { transform(m_uuidMap.begin(), m_uuidMap.end(), back_inserter(target), get_second()); }
 
 void IResourceManager::Load(IResourceBuilder* builder)
 {
-    std::string name = builder->GetName();
+    std::string name = builder->GetUuid();
     transform(name.begin(), name.end(), name.begin(), tolower);
 
-    auto it = m_nameMap.find(name);
+    auto it = m_uuidMap.find(name);
 
     // Ha nincs resource, elotoltjuk. 
-    if (it == m_nameMap.end()) { Reload(builder); }
+    if (it == m_uuidMap.end()) { Reload(builder); }
 }
 
 void IResourceManager::TriggerReload(std::string filename)
@@ -118,7 +98,7 @@ void IResourceManager::TriggerReload(std::string filename)
     {
         auto value = it->second;
         IResourceBuilder* builder = value.second;
-        IResource* oldResource = GetByName<IResource>(value.first);
+        IResource* oldResource = GetByUuid<IResource>(value.first);
         if (oldResource && builder)
         {
             LOGGER(Log::Logger().Trace("Reloading modified resource %s => %s", it->first.c_str(), value.first.c_str()));
@@ -131,11 +111,12 @@ void IResourceManager::TriggerReload(std::string filename)
 void IResourceManager::Reload(IResourceBuilder* builder)
 {
     IResource* resource = builder->NewResource();
-    std::string name = builder->GetName();
-    resource->SetName(name);
+    std::string uuid = builder->GetUuid();
+    if (uuid.empty()) { resource->SetUuid(uuid); }
+    resource->SetName(builder->GetName());
     Add(resource);
-    m_builders[name] = builder;
-    if (!builder->GetSourceName().empty()) { m_filenamesToBuilder[builder->GetSourceName()] = std::pair<std::string, IResourceBuilder*>(name, builder); }
+    m_builders[uuid] = builder;
+    if (!builder->GetSourceName().empty()) { m_filenamesToBuilder[builder->GetSourceName()] = std::pair<std::string, IResourceBuilder*>(uuid, builder); }
 }
 
 void IResourceManager::DoPrecalc()
@@ -150,7 +131,7 @@ void IResourceManager::DoPrecalc()
     {
         LOGGER(Log::Logger().Trace("Preloading item %d of %d", i, len));
         IResourceBuilder* builder = it->second;
-        if (builder) { builder->Load(this, GetByName<IResource>(builder->GetName())); }
+        if (builder) { builder->Load(this, GetByUuid<IResource>(builder->GetUuid())); }
 
         if (m_preloadEvents)
             m_preloadEvents->OnElemLoad(i, len);

@@ -6,18 +6,18 @@
 
 using namespace Grafkit;
 
-IAssetRef IResourceBuilder::GetSourceAsset(IResourceManager * const & assman)
+IAssetRef IResourceBuilder::GetSourceAsset(IResourceManager * const & assman) const
 {
 	if (assman && assman->GetAssetFactory()) 
 		return assman->GetAssetFactory()->Get(m_srcName);
-	else 
-		return IAssetRef();
+    return IAssetRef();
 }
 
-IAssetRef Grafkit::IResourceBuilder::GetAsset(IResourceManager * const & assman, std::string asset)
-{
-	if (assman && assman->GetAssetFactory())
-		return assman->GetAssetFactory()->Get(asset);
-	return IAssetRef();
-}
+
+//IAssetRef IResourceBuilder::GetAsset(IResourceManager * const & assman, std::string asset)
+//{
+//	if (assman && assman->GetAssetFactory())
+//		return assman->GetAssetFactory()->Get(asset);
+//	return IAssetRef();
+//}
 

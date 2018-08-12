@@ -31,8 +31,10 @@ namespace GkDemo
         void BuildResources(Grafkit::IResourceManager*const& resourceManager, const Json& json);
 
         void AssignShader(Grafkit::IResourceManager * const & resourceManager, Json sceneJson);
+        void AssignAnimations(Grafkit::IResourceManager * const & resourceManager, Json sceneJson);
 
-        void BuildScenes(Grafkit::IResourceManager * const & resourceManager, const Json & demo);
+        void BuildScene(Grafkit::IResourceManager * const & resourceManager, const Json & sceneJson);
+        void BuildAnimation(Grafkit::IResourceManager * const & resourceManager, const Json & sceneJson);
 
         void BuildAssets(Grafkit::IResourceManager*const& resourceManager, const Json& assets);
         void AssignModel(Grafkit::IResourceManager*const& resourceManager, const Json& json);

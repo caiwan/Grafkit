@@ -10,7 +10,7 @@ namespace Grafkit {
 	class MusicBassLoader : public Grafkit::IResourceBuilder {
 
 	public:
-		MusicBassLoader(const std::string& source_name);
+	    explicit MusicBassLoader(const std::string& source_name);
 		~MusicBassLoader();
 
 	    void Load(IResourceManager * const & resman, IResource * source) override;
