@@ -130,13 +130,14 @@ TEST_F(ContextPregnancyTest, JsonLoad)
 {
     // given: context
     this->BuildDemo();
+    ASSERT_TRUE(m_demo.Valid());
 
     // when
     m_context->DoPrecalc();
+
     m_demo->Initialize(m_render);
 
     // then
-    ASSERT_TRUE(m_demo.Valid());
     ASSERT_EQ(1, m_demo->GetSceneCount());
     ASSERT_TRUE(m_demo->GetScene(0));
     ASSERT_TRUE(m_demo->GetMusic());

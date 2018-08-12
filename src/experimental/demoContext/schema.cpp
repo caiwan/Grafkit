@@ -137,7 +137,7 @@ void SchemaBuilder::BuildScene(IResourceManager* const& resourceManager, const J
 void SchemaBuilder::BuildAnimation(IResourceManager * const & resourceManager, const Json & animationJson) {
     Ref<Resource<Animation>> animation;
 
-    std::string type = animationJson.at("tpye");
+    std::string type = animationJson.at("type");
     if (type.compare("actor"))
     {
         //animation = resourceManager->Load<Resource<Animation>>(new ActorAnimationLoader());

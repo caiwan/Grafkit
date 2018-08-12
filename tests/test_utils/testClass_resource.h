@@ -59,7 +59,7 @@ typedef Ref<AnotherThingResource> AnotherThingResourceRef;
 class ThingLoader : public Grafkit::IResourceBuilder
 {
 public:
-    ThingLoader(std::string name) : IResourceBuilder(name, name) {
+    explicit ThingLoader(std::string name) : IResourceBuilder(name, name, name) {
     }
 
     virtual ~ThingLoader() {
@@ -87,7 +87,7 @@ public:
 class ErrorousThingLoader : public Grafkit::IResourceBuilder
 {
 public:
-    ErrorousThingLoader(std::string name) : IResourceBuilder(name, name) {
+    explicit ErrorousThingLoader(std::string name) : IResourceBuilder(name, name, name) {
     }
 
     virtual ~ErrorousThingLoader() {

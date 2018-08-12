@@ -12,12 +12,3 @@ IAssetRef IResourceBuilder::GetSourceAsset(IResourceManager * const & assman) co
 		return assman->GetAssetFactory()->Get(m_srcName);
     return IAssetRef();
 }
-
-
-//IAssetRef IResourceBuilder::GetAsset(IResourceManager * const & assman, std::string asset)
-//{
-//	if (assman && assman->GetAssetFactory())
-//		return assman->GetAssetFactory()->Get(asset);
-//	return IAssetRef();
-//}
-

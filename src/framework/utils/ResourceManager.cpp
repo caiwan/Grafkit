@@ -66,10 +66,7 @@ void IResourceManager::RemoveByUuid(const std::string& uuid)
     }
 }
 
-void IResourceManager::RemoveAll()
-{
-    m_uuidMap.clear();
-}
+void IResourceManager::RemoveAll() { m_uuidMap.clear(); }
 
 // STL components p115
 struct get_second : std::unary_function<std::map<std::string, Ref<IResource>>::value_type, Ref<IResource>>
@@ -81,12 +78,18 @@ void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const 
 
 void IResourceManager::Load(IResourceBuilder* builder)
 {
-    std::string name = builder->GetUuid();
-    transform(name.begin(), name.end(), name.begin(), tolower);
-
-    auto it = m_uuidMap.find(name);
+    std::string uuid = builder->GetUuid();
 
     // Ha nincs resource, elotoltjuk. 
+    if (uuid.empty())
+    {
+        Reload(builder);
+        return;
+    }
+
+    transform(uuid.begin(), uuid.end(), uuid.begin(), tolower);
+    auto it = m_uuidMap.find(uuid);
+
     if (it == m_uuidMap.end()) { Reload(builder); }
 }
 
@@ -112,7 +115,7 @@ void IResourceManager::Reload(IResourceBuilder* builder)
 {
     IResource* resource = builder->NewResource();
     std::string uuid = builder->GetUuid();
-    if (uuid.empty()) { resource->SetUuid(uuid); }
+    if (!uuid.empty()) { resource->SetUuid(uuid); }
     resource->SetName(builder->GetName());
     Add(resource);
     m_builders[uuid] = builder;

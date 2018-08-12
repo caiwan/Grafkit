@@ -12,8 +12,8 @@ namespace Grafkit
     {
     public:
         Object();
-        explicit Object(const std::string& name, const std::string& uuid);
-        explicit Object(const std::string& name);
+        explicit Object(const std::string& name, const std::string& uuid = "");
+        //explicit Object(const std::string& name);
 
         virtual ~Object();
 

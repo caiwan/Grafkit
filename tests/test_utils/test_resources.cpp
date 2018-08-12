@@ -35,7 +35,7 @@ TEST_F(ResourceManagerTest, TestAddAndGet) {
 	ThingRef thing = new Thing();
 	resource->AssingnRef(thing);
 
-	resource->SetName("theThing");
+	resource->SetUuid("theThing");
 
 	ASSERT_TRUE(resource.Valid() && resource->Valid());
     
@@ -56,7 +56,7 @@ TEST_F(ResourceManagerTest, TestReplace) {
 	ThingResourceRef resource = new ThingResource();
 	resource->AssingnRef(new Thing());
 
-	resource->SetName("theThing");
+	resource->SetUuid("theThing");
 
 	resman->Add(resource);
 
@@ -79,7 +79,7 @@ TEST_F(ResourceManagerTest, TestRemove ) {
 	ThingResourceRef resource = new ThingResource();
 	resource->AssingnRef(new Thing());
 
-	resource->SetName("theThing");
+	resource->SetUuid("theThing");
 
 	ASSERT_TRUE(resource.Valid() && resource->Valid());
 
