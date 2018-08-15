@@ -161,7 +161,7 @@ namespace Grafkit
             : m_lights(nullptr) {
         }
 
-        void AddLight(ActorRef& actor, LightRef& light) { m_lights->AddEntiy(actor, light); }
+        void AddLight(ActorRef& actor, LightRef& light);
 
         size_t GetLightCount() const { return m_lights->GetCount(); };
 
@@ -180,7 +180,9 @@ namespace Grafkit
         inline void InitializeLights();
 
         inline void ShutdownLights();
+
         inline void UpdateLight(Renderer& render, size_t id);
+
         inline void UpdateLights(Renderer& render);
 
         EntityContainer* m_lights;

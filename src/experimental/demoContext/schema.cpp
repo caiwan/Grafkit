@@ -199,6 +199,7 @@ void SchemaBuilder::BuildAnimation(IResourceManager* const & resourceManager, co
     std::string name = animationJson.at("name");
     std::string uuid = animationJson.at("uuid");
     std::string targetUuid = animationJson.at("target");
+    LOGGER(Log::Logger().Info("-- Animation %s %s uuid=%s target=%s ", type.c_str(), name.c_str(), uuid.c_str(), targetUuid.c_str()));
     if (type.compare("actor") == 0) { resourceManager->Load<Resource<Animation>>(new ActorAnimationLoader(name, "animations/" + uuid, uuid, targetUuid)); }
     if (type.compare("demo") == 0) { resourceManager->Load<Resource<Animation>>(new DemoAnimationLoader(name, "animations/" + uuid, uuid, targetUuid)); }
 }
@@ -385,6 +386,9 @@ void SchemaBuilder::Initialize(IResourceManager*const& resourceManager) {
 
     if (m_inited)
         return;
+
+    LOGGER(Log::Logger().Info("Initializing"));
+
 
     const Json assetsJson = m_json.at("assets");
     AssignAssets(resourceManager, assetsJson);
