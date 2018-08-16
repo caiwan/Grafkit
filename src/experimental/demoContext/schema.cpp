@@ -34,6 +34,7 @@
 #include "json_fwd.hpp"
 #include "animation/actoranimation.h"
 #include "json.hpp"
+
 #include "DemoAnimationLoader.h"
 
 using namespace GkDemo;
