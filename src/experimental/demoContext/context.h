@@ -17,7 +17,7 @@ namespace GkDemo
 
         void Relocate(std::string path);
         
-        void SaveScema();
+        void SaveSchema();
         void LoadScema();
 
         void Intitialize();

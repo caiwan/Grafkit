@@ -58,7 +58,7 @@ void Context::Relocate(std::string path)
     // LOGGER(Log::Logger().Info("Relocate context path %s", path.c_str()));
 }
 
-void Context::SaveScema() {
+void Context::SaveSchema() {
 }
 
 void Context::LoadScema() {

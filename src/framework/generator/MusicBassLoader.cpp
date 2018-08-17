@@ -13,13 +13,15 @@ using namespace FWdebugExceptions;
 /// ====================================================================================================================================================
 /// Bass music class implementation
 /// ====================================================================================================================================================
-namespace {
-
-    class MusicBass : public Music {
-
+namespace
+{
+    class MusicBass : public Music
+    {
     public:
         MusicBass();
         virtual ~MusicBass(void);
+
+        static bool InitializeBass();
 
         void Initialize(IAssetRef asset) override;
         void Shutdown() override;
@@ -39,7 +41,7 @@ namespace {
         int IsPlaying() override;
 
         void GetFFT(float* ptr, int segcount) override;
-        void GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t& samplePerSec) override;
+        void GetWaveform(float*& ptr, size_t& length, size_t& channelCount, size_t& samplePerSec) override;
 
     protected:
         //HSTREAM m_sample;
@@ -53,7 +55,6 @@ namespace {
         uint64_t m_length;
         uint64_t m_samplePerSec;
         uint64_t m_bytesPerSample;
-
     };
 
     MusicBass::MusicBass() : Music()
@@ -63,31 +64,28 @@ namespace {
         , m_isMute(false) {
     }
 
-    MusicBass::~MusicBass(void)
-    {
-        Shutdown();
-    }
+    MusicBass::~MusicBass() { MusicBass::Shutdown(); }
 
-    void MusicBass::Initialize(IAssetRef asset)
+    bool MusicBass::InitializeBass()
     {
-        m_asset = asset;
-        const void* data = m_asset->GetData();
-        const size_t dataSize = m_asset->GetSize();
+        static bool isInitied = false;
+        static bool isNosound = false;
 
-        // TODO: Put init to static or something
+        if (isInitied)
+            return isNosound;
 
         int res = BASS_Init(-1, 44100, 0, nullptr, nullptr);
 
-        bool isNosound = false;
-        if (!res) {
-
+        if (!res)
+        {
             // ignore sound if no sound device detected or installed
             const int errorCode = BASS_ErrorGetCode();
 
             // hack something around error codes
             if (errorCode != BASS_ERROR_ALREADY)
             {
-                if (errorCode == BASS_ERROR_DEVICE) {
+                if (errorCode == BASS_ERROR_DEVICE)
+                {
                     res = BASS_Init(0, 44100, 0, nullptr, nullptr);
                     isNosound = true;
                 }
@@ -99,16 +97,25 @@ namespace {
             }
         }
 
+        isInitied = true;
+
+        return isNosound;
+    }
+
+    void MusicBass::Initialize(IAssetRef asset)
+    {
+        m_asset = asset;
+        const void* data = m_asset->GetData();
+        const size_t dataSize = m_asset->GetSize();
+
+        bool isNosound = InitializeBass();
+
         m_sample = BASS_SampleLoad(true, data, 0, dataSize, 1, BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) | 0);
 
-        //m_sample = BASS_StreamCreateFile(TRUE, data, 0, dataSize,
-        //	BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) |
-        //	0
-        //);
-
-        if (!m_sample) {
+        if (!m_sample)
+        {
             int errcode = BASS_ErrorGetCode();
-            LOGGER(Log::Logger().Error("Failed to laod music. BASS Error code: %d", errcode));
+            LOGGER(Log::Logger().Error("Failed to load music. BASS Error code: %d", errcode));
             THROW_EX(MusicDeviceInitException);
         }
 
@@ -119,29 +126,33 @@ namespace {
         BASS_CHANNELINFO info;
         BASS_ChannelGetInfo(m_channel, &info);
 
+        //LOGGER(Log::Logger().Info("BASS sm: %d ch: %d ", m_sample, m_channel));
+
         m_length = BASS_ChannelGetLength(m_channel, BASS_POS_BYTE);
 
         // length in byte -> samples 
         int sstride = 2;
-        if (info.flags & BASS_SAMPLE_8BITS) sstride = 1; else if (info.flags & BASS_SAMPLE_FLOAT) sstride = 4;
+        if (info.flags & BASS_SAMPLE_8BITS)
+            sstride = 1;
+        else if (info.flags & BASS_SAMPLE_FLOAT)
+            sstride = 4;
 
         m_samplePerSec = info.freq;
         m_bytesPerSample = sstride * info.chans;
-
     }
 
     void MusicBass::Shutdown()
     {
+        //LOGGER(Log::Logger().Info("BASS Close sm: %d ch: %d ", m_sample, m_channel));
+
         BASS_ChannelStop(m_channel);
         BASS_SampleFree(m_sample);
-        BASS_Stop();
-        BASS_Free();
+        //TODO: screw this
+        //BASS_Stop();
+        //BASS_Free();
     }
 
-    void MusicBass::Play()
-    {
-        BASS_ChannelPlay(m_channel, 1);
-    }
+    void MusicBass::Play() { BASS_ChannelPlay(m_channel, 1); }
 
     void MusicBass::Stop()
     {
@@ -152,18 +163,14 @@ namespace {
     void MusicBass::Pause(int e)
     {
         const int b = IsPlaying();
-        if (!b && !e) {
-            BASS_ChannelPlay(m_channel, 0);
-        }
-        else {
-            BASS_ChannelPause(m_channel);
-        }
+        if (!b && !e) { BASS_ChannelPlay(m_channel, 0); }
+        else { BASS_ChannelPause(m_channel); }
+
+        //int errorCode = BASS_ErrorGetCode();
+        //LOGGER(Log::Logger().Trace("BASS Play/Pause: %d Code: %d ch:%d", !b && !e, errorCode, m_channel));
     }
 
-    void MusicBass::Update()
-    {
-        BASS_Update(0);
-    }
+    void MusicBass::Update() { BASS_Update(0); }
 
     void MusicBass::ToggleMute()
     {
@@ -181,20 +188,11 @@ namespace {
         return position;
     }
 
-    void MusicBass::SetTimeSample(uint64_t t)
-    {
-        BASS_ChannelSetPosition(m_channel, t * m_bytesPerSample, BASS_POS_BYTE);
-    }
+    void MusicBass::SetTimeSample(uint64_t t) { BASS_ChannelSetPosition(m_channel, t * m_bytesPerSample, BASS_POS_BYTE); }
 
-    void MusicBass::SetLoop(int e)
-    {
-        BASS_ChannelFlags(m_channel, BASS_SAMPLE_LOOP * e, BASS_SAMPLE_LOOP);
-    }
+    void MusicBass::SetLoop(int e) { BASS_ChannelFlags(m_channel, BASS_SAMPLE_LOOP * e, BASS_SAMPLE_LOOP); }
 
-    int MusicBass::IsPlaying()
-    {
-        return BASS_ChannelIsActive(m_channel) == BASS_ACTIVE_PLAYING;
-    }
+    int MusicBass::IsPlaying() { return BASS_ChannelIsActive(m_channel) == BASS_ACTIVE_PLAYING; }
 
     // taken from Gargaj 
     // https://github.com/Gargaj/Bonzomatic/blob/e1aa90ba5c47a6aa61bcf754a634d09e2ef23f81/src/platform_common/FFT.cpp#L28
@@ -232,11 +230,11 @@ namespace {
             return;
         }
 
-        /*const int numBytes =*/ BASS_ChannelGetData(m_channel, ptr, len | BASS_DATA_FFT_REMOVEDC);
-
+        /*const int numBytes =*/
+        BASS_ChannelGetData(m_channel, ptr, len | BASS_DATA_FFT_REMOVEDC);
     }
 
-    void MusicBass::GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t &samplePerSec)
+    void MusicBass::GetWaveform(float*& ptr, size_t& length, size_t& channelCount, size_t& samplePerSec)
     {
         length = 0;
         ptr = nullptr;
@@ -245,12 +243,12 @@ namespace {
         BASS_SAMPLE sampleInfo;
         if (!BASS_SampleGetInfo(m_sample, &sampleInfo))
         {
-            LOGGER(Log::Logger().Error("Could not get sample info. BASS ERROR: %d", BASS_ErrorGetCode()));
+            LOGGER(Log::Logger().Error("Could not get sample info. BASS ERROR: %d BASS sm: %d ch: %d", BASS_ErrorGetCode(), m_sample, m_channel));
             return;
         }
 
         const size_t tmpbuflen = sampleInfo.length;
-        uint8_t *const tmpbuf = new uint8_t[tmpbuflen];
+        uint8_t*const tmpbuf = new uint8_t[tmpbuflen];
 
         if (BASS_SampleGetData(m_sample, tmpbuf))
         {
@@ -261,27 +259,16 @@ namespace {
             size_t buflen = length * channelCount;
             ptr = new float[buflen];
 
-            if (sampleInfo.flags & BASS_SAMPLE_8BITS)
-            {
-                for (size_t i = 0; i < buflen; ++i)
-                {
-                    ptr[i] = tmpbuf[i] / 256.f;
-                }
-            }
-            else if (sampleInfo.flags & BASS_SAMPLE_FLOAT)
-            {
-                memcpy(ptr, tmpbuf, buflen);
-            }
+            if (sampleInfo.flags & BASS_SAMPLE_8BITS) { for (size_t i = 0; i < buflen; ++i) { ptr[i] = tmpbuf[i] / 256.f; } }
+            else if (sampleInfo.flags & BASS_SAMPLE_FLOAT) { memcpy(ptr, tmpbuf, buflen); }
             else // 16 bit per sample
             {
-                uint16_t *const tmpbuf16 = reinterpret_cast<uint16_t *>(tmpbuf);
-                for (size_t i = 0; i < buflen; ++i)
-                {
-                    ptr[i] = tmpbuf16[i] / 65536.f;
-                }
+                uint16_t*const tmpbuf16 = reinterpret_cast<uint16_t *>(tmpbuf);
+                for (size_t i = 0; i < buflen; ++i) { ptr[i] = tmpbuf16[i] / 65536.f; }
             }
         }
-        else {
+        else
+        {
             LOGGER(Log::Logger().Error("Could not read waveform data. BASS ERROR: %d", BASS_ErrorGetCode()));
         }
 
@@ -290,21 +277,20 @@ namespace {
 }
 
 
-
 /// ====================================================================================================================================================
 /// Factory class implementation
 /// ====================================================================================================================================================
-MusicBassLoader::MusicBassLoader(const std::string& sourceName) : IResourceBuilder(sourceName, sourceName)
-{
+MusicBassLoader::MusicBassLoader(const std::string& sourceName) : IResourceBuilder(sourceName, sourceName) {
 }
 
 MusicBassLoader::~MusicBassLoader()
 = default;
 
-void MusicBassLoader::Load(IResourceManager * const & resman, IResource * source)
+void MusicBassLoader::Load(IResourceManager* const & resman, IResource* source)
 {
     MusicResRef dest = dynamic_cast<MusicRes*>(source);
-    if (dest.Invalid()) {
+    if (dest.Invalid())
+    {
         THROW_EX(NullPointerException);
     }
 
@@ -316,7 +302,4 @@ void MusicBassLoader::Load(IResourceManager * const & resman, IResource * source
     dest->AssingnRef(music);
 }
 
-IResource * MusicBassLoader::NewResource()
-{
-    return new MusicRes();
-}
+IResource* MusicBassLoader::NewResource() { return new MusicRes(); }
