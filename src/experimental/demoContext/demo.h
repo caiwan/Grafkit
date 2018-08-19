@@ -39,11 +39,16 @@ namespace GkDemo
         uint32_t GetActiveSceneId() const { return m_activeSceneId; }
         void SetActiveSceneId(const uint32_t activeSceneId) { m_activeSceneId = activeSceneId; }
 
+        uint32_t GetActiveCameraId() const { return m_activeCameraId; }
+        void SetActiveCameraId(const uint32_t activeCameraId);
+
         Grafkit::MusicResRef GetMusic() const;
         void SetMusic(const Grafkit::MusicResRef& resource);
 
         void AddScene(uint32_t id, const Grafkit::SceneResRef& ref);
         size_t GetSceneCount() const { return m_scenes.size(); }
+
+        void AddCameraId(uint32_t sceneId, std::string uuid, uint32_t cameraId);
 
         Grafkit::SceneResRef GetScene(size_t id) const { return m_scenes.at(id); }
     private:
@@ -55,7 +60,11 @@ namespace GkDemo
         //Grafkit::ShaderResRef m_psShowUv;
         Grafkit::EffectComposerRef m_effect;
 
+        //std::vector<std::pair<uint32_t, std::string>> m_cameraIDs;
+        std::map<std::pair<uint32_t, uint32_t>, std::pair<std::string, uint32_t>> m_cameraIDs; // sceneId, globalCameraId -> uuid, localCameraId
+
         uint32_t m_activeSceneId;
+        uint32_t m_activeCameraId;
     };
 
     class DemoAnimation : public Grafkit::Animation
@@ -68,10 +77,14 @@ namespace GkDemo
         void Initialize() override;
         void Update(double time) override;
 
+        void SetTarget(const Ref<Demo>& target) { m_target = target; }
+        Ref<Demo> GetTarget() const { return m_target; }
+
         PERSISTENT_DECL(GkDemo::DemoAnimation, 1);
 
     private:
         TrackRef m_activeScene;
+        TrackRef m_activeCamera;
         Ref<Demo> m_target;
 
     protected:

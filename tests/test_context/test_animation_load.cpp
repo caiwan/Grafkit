@@ -26,6 +26,7 @@ using namespace GkDemo;
 using namespace Grafkit;
 
 #define ASSET_ROOT "tests/assets/"
+#define ANIMATION_ROOT "animation/"
 #define ANIMATION "testActorAnimation.anim"
 #define ANIMATION_PATH ASSET_ROOT ANIMATION
 
@@ -199,7 +200,7 @@ TEST_F(AnimationLoadTest, CreateEmptyTest)
     ASSERT_STREQ("Scaling", animation->GetTrack(2)->GetName().c_str());
 }
 
-TEST_F(AnimationLoadTest, LoadCacheTest)
+TEST_F(AnimationLoadTest, LoadAnimation)
 {
     // given
     SaveTestData();
@@ -220,7 +221,71 @@ TEST_F(AnimationLoadTest, LoadCacheTest)
     ValidateActrorAnimation(m_animation, animation);
 }
 
-TEST_F(AnimationLoadTest, DISABLED_SaveCacheTest)
+// Load dome pre-existing naimation, due a previous error 
+
+namespace
 {
-    FAIL("Not implemented");
+    const char *animationFileNames[] = {
+        "19ff02df-04d5-49a4-a091-bd92f185316b.1",
+        "353732c5-de20-4180-831c-481b0d3caa460.1",
+        "ad29899f-5424-49dd-b821-3a9644dfd41a.1"
+    };
+
+    const char *animationUuids[] = {
+        "19ff02df-04d5-49a4-a091-bd92f185316b",
+        "353732c5-de20-4180-831c-481b0d3caa460",
+        "ad29899f-5424-49dd-b821-3a9644dfd41a"
+    };
+
+    const char *trackNames[] = {
+        "Position",
+        "Rotation",
+        "Scaling"
+    };
+}
+
+TEST_F(AnimationLoadTest, LoadPreexistingAnimation)
+{
+    // given
+    
+    std::list<Ref<Resource<ActorAnimation>>> resources;
+    for (std::string fileName : animationFileNames)
+    {
+        std::string path = ANIMATION_ROOT + fileName;
+        resources.push_back(m_context->Load<Resource<ActorAnimation>>(new ActorAnimationLoader("", path.c_str(), "" )));   
+    }
+
+    // when
+    m_context->DoPrecalc();
+
+    // then
+    size_t index = 0;
+    for (Ref<Resource<ActorAnimation>>resource : resources )
+    {
+        ASSERT_TRUE(resource) << "Animation id:" << index;
+        ASSERT_TRUE(*resource) << "Animation id:" << index;
+
+        ActorAnimationRef animation = static_cast<Ref<ActorAnimation>>(*resource);
+    
+        size_t trackCount = animation->GetTrackCount();
+        ASSERT_EQ(3, trackCount) << "Animation id:" << index;
+        for (size_t i = 0; i< trackCount; i++)
+        {
+            Ref<Animation::Track> track = animation->GetTrack(i);
+            ASSERT_TRUE(track);
+            ASSERT_STREQ(trackNames[i], track->GetName().c_str()) << "Animation id:" << index << "Track id:" << i;
+
+            size_t channelCount = track->GetChannelCount();
+            ASSERT_NE(0, channelCount); 
+            for (size_t j= 0; j< channelCount;j++)
+            {
+                Ref<Animation::Channel> channel = track->GetChannel(j);
+                ASSERT_TRUE(channel);
+                ASSERT_NE(0, channel->GetKeyCount());
+            }
+        }
+
+        index++;
+    }
+
 }

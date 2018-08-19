@@ -24,11 +24,11 @@ DemoAnimationLoader::DemoAnimationLoader(std::string name, std::string sourcenam
 }
 
 IResource* DemoAnimationLoader::NewResource() {
-    return new Resource<GkDemo::DemoAnimation>();
+    return new Resource<DemoAnimation>();
 }
 
 void DemoAnimationLoader::Load(IResourceManager* const& resman, IResource* source) {
-    Ref<Resource<GkDemo::DemoAnimation>> dstAnimation = dynamic_cast<Resource<DemoAnimation>*>(source);
+    Ref<Resource<DemoAnimation>> dstAnimation = dynamic_cast<Resource<DemoAnimation>*>(source);
     assert(dstAnimation);
 
     Ref<DemoAnimation> animation;

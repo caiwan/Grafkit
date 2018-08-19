@@ -82,7 +82,13 @@ public:
             IAssetFactory* af = m_context->GetAssetFactory();
             IAssetRef file = af->Get(JSON_PATH);
             builder.LoadFromAsset(file, dynamic_cast<IResourceManager*>(m_context));
+
             m_demo = builder.GetDemo();
+
+            m_context->DoPrecalc();
+            builder.Initialize(m_context);
+
+            //m_context->Intitialize();
         }
         catch (std::exception& e)
         {
@@ -133,9 +139,7 @@ TEST_F(ContextPregnancyTest, JsonLoad)
     ASSERT_TRUE(m_demo.Valid());
 
     // when
-    m_context->DoPrecalc();
-
-    m_demo->Initialize(m_render);
+    
 
     // then
     ASSERT_EQ(1, m_demo->GetSceneCount());
@@ -151,7 +155,6 @@ TEST_F(ContextPregnancyTest, JsonLoad)
     ASSERT_EQ(1, m_demo->GetAnimationCount());
     ASSERT_TRUE(m_demo->GetAnimation(0));
 }
-
 TEST_F(ContextPregnancyTest, SceneActorTest)
 {
     // given: context

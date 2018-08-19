@@ -37,13 +37,16 @@
 
 #include "DemoAnimationLoader.h"
 
+#define ANIMATION_ROOT "animation/"
+
 using namespace GkDemo;
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 using json = nlohmann::json;
 
-SchemaBuilder::SchemaBuilder() : m_demo(nullptr),m_inited(false) {
+SchemaBuilder::SchemaBuilder() : m_demo(nullptr)
+    , m_inited(false) {
 }
 
 SchemaBuilder::~SchemaBuilder() {
@@ -51,7 +54,7 @@ SchemaBuilder::~SchemaBuilder() {
 
 /* ======================================================================
  * Loading stuff
- * ======================================================================  
+ * ======================================================================
 */
 
 void SchemaBuilder::LoadFromAsset(const IAssetRef& asset, IResourceManager* resourceManager)
@@ -141,7 +144,6 @@ void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& j
     // effects ?
 
     m_inited = false;
-
 }
 
 void SchemaBuilder::BuildResources(IResourceManager*const& resourceManager, const Json& json)
@@ -201,8 +203,8 @@ void SchemaBuilder::BuildAnimation(IResourceManager* const & resourceManager, co
     std::string uuid = animationJson.at("uuid");
     std::string targetUuid = animationJson.at("target");
     LOGGER(Log::Logger().Info("-- Animation %s %s uuid=%s target=%s ", type.c_str(), name.c_str(), uuid.c_str(), targetUuid.c_str()));
-    if (type.compare("actor") == 0) { resourceManager->Load<Resource<Animation>>(new ActorAnimationLoader(name, "animations/" + uuid, uuid, targetUuid)); }
-    if (type.compare("demo") == 0) { resourceManager->Load<Resource<Animation>>(new DemoAnimationLoader(name, "animations/" + uuid, uuid, targetUuid)); }
+    if (type.compare("actor") == 0) { resourceManager->Load<Resource<Animation>>(new ActorAnimationLoader(name, ANIMATION_ROOT + uuid, uuid, targetUuid)); }
+    if (type.compare("demo") == 0) { resourceManager->Load<Resource<Animation>>(new DemoAnimationLoader(name, ANIMATION_ROOT + uuid, uuid, targetUuid)); }
 }
 
 void SchemaBuilder::BuildMesh(IResourceManager*const& resourceManager, const Json& json)
@@ -321,7 +323,6 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
         LOGGER(Log::Logger().Info("-- Loading shaders"));
         for (Json::const_iterator shaderIt = shaders.begin(); shaderIt != shaders.end(); ++shaderIt) { BuildShader(resourceManager, *shaderIt); }
     }
-
 }
 
 void SchemaBuilder::BuildSceneGraphs(IResourceManager*const& resourceManager, const Json& json)
@@ -381,7 +382,8 @@ void SchemaBuilder::BuildEffects(IResourceManager*const& resourceManager, const 
 /*
  * Wiring stuff together
  */
-void SchemaBuilder::Initialize(IResourceManager*const& resourceManager) { 
+void SchemaBuilder::Initialize(IResourceManager*const& resourceManager)
+{
     if (m_json.empty() || m_json.is_discarded())
         return;
 
@@ -403,17 +405,18 @@ void SchemaBuilder::Initialize(IResourceManager*const& resourceManager) {
     {
         const Json sceneJson = *scenesIt;
         std::string uuid = sceneJson.at("uuid");
-        uint32_t id = sceneJson.at("id").get<uint32_t>();
+        uint32_t sceneId = sceneJson.at("id").get<uint32_t>();
 
         SceneResRef scene = resourceManager->GetByUuid<SceneRes>(uuid);
 
         if (scene && scene->Valid())
         {
-            m_demo->AddScene(id, scene);
-            AssignAnimations(resourceManager,sceneJson);
+            m_demo->AddScene(sceneId, scene);
+            AssignAnimations(resourceManager, sceneJson);
+            AssignCamerasToScene(resourceManager, sceneJson, sceneId);
         }
 
-        AssignAnimations(resourceManager,demoJson);
+        AssignAnimations(resourceManager, demoJson);
     }
 
     AssignShader(resourceManager, demoJson.at("render").at("forward"));
@@ -421,7 +424,21 @@ void SchemaBuilder::Initialize(IResourceManager*const& resourceManager) {
     m_inited = true;
 }
 
-void SchemaBuilder::AssignAnimations(IResourceManager* const& resourceManager, const Json & json)
+void SchemaBuilder::AssignCamerasToScene(IResourceManager* const & resourceManager, const Json& sceneJson, const uint32_t& sceneId)
+{
+    const Json camerasJson = sceneJson["cameras"];
+    if (camerasJson.empty())
+        return;
+
+    for (Json::const_iterator cameraIt = camerasJson.begin(); cameraIt != camerasJson.end(); ++cameraIt)
+    {
+        std::string cameraUuid = cameraIt->at("uuid").get<std::string>();
+        uint32_t cameraId = cameraIt->at("id").get<uint32_t>();
+        m_demo->AddCameraId(sceneId, cameraUuid, cameraId);
+    }
+}
+
+void SchemaBuilder::AssignAnimations(IResourceManager* const& resourceManager, const Json& json)
 {
     const Json animationsJson = json.at("animations");
 
@@ -445,7 +462,8 @@ void SchemaBuilder::AssignAnimations(IResourceManager* const& resourceManager, c
                 assert(*scene);
                 (*animation)->SetActor(static_cast<Ref<Actor>>(*actor));
                 (*scene)->AddAnimation(*animation);
-            } else
+            }
+            else
             {
                 assert(0);
             }
@@ -453,6 +471,7 @@ void SchemaBuilder::AssignAnimations(IResourceManager* const& resourceManager, c
         if (type.compare("demo") == 0)
         {
             Ref<Resource<DemoAnimation>> animation = resourceManager->GetByUuid<Resource<DemoAnimation>>(uuid);
+            (*animation)->SetTarget(m_demo);
             m_demo->AddAnimation(*animation);
         }
     }
@@ -555,6 +574,7 @@ void SchemaBuilder::ExtractEntities(IResourceManager*const& resourceManager, con
             Ref<IResource> entityRes = resourceManager->GetByUuid<IResource>(uuid);
             if (entityRes.Valid())
             {
+                // damn terrible hack
                 Ref<Entity3D> entityRef = dynamic_cast<Entity3D*>(reinterpret_cast<Object*>(entityRes->GetRaw()));
                 if (entityRef.Valid())
                 {

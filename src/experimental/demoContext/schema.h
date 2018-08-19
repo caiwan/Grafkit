@@ -27,28 +27,29 @@ namespace GkDemo
     protected:
         void Build(Grafkit::IResourceManager*const& resourceManager, const Json& json);
         void BuildResources(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        static void BuildAssets(Grafkit::IResourceManager*const& resourceManager, const Json& assets);
+        static void BuildScene(Grafkit::IResourceManager* const & resourceManager, const Json& sceneJson);
+        static void BuildAnimation(Grafkit::IResourceManager* const & resourceManager, const Json& sceneJson);
 
-        void AssignShader(Grafkit::IResourceManager* const & resourceManager, Json sceneJson);
+        static void BuildObject(const Json& json, const Ref<Grafkit::Object>& ref);
+
+        static void BuildMesh(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        static void BuildMaterial(Grafkit::IResourceManager* const & resourceManager, const Json& it);
+        static void BuildShader(Grafkit::IResourceManager* const & resourceManager, const Json shader);
+        void BuildSceneGraphs(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        void BuildEffects(Grafkit::IResourceManager*const& resourceManager, const Json& effects);
+
+        // --- 
+
         void AssignAnimations(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        void AssignCamerasToScene(Grafkit::IResourceManager* const &resourceManager, const Json &sceneJson, const uint32_t &sceneId);
+        void AssignShader(Grafkit::IResourceManager* const & resourceManager, Json sceneJson);
 
-        void BuildScene(Grafkit::IResourceManager* const & resourceManager, const Json& sceneJson);
-        void BuildAnimation(Grafkit::IResourceManager* const & resourceManager, const Json& sceneJson);
-
-        void BuildAssets(Grafkit::IResourceManager*const& resourceManager, const Json& assets);
         void AssignModel(Grafkit::IResourceManager*const& resourceManager, const Json& json);
-
         void AssignAssets(Grafkit::IResourceManager*const& resourceManager, const Json& json);
 
         void ExtractActorParent(Grafkit::IResourceManager*const& resourceManager, const Json& json, const Grafkit::ActorRef& actorRef);
         void ExtractEntities(Grafkit::IResourceManager*const& resourceManager, const Json& json, Grafkit::ActorRef& actorRef);
-
-        void BuildObject(const Json& json, const Ref<Grafkit::Object>& ref);
-
-        void BuildMesh(Grafkit::IResourceManager*const& resourceManager, const Json& json);
-        void BuildMaterial(Grafkit::IResourceManager* const & resourceManager, const Json& it);
-        void BuildShader(Grafkit::IResourceManager* const & resourceManager, const Json shader);
-        void BuildSceneGraphs(Grafkit::IResourceManager*const& resourceManager, const Json& json);
-        void BuildEffects(Grafkit::IResourceManager*const& resourceManager, const Json& effects);
 
     private:
         Ref<Demo> m_demo;

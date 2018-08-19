@@ -27,17 +27,20 @@
 #include "schema.h"
 
 #include "builtin_data/cube.h"
+#include "utils/persistence/archive.h"
 
 using namespace Grafkit;
 using namespace GkDemo;
 using namespace GrafkitData;
 
+#define ANIMATION_ROOT "animation/"
+
 
 Context::Context(Renderer& render, IAssetFactory* assetFactory) : ResourcePreloader()
-    , ClonableInitializer()
-    , m_render(render)
-    , m_demo(nullptr)
-    , m_assetFactory(assetFactory) {
+, ClonableInitializer()
+, m_render(render)
+, m_demo(nullptr)
+, m_assetFactory(assetFactory) {
 }
 
 Context::~Context() = default;
@@ -49,6 +52,8 @@ void Context::Relocate(std::string path)
 
     LOGGER(Log::Logger().Info("Relocate context path %s", path.c_str()));
 
+    m_myBasePath = path;
+
     m_assetFactory->SetBasePath(path);
     delete m_demo;
     m_demo = nullptr;
@@ -56,7 +61,40 @@ void Context::Relocate(std::string path)
     this->RemoveAll();
 }
 
-void Context::SaveSchema() {
+void Context::SaveSchema(bool isAutoSave) const
+{
+    //std::list<Ref<IResource>> resources;
+    //this->GetAllResources(resources);
+
+    //for (Ref<IResource>resource : resources)
+    //{
+    //    //Resource<Object>* objectResource = dynamic_cast<Resource<Object>*>(resource.Get());
+    //    const type_info & tid = resource->GetTpyeId();
+    //    LOGGER(Log::Logger().Debug("Resource: %s", tid.raw_name()));
+    //}
+
+    size_t animationCount = m_demo->GetAnimationCount();
+    AnimationRef animation;
+    for (size_t i = 0; i < animationCount; i++)
+    {
+        animation = m_demo->GetAnimation(i);
+        SaveObject(animation, ANIMATION_ROOT, isAutoSave);
+    }
+    size_t sceneCount = m_demo->GetSceneCount();
+    for (size_t i = 0; i < sceneCount; i++)
+    {
+        SceneResRef scene = m_demo->GetScene(i);
+        if (!scene || !*scene)
+            continue;
+        size_t sceneAnimationCount = (*scene)->GetAnimationCount();
+        for (size_t j = 0; j < sceneAnimationCount; j++)
+        {
+            animation = (*scene)->GetAnimation(j);
+            SaveObject(animation, ANIMATION_ROOT, isAutoSave);
+        }
+
+        // models + meshes?
+    }
 }
 
 void Context::LoadScema()
@@ -167,14 +205,14 @@ void Context::CreateTestStuff()
 
                     Animation::Key key(t, v);
                     key.m_type = Animation::KI_hermite;
-    //key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
+                    //key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
                     channel->AddKey(key);
 
-    //Animation::Key key2(t + .5, 0.);
-    //key2.m_type = Animation::KI_step;
-    //channel->AddKey(key2);
+                    //Animation::Key key2(t + .5, 0.);
+                    //key2.m_type = Animation::KI_step;
+                    //channel->AddKey(key2);
                 }
-            }
+}
         }
 
     }
@@ -184,4 +222,26 @@ void Context::CreateTestStuff()
     demo->AddScene(0, scene);
 
     m_demo = demo;
+}
+
+void Context::SaveObject(const Ref<Object>& ref, const char* path, bool isAutoSave) const {
+    FILE * fp = nullptr;
+
+    std::string savepath = m_myBasePath + "/" + path + ref->GetUuid();
+    if (isAutoSave)
+        savepath = savepath + ".autosave";
+
+    errno_t err = fopen_s(&fp, savepath.c_str(), "wb");
+
+    if (0 == err)
+    {
+        ArchiveFile archive(fp, true);
+        ref->Store(archive);
+        fflush(fp);
+        fclose(fp);
+    } else
+    {
+        assert(0);
+    }
+
 }

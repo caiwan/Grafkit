@@ -541,4 +541,7 @@ TEST_F(SchemaTest, DemoAnimation)
 
     ASSERT_EQ(1, m_demo->GetAnimationCount());
     ASSERT_EQ((*demoAnimation).Get(), m_demo->GetAnimation(0).Get());
+
+    ASSERT_TRUE((*demoAnimation)->GetTarget());
+    ASSERT_EQ((*demoAnimation)->GetTarget().Get(), m_demo.Get());
 }

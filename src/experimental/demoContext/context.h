@@ -17,8 +17,8 @@ namespace GkDemo
 
         void Relocate(std::string path);
         
-        void SaveSchema();
         void LoadScema();
+        void SaveSchema(bool isAutoSave = false) const;
 
         void Intitialize();
 
@@ -37,8 +37,10 @@ namespace GkDemo
         Grafkit::IAssetFactory* m_assetFactory;
 
         SchemaBuilder m_builder;
+        std::string m_myBasePath;
         //SchemaExport m_exporter;
 
+        void SaveObject(const Ref<Grafkit::Object>& ref, const char* str, bool isAutoSave) const;
     };
 
 

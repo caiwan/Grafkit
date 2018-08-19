@@ -41,4 +41,10 @@ void ActorAnimation::Initialize()
     m_scale->SetFloat3(0, float3(1, 1, 1));
 }
 
-void ActorAnimation::Serialize(Archive& ar) { ActorAnimation::_Serialize(ar); }
+void ActorAnimation::Serialize(Archive& ar)
+{
+    ActorAnimation::_Serialize(ar);
+    m_position = m_tracks[0];
+    m_rotation = m_tracks[1];
+    m_scale = m_tracks[2];
+}

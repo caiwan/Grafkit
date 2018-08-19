@@ -2,6 +2,8 @@
 
 #include "modules/curveEditor/CurvePointEditor.h"
 
+#include <QDebug>
+
 using namespace Grafkit;
 using namespace Idogep;
 
@@ -21,12 +23,15 @@ void CurveKeyChangeCommand::Do()
 {
     m_channel->SetKey(m_id, m_newKey);
     m_controller->UpdateKey(m_channel, m_id, m_newKey);
+
+    qDebug() << "Do change key" << m_id << "target channel: " << m_channel.Get();
 }
 
 void CurveKeyChangeCommand::Undo()
 {
     m_channel->SetKey(m_id, m_oldKey);
     m_controller->UpdateKey(m_channel, m_id, m_oldKey);
+    qDebug() << "Undo change key" << m_id << "target channel: " << m_channel.Get();
 }
 
 
@@ -44,10 +49,13 @@ void CurveChangeCommand::Do()
 {
     m_track->SetChannel(m_id, m_newChannel);
     m_controller->UpdateChannel(m_track, m_id, m_newChannel);
+    qDebug() << "Do channel key" << m_id << "target track: " << m_track.Get();
 }
 
 void CurveChangeCommand::Undo()
 {
     m_track->SetChannel(m_id, m_oldChannel);
     m_controller->UpdateChannel(m_track, m_id, m_oldChannel);
+    qDebug() << "Do channel key" << m_id << "target track: " << m_track.Get();
+
 }

@@ -5,6 +5,7 @@ A generator interface for assets
 #pragma once
 
 #include <string>
+#include <typeinfo>
 
 #include "core/Object.h"
 
@@ -34,8 +35,13 @@ namespace Grafkit {
 
         virtual ~IResource();
 
-        virtual void* GetRaw() = 0;
+        virtual void* GetRaw() const = 0;
+        virtual const type_info& GetTpyeId() const = 0;
 
+        template<typename T2> Ref<T2> SafeDynamicCast() const
+        {
+            return nullptr;
+        }
     };
 
     /**
@@ -61,9 +67,11 @@ namespace Grafkit {
 
         explicit operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
         explicit operator T * const & () { return dynamic_cast<T*>(this->Get()); }
-        explicit operator T& () { return *(this->Get()); }
+        explicit operator T& () { return *this->Get(); }
 
-        void* GetRaw() override { return this->Get(); }
+        void* GetRaw() const override { return this->Get(); }
+
+        const type_info & GetTpyeId() const override { return typeid(*this->Get()); }
 
     protected:
         void Serialize(Archive& ar) override;

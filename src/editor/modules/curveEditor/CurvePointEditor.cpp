@@ -92,9 +92,9 @@ void CurvePointEditor::UpdateChannel(const Animation::TrackRef & track, size_t c
     if (m_track != track || channelId != m_channelId)
         return;
 
-    //m_channel = channel;
-    m_channel->Clear();
-    channel->CopyTo(m_channel, 0, channel->GetKeyCount());
+    m_channel = channel;
+    //m_channel->Clear();
+    //channel->CopyTo(m_channel, 0, channel->GetKeyCount());
     
     Rebuild();
     onUpdateChannel();
