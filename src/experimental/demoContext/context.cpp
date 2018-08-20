@@ -63,16 +63,6 @@ void Context::Relocate(std::string path)
 
 void Context::SaveSchema(bool isAutoSave) const
 {
-    //std::list<Ref<IResource>> resources;
-    //this->GetAllResources(resources);
-
-    //for (Ref<IResource>resource : resources)
-    //{
-    //    //Resource<Object>* objectResource = dynamic_cast<Resource<Object>*>(resource.Get());
-    //    const type_info & tid = resource->GetTpyeId();
-    //    LOGGER(Log::Logger().Debug("Resource: %s", tid.raw_name()));
-    //}
-
     size_t animationCount = m_demo->GetAnimationCount();
     AnimationRef animation;
     for (size_t i = 0; i < animationCount; i++)
@@ -95,6 +85,10 @@ void Context::SaveSchema(bool isAutoSave) const
 
         // models + meshes?
     }
+
+    // we have to purge the FS watchers state due to prevent trigger reload again
+    // Todo: find a better way to purge stuff 
+    do {} while(m_assetFactory->PollEvents(nullptr));
 }
 
 void Context::LoadScema()

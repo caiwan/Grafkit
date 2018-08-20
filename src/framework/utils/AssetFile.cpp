@@ -292,7 +292,10 @@ bool FileAssetFactory::PollEvents(IResourceManager* resman)
             do
             {
                 triggered = true;
-                resman->TriggerReload(w->PopFile());
+                if (resman)
+                    resman->TriggerReload(w->PopFile());
+                else
+                    w->PopFile(); // Todo: find a better way to purge stuff 
             }
             while (w->HasItems());
         }

@@ -18,7 +18,7 @@ void Persistent::Store(Archive& ar)
 	string className = this->GetClazzName();
 	UCHAR ver = this->GetVersion();
 
-	Log::Logger().Info("Storing object %s %d", className.c_str(), ver);
+	Log::Logger().Debug("Storing object %s %d", className.c_str(), ver);
 
 	PERSIST_STRING(ar, className);
 	PERSIST_FIELD(ar, ver);
