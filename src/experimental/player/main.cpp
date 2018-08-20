@@ -1,28 +1,22 @@
-#include "core/system.h"
-
-using namespace Grafkit;
-
-class Application : public System
-{
-public:
-    int init() override;
-    int mainloop() override;
-    void release() override;
-};
-
-int Application::init() {
-    return 0;
-}
-
-int Application::mainloop() {
-    return 1;
-}
-
-void Application::release() {
-}
+#include "fwzSetup.h"
+#include "application.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-    Application app;
+    fwzSettings setup;
+    setup.hInstance = hInstance;
+
+    setup.scrBPP = 32;
+    setup.nVsync = 1;
+    setup.nMultisample = 0;
+
+    setup.nAlwaysOnTop = 1;
+    setup.scrWidth = 800;
+    setup.scrHeight = 600;
+    setup.nWindowed = 1;
+    if (!OpenSetupDialog(&setup))
+        return -1;
+
+    Application app(setup);
     return app.execute();
 }
