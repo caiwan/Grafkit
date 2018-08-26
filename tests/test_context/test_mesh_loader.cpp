@@ -26,9 +26,9 @@ using namespace GkDemo;
 using namespace Grafkit;
 
 #define ASSET_ROOT "tests/assets/"
-#define MODEL_ROOT "models/"
+// #define MODEL_ROOT ""
 #define MESH_PERSIST "testMesh.mesh"
-#define MESH_SRC "torus.obj"
+#define MESH_SRC "models/src/torus.obj"
 #define MESH_PATH ASSET_ROOT MESH
 
 namespace NSMeshLoadTest

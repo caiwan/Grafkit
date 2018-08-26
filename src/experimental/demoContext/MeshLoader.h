@@ -6,11 +6,16 @@
 #include "utils/resource.h"
 #include "utils/ResourceBuilder.h"
 
-class aiScene;
+
+struct aiScene;
+namespace Assimp
+{
+    class Importer;
+}
 
 namespace GkDemo
 {
-    class IMeshLoader: public Grafkit::IResourceBuilder
+    class IMeshLoader : public Grafkit::IResourceBuilder
     {
     public:
 
@@ -22,7 +27,7 @@ namespace GkDemo
         void Load(Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override = 0;
 
     protected:
-        const aiScene* LoadAiScene(Grafkit::IResourceManager*const& resman) const;
+        const aiScene* LoadAiScene(Grafkit::IResourceManager*const& resman, Assimp::Importer * const & importer, const char * hint ="") const;
 
         static void LoadMeshes(std::list<Grafkit::MeshRef>& meshes, const aiScene const*& souceScene);
 

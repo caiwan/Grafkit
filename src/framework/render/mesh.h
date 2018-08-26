@@ -28,7 +28,7 @@ namespace Grafkit
         virtual void UpdateMesh(double time);
         void RenderMesh(ID3D11DeviceContext* deviceContext);
 
-        void AddPointer(std::string inputName, uint32_t length, const void* pointer);
+        void AddPointer(std::string inputName, uint32_t length, const void* pointer); // TODO because it copes the underlying data, It should have a more meaningful name instead
         void SetIndices(uint32_t vertexCount, uint32_t indexCount, const uint32_t* const indices);
         void Build(ID3D11Device *const& device, ShaderRef &vertexShader);
 

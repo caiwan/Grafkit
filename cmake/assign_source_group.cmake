@@ -43,3 +43,21 @@ function(assign_source_group)
 
 	endforeach()
 endfunction(assign_source_group)
+
+##
+## 
+
+function(assign_custom_source_group SOURCE_GRP IN_FILES)
+	foreach(_source IN ITEMS ${IN_FILES})
+		if (IS_ABSOLUTE "${_source}")
+			file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
+		else()
+			set(source_rel "${_source}")
+		endif()
+
+		get_filename_component(_source_path "${_source_rel}" PATH)
+		string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
+		source_group("${SOURCE_GRP}/${_source_path_msvc}" FILES "${_source}")
+	
+	endforeach()
+endfunction(assign_custom_source_group)

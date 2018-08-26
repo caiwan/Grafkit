@@ -26,6 +26,7 @@ target_link_libraries(${APPLICATION_NAME}
 )
 
 bass_copy_binaries(${APPLICATION_NAME} "${CMAKE_BINARY_DIR}")
+ASSIMP_COPY_BINARIES(${APPLICATION_NAME})
 
 target_include_directories(${APPLICATION_NAME} PUBLIC include)
 

@@ -18,6 +18,13 @@ include_directories("${STB_INCLUDE_DIR}")
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 msvc_set_win32(${APPLICATION_NAME})
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /GR /Ob1")
+
+if (MSVC)
+	target_compile_options(${APPLICATION_NAME} PUBLIC "$<$<CONFIG:Release>:/MT>")
+	target_compile_options(${APPLICATION_NAME} PUBLIC "$<$<CONFIG:Debug>:/MDd>")
+endif(MSVC)
+
 target_link_libraries(${APPLICATION_NAME} Grafkit2 DemoContext ${BASS_LIBRARY_RELEASE})
 target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
 
@@ -28,3 +35,6 @@ set_target_properties(${APPLICATION_NAME} PROPERTIES FOLDER experimental)
 bass_copy_binaries(${APPLICATION_NAME} "${CMAKE_CURRENT_BINARY_DIR}")
 install(TARGETS ${APPLICATION_NAME} DESTINATION "/")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bass.dll" DESTINATION "/")
+
+ASSIMP_COPY_BINARIES(${APPLICATION_NAME})
+ASSIMP_INSTALL_BINARIES("/")

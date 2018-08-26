@@ -76,8 +76,8 @@ public:
 
     void BuildDemo()
     {
-        try
-        {
+        //try
+        //{
             SchemaBuilder builder;
             IAssetFactory* af = m_context->GetAssetFactory();
             IAssetRef file = af->Get(JSON_PATH);
@@ -89,11 +89,12 @@ public:
             builder.Initialize(m_context);
 
             //m_context->Intitialize();
-        }
+            m_demo->Initialize(m_render);
+        /*} 
         catch (std::exception& e)
         {
             FAIL() << e.what();
-        }
+        }*/
     }
 
     template <class T>
@@ -159,8 +160,7 @@ TEST_F(ContextPregnancyTest, SceneActorTest)
 {
     // given: context
     this->BuildDemo();
-    m_context->DoPrecalc();
-    m_demo->Initialize(m_render);
+
 
     // when
     SceneRef scene = m_demo->GetScene(0)->Get();
@@ -184,8 +184,6 @@ TEST_F(ContextPregnancyTest, DISABLED_SceneEntityTest)
 {
     // given: context
     this->BuildDemo();
-    m_context->DoPrecalc();
-    m_demo->Initialize(m_render);
 
     // when
     SceneRef scene = m_demo->GetScene(0)->Get();
@@ -201,8 +199,6 @@ TEST_F(ContextPregnancyTest, SceneLightTest)
 {
     // given: context
     this->BuildDemo();
-    m_context->DoPrecalc();
-    m_demo->Initialize(m_render);
 
     // when
     SceneRef scene = m_demo->GetScene(0)->Get();
@@ -219,8 +215,6 @@ TEST_F(ContextPregnancyTest, SceneCameraTest)
 {
     // given: context
     this->BuildDemo();
-    m_context->DoPrecalc();
-    m_demo->Initialize(m_render);
 
     // when
     SceneRef scene = m_demo->GetScene(0)->Get();

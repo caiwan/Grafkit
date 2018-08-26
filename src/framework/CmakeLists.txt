@@ -15,7 +15,7 @@ add_library(Grafkit2 STATIC ${SOURCE_FILES} ${HEADER_FILES})
 # target_link_libraries(Grafkit2)
 target_include_directories(Grafkit2 PUBLIC "${CMAKE_SOURCE_DIR}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /Ob1")
 # message("CFLAGS = ${CMAKE_CXX_FLAGS}")
 
 set_target_properties(Grafkit2 PROPERTIES DEBUG_POSTFIX "d")

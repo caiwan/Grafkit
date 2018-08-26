@@ -6,17 +6,19 @@ set(APPLICATION_NAME DemoContext)
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inc)
 file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inl)
 
+add_library(${APPLICATION_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
+
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /GR")
-# message("CFLAGS = ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /GR /Ob1")
 
-add_library(${APPLICATION_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
+if (MSVC)
+	target_compile_options(${APPLICATION_NAME} PUBLIC "$<$<CONFIG:Release>:/MT>")
+	target_compile_options(${APPLICATION_NAME} PUBLIC "$<$<CONFIG:Debug>:/MDd>")
+endif(MSVC)
+
 target_link_libraries(${APPLICATION_NAME} PUBLIC Grafkit2)
-target_link_libraries(${APPLICATION_NAME} PRIVATE optimized "${ASSIMP_LIBRARY_RELEASE}")
-target_link_libraries(${APPLICATION_NAME} PRIVATE debug "${ASSIMP_LIBRARY_DEBUG}")
-
-# target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
+target_link_libraries(${APPLICATION_NAME} PUBLIC ${ASSIMP_LIBRARY})
 
 set_target_properties(${APPLICATION_NAME} PROPERTIES DEBUG_POSTFIX "d")
 

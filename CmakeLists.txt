@@ -9,8 +9,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 message("CMAKE_PREFIX_PATH = ${CMAKE_PREFIX_PATH}")
 
-SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-# SET(GK2_EXTERNALS "${CMAKE_CURRENT_SOURCE_DIR}/externals")
+SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/assign_source_group.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc_add_pch.cmake)

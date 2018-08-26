@@ -37,6 +37,7 @@ subdirs(test_utils)
 add_custom_target(check 
 	COMMAND ${CMAKE_CTEST_COMMAND} 
 	DEPENDS 
+		assets
 		UnitTests
         ContextTest
 		# IT_Importer

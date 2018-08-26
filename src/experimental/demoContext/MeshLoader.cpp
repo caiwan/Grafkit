@@ -39,28 +39,28 @@ namespace
 {
     Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4* m);
     aiVector3D crossProduct(aiVector3D a, aiVector3D b);
-    float2 aiVector2DToFloat2(aiVector2D& v);
-    float2 aiVector3DToFloat2(aiVector3D& v);
-    float3 aiVector3DToFloat3(aiVector3D& v);
-    float4 aiVector3DToFloat4(aiVector3D& v, float w);
-    float4 aiQuaternionToFloat4(aiQuaternion& v);
-    float4 aiColor3DToFloat4(aiColor3D& c);
-    float4 aiMatkey4ToFloat4(aiMaterial*& mat, const char* key, int a1, int a2);
-    float aiMatkeyToFloat(aiMaterial*& mat, const char* key, int a1, int a2);
+    float2 aiVector2DToFloat2(const aiVector2D& v);
+    float2 aiVector3DToFloat2(const aiVector3D& v);
+    float3 aiVector3DToFloat3(const aiVector3D& v);
+    float4 aiVector3DToFloat4(const aiVector3D& v, float w);
+    float4 aiQuaternionToFloat4(const aiQuaternion& v);
+    float4 aiColor3DToFloat4(const aiColor3D& c);
+    float4 aiMatkey4ToFloat4(const aiMaterial*const & mat, const char* key, int a1, int a2);
+    float aiMatkeyToFloat(const aiMaterial*const & mat, const char* key, int a1, int a2);
 }
 
 IResource* IMeshLoader::NewResource() { return new Resource<Mesh>(); }
 
-const aiScene* IMeshLoader::LoadAiScene(IResourceManager* const& resman) const
+const aiScene* IMeshLoader::LoadAiScene(IResourceManager* const& resman, Assimp::Importer * const & importer, const char * hint) const
 {
-    Assimp::Importer importer;
     const IAssetRef data = GetSourceAsset(resman);
-    const unsigned aiFlags = aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace;
-    //const aiScene* scene = importer.ReadFileFromMemory(data->GetData(), data->GetSize(), aiFlags);
-    const aiScene* scene = nullptr;
+    const unsigned int aiFlags = aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace;
+    const void* dataPtr = data->GetData();
+    const size_t length = data->GetSize();
+    const aiScene* scene = importer->ReadFileFromMemory(dataPtr, length, aiFlags, hint);
 
     if (!scene)
-        THROW_EX_DETAILS(MeshLoaderException, importer.GetErrorString());
+        THROW_EX_DETAILS(MeshLoaderException, importer->GetErrorString());
 
     return scene;
 }
@@ -77,66 +77,61 @@ void IMeshLoader::LoadMeshes(std::list<MeshRef>& meshes, const aiScene*& sourceS
     for (size_t i = 0; i < sourceScene->mNumMeshes; i++)
     {
         // -- meshes
-        //ModelRef model = new Model(new Mesh());
         MeshRef mesh = new Mesh();
-        aiMesh* srcMesh = sourceScene->mMeshes[i];
+        const aiMesh* srcMesh = sourceScene->mMeshes[i];
 
         const char* meshName = srcMesh->mName.C_Str();
         LOGGER(Log::Logger().Trace("- Mesh #%d %s", i, meshName));
         //model->SetName(meshName);
 
-        float4* vertices = new float4[srcMesh->mNumVertices];
+        auto vertexCount = srcMesh->mNumVertices;
+
+        float4* vertices = new float4[vertexCount];
 
         // -- texcooord && normals
 
-        float2** texuvs = new float2*[MAX_TEXCOORD_COUNT];
-        for (size_t j = 0; j < MAX_TEXCOORD_COUNT; j++) { texuvs[j] = new float2[srcMesh->mNumVertices]; }
-        float4* normals = new float4[srcMesh->mNumVertices];
+        float2* texuvs = new float2[vertexCount];
+        float4* normals = new float4[vertexCount];
 
-        for (size_t k = 0; k < srcMesh->mNumVertices; k++)
+        for (size_t k = 0; k < vertexCount; k++)
         {
             vertices[k] = aiVector3DToFloat4(srcMesh->mVertices[k], 1.);
             normals[k] = aiVector3DToFloat4(srcMesh->mNormals[k], 0.);
 
             if (srcMesh->mTextureCoords && srcMesh->mTextureCoords[0])
             {
-                for (size_t j = 0; j < MAX_TEXCOORD_COUNT; j++)
-                {
-                    aiVector3D* t = srcMesh->mTextureCoords[j];
-                    if (t)
-                        texuvs[j][k] = aiVector3DToFloat2(t[k]);
-                    else
-                        texuvs[j][k] = float2(0, 0);
-                }
-            }
-
-            mesh->AddPointer("POSITION", srcMesh->mNumVertices * sizeof(*vertices), &vertices[0]);
-            mesh->AddPointer("NORMAL", srcMesh->mNumVertices * sizeof(*normals), &normals[0]);
-
-            for (size_t j = 0; j < MAX_TEXCOORD_COUNT; j++)
-            {
-                std::string buf = "TEXCOORD" + std::to_string(i);
-                mesh->AddPointer(buf, srcMesh->mNumVertices * sizeof(**texuvs), &texuvs[j]);
+                const aiVector3D * const& t = srcMesh->mTextureCoords[0];
+                if (t)
+                    texuvs[k] = aiVector3DToFloat2(t[k]);
+                else
+                    texuvs[k] = float2(0, 0);
             }
         }
 
-        // these will be copied 
+        mesh->AddPointer("POSITION", vertexCount * sizeof(*vertices), &vertices[0]);
+        mesh->AddPointer("NORMAL", vertexCount * sizeof(*normals), &normals[0]);
+
+        mesh->AddPointer("TEXCOORD0", vertexCount * sizeof(*texuvs), texuvs);
+
+        // these were copied 
         delete[] texuvs;
         delete[] normals;
+        delete[] vertices;
 
         // -- faces
 
         if (srcMesh->HasFaces())
         {
             std::vector<uint32_t> indices;
+            indices.reserve(srcMesh->mNumFaces * 3 + 1);
 
             for (size_t j = 0; j < srcMesh->mNumFaces; j++)
             {
-                aiFace* curr_face = &srcMesh->mFaces[j];
-                for (size_t k = 0; k < curr_face->mNumIndices; k++) { indices.push_back(curr_face->mIndices[k]); }
+                const aiFace &currFace = srcMesh->mFaces[j];
+                for (size_t k = 0; k < currFace.mNumIndices; k++) { indices.push_back(currFace.mIndices[k]); }
             }
 
-            mesh->SetIndices(srcMesh->mNumVertices, indices.size(), &indices[0]);
+            mesh->SetIndices(vertexCount, indices.size(), &indices[0]);
         }
 
         // --- 
@@ -172,7 +167,8 @@ void MeshOBJLoader::Load(IResourceManager* const& resman, IResource* source)
 
     if (!mesh)
     {
-        const aiScene* scene = LoadAiScene(resman);
+        Assimp::Importer importer;
+        const aiScene* scene = LoadAiScene(resman, &importer, "obj");
         std::list<MeshRef> meshes;
         LoadMeshes(meshes, scene);
 
@@ -218,26 +214,26 @@ namespace
         );
     }
 
-    float2 aiVector2DToFloat2(aiVector2D& v) { return float2(v.x, v.y); }
+    float2 aiVector2DToFloat2(const aiVector2D& v) { return float2(v.x, v.y); }
 
-    float2 aiVector3DToFloat2(aiVector3D& v) { return float2(v.x, v.y); }
+    float2 aiVector3DToFloat2(const aiVector3D& v) { return float2(v.x, v.y); }
 
-    float3 aiVector3DToFloat3(aiVector3D& v) { return float3(v.x, v.y, v.z); }
+    float3 aiVector3DToFloat3(const  aiVector3D& v) { return float3(v.x, v.y, v.z); }
 
-    float4 aiVector3DToFloat4(aiVector3D& v, float w) { return float4(v.x, v.y, v.z, w); }
+    float4 aiVector3DToFloat4(const aiVector3D& v, float w) { return float4(v.x, v.y, v.z, w); }
 
-    float4 aiQuaternionToFloat4(aiQuaternion& v) { return float4(v.x, v.y, v.z, v.w); }
+    float4 aiQuaternionToFloat4(const aiQuaternion& v) { return float4(v.x, v.y, v.z, v.w); }
 
-    float4 aiColor3DToFloat4(aiColor3D& c) { return float4(c.r, c.g, c.b, 1.); }
+    float4 aiColor3DToFloat4(const aiColor3D& c) { return float4(c.r, c.g, c.b, 1.); }
 
-    float4 aiMatkey4ToFloat4(aiMaterial*& mat, const char* key, int a1, int a2)
+    float4 aiMatkey4ToFloat4(const aiMaterial*const & mat, const char* key, int a1, int a2)
     {
         aiColor4D ac;
         mat->Get(key, a1, a2, ac);
         return float4(ac.r, ac.g, ac.g, ac.a);
     }
 
-    float aiMatkeyToFloat(aiMaterial*& mat, const char* key, int a1, int a2)
+    float aiMatkeyToFloat(const aiMaterial*const & mat, const char* key, int a1, int a2)
     {
         float f = 0.;
         mat->Get(key, a1, a2, f);
