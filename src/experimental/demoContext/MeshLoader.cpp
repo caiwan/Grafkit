@@ -185,6 +185,9 @@ void MeshOBJLoader::Load(IResourceManager* const& resman, IResource* source)
 
     // --- 
 
+    mesh->SetUuid(m_uuid);
+    mesh->SetName(m_name);
+
     dstMesh->AssingnRef(mesh);
 }
 

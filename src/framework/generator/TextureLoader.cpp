@@ -20,40 +20,38 @@ using namespace FWdebugExceptions;
 // Texture buffer generator
 // ========================================================================================================================
 
-IResource * ITexture1DBuilder::NewResource()
-{
-    return new Texture1DRes;
-}
+IResource* ITexture1DBuilder::NewResource() { return new Texture1DRes; }
 
-IResource * ITexture2DBuilder::NewResource()
-{
-    return new Texture2DRes;
-}
+IResource* ITexture2DBuilder::NewResource() { return new Texture2DRes; }
 
 // ========================================================================================================================
 // Texture buffer generator
 // ========================================================================================================================
 
-TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureTypeE type) : ITexture2DBuilder(name),
-m_w(0), m_h(0), m_type(type)
-{
+TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureTypeE type) : ITexture2DBuilder(name)
+    , m_w(0)
+    , m_h(0)
+    , m_type(type) {
 }
 
-TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureTypeE type, uint16_t w, uint16_t h) : ITexture2DBuilder(name),
-m_w(w), m_h(h), m_type(type)
-{
+TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureTypeE type, uint16_t w, uint16_t h) : ITexture2DBuilder(name)
+    , m_w(w)
+    , m_h(h)
+    , m_type(type) {
 }
 
-void TextureBufferBuilder::Load(IResourceManager * const & resman, IResource * source)
+void TextureBufferBuilder::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
-    if (dstTexture.Invalid()) {
+    if (dstTexture.Invalid())
+    {
         THROW_EX(NullPointerException);
     }
 
     TextureRef texture = new Texture2D();
 
-    switch (m_type) {
+    switch (m_type)
+    {
     case TB_RGBA:
         texture->Initialize(resman->GetDeviceContext(), m_w, m_h);
         break;
@@ -68,9 +66,7 @@ void TextureBufferBuilder::Load(IResourceManager * const & resman, IResource * s
         break;
     }
 
-    if (dstTexture->Valid()) {
-        dstTexture->Release();
-    }
+    if (dstTexture->Valid()) { dstTexture->Release(); }
 
     dstTexture->AssingnRef(texture);
 }
@@ -80,29 +76,19 @@ void TextureBufferBuilder::Load(IResourceManager * const & resman, IResource * s
 // Texture from bitmap loader
 // ========================================================================================================================
 
-TextureFromBitmap::TextureFromBitmap(std::string name, std::string sourceName, std::string uuid) : ITexture2DBuilder(name, sourceName, uuid), m_w(0), m_h(0)
-{
+TextureFromBitmap::TextureFromBitmap(std::string name, std::string sourceName, std::string uuid) : ITexture2DBuilder(name, sourceName, uuid)
+    , m_w(0)
+    , m_h(0) {
 }
 
-TextureFromBitmap::~TextureFromBitmap()
-{
-	TextureResRef outTexture = (TextureResRef_t)m_dstResource;
+TextureFromBitmap::~TextureFromBitmap() {
+}
 
-	if (outTexture.Invalid()) {
-		outTexture = new TextureRes;
-	}
-
-	// ha van textura, akkor torolje le 
-	if (outTexture->Valid()) {
-		outTexture->Release();
-	}
-
-	LOGGER(LOG(INFO) << "Loading texture from resource");
-
-void TextureFromBitmap::Load(IResourceManager * const & resman, IResource * source)
+void TextureFromBitmap::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
-    if (dstTexture.Invalid()) {
+    if (dstTexture.Invalid())
+    {
         THROW_EX(NullPointerException);
     }
 
@@ -115,7 +101,7 @@ void TextureFromBitmap::Load(IResourceManager * const & resman, IResource * sour
     IAssetRef asset = this->GetSourceAsset(resman);
 
     // kikenyszeritett rgba mod
-    UCHAR *data = stbi_load_from_memory(static_cast<UCHAR *>(asset->GetData()), asset->GetSize(), &x, &y, &ch, 0);
+    UCHAR* data = stbi_load_from_memory(static_cast<UCHAR *>(asset->GetData()), asset->GetSize(), &x, &y, &ch, 0);
 
     /// @todo resize;
 
@@ -127,9 +113,7 @@ void TextureFromBitmap::Load(IResourceManager * const & resman, IResource * sour
     texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, x, y, ch));
 
     // --- xchg texture 
-    if (dstTexture->Valid()) {
-        dstTexture->Release();
-    }
+    if (dstTexture->Valid()) { dstTexture->Release(); }
 
     dstTexture->AssingnRef(texture);
 }
@@ -143,7 +127,8 @@ TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name,
     std::string source_posy,
     std::string source_negy,
     std::string source_posz,
-    std::string source_negz) : ITexture2DBuilder(name, "")
+    std::string source_negz,
+    std::string uuid) : ITexture2DBuilder(name, uuid)
 {
     m_sourceNames[0] = source_posx;
     m_sourceNames[1] = source_negx;
@@ -153,25 +138,34 @@ TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name,
     m_sourceNames[5] = source_negz;
 }
 
-TextureCubemapFromBitmap::~TextureCubemapFromBitmap()
+TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name, std::vector<std::string> sourceNames, std::string uuid) : ITexture2DBuilder(name, "", uuid)
 {
+    assert(!sourceNames.empty());
+    assert(6 == sourceNames.size());
+
+    for (size_t i = 0; i < 6; i++) { m_sourceNames[i] = sourceNames[i]; }
 }
 
-void TextureCubemapFromBitmap::Load(IResourceManager * const & resman, IResource * source)
+TextureCubemapFromBitmap::~TextureCubemapFromBitmap() {
+}
+
+void TextureCubemapFromBitmap::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureCubeResRef dstTexture = dynamic_cast<TextureCubeRes*>(source);
-    if (dstTexture.Invalid()) {
+    if (dstTexture.Invalid())
+    {
         THROW_EX(NullPointerException);
     }
 
     BitmapRef bitmaps[6];
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++)
+    {
         int x = 0, y = 0, ch = 0;
         IAssetRef asset = resman->GetAssetFactory()->Get(m_sourceNames[i]);
 
         // kikenyszeritett rgba mod
-        uint8_t *data = stbi_load_from_memory(static_cast<uint8_t*>(asset->GetData()), asset->GetSize(), &x, &y, &ch, 0);
+        uint8_t* data = stbi_load_from_memory(static_cast<uint8_t*>(asset->GetData()), asset->GetSize(), &x, &y, &ch, 0);
 
         /// @todo resize;
 
@@ -187,32 +181,28 @@ void TextureCubemapFromBitmap::Load(IResourceManager * const & resman, IResource
     texture->Initialize(resman->GetDeviceContext(), new Cubemap(bitmaps));
 
     // --- xchg texture 
-    if (dstTexture->Valid()) {
-        dstTexture->Release();
-    }
+    if (dstTexture->Valid()) { dstTexture->Release(); }
 
     dstTexture->AssingnRef(texture);
 }
 
-IResource * TextureCubemapFromBitmap::NewResource()
-{
-    return new TextureCubeRes();
-}
+IResource* TextureCubemapFromBitmap::NewResource() { return new TextureCubeRes(); }
 
 // -------------------------------------------------------------------------------
 
-TextureNoiseMap::TextureNoiseMap(size_t size) : TextureFromBitmap("NOISE"), m_size(size)
-{
+TextureNoiseMap::TextureNoiseMap(size_t size, std::string uuid) : TextureFromBitmap("NOISE", uuid)
+    , m_size(size) {
 }
 
-TextureNoiseMap::TextureNoiseMap(std::string name, size_t size) : TextureFromBitmap(name), m_size(size)
-{
+TextureNoiseMap::TextureNoiseMap(std::string name, size_t size, std::string uuid) : TextureFromBitmap(name, "", uuid)
+    , m_size(size) {
 }
 
-void TextureNoiseMap::Load(IResourceManager * const & resman, IResource * source)
+void TextureNoiseMap::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
-    if (dstTexture.Invalid()) {
+    if (dstTexture.Invalid())
+    {
         THROW_EX(NullPointerException);
     }
 
@@ -222,18 +212,14 @@ void TextureNoiseMap::Load(IResourceManager * const & resman, IResource * source
     LOGGER(Log::Logger().Trace("loading texture from resource"));
 
     size_t k = m_size * m_size * 4;
-    UCHAR *data = new UCHAR[m_size * m_size * 4];
+    UCHAR* data = new UCHAR[m_size * m_size * 4];
 
-    for (int i = 0; i < k; i++) {
-        data[i] = rand() % 255;
-    }
+    for (int i = 0; i < k; i++) { data[i] = rand() % 255; }
 
     texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, m_size, m_size, 4));
 
     // --- xchg texture 
-    if (dstTexture->Valid()) {
-        dstTexture->Release();
-    }
+    if (dstTexture->Valid()) { dstTexture->Release(); }
 
     dstTexture->AssingnRef(texture);
 }
@@ -253,11 +239,12 @@ TextureSamplerBuilder::TextureSamplerBuilder(Type_E type) : IResourceBuilder("",
     }
 }
 
-void TextureSamplerBuilder::Load(IResourceManager * const & resman, IResource * source)
+void TextureSamplerBuilder::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureSamplerResRef sampler = dynamic_cast<Resource<TextureSampler>*>(source);
 
-    if (sampler.Invalid()) {
+    if (sampler.Invalid())
+    {
         THROW_EX(NullPointerException);
     }
 
@@ -265,7 +252,4 @@ void TextureSamplerBuilder::Load(IResourceManager * const & resman, IResource * 
     sampler->Get()->Initialize(resman->GetDeviceContext(), m_mode);
 }
 
-IResource * TextureSamplerBuilder::NewResource()
-{
-    return new Resource<TextureSampler>();
-}
+IResource* TextureSamplerBuilder::NewResource() { return new Resource<TextureSampler>(); }

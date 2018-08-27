@@ -188,7 +188,10 @@ namespace Grafkit
 	__declspec(align(16)) class TextureCube : public ATexture, public AlignedNew<Texture2D>
 	{
 	public:
-		TextureCube() : ATexture() {}
+		TextureCube() : ATexture()
+	        , m_initial_data(nullptr) {
+	    }
+
 		~TextureCube() {}
 
 		void Initialize(Renderer &device, CubemapRef cubemap);

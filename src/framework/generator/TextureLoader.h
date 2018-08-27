@@ -74,7 +74,8 @@ namespace Grafkit {
 
     class TextureCubemapFromBitmap : public ITexture2DBuilder {
     public:
-        TextureCubemapFromBitmap(std::string name, std::string source_posx, std::string source_negx, std::string source_posy, std::string source_negy, std::string source_posz, std::string source_negz);
+        explicit TextureCubemapFromBitmap(std::string name, std::string source_posx, std::string source_negx, std::string source_posy, std::string source_negy, std::string source_posz, std::string source_negz, std::string uuid ="");
+        explicit TextureCubemapFromBitmap(std::string name, std::vector<std::string> sourceNames, std::string uuid = "");
         ~TextureCubemapFromBitmap();
 
         void Load(IResourceManager * const & resman, IResource * source) override;
@@ -86,8 +87,8 @@ namespace Grafkit {
 
     class TextureNoiseMap : public TextureFromBitmap {
     public:
-        TextureNoiseMap(size_t size);
-        TextureNoiseMap(std::string name, size_t size);
+        explicit TextureNoiseMap(size_t size, std::string uuid = "");
+        explicit TextureNoiseMap(std::string name, size_t size, std::string uuid = "");
         void Load(IResourceManager * const & resman, IResource * source) override;
     private:
         size_t m_size;

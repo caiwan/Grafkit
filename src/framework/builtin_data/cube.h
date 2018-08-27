@@ -1,4 +1,6 @@
 #pragma once
+#include "common.h"
+
 /**
  *  @file
  *  @brief static geometry data
