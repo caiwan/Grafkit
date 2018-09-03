@@ -103,6 +103,7 @@ void Context::Intitialize()
     LOGGER(Log::Logger().Debug("Demo ptr: %p", m_demo.Get()));
     IResourceManager*const & resman = this;
     m_builder.Initialize(resman);
+    m_demo->SetIsFxaa(m_isFxaa);
     m_demo->Initialize(m_render);
 }
 

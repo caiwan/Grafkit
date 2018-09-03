@@ -22,6 +22,10 @@ namespace GkDemo
 
         void Intitialize();
 
+
+        bool GetIsFxaa() const { return m_isFxaa; }
+        void SetIsFxaa(const bool isFxaa) { m_isFxaa = isFxaa; }
+
         Ref<Demo> GetDemo() const;
         void SetDemo(const Ref<Demo> &demo);
 
@@ -39,6 +43,8 @@ namespace GkDemo
         SchemaBuilder m_builder;
         std::string m_myBasePath;
         //SchemaExport m_exporter;
+
+        bool m_isFxaa;
 
         void SaveObject(const Ref<Grafkit::Object>& ref, const char* str, bool isAutoSave) const;
     };

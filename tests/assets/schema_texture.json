@@ -5,10 +5,8 @@
       "filename": "alpha_c_-_euh.ogg"
     },
     "render": {
-      "forward": {
         "vs": "43ae2c7a-b8e7-4eb0-a888-7ce1c2fa90a1",
         "ps": "5f72e9aa-93f5-4d86-ada8-9543b625337e"
-      }
     },
     "scenes": [
       {
@@ -87,7 +85,7 @@
             "id": 1,
             "uuid": "54e1f5b3-61e2-4413-8d80-edc46148a976"
           }
-        ] 
+        ]
       }
     ],
     "animations": [
@@ -103,9 +101,55 @@
   "assets": {
     "textures": [
       {
-        "name": "",
-        "uuid": "",
-        "filename": ""
+        "name": "normap",
+        "uuid": "4c8c7210-49b5-41a6-9681-fd359cb4d6ab",
+        "filename": "textures/normap.jpg",
+        "generator": "2d"
+      },
+      {
+        "name": "UVAddressBoard",
+        "uuid": "de386543-5cd8-4d87-bd16-9b04e037a393",
+        "filename": "textures/Untitled.png",
+        "generator": "2d"
+      },
+      {
+        "name": "Sky1",
+        "uuid": "2fa2effd-93fa-4984-9647-4b31127a3cbe",
+        "filenames": [
+          "textures/yoko_posx.jpg",
+          "textures/yoko_negx.jpg",
+          "textures/yoko_posy.jpg",
+          "textures/yoko_negy.jpg",
+          "textures/yoko_posz.jpg",
+          "textures/yoko_negz.jpg"
+
+        ],
+        "generator": "cube"
+      },
+      {
+        "name": "SkyRadiance",
+        "uuid": "ed9cd55c-34c9-4644-acfa-35bfb2fbb31a",
+        "filenames": [
+          "textures/yoko_low_posx.jpg",
+          "textures/yoko_low_negx.jpg",
+          "textures/yoko_low_posy.jpg",
+          "textures/yoko_low_negy.jpg",
+          "textures/yoko_low_posz.jpg",
+          "textures/yoko_low_negz.jpg"
+        ],
+        "generator": "cube"
+      },
+      {
+        "name": "Noise256",
+        "uuid": "d519b673-764c-4530-a28f-df9ee6133eae",
+        "size": 256,
+        "generator": "noise"
+      },
+      {
+        "name": "Noise512",
+        "uuid": "8a92cb3a-5b77-4d4f-9e11-3df45b269b03",
+        "size": 512,
+        "generator": "noise"
       }
     ],
     "meshes": [
@@ -113,24 +157,45 @@
         "name": "torus.obj",
         "uuid": "af6404fa-a4f7-4b01-8c8b-1218faf6d35c",
         "generator": "obj",
-		"source":"models.src/torus.obj"
+        "source": "models/src/torus.obj"
       }
     ],
     "models": [
       {
         "name": "Torus",
-        "uuid": "54484011-5c9e-4479-81f4-937888131e60",
+        "uuid": "ce54d354-f867-4ff4-a802-070858691c80",
         "mesh": "af6404fa-a4f7-4b01-8c8b-1218faf6d35c",
         "material": "54484011-5c9e-4479-81f4-937888131e60"
       }
     ],
     "materials": [
       {
-        "name": "PBRMaterial",
-        "uuid": "54484011-5c9e-4479-81f4-937888131e60",
+        "name": "NormapMaterial",
+        "uuid": "1c982eed-494f-4648-96fc-29f6e33becd9",
         "textures": {
-          "diffuse": "",
-          "others": "..."
+          "diffuse": "4c8c7210-49b5-41a6-9681-fd359cb4d6ab"
+        }
+      },
+      {
+        "name": "CheckerBoardMaterial",
+        "uuid": "74e35451-384d-4ae9-b4bf-d630f4cebf63",
+        "textures": {
+          "diffuse": "de386543-5cd8-4d87-bd16-9b04e037a393",
+          "emission": null,
+          "metallic": null,
+          "normal": null,
+          "roughness": null
+        }
+      },
+      {
+        "name": "TorusPbrMaterial",
+        "uuid": "24dc43f2-4bb8-46a1-8614-ead866237cea",
+        "textures": {
+          "diffuse": "de386543-5cd8-4d87-bd16-9b04e037a393",
+          "emission": null,
+          "metallic": null,
+          "normal": null,
+          "roughness": null
         }
       }
     ],

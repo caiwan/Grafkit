@@ -18,6 +18,7 @@ Application::Application(fwzSettings& settings) : System()
 {
     m_file_loader = new FileAssetFactory("./");
     m_context = new Context(m_render, m_file_loader);
+    m_context->SetIsFxaa(settings.nMultisample);
     m_context->SetPreloadListener(this);
 
     int screenWidth = settings.scrWidth;

@@ -17,6 +17,7 @@
 #include "render/mesh.h"
 #include "render/model.h"
 #include "render/material.h"
+#include "render/texture.h"
 
 #include "render/light.h"
 #include "render/camera.h"
@@ -36,6 +37,9 @@
 #include "json.hpp"
 
 #include "DemoAnimationLoader.h"
+#include "MeshLoader.h"
+#include "context.h"
+#include "generator/TextureLoader.h"
 
 #define ANIMATION_ROOT "animation/"
 
@@ -209,39 +213,59 @@ void SchemaBuilder::BuildAnimation(IResourceManager* const & resourceManager, co
 
 void SchemaBuilder::BuildMesh(IResourceManager*const& resourceManager, const Json& json)
 {
-    MeshRef mesh;
+    Ref<Resource<Mesh>> mesh;
     std::string generator = json.at("generator");
+    std::string name = json.at("name");
+    std::string uuid = json.at("uuid");
+    std::string source = json.find("source") == json.end() ? "" : json.at("source").get<std::string>();
+    std::string persistName = "models/" + uuid;
 
     LOGGER(Log::Logger().Info("--- Invoke generator %s", generator.c_str()));
-    if (generator.compare("cube") == 0) { mesh = GrafkitData::CreateCube(); }
-    //else if (generator.compare("cube") == 0)
-    //{
-    //}
+    if (generator.compare("cube") == 0)
+    {
+        mesh = new Resource<Mesh>(GrafkitData::CreateCube());
+        BuildObject(json, *mesh); // crap
+        BuildObject(json, mesh);
+        resourceManager->Add(mesh);
+    }
+    else
+    if (generator.compare("obj") == 0) { mesh = resourceManager->Load<Resource<Mesh>>(new MeshOBJLoader(name, source, persistName, uuid)); }
 
     if (!mesh)
     THROW_EX_DETAILS(SchemaParseException, "Could not add mesh");
-    BuildObject(json, mesh);
-    resourceManager->Add(new Resource<Mesh>(mesh, mesh->GetName(), mesh->GetUuid()));
 }
 
-void SchemaBuilder::BuildMaterial(IResourceManager* const& resourceManager, const Json& it)
+void SchemaBuilder::BuildMaterial(IResourceManager* const& resourceManager, const Json& materialJson)
 {
     MaterialRef material = new Material();
-    BuildObject(it, material);
-    resourceManager->Add(new Resource<Material>(material, material->GetName(), material->GetUuid()));
+    BuildObject(materialJson, material);
 
-    // TODO: ... 
+    Json::const_iterator texturesJsonIt = materialJson.find("textures");
+    if (texturesJsonIt != materialJson.end())
+    {
+        for (auto textureIt = texturesJsonIt->begin(); textureIt != texturesJsonIt->end(); ++textureIt)
+        {
+            if (textureIt.value().is_null())
+                continue;
+            std::string target = textureIt.key();
+            std::string uuid = textureIt.value().get<std::string>();
+            Texture2DResRef texture = resourceManager->GetByUuid<Texture2DRes>(uuid);
+            material->AddTexture(texture, target);
+            LOGGER(Log::Logger().Info("--- Texture %s %s", target.c_str(), uuid.c_str()));
+        }
+    }
+    resourceManager->Add(new Resource<Material>(material, material->GetName(), material->GetUuid()));
 }
 
-void SchemaBuilder::BuildShader(IResourceManager*const& resourceManager, const Json shader)
+void SchemaBuilder::BuildShader(IResourceManager*const& resourceManager, const Json shaderJosn)
 {
     ShaderResRef shaderRes;
-    std::string name = shader.at("name").get<std::string>();
-    std::string uuid = shader.at("uuid").get<std::string>();
-    std::string type = shader.at("type").get<std::string>();
-    std::string filename = shader.at("filename").get<std::string>();
+    std::string name = shaderJosn.at("name").get<std::string>();
+    std::string uuid = shaderJosn.at("uuid").get<std::string>();
+    std::string type = shaderJosn.at("type").get<std::string>();
+    std::string filename = shaderJosn.at("filename").get<std::string>();
 
-    std::string entrypoint = shader["entrypoint"].get<std::string>();
+    std::string entrypoint = shaderJosn["entrypoint"].get<std::string>();
 
     if (type.compare("ps") == 0)
     {
@@ -255,6 +279,36 @@ void SchemaBuilder::BuildShader(IResourceManager*const& resourceManager, const J
     }
 
     shaderRes->SetName(name);
+}
+
+void SchemaBuilder::BuildTexture(IResourceManager*const& resourceManager, const Json& textureJson)
+{
+    std::string name = textureJson.at("name").get<std::string>();
+    std::string uuid = textureJson.at("uuid").get<std::string>();
+    std::string generator = textureJson.at("generator").get<std::string>();
+
+    LOGGER(Log::Logger().Info("-- Loading Texture"));
+
+    if (0 == generator.compare("2d"))
+    {
+        std::string filename = textureJson.at("filename").get<std::string>();
+        resourceManager->Load<Texture2DRes>(new TextureFromBitmap(name, filename, uuid));
+        LOGGER(Log::Logger().Info("--- 2D"));
+    }
+    else if (0 == generator.compare("cube"))
+    {
+        const Json filenameArray = textureJson.at("filenames");
+        std::vector<std::string> filenames;
+        std::transform(filenameArray.begin(), filenameArray.end(), back_inserter(filenames), [](const Json& it)-> std::string { return it.get<std::string>(); });
+        resourceManager->Load<TextureCubeRes>(new TextureCubemapFromBitmap(name, filenames, uuid));
+        LOGGER(Log::Logger().Info("--- Cubemap"));
+    }
+    else if (0 == generator.compare("noise"))
+    {
+        size_t size = textureJson.at("size").get<size_t>();
+        resourceManager->Load<Texture2DRes>(new TextureNoiseMap(name, size, uuid));
+        LOGGER(Log::Logger().Info("--- Noise"));
+    }
 }
 
 void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const Json& json)
@@ -322,6 +376,15 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
     {
         LOGGER(Log::Logger().Info("-- Loading shaders"));
         for (Json::const_iterator shaderIt = shaders.begin(); shaderIt != shaders.end(); ++shaderIt) { BuildShader(resourceManager, *shaderIt); }
+    }
+
+
+    // --- 
+    const Json textures = json["textures"];
+    if (!shaders.empty())
+    {
+        LOGGER(Log::Logger().Info("-- Loading textures"));
+        for (Json::const_iterator textureIt = textures.begin(); textureIt != textures.end(); ++textureIt) { BuildTexture(resourceManager, *textureIt); }
     }
 }
 
@@ -419,7 +482,7 @@ void SchemaBuilder::Initialize(IResourceManager*const& resourceManager)
         AssignAnimations(resourceManager, demoJson);
     }
 
-    AssignShader(resourceManager, demoJson.at("render").at("forward"));
+    AssignShader(resourceManager, demoJson.at("render"));
 
     m_inited = true;
 }
@@ -436,6 +499,14 @@ void SchemaBuilder::AssignCamerasToScene(IResourceManager* const & resourceManag
         uint32_t cameraId = cameraIt->at("id").get<uint32_t>();
         m_demo->AddCameraId(sceneId, cameraUuid, cameraId);
     }
+}
+
+ShaderResRef SchemaBuilder::SafeFindShaderInMap(const std::map<std::string, Ref<Resource<Shader>>>& map, const char* token)
+{
+    auto it = map.find(token);
+    if (it != map.end())
+        return it->second;
+    return nullptr;
 }
 
 void SchemaBuilder::AssignAnimations(IResourceManager* const& resourceManager, const Json& json)
@@ -477,28 +548,44 @@ void SchemaBuilder::AssignAnimations(IResourceManager* const& resourceManager, c
     }
 }
 
-void SchemaBuilder::AssignShader(IResourceManager* const& resourceManager, Json sceneJson)
+void SchemaBuilder::AssignShader(IResourceManager* const& resourceManager, Json renderJson)
 {
     Ref<Resource<SceneGraph>> sceneResource;
-    std::string vsUuid = sceneJson.at("vs").get<std::string>();
-    std::string psUuid = sceneJson.at("ps").get<std::string>();
 
-    ShaderResRef ps = resourceManager->GetByUuid<ShaderRes>(psUuid);
-    ShaderResRef vs = resourceManager->GetByUuid<ShaderRes>(vsUuid);
+    std::map<std::string, ShaderResRef> shaderMap;
 
-    if (ps && vs) // threst will be preloaded
+    for (json::iterator it = renderJson.begin(); it != renderJson.end(); ++it)
     {
-        LOGGER(Log::Logger().Info("--- PS %s uuid=%s", ps->GetName().c_str(), ps->GetUuid().c_str()));
-        m_demo->SetPs(ps);
+        std::string key = it.key();
+        std::string uuid = it.value().get<std::string>();
+        // if (!uuid.empty())
+        {
+            ShaderResRef shader = resourceManager->GetByUuid<ShaderRes>(uuid);
+            if (shader)
+            {
+                shaderMap[key] = shader;
+                LOGGER(Log::Logger().Info("--- %s uuid=%s", key.c_str(), uuid.c_str()));
+            }
+            else
+            {
+                shaderMap[key] = nullptr;
+                LOGGER(Log::Logger().Error("--- No shader found: %s uuid=%s", key.c_str(), uuid.c_str()));
+            }
+        }
+    }
 
-        LOGGER(Log::Logger().Info("--- VS %s uuid=%s ", vs->GetName().c_str(), vs->GetUuid().c_str()));
-        m_demo->SetVs(vs);
-    }
-    else
-    {
-        // todo: throw
-        THROW_EX_DETAILS(SchemaParseException, "Nincs PS vagy VS");
-    }
+    m_demo->SetPs(shaderMap.at("ps"));
+    m_demo->SetVs(shaderMap.at("vs"));
+
+
+    m_demo->SetFxPbr(SafeFindShaderInMap(shaderMap, "pbr"));
+    m_demo->SetFxSsao(SafeFindShaderInMap(shaderMap, "ssao"));
+    m_demo->SetFxSsaoBlur(SafeFindShaderInMap(shaderMap, "ssaoBlur"));
+    m_demo->SetFxBloom(SafeFindShaderInMap(shaderMap, "bloom"));
+    m_demo->SetFxChromaticAbberation(SafeFindShaderInMap(shaderMap, "chronaticAbberation"));
+    m_demo->SetFxDofCompute(SafeFindShaderInMap(shaderMap, "dofCalc"));
+    m_demo->SetFxDofBlur(SafeFindShaderInMap(shaderMap, "dofBlur"));
+    m_demo->SetFxDofJoin(SafeFindShaderInMap(shaderMap, "dofJoin"));
 }
 
 Ref<Demo> SchemaBuilder::GetDemo() const { return m_demo; }

@@ -5,10 +5,17 @@
       "filename": "alpha_c_-_euh.ogg"
     },
     "render": {
-      
         "vs": "43ae2c7a-b8e7-4eb0-a888-7ce1c2fa90a1",
-        "ps": "5f72e9aa-93f5-4d86-ada8-9543b625337e"
-      
+        "ps": "5f72e9aa-93f5-4d86-ada8-9543b625337e",
+        "pbr": "",
+        "ssao": "",
+        "ssaoBlur": "",
+        "bloom": "",
+        "chromaticAbberation": "",
+        "dofCalc": "",
+        "dofBlur": "",
+        "dofJoin": "",
+        "fxaa": ""
     },
     "scenes": [
       {
@@ -87,7 +94,7 @@
             "id": 1,
             "uuid": "54e1f5b3-61e2-4413-8d80-edc46148a976"
           }
-        ] 
+        ]
       }
     ],
     "animations": [
@@ -106,28 +113,29 @@
         "name": "",
         "uuid": "",
         "filename": "",
-		"generator": ""
+		"generator":""
       }
     ],
     "meshes": [
       {
-        "name": "CubeMesh",
-        "uuid": "00751e45-a404-4955-80f4-b17a2c30a027",
-        "generator": "cube"
+        "name": "torus.obj",
+        "uuid": "af6404fa-a4f7-4b01-8c8b-1218faf6d35c",
+        "generator": "obj",
+        "source": "models/src/torus.obj"
       }
     ],
     "models": [
       {
-        "name": "Cube",
-        "uuid": "a0f30c19-ecdb-4f22-8cf5-f908c6250af9",
-        "mesh": "00751e45-a404-4955-80f4-b17a2c30a027",
-        "material": "733e8988-32c3-411f-b877-dca11c761b08"
+        "name": "Torus",
+        "uuid": "ce54d354-f867-4ff4-a802-070858691c80",
+        "mesh": "af6404fa-a4f7-4b01-8c8b-1218faf6d35c",
+        "material": "54484011-5c9e-4479-81f4-937888131e60"
       }
     ],
     "materials": [
       {
-        "name": "PBRCubeMaterial",
-        "uuid": "733e8988-32c3-411f-b877-dca11c761b08",
+        "name": "PBRMaterial",
+        "uuid": "54484011-5c9e-4479-81f4-937888131e60",
         "textures": {
           "diffuse": "",
           "others": "..."
@@ -166,12 +174,62 @@
         "entrypoint": ""
       },
       {
-        "name": "showUVs",
-        "uuid": "203b6d6b-3cfc-4cf3-b624-2f003fd661ec",
+        "name": "pbrShader",
+        "uuid": "a1c0dd7b-6956-45be-9821-4c7a56819d5b",
+        "type": "ps",
+        "filename": "shaders/flat.hlsl",
+        "entrypoint": ""
+      },
+      {
+        "name": "ssaoShader",
+        "uuid": "befdc2c1-9ecc-4e0f-95f4-eb9bc38d0130",
+        "type": "ps",
+        "filename": "shaders/flat.hlsl",
+        "entrypoint": ""
+      },
+      {
+        "name": "ssaoBlurShader",
+        "uuid": "996176c2-dade-4741-b596-fad888af3768",
+        "type": "ps",
+        "filename": "shaders/flat.hlsl",
+        "entrypoint": ""
+      },
+      {
+        "name": "bloomShader",
+        "uuid": "dc02f0c2-b4c8-4710-ba52-f9b441f4b341",
+        "type": "ps",
+        "filename": "shaders/flat.hlsl",
+        "entrypoint": ""
+      },
+      {
+        "name": "chronaticAbberationShader",
+        "uuid": "082484f0-7237-4a24-b6c2-313fd4456ae9",
+        "type": "ps",
+        "filename": "shaders/flat.hlsl",
+        "entrypoint": ""
+      },
+      {
+        "name": "dofCalcShader",
+        "uuid": "7c49edd4-9fab-4faf-916f-319feb0b9a17",
+        "type": "ps",
+        "filename": "shaders/flat.hlsl",
+        "entrypoint": ""
+      },
+      {
+        "name": "dofBlurShader",
+        "uuid": "5188f87c-c66b-4207-af8d-835d9bea3df7",
+        "type": "ps",
+        "filename": "shaders/flat.hlsl",
+        "entrypoint": ""
+      },
+      {
+        "name": "dofJoinShader",
+        "uuid": "d6ed270e-b5d1-4575-ae9a-94168f4f094a",
         "type": "ps",
         "filename": "shaders/flat.hlsl",
         "entrypoint": ""
       }
+
     ]
   },
   "scenegraphs": [

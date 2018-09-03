@@ -14,6 +14,7 @@
 
 #include "render/material.h"
 #include "render/model.h"
+#include "render/mesh.h"
 
 #include "core/Music.h"
 
@@ -22,8 +23,8 @@
 using namespace GkDemo;
 using namespace Grafkit;
 
-#define JSON_PATH "schema_scenegraph.json"
-namespace NSContextPregnancyTest
+#define JSON_PATH "schema_mesh.json"
+namespace NSSchemaMeshTest
 {
     class TestApplicationWindow : public System
     {
@@ -50,18 +51,18 @@ namespace NSContextPregnancyTest
     };
 }
 
-using namespace NSContextPregnancyTest;
+using namespace NSSchemaMeshTest;
 
-class ContextPregnancyTest : public testing::Test
+class SchemaMeshTest : public testing::Test
 {
 public:
-    ContextPregnancyTest() : m_window(nullptr)
+    SchemaMeshTest() : m_window(nullptr)
         , m_context(nullptr) {
         m_window = new TestApplicationWindow(m_render);
         m_assetFactory = new FileAssetFactory("tests/assets/");
     }
 
-    ~ContextPregnancyTest()
+    ~SchemaMeshTest()
     {
         delete m_assetFactory;
         delete m_window;
@@ -133,105 +134,52 @@ protected:
 
 // ============================================================================================
 
-TEST_F(ContextPregnancyTest, JsonLoad)
+namespace Uuids{
+    const char * torusMeshUuid = "af6404fa-a4f7-4b01-8c8b-1218faf6d35c";
+}
+
+TEST_F(SchemaMeshTest, MeshLoad)
 {
     // given: context
     this->BuildDemo();
+
+    // when
     ASSERT_TRUE(m_demo.Valid());
-
-    // when
+    MeshRef mesh = SafeGetObject<Mesh>(Uuids::torusMeshUuid);
     
-
     // then
-    ASSERT_EQ(1, m_demo->GetSceneCount());
-    ASSERT_TRUE(m_demo->GetScene(0));
-    ASSERT_TRUE(m_demo->GetMusic());
+    ASSERT_TRUE(mesh);
+    ASSERT_STREQ(Uuids::torusMeshUuid, mesh->GetUuid().c_str());
+    ASSERT_STREQ("torus.obj", mesh->GetName().c_str());
 
-    ASSERT_TRUE(m_demo->GetPs());
-    ASSERT_TRUE(m_demo->GetPs()->Valid());
-
-    ASSERT_TRUE(m_demo->GetVs());
-    ASSERT_TRUE(m_demo->GetVs()->Valid());
-
-    ASSERT_EQ(1, m_demo->GetAnimationCount());
-    ASSERT_TRUE(m_demo->GetAnimation(0));
-}
-TEST_F(ContextPregnancyTest, SceneActorTest)
-{
-    // given: context
-    this->BuildDemo();
-
-
-    // when
-    SceneRef scene = m_demo->GetScene(0)->Get();
-    ASSERT_TRUE(scene);
-
-    SceneGraphRef scenegraph = scene->GetSceneGraph();
-    ASSERT_TRUE(scenegraph);
-
-    // then
-
-    ASSERT_TRUE(scenegraph->GetRootNode());
-
-    size_t actorCount = scenegraph->GetNodeCount();
-    ASSERT_EQ(6, actorCount);
-
-    for (size_t i = 0; i < actorCount; i++) { ASSERT_TRUE(scenegraph->GetNode(i)) << "Node " << i; }
-
+    // ... 
 }
 
-TEST_F(ContextPregnancyTest, DISABLED_SceneEntityTest)
+namespace Uuids {
+    const char * torusModelUuid = "ce54d354-f867-4ff4-a802-070858691c80";
+}
+
+TEST_F(SchemaMeshTest, ModelLoad)
 {
     // given: context
     this->BuildDemo();
 
     // when
-    SceneRef scene = m_demo->GetScene(0)->Get();
-    ASSERT_TRUE(scene);
-
-    SceneGraphRef scenegraph = scene->GetSceneGraph();
-    ASSERT_TRUE(scenegraph);
+    ASSERT_TRUE(m_demo.Valid());
+    ModelRef model = SafeGetObject<Model>(Uuids::torusModelUuid);
 
     // then
-}
+    ASSERT_TRUE(model);
+    ASSERT_STREQ(Uuids::torusModelUuid, model->GetUuid().c_str());
+    ASSERT_STREQ("Torus", model->GetName().c_str());
 
-TEST_F(ContextPregnancyTest, SceneLightTest)
-{
-    // given: context
-    this->BuildDemo();
+    // 
+    MeshRef  mesh = model->GetMesh();
 
-    // when
-    SceneRef scene = m_demo->GetScene(0)->Get();
-    ASSERT_TRUE(scene);
-    // then
+    ASSERT_TRUE(mesh);
+    ASSERT_STREQ(Uuids::torusMeshUuid, mesh->GetUuid().c_str());
+    ASSERT_STREQ("torus.obj", mesh->GetName().c_str());
 
-    size_t actorCount = scene->GetLightCount();
-    ASSERT_EQ(1, actorCount);
-
-    for (size_t i = 0; i < actorCount; i++) { ASSERT_TRUE(scene->GetLight(i)) << "Light Node " << i; }
-}
-
-TEST_F(ContextPregnancyTest, SceneCameraTest)
-{
-    // given: context
-    this->BuildDemo();
-
-    // when
-    SceneRef scene = m_demo->GetScene(0)->Get();
-    ASSERT_TRUE(scene);
-    // then
-
-    CameraRef camera1 = scene->GetCamera("Camera01");
-    ASSERT_TRUE(camera1);
-    //ASERT_STREQ("", camera1->GetUuid().c_str());
-
-    CameraRef camera2 = scene->GetCamera("Camera02");
-    ASSERT_TRUE(camera2);
-    //ASERT_STREQ("", camera2->GetUuid().c_str());
-
-    size_t actorCount = scene->GetCameraCount();
-    ASSERT_EQ(2, actorCount);
-
-    for (size_t i = 0; i < actorCount; i++) { ASSERT_TRUE(scene->GetCamera(i)) << "Camera Node " << i; }
-
+    // 
+    ASSERT_TRUE(model->GetMaterial());
 }

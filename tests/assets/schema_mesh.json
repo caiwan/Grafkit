@@ -5,10 +5,8 @@
       "filename": "alpha_c_-_euh.ogg"
     },
     "render": {
-      "forward": {
         "vs": "43ae2c7a-b8e7-4eb0-a888-7ce1c2fa90a1",
         "ps": "5f72e9aa-93f5-4d86-ada8-9543b625337e"
-      }
     },
     "scenes": [
       {
@@ -87,7 +85,7 @@
             "id": 1,
             "uuid": "54e1f5b3-61e2-4413-8d80-edc46148a976"
           }
-        ] 
+        ]
       }
     ],
     "animations": [
@@ -105,7 +103,8 @@
       {
         "name": "",
         "uuid": "",
-        "filename": ""
+        "filename": "",
+		"generator" :""
       }
     ],
     "meshes": [
@@ -113,13 +112,13 @@
         "name": "torus.obj",
         "uuid": "af6404fa-a4f7-4b01-8c8b-1218faf6d35c",
         "generator": "obj",
-		"source":"models.src/torus.obj"
+        "source": "models/src/torus.obj"
       }
     ],
     "models": [
       {
         "name": "Torus",
-        "uuid": "54484011-5c9e-4479-81f4-937888131e60",
+        "uuid": "ce54d354-f867-4ff4-a802-070858691c80",
         "mesh": "af6404fa-a4f7-4b01-8c8b-1218faf6d35c",
         "material": "54484011-5c9e-4479-81f4-937888131e60"
       }

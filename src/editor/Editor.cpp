@@ -51,6 +51,7 @@ void Editor::Initialize(IResourceManager* const& resman)
 
 void Editor::InitializeDocument()
 {
+    m_context->SetIsFxaa(true);
     Demo* demo = m_context->GetDemo();
     assert(demo);
     try

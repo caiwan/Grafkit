@@ -27,11 +27,11 @@
 using namespace GkDemo;
 using namespace Grafkit;
 
-#define JSON_PATH "schema.json"
+#define JSON_PATH "schema_scenegraph.json"
 
 // --- 
 
-namespace NSSchemaTest
+namespace NSSchemaSchenegraphTest
 {
     class TestApplicationWindow : public System
     {
@@ -56,13 +56,13 @@ namespace NSSchemaTest
     };
 }
 
-using namespace NSSchemaTest;
+using namespace NSSchemaSchenegraphTest;
 
 
-class SchemaTest : public testing::Test
+class SchemaSchenegraphTest : public testing::Test
 {
 public:
-    SchemaTest() : m_context(nullptr)
+    SchemaSchenegraphTest() : m_context(nullptr)
         , m_window(nullptr)
         , m_assetFactory(nullptr)
     {
@@ -70,7 +70,7 @@ public:
         m_assetFactory = new FileAssetFactory("tests/assets/");
     }
 
-    ~SchemaTest()
+    ~SchemaSchenegraphTest()
     {
         delete m_assetFactory;
         delete m_window;
@@ -137,7 +137,7 @@ protected:
 
 // ============================================================================================
 
-TEST_F(SchemaTest, JsonLoad)
+TEST_F(SchemaSchenegraphTest, JsonLoad)
 {
     // given: context
     // when
@@ -168,7 +168,7 @@ namespace Uuids
     const char* psUuid = "5f72e9aa-93f5-4d86-ada8-9543b625337e";
 }
 
-TEST_F(SchemaTest, AssetMaterialLoadTest)
+TEST_F(SchemaSchenegraphTest, AssetMaterialLoadTest)
 {
     // given: 
     this->BuildDemo();
@@ -181,7 +181,7 @@ TEST_F(SchemaTest, AssetMaterialLoadTest)
     ASSERT_STREQ("PBRCubeMaterial", material->GetName().c_str());
 }
 
-TEST_F(SchemaTest, AssetMeshLoadTest)
+TEST_F(SchemaSchenegraphTest, AssetMeshLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -200,7 +200,7 @@ TEST_F(SchemaTest, AssetMeshLoadTest)
     ASSERT_NE(nullptr, mesh->GetIndices());
 }
 
-TEST_F(SchemaTest, AssetModelLoadTest)
+TEST_F(SchemaSchenegraphTest, AssetModelLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -217,7 +217,7 @@ TEST_F(SchemaTest, AssetModelLoadTest)
     ASSERT_EQ(material, model->GetMaterial());
 }
 
-TEST_F(SchemaTest, AssetCameraLoadTest)
+TEST_F(SchemaSchenegraphTest, AssetCameraLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -235,7 +235,7 @@ TEST_F(SchemaTest, AssetCameraLoadTest)
     ASSERT_STREQ("Camera02", camera2->GetName().c_str());
 }
 
-TEST_F(SchemaTest, AssetLightLoadTest)
+TEST_F(SchemaSchenegraphTest, AssetLightLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -248,7 +248,7 @@ TEST_F(SchemaTest, AssetLightLoadTest)
     ASSERT_STREQ("Light01", light->GetName().c_str());
 }
 
-TEST_F(SchemaTest, AssetVShaderLoadTest)
+TEST_F(SchemaSchenegraphTest, AssetVShaderLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -261,7 +261,7 @@ TEST_F(SchemaTest, AssetVShaderLoadTest)
     ASSERT_STREQ("vertexShader", shader->GetName().c_str());
 }
 
-TEST_F(SchemaTest, AssetPShaderLoadTest)
+TEST_F(SchemaSchenegraphTest, AssetPShaderLoadTest)
 {
     // given: context and ... 
     this->BuildDemo();
@@ -286,7 +286,7 @@ namespace Uuids
     const char* cubeActorUuid = "3bd7e8db-e851-4db2-b333-16e0b3f66019";
 }
 
-TEST_F(SchemaTest, ActorMeshTest)
+TEST_F(SchemaSchenegraphTest, ActorMeshTest)
 {
     // given
     this->BuildDemo();
@@ -306,7 +306,7 @@ TEST_F(SchemaTest, ActorMeshTest)
     ASSERT_EQ(model.Get(), cubeActor->GetEntity(0).Get());
 }
 
-TEST_F(SchemaTest, ActorCameraTest)
+TEST_F(SchemaSchenegraphTest, ActorCameraTest)
 {
     // given
     this->BuildDemo();
@@ -346,7 +346,7 @@ TEST_F(SchemaTest, ActorCameraTest)
     ASSERT_EQ(camera2.Get(), camera2Actor->GetEntity(0).Get());
 }
 
-TEST_F(SchemaTest, ActorLightTest)
+TEST_F(SchemaSchenegraphTest, ActorLightTest)
 {
     // given
     this->BuildDemo();
@@ -373,7 +373,7 @@ TEST_F(SchemaTest, ActorLightTest)
  * CameraActor -> Camera02
  */
 
-TEST_F(SchemaTest, ActorSchemaTest)
+TEST_F(SchemaSchenegraphTest, ActorSchemaSchenegraphTest)
 {
     // given
     BuildDemo();
@@ -407,7 +407,7 @@ namespace Uuids
     const char* sceneUuid = "dd0900ab-d654-4d65-9960-42c0633c535e";
 }
 
-TEST_F(SchemaTest, DemoSceneTest)
+TEST_F(SchemaSchenegraphTest, DemoSceneTest)
 {
     // given
     BuildDemo();
@@ -434,7 +434,7 @@ TEST_F(SchemaTest, DemoSceneTest)
 }
 
 
-TEST_F(SchemaTest, DemoPShaderTest)
+TEST_F(SchemaSchenegraphTest, DemoPShaderTest)
 {
     // given
     BuildDemo();
@@ -448,7 +448,7 @@ TEST_F(SchemaTest, DemoPShaderTest)
     ASSERT_EQ(shader, m_demo->GetPs());
 }
 
-TEST_F(SchemaTest, DemoVShaderTest)
+TEST_F(SchemaSchenegraphTest, DemoVShaderTest)
 {
     // given
     BuildDemo();
@@ -481,7 +481,7 @@ namespace Uuids
 }
 
 
-TEST_F(SchemaTest, ActorAnimations)
+TEST_F(SchemaSchenegraphTest, ActorAnimations)
 {
     // given
     BuildDemo();
@@ -526,7 +526,7 @@ TEST_F(SchemaTest, ActorAnimations)
 }
 
 
-TEST_F(SchemaTest, DemoAnimation)
+TEST_F(SchemaSchenegraphTest, DemoAnimation)
 {
     // given
     BuildDemo();

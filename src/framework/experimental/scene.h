@@ -5,6 +5,9 @@
 
 #include "common.h"
 
+#include "renderable.h"
+
+
 #include "render/SceneGraph.h"
 
 #include "render/Shader.h"
@@ -192,7 +195,7 @@ namespace Grafkit
     // ---------------------------------------------------------------------------
 
 
-    class Scene : public Object,
+    class Scene : public Object, public Renderable,
         public HasSceneGraphRole,
         public HasAnimationsRole,
         public HasCamerasRole,
@@ -202,45 +205,21 @@ namespace Grafkit
         Scene();
         virtual ~Scene();
 
-        void Initialize();
-        void Shutdown();
+        void Initialize() override;
+        void Shutdown() override;
 
-        void Build(Renderer& render);
-        void Build(Renderer& render, ShaderResRef vs, ShaderResRef ps); // legacy stuff
+        void Build(Renderer& render) override;
+        void Build(Renderer& render, ShaderResRef vs, ShaderResRef ps) override; // legacy stuff
 
-        void UpdateScene(Renderer& render, float time);
+        void UpdateScene(Renderer& render, float time) override;
 
-        void RenderFrame(Renderer& render, float time);
-        void Render(Renderer& render);
+        void RenderFrame(Renderer& render, float time) override;
+        void Render(Renderer& render) override;
 
         // -- persistent
         PERSISTENT_DECL(Grafkit::Scene, 1);
     protected:
         void Serialize(Archive& ar) override;
-    };
-
-
-    // ---------------------------------------------------------------------------
-    // -> Demo CTX.
-    class SceneRenderBuffers
-    {
-    public:
-        //void Precalc(/* + resman */); // + resman
-
-        // + Initialize
-        // + Shutdown
-
-        // + bind to render
-        // + bind to shader param
-
-    private:
-        Texture2DResRef m_mapColor;
-        Texture2DResRef m_mapNormal;
-        Texture2DResRef m_mapPosition;
-        Texture2DResRef m_mapHeight;
-        Texture2DResRef m_mapRoughness;
-        Texture2DResRef m_mapMetallic;
-        Texture2DResRef m_mapEmission;
     };
 }
 

@@ -95,7 +95,9 @@ namespace Grafkit
         ~MutexLocker()
         {
             m_mutex->Unlock();
-            assert(!m_mutex->IsLocked());
+            
+            if (m_mutex->IsLocked())
+                assert(0);
         }
 
         Mutex* GetMutex() const { return m_mutex; }

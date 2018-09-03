@@ -9,6 +9,7 @@
 #include "render/model.h"
 #include "render/material.h"
 #include "render/texture.h"
+//#include "render/effect.h"
 
 #include "render/SceneGraph.h"
 #include "experimental/scene.h"
@@ -32,7 +33,16 @@ using namespace GrafkitData;
 // ============================================================================================
 
 Demo::Demo() : m_activeSceneId(0)
-    , m_activeCameraId(0) {
+    , m_activeCameraId(0)
+    , m_isFxaa(false)
+{
+    //m_renderTarget = new DeferredRenderTarget();
+
+    m_mapNormal = new Texture2D();
+    m_mapPosition = new Texture2D();
+    m_mapRoughness = new Texture2D();
+    m_mapMetallic = new Texture2D();
+    m_mapEmission = new Texture2D();
 }
 
 Demo::~Demo() {
@@ -87,7 +97,33 @@ void Demo::Initialize(Renderer& render)
             }
         }
     }
+
+    //m_renderTarget->Initialize(render);
+
+    m_mapNormal->InitializeFloatRGBA(render);
+    m_mapPosition->InitializeFloatRGBA(render);
+    m_mapRoughness->InitializeFloatRGBA(render);
+    m_mapMetallic->InitializeFloatRGBA(render);
+    m_mapEmission->InitializeFloatRGBA(render);
+
+    m_effect = new EffectComposer();
+
+    //m_effect->AddPass(new EffectPass(m_fxPBR));
+    //m_effect->AddPass(new EffectPass(m_fxSSAO));
+    //m_effect->AddPass(new EffectPass(m_fxSSAOBlur));
+    //m_effect->AddPass(new EffectPass(m_fxBloom));
+    //m_effect->AddPass(new EffectPass(m_fxChromaticAbberation));
+    if (m_isFxaa) m_effect->AddPass(new EffectPass(m_fxaa));
+
+    m_effect->Initialize(render);
+
+    m_effect->SetInput(1, m_mapNormal);
+    m_effect->SetInput(2, m_mapPosition);
+    m_effect->SetInput(3, m_mapRoughness);
+    m_effect->SetInput(4, m_mapMetallic);
+    m_effect->SetInput(5, m_mapEmission);
 }
+
 
 SceneResRef Demo::GetActiveScene() const { return m_scenes.at(m_activeSceneId); }
 
@@ -111,8 +147,15 @@ int Demo::Render(Renderer& render, float time)
     // --- 
     render.BeginScene();
 
+    //m_renderTarget->BindTarget();
+    m_effect->BindInput(render);
+
     SceneResRef scene = GetActiveScene();
     if (scene && *scene) { (*scene)->Render(render); }
+
+    m_effect->UnbindInput(render);
+
+    m_effect->Render(render);
 
     render.EndScene();
 
@@ -129,13 +172,8 @@ void Demo::SetActiveCameraId(const uint32_t activeCameraId)
 {
     std::pair<uint32_t, uint32_t> id(m_activeSceneId, activeCameraId);
     auto it = m_cameraIDs.find(id);
-    if (it != m_cameraIDs.end())
-    {
-        m_activeCameraId = it->second.second;
-    } else
-    {
-        m_activeCameraId = 0;
-    }
+    if (it != m_cameraIDs.end()) { m_activeCameraId = it->second.second; }
+    else { m_activeCameraId = 0; }
 }
 
 MusicResRef Demo::GetMusic() const { return m_music; }
@@ -183,11 +221,11 @@ void DemoAnimation::Update(double time)
 
         float fCameraId = floor(m_activeCamera->GetChannel(0)->GetValue(time));
         m_target->SetActiveCameraId(uint32_t(fCameraId));
-
     }
 }
 
-void DemoAnimation::Serialize(Archive& ar) {
+void DemoAnimation::Serialize(Archive& ar)
+{
     Animation::_Serialize(ar);
     m_activeScene = m_tracks[0];
     m_activeCamera = m_tracks[1];
