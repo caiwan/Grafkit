@@ -3,11 +3,14 @@
 */
 #pragma once 
 
-#include "core/Asset.h"
-#include "core/Resource.h"
+#include "core/Object.h"
+
+// #include "core/Asset.h"
+// #include "core/Resource.h"
 
 namespace Grafkit {
-
+    class Clonable;
+    class IResource;
     class IResourceManager;
 
     class IResourceBuilder : public Object

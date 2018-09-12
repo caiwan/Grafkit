@@ -15,7 +15,7 @@
 #include "render/material.h"
 #include "render/texture.h""
 
-#include "resource/loadersTextureLoader.h"
+#include "resource/loaders/TextureLoader.h"
 
 // --- 
 

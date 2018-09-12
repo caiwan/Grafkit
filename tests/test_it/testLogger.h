@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/logger.h"
+#include "core/logger.h"
 
 
 class TestLoggerHandler : public Grafkit::Logger::ILoggerHandler

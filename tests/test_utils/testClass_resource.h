@@ -40,10 +40,11 @@ typedef Ref<ThingResource> ThingResourceRef;
 class BaseThing : public Grafkit::Object
 {
 public:
-    virtual int GetId() const  = 0;
+    virtual int GetId() const { return 0; };
 
+protected:
+    void Serialize(Grafkit::Archive &ar) override {}
     PERSISTENT_DECL(BaseThing, 1);
-
 };
 
 class DerivedThing1 : public BaseThing

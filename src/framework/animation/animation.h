@@ -16,7 +16,7 @@ namespace Grafkit
     /**
     Common anim. interface
     */
-    class Animation : public Object
+    class Animation : public Object 
     {
     public:
         Animation();

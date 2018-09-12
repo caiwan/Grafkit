@@ -1,8 +1,6 @@
 #include "context.h"
 
 #include "demo.h"
-
-
 #include "math/fbm.h"
 
 #include "render/shader.h"
@@ -20,9 +18,12 @@
 #include "resource/loaders/ShaderLoader.h"
 
 #include "resource/ResourceManager.h"
-#include "resource/loaders/MusicBassLoader.h"
+
+#include "utils/asset/AssetFactory.h"
+#include "core/Asset.h"
 
 #include "core/Music.h"
+#include "resource/loaders/MusicBassLoader.h"
 
 #include "schema.h"
 

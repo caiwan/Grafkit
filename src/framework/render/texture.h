@@ -82,10 +82,10 @@ namespace Grafkit
 		ID3D11RenderTargetView* GetRenderTargetView() const { return this->m_pTargetView; }
 		ID3D11Resource* GetTextureResource() const { return this->m_pTexture; }
 
-	    explicit operator ID3D11ShaderResourceView*() const { return this->m_pResourceView; }
+	    /*explicit*/ operator ID3D11ShaderResourceView*() const { return this->m_pResourceView; }
 
-	    explicit operator ID3D11RenderTargetView*() const { return this->m_pTargetView; }
-	    explicit operator ID3D11Resource*() const { return this->m_pTexture; }
+	    /*explicit */ operator ID3D11RenderTargetView*() const { return this->m_pTargetView; }
+	    /*explicit */ operator ID3D11Resource*() const { return this->m_pTexture; }
 
 		// Ezt kurvara ki kell innen baszni
 		//void SetRenderTargetView(Renderer & device, size_t id = 0) const;

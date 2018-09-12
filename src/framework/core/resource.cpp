@@ -37,7 +37,7 @@ IResource::IResource(const std::string& name, const std::string& uuid) : Object(
 IResource::~IResource() {
 }
 
-void IResource::Serialize(Archive& ar) {
-    assert(0);
-}
+//void IResource::Serialize(Archive& ar) {
+//    assert(0);
+//}
 

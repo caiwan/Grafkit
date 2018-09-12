@@ -25,7 +25,11 @@ if (MSVC)
 	target_compile_options(${APPLICATION_NAME} PUBLIC "$<$<CONFIG:Debug>:/MDd>")
 endif(MSVC)
 
-target_link_libraries(${APPLICATION_NAME} Grafkit2 DemoContext ${BASS_LIBRARY_RELEASE})
+target_link_libraries( ${APPLICATION_NAME} 
+	# Grafkit2 
+	DemoContext 
+	${BASS_LIBRARY_RELEASE}
+)
 target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES})

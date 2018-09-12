@@ -62,10 +62,10 @@ namespace Grafkit {
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
 
 		// --- getters
-        ID3D11Device * const & GetDevice() { return this->m_device; }
+        ID3D11Device * const & GetDevice() const { return this->m_device; }
 		operator ID3D11Device *&() { return this->m_device; }
 
-        ID3D11DeviceContext * const & GetDeviceContext() { return this->m_deviceContext; }
+        ID3D11DeviceContext * const & GetDeviceContext() const { return this->m_deviceContext; }
 		operator ID3D11DeviceContext *&() { return this->m_deviceContext; }
 
 		void GetVideoCardInfo(char* dest);
@@ -73,11 +73,11 @@ namespace Grafkit {
 		void GetScreenSize(int &screenW, int &screenH) const { screenW = m_screenW; screenH = m_screenH; }
 		void GetScreenSizef(float &screenW, float &screenH) const { screenW = m_screenW; screenH = m_screenH; }
 
-		void GetViewportSize(int &viewW, int &viewH) const { viewW = m_viewport.Width; viewH = m_viewport.Height; }
-		void GetViewportSize(int &viewW, int &viewH, int &viewX, int &viewY) const { viewW = m_viewport.Width; viewH = m_viewport.Height; viewX = m_viewport.TopLeftX; viewY = m_viewport.TopLeftY; }
-		void GetViewportSizef(float &viewW, float &viewH) const { viewW = (float)m_viewport.Width; viewH = (float)m_viewport.Height; }
+		void GetViewportSize(int &viewW, int &viewH) const { viewW = (int)m_viewport.Width; viewH = (int)m_viewport.Height; }
+		void GetViewportSize(int &viewW, int &viewH, int &viewX, int &viewY) const { viewW = (int)m_viewport.Width; viewH = (int)m_viewport.Height; viewX = (int)m_viewport.TopLeftX; viewY = (int)m_viewport.TopLeftY; }
+		void GetViewportSizef(float &viewW, float &viewH) const { viewW = float(m_viewport.Width); viewH = static_cast<float>(m_viewport.Height); }
 
-		float GetAspectRatio() const {return (float)m_viewport.Width / (float)m_viewport.Height;}
+		float GetAspectRatio() const {return float(m_viewport.Width) / float(m_viewport.Height);}
 
 		float GetDeltaTime() const { return m_lastDeltaTime; }
 

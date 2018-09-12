@@ -17,7 +17,7 @@
 
 #include "core/Music.h"
 #include "animation/actoranimation.h"
-#include "experimental/AnimationLoader.h"
+#include "resource/loaders/AnimationLoader.h"
 #include "utils/persistence/archive.h"
 
 // --- 

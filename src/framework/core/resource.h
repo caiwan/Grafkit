@@ -36,10 +36,10 @@ namespace Grafkit
         virtual ~IResource();
 
         virtual void* GetRaw() const = 0;
-   
+
     protected:
-        PERSISTENT_DECL(Grafkit::IResource, 1)
-        void Serialize(Archive& ar) override ;
+        //void Serialize(Archive& ar) override;
+        //PERSISTENT_DECL(Grafkit::IResource, 1);
     };
 
     /**
@@ -75,16 +75,27 @@ namespace Grafkit
         explicit Resource(Ref<T> tref, const std::string& name, const std::string& uuid) : IResource(name, uuid)
             , Ref<T>(tref) {
         }
-        
+
         explicit operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
         explicit operator T * const &() { return dynamic_cast<T*>(this->Get()); }
         explicit operator T&() { return *this->Get(); }
 
         void* GetRaw() const override { return this->Get(); }
+    protected:
+
+        void Serialize(Archive& ar) override;
+        PERSISTENT_DECL(Grafkit::Resource<T>, 1);
     };
 
     //template <typename T>
-    //void Resource<T>::Serialize(Archive& ar) { _Serialize(ar); }
+    //void Resource<T>::Serialize(Archive& ar) {
+    //    assert(0);
+    //}
+
+    template <typename T>
+    void Resource<T>::Serialize(Archive& ar) { _Serialize(ar); }
+
+    // ------------------------------------------------------------------
 
     //class ObjectResource : public Resource<Object>
     //{
@@ -93,13 +104,13 @@ namespace Grafkit
     //    ObjectResource() {
     //    }
 
-    //    explicit ObjectResource(Resource* ptr)
+    //    explicit ObjectResource(Resource<Object>* ptr)
     //        : Resource<Object>(ptr) {
     //        SetName(ptr->GetName());
     //        SetUuid(ptr->GetUuid());
     //    }
 
-    //    explicit ObjectResource(const Ref<Resource>& ref)
+    //    explicit ObjectResource(const Ref<Resource<Object>>& ref)
     //        : Resource<Object>(ref) {
     //        SetName(ref->GetName());
     //        SetUuid(ref->GetUuid());
@@ -125,7 +136,7 @@ namespace Grafkit
     //    }
 
     //    ~ObjectResource() override {};
-    //    void* GetRaw() const override {};
+    //    void* GetRaw() const override { return this->Get(); };
 
     //};
 }

@@ -1,8 +1,8 @@
 #include "stdafx.h"
-
 #include "Actor.h"
-#include "shader.h"
 #include "SceneGraph.h"
+
+#include "shader.h"
 
 PERSISTENT_IMPL(Grafkit::Actor)
 
