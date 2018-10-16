@@ -142,10 +142,10 @@ ActorRef SceneGraph::GetNode(std::string name)
     return nullptr;
 }
 
-void SceneGraph::Serialize(Archive& ar)
-{
-    _Serialize(ar);
-    // actorok, entityk exportja, importja goez here 
-    // a regi scene loaderbol ki kell szedni es ide be kell rakosgatni
-    assert(0);
-}
+//void SceneGraph::Serialize(Archive& ar)
+//{
+//    _Serialize(ar);
+//    // actorok, entityk exportja, importja goez here 
+//    // a regi scene loaderbol ki kell szedni es ide be kell rakosgatni
+//    assert(0);
+//}

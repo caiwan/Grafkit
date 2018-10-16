@@ -4,25 +4,35 @@
 
 namespace Grafkit
 {
-    class IAnimationLoader : public IResourceBuilder
-    {
-    public:
-        explicit IAnimationLoader(std::string name, std::string sourcename = "", std::string uuid = "", std::string targetUuid = "")
-            : IResourceBuilder(name, sourcename, uuid)
-            , m_target(targetUuid) {
-        }
+    class ActorAnimation;
 
-    protected:
-        std::string m_target;
+    struct ActorAnimationParams
+    {
+        std::string sourceName;
+        std::string target;
     };
 
-    class ActorAnimationLoader : public IAnimationLoader
+    class ActorAnimationLoader : public ResourceBuilder<ActorAnimation, ActorAnimationParams>
     {
     public:
-        explicit ActorAnimationLoader(std::string name, std::string sourcename = "", std::string uuid = "", std::string targetUuid = "");
+        ActorAnimationLoader() {
+        }
 
-        IResource* NewResource() override;
+        explicit ActorAnimationLoader(const ActorAnimationParams& params)
+            : ResourceBuilder<ActorAnimation, ActorAnimationParams>(params) {
+        }
+
+        ActorAnimationLoader(const std::string& name, const std::string& uuid, const ActorAnimationParams& params)
+            : ResourceBuilder<ActorAnimation, ActorAnimationParams>(name, uuid, params) {
+        }
+
         void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        PERSISTENT_DECL(ActorAnimationLoader, 1);
+
+    //protected:
+    //    void Serialize(Archive& ar) override;
     };
 }
 

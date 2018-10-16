@@ -1,205 +1,220 @@
 #pragma once
+#include <array>
 #include "render/dxtypes.h"
 #include "quaternion.h"
+#include "vector.h"
 #include "core/memory.h"
 
-namespace Grafkit {
-	/**
-	Extends DirectX::XMMATRIX with operations to make thing easier, and use as a real type.
-	https://msdn.microsoft.com/en-us/library/windows/desktop/ee415594(v=vs.85).aspx
+namespace Grafkit
+{
+    /**
+    Extends DirectX::XMMATRIX with operations to make thing easier, and use as a real type.
+    https://msdn.microsoft.com/en-us/library/windows/desktop/ee415594(v=vs.85).aspx
 
-	NOTE THIS FUCKER ALL THE TIME http://stackoverflow.com/questions/11285680/crash-after-m-xmmatrixidentity-aligment-memory-in-classes
+    NOTE THIS FUCKER ALL THE TIME http://stackoverflow.com/questions/11285680/crash-after-m-xmmatrixidentity-aligment-memory-in-classes
 
-	`::matrix` is a shortcut to `DirectX::XMMATRIX`
-	*/
+    `::matrix` is a shortcut to `DirectX::XMMATRIX`
+    */
 
-	__declspec(align(16)) class Matrix : public AlignedNew<Matrix>
-	{
+    __declspec(align(16)) class Matrix : public AlignedNew<Matrix>
+    {
+    public:
+        // --- constructors
+        Matrix() { this->Identity(); }
 
-	private:
-		matrix mat;
+        Matrix(
+            float a1, float a2, float a3, float a4,
+            float b1, float b2, float b3, float b4,
+            float c1, float c2, float c3, float c4,
+            float d1, float d2, float d3, float d4
+        )
+        {
+            this->m_mat = DirectX::XMMatrixSet(
+                a1, a2, a3, a4,
+                b1, b2, b3, b4,
+                c1, c2, c3, c4,
+                d1, d2, d3, d4
+            );
+        }
 
-	public:
-		// --- constructors
-		Matrix() {
-			this->Identity();
-		}
+        Matrix(const matrix& m) : m_mat(m) {
+        }
 
-		Matrix(
-			float a1, float a2, float a3, float a4,
-			float b1, float b2, float b3, float b4,
-			float c1, float c2, float c3, float c4,
-			float d1, float d2, float d3, float d4
-		) {
-			this->mat = DirectX::XMMatrixSet(
-				a1, a2, a3, a4,
-				b1, b2, b3, b4,
-				c1, c2, c3, c4,
-				d1, d2, d3, d4
-			);
-		}
+        Matrix(const Matrix& m) : m_mat(m.m_mat) {
+        }
 
-		Matrix(const matrix &m) : mat(m) {
-		}
+        Matrix(const Quaternion& q) { m_mat = matrix(q); }
 
-		Matrix(const Matrix &m) : mat(m.mat) {
-		}
+        // identity
+        void Identity() { this->m_mat = DirectX::XMMatrixIdentity(); }
 
-		Matrix(const Quaternion &q) {
-			mat = (matrix)q;
-		}
+        ///@{
+        /// Multiply
+        void Multiply(const matrix& m) { this->m_mat = XMMatrixMultiply(m, this->m_mat); }
 
-		// identity
-		void Identity() {
-			this->mat = DirectX::XMMatrixIdentity();
-		}
+        void Multiply(const Matrix& m) { this->m_mat = XMMatrixMultiply(m.m_mat, this->m_mat); }
+        ///@}
 
-		///@{
-		/// Multiply
-		void Multiply(const matrix &m)
-		{
-			this->mat = DirectX::XMMatrixMultiply(m, this->mat);
-		}
+        ///@{
+        ///translation
+        void Translate(const float3& v) { this->m_mat = XMMatrixMultiply(this->m_mat, DirectX::XMMatrixTranslation(v.x, v.y, v.z)); }
 
-		void Multiply(const Matrix &m)
-		{
-			this->mat = DirectX::XMMatrixMultiply(m.mat, this->mat);
-		}
-		///@}
+        void Translate(float x, float y, float z) { this->m_mat = XMMatrixMultiply(this->m_mat, DirectX::XMMatrixTranslation(x, y, z)); }
+        ///@}
 
-		///@{
-		///translation
-		void Translate(const float3 &v)
-		{
-			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixTranslation(v.x, v.y, v.z));
-		}
+        /// banana for
+        void Scale(const float3 v) { this->m_mat = XMMatrixMultiply(this->m_mat, DirectX::XMMatrixScaling(v.x, v.y, v.z)); }
 
-		void Translate(float x, float y, float z)
-		{
-			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixTranslation(x, y, z));
-		}
-		///@}
+        void Scale(float s) { Scale(s, s, s); }
 
-		/// banana for
-		void Scale(const float3 v)
-		{
-			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(v.x, v.y, v.z));
-		}
+        void Scale(float x, float y, float z) { this->m_mat = XMMatrixMultiply(this->m_mat, DirectX::XMMatrixScaling(x, y, z)); }
 
-		void Scale(float s) {
-			Scale(s, s, s);
-		}
+        /** Rotate around a given axis
+            @param v given axis
+            @param phi angle, rad */
+        void Rotate(const float3 v, float phi)
+        {
+            const dxvector vv = XMLoadFloat3(&v);
+            this->m_mat = XMMatrixMultiply(this->m_mat, DirectX::XMMatrixRotationNormal(vv, phi));
+        }
 
-		void Scale(float x, float y, float z)
-		{
-			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixScaling(x, y, z));
-		}
+        void Rotate(const Quaternion& q) { Multiply(static_cast<matrix>(q)); }
 
-		/** Rotate around a given axis
-			@param v given axis
-			@param phi angle, rad */
-		void Rotate(const float3 v, float phi)
-		{
-			dxvector vv;
-			vv = DirectX::XMLoadFloat3(&v);
-			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationNormal(vv, phi));
-		}
+        /// @todo https://en.wikipedia.org/wiki/Euler_angles
 
-		void Rotate(const Quaternion& q) {
-			Multiply((matrix)q);
-		}
+        /// Roll-Pitch-Yaw rotation, in rad
+        void RotateRPY(float roll, float pitch, float yaw) { this->m_mat = XMMatrixMultiply(this->m_mat, DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw)); }
 
-		/// @todo https://en.wikipedia.org/wiki/Euler_angles
+        void RotateRPY(float3 rpy) { this->RotateRPY(rpy.x, rpy.y, rpy.z); }
 
-		/// Roll-Pitch-Yaw rotation, in rad
-		void RotateRPY(float roll, float pitch, float yaw)
-		{
-			this->mat = DirectX::XMMatrixMultiply(this->mat, DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw));
-		}
+        // --- lookat
+        void LookAtLH(const float3& e, const float3& c = float3(0, 0, 0), const float3& u = float3(0, 1, 0))
+        {
+            const dxvector ev = XMLoadFloat3(&e);
+            const dxvector cv = XMLoadFloat3(&c);
+            const dxvector uv = XMLoadFloat3(&u);
+            m_mat = DirectX::XMMatrixLookAtLH(ev, cv, uv);
+        }
 
-		void RotateRPY(float3 rpy) {
-			this->RotateRPY(rpy.x, rpy.y, rpy.z);
-		}
+        void LookAtRH(const float3& e, const float3& c = float3(), const float3& u = float3(0, 1, 0))
+        {
+            const dxvector ev = XMLoadFloat3(&e);
+            const dxvector cv = XMLoadFloat3(&c);
+            const dxvector uv = XMLoadFloat3(&u);
+            m_mat = DirectX::XMMatrixLookAtRH(ev, cv, uv);
+        }
 
-		// --- lookat
-		void LookAtLH(const float3 &e, const float3 &c = float3(0,0,0), const float3 & u = float3(0, 1, 0)) {
-			dxvector ev = XMLoadFloat3(&e);
-			dxvector cv = XMLoadFloat3(&c);
-			dxvector uv = XMLoadFloat3(&u);
-			mat = DirectX::XMMatrixLookAtLH(ev, cv, uv);
-		}
+        /// Transpose matrix
+        void Transpose() { m_mat = XMMatrixTranspose(m_mat); }
 
-		void LookAtRH(const float3 &e, const float3 &c = float3(), const float3 & u = float3(0, 1, 0)) {
-			dxvector ev = XMLoadFloat3(&e);
-			dxvector cv = XMLoadFloat3(&c);
-			dxvector uv = XMLoadFloat3(&u);
-			mat = DirectX::XMMatrixLookAtRH(ev, cv, uv);
-		}
+        /// Invert matrix
+        void Invert() { m_mat = XMMatrixInverse(nullptr, m_mat); }
 
-		/// Transpose matrix
-		void Transpose() {
-			mat = DirectX::XMMatrixTranspose(mat);
-		}
+        // ===
+        // --- operations
 
-		/// Invert matrix
-		void Invert() {
-			mat = DirectX::XMMatrixInverse(nullptr, mat);
-		}
+        void Set(const Matrix& m) { m_mat = m.m_mat; }
+        void Set(const matrix& m) { m_mat = m; }
 
-		// ===
-		// --- operations
+        void Set(std::array<float4, 4> const &v)
+        {
+            m_mat.r[0] = XMLoadFloat4(&v[0]);
+            m_mat.r[1] = XMLoadFloat4(&v[1]);
+            m_mat.r[2] = XMLoadFloat4(&v[2]);
+            m_mat.r[3] = XMLoadFloat4(&v[3]);
+        }
 
-		void Set(const Matrix& m) { mat = m.mat; }
-		void Set(const matrix& m) { mat = m; }
+        /// @note operator= valamiert nem mukodik, kiveve, ha ... 
+        Matrix& operator=(const Matrix& m)
+        {
+            m_mat = m.m_mat;
+            return *this;
+        }
 
-		/// @note operator= valamiert nem mukodik, kiveve, ha ... 
-		Matrix& operator= (const Matrix& m)
-		{
-			mat = m.mat;
-			return *this;
-		}
+        Matrix& operator=(const matrix& m)
+        {
+            m_mat = m;
+            return *this;
+        }
 
-		Matrix& operator= (const matrix &m)
-		{
-			mat = m;
-			return *this;
-		}
+        friend bool operator==(const Matrix& lhs, const Matrix& rhs)
+        {
+            std::array<float4, 4> lv, rv;
+            lhs.Get(lv);
+            rhs.Get(rv);
+            return rv == lv;
+        }
 
-		// --- getters
-		const matrix& Get() const {
-			return mat;
-		}
+        friend bool operator!=(const Matrix& lhs, const Matrix& rhs) { return !(lhs == rhs); }
 
-		const float Get(size_t row, size_t col) const {
+        // --- getters
+        const matrix& Get() const { return m_mat; }
+
+        void Get(std::array<float4, 4>& v) const
+        {
+            XMStoreFloat4(&v[0], m_mat.r[0]);
+            XMStoreFloat4(&v[1], m_mat.r[1]);
+            XMStoreFloat4(&v[2], m_mat.r[2]);
+            XMStoreFloat4(&v[3], m_mat.r[3]);
+        }
+
+        float Get(size_t row, size_t col) const
+        {
 #ifdef _XM_NO_INTRINSICS_
-			return mat.r[row][col];
+            return m_mat.r[row][col];
 #else
-			return DirectX::XMVectorGetByIndex(mat.r[row], col);
-#endif 
-		}
+            return DirectX::XMVectorGetByIndex(m_mat.r[row], col);
+#endif
+        }
 
-		const bool Decompose(float3 &outTranslation, Quaternion &outOrientation, float3 &outScale) {
-			dxvector translation, orientation, scale;
-			bool res = DirectX::XMMatrixDecompose(&scale, &orientation, &translation, mat);
-			DirectX::XMStoreFloat3(&outTranslation, translation);
-			outOrientation = Quaternion(orientation);
-			DirectX::XMStoreFloat3(&outScale, scale);
-			return res;
-		}
+        float4 Get(size_t row) const
+        {
+#ifdef _XM_NO_INTRINSICS_
+            return m_mat.r[row];
+#else
+            float4 res;
+            XMStoreFloat4(&res, m_mat.r[row]);
+            return res;
+#endif
+        }
 
-		// --- matrix - vector ops
-		float4 Transfrom(float4 &f4) const {
-			dxvector v = XMVector4Transform(XMLoadFloat4(&f4), mat);
-			float4 r;
-			XMStoreFloat4(&r, v);
-			return r;
-		}
+        bool Decompose(float3& outTranslation, Quaternion& outOrientation, float3& outScale) const
+        {
+            dxvector translation, orientation, scale;
+            bool res = XMMatrixDecompose(&scale, &orientation, &translation, m_mat);
+            XMStoreFloat3(&outTranslation, translation);
+            outOrientation = Quaternion(orientation);
+            XMStoreFloat3(&outScale, scale);
+            return res;
+        }
 
-		float3 Transfrom(float3 &f3) const {
-			dxvector v = XMVector3Transform(XMLoadFloat3(&f3), mat);
-			float3 r;
-			XMStoreFloat3(&r, v);
-			return r;
-		}
-	};
+        // --- matrix - vector ops
+        float4 Transfrom(float4& f4) const
+        {
+            dxvector v = XMVector4Transform(XMLoadFloat4(&f4), m_mat);
+            float4 r;
+            XMStoreFloat4(&r, v);
+            return r;
+        }
+
+        float3 Transfrom(float3& f3) const
+        {
+            dxvector v = XMVector3Transform(XMLoadFloat3(&f3), m_mat);
+            float3 r;
+            XMStoreFloat3(&r, v);
+            return r;
+        }
+
+        template <class AR>
+        void Serialize(AR& ar)
+        {
+            std::array<float4, 4> v;
+            Get(v);
+            ar&v;
+            Set(v);
+        }
+
+    private:
+        matrix m_mat;
+    };
 }

@@ -36,7 +36,7 @@ using namespace GrafkitData;
 
 #define ANIMATION_ROOT "animation/"
 
-
+#if 0
 Context::Context(Renderer& render, IAssetFactory* assetFactory) : ResourcePreloader()
 , ClonableInitializer()
 , m_render(render)
@@ -241,3 +241,5 @@ void Context::SaveObject(const Ref<Object>& ref, const char* path, bool isAutoSa
     }
 
 }
+
+#endif 

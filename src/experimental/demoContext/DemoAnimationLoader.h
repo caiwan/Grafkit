@@ -4,6 +4,7 @@
 
 namespace GkDemo
 {
+#if 0
     class DemoAnimationLoader : public Grafkit::IAnimationLoader
     {
     public:
@@ -12,4 +13,5 @@ namespace GkDemo
         Grafkit::IResource* NewResource() override;
         void Load(Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override;
     };
+#endif
 }

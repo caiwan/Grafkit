@@ -157,7 +157,7 @@ TEST_F(TextureLoadTest, LoadCubeMap)
 TEST_F(TextureLoadTest, LoadNoiseMap)
 {
     // given
-    Texture2DResRef resource = m_context->Load<Texture2DRes>(new TextureNoiseMap("noiseMap", 256, TEXTURE_NOISE_UUID));
+    Texture2DResRef resource = m_context->Load<Texture2DRes>(new TextureNoiseMapBuilder("noiseMap", 256, TEXTURE_NOISE_UUID));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);

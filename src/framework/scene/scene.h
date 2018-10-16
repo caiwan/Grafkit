@@ -218,8 +218,8 @@ namespace Grafkit
 
         // -- persistent
         PERSISTENT_DECL(Grafkit::Scene, 1);
-    protected:
-        void Serialize(Archive& ar) override;
+    //protected:
+    //    void Serialize(Archive& ar) override;
     };
 }
 

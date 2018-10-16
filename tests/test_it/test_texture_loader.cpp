@@ -67,7 +67,8 @@ protected:
 TEST_F(TextureLoadTest, Load2DTexture)
 {
     // given
-    Texture2DResRef resource = m_app->Load<Texture2DRes>(new TextureFromBitmap("texture", TEXTURE_PATH, TEXTURE_2D_UUID));
+    TextureBitmapParams params = { TEXTURE_PATH };
+    Texture2DResRef resource = m_app->Load<Texture2DRes>(new TextureFromBitmap("texture", TEXTURE_2D_UUID, params));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);
@@ -103,10 +104,10 @@ namespace
 TEST_F(TextureLoadTest, LoadCubeMap)
 {
     // given
-    std::vector<std::string> filenames;
-    std::transform(cubemapNames, cubemapNames + 6, std::back_inserter(filenames), [](std::string s)->std::string {return std::string(TEXTURE_ROOT) + s; });
+    TextureCubemapParams params;
+    std::transform(cubemapNames, cubemapNames + 6, std::back_inserter(params.sourceNames), [](std::string s)->std::string {return std::string(TEXTURE_ROOT) + s; });
 
-    TextureCubeResRef resource = m_app->Load<TextureCubeRes>(new TextureCubemapFromBitmap("texture", filenames, TEXTURE_CUBE_UUID));
+    TextureCubeResRef resource = m_app->Load<TextureCubeRes>(new TextureCubemapFromBitmap("texture", TEXTURE_CUBE_UUID, params));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);
@@ -131,7 +132,8 @@ TEST_F(TextureLoadTest, LoadCubeMap)
 TEST_F(TextureLoadTest, LoadNoiseMap)
 {
     // given
-    Texture2DResRef resource = m_app->Load<Texture2DRes>(new TextureNoiseMap("noiseMap", 256, TEXTURE_NOISE_UUID));
+    TextureNoiseParams params{ 256 };
+    Texture2DResRef resource = m_app->Load<Texture2DRes>(new TextureNoiseMapBuilder("noiseMap", TEXTURE_NOISE_UUID, params));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);

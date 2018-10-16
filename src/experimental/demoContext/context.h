@@ -8,6 +8,8 @@ namespace GkDemo
     class SchemaBuilder;
     class Demo;
 
+#if 0
+
     class Context : public Grafkit::ResourcePreloader, Grafkit::ClonableInitializer
     {
     public:
@@ -49,5 +51,6 @@ namespace GkDemo
         void SaveObject(const Ref<Grafkit::Object>& ref, const char* str, bool isAutoSave) const;
     };
 
+#endif 
 
 }

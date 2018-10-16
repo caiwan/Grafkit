@@ -9,6 +9,8 @@
 using namespace FWdebugExceptions;
 using namespace Grafkit;
 
+#if 0
+
 ArchiveFile::ArchiveFile(FILE* stream, bool IsStoring) : 
 	Archive(IsStoring), 
 	m_stream(stream)
@@ -84,3 +86,5 @@ void ArchiveAsset::Read(void* buffer, size_t length) {
     memcpy_s(buffer, length, &data[m_cursor], length);
     m_cursor += length;
 }
+
+#endif

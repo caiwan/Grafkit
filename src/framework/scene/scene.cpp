@@ -99,7 +99,7 @@ void Scene::Build(Renderer& render, ShaderResRef vs, ShaderResRef ps)
 
 // =============================================================================================
 
-void Scene::Serialize(Archive& ar) {
-    _Serialize(ar);
-    assert(0);
-}
+//void Scene::Serialize(Archive& ar) {
+//    _Serialize(ar);
+//    assert(0);
+//}

@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include <cstring>
-#include "testClass_persistence.h"
+//#include "testClass_persistence.h"
+
+# if 0
 
 using namespace ArchivePersistent;
 
 PERSISTENT_IMPL(EmptyClass);
-
 PERSISTENT_IMPL(FieldClass);
-
 PERSISTENT_IMPL(NestedClass);
 
 /*
@@ -62,3 +62,5 @@ void NestedClass::Serialize(Grafkit::Archive& stream)
     PERSIST_OBJECT(stream, m_cl1);
     PERSIST_OBJECT(stream, m_cl2);
 }
+
+#endif

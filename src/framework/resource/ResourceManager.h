@@ -8,9 +8,6 @@
 
 #include "render/renderer.h"
 
-//#include "ResourceBuilder.h"
-//#include "core/resource.h"
-
 namespace Grafkit
 {
     class IAssetFactory;
@@ -36,15 +33,15 @@ namespace Grafkit
     class IResourceManager
     {
     public:
+        void AddResourcePaths();
         IResourceManager();
+        explicit IResourceManager(IPreloadEvents* preloadEvents);
         virtual ~IResourceManager();
 
-        //template<class T> Ref<T> GetByName(const std::string &pName) const;
         template <class T>
         Ref<T> GetByUuid(const std::string& uuid) const;
 
         void Add(Ref<IResource> pResource);
-        //void RemoveByName(const std::string &name);
         void RemoveByUuid(const std::string& uuid);
         void RemoveAll();
 
@@ -75,10 +72,10 @@ namespace Grafkit
 
     protected:
         typedef std::pair<std::string, Ref<IResourceBuilder>> BuilderPair;
-        std::map<std::string, std::string> m_pathMap;
+        std::map<std::string, std::string> m_pathMap; // TODO: this stinks
         std::map<std::string, Ref<IResource>> m_uuidMap;
         std::map<std::string, Ref<IResourceBuilder>> m_builders;
-        std::map<std::string, std::list<BuilderPair>> m_filenamesToBuilder;
+        std::map<std::string, std::list<BuilderPair>> m_filenamesToBuilder; // TODO: this stinks
 
         IPreloadEvents* m_preloadEvents;
     };
@@ -88,9 +85,7 @@ namespace Grafkit
     Ref<T> IResourceManager::GetByUuid(const std::string& uuid) const
     {
         auto it = m_uuidMap.find(uuid);
-
         if (it != m_uuidMap.end()) { return Ref<T>(dynamic_cast<T*>(it->second.Get())); }
-
         return nullptr;
     }
 
@@ -102,9 +97,3 @@ namespace Grafkit
         return res;
     }
 }
-
-DEFINE_EXCEPTION(NoAssetFoundByNameException, 1, "No asset found by the given name");
-
-DEFINE_EXCEPTION(NoAssetBucketFoundException, 3, "No asset bucket found");
-
-DEFINE_EXCEPTION(UpdateResourceExcpetion, 4, "Cannot update resource");

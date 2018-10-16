@@ -4,7 +4,7 @@
 
 #include "SceneGraph.h"
 
-PERSISTENT_IMPL(Grafkit::Light)
+PERSISTENT_IMPL(Grafkit::Light);
 
 using namespace Grafkit;
 
@@ -59,11 +59,11 @@ void Light::Render(Renderer& deviceContext, SceneGraph* const & scene) {
 
 // ============================================================================================================
 
-void Light::Serialize(Archive& ar)
-{
-    _Serialize(ar);
-
-    PERSIST_FIELD(ar, m_position);
-    //PERSIST_FIELD(ar, m_direction);
-    PERSIST_FIELD(ar, m_light);
-}
+//void Light::Serialize(Archive& ar)
+//{
+//    _Serialize(ar);
+//
+//    PERSIST_FIELD(ar, m_position);
+//    //PERSIST_FIELD(ar, m_direction);
+//    PERSIST_FIELD(ar, m_light);
+//}

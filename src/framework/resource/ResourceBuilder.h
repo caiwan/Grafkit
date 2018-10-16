@@ -1,14 +1,9 @@
-/**
-    Resource builder interface
-*/
-#pragma once 
+#pragma once
 
 #include "core/Object.h"
 
-// #include "core/Asset.h"
-// #include "core/Resource.h"
-
-namespace Grafkit {
+namespace Grafkit
+{
     class Clonable;
     class IResource;
     class IResourceManager;
@@ -16,28 +11,70 @@ namespace Grafkit {
     class IResourceBuilder : public Object
     {
     public:
-        explicit IResourceBuilder(){}
-        explicit IResourceBuilder(std::string name, std::string sourcename = "", std::string uuid = "") : Object(name, uuid), /*m_name(name), m_uuid(uuid),*/ m_sourceName(sourcename) {}
+        explicit IResourceBuilder() : Object() {
+        }
 
-        virtual ~IResourceBuilder() {}
+        explicit IResourceBuilder(std::string name, Uuid uuid = Uuid()) : Object(name, uuid) {
+        }
 
-        std::string GetSourceName() const { return m_sourceName; }
+        virtual ~IResourceBuilder() {
+        }
 
         // pure virtuals 
-        virtual IResource* NewResource() = 0;
+        virtual Ref<IResource> NewResource() const = 0;
 
-        virtual void Load(IResourceManager * const & resman, IResource * source) = 0;
+        virtual void Load(IResourceManager* const & resman, IResource* source) = 0;
+        virtual void Initialize(Renderer& render, IResourceManager* const & resman, IResource* source) = 0;
 
-    protected:
-        IAssetRef GetSourceAsset(IResourceManager * const & assman) const;
+        /* It needs something that pulls serialiezed stuff as well*/
 
-        std::string m_sourceName;
+        virtual std::string GetWatcherFilename() { return std::string(); };
 
-    public:
-        Clonable * CreateObj() const override { assert(0); return nullptr; }
-    protected:
-        void Serialize(Archive& ar) override { assert(0); }
-        std::string GetClazzName() const override { assert(0); return std::string(); }
+        // --- 
+
     };
 
+    struct None{};
+
+    template <class R, typename U = None>
+    class ResourceBuilder : public IResourceBuilder
+    {
+    public:
+
+        explicit ResourceBuilder(const U params = U()) : IResourceBuilder()
+            , m_params(params) {
+        }
+
+        explicit ResourceBuilder(std::string name, std::string uuid, const U params = U()) : IResourceBuilder(name, Uuid(uuid))
+            , m_params(params) {
+        }
+
+        ~ResourceBuilder() = default;
+
+        U GetParams() const { return m_params; }
+        void SetParams(const U& params) { m_params = params; }
+
+        /* It needs something that pulls parameters from void* */
+
+        Ref<IResource> NewResource() const override { return new Resource<R>(); }
+
+    protected:
+        static Ref<Resource<R>> SafeGetResource(IResource* source)
+        {
+            Resource<R>* pR = dynamic_cast<Resource<R>*>(source);
+            assert(pR);
+            return pR;
+        }
+
+        static Ref<R> SafeGetObject(IResource* source)
+        {
+            Resource<R>* pR = SafeGetResource(source);
+            R* obj = pR->Get();
+            assert(obj);
+            return obj;
+        }
+
+        U m_params;
+        Ref<R> m_oldResource;
+    };
 }

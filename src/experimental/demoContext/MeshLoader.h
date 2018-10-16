@@ -15,6 +15,9 @@ namespace Assimp
 
 namespace GkDemo
 {
+
+#if 0
+
     class IMeshLoader : public Grafkit::IResourceBuilder
     {
     public:
@@ -49,5 +52,4 @@ namespace GkDemo
     };
 }
 
-// exceptions
-DEFINE_EXCEPTION(MeshLoaderException, 9001, "Error while parsing file via ASSIMP");
+#endif

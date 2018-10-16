@@ -16,7 +16,7 @@ namespace Grafkit
     /**
     Common anim. interface
     */
-    class Animation : public Object 
+    class Animation : public Object
     {
     public:
         Animation();
@@ -33,12 +33,6 @@ namespace Grafkit
 
         typedef Ref<Channel> ChannelRef;
         typedef Ref<Track> TrackRef;
-
-    protected:
-        void Serialize(Archive& ar) override = 0;
-        void _Serialize(Archive& ar) override;
-
-    public:
 
         enum KeyInterpolation_e
         {
@@ -88,12 +82,15 @@ namespace Grafkit
             float m_angle;
 
             KeyInterpolation_e m_type;
+
+            template <class Archive>
+            void Serialize(Archive& ar) { ar & m_time & m_value & m_radius & m_angle; }
         };
 
         /**
             Template for animation track
         */
-        class Channel : public Referencable, public Persistent
+        class Channel : public Serializable, virtual public Referencable
         {
             friend class Animation;
         public:
@@ -126,25 +123,23 @@ namespace Grafkit
             */
             int FindKey(float t, Key& v0, Key& v1, float& f) const;
 
-            void serialize(Archive& ar);
             void Clear() { m_keys.clear(); }
 
             void CopyKey(float t, Channel& other);
             void CopyTo(const ChannelRef& target, size_t start, size_t end);
 
+
         protected:
             std::vector<Key> m_keys;
             std::string m_name;
 
-            PERSISTENT_DECL(Grafkit::Animation::Channel, 1);
-        protected:
-            void Serialize(Archive& ar) override;
+            SERIALIZE(Grafkit::Animation::Channel, 1, ar) { ar & m_name & m_keys; }
         };
 
         /**
             N-dimension container for multiple tracks
         */
-        class Track : virtual public Referencable, public Persistent
+        class Track : public Serializable, virtual public Referencable
         {
             friend class Animation;
         public:
@@ -176,10 +171,7 @@ namespace Grafkit
             std::string m_name;
             std::vector<Ref<Channel>> m_channels;
 
-            PERSISTENT_DECL(Grafkit::Animation::Track, 1)
-
-        protected:
-            void Serialize(Archive& ar) override;
+            SERIALIZE(Grafkit::Animation::Track, 1, ar) { ar & m_name & m_channels; }
         };
 
         // -- Animation
@@ -191,6 +183,13 @@ namespace Grafkit
         void AddTrack(Ref<Track> track) { m_tracks.push_back(track); }
 
         std::vector<Ref<Track>> m_tracks;
+
+        template <class Archive>
+        void Serialize(Archive& ar)
+        {
+            Object::Serialize(ar);
+            ar & m_tracks;
+        }
     };
 }
 
@@ -217,27 +216,34 @@ namespace Grafkit
         {
         case KI_step:
             return v0.m_value;
+
         case KI_linear:
-            break;
+            break; // see: interpol. below
+
         case KI_ramp:
             t = t * t;
             break;
+
         case KI_smooth:
             t = t * t * (3 - 2 * t);
             break;
+
         case KI_hermite:
-            // See: https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Interpolation_on_a_single_interval
-            //const float tangent = v1.m_value - v0.m_value;
+            {
+                // See: https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Interpolation_on_a_single_interval
 
-            const float t2 = t * t;
-            const float t3 = t2 * t;
+                const float t2 = t * t;
+                const float t3 = t2 * t;
 
-            return (
-                (2.0f * t3 - 3.0f * t2 + 1.0f) * v0.m_value +
-                (-2.0f * t3 + 3.0f * t2) * v1.m_value +
-                (t3 - 2.0f * t2 + t) * v0.m_angle * v0.m_radius +
-                (t3 - t2) * v1.m_angle * v1.m_radius
-            );
+                return (
+                    (2.0f * t3 - 3.0f * t2 + 1.0f) * v0.m_value +
+                    (-2.0f * t3 + 3.0f * t2) * v1.m_value +
+                    (t3 - 2.0f * t2 + t) * v0.m_angle * v0.m_radius +
+                    (t3 - t2) * v1.m_angle * v1.m_radius
+                );
+            }
+        default:
+            break;
         }
 
         return v0.m_value * (1.f - t) + v1.m_value * t;
@@ -315,29 +321,6 @@ namespace Grafkit
         return 1;
     }
 
-    inline void Animation::Channel::serialize(Archive& ar)
-    {
-        size_t len = 0;
-
-        if (ar.IsStoring()) { len = m_keys.size(); }
-        else { m_keys.clear(); }
-
-        PERSIST_FIELD(ar, len);
-
-        for (size_t i = 0; i < len; ++i)
-        {
-            Key key;
-
-            if (ar.IsStoring()) { key = m_keys[i]; }
-
-            PERSIST_FIELD(ar, key.m_time);
-            PERSIST_FIELD(ar, key.m_type);
-            PERSIST_FIELD(ar, key.m_value);
-
-            if (!ar.IsStoring()) { m_keys.push_back(key); }
-        }
-    }
-
     inline void Animation::Channel::CopyKey(float t, Channel& other)
     {
         if (t <= m_keys.front().m_time)
@@ -349,5 +332,6 @@ namespace Grafkit
         if (i > -1) { other.AddKey(m_keys[i]); }
     }
 
+    // TODO: Do we really need this?
     inline void Animation::Channel::CopyTo(const ChannelRef& target, size_t start, size_t end) { for (size_t i = start; i < end; i++) { target->AddKey(m_keys[i]); } }
 }

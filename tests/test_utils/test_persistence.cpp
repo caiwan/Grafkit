@@ -3,434 +3,308 @@
 #include "stdafx.h"
 
 #include <gtest/gtest.h>
-
-#include <cmath>
-
+#include <fstream>
 #include "math/vector.h"
 #include "math/matrix.h"
 #include "math/quaternion.h"
-
 #include "utils/persistence/dynamics.h"
-#include "utils/persistence/persistence.h"
-
-#include "TestArchiver.h"
-#include "testClass_persistence.h"
+#include "utils/persistence/archive.h"
+#include "assert.h"
 
 using namespace Grafkit;
-using namespace FWdebugExceptions;
-using namespace ArchivePersistent;
 
-TEST(Persistence, PersistFieldTest)
+/* ****************************************************************************************************************************************
+*
+**************************************************************************************************************************************** */
+
+class SimpleClass : public Serializable, virtual public Referencable
 {
-    TestArchiver archive(6, true);
-    // Given 
-
-    int test = 0xfacababa;
-
-    // When
-    PERSIST_FIELD(archive, test);
+public:
+    SimpleClass() : m_integer(0) {
+    }
 
 
-    // Then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
+    SimpleClass(int integer, const std::string& string)
+        : m_integer(integer)
+        , m_string(string) {
+    }
 
-    int testRead = 0;
-    PERSIST_FIELD(archive, testRead);
+    int GetInteger() const { return m_integer; }
+    void SetInteger(const int integer) { m_integer = integer; }
+    std::string GetString() const { return m_string; }
+    void SetString(const std::string& string) { m_string = string; }
 
-    ASSERT_EQ(test, testRead);
-}
+private:
+    int m_integer;
+    std::string m_string;
 
-TEST(Persistence, NDimensionFloatPersistTest)
+    SERIALIZE(SimpleClass, 1, ar) { ar & m_integer & m_string; }
+};
+
+PERSISTENT_IMPL(SimpleClass);
+
+TEST(Persistence, SimpleObjectTest)
 {
-    TestArchiver archive(256, true);
-
     // given
-    float2 f2;
-    f2.x = 1.0;
-    f2.y = 2.16;
+    std::stringstream s;
+    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Ref<SimpleClass> obj = new SimpleClass(42, "some parameter");
 
-    float3 f3;
-    f3.x = 1.0;
-    f3.y = 2.16;
-    f3.z = 3.14159;
+    // when 
+    a << obj;
 
-    float4 f4;
-    f4.x = 1.0;
-    f4.y = 2.16;
-    f4.z = 3.14159;
-    f4.w = 4.0;
+    // then 
+    Ref<SimpleClass> readObj;
+    a >> readObj;
 
-    //when
-    PERSIST_FIELD(archive, f2);
-    PERSIST_FIELD(archive, f3);
-    PERSIST_FIELD(archive, f4);
+    ASSERT_TRUE(readObj);
+    ASSERT_NE(obj, readObj);
 
-
-    //then
-    archive.SetDirection(false);
-    archive.ResetCrsr();
-
-    float2 ft2 = f2;
-    float3 ft3 = f3;
-    float4 ft4 = f4;
-
-    PERSIST_FIELD(archive, f2);
-    PERSIST_FIELD(archive, f3);
-    PERSIST_FIELD(archive, f4);
-
-    ASSERT_LT(abs(f2.x - ft2.x), 000001);
-    ASSERT_LT(abs(f2.y - ft2.y), 000001);
-
-    ASSERT_LT(abs(f3.x - ft3.x), 000001);
-    ASSERT_LT(abs(f3.y - ft3.y), 000001);
-    ASSERT_LT(abs(f3.z - ft3.z), 000001);
-
-    ASSERT_LT(abs(f4.x - ft4.x), 000001);
-    ASSERT_LT(abs(f4.y - ft4.y), 000001);
-    ASSERT_LT(abs(f4.z - ft4.z), 000001);
-    ASSERT_LT(abs(f4.w - ft4.w), 000001);
+    ASSERT_EQ(obj->GetInteger(), readObj->GetInteger());
+    ASSERT_STREQ(obj->GetString().c_str(), readObj->GetString().c_str());
 }
 
-TEST(Persistence, QuaternionPersistTest)
-{
-    TestArchiver archive(256, true);
+/* ****************************************************************************************************************************************
+*
+**************************************************************************************************************************************** */
 
+class NestedClass : public Serializable, virtual public Referencable
+{
+public:
+    NestedClass() {
+    }
+
+    NestedClass(const Ref<SimpleClass>& simpleClass, const Ref<SimpleClass>& simpleClass1)
+        : m_obj1(simpleClass)
+        , m_obj2(simpleClass1) {
+    }
+
+    Ref<SimpleClass> GetObj1() const { return m_obj1; }
+    Ref<SimpleClass> GetObj2() const { return m_obj2; }
+
+    SERIALIZE(NestedClass, 1, ar) { ar & m_obj1 & m_obj2; }
+
+private:
+    Ref<SimpleClass> m_obj1;
+    Ref<SimpleClass> m_obj2;
+};
+
+PERSISTENT_IMPL(NestedClass);
+
+
+TEST(Persistence, NestedClassTest)
+{
     // given
-    float4 f4;
-    f4.x = 1.0;
-    f4.y = 2.16;
-    f4.z = 3.14159;
-    f4.w = 4.0;
-    Quaternion q = f4;
+    std::stringstream s;
+    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Ref<NestedClass> obj = new NestedClass(new SimpleClass(666, "Devil"), new SimpleClass(42, "The ultimate answer"));
+    Ref<NestedClass> objNull = new NestedClass(nullptr, nullptr);
 
-    //when
-    PERSIST_FIELD(archive, q);
+    // when 
+    a << obj << objNull;
 
-    //then
-    archive.SetDirection(false);
-    archive.ResetCrsr();
+    // then 
+    Ref<NestedClass> readObj, readObjNull;
+    a >> readObj >> readObjNull;
 
-    Quaternion q2 = q;
-    PERSIST_FIELD(archive, q);
-    float4 ft4 = q2;
+    ASSERT_TRUE(readObj);
+    ASSERT_TRUE(readObjNull);
+    ASSERT_NE(obj, readObj);
+    ASSERT_NE(objNull, readObjNull);
 
-    ASSERT_LT(abs(f4.x - ft4.x), 000001);
-    ASSERT_LT(abs(f4.y - ft4.y), 000001);
-    ASSERT_LT(abs(f4.z - ft4.z), 000001);
-    ASSERT_LT(abs(f4.w - ft4.w), 000001);
+    // ... MORE ASSERTS
+
+    ASSERT_FALSE(readObjNull->GetObj1());
+    ASSERT_FALSE(readObjNull->GetObj2());
+}
+
+TEST(Persistence, BadTypeTest)
+{
+    // given
+    std::stringstream s;
+    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Ref<SimpleClass> obj = new SimpleClass(42, "some parameter");
+
+    // when 
+    a << obj;
+
+    // then 
+    Ref<NestedClass> readObj;
+
+    // will it blend?
+    ASSERT_THROW(a >> readObj, std::exception);
 }
 
 
-TEST(Persistence, MatrixPersistTest)
+/* ****************************************************************************************************************************************
+ *
+ **************************************************************************************************************************************** */
+
+class SimpleBaseClass : public Serializable, public Referencable
 {
-    TestArchiver archive(256, true);
+public:
 
-    //given
-    Matrix m(
-        11, 12, 13, 14,
-        21, 22, 23, 24,
-        31, 32, 33, 34,
-        41, 42, 43, 44
-    );
+    SimpleBaseClass() : m_i(0) {
+    }
 
-    //when
-    PERSIST_FIELD(archive, m);
+    SimpleBaseClass(int i, const std::string& str)
+        : m_i(i)
+        , m_str(str) {
+    }
 
-    //then
-    archive.SetDirection(false);
-    archive.ResetCrsr();
+    int GetI() const { return m_i; }
+    std::string GetStr() const { return m_str; }
 
-    Matrix m2 = m;
+    virtual std::string GetSomeIntern() const = 0;
 
-    PERSIST_FIELD(archive, m);
+protected:
+    template <class AR>
+    void Serialize(AR& ar) { ar & m_i & m_str; }
 
-    for (uint32_t row = 0; row < 4; row++)
+private:
+    int m_i;
+    std::string m_str;
+};
+
+class DerivedClassA : public SimpleBaseClass
+{
+public:
+    DerivedClassA() {
+    }
+
+    DerivedClassA(int i, const std::string& str, const std::string& str1)
+        : SimpleBaseClass(i, str)
+        , m_str1(str1) {
+    }
+
+    std::string GetSomeIntern() const override { return m_str1; }
+
+    SERIALIZE(DerivedClassA, 1, ar)
     {
-        for (uint32_t col = 0; col < 4; col++)
-        {
-            ASSERT_LT(abs(m.Get(row, col) - m2.Get(row, col)), 000001);
-        }
+        SimpleBaseClass::Serialize(ar);
+        ar & m_str1;
+    }
+
+private:
+    std::string m_str1;
+};
+
+PERSISTENT_IMPL(DerivedClassA);
+
+class DerivedClassB : public SimpleBaseClass
+{
+public:
+    DerivedClassB() {
+    }
+
+    DerivedClassB(int i, const std::string& str, const std::string& str2)
+        : SimpleBaseClass(i, str)
+        , m_str2(str2) {
+    }
+
+    std::string GetSomeIntern() const override { return m_str2; }
+
+    SERIALIZE(DerivedClassB, 1, ar)
+    {
+        SimpleBaseClass::Serialize(ar);
+        ar & m_str2;
+    }
+
+private:
+    std::string m_str2;
+};
+
+PERSISTENT_IMPL(DerivedClassB);
+
+TEST(Persistence, PolimorphClassTest)
+{
+    // given
+    std::stringstream s;
+    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Ref<SimpleBaseClass> objA = new DerivedClassA(42, "Hello", "World");
+    Ref<SimpleBaseClass> objB = new DerivedClassB(666, "This is a", "test message");
+
+    // when 
+    a << objA << objB;
+
+    // then 
+    Ref<SimpleBaseClass> readObjA, readObjB;
+    a >> readObjA >> readObjB;
+
+    ASSERT_TRUE(readObjA);
+    ASSERT_TRUE(readObjB);
+    ASSERT_NE(objA, readObjA);
+    ASSERT_NE(objB, readObjB);
+
+    ASSERT_TRUE(readObjA);
+    ASSERT_TRUE(dynamic_cast<DerivedClassA *>(readObjA.Get()));
+    ASSERT_TRUE(objA->GetI() == readObjA->GetI());
+    ASSERT_TRUE(objA->GetStr().compare(readObjA->GetStr()) == 0);
+    ASSERT_TRUE(objA->GetSomeIntern().compare(readObjA->GetSomeIntern()) == 0);
+
+    ASSERT_TRUE(readObjB);
+    ASSERT_TRUE(dynamic_cast<DerivedClassB *>(readObjB.Get()));
+    ASSERT_TRUE(objB->GetI() == readObjB->GetI());
+    ASSERT_TRUE(objB->GetStr().compare(readObjB->GetStr()) == 0);
+    ASSERT_TRUE(objB->GetSomeIntern().compare(readObjB->GetSomeIntern()) == 0);
+}
+
+void Verify(const Ref<SimpleBaseClass> &expected, const Ref<SimpleBaseClass> &actual)
+{
+    ASSERT_TRUE(actual);
+    ASSERT_NE(expected, actual);
+    ASSERT_EQ(expected->GetI(), actual->GetI());
+    ASSERT_STREQ(expected->GetStr().c_str(), actual->GetStr().c_str());
+    ASSERT_STREQ(expected->GetSomeIntern().c_str(), actual->GetSomeIntern().c_str());
+}
+
+TEST(Persistence, STLContainerObjects)
+{
+    // given
+    std::stringstream s;
+    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+
+    std::array<Ref<SimpleBaseClass>, 256> array;
+    std::vector<Ref<SimpleBaseClass>> vector;
+    std::list<Ref<SimpleBaseClass>> list;
+    for (size_t i = 0; i < 256; ++i)
+    {
+        array[i] = new DerivedClassA(42 + i, "Hello", "Array");
+        vector.push_back(new DerivedClassB(64 + i, "Hello", "List"));
+        list.push_back(new DerivedClassB(128 + i, "Hello", "List"));
+    }
+
+    // when
+    a << array << vector << list;
+
+    // then
+    std::array<Ref<SimpleBaseClass>, 256> readArray;
+    std::vector<Ref<SimpleBaseClass>> readVector;
+    std::list<Ref<SimpleBaseClass>> readList;
+
+    a >> readArray >> readVector >> readList;
+
+    ASSERT_FALSE(readArray.empty());
+    ASSERT_FALSE(readVector.empty());
+    ASSERT_FALSE(readList.empty());
+
+    // ... + asserts
+
+    auto readIt =
+        readList.begin();
+    auto it = list.begin();
+    for (size_t i = 0; i < 256; ++i)
+    {
+        Verify(array[i], readArray[i]);
+        Verify(vector[i], readVector[i]);
+        Verify(*it, *readIt);
+        ++it, ++readIt;
     }
 }
 
-TEST(Persistence, VectorPersistTest)
-{
-    TestArchiver archive(4096, true);
-
-    // given 
-    uint32_t len = rand() % 1024;
-
-    int* test = new int[len];
-
-    for (uint32_t i = 0; i < len; i++) { test[i] = rand(); }
-
-    // when
-    archive.PersistVector<std::remove_pointer<decltype(test)>::type>(test, len);
-
-    //then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    int* testRead = nullptr;
-    uint32_t lenRead = 0;
-    archive.PersistVector<std::remove_pointer<decltype(testRead)>::type>(testRead, lenRead);
-
-    ASSERT_EQ(len, lenRead);
-    for (uint32_t i = 0; i < len; i++)
-    ASSERT_EQ(test[i], testRead[i]);
-
-    delete[] testRead;
-    delete[] test;
-}
-
-TEST(Persistence, StdVectorPersistTest)
-{
-    TestArchiver archive(4096, true);
-
-    // given 
-    uint32_t len = 256 + rand() % 1024;
-    std::vector<int> test;
-    for (uint32_t i = 0; i < len; i++) { test.push_back(rand()); }
-
-    // when
-    PERSIST_STD_VECTOR(archive, test);
-
-    //then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    std::vector<int> testRead;
-    PERSIST_STD_VECTOR(archive, testRead);
-
-    ASSERT_EQ(test.size(), testRead.size());
-    for (uint32_t i = 0; i < len; i++)
-        ASSERT_EQ(test[i], testRead[i]);
-}
-
-
-TEST(Persistence, StdVectorToVectorPersistTest)
-{
-    TestArchiver archive(4096, true);
-
-    // given 
-    uint32_t len = rand() % 1024;
-    std::vector<int> test;
-    for (uint32_t i = 0; i < len; i++) { test.push_back(rand()); }
-
-    // when
-    //archive.PersistStdVector<decltype(test)::value_type>(test);
-    PERSIST_STD_VECTOR(archive, test);
-
-
-    //then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    int* testRead = nullptr;
-    uint32_t len_read = 0;
-    //archive.PersistVector<std::remove_pointer<decltype(testRead)>::type>(testRead, len_read);
-    //PERSIST_STD_VECTOR(archive, test);
-    PERSIST_VECTOR(archive, testRead, len_read);
-
-    ASSERT_EQ(len, len_read);
-    for (uint32_t i = 0; i < len; i++)
-        ASSERT_EQ(test[i], testRead[i]);
-
-    delete[] testRead;
-
-}
-
-TEST(Persistence, StringPersistTest)
-{
-    TestArchiver archive(256, true);
-
-    // given
-    const char* szTest = "The quick brown fox jumps over the lazy dog.";
-
-    // when
-    archive.PersistString(szTest);
-
-    // then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    const char* szRead = nullptr;
-
-    archive.PersistString(szRead);
-
-    ASSERT_FALSE(nullptr == szRead);
-    ASSERT_STREQ(szTest, szRead);
-
-    delete[] szRead;
-}
-
-TEST(Persistence, STDStringPerstTest)
-{
-    TestArchiver archive(256, true);
-
-    // given
-    std::string test = "The quick brown fox jumps over the lazy dog.";
-
-    // when 
-    archive.PersistString(test);
-
-    // then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    std::string read;
-
-    archive.PersistString(read);
-
-    ASSERT_FALSE(read.empty());
-    ASSERT_STREQ(test.c_str(), read.c_str());
-}
-
-TEST(Persistence, STDStringToCstringDeserializeTest)
-{
-    TestArchiver archive(256, true);
-
-    // given
-    std::string test = "The quick brown fox jumps over the lazy dog.";
-    const uint32_t nTest = test.length();
-
-    // when
-    archive.PersistString(test);
-
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    const char* szRead = nullptr;
-
-    archive.PersistString(szRead);
-
-    ASSERT_FALSE(nullptr == szRead);
-    ASSERT_EQ(nTest, strlen(szRead));
-    ASSERT_STREQ(test.c_str(), szRead);
-
-    delete[] szRead;
-}
-
-TEST(Persistence, ObjectPersistTest)
-{
-    TestArchiver archive(256, true);
-
-    //given
-    EmptyClass* object = new EmptyClass();
-
-    //when
-    PERSIST_OBJECT(archive, object);
-
-    //then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    EmptyClass* object_test = nullptr;
-
-    PERSIST_OBJECT(archive, object_test);
-
-    ASSERT_TRUE(object_test != nullptr);
-    ASSERT_TRUE(object != object_test);
-    ASSERT_STREQ(object->GetClazzName().c_str(), object_test->GetClazzName().c_str());
-
-    delete object;
-}
-
-TEST(Persistence, ObjectReferencePersistTest)
-{
-    TestArchiver archive(256, true);
-
-    //given
-    Ref<EmptyClass> object = new EmptyClass();
-
-    //when
-    archive.StoreObject(object);
-
-    //then
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    Ref<EmptyClass> object_test = nullptr;
-    PERSIST_REFOBJECT(archive, object_test);
-
-    ASSERT_TRUE(object_test.Valid());
-    ASSERT_TRUE(object_test != object);
-    ASSERT_STREQ(object->GetClazzName().c_str(), object_test->GetClazzName().c_str());
-}
-
-
-
-TEST(Persistence, ObjectWithFieldsPersistTest)
-{
-    TestArchiver archive(256, true);
-
-    // given
-    FieldClass* object = new FieldClass();
-    object->Build(0xfafababa, 2.16);
-
-    // when
-    PERSIST_OBJECT(archive, object);
-
-    // then
-    FieldClass* object_original = object;
-
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    object = nullptr;
-    PERSIST_OBJECT(archive, object);
-
-    ASSERT_TRUE(object != nullptr);
-    ASSERT_TRUE(object != object_original);
-    ASSERT_STREQ(object->GetClazzName().c_str(), object_original->GetClazzName().c_str());
-    ASSERT_TRUE((*object) == (*object_original));
-}
-
-TEST(Persistence, ObjectCascadeObjectsPersistTest)
-{
-    TestArchiver archive(256, true);
-
-    // given
-    NestedClass* object = new NestedClass();
-    object->Buildup(0xfacababa, 2.16, 0x012345678, 3.141592);
-
-    // when
-    PERSIST_OBJECT(archive, object);
-
-    // then
-    NestedClass* object_original = object;
-
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    object = nullptr;
-    PERSIST_OBJECT(archive, object);
-
-    ASSERT_TRUE(object != nullptr);
-    ASSERT_TRUE(object != object_original);
-    ASSERT_STREQ(object->GetClazzName().c_str(), object_original->GetClazzName().c_str());
-    ASSERT_TRUE((*object) == (*object_original));
-}
-
-TEST(Persistence, NullPointerPersistTest)
-{
-    TestArchiver archive(256, true);
-
-    // given
-    NestedClass* object = nullptr;
-
-    // when
-    PERSIST_OBJECT(archive, object);
-
-    // then
-    NestedClass* object_original = object;
-
-    archive.ResetCrsr();
-    archive.SetDirection(false);
-
-    object = nullptr;
-    PERSIST_OBJECT(archive, object);
-
-    ASSERT_TRUE(object == nullptr);
-}
+// TODO (1) + map
+// TODO (1) + pair 
+
+// TODO (1) + queue 
+// TODO (1) + set, multiset
+// TODO (1) + multimap 

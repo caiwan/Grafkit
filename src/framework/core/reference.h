@@ -6,7 +6,7 @@
 #define RELEASE(refptr) if(refptr) {refptr->Release(); refptr = nullptr;}
 
 /**
-	Baseclass for all classes that support reference counting.
+    Baseclass for all classes that support reference counting.
  */
 
  ///@todo refcount legyen mutable/volatile + mukodjon a refszamlalas const tipussal is 
@@ -16,30 +16,30 @@ public:
     virtual ~Referencable() = default;
     Referencable() : _ref_count(0) { }
 
-	/**
-	 Add a reference to this object.
-	 Increments the internal reference counter.
+    /**
+     Add a reference to this object.
+     Increments the internal reference counter.
 
-	 **refracted** to have correspondence to [IUnknown::AddRef](https://msdn.microsoft.com/en-us/library/windows/desktop/ms691379(v=vs.85).aspx)
-	*/
+     **refracted** to have correspondence to [IUnknown::AddRef](https://msdn.microsoft.com/en-us/library/windows/desktop/ms691379(v=vs.85).aspx)
+    */
     size_t AddRef() { ++_ref_count; return _ref_count; }
 
-	/**
-	 RemoveByName a reference from this object.
+    /**
+     RemoveByName a reference from this object.
 
-	 Decrements the internal reference counter.
+     Decrements the internal reference counter.
 
-	 **refracted** to have correspondence to [IUnknown::Release](https://msdn.microsoft.com/en-us/library/windows/desktop/ms682317(v=vs.85).aspx)
-	*/
+     **refracted** to have correspondence to [IUnknown::Release](https://msdn.microsoft.com/en-us/library/windows/desktop/ms682317(v=vs.85).aspx)
+    */
     size_t Release() { _ref_count--; return _ref_count; }
 
-	/**
-		Returns the current reference count.
-	*/
-    const size_t GetReferenceCount() const { return _ref_count; }
+    /**
+        Returns the current reference count.
+    */
+    size_t GetReferenceCount() const { return _ref_count; }
 
 private:
-	size_t _ref_count;
+    size_t _ref_count;
 };
 
 /**
@@ -56,90 +56,89 @@ Note that type T must inherit from class Referencable!
 */
 template <typename T> class LazyRef {
 private:
-	mutable T* ptr;
+    mutable T* ptr;
 
 public:
-	/** Default constructor. Creates an empty reference. */
+    /** Default constructor. Creates an empty reference. */
     LazyRef() : ptr(nullptr) { }
 
-	/** Creates an reference holding an instance of T. */
-	LazyRef(T* pointer) : ptr(pointer) {
-		if (ptr != nullptr) {
-			ptr->AddRef();
-		}
-	}
+    /** Creates an reference holding an instance of T. */
+    LazyRef(T* pointer) : ptr(pointer) {
+        if (ptr != nullptr) {
+            ptr->AddRef();
+        }
+    }
 
-	/**
-	 Copy constructor for the same type of reference.
-	*/
+    /**
+     Copy constructor for the same type of reference.
+    */
     LazyRef(const LazyRef<T>& other)
-		: ptr(other.ptr)
-	{
-		if (ptr != nullptr) {
-			ptr->AddRef();
-		}
-	}
+        : ptr(other.ptr)
+    {
+        if (ptr != nullptr) {
+            ptr->AddRef();
+        }
+    }
 
-	/**
-	 Destructor
-	*/
+    /**
+     Destructor
+    */
     ~LazyRef()
-	{
-		if (ptr != nullptr &&
-			ptr->Release() == 0) {
-			delete ptr;
-		}
-	}
+    {
+        if (ptr != nullptr &&
+            ptr->Release() == 0) {
+            delete ptr;
+        }
+    }
 
-	/**
-	 Assignment operator.
+    /**
+     Assignment operator.
 
-	 Assigns a new value to the reference. The reference count of the
-	 object hold by the handed reference - if the pointer is not nullptr -
-	 will be incremented. The reference count of the old value will be
-	 decremented and freed, if the count reached 0.
-	*/
-	void operator=(const LazyRef<T>& other)
-	{
-		if (ptr != other.ptr) {
-			if (ptr != nullptr &&
-				ptr->Release() == 0) {
-				delete ptr;
-			}
+     Assigns a new value to the reference. The reference count of the
+     object hold by the handed reference - if the pointer is not nullptr -
+     will be incremented. The reference count of the old value will be
+     decremented and freed, if the count reached 0.
+    */
+    void operator=(const LazyRef<T>& other)
+    {
+        if (ptr != other.ptr) {
+            if (ptr != nullptr &&
+                ptr->Release() == 0) {
+                delete ptr;
+            }
 
-			ptr = other.ptr;
+            ptr = other.ptr;
 
-			if (ptr != nullptr) {
-				ptr->AddRef();
-			}
-		}
-	}
+            if (ptr != nullptr) {
+                ptr->AddRef();
+            }
+        }
+    }
 
-	/**
-	 arrow operator.
+    /**
+     arrow operator.
 
-	 Returns the underlying pointer. Makes the reference behave like a pointer.
-	*/
-	T* operator->() const
-	{
-		if (ptr == nullptr) {
-			ptr = new T();
-			ptr->AddRef();
-		}
+     Returns the underlying pointer. Makes the reference behave like a pointer.
+    */
+    T* operator->() const
+    {
+        if (ptr == nullptr) {
+            ptr = new T();
+            ptr->AddRef();
+        }
 
-		return ptr;
-	}
+        return ptr;
+    }
 
-	/**
-		Dereference operator.
+    /**
+        Dereference operator.
 
-		Returns a reference to the underlying object. Makes the reference behave like a pointer.
-	*/
-	T& operator*() const
-	{
-		DEBUG_ASSERT(ptr == nullptr);
-		return *ptr;
-	}
+        Returns a reference to the underlying object. Makes the reference behave like a pointer.
+    */
+    T& operator*() const
+    {
+        return *ptr;
+    }
 };
 
 
@@ -155,225 +154,232 @@ template <typename T> class Ref
 {
 public:
 
-	typedef T* clazz;
+    typedef T* clazz;
 
-	/**
-	 Default constructor. Creates an empty reference.
-	*/
+    /**
+     Default constructor. Creates an empty reference.
+    */
     Ref() : ptr(nullptr) {}
 
-	/**
-	 Creates an reference holding an instance of T.
-	*/
+    /**
+     Creates an reference holding an instance of T.
+    */
     Ref(T* pointer) : ptr(pointer) {
-		if (ptr != nullptr) {
-			ptr->AddRef();
-		}
-	}
+        if (ptr != nullptr) {
+            ptr->AddRef();
+        }
+    }
 
-	/**
-	 Copy constructor
-	*/
+    /**
+     Copy constructor
+    */
     Ref(const Ref<T>& other) : ptr(other.ptr) {
-		if (ptr != nullptr) {
-			ptr->AddRef();
-		}
-	}
+        if (ptr != nullptr) {
+            ptr->AddRef();
+        }
+    }
 
-	/**
-	  Access operator.
+    /**
+      Access operator.
 
-	  Returns the underlying pointer. Note that the object is still
-	  hold by the Reference.
-	 */
+      Returns the underlying pointer. Note that the object is still
+      hold by the Reference.
+     */
     T* Get() const {
-		return ptr;
-	}
+        return ptr;
+    }
 
-	/**
-	 Copy constructor
-	*/
-	template<typename T1>
-	Ref(const Ref<T1>& other)
-		: ptr(other.Get())
-	{
-		if (ptr != nullptr) {
-			ptr->AddRef();
-		}
-	}
+    /**
+     Copy constructor
+    */
+    template<typename T1>
+    Ref(const Ref<T1>& other)
+        : ptr(other.Get())
+    {
+        if (ptr != nullptr) {
+            ptr->AddRef();
+        }
+    }
 
-	/**
-	 Destructor
-	*/
+    /**
+     Destructor
+    */
     ~Ref()
-	{
-		if (ptr != nullptr &&
-			ptr->Release() == 0) {
-			delete ptr;
-			ptr = nullptr;
-		}
-	}
+    {
+        if (ptr != nullptr &&
+            ptr->Release() == 0) {
+            delete ptr;
+            ptr = nullptr;
+        }
+    }
 
-	/**
-	Assignment without using `operator =`.
+    /**
+    Assignment without using `operator =`.
 
-	Assigns a new value to the reference. The reference count of the
-	new object - if the pointer is not nullptr - will be incremented.
-	The reference count of the old value will be decremented and freed,
-	if the count reached 0.
-	*/
+    Assigns a new value to the reference. The reference count of the
+    new object - if the pointer is not nullptr - will be incremented.
+    The reference count of the old value will be decremented and freed,
+    if the count reached 0.
+    */
 
-	void AssingnRef(T* pointer)
-	{
-		if (ptr != pointer) {
+    void AssingnRef(T* pointer)
+    {
+        if (ptr != pointer) {
 
-			if (pointer != nullptr) {
-				pointer->AddRef();
-			}
+            if (pointer != nullptr) {
+                pointer->AddRef();
+            }
 
-			if (ptr != nullptr &&
-				ptr->Release() == 0) {
-				delete ptr;
-				ptr = nullptr;
-			}
+            if (ptr != nullptr &&
+                ptr->Release() == 0) {
+                delete ptr;
+                ptr = nullptr;
+            }
 
-			ptr = pointer;
-		}
-	}
+            ptr = pointer;
+        }
+    }
 
-	/**
-	 Assignment operator.
+    /**
+     Assignment operator.
 
-	 Assigns a new value to the reference. The reference count of the
-	 new object - if the pointer is not nullptr - will be incremented.
-	 The reference count of the old value will be decremented and freed,
-	 if the count reached 0.
-	*/
-	Ref<T>& operator=(T* pointer)
-	{
-		AssingnRef(pointer);
-		return *this;
-	}
+     Assigns a new value to the reference. The reference count of the
+     new object - if the pointer is not nullptr - will be incremented.
+     The reference count of the old value will be decremented and freed,
+     if the count reached 0.
+    */
+    Ref<T>& operator=(T* pointer)
+    {
+        AssingnRef(pointer);
+        return *this;
+    }
 
-	/**
-	 Assignment operator.
+    /**
+     Assignment operator.
 
-	 Assigns a new value to the reference. The reference count of the
-	 object hold by the handed reference - if the pointer is not nullptr -
-	 will be incremented. The reference count of the old value will be
-	 decremented and freed, if the count reached 0.
-	*/
-	Ref<T>& operator=(const Ref<T>& other)
-	{
-		if (&other != this && this->ptr != other.ptr) {
-			if (ptr != nullptr &&
-				ptr->Release() == 0) {
-				delete ptr;
-			}
+     Assigns a new value to the reference. The reference count of the
+     object hold by the handed reference - if the pointer is not nullptr -
+     will be incremented. The reference count of the old value will be
+     decremented and freed, if the count reached 0.
+    */
+    Ref<T>& operator=(const Ref<T>& other)
+    {
+        if (&other != this && this->ptr != other.ptr) {
+            if (ptr != nullptr &&
+                ptr->Release() == 0) {
+                delete ptr;
+            }
 
-			ptr = other.ptr;
+            ptr = other.ptr;
 
-			if (ptr != nullptr) {
-				ptr->AddRef();
-			}
-		}
+            if (ptr != nullptr) {
+                ptr->AddRef();
+            }
+        }
 
-		return *this;
-	}
+        return *this;
+    }
 
-	template<typename T1> Ref<T>& operator=(const Ref<T1>& other)
-	{
-		if (&other != this && this->ptr != other.Get()) {
-			if (ptr != nullptr &&
-				ptr->Release()) {
-				delete ptr;
-			}
+    template<typename T1> Ref<T>& operator=(const Ref<T1>& other)
+    {
+        if (&other != this && this->ptr != other.Get()) {
+            if (ptr != nullptr &&
+                ptr->Release()) {
+                delete ptr;
+            }
 
-			ptr = other.Get();
+            ptr = other.Get();
 
-			if (ptr != nullptr) {
-				ptr->AddRef();
-			}
-		}
+            if (ptr != nullptr) {
+                ptr->AddRef();
+            }
+        }
 
-		return *this;
-	}
+        return *this;
+    }
 
 
     bool Valid() const { return ptr != nullptr; }
     bool Invalid() const { return ptr == nullptr; }
 
-	/**
-	   arrow operator.
+    /**
+       arrow operator.
 
-	   Returns the underlying pointer. Makes the reference behave like a pointer.
-	*/
-	T* operator->() const {
-		return ptr;
-	}
+       Returns the underlying pointer. Makes the reference behave like a pointer.
+    */
+    T* operator->() const {
+        return ptr;
+    }
 
-	/**
-	 Dereference operator.
+    /**
+     Dereference operator.
 
-	 Returns a reference to the underlying object. Makes the reference behave
-	 like a pointer.
-	*/
-	T& operator*() const {
-		return *ptr;
-	}
+     Returns a reference to the underlying object. Makes the reference behave
+     like a pointer.
+    */
+    T& operator*() const {
+        return *ptr;
+    }
 
-	/**
-	 Type conversion operator.
+    /**
+     Type conversion operator.
 
-	 Returns the underlying pointer. Allows reference to be
-	 passed as a parameter where the base pointer type is required.
-	*/
-	operator T*() const {
-		return ptr;
-	}
+     Returns the underlying pointer. Allows reference to be
+     passed as a parameter where the base pointer type is required.
+    */
+    operator T*() const {
+        return ptr;
+    }
 
-	/**
-	 Type conversion operator.
+    /**
+     Type conversion operator.
 
-	 Returns the underlying object as reference. Allows reference to be
-	 passed as a parameter where the object type is required.
-	*/
-	operator T&() const {
-		return *ptr;
-	}
+     Returns the underlying object as reference. Allows reference to be
+     passed as a parameter where the object type is required.
+    */
+    operator T&() const {
+        return *ptr;
+    }
 
-	bool operator==(const Ref<T>& other) const {
-		return ptr == other.ptr;
-	}
+    bool operator==(const Ref<T>& other) const {
+        return ptr == other.ptr;
+    }
 
-	//bool operator==(const T* const & other) const {
-	//	return ptr == other;
-	//}
+    //bool operator==(const T* const & other) const {
+    //	return ptr == other;
+    //}
 
-	bool operator!=(const Ref<T>& other) const {
-		return ptr != other.ptr;
-	}
+    bool operator!=(const Ref<T>& other) const {
+        return ptr != other.ptr;
+    }
 
-	//bool operator!=(const T * const & other) const {
-	//	return ptr != other;
-	//}
+    //bool operator!=(const T * const & other) const {
+    //	return ptr != other;
+    //}
 
-	bool operator<(const Ref<T>& other) const {
-		return ptr < other.ptr;
-	}
+    bool operator<(const Ref<T>& other) const {
+        return ptr < other.ptr;
+    }
 
-	//bool operator<(const T * const & other) const {
-	//	return ptr < other;
-	//}
+    //bool operator<(const T * const & other) const {
+    //	return ptr < other;
+    //}
 
-	bool operator>(const Ref<T>& other) const {
-		return ptr > other.ptr;
-	}
+    bool operator>(const Ref<T>& other) const {
+        return ptr > other.ptr;
+    }
 
-	//bool operator>(const T * const & other) const {
-	//	return ptr > other;
-	//}
+    //bool operator>(const T * const & other) const {
+    //	return ptr > other;
+    //}
+
+    template<class AR>
+    void Serialize(AR &ar){
+        T * p = ptr;
+        ar & p;
+        AssingnRef(p);
+    }
 
 protected:
-	T* ptr;
+    T * ptr;
 };

@@ -4,11 +4,7 @@ A generator interface for assets
 
 #pragma once
 
-#include <string>
-#include <typeinfo>
-
 #include "core/Object.h"
-
 #include "reference.h"
 
 namespace Grafkit
@@ -24,22 +20,12 @@ namespace Grafkit
     {
         friend class IResourceManager;
     public:
-        IResource();
+        IResource() = default;
 
-        IResource(const IResource& other);
+        explicit IResource(const std::string& name) : Object(name){}
+        explicit IResource(const std::string& name, const std::string& uuid) : Object(name, Uuid(uuid)) {}
 
-        IResource& operator=(const IResource& other);
-
-        explicit IResource(const std::string& name);
-        explicit IResource(const std::string& name, const std::string& uuid);
-
-        virtual ~IResource();
-
-        virtual void* GetRaw() const = 0;
-
-    protected:
-        //void Serialize(Archive& ar) override;
-        //PERSISTENT_DECL(Grafkit::IResource, 1);
+        virtual ~IResource() = default;
     };
 
     /**
@@ -80,63 +66,9 @@ namespace Grafkit
         explicit operator T * const &() { return dynamic_cast<T*>(this->Get()); }
         explicit operator T&() { return *this->Get(); }
 
-        void* GetRaw() const override { return this->Get(); }
+    // ???
     protected:
-
-        void Serialize(Archive& ar) override;
-        PERSISTENT_DECL(Grafkit::Resource<T>, 1);
+        std::string GetClazzName() const override { return {}; }
+        uint16_t GetVersion() const override { return 0; }
     };
-
-    //template <typename T>
-    //void Resource<T>::Serialize(Archive& ar) {
-    //    assert(0);
-    //}
-
-    template <typename T>
-    void Resource<T>::Serialize(Archive& ar) { _Serialize(ar); }
-
-    // ------------------------------------------------------------------
-
-    //class ObjectResource : public Resource<Object>
-    //{
-    //public:
-
-    //    ObjectResource() {
-    //    }
-
-    //    explicit ObjectResource(Resource<Object>* ptr)
-    //        : Resource<Object>(ptr) {
-    //        SetName(ptr->GetName());
-    //        SetUuid(ptr->GetUuid());
-    //    }
-
-    //    explicit ObjectResource(const Ref<Resource<Object>>& ref)
-    //        : Resource<Object>(ref) {
-    //        SetName(ref->GetName());
-    //        SetUuid(ref->GetUuid());
-    //    }
-
-    //    explicit ObjectResource(const Ref<Object>& tref)
-    //        : Resource<Object>(tref) {
-    //        SetName(tref->GetName());
-    //        SetUuid(tref->GetUuid());
-    //    }
-
-    //    explicit ObjectResource(Object* tptr)
-    //        : Resource<Object>(tptr) {
-    //        SetName(tptr->GetName());
-    //        SetUuid(tptr->GetUuid());
-    //    }
-
-    //   void AssingnRef(Object *p)
-    //    {
-    //       SetName(p->GetName());
-    //       SetUuid(p->GetUuid());
-    //       Resource<Object>::AssingnRef(p);
-    //    }
-
-    //    ~ObjectResource() override {};
-    //    void* GetRaw() const override { return this->Get(); };
-
-    //};
 }

@@ -20,30 +20,17 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+DEFINE_EXCEPTION(BitmapLoadException, 1105, "Could not load and create bitmap from file")
 
 // ========================================================================================================================
 // Texture buffer generator
 // ========================================================================================================================
 
-IResource* ITexture1DBuilder::NewResource() { return new Texture1DRes; }
-
-IResource* ITexture2DBuilder::NewResource() { return new Texture2DRes; }
+// Nothing here ATM
 
 // ========================================================================================================================
 // Texture buffer generator
 // ========================================================================================================================
-
-TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureTypeE type) : ITexture2DBuilder(name)
-    , m_w(0)
-    , m_h(0)
-    , m_type(type) {
-}
-
-TextureBufferBuilder::TextureBufferBuilder(std::string name, TextureTypeE type, uint16_t w, uint16_t h) : ITexture2DBuilder(name)
-    , m_w(w)
-    , m_h(h)
-    , m_type(type) {
-}
 
 void TextureBufferBuilder::Load(IResourceManager* const & resman, IResource* source)
 {
@@ -53,41 +40,40 @@ void TextureBufferBuilder::Load(IResourceManager* const & resman, IResource* sou
         THROW_EX(NullPointerException);
     }
 
+    //m_oldResource = static_cast<Ref<Texture2D>>(*dstTexture);
+
     TextureRef texture = new Texture2D();
 
-    switch (m_type)
-    {
-    case TB_RGBA:
-        texture->Initialize(resman->GetDeviceContext(), m_w, m_h);
-        break;
-    case TB_RGBA32:
-        texture->InitializeFloatRGBA(resman->GetDeviceContext(), m_w, m_h);
-        break;
-    case TB_Float:
-        texture->InitializeFloat(resman->GetDeviceContext(), m_w, m_h);
-        break;
-    case TB_Depth:
-        texture->InitializeDepth(resman->GetDeviceContext(), m_w, m_h);
-        break;
-    }
-
     if (dstTexture->Valid()) { dstTexture->Release(); }
-
     dstTexture->AssingnRef(texture);
 }
 
+void TextureBufferBuilder::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) 
+{
+    Ref<Texture2D> texture = SafeGetObject(source);
+
+    switch (m_params.type)
+    {
+    case TextureBufferParams::TB_RGBA:
+        texture->Initialize(render, m_params.width, m_params.height);
+        break;
+    case TextureBufferParams::TB_RGBA32:
+        texture->InitializeFloatRGBA(render, m_params.width, m_params.height);
+        break;
+    case TextureBufferParams::TB_Float:
+        texture->InitializeFloat(render, m_params.width, m_params.height);
+        break;
+    case TextureBufferParams::TB_Depth:
+        texture->InitializeDepth(render, m_params.width, m_params.height);
+        break;
+    }
+}
+
+//void TextureBufferBuilder::Serialize(Archive& ar) { assert(0); }
 
 // ========================================================================================================================
 // Texture from bitmap loader
 // ========================================================================================================================
-
-TextureFromBitmap::TextureFromBitmap(std::string name, std::string sourceName, std::string uuid) : ITexture2DBuilder(name, sourceName, uuid)
-    , m_w(0)
-    , m_h(0) {
-}
-
-TextureFromBitmap::~TextureFromBitmap() {
-}
 
 void TextureFromBitmap::Load(IResourceManager* const & resman, IResource* source)
 {
@@ -103,7 +89,7 @@ void TextureFromBitmap::Load(IResourceManager* const & resman, IResource* source
     LOGGER(Log::Logger().Trace("loading texture from resource"));
 
     int x = 0, y = 0, ch = 0;
-    IAssetRef asset = this->GetSourceAsset(resman);
+    IAssetRef asset = resman->GetAssetFactory()->Get(m_params.sourceName);
 
     // kikenyszeritett rgba mod
     UCHAR* data = stbi_load_from_memory(static_cast<UCHAR *>(asset->GetData()), asset->GetSize(), &x, &y, &ch, 0);
@@ -123,36 +109,17 @@ void TextureFromBitmap::Load(IResourceManager* const & resman, IResource* source
     dstTexture->AssingnRef(texture);
 }
 
-/*
-*/
-
-TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name,
-    std::string source_posx,
-    std::string source_negx,
-    std::string source_posy,
-    std::string source_negy,
-    std::string source_posz,
-    std::string source_negz,
-    std::string uuid) : ITexture2DBuilder(name, uuid)
-{
-    m_sourceNames[0] = source_posx;
-    m_sourceNames[1] = source_negx;
-    m_sourceNames[2] = source_posy;
-    m_sourceNames[3] = source_negy;
-    m_sourceNames[4] = source_posz;
-    m_sourceNames[5] = source_negz;
+void TextureFromBitmap::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
 }
 
-TextureCubemapFromBitmap::TextureCubemapFromBitmap(std::string name, std::vector<std::string> sourceNames, std::string uuid) : ITexture2DBuilder(name, "", uuid)
-{
-    assert(!sourceNames.empty());
-    assert(6 == sourceNames.size());
+//void TextureFromBitmap::Serialize(Archive& ar) {
+//    assert(0);
+//}
 
-    for (size_t i = 0; i < 6; i++) { m_sourceNames[i] = sourceNames[i]; }
-}
+// ========================================================================================================================
+// 
+// ========================================================================================================================
 
-TextureCubemapFromBitmap::~TextureCubemapFromBitmap() {
-}
 
 void TextureCubemapFromBitmap::Load(IResourceManager* const & resman, IResource* source)
 {
@@ -167,7 +134,7 @@ void TextureCubemapFromBitmap::Load(IResourceManager* const & resman, IResource*
     for (int i = 0; i < 6; i++)
     {
         int x = 0, y = 0, ch = 0;
-        IAssetRef asset = resman->GetAssetFactory()->Get(m_sourceNames[i]);
+        IAssetRef asset = resman->GetAssetFactory()->Get(m_params.sourceNames[i]);
 
         // kikenyszeritett rgba mod
         uint8_t* data = stbi_load_from_memory(static_cast<uint8_t*>(asset->GetData()), asset->GetSize(), &x, &y, &ch, 0);
@@ -182,6 +149,7 @@ void TextureCubemapFromBitmap::Load(IResourceManager* const & resman, IResource*
         bitmaps[i] = new Bitmap(data, x, y, ch);
     }
 
+    // TODO -> Initialize
     TextureCubeRef texture = new TextureCube();
     texture->Initialize(resman->GetDeviceContext(), new Cubemap(bitmaps));
 
@@ -191,19 +159,18 @@ void TextureCubemapFromBitmap::Load(IResourceManager* const & resman, IResource*
     dstTexture->AssingnRef(texture);
 }
 
-IResource* TextureCubemapFromBitmap::NewResource() { return new TextureCubeRes(); }
-
-// -------------------------------------------------------------------------------
-
-TextureNoiseMap::TextureNoiseMap(size_t size, std::string uuid) : TextureFromBitmap("NOISE", uuid)
-    , m_size(size) {
+void TextureCubemapFromBitmap::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
 }
 
-TextureNoiseMap::TextureNoiseMap(std::string name, size_t size, std::string uuid) : TextureFromBitmap(name, "", uuid)
-    , m_size(size) {
-}
+//void TextureCubemapFromBitmap::Serialize(Archive& ar) {
+//    assert(0);
+//}
 
-void TextureNoiseMap::Load(IResourceManager* const & resman, IResource* source)
+// ========================================================================================================================
+// 
+// ========================================================================================================================
+
+void TextureNoiseMapBuilder::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
     if (dstTexture.Invalid())
@@ -216,12 +183,13 @@ void TextureNoiseMap::Load(IResourceManager* const & resman, IResource* source)
 
     LOGGER(Log::Logger().Trace("loading texture from resource"));
 
-    size_t k = m_size * m_size * 4;
-    UCHAR* data = new UCHAR[m_size * m_size * 4];
+    size_t k = m_params.size * m_params.size * 4;
+    UCHAR* data = new UCHAR[k];
 
     for (int i = 0; i < k; i++) { data[i] = rand() % 255; }
 
-    texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, m_size, m_size, 4));
+    // TODO: initialize
+    texture->Initialize(resman->GetDeviceContext(), new Bitmap(data, m_params.size, m_params.size, 4));
 
     // --- xchg texture 
     if (dstTexture->Valid()) { dstTexture->Release(); }
@@ -229,32 +197,49 @@ void TextureNoiseMap::Load(IResourceManager* const & resman, IResource* source)
     dstTexture->AssingnRef(texture);
 }
 
-TextureSamplerBuilder::TextureSamplerBuilder(Type_E type) : IResourceBuilder("", "")
-{
-    switch (type)
-    {
-    case TGG_Clamping:
-        m_name = TS_NAME_CLAMP;
-        m_mode = D3D11_TEXTURE_ADDRESS_CLAMP;
-        break;
-    default:
-        m_name = TS_NAME_WRAP;
-        m_mode = D3D11_TEXTURE_ADDRESS_WRAP;
-        break;
-    }
+void TextureNoiseMapBuilder::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
 }
+
+//void TextureNoiseMapBuilder::Serialize(Archive& ar) {
+//    assert(0);
+//}
+
+// ========================================================================================================================
+// 
+// ========================================================================================================================
+
 
 void TextureSamplerBuilder::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureSamplerResRef sampler = dynamic_cast<Resource<TextureSampler>*>(source);
 
     if (sampler.Invalid())
-    {
         THROW_EX(NullPointerException);
+
+
+    enum D3D11_TEXTURE_ADDRESS_MODE dxMode;
+
+    switch (m_params.mode)
+    {
+    case TextureSamplerParams::TGG_Clamping:
+        //m_name = TS_NAME_CLAMP;
+        dxMode = D3D11_TEXTURE_ADDRESS_CLAMP;
+        break;
+    default:
+        //m_name = TS_NAME_WRAP;
+        dxMode = D3D11_TEXTURE_ADDRESS_WRAP;
+        break;
     }
 
+    // TODO -> Initialize
+
     sampler->AssingnRef(new TextureSampler());
-    sampler->Get()->Initialize(resman->GetDeviceContext(), m_mode);
+    sampler->Get()->Initialize(resman->GetDeviceContext(), dxMode);
 }
 
-IResource* TextureSamplerBuilder::NewResource() { return new Resource<TextureSampler>(); }
+void TextureSamplerBuilder::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
+}
+
+//void TextureSamplerBuilder::Serialize(Archive& ar) {
+//    assert(0);
+//}

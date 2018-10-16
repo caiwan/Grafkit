@@ -3,6 +3,7 @@
 #include "ResourcePreloader.h"
 #include "loaders/TextureLoader.h"
 #include "utils/asset/AssetFactory.h"
+#include "render/Texture.h"
 
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
@@ -22,8 +23,7 @@ namespace {
 	};
 }
 
-/// @TODO init + shutdown
-
+// TODO: Lagacy stuff, get rid of it
 ResourcePreloader::ResourcePreloader(IPreloadEvents * pPreloader) : IResourceManager()
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
@@ -33,6 +33,7 @@ ResourcePreloader::ResourcePreloader(IPreloadEvents * pPreloader) : IResourceMan
 	SetPreloadListener(pPreloader);
 }
 
+// TODO: Lagacy stuff, get rid of it
 ResourcePreloader::~ResourcePreloader()
 {
 	for (size_t i = 0; i < m_filters.size(); i++) {
@@ -42,6 +43,7 @@ ResourcePreloader::~ResourcePreloader()
 
 // ============================================================================================================
 
+// TODO: Lagacy stuff, get rid of it
 void ResourcePreloader::LoadCache()
 {
 	for (size_t i = 0; i < m_filters.size(); i++) 
@@ -51,7 +53,7 @@ void ResourcePreloader::LoadCache()
 
 			IAssetFactory::filelist_t filelist = this->GetAssetFactory()->GetAssetList(m_filters[i]);
 
-			if (!filelist.empty()) for (IAssetFactory::filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++)
+			if (!filelist.empty()) for (IAssetFactory::filelist_t::iterator it = filelist.begin(); it != filelist.end(); ++it)
 			{
 
 				std::string filename = *it, name, path, ext;
@@ -63,10 +65,13 @@ void ResourcePreloader::LoadCache()
 				{
 				case TEXTURES:
 				{
-					Reload(new TextureFromBitmap(name, filename));
+                    // TODO: Lagacy stuff, get rid of it
+                    std::string uuid = "";
+                    TextureBitmapParams params {filename};
+					Reload(new TextureFromBitmap(name, uuid, params));
+                    // assert(0); 
 				}
 				break;
-
 				}
 			}
 		}
@@ -78,6 +83,27 @@ void ResourcePreloader::LoadCache()
 void ResourcePreloader::SaveCache()
 {
 	/// -- save cached files if any 
+    // name:uuid:path
 }
 
 // ============================================================================================================
+
+ParametricResourceLoader::ParametricResourceLoader(IPreloadEvents* pPreloader) : IResourceManager(pPreloader){
+
+}
+
+ParametricResourceLoader::~ParametricResourceLoader() {
+}
+
+//void ParametricResourceLoader::RegisterBuilderFactory(IResourceBuilderFactroy* factroy) {
+//}
+
+void ParametricResourceLoader::LoadCache() {
+}
+
+void ParametricResourceLoader::SaveCache() {
+}
+
+//void ParametricResourceLoader::PushNewBuilder(std::string builder, std::string name, std::string uuid, void* const& params) {
+//}
+

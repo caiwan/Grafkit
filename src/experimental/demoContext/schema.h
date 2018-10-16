@@ -2,7 +2,7 @@
 
 #include "json.hpp"
 
-#include"core/reference.h"
+#include "core/reference.h"
 #include "core/exceptions.h"
 #include "core/asset.h"
 
@@ -12,7 +12,7 @@ namespace GkDemo
 {
     class Demo;
 
-    typedef Ref<Demo> DemoRef;
+    //typedef Ref<Demo> DemoRef;
 
     class SchemaBuilder
     {
@@ -20,11 +20,12 @@ namespace GkDemo
         SchemaBuilder();
         ~SchemaBuilder();
 
-        void LoadFromAsset(const Grafkit::IAssetRef& asset, Grafkit::IResourceManager* resourceManager);
-        void Initialize(Grafkit::IResourceManager*const& resourceManager);
+        void LoadFromAsset(const Grafkit::IAssetRef& asset, Grafkit::IResourceManager* resourceManager) const;
+        void Initialize(Grafkit::IResourceManager*const& resourceManager) const;
         Ref<Demo> GetDemo() const;
 
     protected:
+#if 0
         void Build(Grafkit::IResourceManager*const& resourceManager, const Json& json);
         void BuildResources(Grafkit::IResourceManager*const& resourceManager, const Json& json);
         void BuildAssets(Grafkit::IResourceManager*const& resourceManager, const Json& assets);
@@ -53,8 +54,12 @@ namespace GkDemo
         void ExtractActorParent(Grafkit::IResourceManager*const& resourceManager, const Json& json, const Grafkit::ActorRef& actorRef);
         void ExtractEntities(Grafkit::IResourceManager*const& resourceManager, const Json& json, Grafkit::ActorRef& actorRef);
 
+#endif
+
     private:
+#if 0
         static Grafkit::ShaderResRef SafeFindShaderInMap(const std::map<std::string, Ref<Grafkit::Resource<Grafkit::Shader>>>& map, const char* token);
+#endif
 
         Ref<Demo> m_demo;
         Json m_json;

@@ -80,8 +80,8 @@ namespace Grafkit {
         std::stack<Matrix> m_worldMatrixStack;
 
         // -- persistent
-    protected:
-        void Serialize(Archive& ar) override;
+    //protected:
+    //    void Serialize(Archive& ar) override;
         PERSISTENT_DECL(Grafkit::SceneGraph, 1);
     };
 }

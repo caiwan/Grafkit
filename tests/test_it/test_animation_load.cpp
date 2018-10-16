@@ -144,7 +144,8 @@ protected:
 TEST_F(AnimationLoadTest, CreateEmptyTest)
 {
     // given
-    Ref<Resource<ActorAnimation>> resource = m_app->Load<Resource<ActorAnimation>>(new ActorAnimationLoader("testActorAnimation"));
+    ActorAnimationParams params{};
+    Ref<Resource<ActorAnimation>> resource = m_app->Load<Resource<ActorAnimation>>(new ActorAnimationLoader("testActorAnimation", "", params));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);
@@ -168,7 +169,8 @@ TEST_F(AnimationLoadTest, LoadAnimation)
 {
     // given
     SaveTestData();
-    Ref<Resource<ActorAnimation>> resource = m_app->Load<Resource<ActorAnimation>>(new ActorAnimationLoader("testActorAnimation", ANIMATION));
+    ActorAnimationParams params{ ANIMATION };
+    Ref<Resource<ActorAnimation>> resource = m_app->Load<Resource<ActorAnimation>>(new ActorAnimationLoader("testActorAnimation", "", params));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);
@@ -216,7 +218,8 @@ TEST_F(AnimationLoadTest, LoadPreexistingAnimation)
     for (std::string fileName : animationFileNames)
     {
         std::string path = ANIMATION_ROOT + fileName;
-        resources.push_back(m_app->Load<Resource<ActorAnimation>>(new ActorAnimationLoader("", path.c_str(), "" )));
+        ActorAnimationParams params{ path };
+        resources.push_back(m_app->Load<Resource<ActorAnimation>>(new ActorAnimationLoader(params)));
     }
 
     // when

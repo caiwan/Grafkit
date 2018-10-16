@@ -5,7 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-PERSISTENT_IMPL(Grafkit::Camera)
+PERSISTENT_IMPL(Grafkit::Camera);
 using namespace Grafkit;
 using namespace DirectX;
 
@@ -80,14 +80,14 @@ void Camera::Calculate(Renderer & renderer, ActorRef parent)
 }
 
 
-void Camera::Serialize(Archive & ar)
-{
-	_Serialize(ar);
-
-	PERSIST_FIELD(ar, m_type);
-	PERSIST_FIELD(ar, m_mode);
-
-	PERSIST_FIELD(ar, m_znear);
-	PERSIST_FIELD(ar, m_zfar);
-	PERSIST_FIELD(ar, m_hFov);
-}
+//void Camera::Serialize(Archive & ar)
+//{
+//	_Serialize(ar);
+//
+//	PERSIST_FIELD(ar, m_type);
+//	PERSIST_FIELD(ar, m_mode);
+//
+//	PERSIST_FIELD(ar, m_znear);
+//	PERSIST_FIELD(ar, m_zfar);
+//	PERSIST_FIELD(ar, m_hFov);
+//}

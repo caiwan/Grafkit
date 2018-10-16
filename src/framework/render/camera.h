@@ -87,8 +87,8 @@ namespace Grafkit {
         Matrix m_perspectiveMatrix;
         Matrix m_orthoMatrix;
 
-    protected:
-        void Serialize(Archive& ar) override;
         PERSISTENT_DECL(Grafkit::Camera, 1);
+    //protected:
+        //void Serialize(Archive& ar) override;
     };
 }

@@ -16,10 +16,12 @@
 
 //#pragma warning(push)
 #pragma warning(disable : 4005)
-#pragma warning(disable : 4290)
-#pragma warning(disable : 4305)
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4267)
+#pragma warning(disable : 4290)
+#pragma warning(disable : 4305)
+#pragma warning(disable : 4838)
+#pragma warning(disable : 5040)
 
 #ifdef __cplusplus
 #include "common.h"

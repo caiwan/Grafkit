@@ -1,21 +1,19 @@
 #include "stdafx.h"
 #include "animation.h"
 
-PERSISTENT_IMPL(Grafkit::Animation::Track);
 PERSISTENT_IMPL(Grafkit::Animation::Channel);
+PERSISTENT_IMPL(Grafkit::Animation::Track);
 
 using namespace Grafkit;
 
 /* ============================================================================================== */
 
 Animation::Animation() : Object()
-//: m_duration(0) 
 {
 }
 
 Animation::~Animation() {
 }
-
 
 /* ============================================================================================== */
 
@@ -31,12 +29,6 @@ void Animation::Channel::DeleteKey(const size_t& id)
     const auto it = m_keys.begin() + id;
     m_keys.erase(it);
 }
-
-void Animation::Channel::Serialize(Archive& ar) {
-    PERSIST_STRING(ar, m_name);
-    PERSIST_STD_VECTOR(ar, m_keys);
-}
-
 
 /* ============================================================================================== */
 Animation::Track::Track() {
@@ -117,47 +109,6 @@ void Animation::Track::SetFloat4(size_t id, float4 v)
     m_channels[3]->SetValue(id, v.w);
 }
 
-void Animation::Track::Serialize(Archive& ar)
-{
-    PERSIST_STRING(ar, m_name);
-
-    if (ar.IsStoring()) {
-        uint32_t len = m_channels.size();
-        PERSIST_FIELD(ar, len);
-        for (auto channel : m_channels) {
-            channel->Store(ar);
-        }
-    }
-    else {
-        uint32_t len = 0;
-        PERSIST_FIELD(ar, len);
-        for (uint32_t i = 0; i < len; i++) {
-            auto channel = Persistent::LoadT<Animation::Channel>(ar);
-            m_channels.push_back(channel);
-        }
-    }
-}
-
 /* ============================================================================================== */
 
-void Animation::_Serialize(Archive& ar)
-{
-    Object::_Serialize(ar);
 
-    if (ar.IsStoring()) {
-        uint32_t len = m_tracks.size();
-        PERSIST_FIELD(ar, len);
-        for (auto channel : m_tracks) {
-            channel->Store(ar);
-        }
-    }
-    else 
-    {
-        uint32_t len = 0;
-        PERSIST_FIELD(ar, len);
-        for (uint32_t i = 0; i < len; i++) {
-            auto track = Persistent::LoadT<Animation::Track>(ar);
-            m_tracks.push_back(track);
-        }
-    }
-}

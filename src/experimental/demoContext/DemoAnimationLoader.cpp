@@ -19,6 +19,7 @@ namespace Grafkit {
 using namespace GkDemo;
 using namespace Grafkit;
 
+#if 0
 
 DemoAnimationLoader::DemoAnimationLoader(std::string name, std::string sourcename, std::string uuid, std::string targetUuid) : IAnimationLoader(name, sourcename, uuid, targetUuid){
 }
@@ -67,3 +68,5 @@ void DemoAnimationLoader::Load(IResourceManager* const& resman, IResource* sourc
 
     dstAnimation->AssingnRef(animation);
 }
+
+#endif

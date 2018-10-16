@@ -29,15 +29,12 @@
 
 #define MAX_TEXCOORD_COUNT 2
 
-using namespace Grafkit;
-using namespace GkDemo;
-using namespace FWdebugExceptions;
 
 // TODO -> Library
 
 namespace
 {
-    Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4* m);
+    Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4* m);
     aiVector3D crossProduct(aiVector3D a, aiVector3D b);
     float2 aiVector2DToFloat2(const aiVector2D& v);
     float2 aiVector3DToFloat2(const aiVector3D& v);
@@ -48,6 +45,14 @@ namespace
     float4 aiMatkey4ToFloat4(const aiMaterial*const & mat, const char* key, int a1, int a2);
     float aiMatkeyToFloat(const aiMaterial*const & mat, const char* key, int a1, int a2);
 }
+
+DEFINE_EXCEPTION(MeshLoaderException, 9001, "Error while parsing file via ASSIMP");
+
+using namespace Grafkit;
+using namespace GkDemo;
+using namespace FWdebugExceptions;
+
+#if 0
 
 IResource* IMeshLoader::NewResource() { return new Resource<Mesh>(); }
 
@@ -229,17 +234,19 @@ namespace
 
     float4 aiColor3DToFloat4(const aiColor3D& c) { return float4(c.r, c.g, c.b, 1.); }
 
-    float4 aiMatkey4ToFloat4(const aiMaterial*const & mat, const char* key, int a1, int a2)
+    float4 aiMatkey4ToFloat4(const aiMaterial*const & m_mat, const char* key, int a1, int a2)
     {
         aiColor4D ac;
-        mat->Get(key, a1, a2, ac);
+        m_mat->Get(key, a1, a2, ac);
         return float4(ac.r, ac.g, ac.g, ac.a);
     }
 
-    float aiMatkeyToFloat(const aiMaterial*const & mat, const char* key, int a1, int a2)
+    float aiMatkeyToFloat(const aiMaterial*const & m_mat, const char* key, int a1, int a2)
     {
         float f = 0.;
-        mat->Get(key, a1, a2, f);
+        m_mat->Get(key, a1, a2, f);
         return 0.0f;
     }
 }
+
+#endif

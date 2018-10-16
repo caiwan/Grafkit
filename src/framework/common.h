@@ -8,6 +8,8 @@
 #include "render/renderer.h"
 #include "render/dxtypes.h"
 
+#include "utils/persistence/dynamics.h"
+
 // predefine classes to reduce compile time 
 
 namespace Grafkit {

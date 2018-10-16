@@ -19,7 +19,7 @@ include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/path_find_in_list.cmake)
 
 # avoiding dev and prod builds from now on
 if (MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX /D_USE_MATH_DEFINES /MP6")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX /D_USE_MATH_DEFINES /MP6 /std:c++latest")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /DNOMINMAX /D_USE_MATH_DEFINES /MP6")
 	# set(CMAKE_C_FLAGS "${LIVERELEASE_CXX_FLAGS}")
 endif(MSVC)

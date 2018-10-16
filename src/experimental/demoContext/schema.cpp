@@ -41,7 +41,7 @@
 #include "context.h"
 #include "resource/loaders/TextureLoader.h"
 
-#define ANIMATION_ROOT "animation/"
+//#define ANIMATION_ROOT "animation/"
 
 using namespace GkDemo;
 using namespace Grafkit;
@@ -56,11 +56,25 @@ SchemaBuilder::SchemaBuilder() : m_demo(nullptr)
 SchemaBuilder::~SchemaBuilder() {
 }
 
+
 /* ======================================================================
  * Loading stuff
  * ======================================================================
 */
 
+
+void SchemaBuilder::LoadFromAsset(const IAssetRef& asset, IResourceManager* resourceManager) const {
+    assert(0);
+}
+
+void SchemaBuilder::Initialize(IResourceManager* const& resourceManager) const {
+    assert(0);
+}
+
+Ref<Demo> SchemaBuilder::GetDemo() const { return m_demo; }
+
+
+# if 0
 void SchemaBuilder::LoadFromAsset(const IAssetRef& asset, IResourceManager* resourceManager)
 {
     const char* dataPtr = static_cast<const char*>(asset->GetData());
@@ -81,10 +95,10 @@ void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& j
 {
     LOGGER(Log::Logger().Info("Loading context"));
 
-    // build 
+// build 
     BuildResources(resourceManager, json);
 
-    // join includes if any
+// join includes if any
     Json demoJson = json.at("demo");
     Json demoIncludes = demoJson["includes"];
     if (!demoIncludes.empty())
@@ -100,7 +114,7 @@ void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& j
         }
     }
 
-    // -- setup demo
+// -- setup demo
     LOGGER(Log::Logger().Info("Building Demo"));
     m_demo = new Demo();
 
@@ -110,7 +124,7 @@ void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& j
 
     m_demo->SetMusic(music);
 
-    // build scenes
+// build scenes
 
     const Json scenes = demoJson.at("scenes");
     LOGGER(Log::Logger().Info("- Loading Scenes"));
@@ -143,9 +157,9 @@ void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& j
     }
 
 
-    // buffers? shit?
+// buffers? shit?
 
-    // effects ?
+// effects ?
 
     m_inited = false;
 }
@@ -167,7 +181,7 @@ void SchemaBuilder::BuildScene(IResourceManager* const& resourceManager, const J
 {
     std::string uuid = sceneJson.at("uuid");
 
-    // ids
+// ids
     uint32_t id = sceneJson.at("id").get<uint32_t>();
     std::string sceneUuid = sceneJson.at("scene");
 
@@ -183,24 +197,24 @@ void SchemaBuilder::BuildScene(IResourceManager* const& resourceManager, const J
             sceneResource->GetUuid().c_str()
             ));
 
-        // TODO add scene here 
+// TODO add scene here 
         SceneRef scene = new Scene();
         BuildObject(sceneJson, scene);
         scene->SetSceneGraph(sceneResource);
-        // It will build itself later on
+// It will build itself later on
 
         resourceManager->Add(new SceneRes(scene, scene->GetName(), scene->GetUuid()));
     }
     else
     {
-        // TODO: throw
+// TODO: throw
         THROW_EX_DETAILS(SchemaParseException, "Nincs Scene");
     }
 }
 
 void SchemaBuilder::BuildAnimation(IResourceManager* const & resourceManager, const Json& animationJson)
 {
-    //Ref<Resource<Animation>> animation;
+//Ref<Resource<Animation>> animation;
 
     std::string type = animationJson.at("type");
     std::string name = animationJson.at("name");
@@ -306,7 +320,7 @@ void SchemaBuilder::BuildTexture(IResourceManager*const& resourceManager, const 
     else if (0 == generator.compare("noise"))
     {
         size_t size = textureJson.at("size").get<size_t>();
-        resourceManager->Load<Texture2DRes>(new TextureNoiseMap(name, size, uuid));
+        resourceManager->Load<Texture2DRes>(new TextureNoiseMapBuilder(name, size, uuid));
         LOGGER(Log::Logger().Info("--- Noise"));
     }
 }
@@ -315,7 +329,7 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
 {
     LOGGER(Log::Logger().Info("- Loading json"));
 
-    // --- 
+// --- 
     const Json meshJson = json["meshes"];
     if (!meshJson.empty())
     {
@@ -323,7 +337,7 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
         for (Json::const_iterator meshIt = meshJson.begin(); meshIt != meshJson.end(); ++meshIt) { BuildMesh(resourceManager, *meshIt); }
     }
 
-    // --- 
+// --- 
     const Json camerasJson = json["cameras"];
     if (!camerasJson.empty())
     {
@@ -336,7 +350,7 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
         }
     }
 
-    // ---
+// ---
     const Json lightsJson = json["lights"];
     if (!lightsJson.empty())
     {
@@ -349,7 +363,7 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
         }
     }
 
-    // --- 
+// --- 
     const Json models = json["models"];
     if (!models.empty())
     {
@@ -362,7 +376,7 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
         }
     }
 
-    // --- 
+// --- 
     const Json materials = json["materials"];
     if (!materials.empty())
     {
@@ -370,7 +384,7 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
         for (Json::const_iterator materialIt = materials.begin(); materialIt != materials.end(); ++materialIt) { BuildMaterial(resourceManager, *materialIt); }
     }
 
-    // --- 
+// --- 
     const Json shaders = json["shaders"];
     if (!shaders.empty())
     {
@@ -379,7 +393,7 @@ void SchemaBuilder::BuildAssets(IResourceManager*const& resourceManager, const J
     }
 
 
-    // --- 
+// --- 
     const Json textures = json["textures"];
     if (!shaders.empty())
     {
@@ -403,7 +417,7 @@ void SchemaBuilder::BuildSceneGraphs(IResourceManager*const& resourceManager, co
             const Json actors = scenegraphIt->at("actors");
             if (!actors.empty())
             {
-                // create
+// create
                 LOGGER(Log::Logger().Info("-- Loading actors"));
                 for (Json::const_iterator actorIt = actors.begin(); actorIt != actors.end(); ++actorIt)
                 {
@@ -412,7 +426,7 @@ void SchemaBuilder::BuildSceneGraphs(IResourceManager*const& resourceManager, co
                     resourceManager->Add(new Resource<Actor>(actor, actor->GetName(), actor->GetUuid()));
                 }
 
-                //assign
+//assign
                 LOGGER(Log::Logger().Info("-- Assign actors"));
                 for (Json::const_iterator actorIt = actors.begin(); actorIt != actors.end(); ++actorIt)
                 {
@@ -558,7 +572,7 @@ void SchemaBuilder::AssignShader(IResourceManager* const& resourceManager, Json 
     {
         std::string key = it.key();
         std::string uuid = it.value().get<std::string>();
-        // if (!uuid.empty())
+// if (!uuid.empty())
         {
             ShaderResRef shader = resourceManager->GetByUuid<ShaderRes>(uuid);
             if (shader)
@@ -657,11 +671,11 @@ void SchemaBuilder::ExtractEntities(IResourceManager*const& resourceManager, con
         for (Json::const_iterator entityIt = entities.begin(); entityIt != entities.end(); ++entityIt)
         {
             std::string uuid = entityIt->get<std::string>();
-            // terrible hack
+// terrible hack
             Ref<IResource> entityRes = resourceManager->GetByUuid<IResource>(uuid);
             if (entityRes.Valid())
             {
-                // damn terrible hack
+// damn terrible hack
                 Ref<Entity3D> entityRef = dynamic_cast<Entity3D*>(reinterpret_cast<Object*>(entityRes->GetRaw()));
                 if (entityRef.Valid())
                 {
@@ -672,3 +686,4 @@ void SchemaBuilder::ExtractEntities(IResourceManager*const& resourceManager, con
         }
     }
 }
+#endif

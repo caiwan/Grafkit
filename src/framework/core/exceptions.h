@@ -10,6 +10,9 @@
 
 namespace FWdebug
 {
+    // TODO: get rid of this later on 
+    // or at least use std::excepotions more wisely
+
     /// http://en.cppreference.com/w/cpp/error/exception
     /// http://www.boost.org/doc/libs/1_59_0/libs/exception/doc/boost-exception.html
     /// http://www.boost.org/community/error_handling.html

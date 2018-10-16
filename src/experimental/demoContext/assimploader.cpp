@@ -516,17 +516,17 @@ inline float4 GKimporter::AssimpLoader::aiColor3DToFloat4(aiColor3D &c)
 	return float4(c.r, c.g, c.b, 1.);
 }
 
-inline float4 GKimporter::AssimpLoader::aiMatkey4ToFloat4(aiMaterial *& mat, const char * key, int a1, int a2)
+inline float4 GKimporter::AssimpLoader::aiMatkey4ToFloat4(aiMaterial *& m_mat, const char * key, int a1, int a2)
 {
 	aiColor4D ac;
-	mat->Get(key, a1, a2, ac);
+	m_mat->Get(key, a1, a2, ac);
 	return float4(ac.r, ac.g, ac.g, ac.a);
 }
 
-inline float GKimporter::AssimpLoader::aiMatkeyToFloat(aiMaterial *& mat, const char * key, int a1, int a2)
+inline float GKimporter::AssimpLoader::aiMatkeyToFloat(aiMaterial *& m_mat, const char * key, int a1, int a2)
 {
 	float f = 0.;
-	mat->Get(key, a1, a2, f);
+	m_mat->Get(key, a1, a2, f);
 	return 0.0f;
 }
 

@@ -6,8 +6,8 @@
 #include "renderer.h"
 #include "math/matrix.h"
 
-namespace Grafkit {
-
+namespace Grafkit
+{
     class SceneGraph;
 
     class Actor;
@@ -18,27 +18,22 @@ namespace Grafkit {
 
         friend class Actor;
     public:
-        Entity3D();
-        virtual ~Entity3D();
+        Entity3D() = default;
+        virtual ~Entity3D() = default;
 
         virtual void Calculate(Renderer& renderer, ActorRef parent = nullptr) = 0;
-        virtual void Render(Renderer& deviceContext, SceneGraph * const & scene) = 0;
-        virtual void Build(Renderer& deviceContext, SceneGraph * const & scene) = 0;
+        virtual void Render(Renderer& deviceContext, SceneGraph* const & scene) = 0;
+        virtual void Build(Renderer& deviceContext, SceneGraph* const & scene) = 0;
 
     protected:
-        std::string m_name;
-        std::string m_uuid;
-
-        void Serialize(Archive& ar) override = 0;
-        void _Serialize(Archive& ar);
+        template <class Archive>
+        void Serialize(Archive& ar) { Object::Serialize(ar); }
     };
 
-
     /**
-    An actor node - ez a scenegraph es a nodeja
     */
     __declspec(align(16))
-        class Actor : public AlignedNew<Actor>, public Object
+    class Actor : public AlignedNew<Actor>, public Object
     {
         friend class SceneGraph;
     public:
@@ -47,13 +42,13 @@ namespace Grafkit {
         ~Actor();
 
         // kisse kulonos megoldas ... 
-        void Matrix(const Matrix &mat) { m_viewMatrix = mat; }
-        void Transform(const Grafkit::Matrix &mat) { m_transformMatrix = mat; }
+        void Matrix(const Matrix& mat) { m_viewMatrix = mat; }
+        void Transform(const Grafkit::Matrix& mat) { m_transformMatrix = mat; }
 
         Grafkit::Matrix& Matrix() { return m_viewMatrix; }
         Grafkit::Matrix& Transform() { return m_transformMatrix; }
 
-        virtual void Render(Renderer &render, SceneGraph* scene);
+        virtual void Render(Renderer& render, SceneGraph* scene);
 
         /// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
         Ref<Actor> GetParent() const { return m_pParent; }
@@ -66,30 +61,32 @@ namespace Grafkit {
         Entity3DRef GetEntity(int id = 0) { return m_pEntities[id]; }
         size_t GetEntityCount() const { return m_pEntities.size(); }
 
-        void Hide() { m_ishidden = 1; }
-        void Show() { m_ishidden = 0; }
+        void Hide() { m_isHidden = true; }
+        void Show() { m_isHidden = false; }
 
-        int IsHidden() const { return (m_pParent.Invalid() ? 0 : m_pParent->IsHidden()) || m_ishidden; }
+        bool IsHidden() const { return (m_pParent.Invalid() ? 0 : m_pParent->IsHidden()) || m_isHidden; }
 
         // calculated matrix for internal use
         Grafkit::Matrix WorldMatrix() const { return m_worldMatrix; }
 
     protected:
 
-        void WorldMatrix(const Grafkit::Matrix &mat) { m_worldMatrix = mat; }
+        void WorldMatrix(const Grafkit::Matrix& mat) { m_worldMatrix = mat; }
 
-        Grafkit::Matrix m_viewMatrix;			///< Node tranyyformacioja
-        Grafkit::Matrix m_transformMatrix;		///< Kulon transzformacio a node tetejen (hogy ne legyen szukseg az eredeti matrixra)
-        Grafkit::Matrix m_worldMatrix;			///< Szarmaztatott matrix
+        Grafkit::Matrix m_viewMatrix; 
+        Grafkit::Matrix m_transformMatrix;
+        Grafkit::Matrix m_worldMatrix;
 
         Ref<Actor> m_pParent;
         std::vector<Ref<Actor>> m_pChildren;
         std::vector<Ref<Entity3D>> m_pEntities;
 
-        int m_ishidden;
+        bool m_isHidden;
 
-        void Serialize(Archive& ar) override;
-        PERSISTENT_DECL(Grafkit::Actor, 1);
+        SERIALIZE(Grafkit::Actor, 1, ar)
+        {
+            Object::Serialize(ar);
+            ar & m_viewMatrix & m_transformMatrix & m_isHidden;
+        }
     };
-
 }

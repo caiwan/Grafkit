@@ -1,11 +1,11 @@
 #pragma once
 #include "core/system.h"
 #include "render/renderer.h"
-#include "resource/ResourceManager.h"
+#include "resource/ResourcePreloader.h"
 
 namespace Testing
 {
-    class TestApplicationContext : public Grafkit::System, public Grafkit::IResourceManager
+    class TestApplicationContext : public Grafkit::System, public Grafkit::ParametricResourceLoader
     {
     public:
         explicit TestApplicationContext(Grafkit::Renderer& render, Grafkit::IAssetFactory* assetFactory);

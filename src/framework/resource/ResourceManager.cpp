@@ -9,18 +9,29 @@
 #include <iterator>
 #include <sstream>
 
+DEFINE_EXCEPTION(NoAssetFoundByNameException, 1, "No asset found by the given name");
+DEFINE_EXCEPTION(NoAssetBucketFoundException, 3, "No asset bucket found");
+DEFINE_EXCEPTION(UpdateResourceExcpetion, 4, "Cannot update resource");
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-IResourceManager::IResourceManager() : m_preloadEvents(nullptr)
+void IResourceManager::AddResourcePaths()
 {
     /* Base resource paths inside the asset directory */
-    this->AddResourcePath("texture", "textures/");
-    this->AddResourcePath("shader", "shaders/");
-    this->AddResourcePath("shaderincludesystem", "shaders/lib/");
-    this->AddResourcePath("shaderincludelocal", "shaders/");
-    this->AddResourcePath("model", "models/");
-    this->AddResourcePath("syncdata", "sync/");
+    AddResourcePath("texture", "textures/");
+    AddResourcePath("shader", "shaders/");
+    AddResourcePath("shaderincludesystem", "shaders/lib/");
+    AddResourcePath("shaderincludelocal", "shaders/");
+    AddResourcePath("model", "models/");
+    AddResourcePath("syncdata", "sync/");
+}
+
+IResourceManager::IResourceManager() : m_preloadEvents(nullptr) { AddResourcePaths(); }
+
+IResourceManager::IResourceManager(IPreloadEvents* preloadEvents)
+    : m_preloadEvents(preloadEvents) {
+    AddResourcePaths();
 }
 
 IResourceManager::~IResourceManager()
@@ -33,25 +44,20 @@ void IResourceManager::Add(Ref<IResource> pResource)
 {
     if (pResource.Valid())
     {
-        Ref<IResource> i_ref = this->GetByUuid<IResource>(pResource->GetUuid());
+        Ref<IResource> i_ref = GetByUuid<IResource>(pResource->GetUuid());
         if (i_ref.Valid())
         {
             if (i_ref.Get() != pResource.Get())
             {
                 std::ostringstream msg;
                 msg << "(A resource pointerek nem egyformak, vangy nem egyedi a UUID.Geteld ki elobb, aztan frissits.)";
-                msg << " requested ref uuid = " << pResource->GetUuid();
-                msg << " stored ref uuid = " << i_ref->GetUuid();
+                msg << " requested ref uuid = " << std::string(pResource->GetUuid()).c_str();
+                msg << " stored ref uuid = " << std::string(i_ref->GetUuid()).c_str();
                 THROW_EX_DETAILS(UpdateResourceExcpetion, msg.str().c_str());
             }
         }
         std::string uuid = pResource->GetUuid();
 
-        // case sensitive Windows filesystem crap shit
-        //std::string name = pResource->GetName();
-        //transform(name.begin(), name.end(), name.begin(), tolower);
-
-        //m_nameMap[name] = pResource;
         m_uuidMap[uuid] = pResource;
     }
 }
@@ -71,19 +77,14 @@ void IResourceManager::RemoveByUuid(const std::string& uuid)
 
 void IResourceManager::RemoveAll() { m_uuidMap.clear(); }
 
-// STL components p115
-struct get_second : std::unary_function<std::map<std::string, Ref<IResource>>::value_type, Ref<IResource>>
-{
-    Ref<IResource> operator()(const std::map<std::string, Ref<IResource>>::value_type& value) const { return value.second; }
-};
-
-void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const { transform(m_uuidMap.begin(), m_uuidMap.end(), back_inserter(target), get_second()); }
+void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const {
+    transform(m_uuidMap.begin(), m_uuidMap.end(), back_inserter(target), [](const std::map<std::string, Ref<IResource>>::value_type& value) { return value.second; });
+}
 
 void IResourceManager::Load(IResourceBuilder* builder)
 {
     std::string uuid = builder->GetUuid();
 
-    // Ha nincs resource, elotoltjuk. 
     if (uuid.empty())
     {
         Reload(builder);
@@ -96,9 +97,10 @@ void IResourceManager::Load(IResourceBuilder* builder)
     if (it == m_uuidMap.end()) { Reload(builder); }
 }
 
+// TODO: This needs to be  or at least the testcase 
 void IResourceManager::TriggerReload(std::string filename)
 {
-    // filename => {resource name, builder object}
+    //TODO: this part stinks
     auto it = m_filenamesToBuilder.find(filename);
     if (it != m_filenamesToBuilder.end())
     {
@@ -115,31 +117,28 @@ void IResourceManager::TriggerReload(std::string filename)
                 Add(oldResource);
             }
         }
-
     }
 }
 
 void IResourceManager::Reload(IResourceBuilder* builder)
 {
     IResource* resource = builder->NewResource();
-    std::string uuid = builder->GetUuid();
-    if (!uuid.empty()) { resource->SetUuid(uuid); }
+    Uuid uuid(builder->GetUuid());
+    if (!uuid.IsEmpty()) { resource->SetUuid(uuid); }
     resource->SetName(builder->GetName());
     Add(resource);
     m_builders[uuid] = builder;
-    if (!builder->GetSourceName().empty())
+    if (!builder->GetWatcherFilename().empty())
     {
-        std::string name = builder->GetSourceName();
+        std::string name = builder->GetWatcherFilename();
         BuilderPair builderPair(uuid, builder);
         auto it = m_filenamesToBuilder.find(name);
-        if (it != m_filenamesToBuilder.end())
+        if (it != m_filenamesToBuilder.end()) { it->second.push_back(builderPair); }
+        else
         {
-            it->second.push_back(builderPair);
-        } else
-        {
+            // TODO: get rid of this && make a bit more efficient this part || clean it up at least
             m_filenamesToBuilder[name] = std::list<BuilderPair>();
             m_filenamesToBuilder[name].push_back(builderPair); // lol?
-            
         }
     }
 }
@@ -172,12 +171,6 @@ void IResourceManager::DoPrecalc()
 
 void IResourceManager::ClearLoadStack()
 {
-    //for (auto it = m_builders.begin(); it != m_builders.end(); ++it)
-    //{
-    //    IResourceBuilder* builder = it->second;
-    //    if (builder) { delete builder; }
-    //}
-
     m_builders.clear();
 }
 

@@ -6,8 +6,10 @@ Unittest for resource management system II.
 
 #include <gtest/gtest.h>
 
-#include "testClass_resource.h"
+//#include "testClass_resource.h"
 // --- 
+
+# if 0
 
 class ResourcePreloaderTest : public testing::Test {
 
@@ -28,3 +30,6 @@ TEST_F(ResourcePreloaderTest, TestAssignment) {
 
     ASSERT_TRUE(resource.Valid() && resource->Valid());
 }
+
+
+#endif

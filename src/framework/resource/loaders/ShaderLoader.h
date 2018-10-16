@@ -1,58 +1,115 @@
-#pragma once 
+#pragma once
 
 #include "common.h"
-
 #include "resource/ResourceBuilder.h"
 
-namespace Grafkit {
+namespace Grafkit
+{
+    struct ShaderParams
+    {
+        std::string sourceName;
+        std::string entryPoint;
+    };
 
-	class ShaderLoader : public IResourceBuilder{
-	public:
-		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, std::string uuid="");
-		~ShaderLoader();
+    class IShaderLoader : public ResourceBuilder<Shader, ShaderParams>
+    {
+    public:
+        IShaderLoader() {
+        }
 
-	    void Load(IResourceManager * const & resman, IResource * source) override;
+        explicit IShaderLoader(const ShaderParams& params)
+            : ResourceBuilder<Shader, ShaderParams>(params) {
+        }
 
-	    IResource* NewResource() override;
+        IShaderLoader(const std::string& name, const std::string& uuid, const ShaderParams& params)
+            : ResourceBuilder<Shader, ShaderParams>(name, uuid, params) {
+        }
 
-	protected:
-		virtual Shader* NewShader() = 0;
-		virtual std::string DefaultEntryPointName() = 0;
-		std::string m_entrypoint;
-	};
+        void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        // + Serialize maybe?
+
+    protected:
+        virtual Shader* NewShader() const = 0;
+        virtual std::string DefaultEntryPointName() const = 0;
+    };
+
+    /**
+     *
+     */
+
+    class VertexShaderLoader : public IShaderLoader
+    {
+    public:
+        VertexShaderLoader() {
+        }
+
+        explicit VertexShaderLoader(const ShaderParams& params)
+            : IShaderLoader(params) {
+        }
+
+        VertexShaderLoader(const std::string& name, const std::string& uuid, const ShaderParams& params)
+            : IShaderLoader(name, uuid, params) {
+        }
+
+        // + Serialize maybe?
 
 
-	class VertexShaderLoader : public ShaderLoader {
-	public:
-		VertexShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "", std::string uuid = "")
-			: ShaderLoader(name, sourcename, entrypoint, uuid){}
-		~VertexShaderLoader(){}
+    protected:
+        Shader * NewShader() const override;
+        std::string DefaultEntryPointName() const override { return "mainVertex"; }
+    };
 
-	protected:
-	    Shader* NewShader() override;
-	    std::string DefaultEntryPointName() override { return "mainVertex"; }
-	};
+    /**
+    *
+    */
+
+    class PixelShaderLoader : public IShaderLoader
+    {
+    public:
+        PixelShaderLoader() {
+        }
+
+        explicit PixelShaderLoader(const ShaderParams& params)
+            : IShaderLoader(params) {
+        }
+
+        PixelShaderLoader(const std::string& name, const std::string& uuid, const ShaderParams& params)
+            : IShaderLoader(name, uuid, params) {
+        }
+
+        // + Serialize maybe?
 
 
-	class PixelShaderLoader : public ShaderLoader {
-	public:
-		PixelShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "", std::string uuid = "")
-			: ShaderLoader(name, sourcename, entrypoint, uuid) {}
-		~PixelShaderLoader(){}
-	protected:
-	    Shader* NewShader() override;
-	    std::string DefaultEntryPointName() override { return "mainPixel"; }
-	};
+    protected:
+        Shader * NewShader() const override;
+        std::string DefaultEntryPointName() const override { return "mainPixel"; }
+    };
 
-	class GeometryShaderLoader : public ShaderLoader {
-	public:
-		GeometryShaderLoader(std::string name, std::string sourcename, std::string entrypoint = "", std::string uuid = "")
-			: ShaderLoader(name, sourcename, entrypoint, uuid) {}
-		~GeometryShaderLoader() {}
+    /**
+    *
+    */
 
-	protected:
-	    Shader* NewShader() override;
-	    std::string DefaultEntryPointName() override { return "mainGeometry"; }
-	};
+    class GeometryShaderLoader : public IShaderLoader
+    {
+    public:
+        GeometryShaderLoader() {
+        }
 
+        explicit GeometryShaderLoader(const ShaderParams& params)
+            : IShaderLoader(params) {
+        }
+
+        GeometryShaderLoader(const std::string& name, const std::string& uuid, const ShaderParams& params)
+            : IShaderLoader(name, uuid, params) {
+        }
+
+        // + Serialize maybe?
+
+
+    protected:
+        Shader * NewShader() const override;
+        std::string DefaultEntryPointName() const override { return "mainGeometry"; }
+    };
 }

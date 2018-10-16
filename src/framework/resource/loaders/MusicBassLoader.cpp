@@ -3,6 +3,9 @@
 
 #include "MusicBassLoader.h"
 
+#include "resource/ResourceManager.h"
+#include "utils/asset/AssetFactory.h"
+
 #include "core/Music.h"
 #include "bass.h"
 
@@ -10,6 +13,9 @@
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
+
+DEFINE_EXCEPTION(MusicLoadException, 0, "Could not load music from disk");
+DEFINE_EXCEPTION(MusicDeviceInitException, 0, "Could not init playback device");
 
 /// ====================================================================================================================================================
 /// Bass music class implementation
@@ -20,7 +26,7 @@ namespace
     {
     public:
         MusicBass();
-        virtual ~MusicBass(void);
+        virtual ~MusicBass();
 
         static bool InitializeBass();
 
@@ -62,7 +68,11 @@ namespace
         , //m_sample(0),
         m_asset()
         , m_sample(0)
-        , m_isMute(false) {
+        , m_channel(0)
+        , m_isMute(false)
+        , m_length(0)
+        , m_samplePerSec(0)
+        , m_bytesPerSample(0) {
     }
 
     MusicBass::~MusicBass() { MusicBass::Shutdown(); }
@@ -281,12 +291,6 @@ namespace
 /// ====================================================================================================================================================
 /// Factory class implementation
 /// ====================================================================================================================================================
-MusicBassLoader::MusicBassLoader(const std::string& sourceName) : IResourceBuilder(sourceName, sourceName) {
-}
-
-MusicBassLoader::~MusicBassLoader()
-= default;
-
 void MusicBassLoader::Load(IResourceManager* const & resman, IResource* source)
 {
     MusicResRef dest = dynamic_cast<MusicRes*>(source);
@@ -297,10 +301,15 @@ void MusicBassLoader::Load(IResourceManager* const & resman, IResource* source)
 
     Music* music = new MusicBass();
 
-    const IAssetRef asset = this->GetSourceAsset(resman);
+    const IAssetRef asset = resman->GetAssetFactory()->Get(m_params.source);
     music->Initialize(asset);
 
     dest->AssingnRef(music);
 }
 
-IResource* MusicBassLoader::NewResource() { return new MusicRes(); }
+void MusicBassLoader::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
+}
+
+//void MusicBassLoader::Serialize(Archive& ar) {
+//    assert(0);
+//}

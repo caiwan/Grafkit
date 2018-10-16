@@ -39,10 +39,10 @@ Material::Material() : Object()
 , m_colors_id(0)
 , m_params_id(0)
 {
-    CreateUuid();
+    //CreateUuid();
 
-    ZeroMemory(&m_colors, sizeof(m_colors));
-    ZeroMemory(&m_params, sizeof(m_params));
+    //ZeroMemory(&m_colors, sizeof(m_colors));
+    //ZeroMemory(&m_params, sizeof(m_params));
 
     m_colors.diffuse = float4(1, 1, 1, 1);
 }
@@ -148,10 +148,10 @@ bool Material::GetTextureMap(std::map<std::string, TextureResRef>& textureMap) c
     return true;
 }
 
-void Material::Serialize(Archive & ar)
-{
-    _Serialize(ar);
-
-    PERSIST_FIELD(ar, m_colors);
-    PERSIST_FIELD(ar, m_params);
-}
+//void Material::Serialize(Archive & ar)
+//{
+//    _Serialize(ar);
+//
+//    PERSIST_FIELD(ar, m_colors);
+//    PERSIST_FIELD(ar, m_params);
+//}

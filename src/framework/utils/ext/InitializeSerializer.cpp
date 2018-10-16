@@ -19,10 +19,12 @@
 
 Grafkit::ClonableInitializer::ClonableInitializer()
 {
-	ADD_CLONABLE(mesh, Grafkit::Mesh);
-	ADD_CLONABLE(model, Grafkit::Model);
-	ADD_CLONABLE(material, Grafkit::Material);
-	ADD_CLONABLE(camera, Grafkit::Camera);
-	ADD_CLONABLE(light, Grafkit::Light);
+    // Hello ?
+
+	//ADD_CLONABLE(mesh, Grafkit::Mesh);
+	//ADD_CLONABLE(model, Grafkit::Model);
+	//ADD_CLONABLE(material, Grafkit::Material);
+	//ADD_CLONABLE(camera, Grafkit::Camera);
+	//ADD_CLONABLE(light, Grafkit::Light);
 	//ADD_CLONABLE(actorAnimation, Grafkit::ActorAnimation);
 }

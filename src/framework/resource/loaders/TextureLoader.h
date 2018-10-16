@@ -7,113 +7,210 @@
 
 #include "core/exceptions.h"
 
-namespace Grafkit {
-
+namespace Grafkit
+{
+    // ==============================================================================================================================
     /**
-    Texture generator interface
+    1D textures
     */
-    class ITexture1DBuilder : public IResourceBuilder
-    {
-    public:
-        explicit ITexture1DBuilder(std::string name, std::string sourceName = "", std::string uuid = "") : IResourceBuilder(name, sourceName, uuid) {}
-        virtual ~ITexture1DBuilder() {}
 
-        void Load(IResourceManager * const & resman, IResource * source) override = 0;
-
-        IResource* NewResource() override;
-    };
-
-    class ITexture2DBuilder : public IResourceBuilder
-    {
-    public:
-        explicit ITexture2DBuilder(std::string name, std::string sourceName = "", std::string uuid = "") : IResourceBuilder(name, sourceName, uuid) {}
-        virtual ~ITexture2DBuilder() {}
-
-        void Load(IResourceManager * const & resman, IResource * source) override = 0;
-
-        IResource* NewResource() override;
-    };
-
-    /*
+    // ==============================================================================================================================
+    /**
+    2D textures
     */
-    class TextureBufferBuilder : public ITexture2DBuilder {
-    public:
-        enum TextureTypeE {
+
+    struct TextureBufferParams
+    {
+        enum TextureTypeE
+        {
             TB_RGBA,
             TB_RGBA32,
             TB_Float,
             TB_Depth
         };
 
-        TextureBufferBuilder(std::string name, TextureTypeE type);
-        TextureBufferBuilder(std::string name, TextureTypeE type, uint16_t w, uint16_t h);
+        std::string name;
+        TextureTypeE type;
+        uint16_t width;
+        uint16_t height;
+    };
 
-        void Load(IResourceManager * const & resman, IResource * source) override;
+    class TextureBufferBuilder : public ResourceBuilder<Texture2D, TextureBufferParams>
+    {
+    public:
+        TextureBufferBuilder() {
+        }
 
-    private:
-        uint16_t m_w, m_h;
-        TextureTypeE m_type;
+        explicit TextureBufferBuilder(const TextureBufferParams& params)
+            : ResourceBuilder<Texture2D, TextureBufferParams>(params) {
+        }
+
+        TextureBufferBuilder(const std::string& name, const std::string& uuid, const TextureBufferParams& params)
+            : ResourceBuilder<Texture2D, TextureBufferParams>(name, uuid, params) {
+        }
+
+        void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        SERIALIZE(TextureBufferBuilder, 1, ar)
+        {
+            assert(0);
+        }
+        //protected:
+        //    void Serialize(Archive& ar) override;
     };
 
     /**
     */
-    class TextureFromBitmap : public ITexture2DBuilder
+
+    struct TextureBitmapParams
+    {
+        std::string sourceName;
+        // resize?
+    };
+
+    class TextureFromBitmap : public ResourceBuilder<Texture2D, TextureBitmapParams>
     {
     public:
-        explicit TextureFromBitmap(std::string name, std::string sourceName = "", std::string uuid = "");
-        ~TextureFromBitmap();
 
-        ///@todo implement resize
-        void Resize(int x, int y) { m_w = x, m_h = y; }
+        TextureFromBitmap() {
+        }
 
-        void Load(IResourceManager * const & resman, IResource * source) override;
+        explicit TextureFromBitmap(const TextureBitmapParams& params)
+            : ResourceBuilder<Texture2D, TextureBitmapParams>(params) {
+        }
 
-    protected:
-        int m_w, m_h;
+        TextureFromBitmap(const std::string& name, const std::string& uuid, const TextureBitmapParams& params)
+            : ResourceBuilder<Texture2D, TextureBitmapParams>(name, uuid, params) {
+        }
+
+        void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        SERIALIZE(TextureFromBitmap, 1, ar)
+        {
+            assert(0);
+        }
+
+        //protected:
+        //    void Serialize(Archive& ar) override;
     };
 
-    class TextureCubemapFromBitmap : public ITexture2DBuilder {
-    public:
-        explicit TextureCubemapFromBitmap(std::string name, std::string source_posx, std::string source_negx, std::string source_posy, std::string source_negy, std::string source_posz, std::string source_negz, std::string uuid ="");
-        explicit TextureCubemapFromBitmap(std::string name, std::vector<std::string> sourceNames, std::string uuid = "");
-        ~TextureCubemapFromBitmap();
 
-        void Load(IResourceManager * const & resman, IResource * source) override;
+    /**
+     *
+     */
 
-        IResource* NewResource() override;
-    private:
-        std::string m_sourceNames[6];
+    struct TextureCubemapParams
+    {
+        std::vector<std::string> sourceNames;
+        //std::string m_sourceNames[6];
     };
 
-    class TextureNoiseMap : public TextureFromBitmap {
+    class TextureCubemapFromBitmap : public ResourceBuilder<TextureCube, TextureCubemapParams>
+    {
     public:
-        explicit TextureNoiseMap(size_t size, std::string uuid = "");
-        explicit TextureNoiseMap(std::string name, size_t size, std::string uuid = "");
-        void Load(IResourceManager * const & resman, IResource * source) override;
-    private:
-        size_t m_size;
+        TextureCubemapFromBitmap() {
+        }
+
+        explicit TextureCubemapFromBitmap(const TextureCubemapParams& params)
+            : ResourceBuilder<TextureCube, TextureCubemapParams>(params) {
+        }
+
+        TextureCubemapFromBitmap(const std::string& name, const std::string& uuid, const TextureCubemapParams& params)
+            : ResourceBuilder<TextureCube, TextureCubemapParams>(name, uuid, params) {
+        }
+
+        void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        SERIALIZE(TextureCubemapFromBitmap, 1, ar)
+        {
+            assert(0);
+        }
+
+        //protected:
+        //    void Serialize(Archive& ar) override;
     };
 
-#define TS_NAME_CLAMP "TextureSamplerClamp"
-#define TS_NAME_WRAP "TextureSamplerWrap"
+    /*
+     *
+     */
 
-    class TextureSamplerBuilder : public IResourceBuilder {
+    struct TextureNoiseParams
+    {
+        uint16_t size;
+    };
+
+    class TextureNoiseMapBuilder : public ResourceBuilder<Texture2D, TextureNoiseParams>
+    {
     public:
-        enum Type_E {
+
+        TextureNoiseMapBuilder() {
+        }
+
+        explicit TextureNoiseMapBuilder(const TextureNoiseParams& params)
+            : ResourceBuilder<Texture2D, TextureNoiseParams>(params) {
+        }
+
+        TextureNoiseMapBuilder(const std::string& name, const std::string& uuid, const TextureNoiseParams& params)
+            : ResourceBuilder<Texture2D, TextureNoiseParams>(name, uuid, params) {
+        }
+
+        void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        SERIALIZE(TextureNoiseMapBuilder, 1, ar)
+        {
+            assert(0);
+        }
+        //protected:
+        //    void Serialize(Archive& ar) override;
+    };
+
+    /**
+     *
+     */
+
+    //#define TS_NAME_CLAMP "TextureSamplerClamp"
+    //#define TS_NAME_WRAP "TextureSamplerWrap"
+
+    struct TextureSamplerParams
+    {
+        enum AddressMode
+        {
             TGG_Clamping,
             TGG_Wrapping
         };
 
-        TextureSamplerBuilder(Type_E type);
-
-        void Load(IResourceManager * const & resman, IResource * source) override;
-
-        IResource* NewResource() override;
-
-    private:
-        D3D11_TEXTURE_ADDRESS_MODE m_mode;
-
+        AddressMode mode;
     };
 
-}
+    class TextureSamplerBuilder : public ResourceBuilder<TextureSampler, TextureSamplerParams>
+    {
+    public:
 
+        TextureSamplerBuilder() {
+        }
+
+        explicit TextureSamplerBuilder(const TextureSamplerParams& params)
+            : ResourceBuilder<TextureSampler, TextureSamplerParams>(params) {
+        }
+
+        TextureSamplerBuilder(const std::string& name, const std::string& uuid, const TextureSamplerParams& params)
+            : ResourceBuilder<TextureSampler, TextureSamplerParams>(name, uuid, params) {
+        }
+
+
+        void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        SERIALIZE(TextureSamplerBuilder, 1, ar)
+        {
+            assert(0);
+        }
+
+        //protected:
+        //    void Serialize(Archive& ar) override;
+    };
+}

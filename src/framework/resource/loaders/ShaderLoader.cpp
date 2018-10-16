@@ -85,19 +85,10 @@ namespace {
 
 // =============================================================================================================================
 
-ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, std::string uuid): IResourceBuilder(name, sourcename, uuid) ,
-	m_entrypoint(entrypoint)
+void IShaderLoader::Load(IResourceManager * const & resman, IResource* source)
 {
-}
-
-ShaderLoader::~ShaderLoader()
-{
-}
-
-void ShaderLoader::Load(IResourceManager * const & resman, IResource* source)
-{
-	if (m_entrypoint.empty())
-		m_entrypoint = DefaultEntryPointName();
+	if (m_params.entryPoint.empty())
+        m_params.entryPoint = DefaultEntryPointName();
 
 	ShaderResRef dstShader = static_cast<ShaderRes*>(source);
 	if (dstShader.Invalid()) {
@@ -105,18 +96,18 @@ void ShaderLoader::Load(IResourceManager * const & resman, IResource* source)
 	}
 
 	try {
-		IAssetRef asset = this->GetSourceAsset(resman);
+        IAssetRef asset = resman->GetAssetFactory()->Get(m_params.sourceName); //this->GetSourceAsset(resman);
 		ShaderRef shader = NewShader();
 		// load from asset
 		if (asset.Valid()) {
-			LOGGER(Log::Logger().Info("Lading shader from resource %d %s@%s", shader->GetShaderType(), m_name.c_str(), m_entrypoint.c_str()));
+			LOGGER(Log::Logger().Info("Lading shader from resource %d %s@%s", shader->GetShaderType(), m_name.c_str(), m_params.entryPoint.c_str()));
 			ID3DInclude * pInclude = new IncludeProvider(resman);
-			shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), static_cast<LPCSTR>(asset->GetData()), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
+			shader->LoadFromMemory(resman->GetDeviceContext(), m_params.entryPoint.c_str(), static_cast<LPCSTR>(asset->GetData()), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
 			delete pInclude;
 		}
 		else {
 			///@todo load from compiled shader
-			THROW_EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a forrasbol valo shader betoltes");
+			THROW_EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a nyers forrasbol valo shader betoltes");
 		}
 
 		// 2.
@@ -138,16 +129,12 @@ void ShaderLoader::Load(IResourceManager * const & resman, IResource* source)
 	}
 }
 
-IResource * ShaderLoader::NewResource()
-{
-	ShaderRes* res = new ShaderRes();
-	return res;
+void IShaderLoader::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
+   // Nothing to do ATM
 }
 
-Shader* VertexShaderLoader::NewShader() { return new VertexShader(); }
+Shader* VertexShaderLoader::NewShader() const { return new VertexShader(); }
 
-Shader* PixelShaderLoader::NewShader() { return new PixelShader(); }
+Shader* PixelShaderLoader::NewShader() const { return new PixelShader(); }
 
-Shader* GeometryShaderLoader::NewShader() { return new GeometryShader(); }
-
-
+Shader* GeometryShaderLoader::NewShader() const { return new GeometryShader(); }

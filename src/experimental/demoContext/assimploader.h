@@ -64,8 +64,8 @@ namespace GKimporter {
 		static inline float4 aiQuaternionToFloat4(aiQuaternion &v);
 		static inline float4 aiColor3DToFloat4(aiColor3D &c);
 
-		static inline float4 aiMatkey4ToFloat4(aiMaterial *&mat, const char* key, int a1, int a2);
-		static inline float aiMatkeyToFloat(aiMaterial *&mat, const char* key, int a1, int a2);
+		static inline float4 aiMatkey4ToFloat4(aiMaterial *&m_mat, const char* key, int a1, int a2);
+		static inline float aiMatkeyToFloat(aiMaterial *&m_mat, const char* key, int a1, int a2);
 
 	private:
 		Assimp::Importer importer;

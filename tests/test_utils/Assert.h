@@ -17,3 +17,4 @@
 #define ASSERT_FLOAT4_EQ(val1, val2)\
 	ASSERT_FLOAT3_EQ(val1, val2);\
 	ASSERT_NEAR(val1.w, val2.w, _ASSERT_EPSILON) << "W component got: " << val2.w  << " expected: " << val1.w;
+

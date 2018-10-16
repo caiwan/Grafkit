@@ -1,24 +1,35 @@
 #pragma once
 
 #include "resource/ResourceBuilder.h"
-//#include "core/exceptions.h"
-//
-//#include "../utils/resource.h"
 
 namespace Grafkit {
 
-	class MusicBassLoader : public IResourceBuilder {
+    struct MusicParams { std::string source; };
 
-	public:
-	    explicit MusicBassLoader(const std::string& source_name);
-		~MusicBassLoader();
+    class MusicBassLoader : public ResourceBuilder<Music, MusicParams> {
 
-	    void Load(IResourceManager * const & resman, IResource * source) override;
+    public:
 
-	    IResource* NewResource() override;
-	};
+        MusicBassLoader() {
+        }
+
+        explicit MusicBassLoader(const MusicParams& params)
+            : ResourceBuilder<Music, MusicParams>(params) {
+        }
+
+        MusicBassLoader(const std::string& name, const std::string& uuid, const MusicParams& params)
+            : ResourceBuilder<Music, MusicParams>(name, uuid, params) {
+        }
+
+
+        void Load(IResourceManager* const& resman, IResource* source) override;
+        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
+
+        PERSISTENT_DECL(MusicBassLoader, 1);
+
+    //protected:
+        //void Serialize(Archive& ar) override;
+    };
 
 }
 
-DEFINE_EXCEPTION(MusicLoadException, 0, "Could not load music from disk");
-DEFINE_EXCEPTION(MusicDeviceInitException, 0, "Could not init playback device");

@@ -66,10 +66,10 @@ void Model::SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; 
 
 ShaderResRef Model::GetGeometryShader() const { return m_geometryShader; }
 
-void Model::Serialize(Archive& ar)
-{
-    Object::_Serialize(ar);
-    // Materials will be persisted ina separate map
-    //PERSIST_REFOBJECT(ar, m_material);
-    PERSIST_REFOBJECT(ar, m_mesh);
-}
+//void Model::Serialize(Archive& ar)
+//{
+//    Object::_Serialize(ar);
+//    // Materials will be persisted ina separate map
+//    //PERSIST_REFOBJECT(ar, m_material);
+//    PERSIST_REFOBJECT(ar, m_mesh);
+//}
