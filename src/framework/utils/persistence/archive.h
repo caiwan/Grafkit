@@ -571,8 +571,8 @@ private: \
 protected:\
 	std::string GetClazzName() const override { return #CLAZZ; } \
 	uint16_t GetVersion() const override { return VERSION; }\
-    void _InvokeSerialize(const Archive &ar) override {Serialize(ar);} \
-    void _InvokeDeserialize(Archive &ar) override {Serialize(ar);}
+    void _InvokeSerialize(const Grafkit::Archive &ar) override {Serialize(ar);} \
+    void _InvokeDeserialize(Grafkit::Archive &ar) override {Serialize(ar);}
 
 // for some convinience
 #define SERIALIZE(CLAZZ, VERSION, myAr) \

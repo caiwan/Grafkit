@@ -118,7 +118,7 @@ namespace GkDemo
         void SetTarget(const Ref<Demo>& target) { m_target = target; }
         Ref<Demo> GetTarget() const { return m_target; }
 
-        PERSISTENT_DECL(GkDemo::DemoAnimation, 1);
+        //PERSISTENT_DECL(GkDemo::DemoAnimation, 1);
 
     private:
         TrackRef m_activeScene;
@@ -126,6 +126,6 @@ namespace GkDemo
         Ref<Demo> m_target;
 
     protected:
-        void Serialize(Grafkit::Archive& ar) override;
+        //void Serialize(Grafkit::Archive& ar) override;
     };
 }

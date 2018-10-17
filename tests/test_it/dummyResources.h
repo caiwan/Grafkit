@@ -1,10 +1,10 @@
 #pragma once
 
 #include "common.h"
+#include "utils/persistence/archive.h"
 #include "resource/ResourceBuilder.h"
 
-
-class DummyObject
+class DummyObject : public Grafkit::Object
 {
 public:
     DummyObject() : m_param1(0)
@@ -32,6 +32,11 @@ private:
     float m_param2;
 
     bool m_isInitialized;
+
+    SERIALIZE(DummyObject, 1, ar)
+    {
+        assert(0);
+    }
 };
 
 struct DummyResourceParameters
@@ -39,14 +44,34 @@ struct DummyResourceParameters
     std::string sourceName;
     float param1;
     float param2;
+
+    template <class A>
+    void Serialize(A& ar) { ar & sourceName & param1 & param2; }
 };
 
 class DummyObjectLoader : public Grafkit::ResourceBuilder<DummyObject, DummyResourceParameters>
 {
 public:
+
+
+    DummyObjectLoader() {
+    }
+
+    explicit DummyObjectLoader(const DummyResourceParameters& params)
+        : ResourceBuilder<DummyObject, DummyResourceParameters>(params) {
+    }
+
+    DummyObjectLoader(const std::string& name, const std::string& uuid, const DummyResourceParameters& params)
+        : ResourceBuilder<DummyObject, DummyResourceParameters>(name, uuid, params) {
+    }
+
     void Load(Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override;
     void Initialize(Grafkit::Renderer& render, Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override;
+    PERSISTENT_DECL(DummyObjectLoader, 1);
 };
+
+PERSISTENT_IMPL(DummyObjectLoader);
+
 
 inline void DummyObjectLoader::Load(Grafkit::IResourceManager* const& resman, Grafkit::IResource* source)
 {

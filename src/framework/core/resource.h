@@ -20,12 +20,14 @@ namespace Grafkit
     {
         friend class IResourceManager;
     public:
-        IResource() = default;
+        IResource(){};
 
         explicit IResource(const std::string& name) : Object(name){}
         explicit IResource(const std::string& name, const std::string& uuid) : Object(name, Uuid(uuid)) {}
 
         virtual ~IResource() = default;
+
+        virtual const void * GetRaw() const = 0;
     };
 
     /**
@@ -65,6 +67,8 @@ namespace Grafkit
         explicit operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
         explicit operator T * const &() { return dynamic_cast<T*>(this->Get()); }
         explicit operator T&() { return *this->Get(); }
+
+        const void * GetRaw() const override { return ptr; }
 
     // ???
     protected:

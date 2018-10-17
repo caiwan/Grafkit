@@ -2,12 +2,18 @@
 
 #include "resource/ResourceBuilder.h"
 
-namespace Grafkit {
+namespace Grafkit
+{
+    struct MusicParams
+    {
+        std::string source;
 
-    struct MusicParams { std::string source; };
+        template <class A>
+        void Serialize(A& ar) { ar & source; }
+    };
 
-    class MusicBassLoader : public ResourceBuilder<Music, MusicParams> {
-
+    class MusicBassLoader : public ResourceBuilder<Music, MusicParams>
+    {
     public:
 
         MusicBassLoader() {
@@ -27,9 +33,7 @@ namespace Grafkit {
 
         PERSISTENT_DECL(MusicBassLoader, 1);
 
-    //protected:
+        //protected:
         //void Serialize(Archive& ar) override;
     };
-
 }
-

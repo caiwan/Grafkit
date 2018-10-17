@@ -48,10 +48,12 @@ void SceneGraph::Shutdown()
 
     m_entities.clear();
 
-    m_root = nullptr;
+    RELEASE(m_root);
 
-    m_pixelShader = nullptr;
-    m_vertexShader = nullptr;
+    RELEASE(m_pixelShader);
+    RELEASE(m_vertexShader);
+
+    OBJECT_RELEASE();
 }
 
 void SceneGraph::BuildScene(Renderer& render) { for (auto it = m_entities.begin(); it != m_entities.end(); ++it) { (*it)->Build(render, this); } }

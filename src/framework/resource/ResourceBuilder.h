@@ -11,7 +11,7 @@ namespace Grafkit
     class IResourceBuilder : public Object
     {
     public:
-        explicit IResourceBuilder() : Object() {
+        IResourceBuilder() {
         }
 
         explicit IResourceBuilder(std::string name, Uuid uuid = Uuid()) : Object(name, uuid) {
@@ -31,21 +31,30 @@ namespace Grafkit
         virtual std::string GetWatcherFilename() { return std::string(); };
 
         // --- 
+        //virtual const void* GetParamP() const = 0;
+        //virtual void SetParamP(const void*) = 0;
 
+        template <class A> void Serialize(A &ar) { Object::Serialize(ar); }
     };
 
-    struct None{};
+    struct None
+    {
+        template<class A > void Serialize(A & ar){}
+    };
 
     template <class R, typename U = None>
     class ResourceBuilder : public IResourceBuilder
     {
     public:
 
-        explicit ResourceBuilder(const U params = U()) : IResourceBuilder()
+        ResourceBuilder() : m_params(){
+        }
+
+        explicit ResourceBuilder(const U &params) : IResourceBuilder()
             , m_params(params) {
         }
 
-        explicit ResourceBuilder(std::string name, std::string uuid, const U params = U()) : IResourceBuilder(name, Uuid(uuid))
+        explicit ResourceBuilder(std::string name, std::string uuid, const U &params = U()) : IResourceBuilder(name, Uuid(uuid))
             , m_params(params) {
         }
 
@@ -54,9 +63,15 @@ namespace Grafkit
         U GetParams() const { return m_params; }
         void SetParams(const U& params) { m_params = params; }
 
-        /* It needs something that pulls parameters from void* */
+        // fuck this 
+        //// if you're brave enoguh
+        //// this should be protected 
+        //const void* GetParamP() const override { return reinterpret_cast<const void*>(&m_params); }
+        //void SetParamP(const void* p) override { assert(p); m_params = *(reinterpret_cast<const U*>(p)); }
 
         Ref<IResource> NewResource() const override { return new Resource<R>(); }
+
+        template <class A> void Serialize(A &ar) { IResourceBuilder::Serialize(ar); ar&m_params; }
 
     protected:
         static Ref<Resource<R>> SafeGetResource(IResource* source)

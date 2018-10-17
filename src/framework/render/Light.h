@@ -16,7 +16,7 @@ namespace Grafkit
     typedef Ref<Light> LightRef;
 
     __declspec(align(16))
-    class Light : virtual public Referencable, public Entity3D, public AlignedNew<Light>
+    class Light : public Entity3D, public AlignedNew<Light>
     {
     public:
         enum light_type_t

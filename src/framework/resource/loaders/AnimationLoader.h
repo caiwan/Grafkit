@@ -10,6 +10,9 @@ namespace Grafkit
     {
         std::string sourceName;
         std::string target;
+
+        template <class A>
+        void Serialize(A& ar) { ar & sourceName & target; }
     };
 
     class ActorAnimationLoader : public ResourceBuilder<ActorAnimation, ActorAnimationParams>
@@ -22,7 +25,7 @@ namespace Grafkit
             : ResourceBuilder<ActorAnimation, ActorAnimationParams>(params) {
         }
 
-        ActorAnimationLoader(const std::string& name, const std::string& uuid, const ActorAnimationParams& params)
+        explicit ActorAnimationLoader(const std::string& name, const std::string& uuid, const ActorAnimationParams& params)
             : ResourceBuilder<ActorAnimation, ActorAnimationParams>(name, uuid, params) {
         }
 
@@ -30,9 +33,5 @@ namespace Grafkit
         void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
 
         PERSISTENT_DECL(ActorAnimationLoader, 1);
-
-    //protected:
-    //    void Serialize(Archive& ar) override;
     };
 }
-

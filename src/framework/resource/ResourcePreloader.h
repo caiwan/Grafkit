@@ -3,12 +3,10 @@
 #include <vector>
 
 #include "ResourceManager.h"
-//#include "ResourceBuilder.h"
+#include "ResourceBuilder.h"
 
 namespace Grafkit
 {
-    class IResourceBuilderFactroy;
-
     class IPreloadEvents;
     class AssetFileFilter;
 
@@ -26,28 +24,56 @@ namespace Grafkit
         	std::vector<AssetFileFilter*> m_filters;
     };
 
+    /*
+     *
+     */
     class ParametricResourceLoader : public IResourceManager
     {
+    protected:
+        typedef std::function<Ref<IResourceBuilder>()> ResourceBuilderFactroy;
     public:
         explicit ParametricResourceLoader(IPreloadEvents* pPreloader = nullptr);
         virtual ~ParametricResourceLoader();
 
-        //void RegisterBuilderFactory(IResourceBuilderFactroy* factroy);
+        // Fuck all of this crap
+
+        //template<class B>
+        //void RegisterBuilderFactory(const char* builderName)
+        //{
+        //    assert(m_factories.find(builderName) == m_factories.end());
+        //    m_factories[builderName] = []() {return new B(); };
+        //}
 
         virtual void LoadCache();
         virtual void SaveCache();
 
-        //template<class typename T >
-        //void PushNewBuilder(std::string builder, std::string name, std::string uuid, const T& params)
+        //template<class T >
+        //void PushNewBuilder(std::string builderName, std::string name, const Uuid uuid, const T& params)
         //{
-        //    auto it = m_factories.find(builder);
+        //    auto it = m_factories.find(builderName);
         //    if (it != m_factories.end())
         //    {
-        //        Load(it->second->NewBuilder());
+        //        const Ref<IResourceBuilder> builder = it->second();
+        //        //builder->SetName(name);
+        //        //builder->SetUuid(uuid);
+        //        builder->SetParamP(/*reinterpret_cast<const void*>*/(&params));
+        //        Load(builder);
+        //    }
+        //}
+
+        //template<class T >
+        //void PushNewBuilder(std::string builderName, const T& params)
+        //{
+        //    auto it = m_factories.find(builderName);
+        //    if (it != m_factories.end())
+        //    {
+        //        auto *builder = it->second();
+        //        builder->SetParamP(&p);
+        //        Load(builder);
         //    }
         //}
 
     private:
-        std::map<std::string, IResourceBuilderFactroy*> m_factories;
+        //std::map<std::string, ResourceBuilderFactroy> m_factories;
     };
 }

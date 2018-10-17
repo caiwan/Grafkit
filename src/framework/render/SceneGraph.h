@@ -20,7 +20,7 @@ namespace Grafkit {
         // Init, shutdown 
         void Initialize();
         void Initialize(ActorRef root); // legacy stuff 
-        void Shutdown();
+        void Shutdown() override;
 
         void Update();
         void Render(Renderer & render, CameraRef & camera);

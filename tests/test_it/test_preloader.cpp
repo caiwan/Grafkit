@@ -32,7 +32,7 @@ public:
     void TearDown() override
     {
     }
- 
+
 protected:
     Testing::TestApplicationContext* m_app;
 
@@ -50,11 +50,10 @@ TEST_F(PreloaderTest, RegisterAndLoadObject)
 
     // given
     DummyResourceParameters params{ "lol", 2, 3 };
-    m_app->RegisterBuilderFactory(new ResourceBuilderFactroy<DummyObjectLoader>("dummyObject"));
 
     // when
-    m_app->PushNewBuilder("dummyObject", DUMMY_NAME ,DUMMY_UUID, &params);
-    m_app->DoPrecalc();
+    m_app->Load(new DummyObjectLoader(DUMMY_NAME, Uuid(DUMMY_UUID), params));
+    m_app->DoPrecalc(m_render);
 
     // then
     Ref<Resource<DummyObject>> loadedObject = m_app->GetByUuid<Resource<DummyObject>>(DUMMY_UUID);
@@ -67,12 +66,12 @@ TEST_F(PreloaderTest, RegisterAndLoadObject)
     ASSERT_TRUE((*loadedObject)->GetIsInitialized());
 }
 
-TEST_F(PreloaderTest, ChangeParametersThenReload)
+TEST_F(PreloaderTest, DISABLED_ChangeParametersThenReload)
 {
     FAIL() << "Not implemented";
 }
 
-TEST_F(PreloaderTest, ChangeParametersThenUndo)
+TEST_F(PreloaderTest, DISABLED_ChangeParametersThenUndo)
 {
     FAIL() << "Not implemented";
 }

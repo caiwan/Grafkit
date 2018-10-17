@@ -9,12 +9,12 @@ using namespace Grafkit;
 // =================================================================
 
 Actor::Actor() : Object()
-    , m_isHidden(0) 
+    , m_isHidden(false) 
 {
 }
 
 Actor::Actor(Ref<Entity3D> entity) : Object()
-    , m_isHidden(0)
+    , m_isHidden(false)
 {
     AddEntity(entity);
 }

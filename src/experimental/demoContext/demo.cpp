@@ -197,7 +197,7 @@ void Demo::AddCameraId(uint32_t sceneId, std::string cameraUuid, uint32_t camera
 
 // ============================================================================================
 
-PERSISTENT_IMPL(GkDemo::DemoAnimation);
+//PERSISTENT_IMPL(GkDemo::DemoAnimation);
 
 void DemoAnimation::Initialize()
 {
@@ -224,9 +224,9 @@ void DemoAnimation::Update(double time)
     }
 }
 
-void DemoAnimation::Serialize(Archive& ar)
-{
-    Animation::_Serialize(ar);
-    m_activeScene = m_tracks[0];
-    m_activeCamera = m_tracks[1];
-}
+//void DemoAnimation::Serialize(Archive& ar)
+//{
+//    Animation::_Serialize(ar);
+//    m_activeScene = m_tracks[0];
+//    m_activeCamera = m_tracks[1];
+//}

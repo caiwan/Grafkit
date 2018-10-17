@@ -40,7 +40,7 @@ IResourceManager::~IResourceManager()
     for (auto it = m_uuidMap.begin(); it != m_uuidMap.end(); ++it) { it->second.AssingnRef(nullptr); }
 }
 
-void IResourceManager::Add(Ref<IResource> pResource)
+void IResourceManager::Add(const Ref<IResource> & pResource)
 {
     if (pResource.Valid())
     {
@@ -81,7 +81,7 @@ void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const 
     transform(m_uuidMap.begin(), m_uuidMap.end(), back_inserter(target), [](const std::map<std::string, Ref<IResource>>::value_type& value) { return value.second; });
 }
 
-void IResourceManager::Load(IResourceBuilder* builder)
+void IResourceManager::Load(Ref<IResourceBuilder> builder)
 {
     std::string uuid = builder->GetUuid();
 
@@ -120,9 +120,9 @@ void IResourceManager::TriggerReload(std::string filename)
     }
 }
 
-void IResourceManager::Reload(IResourceBuilder* builder)
+void IResourceManager::Reload(Ref<IResourceBuilder> builder)
 {
-    IResource* resource = builder->NewResource();
+    Ref<IResource> resource = builder->NewResource();
     Uuid uuid(builder->GetUuid());
     if (!uuid.IsEmpty()) { resource->SetUuid(uuid); }
     resource->SetName(builder->GetName());
@@ -143,7 +143,7 @@ void IResourceManager::Reload(IResourceBuilder* builder)
     }
 }
 
-void IResourceManager::DoPrecalc()
+void IResourceManager::DoPrecalc(Grafkit::Renderer& render)
 {
     size_t i = 0;
     size_t len = m_builders.size();
@@ -151,6 +151,7 @@ void IResourceManager::DoPrecalc()
     if (m_preloadEvents)
         m_preloadEvents->OnBeginLoad();
 
+    // pass 1
     for (auto it = m_builders.begin(); it != m_builders.end(); ++it)
     {
         LOGGER(Log::Logger().Trace("Preloading item %d of %d", i, len));
@@ -158,7 +159,22 @@ void IResourceManager::DoPrecalc()
         if (builder) { builder->Load(this, GetByUuid<IResource>(builder->GetUuid())); }
 
         if (m_preloadEvents)
-            m_preloadEvents->OnElemLoad(i, len);
+            m_preloadEvents->OnElemLoad(i, len * 2);
+
+        i++;
+    }
+
+    i = 0;
+
+    // pass 2
+    for (auto it = m_builders.begin(); it != m_builders.end(); ++it)
+    {
+        LOGGER(Log::Logger().Trace("Initializing item %d of %d", i, len));
+        IResourceBuilder* builder = it->second;
+        if (builder) { builder->Initialize(render, this, GetByUuid<IResource>(builder->GetUuid())); }
+
+        if (m_preloadEvents)
+            m_preloadEvents->OnElemLoad(len + i, len * 2);
 
         i++;
     }

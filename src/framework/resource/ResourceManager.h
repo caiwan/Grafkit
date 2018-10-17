@@ -41,7 +41,7 @@ namespace Grafkit
         template <class T>
         Ref<T> GetByUuid(const std::string& uuid) const;
 
-        void Add(Ref<IResource> pResource);
+        void Add(const Ref<IResource> & pResource);
         void RemoveByUuid(const std::string& uuid);
         void RemoveAll();
 
@@ -50,14 +50,14 @@ namespace Grafkit
         void SetPreloadListener(IPreloadEvents* listener) { m_preloadEvents = listener; }
 
         // preloader
-        void Load(IResourceBuilder* builder);
+        void Load(Ref<IResourceBuilder> builder);
         template <class T>
-        Ref<T> Load(IResourceBuilder* builder);
+        Ref<T> Load(Ref<IResourceBuilder> builder);
 
         void TriggerReload(std::string filename);
-        void Reload(IResourceBuilder* builder);
+        void Reload(Ref<IResourceBuilder> builder);
 
-        virtual void DoPrecalc();
+        virtual void DoPrecalc(Grafkit::Renderer& render);
 
         void ClearLoadStack();
 
@@ -90,7 +90,7 @@ namespace Grafkit
     }
 
     template <class T>
-    Ref<T> IResourceManager::Load(IResourceBuilder* builder)
+    Ref<T> IResourceManager::Load(Ref<IResourceBuilder> builder)
     {
         Load(builder);
         T* res = GetByUuid<T>(builder->GetUuid());

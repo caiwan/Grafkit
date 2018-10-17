@@ -51,7 +51,7 @@ namespace Grafkit
 
 #define OBJECT_RELEASE() m_allocation--
 
-    class Object : public Serializable, virtual public Referencable
+    class Object : public Serializable, public Referencable
     {
     public:
 

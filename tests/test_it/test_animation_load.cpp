@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include <fstream>
 #include <gtest/gtest.h>
 
 #include "utils/asset/AssetFile.h"
@@ -68,13 +69,8 @@ public:
 
         }
 
-        FILE* fp;
-        errno_t err = fopen_s(&fp, ANIMATION_PATH, "wb");
-        assert(0 == err);
-
-        ArchiveFile archive(fp, true);
-        m_animation->Store(archive);
-        fclose(fp);
+        std::ofstream ofile(ANIMATION_PATH, std::ios::binary);
+        Archive a(std::make_unique<Archive::OutputStream<std::ofstream>>(ofile));
     }
 
     void ValidateKey(const Animation::Key& expected, const Animation::Key& actual) const
@@ -106,7 +102,6 @@ public:
         ASSERT_TRUE(actual.Valid());
 
         ASSERT_STREQ(expected->GetName().c_str(), actual->GetName().c_str());
-
 
         for (size_t i = 0; i < expected->GetChannelCount(); ++i)
         {
@@ -151,7 +146,7 @@ TEST_F(AnimationLoadTest, CreateEmptyTest)
     ASSERT_FALSE(*resource);
 
     // when
-    m_app->DoPrecalc();
+    m_app->DoPrecalc(m_render);
 
     // then
     ASSERT_TRUE(resource);
@@ -176,7 +171,7 @@ TEST_F(AnimationLoadTest, LoadAnimation)
     ASSERT_FALSE(*resource);
 
     // when
-    m_app->DoPrecalc();
+    m_app->DoPrecalc(m_render);
 
     // then
     ASSERT_TRUE(resource);
@@ -223,7 +218,7 @@ TEST_F(AnimationLoadTest, LoadPreexistingAnimation)
     }
 
     // when
-    m_app->DoPrecalc();
+    m_app->DoPrecalc(m_render);
 
     // then
     size_t index = 0;
