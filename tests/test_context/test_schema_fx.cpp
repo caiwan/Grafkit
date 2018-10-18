@@ -23,6 +23,8 @@ using namespace Grafkit;
 
 #define JSON_PATH "schema_fx.json"
 
+#if 0
+
 namespace NSMaterialTest
 {
     class TestApplicationWindow : public System
@@ -264,3 +266,5 @@ TEST_F(ContextShaderTest, ShaderBind)
     ASSERT_EQ(m_demo->GetFxaa()->Get(), fxaaShader->Get());
 
 }
+
+#endif

@@ -23,6 +23,8 @@
 using namespace GkDemo;
 using namespace Grafkit;
 
+#if 0
+
 #define JSON_PATH "schema_texture.json"
 namespace NSMaterialTest
 {
@@ -278,3 +280,5 @@ TEST_F(ContextMaterialTest, TextureBoundMaterialLoad)
     ASSERT_STREQ(Uuids::torusPbrMaterialUuid, torusPbrMaterial->GetTexture("diffuse")->GetName().c_str());
     ASSERT_STREQ("TorusPbrMaterial", torusPbrMaterial->GetTexture("diffuse")->GetUuid().c_str());*/
 }
+
+#endif

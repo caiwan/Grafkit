@@ -53,7 +53,7 @@ TEST_F(PreloaderTest, RegisterAndLoadObject)
 
     // when
     m_app->Load(new DummyObjectLoader(DUMMY_NAME, Uuid(DUMMY_UUID), params));
-    m_app->DoPrecalc(m_render);
+    m_app->DoPrecalc();
 
     // then
     Ref<Resource<DummyObject>> loadedObject = m_app->GetByUuid<Resource<DummyObject>>(DUMMY_UUID);

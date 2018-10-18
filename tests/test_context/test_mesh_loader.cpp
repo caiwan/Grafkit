@@ -37,6 +37,8 @@ using namespace GrafkitData;
 #define MESH_UUID "b25eafaa-399e-4c87-b254-04b0de2ec436"
 #define MESH_PERSIST_UUID "4ad71d86-0e40-494e-9376-36bffd21b2e7"
 
+#if 0
+
 namespace NSMeshLoadTest
 {
     class TestApplicationWindow : public System
@@ -165,3 +167,4 @@ TEST_F(MeshLoadTest, LoadPersisted)
     ASSERT_NE(nullptr, (*resource)->GetPointer("NORMAL"));
 }
 
+#endif

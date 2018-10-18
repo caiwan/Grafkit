@@ -23,6 +23,9 @@ using namespace GkDemo;
 using namespace Grafkit;
 
 #define JSON_PATH "schema_scenegraph.json"
+
+#if 0
+
 namespace NSContextPregnancyTest
 {
     class TestApplicationWindow : public System
@@ -235,3 +238,5 @@ TEST_F(ContextPregnancyTest, SceneCameraTest)
     for (size_t i = 0; i < actorCount; i++) { ASSERT_TRUE(scene->GetCamera(i)) << "Camera Node " << i; }
 
 }
+
+#endif

@@ -31,6 +31,8 @@ using namespace Grafkit;
 
 // --- 
 
+#if 0
+
 namespace NSSchemaSchenegraphTest
 {
     class TestApplicationWindow : public System
@@ -545,3 +547,5 @@ TEST_F(SchemaSchenegraphTest, DemoAnimation)
     ASSERT_TRUE((*demoAnimation)->GetTarget());
     ASSERT_EQ((*demoAnimation)->GetTarget().Get(), m_demo.Get());
 }
+
+#endif 

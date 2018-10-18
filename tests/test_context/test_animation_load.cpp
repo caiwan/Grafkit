@@ -30,6 +30,8 @@ using namespace Grafkit;
 #define ANIMATION "testActorAnimation.anim"
 #define ANIMATION_PATH ASSET_ROOT ANIMATION
 
+#if 0
+
 namespace NSAnimationLoadTest
 {
     class TestApplicationWindow : public System
@@ -289,3 +291,4 @@ TEST_F(AnimationLoadTest, LoadPreexistingAnimation)
     }
 
 }
+#endif

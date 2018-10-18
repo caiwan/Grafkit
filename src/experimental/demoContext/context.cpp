@@ -36,6 +36,38 @@ using namespace GrafkitData;
 
 #define ANIMATION_ROOT "animation/"
 
+
+Context::Context(Renderer& render, IAssetFactory*const& assetFactory): m_render(render)
+, m_assetFactory(assetFactory) {
+}
+
+Context::~Context() {
+}
+
+// TODO -> Editor
+void Context::Relocate(std::string path) {
+    assert(0);
+}
+
+void Context::LoadScema() {
+    assert(0);
+
+}
+
+// TODO -> Editor
+void Context::SaveSchema(bool isAutoSave) const {
+    assert(0);
+}
+
+void Context::Intitialize() {
+    // precalc?
+    assert(0);
+}
+
+Ref<Demo> Context::GetDemo() const { return m_demo; }
+
+void Context::SetDemo(const Ref<Demo>& demo) { m_demo = demo; }
+
 #if 0
 Context::Context(Renderer& render, IAssetFactory* assetFactory) : ResourcePreloader()
 , ClonableInitializer()
@@ -108,9 +140,7 @@ void Context::Intitialize()
     m_demo->Initialize(m_render);
 }
 
-Ref<Demo> Context::GetDemo() const { return m_demo; }
 
-void Context::SetDemo(const Ref<Demo>& demo) { m_demo = demo; }
 
 void Context::CreateTestStuff()
 {
@@ -243,3 +273,5 @@ void Context::SaveObject(const Ref<Object>& ref, const char* path, bool isAutoSa
 }
 
 #endif 
+
+

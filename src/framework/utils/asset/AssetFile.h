@@ -68,20 +68,20 @@ namespace Grafkit {
 		IFileEventWatch *m_eventWatcher;
 
 	public:
-		class FileAsset : public IAsset {
-			friend class FileAssetFactory;
-		public:
-			FileAsset() : m_size(0), m_data(nullptr) {}
-			~FileAsset();
-		    void* GetData() const  override { return m_data; }
-		    size_t GetSize() const override { return m_size; }
+		//class FileAsset : public IAsset {
+		//	friend class FileAssetFactory;
+		//public:
+		//	FileAsset() : m_size(0), m_data(nullptr) {}
+		//	~FileAsset();
+		//    void* GetData() const  override { return m_data; }
+		//    size_t GetSize() const override { return m_size; }
 
-		protected:
-			FileAsset(void* data, size_t size) : m_size(size), m_data(data) {}
+		//protected:
+		//	FileAsset(void* data, size_t size) : m_size(size), m_data(data) {}
 
-		private:
-			size_t m_size;
-			void* m_data;
-		};
+		//private:
+		//	size_t m_size;
+		//	void* m_data;
+		//};
 	};
 }

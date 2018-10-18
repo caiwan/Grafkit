@@ -5,11 +5,14 @@
 #include "ResourceManager.h"
 #include "ResourceBuilder.h"
 
+#pragma message('Obsolete, please remove')
+
 namespace Grafkit
 {
     class IPreloadEvents;
     class AssetFileFilter;
 
+# if 0
     /*Legacy code*/
     class ResourcePreloader : public IResourceManager
     {
@@ -76,4 +79,6 @@ namespace Grafkit
     private:
         //std::map<std::string, ResourceBuilderFactroy> m_factories;
     };
+
+#endif 
 }

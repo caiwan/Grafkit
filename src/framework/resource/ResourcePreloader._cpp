@@ -1,3 +1,4 @@
+# if 0
 #include "stdafx.h"
 
 #include "ResourcePreloader.h"
@@ -107,3 +108,4 @@ void ParametricResourceLoader::SaveCache() {
 //void ParametricResourceLoader::PushNewBuilder(std::string builder, std::string name, std::string uuid, void* const& params) {
 //}
 
+#endif 

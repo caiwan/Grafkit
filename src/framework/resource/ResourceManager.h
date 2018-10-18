@@ -36,6 +36,7 @@ namespace Grafkit
         void AddResourcePaths();
         IResourceManager();
         explicit IResourceManager(IPreloadEvents* preloadEvents);
+
         virtual ~IResourceManager();
 
         template <class T>
@@ -57,7 +58,7 @@ namespace Grafkit
         void TriggerReload(std::string filename);
         void Reload(Ref<IResourceBuilder> builder);
 
-        virtual void DoPrecalc(Grafkit::Renderer& render);
+        virtual void DoPrecalc();
 
         void ClearLoadStack();
 

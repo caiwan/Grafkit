@@ -143,7 +143,7 @@ void IResourceManager::Reload(Ref<IResourceBuilder> builder)
     }
 }
 
-void IResourceManager::DoPrecalc(Grafkit::Renderer& render)
+void IResourceManager::DoPrecalc()
 {
     size_t i = 0;
     size_t len = m_builders.size();
@@ -171,7 +171,7 @@ void IResourceManager::DoPrecalc(Grafkit::Renderer& render)
     {
         LOGGER(Log::Logger().Trace("Initializing item %d of %d", i, len));
         IResourceBuilder* builder = it->second;
-        if (builder) { builder->Initialize(render, this, GetByUuid<IResource>(builder->GetUuid())); }
+        if (builder) { builder->Initialize(GetDeviceContext(), this, GetByUuid<IResource>(builder->GetUuid())); }
 
         if (m_preloadEvents)
             m_preloadEvents->OnElemLoad(len + i, len * 2);

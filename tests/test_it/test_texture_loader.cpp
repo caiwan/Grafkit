@@ -74,7 +74,7 @@ TEST_F(TextureLoadTest, Load2DTexture)
     ASSERT_FALSE(*resource);
 
     // when
-    m_app->DoPrecalc(m_render);
+    m_app->DoPrecalc();
 
     // then
     ASSERT_TRUE(resource);
@@ -113,7 +113,7 @@ TEST_F(TextureLoadTest, LoadCubeMap)
     ASSERT_FALSE(*resource);
 
     // when
-    m_app->DoPrecalc(m_render);
+    m_app->DoPrecalc();
 
     // then
     ASSERT_TRUE(resource);
@@ -139,7 +139,7 @@ TEST_F(TextureLoadTest, LoadNoiseMap)
     ASSERT_FALSE(*resource);
 
     // when
-    m_app->DoPrecalc(m_render);
+    m_app->DoPrecalc();
 
     // then
     ASSERT_TRUE(resource);

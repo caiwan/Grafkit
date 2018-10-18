@@ -24,6 +24,9 @@ using namespace GkDemo;
 using namespace Grafkit;
 
 #define JSON_PATH "schema_mesh.json"
+
+#if 0
+
 namespace NSSchemaMeshTest
 {
     class TestApplicationWindow : public System
@@ -183,3 +186,5 @@ TEST_F(SchemaMeshTest, ModelLoad)
     // 
     ASSERT_TRUE(model->GetMaterial());
 }
+
+#endif

@@ -25,6 +25,8 @@ using namespace Grafkit;
 #define ASSET_ROOT "tests/assets/"
 #define TEXTURE_ROOT "textures/"
 
+#if 0
+
 namespace NSTextureLoadTest
 {
     class TestApplicationWindow : public System
@@ -175,3 +177,5 @@ TEST_F(TextureLoadTest, LoadNoiseMap)
     ASSERT_NE(nullptr, (*resource)->GetTextureResource());
     ASSERT_NE(nullptr, (*resource)->GetShaderResourceView());
 }
+
+#endif
