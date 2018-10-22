@@ -5,10 +5,6 @@
 #include "utils/asset/AssetFile.h"
 #include "scene/scene.h"
 
-//#include "demo.h"
-//#include "context.h"
-//#include "schema.h"
-
 #include "core/system.h"
 
 #include "render/material.h"
@@ -20,7 +16,6 @@
 
 // --- 
 
-//using namespace GkDemo;
 using namespace Grafkit;
 
 #define ASSET_ROOT "tests/assets/"
@@ -30,7 +25,6 @@ class TextureLoadTest : public testing::Test
 {
 public:
     TextureLoadTest() : m_app(nullptr)
-        //, m_context(nullptr)
     {
         m_assetFactory = new FileAssetFactory(ASSET_ROOT);
         m_app = new Testing::TestApplicationContext(m_render, m_assetFactory);
@@ -43,13 +37,10 @@ public:
     }
 
     void SetUp() override { 
-        //m_context = new Context(m_render, m_assetFactory); 
     }
 
     void TearDown() override
     {
-        //delete m_context;
-        //m_context = nullptr;
     }
 
 protected:

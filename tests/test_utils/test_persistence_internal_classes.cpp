@@ -33,7 +33,7 @@ void TestArchive(const T& testValue)
 {
     // given
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
     T value(testValue);
 
     //when
@@ -69,7 +69,7 @@ void TestObject(const Ref<C>& object)
     //Ref<const C> object = testValue;//new C();
 
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
 
     //when
     a << object;

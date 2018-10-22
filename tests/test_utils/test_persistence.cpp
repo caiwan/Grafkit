@@ -47,7 +47,7 @@ TEST(Persistence, SimpleObjectTest)
 {
     // given
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
     Ref<SimpleClass> obj = new SimpleClass(42, "some parameter");
 
     // when 
@@ -96,7 +96,7 @@ TEST(Persistence, NestedClassTest)
 {
     // given
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
     Ref<NestedClass> obj = new NestedClass(new SimpleClass(666, "Devil"), new SimpleClass(42, "The ultimate answer"));
     Ref<NestedClass> objNull = new NestedClass(nullptr, nullptr);
 
@@ -122,7 +122,7 @@ TEST(Persistence, BadTypeTest)
 {
     // given
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
     Ref<SimpleClass> obj = new SimpleClass(42, "some parameter");
 
     // when 
@@ -220,7 +220,7 @@ TEST(Persistence, PolimorphClassTest)
 {
     // given
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
     Ref<SimpleBaseClass> objA = new DerivedClassA(42, "Hello", "World");
     Ref<SimpleBaseClass> objB = new DerivedClassB(666, "This is a", "test message");
 
@@ -262,7 +262,7 @@ TEST(Persistence, STLContainerObjects)
 {
     // given
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
 
     std::array<Ref<SimpleBaseClass>, 256> array;
     std::vector<Ref<SimpleBaseClass>> vector;

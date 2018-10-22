@@ -70,7 +70,7 @@ template <class T>
 void TestArchive(const T& testValue)
 {
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
     T value(testValue);
 
     a << testValue;
@@ -87,8 +87,7 @@ template <class T, size_t N>
 void TestArray(T (&testValue)[N])
 {
     std::stringstream s;
-    //Archive<std::stringstream> a(s);
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
 
     T (&value)[N](testValue);
 
@@ -164,7 +163,7 @@ TEST(Archive, POCOToFileTest)
     try
     {
         std::ofstream ofile("test.bin", std::ios::binary);
-        Archive a(std::make_unique<Archive::OutputStream<std::ofstream>>(ofile));
+        Archive a(std::make_unique<OutputStream<std::ofstream>>(ofile));
 
         a << i << name << pi << m;
         ofile.close();
@@ -190,7 +189,7 @@ TEST(Archive, POCOToFileTest)
             return;
         }
 
-        Archive a2(std::make_unique<Archive::InputStream<std::ifstream>>(ifile));
+        Archive a2(std::make_unique<InputStream<std::ifstream>>(ifile));
         a2 >> i2;
         a2 >> name2;
         a2 >> pi2;
@@ -213,7 +212,7 @@ TEST(Archive, POCOMalformedDataTest)
 {
     // invalid data, invalid string length
     std::stringstream s1;
-    Archive a1(std::make_unique<Archive::Stream<std::stringstream>>(s1));
+    Archive a1(std::make_unique<Stream<std::stringstream>>(s1));
 
     a1 << std::string("salut");
 
@@ -228,7 +227,7 @@ TEST(Archive, POCOMalformedDataTest)
     // Try to read back the data:
 
     std::istringstream s2(data);
-    Archive a2(std::make_unique<Archive::InputStream<std::istringstream>>(s2));
+    Archive a2(std::make_unique<InputStream<std::istringstream>>(s2));
 
     std::string value;
     try
@@ -247,7 +246,7 @@ TEST(Archive, InvalidDataTest)
 {
     // invalid data, not enough data
     std::stringstream s1;
-    Archive a1(std::make_unique<Archive::Stream<std::stringstream>>(s1));
+    Archive a1(std::make_unique<Stream<std::stringstream>>(s1));
     //Archive<std::stringstream> a1(s1);
     a1 << 'a';
 
@@ -257,7 +256,7 @@ TEST(Archive, InvalidDataTest)
     try
     {
         std::istringstream s2(data);
-        Archive a2(std::make_unique<Archive::InputStream<std::istringstream>>(s2));
+        Archive a2(std::make_unique<InputStream<std::istringstream>>(s2));
 
         int value;
         a2 >> value;
@@ -273,7 +272,7 @@ TEST(Archive, CharToStdSting)
 {
     // given 
     std::stringstream s;
-    Archive a(std::make_unique<Archive::Stream<std::stringstream>>(s));
+    Archive a(std::make_unique<Stream<std::stringstream>>(s));
 
     //when
     a << "Hello World" << "";

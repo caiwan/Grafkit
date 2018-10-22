@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include <algorithm>
-#include <iostream>
 #include <fstream>
+#include <filesystem>
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -24,6 +24,78 @@ using namespace FWdebugExceptions;
 
 namespace
 {
+    // sorry.
+    template <class STREAM>
+    class InStreamWrapper : Grafkit::IStream
+    {
+        friend class FileAssetFactory;
+    public:
+        explicit InStreamWrapper(std::string filename) : m_isInited(false)
+            , m_filename(filename)
+            , m_stream(m_dataStream) {
+        }
+
+        InStreamWrapper(const InStreamWrapper& other) :
+            m_isInited(false)
+            , m_filename(other.m_filename)
+            , m_stream(m_dataStream) {
+        }
+
+        InStreamWrapper& operator=(const InStreamWrapper& other)
+        {
+            if (this == &other)
+                return *this;
+            m_filename = other.m_filename;
+            return *this;
+        }
+
+        ~InStreamWrapper() override {
+        }
+
+        void Read(char* const& buffer, size_t length) override
+        {
+            Init();
+            m_stream.Read(buffer, length);
+        }
+
+        void Write(const char* const buffer, size_t length) override
+        {
+            Init();
+            m_stream.Write(buffer, length);
+        }
+
+        bool IsSuccess() const override { return m_isInited && m_stream.IsSuccess(); }
+
+        bool ReadAll(size_t& outSize, StreamDataPtr& outBuffer) override
+        {
+            Init();
+            return m_stream.ReadAll(outSize, outBuffer);
+        }
+
+    private:
+        void Init()
+        {
+            if (m_isInited)
+                return;
+
+            assert(!m_dataStream.is_open());
+            m_dataStream.open(m_filename, std::ios::binary);
+            LOGGER(Log::Logger().Info("Accessing file: %s", m_filename.c_str()));
+
+            if (m_dataStream.fail())
+            {
+                LOGGER(Log::Logger().Error("Could not access file: %s errno: %s", m_filename.c_str(), std::strerror(errno)));
+                THROW_EX_DETAILS(FWdebugExceptions::AssetLoadException, m_filename.c_str());
+            }
+            m_isInited = true;
+        }
+
+        bool m_isInited;
+        std::string m_filename;
+        STREAM m_dataStream;
+        InputStream<STREAM> m_stream;
+    };
+
     std::string TrimSlashes(std::string in)
     {
         std::string out = "";
@@ -42,8 +114,7 @@ namespace
                 out.append(in.substr(left, in.length() - left));
                 break;
             }
-        }
-        while (left != in.length());
+        } while (left != in.length());
 
         return out;
     }
@@ -127,8 +198,7 @@ namespace LiveReload
         int Run() override
         {
             LOGGER(Log::Logger().Trace("FS Watcher Thread started"));
-            do { Poll(); }
-            while (!m_isTerminate);
+            do { Poll(); } while (!m_isTerminate);
             LOGGER(Log::Logger().Trace("FS Watcher Thread terminated"));
             return true;
         }
@@ -211,8 +281,7 @@ namespace LiveReload
                 }
 
                 offset += pNotify->NextEntryOffset;
-            }
-            while (pNotify->NextEntryOffset); //(offset != 0);
+            } while (pNotify->NextEntryOffset); //(offset != 0);
             //}
         }
 
@@ -228,7 +297,9 @@ namespace LiveReload
 #endif /*LIVE_RELEASE*/
 
 FileAssetFactory::FileAssetFactory(std::string root) : m_root()
-    , m_eventWatcher(nullptr) { FileAssetFactory::SetBasePath(root); }
+, m_eventWatcher(nullptr) {
+    FileAssetFactory::SetBasePath(root);
+}
 
 
 FileAssetFactory::~FileAssetFactory()
@@ -242,21 +313,11 @@ FileAssetFactory::~FileAssetFactory()
 StreamRef FileAssetFactory::Get(std::string name)
 {
     std::string fullname = TrimSlashes(m_root + name);
-
-    auto *inStream = new InStreamWrapper<std::ifstream>();
-    //auto inStream = std::unique_ptr<InStreamWrapper<std::ifstream>>{ new InStreamWrapper<std::ifstream>() };
-
-    LOGGER(Log::Logger().Info("Accessing file: %s", fullname.c_str()));
-    inStream->m_dataStream.open(fullname, std::ios::binary);
-
-    if (inStream->m_dataStream.fail())
-        THROW_EX_DETAILS(AssetLoadException, fullname.c_str());
-
-    return StreamRef(inStream);
+    LOGGER(Log::Logger().Info("Creating wrapper for file: %s", fullname.c_str()));
+    return StreamRef(new InStreamWrapper<std::ifstream>(fullname));
 }
 
 IAssetFactory::filelist_t FileAssetFactory::GetAssetList() { return this->m_dirlist; }
-
 
 IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter* filter)
 {
@@ -287,8 +348,7 @@ bool FileAssetFactory::PollEvents(IResourceManager* resman)
                     resman->TriggerReload(w->PopFile());
                 else
                     w->PopFile(); // Todo: find a better way to purge stuff 
-            }
-            while (w->HasItems());
+            } while (w->HasItems());
         }
         count = 30;
         return triggered;

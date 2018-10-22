@@ -39,7 +39,7 @@ namespace Grafkit
 
         bool ReadAll(size_t& outLength, StreamDataPtr& outBuffer) override
         {
-            assert(m_stream.is_open());
+            assert(m_stream.good());
             m_stream.seekg(0, m_stream.end);
             outLength = m_stream.tellg();
             m_stream.seekg(0, m_stream.beg);
@@ -69,7 +69,7 @@ namespace Grafkit
 
         bool ReadAll(size_t& outLength, StreamDataPtr& outBuffer) override
         {
-            assert(m_stream.is_open());
+            assert(m_stream.good());
             m_stream.seekg(0, m_stream.end);
             outLength = m_stream.tellg();
             m_stream.seekg(0, m_stream.beg);

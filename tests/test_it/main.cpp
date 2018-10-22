@@ -19,8 +19,5 @@ int main(int argc, char **argv) {
 	InitGoogleTest(&argc, argv);
 	int res = RUN_ALL_TESTS();
 
-//#ifdef _DEBUG
-//	system("pause");
-//#endif // _DEBUG
 	return res;
 }

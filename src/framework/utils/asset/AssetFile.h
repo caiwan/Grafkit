@@ -1,34 +1,38 @@
 #pragma once
 
+#include <string>
+
 #include "core/Asset.h"
 #include "core/thread.h"
 #include "AssetFactory.h"
 
-namespace Grafkit {
-
+namespace Grafkit
+{
     /**
         File event watcher interface a live reloadingohz
     */
-    class IFileEventWatch {
+    class IFileEventWatch
+    {
     public:
         IFileEventWatch() : m_isTerminate(false) {
         }
 
-        virtual ~IFileEventWatch() {}
+        virtual ~IFileEventWatch() {
+        }
 
-        std::string PopFile() {
+        std::string PopFile()
+        {
             MutexLocker lock(&m_queueMutex);
             std::string fn;
-            if (!m_fileReloadList.empty()) {
+            if (!m_fileReloadList.empty())
+            {
                 fn = m_fileReloadList.front();
                 m_fileReloadList.pop_front();
             }
             return fn;
         }
 
-        bool HasItems() const {
-            return !m_fileReloadList.empty();
-        }
+        bool HasItems() const { return !m_fileReloadList.empty(); }
 
         void Terminate() { m_isTerminate = true; }
 
@@ -55,36 +59,21 @@ namespace Grafkit {
         StreamRef Get(std::string name) override;
 
         filelist_t GetAssetList() override;
-        filelist_t GetAssetList(AssetFileFilter * filter) override;
+        filelist_t GetAssetList(AssetFileFilter* filter) override;
 
         // TODO: -> Editor
-        bool PollEvents(IResourceManager *resman) override;
+        bool PollEvents(IResourceManager* resman) override;
 
         void SetBasePath(const std::string& path) override;
 
     private:
-        // sorry.
-        template <class STREAM>
-        class InStreamWrapper : IStream
-        {
-            friend class FileAssetFactory;
-        public:
-            InStreamWrapper() {}
-            ~InStreamWrapper() override {}
-            void Read(char* const& buffer, size_t length) override { m_stream.Read(buffer, length); }
-            void Write(const char* const buffer, size_t length) override { m_stream.Write(buffer, length); }
-            bool IsSuccess() const override { return m_stream.IsSuccess(); }
-            bool ReadAll(size_t& outSize, StreamDataPtr& outBuffer) override { return m_stream.ReadAll(outSize, outBuffer); }
-        private:
-            STREAM m_dataStream;
-            InputStream<STREAM> m_stream;
-        };
 
-        // -------- 
+        // --------------------------------------------------------------------------------------
         std::string m_root;
         filelist_t m_dirlist;
 
+        // --------------------------------------------------------------------------------------
         // TODO: -> Editor
-        IFileEventWatch *m_eventWatcher;
+        IFileEventWatch* m_eventWatcher;
     };
 }
