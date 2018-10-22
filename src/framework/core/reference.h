@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 /// @file taken from libosmscout: https://github.com/nkostelnik/libosmscout/blob/master/libosmscout/include/osmscout/util/Reference.h
 
 /// Safe ptr release

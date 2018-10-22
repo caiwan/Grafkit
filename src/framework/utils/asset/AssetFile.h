@@ -6,82 +6,85 @@
 
 namespace Grafkit {
 
-	/** 
-		File event watcher interface a live reloadingohz
-	*/
-	class IFileEventWatch {
-	public:
-		IFileEventWatch(): m_isTerminate(false) {
-	    }
+    /**
+        File event watcher interface a live reloadingohz
+    */
+    class IFileEventWatch {
+    public:
+        IFileEventWatch() : m_isTerminate(false) {
+        }
 
-	    virtual ~IFileEventWatch() {}
+        virtual ~IFileEventWatch() {}
 
-		std::string PopFile() {
-			MutexLocker lock(&m_queueMutex);
-			std::string fn;
-			if (!m_fileReloadList.empty()) {
-				fn = m_fileReloadList.front();
-				m_fileReloadList.pop_front();
-			}
-			return fn;
-		}
+        std::string PopFile() {
+            MutexLocker lock(&m_queueMutex);
+            std::string fn;
+            if (!m_fileReloadList.empty()) {
+                fn = m_fileReloadList.front();
+                m_fileReloadList.pop_front();
+            }
+            return fn;
+        }
 
-		bool HasItems() const {
-			return !m_fileReloadList.empty();
-		}
+        bool HasItems() const {
+            return !m_fileReloadList.empty();
+        }
 
         void Terminate() { m_isTerminate = true; }
 
-		virtual void Poll() = 0;
+        virtual void Poll() = 0;
 
-	protected:
-		std::list<std::string> m_fileReloadList;
-		Mutex m_queueMutex;
+    protected:
+        std::list<std::string> m_fileReloadList;
+        Mutex m_queueMutex;
 
         bool m_isTerminate;
-	};
+    };
 
-	/**
-		Makes asset directly from files
-	*/
-	class FileAssetFactory : public IAssetFactory
-	{
-	public:
-		class FileAsset;
+    /**
+        Makes asset directly from files
+    */
+    class FileAssetFactory : public IAssetFactory
+    {
+    public:
+        class FileAsset;
 
-	    explicit FileAssetFactory(std::string root);
-		~FileAssetFactory();
+        explicit FileAssetFactory(std::string root);
+        ~FileAssetFactory();
 
-	    IAssetRef Get(std::string name) override;
+        StreamRef Get(std::string name) override;
 
-	    filelist_t GetAssetList() override;
-	    filelist_t GetAssetList(AssetFileFilter * filter) override;
+        filelist_t GetAssetList() override;
+        filelist_t GetAssetList(AssetFileFilter * filter) override;
 
-	    bool PollEvents(IResourceManager *resman) override;
+        // TODO: -> Editor
+        bool PollEvents(IResourceManager *resman) override;
 
-	    void SetBasePath(const std::string& path) override;
+        void SetBasePath(const std::string& path) override;
 
-	private:
-		std::string m_root;
-		filelist_t m_dirlist;
+    private:
+        // sorry.
+        template <class STREAM>
+        class InStreamWrapper : IStream
+        {
+            friend class FileAssetFactory;
+        public:
+            InStreamWrapper() {}
+            ~InStreamWrapper() override {}
+            void Read(char* const& buffer, size_t length) override { m_stream.Read(buffer, length); }
+            void Write(const char* const buffer, size_t length) override { m_stream.Write(buffer, length); }
+            bool IsSuccess() const override { return m_stream.IsSuccess(); }
+            bool ReadAll(size_t& outSize, StreamDataPtr& outBuffer) override { return m_stream.ReadAll(outSize, outBuffer); }
+        private:
+            STREAM m_dataStream;
+            InputStream<STREAM> m_stream;
+        };
 
-		IFileEventWatch *m_eventWatcher;
+        // -------- 
+        std::string m_root;
+        filelist_t m_dirlist;
 
-	public:
-		//class FileAsset : public IAsset {
-		//	friend class FileAssetFactory;
-		//public:
-		//	FileAsset() : m_size(0), m_data(nullptr) {}
-		//	~FileAsset();
-		//    void* GetData() const  override { return m_data; }
-		//    size_t GetSize() const override { return m_size; }
-
-		//protected:
-		//	FileAsset(void* data, size_t size) : m_size(size), m_data(data) {}
-
-		//private:
-		//	size_t m_size;
-		//	void* m_data;
-		//};
-	};
+        // TODO: -> Editor
+        IFileEventWatch *m_eventWatcher;
+    };
 }

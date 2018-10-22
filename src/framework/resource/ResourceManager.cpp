@@ -19,12 +19,14 @@ using namespace FWdebugExceptions;
 void IResourceManager::AddResourcePaths()
 {
     /* Base resource paths inside the asset directory */
-    AddResourcePath("texture", "textures/");
-    AddResourcePath("shader", "shaders/");
-    AddResourcePath("shaderincludesystem", "shaders/lib/");
-    AddResourcePath("shaderincludelocal", "shaders/");
-    AddResourcePath("model", "models/");
-    AddResourcePath("syncdata", "sync/");
+    SetResourcePath("texture", "textures/");
+    SetResourcePath("shader", "shaders/");
+    SetResourcePath("shaderincludesystem", "shaders/lib/");
+    SetResourcePath("shaderincludelocal", "shaders/");
+    SetResourcePath("model", "models/");
+    SetResourcePath("syncdata", "sync/");
+    SetResourcePath("animation", "animation/");
+    SetResourcePath("scripts", "script/");
 }
 
 IResourceManager::IResourceManager() : m_preloadEvents(nullptr) { AddResourcePaths(); }
@@ -190,7 +192,7 @@ void IResourceManager::ClearLoadStack()
     m_builders.clear();
 }
 
-void IResourceManager::AddResourcePath(std::string resourceType, std::string path) { m_pathMap[resourceType] = path; }
+void IResourceManager::SetResourcePath(std::string resourceType, std::string path) { m_pathMap[resourceType] = path; }
 
 std::string IResourceManager::GetResourcePath(std::string resourceClass)
 {

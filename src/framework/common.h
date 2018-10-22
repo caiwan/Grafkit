@@ -10,6 +10,8 @@
 
 #include "utils/persistence/dynamics.h"
 
+#include <memory>
+
 // predefine classes to reduce compile time 
 
 namespace Grafkit {
@@ -24,7 +26,6 @@ namespace Grafkit {
 	typedef Ref<Shader> ShaderRef;
 	typedef Resource<Shader> ShaderRes;
 	typedef Ref<ShaderRes> ShaderResRef;
-    // --- 
 
 	// --- 
 	class Animation;
@@ -97,4 +98,8 @@ namespace Grafkit {
 	typedef Ref<Music> MusicRef;
 	typedef Resource<Music> MusicRes;
 	typedef Ref<MusicRes> MusicResRef;
+
+    // --- 
+    class IStream;
+    typedef std::unique_ptr<IStream> StreamRef;
 }

@@ -61,7 +61,7 @@ SchemaBuilder::~SchemaBuilder() {
  * ======================================================================
 */
 
-void SchemaBuilder::LoadFromAsset(const IAssetRef& asset, IResourceManager* resourceManager) const {
+void SchemaBuilder::LoadFromAsset(const StreamRef& asset, IResourceManager* resourceManager) const {
     assert(0);
 }
 

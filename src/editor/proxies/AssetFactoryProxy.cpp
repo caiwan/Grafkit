@@ -11,9 +11,9 @@ AssetFactoryProxy::AssetFactoryProxy(IAssetFactory * const & parentFactory) : IA
 {
 }
 
-IAssetRef AssetFactoryProxy::Get(std::string name)
+StreamRef AssetFactoryProxy::Get(std::string name)
 {
-	IAssetRef asset = nullptr;
+	StreamRef asset = nullptr;
 
 	try {
 		asset = m_parentFactory->Get(name);

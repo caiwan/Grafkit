@@ -459,12 +459,12 @@ void Grafkit::Renderer::ToggleDepthWrite(bool isEanbled)
 void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int offsetY)
 {
 	// Setup the viewport for rendering.
-	m_viewport.Width = (float)screenW;
-	m_viewport.Height = (float)screenH;
+	m_viewport.Width = float(screenW);
+	m_viewport.Height = float(screenH);
 	m_viewport.MinDepth = 0.0f;
 	m_viewport.MaxDepth = 1.0f;
-	m_viewport.TopLeftX = (float)offsetX;
-	m_viewport.TopLeftY = (float)offsetY;
+	m_viewport.TopLeftX = float(offsetX);
+	m_viewport.TopLeftY = float(offsetY);
 
 	// TODO: the enitre render output stack and buffers has to be updated
 	if (m_deviceContext)

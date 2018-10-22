@@ -20,7 +20,7 @@ namespace GkDemo
         SchemaBuilder();
         ~SchemaBuilder();
 
-        void LoadFromAsset(const Grafkit::IAssetRef& asset, Grafkit::IResourceManager* resourceManager) const;
+        void LoadFromAsset(const Grafkit::StreamRef& asset, Grafkit::IResourceManager* resourceManager) const;
         DemoRef GetDemo() const;
 
     protected:

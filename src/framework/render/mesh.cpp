@@ -25,14 +25,8 @@ Mesh::Mesh() :
 {
 }
 
-//Mesh::Mesh(const Mesh & mesh)
-//{
-//	///@todo TBD
-//}
-
 Mesh::~Mesh()
 {
-    //this->Shutdown();
 }
 
 void Mesh::UpdateMesh(double time)

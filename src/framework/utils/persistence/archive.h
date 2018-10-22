@@ -12,12 +12,12 @@
 #include <deque>
 #include <set>
 #include <map>
-#include <string>
-#include <exception>
+//#include <string>
+//#include <exception>
 #include <functional>
 #include <cassert>
 
-//#include "core/asset"
+#include "core/asset.h"
 
 namespace Grafkit
 {
@@ -420,6 +420,7 @@ namespace Grafkit
 
         // --- 
         std::unique_ptr<IStream> m_stream;
+        //Ref<IStream> m_stream;
     };
 
     class Serializable

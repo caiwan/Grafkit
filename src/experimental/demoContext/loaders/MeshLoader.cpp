@@ -58,7 +58,7 @@ IResource* IMeshLoader::NewResource() { return new Resource<Mesh>(); }
 
 const aiScene* IMeshLoader::LoadAiScene(IResourceManager* const& resman, Assimp::Importer * const & importer, const char * hint) const
 {
-    const IAssetRef data = GetSourceAsset(resman);
+    const StreamRef data = GetSourceAsset(resman);
     const unsigned int aiFlags = aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace;
     const void* dataPtr = data->GetData();
     const size_t length = data->GetSize();
@@ -157,7 +157,7 @@ void MeshOBJLoader::Load(IResourceManager* const& resman, IResource* source)
         try
         {
             IAssetFactory* assetFactory = resman->GetAssetFactory();
-            IAssetRef resource = assetFactory->Get(m_persistName.c_str());
+            StreamRef resource = assetFactory->Get(m_persistName.c_str());
             ArchiveAsset archiveAsset(resource);
             mesh = dynamic_cast<Mesh*>(Mesh::Load(archiveAsset));
         }

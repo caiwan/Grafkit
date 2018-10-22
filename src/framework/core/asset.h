@@ -4,8 +4,10 @@
 
 namespace Grafkit
 {
-    typedef Ref<IStream> StreamRef;
-    typedef IStream IAsset;
+
+    class IStream;
+    typedef std::unique_ptr<IStream> StreamRef;
+    typedef std::unique_ptr<uint8_t> StreamDataPtr;
 
     // I'm sorry, I had to do this "clever trick" in order to keep polimorphic stuff working a layer above
     class IStream
@@ -18,7 +20,7 @@ namespace Grafkit
         virtual void Write(const char* const buffer, size_t length) = 0;
         virtual bool IsSuccess() const = 0;
 
-        virtual bool ReadAll(size_t& outSize, char*& outBuffer) = 0;
+        virtual bool ReadAll(size_t& outSize, StreamDataPtr& outBuffer) = 0;
     };
 
     // ----------
@@ -35,13 +37,14 @@ namespace Grafkit
         void Write(const char* const buffer, size_t length) override { m_stream.write(buffer, length); }
         bool IsSuccess() const override { return bool(m_stream); };
 
-        bool ReadAll(size_t& outLength, char*& outBuffer) override
+        bool ReadAll(size_t& outLength, StreamDataPtr& outBuffer) override
         {
+            assert(m_stream.is_open());
             m_stream.seekg(0, m_stream.end);
             outLength = m_stream.tellg();
             m_stream.seekg(0, m_stream.beg);
-            outBuffer = new char[outLength];
-            m_stream.read(outBuffer, outLength);
+            outBuffer = StreamDataPtr(new uint8_t[outLength]);
+            m_stream.read((char*)(outBuffer.get()), outLength);
             m_stream.seekg(0, m_stream.beg);
             return IsSuccess();
         }
@@ -51,26 +54,27 @@ namespace Grafkit
     };
 
     template <class STREAM_TYPE>
-    class InputStream : public IStream //: public Stream<STREAM_TYPE>
+    class InputStream : public IStream
     {
     public:
         explicit InputStream(STREAM_TYPE& stream) : m_stream(stream) {
         }
 
-        ~InputStream() { /*m_stream.flush();*/ }
+        ~InputStream() {}
 
         void Read(char* const & buffer, size_t length) override { m_stream.read(buffer, length); }
 
         void Write(const char* const buffer, size_t length) override { throw std::runtime_error("Can't write to an InputStream"); }
         bool IsSuccess() const override { return bool(m_stream); };
 
-        bool ReadAll(size_t& outLength, char*& outBuffer) override
+        bool ReadAll(size_t& outLength, StreamDataPtr& outBuffer) override
         {
+            assert(m_stream.is_open());
             m_stream.seekg(0, m_stream.end);
             outLength = m_stream.tellg();
             m_stream.seekg(0, m_stream.beg);
-            outBuffer = new char[outLength];
-            m_stream.read(outBuffer, outLength);
+            outBuffer = StreamDataPtr(new uint8_t[outLength]);
+            m_stream.read((char*)(outBuffer.get()), outLength);
             m_stream.seekg(0, m_stream.beg);
             return IsSuccess();
         }
@@ -80,7 +84,7 @@ namespace Grafkit
     };
 
     template <class STREAM_TYPE>
-    class OutputStream : public IStream //: public Stream<STREAM_TYPE>
+    class OutputStream : public IStream
     {
     public:
         explicit OutputStream(STREAM_TYPE& stream) : m_stream(stream) {
@@ -92,7 +96,7 @@ namespace Grafkit
 
         bool IsSuccess() const override { return bool(m_stream); };
 
-        bool ReadAll(size_t& outSize, char*& outBuffer) override { throw std::runtime_error("Can't read from an OutputStream"); }
+        bool ReadAll(size_t& outSize, StreamDataPtr& outBuffer) override { throw std::runtime_error("Can't read from an OutputStream"); }
 
     protected:
         STREAM_TYPE& m_stream;

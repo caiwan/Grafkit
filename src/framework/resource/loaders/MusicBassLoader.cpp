@@ -30,7 +30,7 @@ namespace
 
         static bool InitializeBass();
 
-        void Initialize(IAssetRef asset) override;
+        void Initialize(StreamRef& asset) override;
         void Shutdown() override;
 
         void Play() override;
@@ -51,8 +51,6 @@ namespace
         void GetWaveform(float*& ptr, size_t& length, size_t& channelCount, size_t& samplePerSec) override;
 
     protected:
-        //HSTREAM m_sample;
-        IAssetRef m_asset;
         HSAMPLE m_sample;
         HCHANNEL m_channel;
 
@@ -62,11 +60,11 @@ namespace
         uint64_t m_length;
         uint64_t m_samplePerSec;
         uint64_t m_bytesPerSample;
+
+        std::pair<size_t, StreamDataPtr> m_musicData;
     };
 
     MusicBass::MusicBass() : Music()
-        , //m_sample(0),
-        m_asset()
         , m_sample(0)
         , m_channel(0)
         , m_isMute(false)
@@ -113,15 +111,14 @@ namespace
         return isNosound;
     }
 
-    void MusicBass::Initialize(IAssetRef asset)
+    void MusicBass::Initialize(StreamRef& asset)
     {
-        m_asset = asset;
-        const void* data = m_asset->GetData();
-        const size_t dataSize = m_asset->GetSize();
+        // pair<length, data>
+        asset->ReadAll(m_musicData.first, m_musicData.second);
 
         bool isNosound = InitializeBass();
 
-        m_sample = BASS_SampleLoad(true, data, 0, dataSize, 1, BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) | 0);
+        m_sample = BASS_SampleLoad(true, m_musicData.second.get(), 0, m_musicData.first, 1, BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) | 0);
 
         if (!m_sample)
         {
@@ -161,6 +158,8 @@ namespace
         //TODO: screw this
         //BASS_Stop();
         //BASS_Free();
+        m_musicData.second.release();
+        m_musicData = std::make_pair(0, nullptr);
     }
 
     void MusicBass::Play() { BASS_ChannelPlay(m_channel, 1); }
@@ -301,7 +300,7 @@ void MusicBassLoader::Load(IResourceManager* const & resman, IResource* source)
 
     Music* music = new MusicBass();
 
-    const IAssetRef asset = resman->GetAssetFactory()->Get(m_params.source);
+    StreamRef asset = resman->GetAssetFactory()->Get(m_params.source);
     music->Initialize(asset);
 
     dest->AssingnRef(music);
@@ -309,7 +308,3 @@ void MusicBassLoader::Load(IResourceManager* const & resman, IResource* source)
 
 void MusicBassLoader::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
 }
-
-//void MusicBassLoader::Serialize(Archive& ar) {
-//    assert(0);
-//}

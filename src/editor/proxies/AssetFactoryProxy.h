@@ -18,7 +18,7 @@ namespace Idogep {
 
 	    bool PollEvents(Grafkit::IResourceManager *resman) override { return m_parentFactory->PollEvents(resman); }
 
-	    Grafkit::IAssetRef Get(std::string name) override;
+	    Grafkit::StreamRef Get(std::string name) override;
 
 	    filelist_t GetAssetList() override { return m_parentFactory->GetAssetList(); }
 	    filelist_t GetAssetList(Grafkit::AssetFileFilter * filter) override { return m_parentFactory->GetAssetList(filter); }
@@ -31,9 +31,9 @@ namespace Idogep {
 
 	// --- 
 	// Wrapper class for QT Resource 
-	class QResourceAsset : public Grafkit::IAsset {
+	class QResourceAsset : public Grafkit::IStream {
 	public:
-		QResourceAsset(QByteArray &data) : IAsset(), m_data(data) {}
+		QResourceAsset(QByteArray &data) : IStream(), m_data(data) {}
 
 	    void* GetData() const override { return (void*)m_data.data(); }
 	    size_t GetSize() const override { return m_data.size(); }

@@ -83,7 +83,7 @@ public:
         //{
         SchemaBuilder builder;
         IAssetFactory* af = m_context->GetAssetFactory();
-        IAssetRef file = af->Get(JSON_PATH);
+        StreamRef file = af->Get(JSON_PATH);
         builder.LoadFromAsset(file, dynamic_cast<IResourceManager*>(m_context));
 
         m_demo = builder.GetDemo();

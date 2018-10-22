@@ -67,7 +67,7 @@ void ArchiveMemory::Read(void * buffer, size_t length)
  *
 */
 
-ArchiveAsset::ArchiveAsset(const IAssetRef& asset): Archive(false),
+ArchiveAsset::ArchiveAsset(const StreamRef& asset): Archive(false),
 m_asset(asset), m_cursor(0) {
 }
 

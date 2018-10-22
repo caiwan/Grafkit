@@ -1,19 +1,15 @@
 #include "stdafx.h"
 
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
-
-#ifndef LIVE_RELEASE
-
-#include <algorithm>
 #include <Winbase.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <tchar.h>
 
 #include "core/thread.h"
-#endif /*LIVE_RELEASE*/
 
 #include "AssetFile.h"
 #include "resource/ResourceManager.h"
@@ -24,7 +20,7 @@ using namespace FWdebugExceptions;
 
 #define MAX_DIRS 25
 #define MAX_FILES 255
-#define MAX_BUFFER 4096
+#define MAX_BUFFER (4*4096)
 
 namespace
 {
@@ -80,6 +76,7 @@ namespace
     }
 }
 
+// TODO: -> Editor
 #ifndef LIVE_RELEASE
 
 namespace LiveReload
@@ -164,7 +161,7 @@ namespace LiveReload
                 FILE_NOTIFY_CHANGE_CREATION |
                 0,
                 &nRet,// number of bytes returned
-                &PollingOverlap,// pointer to structure needed for overlapped I/O
+                &PollingOverlap,// pointer to structure needed for overlapped I/O                
                 nullptr);
 
             if (!result)
@@ -242,26 +239,20 @@ FileAssetFactory::~FileAssetFactory()
 }
 
 
-IAssetRef FileAssetFactory::Get(std::string name)
+StreamRef FileAssetFactory::Get(std::string name)
 {
-    FILE* fp = nullptr;
+    std::string fullname = TrimSlashes(m_root + name);
 
-    std::string fullname = m_root + name;
+    auto *inStream = new InStreamWrapper<std::ifstream>();
+    //auto inStream = std::unique_ptr<InStreamWrapper<std::ifstream>>{ new InStreamWrapper<std::ifstream>() };
 
-    LOGGER(Log::Logger().Info("Accessing file %s", fullname.c_str()));
-    if (0 != fopen_s(&fp, fullname.c_str(), "rb"))
-    {
+    LOGGER(Log::Logger().Info("Accessing file: %s", fullname.c_str()));
+    inStream->m_dataStream.open(fullname, std::ios::binary);
+
+    if (inStream->m_dataStream.fail())
         THROW_EX_DETAILS(AssetLoadException, fullname.c_str());
-    }
 
-    fseek(fp, 0, SEEK_END);
-    size_t size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    void* data = malloc(size);
-    fread(data, 1, size, fp);
-    fclose(fp);
-
-    return IAssetRef(new FileAsset(data, size));
+    return StreamRef(inStream);
 }
 
 IAssetFactory::filelist_t FileAssetFactory::GetAssetList() { return this->m_dirlist; }
@@ -329,16 +320,4 @@ void FileAssetFactory::SetBasePath(const std::string& root)
     m_eventWatcher = new LiveReload::WatchDirectory(root.c_str());
     static_cast<LiveReload::WatchDirectory*>(m_eventWatcher)->Start();
 #endif
-}
-
-
-// ==================================================================================== 
-
-inline FileAssetFactory::FileAsset::~FileAsset()
-{
-    if (m_data)
-    {
-        free(m_data);
-        m_data = nullptr;
-    }
 }

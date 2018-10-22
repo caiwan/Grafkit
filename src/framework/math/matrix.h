@@ -80,8 +80,6 @@ namespace Grafkit
 
         void Rotate(const Quaternion& q) { Multiply(static_cast<matrix>(q)); }
 
-        /// @todo https://en.wikipedia.org/wiki/Euler_angles
-
         /// Roll-Pitch-Yaw rotation, in rad
         void RotateRPY(float roll, float pitch, float yaw) { this->m_mat = XMMatrixMultiply(this->m_mat, DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw)); }
 

@@ -1,3 +1,5 @@
+#if 0
+
 #include "stdafx.h"
 
 #include <fstream>
@@ -14,7 +16,7 @@
 
 #include "core/Music.h"
 #include "animation/actoranimation.h"
-#include "resource/loaders/AnimationLoader.h"
+//#include "resource/loaders/AnimationLoader.h"
 #include "utils/persistence/archive.h"
 
 // --- 
@@ -26,7 +28,6 @@ using namespace Grafkit;
 #define ANIMATION "testActorAnimation.anim"
 #define ANIMATION_PATH ASSET_ROOT ANIMATION
 
-#if 0
 
 class AnimationLoadTest : public testing::Test //, public ResourceManager
 {

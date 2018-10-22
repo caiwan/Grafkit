@@ -46,7 +46,7 @@ void DemoAnimationLoader::Load(IResourceManager* const& resman, IResource* sourc
     {
         try
         {
-            IAssetRef resource = GetSourceAsset(resman);
+            StreamRef resource = GetSourceAsset(resman);
             ArchiveAsset archiveAsset(resource);
             animation = dynamic_cast<DemoAnimation*>(DemoAnimation::Load(archiveAsset));
         }

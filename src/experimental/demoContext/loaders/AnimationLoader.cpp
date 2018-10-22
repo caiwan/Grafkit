@@ -34,7 +34,7 @@ void ActorAnimationLoader::Load(IResourceManager* const& resman, IResource* sour
     {
         try
         {
-            IAssetRef resource = resman->GetAssetFactory()->Get(m_params.sourceName);
+            StreamRef resource = resman->GetAssetFactory()->Get(m_params.sourceName);
             //ArchiveAsset archiveAsset(resource);
             //animation = dynamic_cast<ActorAnimation*>(ActorAnimation::Load(archiveAsset));
         }

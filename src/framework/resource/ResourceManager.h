@@ -68,7 +68,7 @@ namespace Grafkit
         /**
             Resource tipusokra (shader, texture) regisztral egy relativ eleresi utvonalat
         */
-        void AddResourcePath(std::string resourceClass, std::string path);
+        void SetResourcePath(std::string resourceClass, std::string path);
         std::string GetResourcePath(std::string resourceClass);
 
     protected:
