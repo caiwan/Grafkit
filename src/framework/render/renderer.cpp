@@ -392,7 +392,7 @@ void Renderer::BeginScene(float red, float green, float blue, float alpha)
 }
 
 static const float black[4] = { 0.f, 0.f, 0.f, 1.f };
-static const float color_Citrus_flavoured_black[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+static const float cornflowerBlue[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
 /*
 [19:05:47] Citrus Lee: cornflower blue :D
 [19:05:52] Citrus Lee: you're welcome :D
@@ -407,8 +407,6 @@ void Renderer::BeginScene()
 		}
 	// Clear the depth buffer.
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-	return;
 }
 
 void Renderer::BeginSceneDev()
@@ -416,12 +414,10 @@ void Renderer::BeginSceneDev()
 	// Clear the back buffer.
 	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
 		if (m_renderTargetViews[i]) {
-			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color_Citrus_flavoured_black);
+			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], cornflowerBlue);
 		}
 	// Clear the depth buffer.
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-	return;
 }
 
 
@@ -443,12 +439,12 @@ void Renderer::EndScene()
 	auto deltaTime = timePoint - m_lastTimePoint;
 
 	// Ref: http://en.cppreference.com/w/cpp/chrono/duration
-	m_lastDeltaTime = (float)(std::chrono::duration_cast<std::chrono::microseconds>(deltaTime).count()) / 1000.f / 1000.f;
+	m_lastDeltaTime = float(std::chrono::duration_cast<std::chrono::microseconds>(deltaTime).count()) / 1000.f / 1000.f;
 	m_lastTimePoint = timePoint;
 }
 
 
-void Grafkit::Renderer::ToggleDepthWrite(bool isEanbled)
+void Renderer::ToggleDepthWrite(bool isEanbled)
 {
 	if (isEanbled)
 		m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
@@ -456,7 +452,7 @@ void Grafkit::Renderer::ToggleDepthWrite(bool isEanbled)
 		m_deviceContext->OMSetDepthStencilState(m_depthStencilStateWriteDisabled, 1);
 }
 
-void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int offsetY)
+void Renderer::SetViewport(int screenW, int screenH, int offsetX, int offsetY)
 {
 	// Setup the viewport for rendering.
 	m_viewport.Width = float(screenW);
@@ -471,7 +467,7 @@ void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int o
 		m_deviceContext->RSSetViewports(1, &m_viewport);
 }
 
-void Grafkit::Renderer::SetViewportAspect(float aspectW, float aspectH)
+void Renderer::SetViewportAspect(float aspectW, float aspectH)
 {
 	// reset on invalid input
 	if (aspectW <= 0 || aspectH <= 0)
@@ -479,14 +475,14 @@ void Grafkit::Renderer::SetViewportAspect(float aspectW, float aspectH)
 
 	if (aspectW > aspectH) {
 		float ah = aspectH / aspectW;
-		float h = floor((float)m_screenH * ah);
+		float h = floor(float(m_screenH) * ah);
 		float oh = floor((m_screenH - h) * .5);
-		SetViewport(m_screenW, (int)h, 0, (int)oh);
+		SetViewport(m_screenW, int(h), 0, int(oh));
 	}
 	// we dont care about the rest atm
 }
 
-void Grafkit::Renderer::SetRenderTargetView(ID3D11RenderTargetView * pRenderTargetView, size_t n)
+void Renderer::SetRenderTargetView(ID3D11RenderTargetView * pRenderTargetView, size_t n)
 {
 	n = n < RENDER_TARGET_MAX ? n : RENDER_TARGET_MAX;
 	if (!n && pRenderTargetView == nullptr) {
@@ -497,13 +493,13 @@ void Grafkit::Renderer::SetRenderTargetView(ID3D11RenderTargetView * pRenderTarg
 	}
 }
 
-void Grafkit::Renderer::ApplyRenderTargetView(size_t count)
+void Renderer::ApplyRenderTargetView(size_t count)
 {
 	m_renderTargetViewCount = count < RENDER_TARGET_MAX ? count : RENDER_TARGET_MAX;
 	m_deviceContext->OMSetRenderTargets(m_renderTargetViewCount, m_renderTargetViews, m_depthStencilView);
 }
 
-void Grafkit::Renderer::SetDepthStencilView(ID3D11DepthStencilView * pDepthStencilview)
+void Renderer::SetDepthStencilView(ID3D11DepthStencilView * pDepthStencilview)
 {
 	if (pDepthStencilview == nullptr) {
 		m_depthStencilView = m_myDepthStencilView;
@@ -514,7 +510,7 @@ void Grafkit::Renderer::SetDepthStencilView(ID3D11DepthStencilView * pDepthStenc
 }
 
 
-void Grafkit::Renderer::CreateDepthStencilView()
+void Renderer::CreateDepthStencilView()
 {
 	HRESULT result = 0;
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
@@ -561,7 +557,7 @@ void Grafkit::Renderer::CreateDepthStencilView()
 }
 
 // folyt kov
-ID3D11DepthStencilState* Grafkit::Renderer::CreateStencilState(bool isEnable)
+ID3D11DepthStencilState* Renderer::CreateStencilState(bool isEnable)
 {
 	HRESULT result;
 	D3D11_DEPTH_STENCIL_DESC dsDesc;
@@ -605,7 +601,7 @@ ID3D11DepthStencilState* Grafkit::Renderer::CreateStencilState(bool isEnable)
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-void Grafkit::Renderer::SaveScreenshot(const char * filename)
+void Renderer::SaveScreenshot(const char * filename)
 {
 	const int &width = m_viewport.Width;
 	const int &height = m_viewport.Height;
