@@ -141,7 +141,7 @@ void Editor::OpenDocument() {
         try
         {
             m_context->Relocate(path);
-            m_context->LoadScema();
+            m_context->Load();
             m_reloadRequested = true;
         }
         catch (FWdebug::Exception & ex)

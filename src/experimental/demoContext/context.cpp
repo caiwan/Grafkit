@@ -1,34 +1,33 @@
 #include "context.h"
 
+#include "json.hpp"
+
 #include "demo.h"
-#include "math/fbm.h"
+#include "core/Asset.h"
+
+#include "utils/persistence/archive.h"
 
 #include "render/shader.h"
 #include "render/effect.h"
-
 #include "render/mesh.h"
 #include "render/model.h"
 #include "render/material.h"
 #include "render/texture.h"
-
 #include "render/SceneGraph.h"
+
 #include "scene/scene.h"
 #include "animation/actoranimation.h"
-
-#include "resource/loaders/ShaderLoader.h"
 
 #include "resource/ResourceManager.h"
 
 #include "utils/asset/AssetFactory.h"
-#include "core/Asset.h"
-
 #include "core/Music.h"
-#include "resource/loaders/MusicBassLoader.h"
-
-#include "schema.h"
 
 #include "builtin_data/cube.h"
-#include "utils/persistence/archive.h"
+
+#include "resource/loaders/MusicBassLoader.h"
+#include "resource/loaders/ShaderLoader.h"
+#include "loaders/MeshLoader.h"
 
 using namespace Grafkit;
 using namespace GkDemo;
@@ -36,31 +35,70 @@ using namespace GrafkitData;
 
 #define ANIMATION_ROOT "animation/"
 
-
-Context::Context(Renderer& render, IAssetFactory*const& assetFactory): m_render(render)
-, m_assetFactory(assetFactory) {
+// TODO : separate file(s)
+namespace GkDemo
+{
+    void from_json(const Json& json, MeshLoadParams &params)
+    {
+        params.filename = json.at("filename").get<std::string>();
+        params.typeHint = json.at("type_hint").get<std::string>();
+    }
 }
+
+
+Context::Context(Renderer& render, const std::shared_ptr<IAssetFactory> & assetFactory) : m_isFxaa(false)
+, m_render(render)
+, m_assetFactory(assetFactory) {
+
+#define P_LIST(json) json.at("name").get<std::string>(), json.at("uuid").get<std::string>(), json.at("params")
+
+    m_loaders["mesh"] = [](const Json & json) {return new MeshLoader(P_LIST(json)); };
+    // ... 
+
+#undef P_LIST
+}
+
 
 Context::~Context() {
 }
+
+
+void Context::LoadDemo(const std::string filename) {
+
+    StreamRef schemaAsset = m_assetFactory->Get(filename);
+    const Json shemaJson = Json::parse(static_cast<std::istream&>(*schemaAsset));
+
+    // -- include
+    // -- demo
+    m_demo = new Demo();
+    // -- asset
+    try {
+        const Json assetJson = shemaJson.at("asset");
+        for (auto& assetElem : assetJson)
+        {
+            std::string generatorType = assetElem.at("generator");
+            auto loaderIt = m_loaders.find(generatorType);
+            if (loaderIt != m_loaders.end())
+            {
+                this->Load(loaderIt->second(assetElem));
+            }
+        }
+    }
+    catch (std::exception &e)
+    {
+        throw std::runtime_error(std::string("Cannot load assets - ") + e.what());
+    }
+
+    assert(m_demo);
+}
+
 
 // TODO -> Editor
 void Context::Relocate(std::string path) {
     assert(0);
 }
-
-void Context::LoadScema() {
-    assert(0);
-
-}
-
 // TODO -> Editor
 void Context::SaveSchema(bool isAutoSave) const {
-    assert(0);
-}
-
-void Context::Intitialize() {
-    // precalc?
     assert(0);
 }
 
@@ -121,10 +159,10 @@ void Context::SaveSchema(bool isAutoSave) const
 
     // we have to purge the FS watchers state due to prevent trigger reload again
     // Todo: find a better way to purge stuff 
-    do {} while(m_assetFactory->PollEvents(nullptr));
+    do {} while (m_assetFactory->PollEvents(nullptr));
 }
 
-void Context::LoadScema()
+void Context::Load()
 {
     m_builder.LoadFromAsset(m_assetFactory->Get("/schema.json"), this);
     m_demo = m_builder.GetDemo();
@@ -238,7 +276,7 @@ void Context::CreateTestStuff()
                     //key2.m_type = Animation::KI_step;
                     //channel->AddKey(key2);
                 }
-}
+            }
         }
 
     }
@@ -265,7 +303,8 @@ void Context::SaveObject(const Ref<Object>& ref, const char* path, bool isAutoSa
         ref->Store(archive);
         fflush(fp);
         fclose(fp);
-    } else
+    }
+    else
     {
         assert(0);
     }

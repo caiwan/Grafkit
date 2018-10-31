@@ -1,24 +1,30 @@
 #pragma once
+
+#include "common.h"
+#include "json_fwd.hpp"
 #include "resource/ResourceManager.h"
-//#include "utils/ext/InitializeSerializer.h"
-#include "schema.h"
+
+using Json = nlohmann::json;
+
+namespace Grafkit
+{
+    class IResourceBuilder;
+}
 
 namespace GkDemo
 {
-    class SchemaBuilder;
     class Demo;
 
     class Context : public Grafkit::IResourceManager
     {
-        explicit Context(Grafkit::Renderer &render, Grafkit::IAssetFactory*const& assetFactory);
+    public:
+        explicit Context(Grafkit::Renderer &render, const std::shared_ptr<Grafkit::IAssetFactory>& assetFactory);
         ~Context();
 
-        void Relocate(std::string path);
+        Context(const Context& other) = delete;
+        Context& operator=(const Context& other) = delete;
 
-        void LoadScema();
-        void SaveSchema(bool isAutoSave = false) const;
-
-        void Intitialize();
+        void LoadDemo(const std::string filename = "demo.json");
 
         bool GetIsFxaa() const { return m_isFxaa; }
         void SetIsFxaa(const bool isFxaa) { m_isFxaa = isFxaa; }
@@ -27,63 +33,19 @@ namespace GkDemo
         void SetDemo(const Ref<Demo> &demo);
 
         Grafkit::Renderer& GetDeviceContext() override { return m_render; }
-        Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory; }
+        Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory.get(); }
 
-    protected:
-        bool m_isFxaa;
-
-        Grafkit::Renderer& m_render;
-
-        Ref<Demo> m_demo;
-
-        Grafkit::IAssetFactory* m_assetFactory;
-
-        SchemaBuilder m_builder;
-        std::string m_myBasePath;
-    };
-
-#if 0
-    class Context : public Grafkit::ResourcePreloader, Grafkit::ClonableInitializer
-    {
-    public:
-
-        explicit Context(Grafkit::Renderer &render, Grafkit::IAssetFactory* assetFactory);
-        ~Context() override;
-
+        // TODO: -> editor
         void Relocate(std::string path);
-        
-        void LoadScema();
         void SaveSchema(bool isAutoSave = false) const;
 
-        void Intitialize();
-
-
-        bool GetIsFxaa() const { return m_isFxaa; }
-        void SetIsFxaa(const bool isFxaa) { m_isFxaa = isFxaa; }
-
-        Ref<Demo> GetDemo() const;
-        void SetDemo(const Ref<Demo> &demo);
-
-        Grafkit::Renderer& GetDeviceContext() override { return m_render; }
-        Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory; }
-        void CreateTestStuff();
-
     protected:
-        Grafkit::Renderer& m_render;
-        
-        Ref<Demo> m_demo;
-
-        Grafkit::IAssetFactory* m_assetFactory;
-
-        SchemaBuilder m_builder;
-        std::string m_myBasePath;
-        //SchemaExport m_exporter;
-
         bool m_isFxaa;
+        Grafkit::Renderer& m_render;
+        Ref<Demo> m_demo;
+        const std::shared_ptr<Grafkit::IAssetFactory> m_assetFactory;
+        std::string m_myBasePath;
 
-        void SaveObject(const Ref<Grafkit::Object>& ref, const char* str, bool isAutoSave) const;
+        std::map<std::string, std::function<Ref<Grafkit::IResourceBuilder>(const Json &)>> m_loaders;
     };
-
-#endif 
-
 }

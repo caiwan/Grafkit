@@ -85,6 +85,7 @@ void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const 
 
 void IResourceManager::Load(Ref<IResourceBuilder> builder)
 {
+    assert(builder);
     std::string uuid = builder->GetUuid();
 
     if (uuid.empty())

@@ -33,7 +33,7 @@ namespace NSMaterialTest
         explicit TestApplicationWindow(Renderer& render) : m_render(render)
         {
             InitializeWindows(320, 240);
-            m_render.Initialize(m_window.getRealWidth(), m_window.getRealHeight(), true, this->m_window.getHWnd(), false);
+            m_render.Initialize(m_app.getRealWidth(), m_app.getRealHeight(), true, this->m_app.getHWnd(), false);
         }
 
         ~TestApplicationWindow() { ShutdownWindows(); }
@@ -55,17 +55,17 @@ using namespace NSMaterialTest;
 class ContextShaderTest : public testing::Test
 {
 public:
-    ContextShaderTest() : m_window(nullptr)
+    ContextShaderTest() : m_app(nullptr)
         , m_context(nullptr)
     {
-        m_window = new TestApplicationWindow(m_render);
+        m_app = new TestApplicationWindow(m_render);
         m_assetFactory = new FileAssetFactory("tests/assets/");
     }
 
     ~ContextShaderTest()
     {
         delete m_assetFactory;
-        delete m_window;
+        delete m_app;
     }
 
     void SetUp() override { m_context = new Context(m_render, m_assetFactory); }
@@ -125,7 +125,7 @@ public:
 
 protected:
     Ref<Demo> m_demo;
-    TestApplicationWindow* m_window;
+    TestApplicationWindow* m_app;
     Context* m_context;
 
     Renderer m_render;

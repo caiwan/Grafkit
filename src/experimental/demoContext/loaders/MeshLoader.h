@@ -8,6 +8,7 @@
 
 
 struct aiScene;
+
 namespace Assimp
 {
     class Importer;
@@ -15,41 +16,40 @@ namespace Assimp
 
 namespace GkDemo
 {
-
-#if 0
-
-    class IMeshLoader : public Grafkit::IResourceBuilder
+    struct MeshLoadParams
     {
-    public:
+        // ...
+        std::string filename;
+        std::string typeHint;
+        //uint32_t meshIndex;
 
-        IMeshLoader(const std::string& name, const std::string& sourcename, const std::string& uuid)
-            : IResourceBuilder(name, sourcename, uuid) {
-        }
-
-        Grafkit::IResource* NewResource() override;
-        void Load(Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override = 0;
-
-    protected:
-        const aiScene* LoadAiScene(Grafkit::IResourceManager*const& resman, Assimp::Importer * const & importer, const char * hint ="") const;
-
-        static void LoadMeshes(std::list<Grafkit::MeshRef>& meshes, const aiScene const*& souceScene);
-
+        template <class A>
+        void Serialize(A& a) { a & filename & typeHint /*& meshIndex*/; }
     };
 
-
-    class MeshOBJLoader : public IMeshLoader
+    class MeshLoader : public Grafkit::ResourceBuilder<Grafkit::Mesh, MeshLoadParams>
     {
     public:
+        MeshLoader() {
+        }
 
-        MeshOBJLoader(const std::string& name, const std::string& sourcename, const std::string& persistName, const std::string& uuid = "")
-            : IMeshLoader(name, sourcename, uuid)
-            , m_persistName(persistName) {
+        explicit MeshLoader(const MeshLoadParams& params)
+            : ResourceBuilder<Grafkit::Mesh, MeshLoadParams>(params) {
+        }
+
+        MeshLoader(const std::string& name, const std::string& uuid, const MeshLoadParams& params)
+            : ResourceBuilder<Grafkit::Mesh, MeshLoadParams>(name, uuid, params) {
         }
 
         void Load(Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override;
-    private:
-        std::string m_persistName;
+        void Initialize(Grafkit::Renderer& render, Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override;
+
+        SERIALIZE(GkDemo::MeshLoader, 1, ar)
+        {
+            assert(0);
+        }
+
+        static void LoadMeshes(std::vector<Grafkit::MeshRef>& meshes, const aiScene const*& souceScene);
+
     };
 }
-
-#endif

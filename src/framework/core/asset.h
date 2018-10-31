@@ -4,7 +4,6 @@
 
 namespace Grafkit
 {
-
     class IStream;
     typedef std::unique_ptr<IStream> StreamRef;
     typedef std::unique_ptr<uint8_t> StreamDataPtr;
@@ -21,6 +20,9 @@ namespace Grafkit
         virtual bool IsSuccess() const = 0;
 
         virtual bool ReadAll(size_t& outSize, StreamDataPtr& outBuffer) = 0;
+
+        explicit virtual operator std::istream&() const = 0;
+        explicit virtual operator std::ostream&() const = 0;
     };
 
     // ----------
@@ -29,7 +31,7 @@ namespace Grafkit
     class Stream : public IStream
     {
     public:
-        Stream(STREAM_TYPE& stream) : m_stream(stream) {
+        explicit Stream(STREAM_TYPE& stream) : m_stream(stream) {
         }
 
         ~Stream() { m_stream.flush(); }
@@ -49,6 +51,9 @@ namespace Grafkit
             return IsSuccess();
         }
 
+        explicit operator std::istream&() const override { return static_cast<std::istream&>(m_stream); }
+        explicit operator std::ostream&() const override { return static_cast<std::ostream&>(m_stream); }
+
     protected:
         STREAM_TYPE& m_stream;
     };
@@ -60,7 +65,8 @@ namespace Grafkit
         explicit InputStream(STREAM_TYPE& stream) : m_stream(stream) {
         }
 
-        ~InputStream() {}
+        ~InputStream() {
+        }
 
         void Read(char* const & buffer, size_t length) override { m_stream.read(buffer, length); }
 
@@ -78,8 +84,11 @@ namespace Grafkit
             m_stream.seekg(0, m_stream.beg);
             return IsSuccess();
         }
+        
+        explicit operator std::istream&() const override { return static_cast<std::istream&>(m_stream); }
+        explicit operator std::ostream&() const override { throw std::runtime_error("Can't write to an InputStream"); }
 
-    private:
+    protected:
         STREAM_TYPE& m_stream;
     };
 
@@ -97,6 +106,9 @@ namespace Grafkit
         bool IsSuccess() const override { return bool(m_stream); };
 
         bool ReadAll(size_t& outSize, StreamDataPtr& outBuffer) override { throw std::runtime_error("Can't read from an OutputStream"); }
+
+        explicit operator std::istream&() const override { throw std::runtime_error("Can't read from an OutputStream"); }
+        explicit operator std::ostream&() const override { return static_cast<std::ostream&>(m_stream); }
 
     protected:
         STREAM_TYPE& m_stream;

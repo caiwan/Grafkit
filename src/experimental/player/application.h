@@ -6,7 +6,6 @@
 #include "fwzSetup.h"
 
 #include "utils/asset/AssetFactory.h"
-#include "resource/ResourcePreloader.h"
 
 namespace GkDemo
 {
@@ -33,11 +32,9 @@ protected:
     void UpdateLoaderBar(float p) override;
 
 private:
-    Grafkit::IAssetFactory * m_file_loader;
-    GkDemo::Context *m_context;
-    Ref<GkDemo::Demo> m_demo;
+    std::unique_ptr<Grafkit::IAssetFactory> m_file_loader;
 
     Grafkit::Renderer m_render;
-    Grafkit::MusicResRef m_music;
+    std::unique_ptr<GkDemo::Context> m_context;
 };
 

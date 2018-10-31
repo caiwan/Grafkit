@@ -42,6 +42,7 @@ void Mesh::RenderMesh(ID3D11DeviceContext * dev) const
     dev->DrawIndexed(GetIndexCount(), 0, 0);
 }
 
+// TODO: ->CopyVertexAttribute
 void Mesh::AddPointer(std::string inputName, uint32_t length, const void * pointer)
 {
     std::vector<uint8_t> vertexData;
@@ -50,6 +51,7 @@ void Mesh::AddPointer(std::string inputName, uint32_t length, const void * point
     this->m_vertices[inputName] = vertexData;
 }
 
+// TODO: ->CopyAddAttribute
 void Mesh::SetIndices(uint32_t vertexCount, uint32_t indexCount, const uint32_t*const indices)
 {
     m_vertexCount = vertexCount;

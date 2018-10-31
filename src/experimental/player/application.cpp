@@ -28,10 +28,10 @@ Application::Application(fwzSettings& settings) : System()
 
     //InitializeWindows(screenWidth, screenHeight, !settings.nWindowed, 0, "Grafkit2 Player");
 
-    //screenWidth = m_window.getRealWidth() , screenHeight = m_window.getRealHeight();
+    //screenWidth = m_app.getRealWidth() , screenHeight = m_app.getRealHeight();
 
     //int result = 0;
-    //result = m_render.Initialize(screenWidth, screenHeight, settings.nVsync, m_window.getHWnd(), !settings.nWindowed);
+    //result = m_render.Initialize(screenWidth, screenHeight, settings.nVsync, m_app.getHWnd(), !settings.nWindowed);
     //assert(result);
 
     //this->m_render.SetViewportAspect(2.33, 1.);
@@ -49,7 +49,7 @@ int Application::init()
     InitializeLoaderBar(m_render);
 
     //m_context->LoadCache();
-    //m_context->LoadScema();
+    //m_context->Load();
     //m_context->DoPrecalc();
     //m_context->Intitialize();
     //m_demo = m_context->GetDemo();

@@ -17,7 +17,7 @@
 
 #include "core/Music.h"
 #include "render/mesh.h"
-#include "MeshLoader.h"
+//#include "MeshLoader.h"
 #include "utils/persistence/archive.h"
 
 #include "builtin_data/cube.h"
@@ -47,7 +47,7 @@ namespace NSMeshLoadTest
         explicit TestApplicationWindow(Renderer& render) : m_render(render)
         {
             InitializeWindows(320, 240);
-            m_render.Initialize(m_window.getRealWidth(), m_window.getRealHeight(), true, this->m_window.getHWnd(), false);
+            m_render.Initialize(m_app.getRealWidth(), m_app.getRealHeight(), true, this->m_app.getHWnd(), false);
         }
 
         ~TestApplicationWindow() { ShutdownWindows(); }
@@ -69,17 +69,17 @@ using namespace NSMeshLoadTest;
 class MeshLoadTest : public testing::Test
 {
 public:
-    MeshLoadTest() : m_window(nullptr)
+    MeshLoadTest() : m_app(nullptr)
         , m_context(nullptr)
     {
-        m_window = new TestApplicationWindow(m_render);
+        m_app = new TestApplicationWindow(m_render);
         m_assetFactory = new FileAssetFactory(ASSET_ROOT);
     }
 
     ~MeshLoadTest()
     {
         delete m_assetFactory;
-        delete m_window;
+        delete m_app;
     }
 
     void SetUp() override { m_context = new Context(m_render, m_assetFactory); }
@@ -109,7 +109,7 @@ public:
 
 protected:
     Ref<Demo> m_demo;
-    TestApplicationWindow* m_window;
+    TestApplicationWindow* m_app;
     Context* m_context;
 
     Renderer m_render;
@@ -123,7 +123,7 @@ TEST_F(MeshLoadTest, LoadOBJViaAssimp)
 {
     // given
     SaveTestData();
-    Ref<Resource<Mesh>> resource = m_context->Load<Resource<Mesh>>(new MeshOBJLoader("testMesh", MESH_SRC, "", MESH_UUID));
+    Ref<Resource<Mesh>> resource = m_context->Load<Resource<Mesh>>(new MeshLoader("testMesh", MESH_SRC, "", MESH_UUID));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);
@@ -148,7 +148,7 @@ TEST_F(MeshLoadTest, LoadPersisted)
 {
     // given
     SaveTestData();
-    Ref<Resource<Mesh>> resource = m_context->Load<Resource<Mesh>>(new MeshOBJLoader("testMesh", "", MESH_PERSIST, MESH_PERSIST_UUID));
+    Ref<Resource<Mesh>> resource = m_context->Load<Resource<Mesh>>(new MeshLoader("testMesh", "", MESH_PERSIST, MESH_PERSIST_UUID));
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);

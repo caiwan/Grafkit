@@ -63,12 +63,6 @@ namespace Grafkit
         U GetParams() const { return m_params; }
         void SetParams(const U& params) { m_params = params; }
 
-        // fuck this 
-        //// if you're brave enoguh
-        //// this should be protected 
-        //const void* GetParamP() const override { return reinterpret_cast<const void*>(&m_params); }
-        //void SetParamP(const void* p) override { assert(p); m_params = *(reinterpret_cast<const U*>(p)); }
-
         Ref<IResource> NewResource() const override { return new Resource<R>(); }
 
         template <class A> void Serialize(A &ar) { IResourceBuilder::Serialize(ar); ar&m_params; }

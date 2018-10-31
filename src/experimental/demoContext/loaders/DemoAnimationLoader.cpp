@@ -1,5 +1,5 @@
 #include "DemoAnimationLoader.h"
-#include "demo.h"
+//#include "demo.h"
 
 #include "core/resource.h"
 #include "resource/ResourceManager.h"

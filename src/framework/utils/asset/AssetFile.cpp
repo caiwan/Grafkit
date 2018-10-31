@@ -26,7 +26,7 @@ namespace
 {
     // sorry.
     template <class STREAM>
-    class InStreamWrapper : Grafkit::IStream
+    class InStreamWrapper : public Grafkit::IStream
     {
         friend class FileAssetFactory;
     public:
@@ -71,6 +71,9 @@ namespace
             Init();
             return m_stream.ReadAll(outSize, outBuffer);
         }
+
+        explicit operator std::basic_istream<char>&() const override{ const_cast<InStreamWrapper*const>(this)->Init(); return static_cast<std::istream&>(m_stream); }
+        explicit operator std::basic_ostream<char>&() const override{ throw std::runtime_error("Can't write to an InputStream"); }
 
     private:
         void Init()
@@ -241,9 +244,9 @@ namespace LiveReload
             if (pollingResult == WAIT_TIMEOUT) { return; }
 
             int offset = 0;
-            int rename = 0;
-            char oldName[260];
-            char newName[260];
+            //int rename = 0;
+            //char oldName[260];
+            //char newName[260];
 
             do
             {

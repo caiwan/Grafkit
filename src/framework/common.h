@@ -102,4 +102,5 @@ namespace Grafkit {
     // --- 
     class IStream;
     typedef std::unique_ptr<IStream> StreamRef;
+    typedef std::unique_ptr<uint8_t> StreamDataPtr;
 }

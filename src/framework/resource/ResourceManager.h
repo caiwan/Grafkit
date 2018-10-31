@@ -7,6 +7,7 @@
 #include "common.h"
 
 #include "render/renderer.h"
+#include "ResourceBuilder.h"
 
 namespace Grafkit
 {

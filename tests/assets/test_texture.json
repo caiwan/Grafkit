@@ -1,0 +1,68 @@
+{
+  "demo": {
+    "uuid": "acec776b-d2ce-45ac-b082-f7072c46c38f"
+  },
+  "assets": [{
+      "name": "normap",
+      "uuid": "4c8c7210-49b5-41a6-9681-fd359cb4d6ab",
+      "generator": "texture2d",
+      "params": {
+        "filename": "textures/normap.jpg"
+      }
+    },
+    {
+      "name": "UVAddressBoard",
+      "uuid": "de386543-5cd8-4d87-bd16-9b04e037a393",
+      "generator": "texture2d",
+      "params": {
+        "filename": "textures/Untitled.png"
+      }
+    },
+    {
+      "name": "Sky1",
+      "uuid": "2fa2effd-93fa-4984-9647-4b31127a3cbe",
+      "generator": "texturecube",
+      "params": {
+        "filenames": [
+          "textures/yoko_posx.jpg",
+          "textures/yoko_negx.jpg",
+          "textures/yoko_posy.jpg",
+          "textures/yoko_negy.jpg",
+          "textures/yoko_posz.jpg",
+          "textures/yoko_negz.jpg"
+        ]
+      }
+    },
+    {
+      "name": "SkyRadiance",
+      "uuid": "ed9cd55c-34c9-4644-acfa-35bfb2fbb31a",
+      "generator": "texturecube",
+      "params": {
+        "filenames": [
+          "textures/yoko_low_posx.jpg",
+          "textures/yoko_low_negx.jpg",
+          "textures/yoko_low_posy.jpg",
+          "textures/yoko_low_negy.jpg",
+          "textures/yoko_low_posz.jpg",
+          "textures/yoko_low_negz.jpg"
+        ]
+      }
+    },
+    {
+      "name": "Noise256",
+      "uuid": "d519b673-764c-4530-a28f-df9ee6133eae",
+      "generator": "texturenoise",
+      "params": {
+        "size": 256
+      }
+    },
+    {
+      "name": "Noise512",
+      "uuid": "8a92cb3a-5b77-4d4f-9e11-3df45b269b03",
+      "generator": "texturenoise",
+      "params": {
+        "size": 512
+      }
+    }
+  ]
+}

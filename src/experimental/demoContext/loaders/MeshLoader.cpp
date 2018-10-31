@@ -29,12 +29,13 @@
 
 #define MAX_TEXCOORD_COUNT 2
 
+using namespace Grafkit;
+using namespace GkDemo;
 
 // TODO -> Library
-
 namespace
 {
-    Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4* m);
+    Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4* m);
     aiVector3D crossProduct(aiVector3D a, aiVector3D b);
     float2 aiVector2DToFloat2(const aiVector2D& v);
     float2 aiVector3DToFloat2(const aiVector3D& v);
@@ -46,36 +47,43 @@ namespace
     float aiMatkeyToFloat(const aiMaterial*const & mat, const char* key, int a1, int a2);
 }
 
-DEFINE_EXCEPTION(MeshLoaderException, 9001, "Error while parsing file via ASSIMP");
+void MeshLoader::Load(IResourceManager* const& resman, IResource* source) {
+    // if no cache exists || cached file is old
+    if (true)
+    {
+        Assimp::Importer importer;
+        StreamRef data = resman->GetAssetFactory()->Get(m_params.filename);
+        const unsigned int aiFlags = aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace;
+        std::unique_ptr<uint8_t> dataPtr;
+        size_t length = 0;
+        data->ReadAll(length, dataPtr);
+        const aiScene* scene = importer.ReadFileFromMemory(dataPtr.get(), length, aiFlags, m_params.typeHint.c_str());
 
-using namespace Grafkit;
-using namespace GkDemo;
-using namespace FWdebugExceptions;
+        if (!scene)
+            throw std::runtime_error(std::string("Could not load mesh: ") + importer.GetErrorString());
 
-#if 0
+        std::vector<MeshRef> meshes;
+        LoadMeshes(meshes, scene);
 
-IResource* IMeshLoader::NewResource() { return new Resource<Mesh>(); }
-
-const aiScene* IMeshLoader::LoadAiScene(IResourceManager* const& resman, Assimp::Importer * const & importer, const char * hint) const
-{
-    const StreamRef data = GetSourceAsset(resman);
-    const unsigned int aiFlags = aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace;
-    const void* dataPtr = data->GetData();
-    const size_t length = data->GetSize();
-    const aiScene* scene = importer->ReadFileFromMemory(dataPtr, length, aiFlags, hint);
-
-    if (!scene)
-        THROW_EX_DETAILS(MeshLoaderException, importer->GetErrorString());
-
-    return scene;
+        // lolz
+        auto resource = SafeGetResource(source);
+        meshes.front()->SetName(m_name);
+        meshes.front()->SetUuid(m_uuid);
+        resource->AssingnRef(meshes.front());
+    }
 }
 
-void IMeshLoader::LoadMeshes(std::list<MeshRef>& meshes, const aiScene*& sourceScene)
+void MeshLoader::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
+    // ... 
+}
+
+
+void MeshLoader::LoadMeshes(std::vector<MeshRef>& meshes, const aiScene*& sourceScene)
 {
     meshes.clear();
 
     if (!sourceScene->HasMeshes())
-        return;
+        throw std::runtime_error("File has no meshes");
 
     LOGGER(Log::Logger().Trace("Meshes"));
 
@@ -89,30 +97,20 @@ void IMeshLoader::LoadMeshes(std::list<MeshRef>& meshes, const aiScene*& sourceS
         LOGGER(Log::Logger().Trace("- Mesh #%d %s", i, meshName));
         //model->SetName(meshName);
 
-        auto vertexCount = srcMesh->mNumVertices;
+        const auto vertexCount = srcMesh->mNumVertices;
 
-        float4* vertices = new float4[vertexCount];
+        float4* const vertices = new float4[vertexCount];
+        float2* const texuvs = new float2[vertexCount];
+        float4* const normals = new float4[vertexCount];
 
-        // -- texcooord && normals
+        std::transform(srcMesh->mVertices, srcMesh->mVertices + vertexCount, vertices, [](auto &elem) {return aiVector3DToFloat4(elem, 1.); });
+        std::transform(srcMesh->mNormals, srcMesh->mNormals + vertexCount, normals, [](auto &elem) {return aiVector3DToFloat4(elem, 0.); });
 
-        float2* texuvs = new float2[vertexCount];
-        float4* normals = new float4[vertexCount];
-
-        for (size_t k = 0; k < vertexCount; k++)
-        {
-            vertices[k] = aiVector3DToFloat4(srcMesh->mVertices[k], 1.);
-            normals[k] = aiVector3DToFloat4(srcMesh->mNormals[k], 0.);
-
-            if (srcMesh->mTextureCoords && srcMesh->mTextureCoords[0])
-            {
-                const aiVector3D * const& t = srcMesh->mTextureCoords[0];
-                if (t)
-                    texuvs[k] = aiVector3DToFloat2(t[k]);
-                else
-                    texuvs[k] = float2(0, 0);
-            }
-        }
-
+        if (srcMesh->mTextureCoords && srcMesh->mTextureCoords[0])
+            std::transform(srcMesh->mTextureCoords[0], srcMesh->mTextureCoords[0] + vertexCount, texuvs, [](auto &elem) {return aiVector3DToFloat2(elem); });
+        else
+            std::fill_n(texuvs, vertexCount, float2(0,0));
+    
         mesh->AddPointer("POSITION", vertexCount * sizeof(*vertices), &vertices[0]);
         mesh->AddPointer("NORMAL", vertexCount * sizeof(*normals), &normals[0]);
 
@@ -130,14 +128,15 @@ void IMeshLoader::LoadMeshes(std::list<MeshRef>& meshes, const aiScene*& sourceS
             std::vector<uint32_t> indices;
             indices.reserve(srcMesh->mNumFaces * 3 + 1);
 
-            for (size_t j = 0; j < srcMesh->mNumFaces; j++)
+            std::for_each_n(srcMesh->mFaces, srcMesh->mNumFaces, [&indices](auto& face)
             {
-                const aiFace &currFace = srcMesh->mFaces[j];
-                for (size_t k = 0; k < currFace.mNumIndices; k++) { indices.push_back(currFace.mIndices[k]); }
-            }
+                std::copy_n(face.mIndices, face.mNumIndices, std::back_inserter(indices));
+            });
 
             mesh->SetIndices(vertexCount, indices.size(), &indices[0]);
         }
+        else
+            throw std::runtime_error("Mesh has no faces");
 
         // --- 
 
@@ -145,66 +144,12 @@ void IMeshLoader::LoadMeshes(std::list<MeshRef>& meshes, const aiScene*& sourceS
     }
 }
 
-void MeshOBJLoader::Load(IResourceManager* const& resman, IResource* source)
-{
-    Ref<Resource<Mesh>> dstMesh = dynamic_cast<Resource<Mesh>*>(source);
-    assert(dstMesh);
-
-    MeshRef mesh;
-
-    if (!m_persistName.empty())
-    {
-        try
-        {
-            IAssetFactory* assetFactory = resman->GetAssetFactory();
-            StreamRef resource = assetFactory->Get(m_persistName.c_str());
-            ArchiveAsset archiveAsset(resource);
-            mesh = dynamic_cast<Mesh*>(Mesh::Load(archiveAsset));
-        }
-        catch (std::exception &e)
-        {
-            LOGGER(Log::Logger().Warn("Cannot load cache %s", m_persistName.c_str()));
-            mesh = nullptr;
-        }
-    }
-
-    // --- 
-
-    if (!mesh)
-    {
-        Assimp::Importer importer;
-        const aiScene* scene = LoadAiScene(resman, &importer, "obj");
-        std::list<MeshRef> meshes;
-        LoadMeshes(meshes, scene);
-
-        if (meshes.empty())
-            THROW_EX_DETAILS(MeshLoaderException, "No meshes loaded");
-        if (meshes.size() != 1)
-            THROW_EX_DETAILS(MeshLoaderException, "Source contains multiple meshes");
-
-        mesh = meshes.back();
-
-        if (!mesh)
-            THROW_EX_DETAILS(MeshLoaderException, "Invlaid mesh was loaded");
-    }
-
-    // --- 
-
-    mesh->SetUuid(m_uuid);
-    mesh->SetName(m_name);
-
-    dstMesh->AssingnRef(mesh);
-}
-
 // TODO -> Library
-
 namespace
 {
     Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4* m)
     {
-        if (!m)
-            THROW_EX(NullPointerException);
-
+        assert(m);
         return Matrix(
             m->a1, m->b1, m->c1, m->d1,
             m->a2, m->b2, m->c2, m->d2,
@@ -248,5 +193,3 @@ namespace
         return 0.0f;
     }
 }
-
-#endif
