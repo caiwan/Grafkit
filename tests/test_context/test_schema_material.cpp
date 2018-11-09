@@ -1,14 +1,8 @@
 #include "stdafx.h"
 
-#include <gtest/gtest.h>
-
 #include "utils/asset/AssetFile.h"
 
 #include "scene/scene.h"
-
-#include "demo.h"
-#include "context.h"
-#include "schema.h"
 
 #include "core/system.h"
 
@@ -16,211 +10,93 @@
 #include "render/model.h"
 #include "render/texture.h"
 
-#include "core/Music.h"
-
 // --- 
 
 using namespace GkDemo;
 using namespace Grafkit;
 
-#define JSON_PATH "schema_texture.json"
-#if 0
-namespace NSMaterialTest
-{
-    class TestApplicationWindow : public System
-    {
-    public:
-        explicit TestApplicationWindow(Renderer &render) : m_render(render)
-        {
-            InitializeWindows(320, 240);
-            m_render.Initialize(m_app.getRealWidth(), m_app.getRealHeight(), true, this->m_app.getHWnd(), false);
-        }
+#define JSON_TERXTURE_PATH "test_texture.json"
+#define JSON_MATERIAL_PATH "test_material.json"
 
-        ~TestApplicationWindow()
-        {
-            ShutdownWindows();
-        }
-
-        int init() override { return 0; }
-
-        int mainloop() override { return 0; }
-
-        void release() override { }
-
-    private:
-        Renderer & m_render;
-    };
-}
-
-using namespace NSMaterialTest;
-
-class ContextMaterialTest : public testing::Test
+class LoadMaterialTest : public testing::Test
 {
 public:
-    ContextMaterialTest() : m_app(nullptr)
-        , m_context(nullptr) {
-        m_app = new TestApplicationWindow(m_render);
-        m_assetFactory = new FileAssetFactory("tests/assets/");
+    LoadMaterialTest() {
     }
 
-    ~ContextMaterialTest()
+    virtual ~LoadMaterialTest() {
+    }
+
+    void SetUp() override
     {
-        delete m_assetFactory;
-        delete m_app;
+        m_app = std::make_unique<Testing::TestApplicationContext>();
+        m_app->Initialize();
     }
 
-    void SetUp() override { m_context = new Context(m_render, m_assetFactory); }
-
-    void TearDown() override {
-        delete m_context;
-        m_context = nullptr;
-    }
-
-    void BuildDemo()
-    {
-        //try
-        //{
-        SchemaBuilder builder;
-        IAssetFactory* af = m_context->GetAssetFactory();
-        StreamRef file = af->Get(JSON_PATH);
-        builder.LoadFromAsset(file, dynamic_cast<IResourceManager*>(m_context));
-
-        m_demo = builder.GetDemo();
-
-        m_context->DoPrecalc();
-        builder.Initialize(m_context);
-
-        //m_context->Intitialize();
-        m_demo->Initialize(m_render);
-        /*}
-        catch (std::exception& e)
-        {
-            FAIL() << e.what();
-        }*/
-    }
-
-    template <class T>
-    Ref<T> SafeGetObject(const char* uuid)
-    {
-        assert(uuid);
-        IResourceManager* resman = dynamic_cast<IResourceManager*>(m_context);
-        assert(resman);
-        Ref<Resource<T>> tResource = resman->GetByUuid<Resource<T>>(uuid);
-        if (!tResource)
-            return nullptr;
-        if (!*tResource)
-            return nullptr;
-        return tResource->Get();
-    }
-
-    template <class T>
-    Ref<Resource<T>> SafeGetResource(const char* uuid)
-    {
-        assert(uuid);
-        Ref<Resource<T>> tResource = m_context->GetByUuid<Resource<T>>(uuid);
-        if (!tResource)
-            return nullptr;
-        return tResource;
-    }
+    void TearDown() override { m_app->Release(); }
 
 protected:
-    Ref<Demo> m_demo;
-    TestApplicationWindow* m_app;
-    Context * m_context;
-
-    Renderer m_render;
-    IAssetFactory* m_assetFactory;
-
+    std::unique_ptr<Testing::TestApplicationContext> m_app;
 };
+
 
 // ============================================================================================
 
-namespace Uuids
+template <class T>
+class TextureWrapper
 {
-    const char * normapUuid = "4c8c7210-49b5-41a6-9681-fd359cb4d6ab";
-    const char * checkerBoardUuid = "de386543-5cd8-4d87-bd16-9b04e037a393";
-    const char * skyTextureUuid = "2fa2effd-93fa-4984-9647-4b31127a3cbe";
-    const char * skyRadianceTextureUuid = "ed9cd55c-34c9-4644-acfa-35bfb2fbb31a";
-    const char * noise256TextureUuid = "d519b673-764c-4530-a28f-df9ee6133eae";
-    const char * noise512TextureUuid = "8a92cb3a-5b77-4d4f-9e11-3df45b269b03";
-}
+    typedef T my_type;
+    Ref<Resource<T>> resource;
 
-TEST_F(ContextMaterialTest, TextureLoad)
+public:
+    explicit TextureWrapper(const Ref<Resource<T>>& resource)
+        : resource(resource) {
+    }
+
+    constexpr void validate(const char* name, const char* uuid) const
+    {
+        ASSERT_TRUE(resource);
+        ASSERT_TRUE((*resource));
+        ASSERT_STREQ(uuid, resource->GetUuid().c_str());
+        ASSERT_STREQ(name, resource->GetName().c_str());
+
+        ASSERT_TRUE((*resource)->GetTexture2D()) << name << " " << uuid;
+        ASSERT_TRUE((*resource)->GetTextureResource()) << name << " " << uuid;
+        ASSERT_TRUE((*resource)->GetShaderResourceView()) << name << " " << uuid;
+    }
+};
+
+TEST_F(LoadMaterialTest, TextureLoad)
 {
     // given: context
-    this->BuildDemo();
-    ASSERT_TRUE(m_demo.Valid());
+    m_app->GetContext().LoadDemo(JSON_TERXTURE_PATH);
+    m_app->GetContext().DoPrecalc();
 
     // when
-    Texture2DResRef normapTexture = SafeGetResource<Texture2D>(Uuids::normapUuid);
-    Texture2DResRef checkerBoardTexture = SafeGetResource<Texture2D>(Uuids::checkerBoardUuid);
-    TextureCubeResRef skyTextureTexture = SafeGetResource<TextureCube>(Uuids::skyTextureUuid);
-    TextureCubeResRef skyRadianceTextureTexture = SafeGetResource<TextureCube>(Uuids::skyRadianceTextureUuid);
-    Texture2DResRef noise256TextureTexture = SafeGetResource<Texture2D>(Uuids::noise256TextureUuid);
-    Texture2DResRef noise512TextureTexture = SafeGetResource<Texture2D>(Uuids::noise512TextureUuid);
+    TextureWrapper<Texture2D> normapTexture(m_app->SafeGetResource<Texture2D>(Uuids::normapUuid));
+    TextureWrapper<Texture2D> checkerBoardTexture(m_app->SafeGetResource<Texture2D>(Uuids::checkerBoardUuid));
+    TextureWrapper<TextureCube> skyTextureTexture(m_app->SafeGetResource<TextureCube>(Uuids::skyTextureUuid));
+    TextureWrapper<TextureCube> skyRadianceTextureTexture(m_app->SafeGetResource<TextureCube>(Uuids::skyRadianceTextureUuid));
+    TextureWrapper<Texture2D> noise256TextureTexture(m_app->SafeGetResource<Texture2D>(Uuids::noise256TextureUuid));
+    TextureWrapper<Texture2D> noise512TextureTexture(m_app->SafeGetResource<Texture2D>(Uuids::noise512TextureUuid));
 
     // then
 
     // bitmap
-    ASSERT_TRUE(normapTexture);
-    ASSERT_TRUE((*normapTexture));
-    ASSERT_STREQ(Uuids::normapUuid, normapTexture->GetUuid().c_str());
-    ASSERT_STREQ("normap", normapTexture->GetName().c_str());
-
-    ASSERT_TRUE((*normapTexture)->GetTexture2D());
-    ASSERT_TRUE((*normapTexture)->GetTextureResource());
-    ASSERT_TRUE((*normapTexture)->GetShaderResourceView());
-
-    // 
-    ASSERT_TRUE(checkerBoardTexture);
-    ASSERT_TRUE((*checkerBoardTexture));
-    ASSERT_STREQ(Uuids::checkerBoardUuid, checkerBoardTexture->GetUuid().c_str());
-    
-    ASSERT_STREQ("UVAddressBoard", checkerBoardTexture->GetName().c_str());
-    ASSERT_TRUE((*checkerBoardTexture)->GetTexture2D());
-    ASSERT_TRUE((*checkerBoardTexture)->GetTextureResource());
-    ASSERT_TRUE((*checkerBoardTexture)->GetShaderResourceView());
+    normapTexture.validate("normap", Uuids::normapUuid);
+    checkerBoardTexture.validate("UVAddressBoard", Uuids::checkerBoardUuid);
 
     // cubemap
-    ASSERT_TRUE(skyTextureTexture);
-    ASSERT_TRUE((*skyTextureTexture));
-    ASSERT_STREQ(Uuids::skyTextureUuid, skyTextureTexture->GetUuid().c_str());
-    ASSERT_STREQ("Sky1", skyTextureTexture->GetName().c_str());
-
-    ASSERT_TRUE((*skyTextureTexture)->GetTexture2D());
-    ASSERT_TRUE((*skyTextureTexture)->GetTextureResource());
-    ASSERT_TRUE((*skyTextureTexture)->GetShaderResourceView());
-
-    // 
-    ASSERT_TRUE(skyRadianceTextureTexture);
-    ASSERT_TRUE((*skyRadianceTextureTexture));
-    ASSERT_STREQ(Uuids::skyRadianceTextureUuid, skyRadianceTextureTexture->GetUuid().c_str());
-    ASSERT_STREQ("SkyRadiance", skyRadianceTextureTexture->GetName().c_str());
-
-    ASSERT_TRUE((*skyRadianceTextureTexture)->GetTexture2D());
-    ASSERT_TRUE((*skyRadianceTextureTexture)->GetTextureResource());
-    ASSERT_TRUE((*skyRadianceTextureTexture)->GetShaderResourceView());
-
+    skyTextureTexture.validate("Sky1", Uuids::skyTextureUuid);
+    skyRadianceTextureTexture.validate("SkyRadiance", Uuids::skyRadianceTextureUuid);
+    
     // noise kernel
-    ASSERT_TRUE(noise256TextureTexture);
-    ASSERT_TRUE((*noise256TextureTexture));
-    ASSERT_STREQ(Uuids::noise256TextureUuid, noise256TextureTexture->GetUuid().c_str());
-    ASSERT_STREQ("Noise256", noise256TextureTexture->GetName().c_str());
-
-    ASSERT_TRUE((*noise256TextureTexture)->GetTexture2D());
-    ASSERT_TRUE((*noise256TextureTexture)->GetTextureResource());
-    ASSERT_TRUE((*noise256TextureTexture)->GetShaderResourceView());
-
-    //
-    ASSERT_TRUE(noise512TextureTexture);
-    ASSERT_TRUE((*noise512TextureTexture));
-    ASSERT_STREQ(Uuids::noise512TextureUuid, noise512TextureTexture->GetUuid().c_str());
-    ASSERT_STREQ("Noise512", noise512TextureTexture->GetName().c_str());
-
-    ASSERT_TRUE((*noise512TextureTexture)->GetTexture2D());
-    ASSERT_TRUE((*noise512TextureTexture)->GetTextureResource());
-    ASSERT_TRUE((*noise512TextureTexture)->GetShaderResourceView());
+    noise256TextureTexture.validate("Noise256", Uuids::noise256TextureUuid);
+    noise512TextureTexture.validate("Noise512", Uuids::noise512TextureUuid);
 }
+
+#if 0
+
 
 namespace Uuids
 {

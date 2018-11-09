@@ -1,4 +1,17 @@
 #pragma once 
+#include <algorithm>
+#include <string>
+
+#include <string>
+#include <array>
+#include <vector>
+#include <list>
+#include <map>
+
+#include <cassert>
+#include <memory>
+
+#ifdef __cplusplus
 
 #include"core/reference.h"
 #include"core/resource.h"
@@ -10,7 +23,6 @@
 
 #include "utils/persistence/dynamics.h"
 
-#include <memory>
 
 // predefine classes to reduce compile time 
 
@@ -104,3 +116,5 @@ namespace Grafkit {
     typedef std::unique_ptr<IStream> StreamRef;
     typedef std::unique_ptr<uint8_t> StreamDataPtr;
 }
+
+#endif //__cplusplus

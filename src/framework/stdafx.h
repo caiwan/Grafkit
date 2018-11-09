@@ -4,12 +4,7 @@
 #define NOMINMAX
 #endif //NOMINMAX
 
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
-
-#include <cassert>
+#include "common.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -24,7 +19,6 @@
 #pragma warning(disable : 5040)
 
 #ifdef __cplusplus
-#include "common.h"
 #include "core/reference.h"
 #include "core/memory.h"
 #include "core/thread.h"

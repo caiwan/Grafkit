@@ -11,7 +11,7 @@ using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 System::System()
-	: Window::WindowHandler(), m_window(this), m_pInput(nullptr)
+	: WindowHandler(), m_window(this), m_pInput(nullptr)
 {
 	// init logger 
 	LOGGER(Log::Logger().Info("---- APPSTART ----"));
@@ -23,7 +23,7 @@ System::~System()
 
 }
 
-int System::execute() {
+int System::Execute() {
 	int result = 0;
 	MSG msg;
 
@@ -38,25 +38,25 @@ int System::execute() {
 	// + exception handling
 	try
 	{
-		result = this->init();
+		result = this->Initialize();
 		if (result != 0) {
-			this->release();
+			this->Release();
 			return 1;
 		}
 	}
 	catch (FWdebug::Exception & ex)
 	{
 		///@todo handle exceptions here 
-		MessageBoxA(NULL, ex.what(), "Exception", 0);
+		MessageBoxA(nullptr, ex.what(), "Exception", 0);
 		LOGGER(Log::Logger().Error(ex.what()));
 
-		this->release();
+		this->Release();
 
 		return 0;	// who will do the shutdown???
 	}
 
 	// ================================================================================================================================
-	// --- mainloop
+	// --- Mainloop
 
 	try
 	{
@@ -78,7 +78,7 @@ int System::execute() {
 			else
 			{
 				// Otherwise do the frame processing.
-				result = this->mainloop();
+				result = this->Mainloop();
 				if (result != 0)
 				{
 					done = 1;
@@ -101,7 +101,7 @@ int System::execute() {
 	// ================================================================================================================================
 	// --- teardown
 	{
-		this->release();
+		this->Release();
 	}
 
 	this->ShutdownWindows();

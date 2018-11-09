@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 // #include "core/asset.h"
 #include "core/resource.h"
 #include "resource/ResourceBuilder.h"
@@ -65,7 +67,7 @@ namespace Grafkit
 
     struct TextureBitmapParams
     {
-        std::string sourceName;
+        std::string filename;
         // resize?
     };
 
@@ -103,8 +105,7 @@ namespace Grafkit
 
     struct TextureCubemapParams
     {
-        std::vector<std::string> sourceNames;
-        //std::string m_sourceNames[6];
+        std::array<std::string, 6> sourceNames;
     };
 
     class TextureCubemapFromBitmap : public ResourceBuilder<TextureCube, TextureCubemapParams>
@@ -179,8 +180,8 @@ namespace Grafkit
     {
         enum AddressMode
         {
-            TGG_Clamping,
-            TGG_Wrapping
+            TGG_Clamping = 0,
+            TGG_Wrapping = 1
         };
 
         AddressMode mode;

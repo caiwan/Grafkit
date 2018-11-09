@@ -38,11 +38,11 @@ namespace NSMaterialTest
 
         ~TestApplicationWindow() { ShutdownWindows(); }
 
-        int init() override { return 0; }
+        int Initialize() override { return 0; }
 
-        int mainloop() override { return 0; }
+        int Mainloop() override { return 0; }
 
-        void release() override {
+        void Release() override {
         }
 
     private:

@@ -44,7 +44,7 @@ Application::~Application()
     //m_render.Shutdown();
 }
 
-int Application::init()
+int Application::Initialize()
 {
     InitializeLoaderBar(m_render);
 
@@ -61,7 +61,7 @@ int Application::init()
     return 0;
 }
 
-int Application::mainloop()
+int Application::Mainloop()
 {
     //float time = (*m_music)->GetTime();
     //m_demo->PreRender(m_render, time);
@@ -75,7 +75,7 @@ int Application::mainloop()
     return 0;
 }
 
-void Application::release()
+void Application::Release()
 {
     //if (m_music && *m_music)
     //    (*m_music)->Stop();

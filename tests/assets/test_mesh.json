@@ -1,8 +1,5 @@
 {
-	"demo": {
-		"uuid": "acec776b-d2ce-45ac-b082-f7072c46c38f"
-	},
-	"asset": [{
+	"assets": [{
 		"name": "torus.obj",
 		"uuid": "af6404fa-a4f7-4b01-8c8b-1218faf6d35c",
 		"generator": "mesh",

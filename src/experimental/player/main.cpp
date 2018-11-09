@@ -18,5 +18,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
         return -1;
 
     Application app(setup);
-    return app.execute();
+    return app.Execute();
 }

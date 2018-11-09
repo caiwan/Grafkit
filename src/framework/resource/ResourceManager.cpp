@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-#include <algorithm>
-#include <string>
+
 
 #include "ResourceManager.h"
 #include "ResourceBuilder.h"

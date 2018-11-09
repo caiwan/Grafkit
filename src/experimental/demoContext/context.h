@@ -24,6 +24,8 @@ namespace GkDemo
         Context(const Context& other) = delete;
         Context& operator=(const Context& other) = delete;
 
+        Json LoadJson(const Grafkit::StreamRef & schemaAsset);
+
         void LoadDemo(const std::string filename = "demo.json");
 
         bool GetIsFxaa() const { return m_isFxaa; }

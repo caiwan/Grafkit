@@ -1,11 +1,8 @@
 #pragma once
-#include <list>
-
-#include "core/exceptions.h"
+#include <vector>
 
 #include "core/resource.h"
 #include "resource/ResourceBuilder.h"
-
 
 struct aiScene;
 
@@ -21,7 +18,8 @@ namespace GkDemo
         // ...
         std::string filename;
         std::string typeHint;
-        //uint32_t meshIndex;
+        // TODO idx || select nem somehow if needed
+        //uint32_t meshIndex; 
 
         template <class A>
         void Serialize(A& a) { a & filename & typeHint /*& meshIndex*/; }

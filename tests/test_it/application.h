@@ -12,11 +12,10 @@ namespace Testing
 
         virtual ~TestApplicationContext();
 
-        int init() override;
-        int mainloop() override;
+        int Initialize() override;
+        int Mainloop() override;
+        void Release() override;
 
-        void release() override {
-        }
 
         Grafkit::Renderer& GetDeviceContext() override;
         Grafkit::IAssetFactory* GetAssetFactory() override;

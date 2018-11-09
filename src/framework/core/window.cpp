@@ -131,8 +131,6 @@ void Window::createWindow(int sx, int sy, int isfullscreen){
 
 		long reso = ChangeDisplaySettings(&screenSettings, CDS_FULLSCREEN );
 		if( reso != DISP_CHANGE_SUCCESSFUL ) {
-			//char asda[512];
-
 			MessageBox( nullptr, _T(""), _T("Could not initialize fullscreen window."), MB_OK );
 			exit(1);
 		}

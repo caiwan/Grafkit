@@ -19,11 +19,11 @@ namespace Grafkit
 		System();
 		virtual ~System();
 
-		int execute();
+		int Execute();
 
-		virtual int init() = 0;
-		virtual int mainloop() = 0;
-		virtual void release() = 0;
+		virtual int Initialize() = 0;
+		virtual int Mainloop() = 0;
+		virtual void Release() = 0;
 
 		LRESULT MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) override;
 

@@ -87,7 +87,7 @@ void TextureFromBitmap::Load(IResourceManager* const & resman, IResource* source
     LOGGER(Log::Logger().Trace("loading texture from resource"));
 
     int x = 0, y = 0, ch = 0;
-    StreamRef asset = resman->GetAssetFactory()->Get(m_params.sourceName);
+    StreamRef asset = resman->GetAssetFactory()->Get(m_params.filename);
 
     StreamDataPtr assetData = nullptr;
     size_t assetLength = 0;
@@ -134,7 +134,7 @@ void TextureCubemapFromBitmap::Load(IResourceManager* const & resman, IResource*
         int x = 0, y = 0, ch = 0;
         StreamRef asset = resman->GetAssetFactory()->Get(m_params.sourceNames[i]);
 
-        // kikenyszeritett rgba mod
+        // force rgba mode
         StreamDataPtr assetData = nullptr;
         size_t assetLength = 0;
         asset->ReadAll(assetLength, assetData);

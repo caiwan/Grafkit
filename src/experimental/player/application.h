@@ -23,9 +23,9 @@ public:
     explicit Application(fwzSettings &settings);
     ~Application();
 
-    int init() override;
-    int mainloop() override;
-    void release() override;
+    int Initialize() override;
+    int Mainloop() override;
+    void Release() override;
 
 
 protected:

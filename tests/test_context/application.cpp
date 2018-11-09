@@ -18,21 +18,22 @@ Testing::TestApplicationContext::TestApplicationContext()
     m_render.Initialize(m_window.getRealWidth(), m_window.getRealHeight(), true, this->m_window.getHWnd(), false);
 }
 
-Testing::TestApplicationContext::~TestApplicationContext() { ShutdownWindows(); }
+Testing::TestApplicationContext::~TestApplicationContext() { /*Boops?*/ }
 
-int Testing::TestApplicationContext::init()
+int Testing::TestApplicationContext::Initialize()
 {
     m_render.BeginSceneDev();
     m_render.EndScene();
     return 0;
 }
 
-int Testing::TestApplicationContext::mainloop()
+int Testing::TestApplicationContext::Mainloop()
 {
     m_render.BeginSceneDev();
     m_render.EndScene();
     return 0;
 }
 
-void Testing::TestApplicationContext::release() {
+void Testing::TestApplicationContext::Release() {
+    ShutdownWindows();
 }

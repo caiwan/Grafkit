@@ -27,10 +27,9 @@ namespace Testing
 
         virtual ~TestApplicationContext();
 
-        int init() override;
-        int mainloop() override;
-
-        void release() override;
+        int Initialize() override;
+        int Mainloop() override;
+        void Release() override;
 
         Grafkit::Renderer& GetRender() { return m_render; }
         GkDemo::Context& GetContext() const { return *m_context.get(); }
