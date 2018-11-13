@@ -62,7 +62,8 @@ void Editor::InitializeDocument()
 
         // TODO: remove it later on 
 
-        m_context->Intitialize();
+        //m_context->Intitialize();
+        m_context->DoPrecalc();
 
         m_musicProxy->m_music = demo->GetMusic();
 
@@ -119,13 +120,13 @@ bool Editor::RenderFrame()
 void Editor::NewDocument()
 {
     // check shit here
-    m_context->CreateTestStuff();
+    //m_context->CreateTestStuff();
     m_reloadRequested = true;
 }
 
 void Editor::SaveDocument() 
 {
-    m_context->SaveCache();
+    //m_context->SaveCache();
     m_context->SaveSchema();
 }
 
@@ -141,7 +142,7 @@ void Editor::OpenDocument() {
         try
         {
             m_context->Relocate(path);
-            m_context->Load();
+            m_context->LoadDemo("schema.json");
             m_reloadRequested = true;
         }
         catch (FWdebug::Exception & ex)

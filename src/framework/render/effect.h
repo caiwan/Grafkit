@@ -1,25 +1,36 @@
 #pragma once 
 
+#include "common.h"
+
 #include <vector>
 
-#include"core/reference.h"
+#include "core/reference.h"
 #include "core/memory.h"
 
-#include "renderer.h"
-#include "texture.h"
-#include "shader.h"
+//#include "renderer.h"
+//#include "texture.h"
+//#include "shader.h"
 
 #include "shaderparameter.h"
 
 namespace Grafkit {
 
+    class Mesh;
+    typedef Ref<Mesh> MeshRef;
+
 	class ShaderParameter;
+
+    typedef Ref<ShaderParameter> ShaderParameterRef;
+    //typedef std::shared_ptr<ShaderParameter> ShaderParameterRef;
 
 	class EffectComposer;
 	class EffectPass;
 
 	typedef Ref<EffectComposer> EffectComposerRef_t;
 	typedef Ref<EffectPass> EffectPassRef;
+
+    //typedef std::shared_ptr<EffectComposer> EffectComposerRef;
+    //typedef std::shared_ptr<EffectPass> EffectPassRef;
 
 	// ---------------------------------------------------------------------------------------------------
 
@@ -44,11 +55,11 @@ namespace Grafkit {
 		void Render(Renderer &m_render, int autoflush = 1);
 		void Flush(Renderer &m_render);
 
-		void SetInput(size_t bind, TextureRef tex) { m_inputMap[bind] = tex; }
-		TextureRef GetInput(size_t bind) { auto it = m_inputMap.find(bind); return it == m_inputMap.end() ? TextureRef() : it->second; }
+		void SetInput(size_t bind, const Texture2DResRef &tex) { m_inputMap[bind] = tex; }
+		Texture2DResRef GetInput(size_t bind) const { auto it = m_inputMap.find(bind); return it == m_inputMap.end() ? Texture2DResRef() : it->second; }
 		void ClearInput() { m_inputMap.clear(); }
 
-		void SetOutput(TextureRef tex) { m_chainOutput = tex; }
+		void SetOutput(Texture2DResRef tex) { m_chainOutput = tex; }
 
 	protected:
 		void SwapBuffers();
@@ -57,10 +68,10 @@ namespace Grafkit {
 
 		//std::vector<Ref<EffectComposer>> m_parentSource;
 
-		TextureRef m_texOut[4];
-		Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
+		Texture2DRef m_texOut[4];
+        Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
 
-		Texture2DRef m_chainOutput;
+		Texture2DResRef m_chainOutput;
 
 		TextureSamplerRef m_textureSampler;
 
@@ -69,7 +80,7 @@ namespace Grafkit {
 		ShaderRef m_shaderCopyScreen;
 
 		std::vector<EffectPassRef> m_effectChain;
-		typedef std::map<size_t, TextureRef> bind_map_t;
+		typedef std::map<size_t, Texture2DResRef> bind_map_t;
 
 		bind_map_t m_inputMap;
 
@@ -82,7 +93,7 @@ namespace Grafkit {
 
 	// ---------------------------------------------------------------------------------------------------
 
-	typedef EffectComposerRef_t EffectComposerRef;
+	//typedef EffectComposerRef_t EffectComposerRef;
 
 	// ===================================================================================================
 
@@ -95,15 +106,15 @@ namespace Grafkit {
 		void Initialize(Renderer &render);
 		void Shutdown();
 
-		void AddPass(EffectPassRef pass) { m_effects.push_back(pass); }
+		void AddPass(const EffectPassRef &pass) { m_effects.push_back(pass); }
 		EffectPassRef GetPass(size_t id) { return id < m_effects.size() ? m_effects[id] : EffectPassRef(); }
 
-		void Render(Renderer &render, TextureResRef output = nullptr);
+		void Render(Renderer &render, const Texture2DRef &output = nullptr);
 
 	private:
 		std::vector<EffectPassRef> m_effects;
 
-		TextureRef m_texOut[2];
+		Texture2DRef m_texOut[2];
 		Texture2D *m_pTexRead, *m_pTexWrite;
 
 		TextureSamplerRef m_textureSampler;
@@ -136,28 +147,28 @@ namespace Grafkit {
 		void BindFx(Renderer &m_render);
 		void UnbindFx(Renderer &m_render);
 
-		ShaderRef GetShader() { return m_shader->Get(); }
+		ShaderResRef GetShader() const { return m_shader; }
 
 		// Ezeknke itt semmi ertelme nincs meg: 
-		void SetOutput(size_t bind, TextureRef tex) { m_output_map[bind] = tex; }
-		void SetInput(std::string name, TextureRef tex) { m_inputMap[name] = tex; }
+		void SetOutput(size_t bind, const Texture2DResRef &tex) { m_output_map[bind] = tex; }
+		void SetInput(std::string name, const Texture2DResRef &tex) { m_inputMap[name] = tex; }
 
 		void ClearOutputs() { m_output_map.clear(); }
 		void ClearInputs() { m_inputMap.clear(); }
 
-		TextureRef GetOutput(size_t bind);
-		TextureRef GetInput(std::string name);
+		Texture2DResRef GetOutput(size_t bind);
+		Texture2DResRef GetInput(std::string name);
 
-		Ref<ShaderParameter> GetParameter() { return m_shaderParameter; }
+		ShaderParameterRef GetParameter() const { return m_shaderParameter; }
 
 	private:
 		ShaderResRef m_shader;
 
-		Ref<ShaderParameter> m_shaderParameter;
+		ShaderParameterRef m_shaderParameter;
 
-		typedef std::map<size_t, TextureRef> bind_map_t;
+		typedef std::map<size_t, Texture2DResRef> bind_map_t;
 		typedef bind_map_t::iterator bind_map_it_t;
-		typedef std::map<std::string, TextureRef> name_map_t;
+		typedef std::map<std::string, Texture2DResRef> name_map_t;
 		typedef name_map_t::iterator name_map_it_t;
 
 		bind_map_t m_output_map;

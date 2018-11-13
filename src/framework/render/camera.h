@@ -37,7 +37,7 @@ namespace Grafkit {
         /// @todo void GetScreenMetrics(float width, float height) { this->m_screenWidth = width, this->m_screenHeight = height; }
 
         /** Generate matrices */
-        void Calculate(Renderer& renderer, ActorRef parent = nullptr) override;
+        void Calculate(Renderer& renderer, const ActorRef & parent = nullptr) override;
 
         //skip render, nothing to do with it. 
         void Render(Renderer& deviceContext, SceneGraph* const & scene) override {}

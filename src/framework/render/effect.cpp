@@ -33,7 +33,7 @@ void EffectComposer::Initialize(Renderer& render, bool singlepass)
     {
         for (int i = 0; i < 4; i++)
         {
-            m_texOut[i] = new Texture2D();
+            m_texOut[i] = Texture2DRef(new Texture2D());
             m_texOut[i]->Initialize(render);
         }
 
@@ -48,7 +48,7 @@ void EffectComposer::Initialize(Renderer& render, bool singlepass)
     m_textureSampler->Initialize(render);
 
     // --- 
-    m_shaderFullscreenQuad = new VertexShader();
+    m_shaderFullscreenQuad = ShaderRef(new VertexShader());
     m_shaderFullscreenQuad->LoadFromMemory(
         render,
         effectFullscreenQuadEntry,
@@ -56,7 +56,7 @@ void EffectComposer::Initialize(Renderer& render, bool singlepass)
         "FullscreenQuad"
     );
 
-    m_shaderCopyScreen = new PixelShader();
+    m_shaderCopyScreen = ShaderRef(new PixelShader());
     m_shaderCopyScreen->LoadFromMemory(
         render,
         effectCopyScreenEntry,
@@ -100,14 +100,14 @@ void EffectComposer::BindInput(Renderer& render)
     size_t count = 1;
     render.SetRenderTargetView(m_pTexFront->GetRenderTargetView(), 0);
 
-    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it)
+    std::for_each(m_inputMap.begin(), m_inputMap.end(), [&count, &render](auto &elem)
     {
-        if (it->second.Valid())
-        {
-            render.SetRenderTargetView(static_cast<ID3D11RenderTargetView * >(*(it->second)), it->first);
-            count++;
-        }
-    }
+// szar
+        //if (*elem->second->Valid()) {
+        //    render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>((**(elem->second))), elem->first);
+        //    count++;
+        //}
+    });
 
     render.ApplyRenderTargetView(count);
 }
@@ -120,14 +120,14 @@ void EffectComposer::UnbindInput(Renderer& render)
     size_t count = 1;
     render.SetRenderTargetView(nullptr, 0);
 
-    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it)
+    std::for_each(m_inputMap.begin(), m_inputMap.end(), [&count, &render](auto &elem)
     {
-        if (it->second.Valid())
-        {
-            render.SetRenderTargetView(nullptr, it->first);
-            count++;
-        }
-    }
+        // szar
+        //if (elem->second->Valid()) {
+        //    render.SetRenderTargetView(nullptr, elem->first);
+        //    count++;
+        //}
+    });
 
     render.ApplyRenderTargetView(count);
 }
@@ -140,7 +140,7 @@ void EffectComposer::Render(Renderer& render, int autoflush)
     {
         UnbindInput(render);
 
-        if (m_inputMap.find(0) != m_inputMap.end()) { m_pTexFront = m_inputMap[0]; }
+        if (m_inputMap.find(0) != m_inputMap.end()) { m_pTexFront = *m_inputMap[0]; }
 
         RenderChain(render);
     }
@@ -180,36 +180,37 @@ void EffectComposer::RenderChain(Renderer& render)
     bool firstNode = true;
     for (size_t fxid = 0; fxid < fxcount; fxid++)
     {
-        EffectPass* fx = m_effectChain[fxid].Get();
+        Ref<EffectPass> const & fx = m_effectChain[fxid];
         if (!m_singlepass)
         {
-            render.SetRenderTargetView(static_cast<ID3D11RenderTargetView * >(*m_pTexWrite));
+            render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(*m_pTexWrite));
             render.ApplyRenderTargetView(1);
             render.BeginScene();
         }
 
-        if (fx && fx->GetShader().Valid())
+        if (fx && fx->GetShader() && *(fx->GetShader()))
         {
+            auto fxShader = (fx->GetShader()->Get());
             if (!m_singlepass)
             {
-                fx->GetShader()->SetShaderResourceView(render, "backBuffer", m_pTexBack->GetShaderResourceView());
-                fx->GetShader()->SetShaderResourceView(render, "frontBuffer", m_pTexFront->GetShaderResourceView());
+                fxShader->SetShaderResourceView(render, "backBuffer", m_pTexBack->GetShaderResourceView());
+                fxShader->SetShaderResourceView(render, "frontBuffer", m_pTexFront->GetShaderResourceView());
 
                 if (firstNode)
-                    fx->GetShader()->SetShaderResourceView(render, "effectInput", m_pTexFront->GetShaderResourceView());
+                    fxShader->SetShaderResourceView(render, "effectInput", m_pTexFront->GetShaderResourceView());
                 else
-                    fx->GetShader()->SetShaderResourceView(render, "effectInput", m_pTexRead->GetShaderResourceView());
+                    fxShader->SetShaderResourceView(render, "effectInput", m_pTexRead->GetShaderResourceView());
 
                 firstNode = false;
             }
-            fx->GetShader()->SetSamplerSatate(render, "SampleType", m_textureSampler->GetSamplerState());
-            fx->GetShader()->SetParam(render, "EffectParams", &m_screen_params);
+            fxShader->SetSamplerSatate(render, "SampleType", m_textureSampler->GetSamplerState());
+            fxShader->SetParam(render, "EffectParams", &m_screen_params);
             fx->BindFx(render);
         }
 
         m_fullscreenquad->RenderMesh(render);
 
-        if (fx && fx->GetShader().Valid())
+        if (fx && fx->GetShader())
         {
             fx->UnbindFx(render);
             fx->UnbindOutputs(render);
@@ -231,7 +232,7 @@ void EffectComposer::Flush(Renderer& render)
     if (m_chainOutput.Invalid()) { render.SetRenderTargetView(); }
     else
     {
-        render.SetRenderTargetView(static_cast<ID3D11RenderTargetView * >(*m_chainOutput));
+        render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(**m_chainOutput));
         //m_chainOutput->SetRenderTargetView(0);
     }
 
@@ -266,7 +267,7 @@ void EffectComposer::Flush(Renderer& render)
 
 
 EffectRender::EffectRender() : m_pTexRead(nullptr)
-    , m_pTexWrite(nullptr) {
+, m_pTexWrite(nullptr) {
 }
 
 EffectRender::~EffectRender() {
@@ -278,18 +279,18 @@ void EffectRender::Initialize(Renderer& render)
 
     for (int i = 0; i < 2; i++)
     {
-        m_texOut[i] = new Texture2D();
+        m_texOut[i] = Texture2DRef(new Texture2D());
         m_texOut[i]->Initialize(render);
     }
     m_pTexRead = m_texOut[0];
     m_pTexWrite = m_texOut[1];
 
     // -- 
-    m_textureSampler = new TextureSampler();
+    m_textureSampler = TextureSamplerRef(new TextureSampler());
     m_textureSampler->Initialize(render);
 
     // --- 
-    m_shaderFullscreenQuad = new VertexShader();
+    m_shaderFullscreenQuad = ShaderRef(new VertexShader());
     m_shaderFullscreenQuad->LoadFromMemory(
         render,
         effectFullscreenQuadEntry,
@@ -297,7 +298,7 @@ void EffectRender::Initialize(Renderer& render)
         "FullscreenQuad"
     );
 
-    m_shaderCopyScreen = new PixelShader();
+    m_shaderCopyScreen = ShaderRef(new PixelShader());
     m_shaderCopyScreen->LoadFromMemory(
         render,
         effectCopyScreenEntry,
@@ -331,7 +332,8 @@ void EffectRender::Initialize(Renderer& render)
 void EffectRender::Shutdown() { // ... 
 }
 
-void EffectRender::Render(Renderer& render, TextureResRef output)
+//TODO: No outpout is used here
+void EffectRender::Render(Renderer& render, const Texture2DRef &output)
 {
     m_shaderFullscreenQuad->Bind(render);
 
@@ -340,18 +342,18 @@ void EffectRender::Render(Renderer& render, TextureResRef output)
     bool firstNode = true;
     for (size_t fxid = 0; fxid < fxcount; fxid++)
     {
-        EffectPass* fx = m_effects[fxid].Get();
+        Ref<EffectPass> const & fx = m_effects[fxid];
 
-        render.SetRenderTargetView(static_cast<ID3D11RenderTargetView * >(*m_pTexWrite));
+        render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(*m_pTexWrite));
         render.ApplyRenderTargetView(1);
         render.BeginScene();
 
-        if (fx && fx->GetShader().Valid())
+        if (fx && fx->GetShader())
             fx->BindFx(render);
 
         m_fullscreenquad->RenderMesh(render);
 
-        if (fx && fx->GetShader().Valid())
+        if (fx && fx->GetShader())
         {
             fx->UnbindFx(render);
             fx->UnbindOutputs(render);
@@ -376,8 +378,7 @@ void EffectPass::Initialize(Renderer& render)
     ShaderParameter* shaderParameter = new ShaderParameter();
     shaderParameter->Initialize(render, m_shader);
 
-    m_shaderParameter = shaderParameter;
-
+    m_shaderParameter = ShaderParameterRef(shaderParameter);
     LOGGER(Log::Logger().Trace("FX Init pass %s", m_shader->GetName().c_str()));
 }
 
@@ -392,7 +393,7 @@ size_t EffectPass::BindOutputs(Renderer& render)
     {
         if (it->second.Valid())
         {
-            render.SetRenderTargetView(static_cast<ID3D11RenderTargetView * >(*(it->second)), it->first);
+            render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(**(it->second)), it->first);
             count++;
         }
     }
@@ -415,7 +416,7 @@ size_t EffectPass::UnbindOutputs(Renderer& render)
 
 void EffectPass::BindFx(Renderer& render)
 {
-    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it) { m_shader->Get()->SetShaderResourceView(render, it->first, it->second->GetShaderResourceView()); }
+    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it) { m_shader->Get()->SetShaderResourceView(render, it->first, (*it->second)->GetShaderResourceView()); }
 
     m_shaderParameter->BindParameters(render);
     m_shader->Get()->Bind(render);
@@ -427,14 +428,14 @@ void EffectPass::UnbindFx(Renderer& render)
     m_shader->Get()->Unbind(render);
 }
 
-TextureRef EffectPass::GetOutput(size_t bind)
+Texture2DResRef EffectPass::GetOutput(size_t bind)
 {
     auto it = m_output_map.find(bind);
-    return it == m_output_map.end() ? TextureRef() : it->second;
+    return it == m_output_map.end() ? Texture2DResRef() : it->second;
 }
 
-TextureRef EffectPass::GetInput(std::string name)
+Texture2DResRef EffectPass::GetInput(std::string name)
 {
     auto it = m_inputMap.find(name);
-    return it == m_inputMap.end() ? TextureRef() : it->second;
+    return it == m_inputMap.end() ? Texture2DResRef() : it->second;
 }

@@ -1,17 +1,7 @@
 #pragma once 
 
-#include <vector>
-#include <map>
-
-#include <d3d11shader.h>
-
 #include "common.h"
-
-//#include "stdafx.h"
-
-//#include "core/exceptions.h"
-//#include "../utils/reference.h"
-//#include "../utils/resource.h"
+#include <d3d11shader.h>
 
 #include "renderer.h"
 
@@ -60,8 +50,8 @@ namespace Grafkit {
 		// access constant buffers and variables 
 
 		// reflection?
-		inline size_t GetParamCount() { return this->m_cBuffers.size(); }
-		inline size_t GetParamValueCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
+	    size_t GetParamCount() const { return this->m_cBuffers.size(); }
+	    size_t GetParamValueCount(size_t id) { return id>= GetParamCount() ? 0:this->m_cBuffers[id].m_cbVars.size(); }
 
 		// get direct id, to spped it up a bit 
 		int GetParamId(std::string name);
@@ -99,7 +89,7 @@ namespace Grafkit {
 
 		// ----
 		// set bounded resources
-		size_t GetBoundedResourceCount() { return this->m_bResources.size(); }
+		size_t GetBoundedResourceCount() const { return this->m_bResources.size(); }
 		D3D11_SHADER_INPUT_BIND_DESC GetBoundedResourceDesc(size_t id) { return m_bResources[id].m_desc; }
 
 		int GetBoundedResourceId(std::string name);
@@ -119,7 +109,7 @@ namespace Grafkit {
 	public:
 		// ----
 		// access input layout 
-		size_t GetILayoutElemCount() { return this->m_inputElems.size(); }
+		size_t GetILayoutElemCount() const { return this->m_inputElems.size(); }
 		InputElementRecord GetILayoutElem(size_t index) { return this->m_inputElems[index]; }
 
 	private:
@@ -202,9 +192,9 @@ namespace Grafkit {
 
 	// ================================================================================================================================
 
-	typedef Ref<Shader> ShaderRef;
-	typedef Grafkit::Resource<Shader> ShaderRes;
-	typedef Ref<ShaderRes> ShaderResRef;
+	//typedef Ref<Shader> ShaderRef;
+	//typedef Grafkit::Resource<Shader> ShaderRes;
+	//typedef Ref<ShaderRes> ShaderResRef;
 
 	enum ShaderType_e {
 		SHADER_NONE = 0,
@@ -302,39 +292,4 @@ namespace Grafkit {
 
 }
 
-// Definition of exceptions
-
-#define EX_ERROR_SHADER 1100
-
-DEFINE_EXCEPTION(MissingShaderException, EX_ERROR_SHADER + 0, "Missing shader file")
-
-///@todo ezeket at kell pakolni a shader exceptionbe majd
-DEFINE_EXCEPTION(VSCrerateException, EX_ERROR_SHADER + 1, "Could not create vertex shader")
-DEFINE_EXCEPTION(PSCrerateException, EX_ERROR_SHADER + 2, "Could not create pixel shader")
-DEFINE_EXCEPTION(GSCrerateException, EX_ERROR_SHADER + 3, "Could not create geometry shader")
-
-DEFINE_EXCEPTION(InputLayoutCreateException, EX_ERROR_SHADER + 10, "Could not create input layout")
-DEFINE_EXCEPTION(ConstantBufferCreateException, EX_ERROR_SHADER + 11, "Could not create constant buffer")
-DEFINE_EXCEPTION(ConstantBufferLocateException, EX_ERROR_SHADER + 12, "Could not locate constant buffer")
-DEFINE_EXCEPTION(ConstantBufferMapException, EX_ERROR_SHADER + 13, "Could not map constant buffer")
-DEFINE_EXCEPTION(BoundResourceLocateException, EX_ERROR_SHADER + 14, "Could not locate bound resouce")
-
-///@Todo ennek teljesen sajat exceptiont kell definialni
-
-#if 1 // NO_ShaderException
-
-DEFINE_EXCEPTION(ShaderException, 1200, "Could not compile shader")
-
-#else 0 // NO_ShaderException
-
-#define _HAS_ShaderException
-
-namespace FWdebugExceptions {
-	class ShaderException /*:*/ {
-		// ... 
-
-	};
-}
-
-#endif // NO_ShaderException
 

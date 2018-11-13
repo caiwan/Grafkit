@@ -4,14 +4,14 @@
 
 #define _SILENCE_STDEXT_ALLOCATORS_DEPRECATION_WARNING
 #include <allocators>
-// derpricated
-// #include <memory_resource>
 
+#pragma warning(push)
+#pragma warning(disable : 5040)
 
 template<typename TDerived> struct AlignedNew
 {
 	// Allocate aligned memory.
-	static void* operator new (size_t size) throw(std::bad_alloc)
+    void* operator new (size_t size) throw(std::bad_alloc)
 	{
 		const size_t alignment = __alignof(TDerived);
 		static_assert(alignment > 8, "AlignedNew is only useful for types with > 8 byte alignment. Did you forget a __declspec(align) on TDerived?");
@@ -25,22 +25,23 @@ template<typename TDerived> struct AlignedNew
 	}
 
 	// Free aligned memory.
-	static void operator delete (void* ptr) throw()
+    void operator delete (void* ptr) throw()
 	{
 		_aligned_free(ptr);
 	}
 
 
 	// Array overloads.
-	static void* operator new[](size_t size) 
+    void* operator new[](size_t size) 
 	{
 		return operator new(size);
 	}
 
-	static void operator delete[](void* ptr)
+    void operator delete[](void* ptr)
 	{
 		operator delete(ptr);
 	}
 
 };
 
+#pragma warning(pop)

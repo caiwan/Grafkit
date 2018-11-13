@@ -11,6 +11,26 @@
 using namespace std;
 using namespace Grafkit;
 
+
+// Definition of exceptions
+
+#define EX_ERROR_SHADER 1100
+
+DEFINE_EXCEPTION(MissingShaderException, EX_ERROR_SHADER + 0, "Missing shader file")
+
+///@todo ezeket at kell pakolni a shader exceptionbe majd
+DEFINE_EXCEPTION(VSCrerateException, EX_ERROR_SHADER + 1, "Could not create vertex shader")
+DEFINE_EXCEPTION(PSCrerateException, EX_ERROR_SHADER + 2, "Could not create pixel shader")
+DEFINE_EXCEPTION(GSCrerateException, EX_ERROR_SHADER + 3, "Could not create geometry shader")
+
+DEFINE_EXCEPTION(InputLayoutCreateException, EX_ERROR_SHADER + 10, "Could not create input layout")
+DEFINE_EXCEPTION(ConstantBufferCreateException, EX_ERROR_SHADER + 11, "Could not create constant buffer")
+DEFINE_EXCEPTION(ConstantBufferLocateException, EX_ERROR_SHADER + 12, "Could not locate constant buffer")
+DEFINE_EXCEPTION(ConstantBufferMapException, EX_ERROR_SHADER + 13, "Could not map constant buffer")
+DEFINE_EXCEPTION(BoundResourceLocateException, EX_ERROR_SHADER + 14, "Could not locate bound resouce")
+
+DEFINE_EXCEPTION(ShaderException, 1200, "Could not compile shader")
+
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
 

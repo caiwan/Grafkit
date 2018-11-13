@@ -6,6 +6,12 @@
 
 struct aiScene;
 
+namespace Grafkit
+{
+    class Mesh;
+    typedef Ref<Mesh> MeshRef;
+}
+
 namespace Assimp
 {
     class Importer;

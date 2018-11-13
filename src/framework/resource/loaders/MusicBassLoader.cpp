@@ -30,7 +30,7 @@ namespace
 
         static bool InitializeBass();
 
-        void Initialize(StreamRef& asset) override;
+        void Initialize(const StreamRef& asset) override;
         void Shutdown() override;
 
         void Play() override;
@@ -111,7 +111,7 @@ namespace
         return isNosound;
     }
 
-    void MusicBass::Initialize(StreamRef& asset)
+    void MusicBass::Initialize(const StreamRef& asset)
     {
         // pair<length, data>
         asset->ReadAll(m_musicData.first, m_musicData.second);

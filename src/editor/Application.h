@@ -4,8 +4,8 @@
 #include <qthread.h>
 
 #include "render/renderer.h"
-#include "resource/ResourcePreloader.h"
-#include "utils/ext/InitializeSerializer.h"
+#include "resource/ResourceManager.h"
+//#include "utils/ext/InitializeSerializer.h"
 
 #include "utils/Event.h"
 
@@ -37,7 +37,7 @@ namespace Idogep {
 	class Playback;
 
 	class EditorApplication :
-		public Grafkit::IResourceManager, Grafkit::ClonableInitializer
+		public Grafkit::IResourceManager/*, Grafkit::ClonableInitializer*/
 	{
 	public:
 		static EditorApplication* Instance() { return s_self; }
@@ -50,7 +50,7 @@ namespace Idogep {
 
 	private:
 		Grafkit::Renderer &GetDeviceContext() override { return m_render; }
-		Grafkit::IAssetFactory *GetAssetFactory() override { return m_assetFactory; }
+		Grafkit::IAssetFactory *GetAssetFactory() override { return m_assetFactory.get(); }
 
         virtual int InitializeParentFramework() = 0;
 		virtual int ExecuteParentFramework() = 0;
@@ -77,20 +77,20 @@ namespace Idogep {
 
 	private:
 		Grafkit::Renderer m_render;
-		Grafkit::IAssetFactory *m_assetFactory;
-		Grafkit::IAssetFactory *m_projectFileLoader;
+		std::shared_ptr<Grafkit::IAssetFactory> m_assetFactory;
+		std::shared_ptr<Grafkit::IAssetFactory> m_projectFileLoader;
 
-        GkDemo::Context *m_demoContext;
+        std::unique_ptr<GkDemo::Context> m_demoContext;
 
 		QGrafkitContextWidget *m_renderWidget;
 
-		MainWindow *m_mainWindow{};
-		Preloader *m_preloadWindow;
+        std::unique_ptr<MainWindow> m_mainWindow;
+        std::unique_ptr<Preloader> m_preloadWindow;
 
 		Ref<Editor> m_editor;
 
 		// --- modules
-		LoggerProxy * m_logger = nullptr;
+        std::shared_ptr<LoggerProxy> m_logger;
 
 		Ref<Controller> m_logModule;
 

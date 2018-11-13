@@ -9,7 +9,6 @@
 #include "render/model.h"
 #include "render/material.h"
 #include "render/texture.h"
-//#include "render/effect.h"
 
 #include "render/SceneGraph.h"
 #include "scene/scene.h"
@@ -100,11 +99,11 @@ void Demo::Initialize(Renderer& render)
 
     //m_renderTarget->Initialize(render);
 
-    m_mapNormal->InitializeFloatRGBA(render);
-    m_mapPosition->InitializeFloatRGBA(render);
-    m_mapRoughness->InitializeFloatRGBA(render);
-    m_mapMetallic->InitializeFloatRGBA(render);
-    m_mapEmission->InitializeFloatRGBA(render);
+    //m_mapNormal->InitializeFloatRGBA(render);
+    //m_mapPosition->InitializeFloatRGBA(render);
+    //m_mapRoughness->InitializeFloatRGBA(render);
+    //m_mapMetallic->InitializeFloatRGBA(render);
+    //m_mapEmission->InitializeFloatRGBA(render);
 
     m_effect = new EffectComposer();
 
@@ -117,11 +116,12 @@ void Demo::Initialize(Renderer& render)
 
     m_effect->Initialize(render);
 
-    m_effect->SetInput(1, m_mapNormal);
-    m_effect->SetInput(2, m_mapPosition);
-    m_effect->SetInput(3, m_mapRoughness);
-    m_effect->SetInput(4, m_mapMetallic);
-    m_effect->SetInput(5, m_mapEmission);
+    // Has to be texture Reference
+    //m_effect->SetInput(1, m_mapNormal);
+    //m_effect->SetInput(2, m_mapPosition);
+    //m_effect->SetInput(3, m_mapRoughness);
+    //m_effect->SetInput(4, m_mapMetallic);
+    //m_effect->SetInput(5, m_mapEmission);
 }
 
 

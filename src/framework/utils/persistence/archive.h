@@ -407,7 +407,7 @@ namespace Grafkit
 
         const Archive& operator&(const std::string& v) const
         {
-            uint32_t len = v.length()+1;
+            uint32_t len = uint32_t(v.length()+1);
             *this & len;
             m_stream->Write(v.c_str(), len);
             return *this;

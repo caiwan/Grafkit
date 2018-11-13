@@ -16,7 +16,7 @@ namespace Idogep
         void Pause(int e) override;
         void Update() override;
 
-        void Initialize(Grafkit::StreamRef asset) override{}
+        void Initialize(const Grafkit::StreamRef& asset) override {}
         void Shutdown() override{}
         void ToggleMute() override;
 

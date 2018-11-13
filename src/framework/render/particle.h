@@ -15,10 +15,12 @@ namespace Grafkit
 	*/
 
 	class ParticleEngine;
-	typedef Ref<ParticleEngine> ParticleEngineRef;
+    typedef Ref<ParticleEngine> ParticleEngineRef;
+    //typedef std::shared_ptr<ParticleEngine> ParticleEngineRef;
 
 	class ParticleDynamics;
-	typedef Ref<ParticleDynamics> ParticleDynamicsRef;
+    typedef Ref<ParticleDynamics> ParticleDynamicsRef;
+    //typedef std::shared_ptr<ParticleDynamics> ParticleDynamicsRef;
 
 	// ========================================================================
 
@@ -68,25 +70,7 @@ namespace Grafkit
 		virtual void Calculate();
 		virtual ParticleDynamicsType_e GetType() = 0;
 
-#if 0
-		template<typename T> T GetArgsT() {
-			static_assert(sizeof(T) <= sizeof(m_params.args), "Size of T exceeds parameter size");
-			static_assert(sizeof(T) % 4 != 0, "Size of T does not aligns to 4 byte width");
-			T res;
-			memcpy(&res, &m_params.args, sizeof(T));
-			return res;
-		}
-
-		template<typename T> T SetArgsT(T& in) {
-			static_assert(sizeof(T) <= sizeof(m_params.args), "Size of T exceeds parameter size");
-			static_assert(sizeof(T) % 4 != 0, "Size of T does not aligns to 4 byte width");
-			memcpy(&m_params.args, &in, sizeof(T));
-			return res;
-		}
-#endif
-
-	protected:
-		DynamicElem_t m_params;
+        DynamicElem_t m_params;
 		bool m_enabled;
 	};
 
@@ -102,7 +86,7 @@ namespace Grafkit
 		// up to 24 elements
 		void AddDynamics(ParticleDynamicsRef elem);
 
-		void Initialize(Renderer & render, ShaderResRef engine, size_t particleRes);
+		void Initialize(Renderer & render, const ShaderResRef &engine, size_t particleRes);
 		void Render(Renderer& render);
 
 		ComputeRef GetCompute() const { return m_particleCompute; }
@@ -161,11 +145,7 @@ namespace Grafkit
 	class ParticleAttractor : public ParticleDynamics {
 	public:
 	    explicit ParticleAttractor(float4 pos = float4(0, 0, 0, 1), float weight = 1., float force = 1.f);
-
 	    ParticleDynamicsType_e GetType() override { return PD_attractor; }
-
-	public:
-
 	};
 
 	// ------------------------------------------------------------------------
@@ -173,14 +153,12 @@ namespace Grafkit
 	class ParticleDeflector : public ParticleDynamics {
 	public:
 	    ParticleDynamicsType_e GetType() override { return PD_deflector; }
-
 	};
 
 	// ------------------------------------------------------------------------
 	class ParticleReflector : public ParticleDynamics {
 	public:
 	    ParticleDynamicsType_e GetType() override { return PD_reflector; }
-
 	};
 
 }

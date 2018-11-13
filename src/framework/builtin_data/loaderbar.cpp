@@ -107,9 +107,9 @@ std::string GrafkitData::LoaderBar::GetLoaderBarSrc()
 
 Grafkit::ShaderResRef GrafkitData::LoaderBar::CreateShader(Grafkit::Renderer & renderer)
 {
-	ShaderRef ps = new PixelShader();
+	ShaderRef ps = ShaderRef (new PixelShader());
 	std::string psSrc = GetLoaderBarSrc();
 	ps->LoadFromMemory(renderer, "main", psSrc.c_str(), psSrc.length(), "loaderbar");
-	return new ShaderRes(ps);
+	return ShaderResRef(new ShaderRes(ps));
 }
 

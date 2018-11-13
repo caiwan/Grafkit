@@ -1,11 +1,13 @@
 #include "stdafx.h"
 
 #include "particle.h"
-
+#include "shader.h"
 #include "texture.h"
+#include "mesh.h"
 
 Grafkit::ParticleEngine::ParticleEngine()
 {
+    // TOOD: PLS NO this one 
 	ZeroMemory(&m_shaderParams, sizeof(m_shaderParams));
 }
 
@@ -18,7 +20,7 @@ void Grafkit::ParticleEngine::AddDynamics(ParticleDynamicsRef elem)
 	m_dynamicElements.push_back(elem);
 }
 
-void Grafkit::ParticleEngine::Initialize(Renderer & render, ShaderResRef engine, size_t particleRes)
+void Grafkit::ParticleEngine::Initialize(Renderer & render, const ShaderResRef &engine, size_t particleRes)
 {
 	m_fsParticleEngine = engine;
 
@@ -54,6 +56,7 @@ void Grafkit::ParticleEngine::Render(Renderer & render)
 
 Grafkit::ParticleDynamics::ParticleDynamics(float4 position, float weight) : m_enabled(true)
 {
+    // TOOD: PLS NO this one 
 	ZeroMemory(&m_params, sizeof(m_params));
 	m_params.args.position = position;
 	m_params.weight = weight;

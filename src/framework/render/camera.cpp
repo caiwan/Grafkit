@@ -40,7 +40,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::Calculate(Renderer & renderer, ActorRef parent)
+void Camera::Calculate(Renderer & renderer, const ActorRef & parent)
 {
 	renderer.GetViewportSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;

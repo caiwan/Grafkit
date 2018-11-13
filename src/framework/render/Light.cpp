@@ -35,7 +35,7 @@ Light::Light(light_type_t t) : Entity3D()
 Light::~Light() {
 }
 
-void Light::Calculate(Renderer& deviceContext, ActorRef parent)
+void Light::Calculate(Renderer& deviceContext, const ActorRef & parent)
 {
     if (parent.Invalid())
         return;

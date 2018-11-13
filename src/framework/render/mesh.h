@@ -62,5 +62,5 @@ namespace Grafkit
         std::map<std::string, std::vector<uint8_t>> m_vertices;
     };
 
-    typedef Ref<Mesh> MeshRef;
+    //typedef Ref<Mesh> MeshRef;
 }

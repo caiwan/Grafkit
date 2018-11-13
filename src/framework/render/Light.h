@@ -14,6 +14,7 @@ namespace Grafkit
 {
     class Light;
     typedef Ref<Light> LightRef;
+    //typedef std::shared_ptr<Light> LightRef;
 
     __declspec(align(16))
     class Light : public Entity3D, public AlignedNew<Light>
@@ -58,7 +59,7 @@ namespace Grafkit
         void Build(Renderer& deviceContext, SceneGraph* const & scene) override {
         }
 
-        void Calculate(Renderer& deviceContext, ActorRef parent = nullptr) override;
+        void Calculate(Renderer& deviceContext, const ActorRef & parent = nullptr) override;
         void Render(Renderer& deviceContext, SceneGraph* const & scene) override;
 
     protected:

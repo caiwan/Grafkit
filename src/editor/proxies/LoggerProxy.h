@@ -20,7 +20,7 @@ namespace Idogep {
 	public:
 		LoggerProxy() {}
 		virtual ~LoggerProxy() {}
-		virtual void Write(Grafkit::Logger::message_t * const & message);
+		virtual void Write(const Grafkit::Logger::message_t & message);
 
 		Event<std::string> onUpdateLog;
 

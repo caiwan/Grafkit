@@ -24,8 +24,6 @@ namespace GkDemo
         Context(const Context& other) = delete;
         Context& operator=(const Context& other) = delete;
 
-        Json LoadJson(const Grafkit::StreamRef & schemaAsset);
-
         void LoadDemo(const std::string filename = "demo.json");
 
         bool GetIsFxaa() const { return m_isFxaa; }
@@ -40,6 +38,9 @@ namespace GkDemo
         // TODO: -> editor
         void Relocate(std::string path);
         void SaveSchema(bool isAutoSave = false) const;
+
+    private:
+        Json LoadJson(const Grafkit::StreamRef & schemaAsset);
 
     protected:
         bool m_isFxaa;

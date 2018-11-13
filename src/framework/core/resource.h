@@ -31,6 +31,7 @@ namespace Grafkit
     };
 
     /**
+     *TOOD: Get rid of Ref<T>
     */
     template <typename T>
     class Resource : public IResource, public Ref<T>

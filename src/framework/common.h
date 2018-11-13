@@ -47,8 +47,8 @@ namespace Grafkit {
 	class SceneGraph;
 	typedef Ref<SceneGraph> SceneGraphRef;
 
-	class Mesh;
-	typedef Ref<Mesh> MeshRef;
+	//class Mesh;
+	//typedef Ref<Mesh> MeshRef;
 
 	class Material;
 	typedef Ref<Material> MaterialRef;

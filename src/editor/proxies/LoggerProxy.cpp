@@ -35,15 +35,12 @@ namespace {
 	};
 }
 
-void Idogep::LoggerProxy::Write(Grafkit::Logger::message_t * const & message)
+void Idogep::LoggerProxy::Write(const Grafkit::Logger::message_t & message)
 {
-	if (!message)
+	if (message.type == Grafkit::Logger::LOG_DEBUG)
 		return;
 
-	if (message->type == Grafkit::Logger::LOG_DEBUG)
-		return;
-
-	std::string line = std::string(logTexts[message->type]) + std::string(message->message);
+	std::string line = std::string(logTexts[message.type]) + std::string(message.message);
 	onUpdateLog(line);
 
 }

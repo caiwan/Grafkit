@@ -7,6 +7,7 @@ namespace Grafkit
 {
     class RenderTarget;
     typedef Ref<RenderTarget> RenderTargetRef;
+    //typedef std::shared_ptr<RenderTarget> RenderTargetRef;
 
     class Renderable
     {

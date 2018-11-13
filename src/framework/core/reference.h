@@ -2,17 +2,25 @@
 
 #include <memory>
 
+//#define USE_STD_SHARED_PTR
+
 /// @file taken from libosmscout: https://github.com/nkostelnik/libosmscout/blob/master/libosmscout/include/osmscout/util/Reference.h
 
 /// Safe ptr release
-#define RELEASE(refptr) if(refptr) {refptr->Release(); refptr = nullptr;}
-
+#ifndef USE_STD_SHARED_PTR
+template <typename T>
+constexpr void RELEASE(T *& refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
+#else
+#if 0
+template <typename T>
+constexpr void RELEASE(const Ref<T> & refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
+#endif //0
+#endif //USE_STD_SHARED_PTR
 /**
     Baseclass for all classes that support reference counting.
  */
 
- ///@todo refcount legyen mutable/volatile + mukodjon a refszamlalas const tipussal is 
-
+#ifndef USE_STD_SHARED_PTR
 class Referencable {
 public:
     virtual ~Referencable() = default;
@@ -43,6 +51,12 @@ public:
 private:
     size_t _ref_count;
 };
+#else //USE_STD_SHARED_PTR
+#pragma message("Referencable is obsolete. Consider remove it.")
+class Referencable {}; 
+#endif //USE_STD_SHARED_PTR
+
+#ifndef USE_STD_SHARED_PTR
 
 /**
 LazyRef does delay the allocation of the referenced object of type T. It also
@@ -143,9 +157,11 @@ public:
     }
 };
 
+#else // USE_STD_SHARED_PTR
+template <typename T> using LazyRef = std::shared_ptr<T>;
+#endif //USE_STD_SHARED_PTR
 
-
-
+#ifndef USE_STD_SHARED_PTR
 /**
 Ref handles references to object using reference counting semantic. The object of type
 T is onbly deleted if all references have gone invalid.
@@ -385,3 +401,7 @@ public:
 protected:
     T * ptr;
 };
+
+#else //USE_STD_SHARED_PTR
+template <typename T> using Ref = std::shared_ptr<T>;
+#endif //USE_STD_SHARED_PTR

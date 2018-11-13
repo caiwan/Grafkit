@@ -21,7 +21,7 @@ namespace Grafkit
         Entity3D() = default;
         virtual ~Entity3D() = default;
 
-        virtual void Calculate(Renderer& renderer, ActorRef parent = nullptr) = 0;
+        virtual void Calculate(Renderer& renderer, const ActorRef & parent = nullptr) = 0;
         virtual void Render(Renderer& deviceContext, SceneGraph* const & scene) = 0;
         virtual void Build(Renderer& deviceContext, SceneGraph* const & scene) = 0;
 
@@ -38,7 +38,7 @@ namespace Grafkit
         friend class SceneGraph;
     public:
         Actor();
-        explicit Actor(Ref<Entity3D> entity);
+        explicit Actor(const Entity3DRef & entity);
         ~Actor();
 
         // kisse kulonos megoldas ... 
@@ -51,20 +51,20 @@ namespace Grafkit
         virtual void Render(Renderer& render, SceneGraph* scene);
 
         /// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
-        Ref<Actor> GetParent() const { return m_pParent; }
+        ActorRef GetParent() const { return m_pParent; }
 
         void AddChild(Actor* child);
         ActorRef GetChild(int i = 0) { return this->m_pChildren[i]; }
         size_t GetChildrenCount() const { return this->m_pChildren.size(); }
 
-        void AddEntity(Ref<Entity3D> entity) { m_pEntities.push_back(entity); }
+        void AddEntity(const Entity3DRef & entity) { m_pEntities.push_back(entity); }
         Entity3DRef GetEntity(int id = 0) { return m_pEntities[id]; }
         size_t GetEntityCount() const { return m_pEntities.size(); }
 
         void Hide() { m_isHidden = true; }
         void Show() { m_isHidden = false; }
 
-        bool IsHidden() const { return (m_pParent.Invalid() ? 0 : m_pParent->IsHidden()) || m_isHidden; }
+        bool IsHidden() const { return (m_pParent ? 0 : m_pParent->IsHidden()) || m_isHidden; }
 
         // calculated matrix for internal use
         Grafkit::Matrix WorldMatrix() const { return m_worldMatrix; }
@@ -77,9 +77,9 @@ namespace Grafkit
         Grafkit::Matrix m_transformMatrix;
         Grafkit::Matrix m_worldMatrix;
 
-        Ref<Actor> m_pParent;
-        std::vector<Ref<Actor>> m_pChildren;
-        std::vector<Ref<Entity3D>> m_pEntities;
+        ActorRef m_pParent;
+        std::vector<ActorRef> m_pChildren;
+        std::vector<Entity3DRef> m_pEntities;
 
         bool m_isHidden;
 

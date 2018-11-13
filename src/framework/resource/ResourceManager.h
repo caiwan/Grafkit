@@ -43,11 +43,11 @@ namespace Grafkit
         template <class T>
         Ref<T> GetByUuid(const std::string& uuid) const;
 
-        void Add(const Ref<IResource> & pResource);
+        void Add(const IResourceRef & pResource);
         void RemoveByUuid(const std::string& uuid);
         void RemoveAll();
 
-        void GetAllResources(std::list<Ref<IResource>>& resources) const;
+        void GetAllResources(std::list<IResourceRef>& resources) const;
 
         void SetPreloadListener(IPreloadEvents* listener) { m_preloadEvents = listener; }
 

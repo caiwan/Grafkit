@@ -38,17 +38,17 @@ IResourceManager::IResourceManager(IPreloadEvents* preloadEvents)
 IResourceManager::~IResourceManager()
 {
     ClearLoadStack();
-    for (auto it = m_uuidMap.begin(); it != m_uuidMap.end(); ++it) { it->second.AssingnRef(nullptr); }
+    for (auto it = m_uuidMap.begin(); it != m_uuidMap.end(); ++it) { it->second = nullptr; }
 }
 
-void IResourceManager::Add(const Ref<IResource> & pResource)
+void IResourceManager::Add(const IResourceRef & pResource)
 {
-    if (pResource.Valid())
+    if (pResource)
     {
-        Ref<IResource> i_ref = GetByUuid<IResource>(pResource->GetUuid());
-        if (i_ref.Valid())
+        IResourceRef i_ref = GetByUuid<IResource>(pResource->GetUuid());
+        if (i_ref)
         {
-            if (i_ref.Get() != pResource.Get())
+            if (i_ref != pResource)
             {
                 std::ostringstream msg;
                 msg << "(A resource pointerek nem egyformak, vangy nem egyedi a UUID.Geteld ki elobb, aztan frissits.)";
@@ -78,8 +78,9 @@ void IResourceManager::RemoveByUuid(const std::string& uuid)
 
 void IResourceManager::RemoveAll() { m_uuidMap.clear(); }
 
-void IResourceManager::GetAllResources(std::list<Ref<IResource>>& target) const {
-    transform(m_uuidMap.begin(), m_uuidMap.end(), back_inserter(target), [](const std::map<std::string, Ref<IResource>>::value_type& value) { return value.second; });
+void IResourceManager::GetAllResources(std::list<IResourceRef>& target) const {
+    target.clear();
+    std::transform(m_uuidMap.begin(), m_uuidMap.end(), back_inserter(target), [](const auto& value) { return value.second; });
 }
 
 void IResourceManager::Load(Ref<IResourceBuilder> builder)
@@ -124,7 +125,7 @@ void IResourceManager::TriggerReload(std::string filename)
 
 void IResourceManager::Reload(Ref<IResourceBuilder> builder)
 {
-    Ref<IResource> resource = builder->NewResource();
+    IResourceRef resource = builder->NewResource();
     Uuid uuid(builder->GetUuid());
     if (!uuid.IsEmpty()) { resource->SetUuid(uuid); }
     resource->SetName(builder->GetName());

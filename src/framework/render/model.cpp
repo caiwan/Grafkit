@@ -42,7 +42,7 @@ void Model::SetMaterial(MaterialRef material) { this->m_material = material; }
 
 // ==================================================================
 
-void Model::Calculate(Renderer& deviceContext, ActorRef parent) {
+void Model::Calculate(Renderer& deviceContext, const ActorRef & parent) {
 }
 
 void Model::Render(Renderer& render, SceneGraph* const & scene)

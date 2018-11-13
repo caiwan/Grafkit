@@ -105,7 +105,7 @@ void IShaderLoader::Load(IResourceManager * const & resman, IResource* source)
         delete pInclude;
 
         // 2.
-        if (dstShader->Valid()) {
+        if (*dstShader) {
             (*dstShader)->Shutdown();
         }
 
@@ -113,12 +113,12 @@ void IShaderLoader::Load(IResourceManager * const & resman, IResource* source)
         dstShader->AssingnRef(shader);
 
     }
-    catch (ShaderException &ex) {
+    catch (std::exception &e) {
         // if we are about to replace an existing shader, but we had a compile error
         // then toss the error, due it was prompted to stodut
         // otherwise thow the ex
-        if (dstShader->Invalid()) {
-            throw ex;
+        if (!dstShader) {
+            throw e;
         }
     }
 }

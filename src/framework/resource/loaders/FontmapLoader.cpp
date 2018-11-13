@@ -5,6 +5,8 @@
 using namespace FWdebugExceptions;
 using namespace Grafkit;
 
+DEFINE_EXCEPTION(InvalidBMFVersionException, 301, "Invalid BMF version")
+
 //BMFontParser::BMFontParser(FontMap* _root) : root(_root){
 //}
 

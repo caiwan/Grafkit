@@ -17,4 +17,3 @@ namespace Grafkit {
     };*/
 }
 
-DEFINE_EXCEPTION(InvalidBMFVersionException, 301, "Invalid BMF version")

@@ -5,6 +5,11 @@
  *  @file
  *  @brief static geometry data
  */
+namespace Grafkit
+{
+    class Mesh;
+    typedef Ref<Mesh> MeshRef;
+}
 
 namespace GrafkitData
 {

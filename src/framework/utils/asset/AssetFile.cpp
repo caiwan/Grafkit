@@ -72,8 +72,13 @@ namespace
             return m_stream.ReadAll(outSize, outBuffer);
         }
 
-        explicit operator std::basic_istream<char>&() const override{ const_cast<InStreamWrapper*const>(this)->Init(); return static_cast<std::istream&>(m_stream); }
-        explicit operator std::basic_ostream<char>&() const override{ throw std::runtime_error("Can't write to an InputStream"); }
+        explicit operator std::basic_istream<char>&() const override
+        {
+            const_cast<InStreamWrapper*const>(this)->Init();
+            return static_cast<std::istream&>(m_stream);
+        }
+
+        explicit operator std::basic_ostream<char>&() const override { throw std::runtime_error("Can't write to an InputStream"); }
 
     private:
         void Init()
@@ -117,7 +122,8 @@ namespace
                 out.append(in.substr(left, in.length() - left));
                 break;
             }
-        } while (left != in.length());
+        }
+        while (left != in.length());
 
         return out;
     }
@@ -201,7 +207,8 @@ namespace LiveReload
         int Run() override
         {
             LOGGER(Log::Logger().Trace("FS Watcher Thread started"));
-            do { Poll(); } while (!m_isTerminate);
+            do { Poll(); }
+            while (!m_isTerminate);
             LOGGER(Log::Logger().Trace("FS Watcher Thread terminated"));
             return true;
         }
@@ -284,7 +291,8 @@ namespace LiveReload
                 }
 
                 offset += pNotify->NextEntryOffset;
-            } while (pNotify->NextEntryOffset); //(offset != 0);
+            }
+            while (pNotify->NextEntryOffset); //(offset != 0);
             //}
         }
 
@@ -300,9 +308,7 @@ namespace LiveReload
 #endif /*LIVE_RELEASE*/
 
 FileAssetFactory::FileAssetFactory(std::string root) : m_root()
-, m_eventWatcher(nullptr) {
-    FileAssetFactory::SetBasePath(root);
-}
+    , m_eventWatcher(nullptr) { FileAssetFactory::SetBasePath(root); }
 
 
 FileAssetFactory::~FileAssetFactory()
@@ -317,7 +323,7 @@ StreamRef FileAssetFactory::Get(std::string name)
 {
     std::string fullname = TrimSlashes(m_root + name);
     LOGGER(Log::Logger().Info("Creating wrapper for file: %s", fullname.c_str()));
-    return StreamRef(new InStreamWrapper<std::ifstream>(fullname));
+    return std::unique_ptr<IStream>(std::make_unique<InStreamWrapper<std::ifstream>>(fullname));
 }
 
 IAssetFactory::filelist_t FileAssetFactory::GetAssetList() { return this->m_dirlist; }
@@ -351,7 +357,8 @@ bool FileAssetFactory::PollEvents(IResourceManager* resman)
                     resman->TriggerReload(w->PopFile());
                 else
                     w->PopFile(); // Todo: find a better way to purge stuff 
-            } while (w->HasItems());
+            }
+            while (w->HasItems());
         }
         count = 30;
         return triggered;

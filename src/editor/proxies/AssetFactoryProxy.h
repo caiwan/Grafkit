@@ -1,6 +1,7 @@
 #pragma once 
 
-#include <qobject.h>
+#include <cassert>
+#include <qobject>
 
 #include "core/asset.h"
 #include "utils/asset/AssetFactory.h"
@@ -14,7 +15,8 @@ namespace Idogep {
 
 	class AssetFactoryProxy : public Grafkit::IAssetFactory {
 	public:
-	    explicit AssetFactoryProxy(IAssetFactory * const & parentFactory);
+	    explicit AssetFactoryProxy(const std::shared_ptr<IAssetFactory> & parentFactory);
+	    ~AssetFactoryProxy();
 
 	    bool PollEvents(Grafkit::IResourceManager *resman) override { return m_parentFactory->PollEvents(resman); }
 
@@ -26,20 +28,7 @@ namespace Idogep {
 	    void SetBasePath(const std::string& path) override;
 
 	private:
-		IAssetFactory * const & m_parentFactory;
-	};
-
-	// --- 
-	// Wrapper class for QT Resource 
-	class QResourceAsset : public Grafkit::IStream {
-	public:
-		QResourceAsset(QByteArray &data) : IStream(), m_data(data) {}
-
-	    void* GetData() const override { return (void*)m_data.data(); }
-	    size_t GetSize() const override { return m_data.size(); }
-
-	private:
-		QByteArray m_data;
+		std::shared_ptr<IAssetFactory> m_parentFactory;
 	};
 
 }

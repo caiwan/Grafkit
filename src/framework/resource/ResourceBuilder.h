@@ -8,6 +8,9 @@ namespace Grafkit
     class IResource;
     class IResourceManager;
 
+    typedef Ref<IResource> IResourceRef;
+    //typedef std::shared_ptr<IResource> IResourceRef;
+
     class IResourceBuilder : public Object
     {
     public:
@@ -21,7 +24,7 @@ namespace Grafkit
         }
 
         // pure virtuals 
-        virtual Ref<IResource> NewResource() const = 0;
+        virtual IResourceRef NewResource() const = 0;
 
         virtual void Load(IResourceManager* const & resman, IResource* source) = 0;
         virtual void Initialize(Renderer& render, IResourceManager* const & resman, IResource* source) = 0;
@@ -63,21 +66,21 @@ namespace Grafkit
         U GetParams() const { return m_params; }
         void SetParams(const U& params) { m_params = params; }
 
-        Ref<IResource> NewResource() const override { return new Resource<R>(); }
+        IResourceRef NewResource() const override { return new Resource<R>(); }
 
         template <class A> void Serialize(A &ar) { IResourceBuilder::Serialize(ar); ar&m_params; }
 
     protected:
         static Ref<Resource<R>> SafeGetResource(IResource* source)
         {
-            Resource<R>* pR = dynamic_cast<Resource<R>*>(source);
+            auto pR = dynamic_cast<Resource<R>*>(source);
             assert(pR);
             return pR;
         }
 
         static Ref<R> SafeGetObject(IResource* source)
         {
-            Resource<R>* pR = SafeGetResource(source);
+            auto pR = SafeGetResource(source);
             R* obj = pR->Get();
             assert(obj);
             return obj;

@@ -71,10 +71,10 @@ namespace Grafkit {
 		void GetVideoCardInfo(char* dest);
 
 		void GetScreenSize(int &screenW, int &screenH) const { screenW = m_screenW; screenH = m_screenH; }
-		void GetScreenSizef(float &screenW, float &screenH) const { screenW = m_screenW; screenH = m_screenH; }
+		void GetScreenSizef(float &screenW, float &screenH) const { screenW = float(m_screenW); screenH = float(m_screenH); }
 
-		void GetViewportSize(int &viewW, int &viewH) const { viewW = (int)m_viewport.Width; viewH = (int)m_viewport.Height; }
-		void GetViewportSize(int &viewW, int &viewH, int &viewX, int &viewY) const { viewW = (int)m_viewport.Width; viewH = (int)m_viewport.Height; viewX = (int)m_viewport.TopLeftX; viewY = (int)m_viewport.TopLeftY; }
+		void GetViewportSize(int &viewW, int &viewH) const { viewW = int(m_viewport.Width); viewH = int(m_viewport.Height); }
+		void GetViewportSize(int &viewW, int &viewH, int &viewX, int &viewY) const { viewW = int(m_viewport.Width), viewH = int(m_viewport.Height), viewX = int(m_viewport.TopLeftX), viewY = int(m_viewport.TopLeftY); }
 		void GetViewportSizef(float &viewW, float &viewH) const { viewW = float(m_viewport.Width); viewH = static_cast<float>(m_viewport.Height); }
 
 		float GetAspectRatio() const {return float(m_viewport.Width) / float(m_viewport.Height);}

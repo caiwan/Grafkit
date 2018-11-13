@@ -29,7 +29,7 @@ namespace Grafkit {
 
 		virtual ~Music() {}
 
-		virtual void Initialize(StreamRef& asset) = 0;
+		virtual void Initialize(const StreamRef& asset) = 0;
 		virtual void Shutdown() = 0;
 
 		virtual void ToggleMute() {}

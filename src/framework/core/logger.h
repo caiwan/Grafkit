@@ -12,7 +12,10 @@
 #define HAS_LOGGER 1
 #define LOGGER(x) x
 
-#include <cstdio>
+constexpr size_t loggerBufferLength = 64 * 1024;
+
+
+#include <array>
 #include <set>
 
 namespace Grafkit {
@@ -53,18 +56,16 @@ namespace Grafkit {
 			friend class Logger;
 		public:
 			ILoggerHandler() {}
-			~ILoggerHandler() {}
-		protected:
-			// pure virtual 
-			virtual void Write(message_t * const & message) = 0;
+		    virtual ~ILoggerHandler() {}
+			virtual void Write(const message_t & message) = 0;
 		};
 
 		// Methods, ops
 		void SetLogLevel(logger_msg_type_e type, bool isShow) { m_hideMessage[type] = !isShow; }
-		void AddHandler(ILoggerHandler* hdl) { this->m_loggers.insert(hdl);}
-		void RemoveHandler(ILoggerHandler* hdl) { this->m_loggers.erase(this->m_loggers.find(hdl));}
+		void AddHandler(std::shared_ptr<ILoggerHandler> hdl) { this->m_loggers.insert(hdl);}
+		//void RemoveHandler(std::unique_ptr<ILoggerHandler> hdl) { this->m_loggers.erase(this->m_loggers.find(hdl));}
 
-		 void Write(logger_msg_type_e type, const char* const message);
+		 void Write(logger_msg_type_e type, const char* message);
 		
 		 void Trace(const char* const message, ... );
 		 void Debug(const char* const message, ...);
@@ -80,9 +81,9 @@ namespace Grafkit {
 
 
 	private:
-		std::set<ILoggerHandler*> m_loggers;
-		char * m_buffer;
-		Mutex *m_mutex;
+		std::set<std::shared_ptr<ILoggerHandler>> m_loggers;
+        std::array<char, loggerBufferLength> m_buffer;
+        std::unique_ptr<Mutex> m_mutex;
 
 		bool m_hideMessage[_LOG_COUNT];
 	};
@@ -111,10 +112,10 @@ namespace Grafkit {
 		// ------------------------------------------------------------------
 		class FileLoggerHandler : public Logger::ILoggerHandler {
 		public:
-			FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);
+			explicit FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);
 			~FileLoggerHandler();
 		protected:
-		    void Write(Logger::message_t * const & message) override;
+            void Write(const Logger::message_t & message) override;
 		private:
 			FILE* m_stdout;
 			FILE* m_stderr;
@@ -127,7 +128,7 @@ namespace Grafkit {
 			ConsoleLogger();
 			~ConsoleLogger();
 		protected:
-		    void Write(Logger::message_t * const & message) override;
+		    void Write(const Logger::message_t & message) override;
 
 		private:
 			FILE* m_stdout;
@@ -143,7 +144,7 @@ namespace Grafkit {
 			MsvcOutLogger();
 			~MsvcOutLogger();
 		protected:
-		    void Write(Logger::message_t * const & message) override;
+            void Write(const Logger::message_t & message) override;
 		};
 
 	};

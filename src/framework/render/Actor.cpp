@@ -13,7 +13,7 @@ Actor::Actor() : Object()
 {
 }
 
-Actor::Actor(Ref<Entity3D> entity) : Object()
+Actor::Actor(const Entity3DRef & entity) : Object()
     , m_isHidden(false)
 {
     AddEntity(entity);
