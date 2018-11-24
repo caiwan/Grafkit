@@ -135,7 +135,7 @@ void EditorApplication::Initialize()
 void EditorApplication::BuildEditorModules()
 {
     // -- setup underlying demo context 
-    m_demoContext = std::make_unique<GkDemo::Context>(m_render, m_assetFactory);
+    m_demoContext = std::make_shared<GkDemo::Context>(m_render, m_assetFactory);
     m_preloadWindow = std::make_unique<Preloader>(m_mainWindow.get());
     onFocusChanged += Delegate(m_preloadWindow.get(), &Preloader::FocusChanged);
 
@@ -143,7 +143,7 @@ void EditorApplication::BuildEditorModules()
 
     // --- Setup modules
 
-    m_editor = new Editor(m_render, m_demoContext.get());
+    m_editor = new Editor(m_render, m_demoContext);
     this->Add(new Resource<Controller>(m_editor, "Editor", "Editor"));
 
     m_logModule = new LogModule(m_logger.get());

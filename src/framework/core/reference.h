@@ -6,16 +6,6 @@
 
 /// @file taken from libosmscout: https://github.com/nkostelnik/libosmscout/blob/master/libosmscout/include/osmscout/util/Reference.h
 
-/// Safe ptr release
-#ifndef USE_STD_SHARED_PTR
-template <typename T>
-constexpr void RELEASE(T *& refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
-#else
-#if 0
-template <typename T>
-constexpr void RELEASE(const Ref<T> & refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
-#endif //0
-#endif //USE_STD_SHARED_PTR
 /**
     Baseclass for all classes that support reference counting.
  */
@@ -404,4 +394,17 @@ protected:
 
 #else //USE_STD_SHARED_PTR
 template <typename T> using Ref = std::shared_ptr<T>;
+#endif //USE_STD_SHARED_PTR
+
+/// Safe ptr release
+#ifndef USE_STD_SHARED_PTR
+template <typename T>
+constexpr void RELEASE(T *& refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
+template <typename T>
+constexpr void RELEASE(Ref<T> *& refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
+#else
+#if 0
+template <typename T>
+constexpr void RELEASE(const Ref<T> & refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
+#endif //0
 #endif //USE_STD_SHARED_PTR

@@ -72,10 +72,11 @@ namespace Grafkit
 
 Context::Context(Renderer& render, const std::shared_ptr<IAssetFactory>& assetFactory) : m_isFxaa(false)
     , m_render(render)
-    , m_assetFactory(assetFactory)
+    , m_assetFactory(assetFactory), m_demo(nullptr)
 {
 #define P_LIST(json) json.at("name").get<std::string>(), json.at("uuid").get<std::string>(), json.at("params")
 
+    //m_loaders["demo"] = [](const Json& json) { return new DemoLoader(P_LIST(json)); };
     m_loaders["mesh"] = [](const Json& json) { return new MeshLoader(P_LIST(json)); };
     m_loaders["texture_2d"] = [](const Json& json) { return new TextureFromBitmap(P_LIST(json)); };
     m_loaders["texture_cube"] = [](const Json& json) { return new TextureCubemapFromBitmap(P_LIST(json)); };
@@ -148,12 +149,9 @@ void Context::LoadDemo(const std::string filename)
     catch (std::exception& e) { throw std::runtime_error(std::string("Cannot load assets (") + e.what() + std::string(")")); }
 
     // -- demo
-    // this should be a single uuid lookup || another load task
-    m_demo = new Demo();
-
-    // TODO: ... 
-
-    assert(m_demo);
+    m_demo = GetByUuid<Resource<Demo>>(demoJson['demo'].get<std::string>());
+    //if (!m_demo)
+    //    throw std::runtime_error("No demo, you bastard! Havent't you forget something?");
 }
 
 
@@ -169,9 +167,9 @@ void Context::SaveSchema(bool isAutoSave) const
     assert(0);
 }
 
-Ref<Demo> Context::GetDemo() const { return m_demo; }
+Ref<Resource<Demo>> Context::GetDemo() const { return m_demo; }
 
-void Context::SetDemo(const Ref<Demo>& demo) { m_demo = demo; }
+void Context::SetDemo(const Ref<Resource<Demo>>& demo) { m_demo = demo; }
 
 #if 0
 Context::Context(Renderer& render, IAssetFactory* assetFactory) : ResourcePreloader()

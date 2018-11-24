@@ -35,7 +35,7 @@ namespace Idogep
     class Editor : public Controller
     {
     public:
-        explicit Editor(Grafkit::Renderer& render, GkDemo::Context*const& context);
+        explicit Editor(Grafkit::Renderer& render, const std::weak_ptr<GkDemo::Context> & context);
         ~Editor();
 
         void Initialize(Grafkit::IResourceManager * const & resourceManager) override;
@@ -86,7 +86,6 @@ namespace Idogep
         bool m_isDirty;
         bool m_tmpInitTestStuff;
 
-        //GkDemo::Demo* m_demo;
-        GkDemo::Context*const& m_context;
+        std::weak_ptr<GkDemo::Context> m_context;
     };
 }

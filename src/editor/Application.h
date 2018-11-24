@@ -80,7 +80,7 @@ namespace Idogep {
 		std::shared_ptr<Grafkit::IAssetFactory> m_assetFactory;
 		std::shared_ptr<Grafkit::IAssetFactory> m_projectFileLoader;
 
-        std::unique_ptr<GkDemo::Context> m_demoContext;
+        std::shared_ptr<GkDemo::Context> m_demoContext;
 
 		QGrafkitContextWidget *m_renderWidget;
 

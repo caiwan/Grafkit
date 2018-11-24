@@ -48,15 +48,15 @@ void SceneGraph::Shutdown()
 
     m_entities.clear();
 
-    RELEASE(m_root);
+    //RELEASE(m_root);
 
-    RELEASE(m_pixelShader);
-    RELEASE(m_vertexShader);
+    //RELEASE(m_pixelShader);
+    //RELEASE(m_vertexShader);
 
     OBJECT_RELEASE();
 }
 
-void SceneGraph::BuildScene(Renderer& render) { for (auto it = m_entities.begin(); it != m_entities.end(); ++it) { (*it)->Build(render, this); } }
+void SceneGraph::BuildScene(Renderer& render) { std::for_each(m_entities.begin(), m_entities.end(), [&](auto & entity) { entity->Build(render, this); }); }
 
 void SceneGraph::BuildScene(Renderer& render, ShaderResRef vs, ShaderResRef ps)
 {
@@ -133,7 +133,7 @@ void SceneGraph::AddNode(ActorRef& node)
     m_nodes.push_back(node);
     m_nodeMap[node->GetName()] = node;
 
-    for (int i = 0; i < node->GetEntityCount(); i++) { m_entities.insert(node->GetEntity()); }
+    for (int i = 0; i < node->GetEntityCount(); ++i) { m_entities.insert(node->GetEntity(i)); }
 }
 
 ActorRef SceneGraph::GetNode(std::string name)

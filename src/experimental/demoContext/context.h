@@ -29,8 +29,8 @@ namespace GkDemo
         bool GetIsFxaa() const { return m_isFxaa; }
         void SetIsFxaa(const bool isFxaa) { m_isFxaa = isFxaa; }
 
-        Ref<Demo> GetDemo() const;
-        void SetDemo(const Ref<Demo> &demo);
+        Ref<Grafkit::Resource<Demo>> GetDemo() const;
+        void SetDemo(const Ref<Grafkit::Resource<Demo>> &demo);
 
         Grafkit::Renderer& GetDeviceContext() override { return m_render; }
         Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory.get(); }
@@ -45,9 +45,10 @@ namespace GkDemo
     protected:
         bool m_isFxaa;
         Grafkit::Renderer& m_render;
-        Ref<Demo> m_demo;
         const std::shared_ptr<Grafkit::IAssetFactory> m_assetFactory;
         std::string m_myBasePath;
+
+        Ref<Grafkit::Resource<Demo>> m_demo;
 
         std::map<std::string, std::function<Ref<Grafkit::IResourceBuilder>(const Json &)>> m_loaders;
     };

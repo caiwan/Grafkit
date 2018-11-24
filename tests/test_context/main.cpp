@@ -14,13 +14,10 @@ using ::testing::TestPartResult;
 using ::testing::UnitTest;
 
 int main(int argc, char **argv) {
-    Grafkit::Log::Logger().AddHandler(new TestLoggerHandler());
+    Grafkit::Log::Logger().AddHandler(std::make_shared<TestLoggerHandler>());
 
 	InitGoogleTest(&argc, argv);
 	int res = RUN_ALL_TESTS();
 
-//#ifdef _DEBUG
-//	system("pause");
-//#endif // _DEBUG
 	return res;
 }

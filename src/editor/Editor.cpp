@@ -18,14 +18,13 @@ using namespace Idogep;
 using namespace GkDemo;
 using namespace Grafkit;
 
-Editor::Editor(Renderer& render, Context* const& context)
+Editor::Editor(Renderer& render, const std::weak_ptr<Context> & context)
     : Controller()
     , m_render(render)
     , m_precalcRequested(false)
     , m_reloadRequested(false)
     , m_isDirty(false)
     , m_tmpInitTestStuff(false)
-    //, m_demo(nullptr)
     , m_context(context)
 {
     m_commandStack = new CommandStack();
@@ -53,17 +52,18 @@ void Editor::Initialize(IResourceManager* const& resman)
 
 void Editor::InitializeDocument()
 {
-    m_context->SetIsFxaa(true);
-    Demo* demo = m_context->GetDemo();
+    auto context = m_context.lock();
+    context->SetIsFxaa(true);
+    Demo* demo = context->GetDemo()->Get();
     assert(demo);
     try
     {
-        m_context->DoPrecalc();
+        context->DoPrecalc();
 
         // TODO: remove it later on 
 
         //m_context->Intitialize();
-        m_context->DoPrecalc();
+        context->DoPrecalc();
 
         m_musicProxy->m_music = demo->GetMusic();
 
@@ -75,7 +75,7 @@ void Editor::InitializeDocument()
         MessageBoxA(nullptr, ex.what(), "Exception", 0);
 
         delete demo;
-        m_context->SetDemo(nullptr);
+        context->SetDemo(nullptr);
 
         // TODO: Rollback stuff here or some shit 
     }
@@ -85,7 +85,10 @@ void Editor::InitializeDocument()
 
 bool Editor::RenderFrame()
 {
-    Demo* demo = m_context->GetDemo();
+    auto context = m_context.lock();
+    Demo* demo = nullptr;
+    if (context->GetDemo())
+        demo = context->GetDemo()->Get();
 
     if (m_reloadRequested)
     {
@@ -96,7 +99,7 @@ bool Editor::RenderFrame()
 
     if (m_precalcRequested)
     {
-        m_context->DoPrecalc();
+        context->DoPrecalc();
         m_precalcRequested = false;
         return true;
     }
@@ -112,7 +115,8 @@ bool Editor::RenderFrame()
     if (m_musicProxy->IsPlaying())
         onDemoTimeChanged(time);
 
-    do {} while (m_context->GetAssetFactory()->PollEvents(m_context));
+    // TODO: Bring this one here to the editor itself
+    do {} while (context->GetAssetFactory()->PollEvents(context.get()));
 
     return true;
 }
@@ -127,7 +131,7 @@ void Editor::NewDocument()
 void Editor::SaveDocument() 
 {
     //m_context->SaveCache();
-    m_context->SaveSchema();
+    m_context.lock()->SaveSchema();
 }
 
 void Editor::OpenDocument() {
@@ -141,8 +145,9 @@ void Editor::OpenDocument() {
     {
         try
         {
-            m_context->Relocate(path);
-            m_context->LoadDemo("schema.json");
+            auto context = m_context.lock();
+            context->Relocate(path);
+            context->LoadDemo("schema.json");
             m_reloadRequested = true;
         }
         catch (FWdebug::Exception & ex)
@@ -154,4 +159,4 @@ void Editor::OpenDocument() {
 
 bool Editor::DirtyCheck() const { return false; }
 
-IResourceManager* Editor::GetResourceManager() const { return m_context; }
+IResourceManager* Editor::GetResourceManager() const { return m_context.lock().get(); }
