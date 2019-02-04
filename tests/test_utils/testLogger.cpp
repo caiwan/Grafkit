@@ -24,16 +24,13 @@ namespace
     };
 }
 
-TestLoggerHandler::TestLoggerHandler() {
-}
-
-void TestLoggerHandler::Write(Grafkit::Logger::message_t* const& message)
+void TestLoggerHandler::Write(const Grafkit::Logger::message_t& message) 
 {
     do
     {
-        ColoredPrintf(colors[message->type], formatStrings[message->type]);
-        ColoredPrintf(colors[message->type], message->message);
-        ColoredPrintf(colors[message->type], "\r\n");
+        ColoredPrintf(colors[message.type], formatStrings[message.type]);
+        ColoredPrintf(colors[message.type], message.message);
+        ColoredPrintf(colors[message.type], "\r\n");
     }
     while (false);
 }

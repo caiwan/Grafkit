@@ -10,7 +10,7 @@ using namespace  Grafkit;
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
 
-Material* Material::g_lastMaterial = nullptr;
+//Material* Material::g_lastMaterial = nullptr;
 
 PERSISTENT_IMPL(Grafkit::Material);
 
@@ -34,20 +34,10 @@ namespace {
 // ====================================
 
 Material::Material() : Object()
-, m_lastVShader(nullptr)
-, m_lastPShader(nullptr)
 , m_colors_id(0)
 , m_params_id(0)
 {
-    //CreateUuid();
-
-    //ZeroMemory(&m_colors, sizeof(m_colors));
-    //ZeroMemory(&m_params, sizeof(m_params));
-
     m_colors.diffuse = float4(1, 1, 1, 1);
-}
-
-Material::~Material() {
 }
 
 TextureResRef Material::GetTexture(std::string bindName) const
@@ -100,21 +90,8 @@ void Material::RemoveTexture(TextureResRef texture, texture_type_e slot)
 
 // ====================================
 
-void Material::Render(Renderer& render, ShaderRef &vs, ShaderRef &fs)
+void Material::Render(Renderer& render, ShaderRes &vs, ShaderRes &fs)
 {
-#if 0
-    if (g_lastMaterial == this && m_lastVShader == vs && m_lastPShader == fs)
-        return;
-
-    g_lastMaterial = this;
-    if (m_lastVShader != fs || m_lastPShader) {
-        m_lastPShader = fs;
-        m_lastVShader = vs;
-        //m_colors_id = vs->GetParamId(render, )
-        //m_params_id = 
-    }
-#endif 
-
     vs->SetParam(render, "material_colors", &m_colors);
     fs->SetParam(render, "material_params", &m_params);
 
@@ -122,14 +99,15 @@ void Material::Render(Renderer& render, ShaderRef &vs, ShaderRef &fs)
         fs->SetBoundedResourcePointer(render, texture_map_names[i], nullptr);
     }
 
-    for (auto it = this->m_textures.begin(); it != this->m_textures.end(); ++it) {
-        if (it->second.Valid() && it->second->Valid()) {
-            vs->SetShaderResourceView(render, it->first, static_cast<ID3D11ShaderResourceView*>(**it->second));
-            fs->SetShaderResourceView(render, it->first, static_cast<ID3D11ShaderResourceView*>(**it->second));
+    for (auto &it : m_textures)
+    {
+        if (it.second.Valid()) {
+            vs->SetShaderResourceView(render, it.first, it.second->GetShaderResourceView());
+            fs->SetShaderResourceView(render, it.first, it.second->GetShaderResourceView());
         }
         else {
-            vs->SetShaderResourceView(render, it->first, nullptr);
-            fs->SetShaderResourceView(render, it->first, nullptr);
+            vs->SetShaderResourceView(render, it.first, nullptr);
+            fs->SetShaderResourceView(render, it.first, nullptr);
         }
     }
 }
@@ -147,11 +125,3 @@ bool Material::GetTextureMap(std::map<std::string, TextureResRef>& textureMap) c
 
     return true;
 }
-
-//void Material::Serialize(Archive & ar)
-//{
-//    _Serialize(ar);
-//
-//    PERSIST_FIELD(ar, m_colors);
-//    PERSIST_FIELD(ar, m_params);
-//}

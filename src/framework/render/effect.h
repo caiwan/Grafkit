@@ -18,164 +18,165 @@ namespace Grafkit {
     class Mesh;
     typedef Ref<Mesh> MeshRef;
 
-	class ShaderParameter;
+    class ShaderParameter;
 
     typedef Ref<ShaderParameter> ShaderParameterRef;
     //typedef std::shared_ptr<ShaderParameter> ShaderParameterRef;
 
-	class EffectComposer;
-	class EffectPass;
+    class EffectComposer;
+    class EffectPass;
 
-	typedef Ref<EffectComposer> EffectComposerRef_t;
-	typedef Ref<EffectPass> EffectPassRef;
+    typedef Ref<EffectComposer> EffectComposerRef_t;
+    typedef Ref<EffectPass> EffectPassRef;
 
     //typedef std::shared_ptr<EffectComposer> EffectComposerRef;
     //typedef std::shared_ptr<EffectPass> EffectPassRef;
 
-	// ---------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------
 
-	// Legacy stuff.
-	// Will be thrown out
-	__declspec(align(16)) class EffectComposer : virtual public Referencable, public AlignedNew<EffectComposer>
-	{
-	public:
-		EffectComposer();
-		virtual ~EffectComposer();
+    __declspec(align(16)) class EffectComposer : virtual public Referencable, public AlignedNew<EffectComposer>
+    {
+    public:
+        EffectComposer();
 
-		void Initialize(Renderer &m_render, bool singlepass = false);
-		void Shutdown();
+        EffectComposer(const EffectComposer& other) = delete;
+        EffectComposer& operator=(const EffectComposer& other) = delete;
 
-		void AddPass(EffectPassRef pass) { m_effectChain.push_back(pass); }
+        void Initialize(Renderer &m_render, bool singlepass = false);
 
-		EffectPassRef GetPass(size_t id) { return id < m_effectChain.size() ? m_effectChain[id] : EffectPassRef(); }
+        void AddPass(EffectPassRef pass) { m_effectChain.push_back(pass); }
 
-		void BindInput(Renderer &m_render);
-		void UnbindInput(Renderer& m_render);
+        EffectPassRef GetPass(size_t id) { return id < m_effectChain.size() ? m_effectChain[id] : EffectPassRef(); }
 
-		void Render(Renderer &m_render, int autoflush = 1);
-		void Flush(Renderer &m_render);
+        void BindInput(Renderer &m_render);
+        void UnbindInput(Renderer& m_render);
 
-		void SetInput(size_t bind, const Texture2DResRef &tex) { m_inputMap[bind] = tex; }
-		Texture2DResRef GetInput(size_t bind) const { auto it = m_inputMap.find(bind); return it == m_inputMap.end() ? Texture2DResRef() : it->second; }
-		void ClearInput() { m_inputMap.clear(); }
+        void Render(Renderer &m_render, int autoflush = 1);
+        void Flush(Renderer &m_render);
 
-		void SetOutput(Texture2DResRef tex) { m_chainOutput = tex; }
+        void SetInput(size_t bind, const Texture2DResRef &tex) { m_inputMap[bind] = tex; }
+        Texture2DResRef GetInput(size_t bind) const { auto it = m_inputMap.find(bind); return it == m_inputMap.end() ? Texture2DResRef() : it->second; }
+        void ClearInput() { m_inputMap.clear(); }
 
-	protected:
-		void SwapBuffers();
-		void FlushBuffers();
-		void RenderChain(Renderer &m_render);
+        void SetOutput(Texture2DResRef tex) { m_chainOutput = tex; }
 
-		//std::vector<Ref<EffectComposer>> m_parentSource;
+    protected:
+        void SwapBuffers();
+        void FlushBuffers();
+        void RenderChain(Renderer &m_render);
 
-		Texture2DRef m_texOut[4];
-        Texture2D *m_pTexRead, *m_pTexWrite, *m_pTexFront, *m_pTexBack;
+        //std::vector<Ref<EffectComposer>> m_parentSource;
 
-		Texture2DResRef m_chainOutput;
+        Texture2DRes m_texOut[4]; // These will be managed, but ...
+        Texture2DRef m_pTexRead, m_pTexWrite, m_pTexFront, m_pTexBack; // ... these will be swapped around, but will not be managed
 
-		TextureSamplerRef m_textureSampler;
+        Texture2DRes m_chainOutput;
 
-		MeshRef m_fullscreenquad;
-		ShaderRef m_shaderFullscreenQuad;
-		ShaderRef m_shaderCopyScreen;
+        TextureSamplerRes m_textureSampler;
 
-		std::vector<EffectPassRef> m_effectChain;
-		typedef std::map<size_t, Texture2DResRef> bind_map_t;
+        MeshRef m_fullscreenquad;
+        ShaderRes m_shaderFullscreenQuad;
+        ShaderRes m_shaderCopyScreen;
 
-		bind_map_t m_inputMap;
+        std::vector<EffectPassRef> m_effectChain;
+        typedef std::map<size_t, Texture2DResRef> bind_map_t;
 
-		struct {
-			float4 s, v;
-		} m_screen_params;
+        bind_map_t m_inputMap;
 
-		bool m_singlepass;
-	};
+        struct {
+            float4 s, v;
+        } m_screen_params;
 
-	// ---------------------------------------------------------------------------------------------------
+        bool m_singlepass;
+    };
 
-	//typedef EffectComposerRef_t EffectComposerRef;
+    // ---------------------------------------------------------------------------------------------------
 
-	// ===================================================================================================
+    //typedef EffectComposerRef_t EffectComposerRef;
 
-	__declspec(align(16)) class EffectRender : virtual public Referencable, public AlignedNew<EffectComposer>
-	{ 
-	public:
-		EffectRender();
-		~EffectRender();
+    // ===================================================================================================
 
-		void Initialize(Renderer &render);
-		void Shutdown();
+    __declspec(align(16)) class EffectRender : virtual public Referencable, public AlignedNew<EffectComposer>
+    {
+    public:
+        EffectRender();
 
-		void AddPass(const EffectPassRef &pass) { m_effects.push_back(pass); }
-		EffectPassRef GetPass(size_t id) { return id < m_effects.size() ? m_effects[id] : EffectPassRef(); }
+        EffectRender(const EffectRender& other) = delete;
+        EffectRender& operator=(const EffectRender& other) = delete;
 
-		void Render(Renderer &render, const Texture2DRef &output = nullptr);
+        void Initialize(Renderer &render);
 
-	private:
-		std::vector<EffectPassRef> m_effects;
+        void AddPass(const EffectPassRef &pass) { m_effects.push_back(pass); }
+        EffectPassRef GetPass(size_t id) { return id < m_effects.size() ? m_effects[id] : EffectPassRef(); }
 
-		Texture2DRef m_texOut[2];
-		Texture2D *m_pTexRead, *m_pTexWrite;
+        void Render(Renderer &render, const Texture2DRef &output = nullptr);
 
-		TextureSamplerRef m_textureSampler;
+    private:
+        std::vector<EffectPassRef> m_effects;
 
-		MeshRef m_fullscreenquad;
-		ShaderRef m_shaderFullscreenQuad;
-		ShaderRef m_shaderCopyScreen;
+        Texture2DRes m_texOut[2];
+        Texture2DRef m_pTexRead, m_pTexWrite;
 
-		struct {
-			float4 screen, view;
-		} m_viewportParams;
-	};
+        TextureSamplerRes m_textureSampler;
+
+        MeshRef m_fullscreenquad;
+        ShaderRes m_shaderFullscreenQuad;
+        ShaderRes m_shaderCopyScreen;
+
+        struct {
+            float4 screen, view;
+        } m_viewportParams;
+    };
 
 
-	// ===================================================================================================
+    // ===================================================================================================
 
-	__declspec(align(16)) class EffectPass : virtual public Referencable, public AlignedNew<EffectPass>
-	{
-		friend class EffectComposer;
-	public:
-	    explicit EffectPass(ShaderResRef shader);
-		~EffectPass();
+    __declspec(align(16)) class EffectPass : virtual public Referencable, public AlignedNew<EffectPass>
+    {
+        friend class EffectComposer;
+    public:
+        explicit EffectPass(ShaderResRef shader);
 
-		void Initialize(Renderer &m_render);
-		void Shutdown();
+        EffectPass(const EffectPass& other) = delete;
+        EffectPass& operator=(const EffectPass& other) = delete;
 
-		size_t BindOutputs(Renderer &m_render);
-		size_t UnbindOutputs(Renderer &m_render);
+        void Initialize(Renderer &m_render);
 
-		void BindFx(Renderer &m_render);
-		void UnbindFx(Renderer &m_render);
+        size_t BindOutputs(Renderer &m_render);
+        size_t UnbindOutputs(Renderer &m_render);
 
-		ShaderResRef GetShader() const { return m_shader; }
+        void BindFx(Renderer &m_render);
+        void UnbindFx(Renderer &m_render);
 
-		// Ezeknke itt semmi ertelme nincs meg: 
-		void SetOutput(size_t bind, const Texture2DResRef &tex) { m_output_map[bind] = tex; }
-		void SetInput(std::string name, const Texture2DResRef &tex) { m_inputMap[name] = tex; }
+        ShaderResRef GetShader() const { return m_shader; }
 
-		void ClearOutputs() { m_output_map.clear(); }
-		void ClearInputs() { m_inputMap.clear(); }
+        // Ezeknke itt semmi ertelme nincs meg: 
+        void SetOutput(size_t bind, const Texture2DResRef &tex) { m_output_map[bind] = tex; }
+        void SetInput(std::string name, const Texture2DResRef &tex) { m_inputMap[name] = tex; }
 
-		Texture2DResRef GetOutput(size_t bind);
-		Texture2DResRef GetInput(std::string name);
+        void ClearOutputs() { m_output_map.clear(); }
+        void ClearInputs() { m_inputMap.clear(); }
 
-		ShaderParameterRef GetParameter() const { return m_shaderParameter; }
+        Texture2DResRef GetOutput(size_t bind);
+        Texture2DResRef GetInput(std::string name);
 
-	private:
-		ShaderResRef m_shader;
+        ShaderParameterRef GetParameter() const { return m_shaderParameter; }
 
-		ShaderParameterRef m_shaderParameter;
+    private:
+        ShaderResRef m_shader;
 
-		typedef std::map<size_t, Texture2DResRef> bind_map_t;
-		typedef bind_map_t::iterator bind_map_it_t;
-		typedef std::map<std::string, Texture2DResRef> name_map_t;
-		typedef name_map_t::iterator name_map_it_t;
+        ShaderParameterRef m_shaderParameter;
 
-		bind_map_t m_output_map;
-		name_map_t m_inputMap;
+        typedef std::map<size_t, Texture2DResRef> bind_map_t;
+        typedef bind_map_t::iterator bind_map_it_t;
+        typedef std::map<std::string, Texture2DResRef> name_map_t;
+        typedef name_map_t::iterator name_map_it_t;
 
-	};
+        bind_map_t m_output_map;
+        name_map_t m_inputMap;
 
-	// ===================================================================================================
+    };
+
+    // ===================================================================================================
 
 }

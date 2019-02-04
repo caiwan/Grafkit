@@ -8,31 +8,44 @@
 #include "Light.h"
 #include "shader.h"
 
+#include "dxtypes.h"
+
 PERSISTENT_IMPL(Grafkit::SceneGraph);
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 SceneGraph::SceneGraph() : Object()
-    , m_root(nullptr)
-    , m_tAnim(0) {
+, m_root(nullptr)
+//, m_tAnim(0) 
+{
 }
 
-SceneGraph::~SceneGraph() { Shutdown(); }
+//SceneGraph::~SceneGraph() { Shutdown(); }
 
 void SceneGraph::Initialize()
 {
-    std::stack<ActorRef> stack;
-    stack.push(m_root);
+    m_nodes.clear();
+    m_nodeMap.clear();
+
+    std::stack <std::pair<ActorRef, ActorRef>> stack; // node, parent
+    stack.push(std::make_pair(m_root, nullptr));
 
     while (!stack.empty())
     {
-        ActorRef node = stack.top();
+        auto nodePair = stack.top();
+        auto &node = nodePair.first;
         stack.pop();
 
-        AddNode(node);
+        if (nodePair.first)
+        {
+            m_nodes.push_back(nodePair);
+            m_nodeMap[node->GetName()] = node;
+        }
 
-        for (int i = 0; i < node->GetChildrenCount(); i++) { stack.push(node->GetChild(i)); }
+        for (int i = 0; i < node->GetEntityCount(); ++i) { m_entities.insert(node->GetEntity(i)); }
+
+        for (int i = 0; i < node->GetChildrenCount(); i++) { stack.push(std::make_pair(node->GetChild(i), node)); }
     }
 }
 
@@ -42,29 +55,13 @@ void SceneGraph::Initialize(ActorRef root)
     Initialize();
 }
 
-void SceneGraph::Shutdown()
+void SceneGraph::BuildScene(Renderer& render) { std::for_each(m_entities.begin(), m_entities.end(), [&](auto & entity) { entity->Build(render, *this); }); }
+
+void SceneGraph::BuildScene(Renderer& render, const ShaderRes& vs, const ShaderRes& ps) 
 {
-    m_nodeMap.clear();
-
-    m_entities.clear();
-
-    //RELEASE(m_root);
-
-    //RELEASE(m_pixelShader);
-    //RELEASE(m_vertexShader);
-
-    OBJECT_RELEASE();
-}
-
-void SceneGraph::BuildScene(Renderer& render) { std::for_each(m_entities.begin(), m_entities.end(), [&](auto & entity) { entity->Build(render, this); }); }
-
-void SceneGraph::BuildScene(Renderer& render, ShaderResRef vs, ShaderResRef ps)
-{
-    if (vs.Valid())
-        m_vertexShader = vs;
-
-    if (ps.Valid())
-        m_pixelShader = ps;
+    assert(vs && ps);
+    m_vertexShader = vs;
+    m_pixelShader = ps;
     BuildScene(render);
 }
 
@@ -76,13 +73,13 @@ void SceneGraph::Update()
 {
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
-        const ActorRef& actor = m_nodes[i];
-        const ActorRef& parent = actor->GetParent();
+        const ActorRef& actor = m_nodes[i].first;
+        const ActorRef& parent = m_nodes[i].second;
         const Matrix& matrix = actor->Matrix();
         const Matrix& transform = actor->Transform();
 
         Matrix world = actor->WorldMatrix();
-        if (parent.Invalid())
+        if (!parent)
             world.Identity();
         else
             world = parent->WorldMatrix();
@@ -92,7 +89,7 @@ void SceneGraph::Update()
     }
 }
 
-void SceneGraph::Render(Renderer& render, CameraRef& camera)
+void SceneGraph::Render(Renderer& render, const CameraRef& camera)
 {
     m_worldMatrices.viewMatrix = XMMatrixTranspose(camera->GetWorldMatrix().Get());
     m_worldMatrices.projectionMatrix = XMMatrixTranspose(camera->GetPerspectiveMatrix().Get());
@@ -101,53 +98,31 @@ void SceneGraph::Render(Renderer& render, CameraRef& camera)
     m_currentWorldMatrix.Identity();
     m_worldMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
 
-    Shader* ps = m_pixelShader->Get();
-    Shader* vs = m_vertexShader->Get();
+    m_vertexShader->Bind(render);
+    m_pixelShader->Bind(render);
 
-    vs->Bind(render);
-    ps->Bind(render);
-
-    int vsMatrixId = vs->GetParamId("MatrixBuffer");
-    int psMatrixId = ps->GetParamId("MatrixBuffer");
+    int vsMatrixId = m_vertexShader->GetParamId("MatrixBuffer");
+    int psMatrixId = m_pixelShader->GetParamId("MatrixBuffer");
 
     // render scenegraph
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
-        ActorRef& actor = m_nodes[i];
+        ActorRef& actor = m_nodes[i].first;
         m_worldMatrices.worldMatrix = XMMatrixTranspose(actor->WorldMatrix().Get());
-        vs->SetParamT(render, vsMatrixId, m_worldMatrices);
-        ps->SetParamT(render, psMatrixId, m_worldMatrices);
+        m_vertexShader->SetParamT(render, vsMatrixId, m_worldMatrices);
+        m_pixelShader->SetParamT(render, psMatrixId, m_worldMatrices);
 
-        if (!actor->IsHidden()) { actor->Render(render, this); }
+        if (!actor->IsHidden()) { actor->Render(render, *this); }
     }
 
-    vs->Unbind(render);
-    ps->Unbind(render);
+    m_vertexShader->Unbind(render);
+    m_pixelShader->Unbind(render);
 }
 
-void SceneGraph::AddNode(ActorRef& node)
-{
-    if (node.Invalid())
-        return;
-
-    m_nodes.push_back(node);
-    m_nodeMap[node->GetName()] = node;
-
-    for (int i = 0; i < node->GetEntityCount(); ++i) { m_entities.insert(node->GetEntity(i)); }
-}
-
-ActorRef SceneGraph::GetNode(std::string name)
+ActorRef SceneGraph::GetNode(const std::string & name)
 {
     auto it = m_nodeMap.find(name);
     if (it != m_nodeMap.end())
         return it->second;
     return nullptr;
 }
-
-//void SceneGraph::Serialize(Archive& ar)
-//{
-//    _Serialize(ar);
-//    // actorok, entityk exportja, importja goez here 
-//    // a regi scene loaderbol ki kell szedni es ide be kell rakosgatni
-//    assert(0);
-//}

@@ -47,6 +47,7 @@ namespace
     float aiMatkeyToFloat(const aiMaterial*const & mat, const char* key, int a1, int a2);
 }
 
+# if 0
 void MeshLoader::Load(IResourceManager* const& resman, IResource* source) {
     // if no cache exists || cached file is old
     if (true)
@@ -72,11 +73,18 @@ void MeshLoader::Load(IResourceManager* const& resman, IResource* source) {
         resource->AssingnRef(meshes.front());
     }
 }
+#endif 
 
 void MeshLoader::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
     // ... 
 }
 
+
+void MeshLoader::Load(const std::shared_ptr<Grafkit::IResource>& resource, Grafkit::ResourceManager& resourceManager) {
+}
+
+void MeshLoader::Initialize(const std::shared_ptr<Grafkit::IResource>& resource, Grafkit::ResourceManager& resourceManager) {
+}
 
 void MeshLoader::LoadMeshes(std::vector<MeshRef>& meshes, const aiScene*& sourceScene)
 {
@@ -90,7 +98,7 @@ void MeshLoader::LoadMeshes(std::vector<MeshRef>& meshes, const aiScene*& source
     for (size_t i = 0; i < sourceScene->mNumMeshes; i++)
     {
         // -- meshes
-        MeshRef mesh = new Mesh();
+        MeshRef mesh = MeshRef(new Mesh());
         const aiMesh* srcMesh = sourceScene->mMeshes[i];
 
         const char* meshName = srcMesh->mName.C_Str();
@@ -99,6 +107,7 @@ void MeshLoader::LoadMeshes(std::vector<MeshRef>& meshes, const aiScene*& source
 
         const auto vertexCount = srcMesh->mNumVertices;
 
+        // TODO use unique_ptr instead
         float4* const vertices = new float4[vertexCount];
         float2* const texuvs = new float2[vertexCount];
         float4* const normals = new float4[vertexCount];

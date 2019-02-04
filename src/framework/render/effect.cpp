@@ -16,8 +16,6 @@ EffectComposer::EffectComposer() :
     , m_singlepass(false) {
 }
 
-EffectComposer::~EffectComposer() { this->Shutdown(); }
-
 #include "builtin_data/cube.h"
 #include "builtin_data/defaultShader.h"
 
@@ -33,22 +31,22 @@ void EffectComposer::Initialize(Renderer& render, bool singlepass)
     {
         for (int i = 0; i < 4; i++)
         {
-            m_texOut[i] = Texture2DRef(new Texture2D());
+            m_texOut[i] = Texture2DRes(Texture2DRef(new Texture2D()));
             m_texOut[i]->Initialize(render);
         }
 
-        m_pTexFront = m_texOut[0];
-        m_pTexBack = m_texOut[1];
-        m_pTexRead = m_texOut[2];
-        m_pTexWrite = m_texOut[3];
+        m_pTexFront = *m_texOut[0];
+        m_pTexBack = *m_texOut[1];
+        m_pTexRead = *m_texOut[2];
+        m_pTexWrite = *m_texOut[3];
     }
 
     // -- 
-    m_textureSampler = new TextureSampler();
+    m_textureSampler = TextureSamplerRes(TextureSamplerRef(new TextureSampler()));
     m_textureSampler->Initialize(render);
 
     // --- 
-    m_shaderFullscreenQuad = ShaderRef(new VertexShader());
+    m_shaderFullscreenQuad = ShaderRes(ShaderRef(new VertexShader()));
     m_shaderFullscreenQuad->LoadFromMemory(
         render,
         effectFullscreenQuadEntry,
@@ -56,7 +54,7 @@ void EffectComposer::Initialize(Renderer& render, bool singlepass)
         "FullscreenQuad"
     );
 
-    m_shaderCopyScreen = ShaderRef(new PixelShader());
+    m_shaderCopyScreen = ShaderRes(ShaderRef(new PixelShader()));
     m_shaderCopyScreen->LoadFromMemory(
         render,
         effectCopyScreenEntry,
@@ -83,12 +81,6 @@ void EffectComposer::Initialize(Renderer& render, bool singlepass)
     for (auto it = m_effectChain.begin(); it != m_effectChain.end(); ++it) { (*it)->Initialize(render); }
 
     LOGGER(Log::Logger().Trace("FX Chain OK"));
-}
-
-void EffectComposer::Shutdown()
-{
-    // nothing to do 
-    // a refcounter elviekben megsemmisit mindent
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -154,7 +146,7 @@ void EffectComposer::SwapBuffers()
     if (m_singlepass)
         return;
 
-    Texture2D* tmp = m_pTexWrite;
+    const auto &tmp = m_pTexWrite;
     m_pTexWrite = m_pTexRead;
     m_pTexRead = tmp;
 }
@@ -166,7 +158,7 @@ void EffectComposer::FlushBuffers()
 
     SwapBuffers();
 
-    auto tmp = m_pTexFront;
+    const auto &tmp = m_pTexFront;
     m_pTexFront = m_pTexBack;
     m_pTexBack = tmp;
 }
@@ -183,14 +175,14 @@ void EffectComposer::RenderChain(Renderer& render)
         Ref<EffectPass> const & fx = m_effectChain[fxid];
         if (!m_singlepass)
         {
-            render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(*m_pTexWrite));
+            render.SetRenderTargetView(m_pTexWrite->GetRenderTargetView());
             render.ApplyRenderTargetView(1);
             render.BeginScene();
         }
 
-        if (fx && fx->GetShader() && *(fx->GetShader()))
+        if (fx && fx->GetShader())
         {
-            auto fxShader = (fx->GetShader()->Get());
+            ShaderRef fxShader = *fx->GetShader();
             if (!m_singlepass)
             {
                 fxShader->SetShaderResourceView(render, "backBuffer", m_pTexBack->GetShaderResourceView());
@@ -229,10 +221,10 @@ void EffectComposer::Flush(Renderer& render)
         return;
 
     // ezt ki kell majd baszni innen 
-    if (m_chainOutput.Invalid()) { render.SetRenderTargetView(); }
+    if (!m_chainOutput) { render.SetRenderTargetView(); }
     else
     {
-        render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(**m_chainOutput));
+        render.SetRenderTargetView(m_chainOutput->GetRenderTargetView());
         //m_chainOutput->SetRenderTargetView(0);
     }
 
@@ -254,7 +246,7 @@ void EffectComposer::Flush(Renderer& render)
     m_shaderFullscreenQuad->Unbind(render);
 
     // ezt ki kell majd baszni innen 
-    if (m_chainOutput.Valid())
+    if (m_chainOutput)
     {
         render.SetRenderTargetView();
         render.ApplyRenderTargetView();
@@ -270,27 +262,24 @@ EffectRender::EffectRender() : m_pTexRead(nullptr)
 , m_pTexWrite(nullptr) {
 }
 
-EffectRender::~EffectRender() {
-}
-
 void EffectRender::Initialize(Renderer& render)
 {
     LOGGER(Log::Logger().Trace("Initializing FX Chain"));
 
     for (int i = 0; i < 2; i++)
     {
-        m_texOut[i] = Texture2DRef(new Texture2D());
+        m_texOut[i] = Texture2DRes(Texture2DRef(new Texture2D()));
         m_texOut[i]->Initialize(render);
     }
-    m_pTexRead = m_texOut[0];
-    m_pTexWrite = m_texOut[1];
+    m_pTexRead = *m_texOut[0];
+    m_pTexWrite = *m_texOut[1];
 
     // -- 
-    m_textureSampler = TextureSamplerRef(new TextureSampler());
+    m_textureSampler = TextureSamplerRes(TextureSamplerRef(new TextureSampler()));
     m_textureSampler->Initialize(render);
 
     // --- 
-    m_shaderFullscreenQuad = ShaderRef(new VertexShader());
+    m_shaderFullscreenQuad = ShaderRes(ShaderRef(new VertexShader()));
     m_shaderFullscreenQuad->LoadFromMemory(
         render,
         effectFullscreenQuadEntry,
@@ -298,7 +287,7 @@ void EffectRender::Initialize(Renderer& render)
         "FullscreenQuad"
     );
 
-    m_shaderCopyScreen = ShaderRef(new PixelShader());
+    m_shaderCopyScreen = ShaderRes(ShaderRef(new PixelShader()));
     m_shaderCopyScreen->LoadFromMemory(
         render,
         effectCopyScreenEntry,
@@ -329,9 +318,6 @@ void EffectRender::Initialize(Renderer& render)
     LOGGER(Log::Logger().Trace("FX Chain OK"));
 }
 
-void EffectRender::Shutdown() { // ... 
-}
-
 //TODO: No outpout is used here
 void EffectRender::Render(Renderer& render, const Texture2DRef &output)
 {
@@ -344,7 +330,7 @@ void EffectRender::Render(Renderer& render, const Texture2DRef &output)
     {
         Ref<EffectPass> const & fx = m_effects[fxid];
 
-        render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(*m_pTexWrite));
+        render.SetRenderTargetView(m_pTexWrite->GetRenderTargetView());
         render.ApplyRenderTargetView(1);
         render.BeginScene();
 
@@ -369,8 +355,6 @@ void EffectRender::Render(Renderer& render, const Texture2DRef &output)
 EffectPass::EffectPass(ShaderResRef shader) : m_shader(shader) {
 }
 
-EffectPass::~EffectPass() { this->Shutdown(); }
-
 // ---------------------------------------------------------------------------------------------------
 
 void EffectPass::Initialize(Renderer& render)
@@ -382,8 +366,6 @@ void EffectPass::Initialize(Renderer& render)
     LOGGER(Log::Logger().Trace("FX Init pass %s", m_shader->GetName().c_str()));
 }
 
-void EffectPass::Shutdown() { m_shaderParameter = nullptr; }
-
 // ---------------------------------------------------------------------------------------------------
 
 size_t EffectPass::BindOutputs(Renderer& render)
@@ -391,9 +373,9 @@ size_t EffectPass::BindOutputs(Renderer& render)
     size_t count = 0;
     for (auto it = m_output_map.begin(); it != m_output_map.end(); ++it)
     {
-        if (it->second.Valid())
+        if (it->second)
         {
-            render.SetRenderTargetView(static_cast<ID3D11RenderTargetView *>(**(it->second)), it->first);
+            render.SetRenderTargetView(it->second->GetRenderTargetView(), it->first);
             count++;
         }
     }
@@ -405,7 +387,7 @@ size_t EffectPass::UnbindOutputs(Renderer& render)
     size_t count = 0;
     for (auto it = m_output_map.begin(); it != m_output_map.end(); ++it)
     {
-        if (it->second.Valid())
+        if (it->second)
         {
             render.SetRenderTargetView(nullptr, it->first);
             count++;
@@ -416,16 +398,16 @@ size_t EffectPass::UnbindOutputs(Renderer& render)
 
 void EffectPass::BindFx(Renderer& render)
 {
-    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it) { m_shader->Get()->SetShaderResourceView(render, it->first, (*it->second)->GetShaderResourceView()); }
+    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it) { m_shader->SetShaderResourceView(render, it->first, (*it->second)->GetShaderResourceView()); }
 
     m_shaderParameter->BindParameters(render);
-    m_shader->Get()->Bind(render);
+    m_shader->Bind(render);
 }
 
 void EffectPass::UnbindFx(Renderer& render)
 {
-    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it) { m_shader->Get()->SetShaderResourceView(render, it->first, nullptr); }
-    m_shader->Get()->Unbind(render);
+    for (auto it = m_inputMap.begin(); it != m_inputMap.end(); ++it) { m_shader->SetShaderResourceView(render, it->first, nullptr); }
+    m_shader->Unbind(render);
 }
 
 Texture2DResRef EffectPass::GetOutput(size_t bind)

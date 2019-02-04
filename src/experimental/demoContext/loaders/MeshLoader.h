@@ -31,28 +31,19 @@ namespace GkDemo
         void Serialize(A& a) { a & filename & typeHint /*& meshIndex*/; }
     };
 
-    class MeshLoader : public Grafkit::ResourceBuilder<Grafkit::Mesh, MeshLoadParams>
+    class MeshLoader : public Grafkit::ResourceLoader<Grafkit::Mesh, MeshLoadParams>
     {
     public:
-        MeshLoader() {
+
+        MeshLoader(const std::string& id, const MeshLoadParams& params)
+            : ResourceLoader<Grafkit::Mesh, MeshLoadParams>(id, params) {
         }
 
-        explicit MeshLoader(const MeshLoadParams& params)
-            : ResourceBuilder<Grafkit::Mesh, MeshLoadParams>(params) {
-        }
 
-        MeshLoader(const std::string& name, const std::string& uuid, const MeshLoadParams& params)
-            : ResourceBuilder<Grafkit::Mesh, MeshLoadParams>(name, uuid, params) {
-        }
-
-        void Load(Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override;
-        void Initialize(Grafkit::Renderer& render, Grafkit::IResourceManager* const& resman, Grafkit::IResource* source) override;
-
-        SERIALIZE(GkDemo::MeshLoader, 1, ar)
-        {
-            assert(0);
-        }
-
+    protected:
+        void Load(const std::shared_ptr<Grafkit::IResource>& resource, Grafkit::ResourceManager& resourceManager) override;
+        void Initialize(const std::shared_ptr<Grafkit::IResource>& resource, Grafkit::ResourceManager& resourceManager) override;
+    
         static void LoadMeshes(std::vector<Grafkit::MeshRef>& meshes, const aiScene const*& souceScene);
 
     };

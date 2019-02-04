@@ -29,8 +29,8 @@ Model::Model(MeshRef mesh, MaterialRef material) :
     , m_mesh(mesh) {
 }
 
-Model::~Model() {
-}
+//Model::~Model() {
+//}
 
 MeshRef Model::GetMesh() const { return this->m_mesh; }
 
@@ -45,21 +45,21 @@ void Model::SetMaterial(MaterialRef material) { this->m_material = material; }
 void Model::Calculate(Renderer& deviceContext, const ActorRef & parent) {
 }
 
-void Model::Render(Renderer& render, SceneGraph* const & scene)
+void Model::Render(Renderer& render, SceneGraph & scene)
 {
-    if (m_material) { this->m_material->Render(render, scene->GetVShader(), scene->GetPShader()); }
+    if (m_material) { this->m_material->Render(render, scene.GetVShader(), scene.GetPShader()); }
 
-    if (m_geometryShader.Valid() && m_geometryShader->Valid())
-        m_geometryShader->Get()->Bind(render);
+    if (m_geometryShader)
+        m_geometryShader->Bind(render);
 
     if (m_mesh)
         this->m_mesh->RenderMesh(render);
 }
 
-void Model::Build(Renderer& deviceContext, SceneGraph* const & scene)
+void Model::Build(Renderer& deviceContext, SceneGraph & scene)
 {
-    if (m_mesh.Valid())
-        m_mesh->Build(deviceContext, scene->GetVShader());
+    if (m_mesh)
+        m_mesh->Build(deviceContext, scene.GetVShader());
 }
 
 void Model::SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; }

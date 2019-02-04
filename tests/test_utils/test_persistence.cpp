@@ -48,7 +48,7 @@ TEST(Persistence, SimpleObjectTest)
     // given
     std::stringstream s;
     Archive a(std::make_unique<Stream<std::stringstream>>(s));
-    Ref<SimpleClass> obj = new SimpleClass(42, "some parameter");
+    Ref<SimpleClass> obj = Ref<SimpleClass>(new SimpleClass(42, "some parameter"));
 
     // when 
     a << obj;
@@ -74,7 +74,7 @@ public:
     NestedClass() {
     }
 
-    NestedClass(const Ref<SimpleClass>& simpleClass, const Ref<SimpleClass>& simpleClass1)
+    NestedClass(const Ref<SimpleClass> & simpleClass, const Ref<SimpleClass>& simpleClass1)
         : m_obj1(simpleClass)
         , m_obj2(simpleClass1) {
     }
@@ -97,8 +97,8 @@ TEST(Persistence, NestedClassTest)
     // given
     std::stringstream s;
     Archive a(std::make_unique<Stream<std::stringstream>>(s));
-    Ref<NestedClass> obj = new NestedClass(new SimpleClass(666, "Devil"), new SimpleClass(42, "The ultimate answer"));
-    Ref<NestedClass> objNull = new NestedClass(nullptr, nullptr);
+    Ref<NestedClass> obj = Ref<NestedClass>(new NestedClass(Ref<SimpleClass>(new SimpleClass(666, "Devil")), Ref<SimpleClass>(new SimpleClass(42, "The ultimate answer"))));
+    Ref<NestedClass> objNull = Ref<NestedClass>(new NestedClass(nullptr, nullptr));
 
     // when 
     a << obj << objNull;
@@ -123,7 +123,7 @@ TEST(Persistence, BadTypeTest)
     // given
     std::stringstream s;
     Archive a(std::make_unique<Stream<std::stringstream>>(s));
-    Ref<SimpleClass> obj = new SimpleClass(42, "some parameter");
+    Ref<SimpleClass> obj = Ref<SimpleClass>(new SimpleClass(42, "some parameter"));
 
     // when 
     a << obj;
@@ -221,8 +221,8 @@ TEST(Persistence, PolimorphClassTest)
     // given
     std::stringstream s;
     Archive a(std::make_unique<Stream<std::stringstream>>(s));
-    Ref<SimpleBaseClass> objA = new DerivedClassA(42, "Hello", "World");
-    Ref<SimpleBaseClass> objB = new DerivedClassB(666, "This is a", "test message");
+    Ref<SimpleBaseClass> objA = Ref<SimpleBaseClass>(new DerivedClassA(42, "Hello", "World"));
+    Ref<SimpleBaseClass> objB = Ref<SimpleBaseClass>(new DerivedClassB(666, "This is a", "test message"));
 
     // when 
     a << objA << objB;
@@ -237,13 +237,13 @@ TEST(Persistence, PolimorphClassTest)
     ASSERT_NE(objB, readObjB);
 
     ASSERT_TRUE(readObjA);
-    ASSERT_TRUE(dynamic_cast<DerivedClassA *>(readObjA.Get()));
+    ASSERT_TRUE(dynamic_cast<DerivedClassA *>(readObjA.get()));
     ASSERT_TRUE(objA->GetI() == readObjA->GetI());
     ASSERT_TRUE(objA->GetStr().compare(readObjA->GetStr()) == 0);
     ASSERT_TRUE(objA->GetSomeIntern().compare(readObjA->GetSomeIntern()) == 0);
 
     ASSERT_TRUE(readObjB);
-    ASSERT_TRUE(dynamic_cast<DerivedClassB *>(readObjB.Get()));
+    ASSERT_TRUE(dynamic_cast<DerivedClassB *>(readObjB.get()));
     ASSERT_TRUE(objB->GetI() == readObjB->GetI());
     ASSERT_TRUE(objB->GetStr().compare(readObjB->GetStr()) == 0);
     ASSERT_TRUE(objB->GetSomeIntern().compare(readObjB->GetSomeIntern()) == 0);
@@ -269,9 +269,9 @@ TEST(Persistence, STLContainerObjects)
     std::list<Ref<SimpleBaseClass>> list;
     for (size_t i = 0; i < 256; ++i)
     {
-        array[i] = new DerivedClassA(42 + i, "Hello", "Array");
-        vector.push_back(new DerivedClassB(64 + i, "Hello", "List"));
-        list.push_back(new DerivedClassB(128 + i, "Hello", "List"));
+        array[i] = Ref<DerivedClassA>(new DerivedClassA(42 + i, "Hello", "Array"));
+        vector.push_back(Ref<DerivedClassB>(new DerivedClassB(64 + i, "Hello", "List")));
+        list.push_back(Ref<DerivedClassB>(new DerivedClassB(128 + i, "Hello", "List")));
     }
 
     // when

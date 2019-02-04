@@ -15,23 +15,16 @@ namespace Grafkit
         void Serialize(A& ar) { ar & sourceName & target; }
     };
 
-    class ActorAnimationLoader : public ResourceBuilder<ActorAnimation, ActorAnimationParams>
+    class ActorAnimationLoader : public ResourceLoader<ActorAnimation, ActorAnimationParams>
     {
     public:
-        ActorAnimationLoader() {
+
+        ActorAnimationLoader(const std::string& id, const ActorAnimationParams& params)
+            : ResourceLoader<ActorAnimation, ActorAnimationParams>(id, params) {
         }
 
-        explicit ActorAnimationLoader(const ActorAnimationParams& params)
-            : ResourceBuilder<ActorAnimation, ActorAnimationParams>(params) {
-        }
-
-        explicit ActorAnimationLoader(const std::string& name, const std::string& uuid, const ActorAnimationParams& params)
-            : ResourceBuilder<ActorAnimation, ActorAnimationParams>(name, uuid, params) {
-        }
-
-        void Load(IResourceManager* const& resman, IResource* source) override;
-        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
-
-        PERSISTENT_DECL(ActorAnimationLoader, 1);
+    protected:
+        void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager) override;
+        void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager) override;
     };
 }

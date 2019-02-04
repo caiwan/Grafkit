@@ -11,6 +11,8 @@ namespace Grafkit
     /**
         File event watcher interface a live reloadingohz
     */
+# if 0
+    // TODO: -> Editor
     class IFileEventWatch
     {
     public:
@@ -44,7 +46,7 @@ namespace Grafkit
 
         bool m_isTerminate;
     };
-
+#endif
     /**
         Makes asset directly from files
     */
@@ -56,14 +58,17 @@ namespace Grafkit
         explicit FileAssetFactory(std::string root);
         ~FileAssetFactory();
 
-        StreamRef Get(std::string name) override;
+        StreamRef Get(std::string name) const override;
 
-        filelist_t GetAssetList() override;
-        filelist_t GetAssetList(AssetFileFilter* filter) override;
+#if 0
+        filelist_t GetAssetList() const override;
+        filelist_t GetAssetList(AssetFileFilter* filter) const override;
+#endif 
 
+#if 0
         // TODO: -> Editor
         bool PollEvents(IResourceManager* resman) override;
-
+#endif 
         void SetBasePath(const std::string& path) override;
 
     private:
@@ -74,6 +79,6 @@ namespace Grafkit
 
         // --------------------------------------------------------------------------------------
         // TODO: -> Editor
-        IFileEventWatch* m_eventWatcher;
+        //IFileEventWatch* m_eventWatcher;
     };
 }

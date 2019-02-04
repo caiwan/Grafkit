@@ -14,7 +14,7 @@ class AnimationTrackTest : public testing::Test
 public:
     void SetUp() override
     {
-        channel = new Animation::Channel();
+        channel = Animation::ChannelRef( new Animation::Channel());
         channel->Clear();
         for (int i = 0; i < DATA_LEN; i++) { channel->AddKey(Animation::Key(i, data[i])); }
     }
@@ -240,7 +240,7 @@ TEST_F(AnimationTrackTest, GetValueAfterLastKey) {
 TEST_F(AnimationTrackTest, GetValueFromEmptyChannel)
 {
     //given
-    Animation::ChannelRef channel = new Animation::Channel();
+    Animation::ChannelRef channel = Animation::ChannelRef(new Animation::Channel());
     channel->Clear();
 
     Animation::Key v0, v1;
@@ -259,7 +259,7 @@ TEST_F(AnimationTrackTest, GetValueFromEmptyChannel)
 TEST_F(AnimationTrackTest, GetValueBeforeOneKey)
 {
     //given
-    Animation::ChannelRef channel = new Animation::Channel();
+    Animation::ChannelRef channel = Animation::ChannelRef(new Animation::Channel());
 
     Animation::Key v0, v1;
     float f = -1.f;
@@ -277,7 +277,7 @@ TEST_F(AnimationTrackTest, GetValueBeforeOneKey)
 TEST_F(AnimationTrackTest, GetValueAfterOneKey)
 {
     //given
-    Animation::ChannelRef channel = new Animation::Channel();
+    Animation::ChannelRef channel = Animation::ChannelRef(new Animation::Channel());
 
     Animation::Key v0, v1;
     float f = 1.f;

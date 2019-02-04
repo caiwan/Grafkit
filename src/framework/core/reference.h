@@ -1,8 +1,8 @@
 #pragma once
-
+#if 0
 #include <memory>
 
-//#define USE_STD_SHARED_PTR
+#define USE_STD_SHARED_PTR
 
 /// @file taken from libosmscout: https://github.com/nkostelnik/libosmscout/blob/master/libosmscout/include/osmscout/util/Reference.h
 
@@ -408,3 +408,4 @@ template <typename T>
 constexpr void RELEASE(const Ref<T> & refptr) { if (refptr) { refptr->Release(); refptr = nullptr; } }
 #endif //0
 #endif //USE_STD_SHARED_PTR
+#endif 

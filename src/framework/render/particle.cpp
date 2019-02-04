@@ -24,7 +24,7 @@ void Grafkit::ParticleEngine::Initialize(Renderer & render, const ShaderResRef &
 {
 	m_fsParticleEngine = engine;
 
-	m_particleCompute = new Compute();
+	m_particleCompute = ComputeRef(new Compute());
 	m_particleCompute->AddChannel("tex_age");
 	m_particleCompute->AddChannel("tex_acceleration");
 	m_particleCompute->AddChannel("tex_velocity");

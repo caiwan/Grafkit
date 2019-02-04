@@ -15,6 +15,7 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+#if 0
 void ActorAnimationLoader::Load(IResourceManager* const& resman, IResource* source)
 {
     ActorAnimationResRef dstAnimation = dynamic_cast<ActorAnimationRes*>(source);
@@ -55,9 +56,16 @@ void ActorAnimationLoader::Load(IResourceManager* const& resman, IResource* sour
     dstAnimation->AssingnRef(animation);
 }
 
+
 void ActorAnimationLoader::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
     // Assign target
 }
+#endif
 
 //void ActorAnimationLoader::Serialize(Archive& ar) {
 //}
+void ActorAnimationLoader::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager) {
+}
+
+void ActorAnimationLoader::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager) {
+}

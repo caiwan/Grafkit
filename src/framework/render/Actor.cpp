@@ -22,10 +22,10 @@ Actor::Actor(const Entity3DRef & entity) : Object()
 Actor::~Actor() {
 }
 
-void Actor::Render(Renderer& render, SceneGraph* scene) { for (size_t i = 0; i < this->m_pEntities.size(); i++) { m_pEntities[i]->Render(render, scene); } }
+void Actor::Render(Renderer& render, SceneGraph& scene) { for (size_t i = 0; i < this->m_pEntities.size(); i++) { m_pEntities[i]->Render(render, scene); } }
 
-void Actor::AddChild(Actor* child)
+void Actor::AddChild(const ActorRef & child)
 {
     m_pChildren.push_back(child);
-    child->m_pParent = this;
+    //child->m_pParent = this;
 }

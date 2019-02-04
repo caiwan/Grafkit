@@ -5,23 +5,23 @@
 
 namespace Testing
 {
-    class TestApplicationContext : public Grafkit::System, public Grafkit::IResourceManager
+    class TestApplicationContext : public Grafkit::System
     {
     public:
-        explicit TestApplicationContext(Grafkit::Renderer& render, Grafkit::IAssetFactory* assetFactory);
-
-        virtual ~TestApplicationContext();
+        explicit TestApplicationContext(Grafkit::Renderer& render, std::unique_ptr<Grafkit::IAssetFactory> assetFactory);
+        ~TestApplicationContext() {}
 
         int Initialize() override;
         int Mainloop() override;
         void Release() override;
 
-
-        Grafkit::Renderer& GetDeviceContext() override;
-        Grafkit::IAssetFactory* GetAssetFactory() override;
+        Grafkit::Renderer &GetRender() const { return m_render; }
+        Grafkit::IAssetFactory &GetAssetFactory() const { return *(m_assetFactory.get()); }
+        Grafkit::ResourceManager &GetResourceManager() const { return *(m_resourceManager.get()); }
 
     private:
         Grafkit::Renderer& m_render;
-        Grafkit::IAssetFactory* m_assetFactory;
+        std::unique_ptr<Grafkit::IAssetFactory> m_assetFactory;
+        std::unique_ptr<Grafkit::ResourceManager> m_resourceManager;
     };
 }

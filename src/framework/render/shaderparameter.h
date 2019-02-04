@@ -16,25 +16,25 @@ namespace Grafkit {
 
 		void Initialize(Renderer &m_render, ShaderResRef shader);
 
-		ShaderRef GetShader() const { return m_targetShader->Get(); }
+		ShaderRes GetShader() const { return m_targetShader; }
 
 		// 
 		void SetParam(std::string name, void *ptr);
-		void SetTexture(std::string name, Texture1DResRef texture) { SetATexture(name, texture); }
-		void SetTexture(std::string name, Texture2DResRef texture) { SetATexture(name, texture); }
-		//void SetTexture(std::string name, Texture3DResRef texture){ SetATexture(name, texture); }
-		void SetTexture(std::string name, TextureCubeResRef texture) { SetATexture(name, texture); }
-		void SetSampler(std::string name, TextureSamplerRef sampler);
+		void SetTexture(std::string name, const Texture1DRes &texture) { SetATexture(name, texture.CastTo<ATexture>()); }
+		void SetTexture(std::string name, const Texture2DRes &texture) { SetATexture(name, texture.CastTo<ATexture>()); }
+		//void SetTexture(std::string name, Texture3DRes texture){ SetATexture(name, texture.CastTo<ATexture>()); }
+		void SetTexture(std::string name, const TextureCubeRes &texture) { SetATexture(name, texture.CastTo<ATexture>()); }
+		void SetSampler(std::string name, const TextureSamplerRes &sampler);
 
 		//
 		void BindParameters(Renderer &m_render);
 
 	protected:
-        void SetATexture(std::string name, Ref<IResource> texture);
+        void SetATexture(std::string name, Resource<ATexture> texture);
 		void UpdateTargets();
 
 	private:
-		ShaderResRef m_targetShader;
+		ShaderRes m_targetShader;
 		ShaderRef m_lastShader;
 
 		struct Param_T {
@@ -44,12 +44,12 @@ namespace Grafkit {
 
 		struct Texture_T {
 			int32_t id;
-			Ref<IResource> texture;
+			Resource<ATexture> texture;
 		};
 
 		struct Sampler_T {
 			int32_t id;
-			TextureSamplerRef sampler;
+			TextureSamplerRes sampler;
 		};
 
 		std::map<std::string, Param_T> m_paramMap;

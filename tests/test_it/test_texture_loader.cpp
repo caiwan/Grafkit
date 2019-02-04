@@ -12,7 +12,7 @@
 
 #include "resource/loaders/TextureLoader.h"
 
-#include "application.h" 
+#include "application.h"
 
 // --- 
 
@@ -26,61 +26,58 @@ class TextureLoadTest : public testing::Test
 public:
     TextureLoadTest() : m_app(nullptr)
     {
-        m_assetFactory = new FileAssetFactory(ASSET_ROOT);
-        m_app = new Testing::TestApplicationContext(m_render, m_assetFactory);
+        m_app = std::make_unique<Testing::TestApplicationContext>(
+            m_render, std::make_unique<FileAssetFactory>(ASSET_ROOT)
+        );
     }
 
-    ~TextureLoadTest()
-    {
-        delete m_assetFactory;
-        delete m_app;
+    ~TextureLoadTest() {
     }
 
-    void SetUp() override { 
+    void SetUp() override {
     }
 
-    void TearDown() override
-    {
+    void TearDown() override {
     }
 
 protected:
-    Testing::TestApplicationContext* m_app;
-
+    std::unique_ptr<Testing::TestApplicationContext> m_app;
     Renderer m_render;
-    IAssetFactory* m_assetFactory;
 };
 
 //
-#define TEXTURE_2D_UUID "54484011-5c9e-4479-81f4-937888131e60"
+#define TEXTURE_2D_UUID Uuid("54484011-5c9e-4479-81f4-937888131e60")
 #define TEXTURE_NAME "normap.jpg"
-#define TEXTURE_PATH TEXTURE_ROOT TEXTURE_NAME 
+#define TEXTURE_PATH TEXTURE_ROOT TEXTURE_NAME
 
 TEST_F(TextureLoadTest, Load2DTexture)
 {
     // given
-    TextureBitmapParams params = { TEXTURE_PATH };
-    Texture2DResRef resource = m_app->Load<Texture2DRes>(new TextureFromBitmap("texture", TEXTURE_2D_UUID, params));
+    auto& resourceManager = m_app->GetResourceManager();
+    Texture2DRes resource = resourceManager.Load<Texture2D>(
+        std::make_shared<TextureFromBitmap>(TEXTURE_2D_UUID, TextureBitmapParams({TEXTURE_NAME, TEXTURE_PATH}))
+    );
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(*resource);
 
     // when
-    m_app->DoPrecalc();
+    resourceManager.DoPrecalc(m_app->GetRender(), m_app->GetAssetFactory());
 
     // then
     ASSERT_TRUE(resource);
     ASSERT_TRUE(*resource);
 
-    ASSERT_STREQ(TEXTURE_2D_UUID, resource->GetUuid().c_str());
+    ASSERT_STREQ(TEXTURE_2D_UUID.c_str(), resource.GetId().c_str());
 
-    ASSERT_NE(nullptr, (*resource)->GetTexture2D());
-    ASSERT_NE(nullptr, (*resource)->GetTextureResource());
-    ASSERT_NE(nullptr, (*resource)->GetShaderResourceView());
+    ASSERT_NE(nullptr, resource->GetTexture2D().Get());
+    ASSERT_NE(nullptr, resource->GetTextureResource().Get());
+    ASSERT_NE(nullptr, resource->GetShaderResourceView().Get());
 }
 
 namespace
 {
-    const char *cubemapNames[] = {
+    const char* cubemapNames[] = {
         "yoko_posx.jpg",
         "yoko_negx.jpg",
         "yoko_posy.jpg",
@@ -90,55 +87,63 @@ namespace
     };
 }
 
-#define TEXTURE_CUBE_UUID "af6404fa-a4f7-4b01-8c8b-1218faf6d35c"
+#define TEXTURE_CUBE_UUID Uuid("af6404fa-a4f7-4b01-8c8b-1218faf6d35c")
 //
 TEST_F(TextureLoadTest, LoadCubeMap)
 {
     // given
-    TextureCubemapParams params;
-    std::transform(cubemapNames, cubemapNames + 6, std::back_inserter(params.sourceNames), [](std::string s)->std::string {return std::string(TEXTURE_ROOT) + s; });
+    auto& resourceManager = m_app->GetResourceManager();
 
-    TextureCubeResRef resource = m_app->Load<TextureCubeRes>(new TextureCubemapFromBitmap("texture", TEXTURE_CUBE_UUID, params));
+    TextureCubemapParams params{"cubeMap", {}};
+    std::transform(cubemapNames, cubemapNames + 6, params.sourceNames.begin()/*back_inserter(params.sourceNames)*/, [](std::string s)-> std::string { return std::string(TEXTURE_ROOT) + s; });
 
-    ASSERT_TRUE(resource);
-    ASSERT_FALSE(*resource);
+    TextureCubeRes resource = resourceManager.Load<TextureCube>(
+        std::make_shared<TextureCubemapFromBitmap>(TEXTURE_CUBE_UUID, params)
+    );
+
+    ASSERT_TRUE(!resource.Empty());
+    ASSERT_TRUE(resource.Valid());
 
     // when
-    m_app->DoPrecalc();
+    resourceManager.DoPrecalc(m_app->GetRender(), m_app->GetAssetFactory());
 
     // then
-    ASSERT_TRUE(resource);
-    ASSERT_TRUE(*resource);
+    ASSERT_TRUE(!resource.Empty());
+    ASSERT_TRUE(resource.Valid());
 
-    ASSERT_STREQ(TEXTURE_CUBE_UUID, resource->GetUuid().c_str());
+    ASSERT_STREQ(TEXTURE_CUBE_UUID.c_str(), resource.GetId().c_str());
 
-    ASSERT_NE(nullptr, (*resource)->GetTexture2D());
-    ASSERT_NE(nullptr, (*resource)->GetTextureResource());
-    ASSERT_NE(nullptr, (*resource)->GetShaderResourceView());
+    ASSERT_NE(nullptr, resource->GetTexture2D().Get());
+    ASSERT_NE(nullptr, resource->GetTextureResource().Get());
+    ASSERT_NE(nullptr, resource->GetShaderResourceView().Get());
 }
 
-#define TEXTURE_NOISE_UUID "91bde168-b40e-4c81-b974-2977014e5460"
+#define TEXTURE_NOISE_UUID Uuid("91bde168-b40e-4c81-b974-2977014e5460")
 
 //
 TEST_F(TextureLoadTest, LoadNoiseMap)
 {
     // given
-    TextureNoiseParams params{ 256 };
-    Texture2DResRef resource = m_app->Load<Texture2DRes>(new TextureNoiseMapBuilder("noiseMap", TEXTURE_NOISE_UUID, params));
+    auto& resourceManager = m_app->GetResourceManager();
 
-    ASSERT_TRUE(resource);
-    ASSERT_FALSE(*resource);
+    Texture2DResRef resource = resourceManager.Load<Texture2D>(
+        std::make_shared<TextureNoiseMapBuilder>(TEXTURE_NOISE_UUID, TextureNoiseParams{"noiseMap", 256})
+    );
+
+    ASSERT_TRUE(!resource.Empty());
+    ASSERT_TRUE(resource.Valid());
 
     // when
-    m_app->DoPrecalc();
+    resourceManager.DoPrecalc(m_app->GetRender(), m_app->GetAssetFactory());
+
 
     // then
-    ASSERT_TRUE(resource);
-    ASSERT_TRUE(*resource);
+    ASSERT_TRUE(!resource.Empty());
+    ASSERT_TRUE(resource.Valid());
 
-    ASSERT_STREQ(TEXTURE_NOISE_UUID, resource->GetUuid().c_str());
+    ASSERT_STREQ(TEXTURE_NOISE_UUID.c_str(), resource.GetId().c_str());
 
-    ASSERT_NE(nullptr, (*resource)->GetTexture2D());
-    ASSERT_NE(nullptr, (*resource)->GetTextureResource());
-    ASSERT_NE(nullptr, (*resource)->GetShaderResourceView());
+    ASSERT_NE(nullptr, resource->GetTexture2D().Get());
+    ASSERT_NE(nullptr, resource->GetTextureResource().Get());
+    ASSERT_NE(nullptr, resource->GetShaderResourceView().Get());
 }

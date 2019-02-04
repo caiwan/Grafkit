@@ -33,8 +33,8 @@ void Compute::Initialize(Renderer& render, const ShaderResRef& shader, size_t sa
 {
     m_sampleCount = samples;
     m_computePixelShader = shader;
-    m_shaderFullscreenQuad = ShaderRef(new PixelShader());
-    m_shaderFullscreenQuad = ShaderRef(new VertexShader());
+    m_shaderFullscreenQuad = ShaderRes(ShaderRef(new PixelShader()));
+    m_shaderFullscreenQuad = ShaderRes(ShaderRef(new VertexShader()));
     m_shaderFullscreenQuad->LoadFromMemory(
         render,
         GrafkitData::effectFullscreenQuadEntry,
@@ -85,10 +85,10 @@ void Compute::Initialize(Renderer& render, const ShaderResRef& shader, size_t sa
     depthStencilViewDesc.Texture2D.MipSlice = 0;
 
     // Create the depth stencil view.
-    result = render.GetDevice()->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
-    if (FAILED(result))
-    THROW_EX_HRESULT(InitializeComputeShaderExcepton, result);
-
+    result = render.GetDevice()->CreateDepthStencilView(m_depthStencilBuffer.Get(), &depthStencilViewDesc, &m_depthStencilView);
+    if (FAILED(result)) {
+        THROW_EX_HRESULT(InitializeComputeShaderExcepton, result);
+    }
     // --- snap
 
     LOGGER(Log::Logger().Trace("Compute mockup shader OK"));
@@ -97,25 +97,24 @@ void Compute::Initialize(Renderer& render, const ShaderResRef& shader, size_t sa
 void Compute::Shutdown()
 {
     std::for_each(m_channels.begin(), m_channels.end(), [&](auto& channels) { std::for_each(channels.begin(), channels.end(), [&](auto& channel) { channel->Shutdown(); }); });
-    m_shaderFullscreenQuad->Shutdown();
 }
 
 void Compute::AddChannel(std::string name, const Texture2DRef & inputCondition)
 {
     m_inputNames.push_back(name);
-    m_channels[0].push_back(inputCondition.Valid() ? inputCondition : Texture2DRef(new Texture2D()));
+    m_channels[0].push_back(inputCondition ? inputCondition : Texture2DRef(new Texture2D()));
 
     Texture2DRef tex = Texture2DRef(new Texture2D());
     m_channels[1].push_back(tex);
 
-    Texture2DResRef res = Texture2DResRef(new Texture2DRes(tex));
+    Texture2DResRef res = Texture2DResRef(tex);
     res->SetName(name);
     m_materialResources.push_back(res);
 }
 
 void Compute::Render(Renderer& render)
 {
-    ShaderRef shader = m_computePixelShader->Get();
+    ShaderRef shader = *m_computePixelShader;
     shader->Bind(render);
 
     // bind input && output
@@ -131,7 +130,7 @@ void Compute::Render(Renderer& render)
     for (size_t i = 0; i < targetCount; i++)
     {
         Texture2DRef output = m_outputChannels->at(i);
-        render.SetRenderTargetView(static_cast<ID3D11RenderTargetView*>(*output), i);
+        render.SetRenderTargetView(output->GetRenderTargetView(), i);
     }
 
     render.ApplyRenderTargetView(targetCount);
@@ -170,5 +169,5 @@ void Compute::SwapBuffers()
     m_inputChannels = tmp;
 
     // swp
-    for (size_t i = 0; i < m_materialResources.size(); i++) { m_materialResources[i]->AssingnRef(m_outputChannels->at(i)); }
+    for (size_t i = 0; i < m_materialResources.size(); i++) { m_materialResources[i].AssignRef(m_outputChannels->at(i)); }
 }

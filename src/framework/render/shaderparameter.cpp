@@ -20,7 +20,7 @@ ShaderParameter::~ShaderParameter()
 void ShaderParameter::Initialize(Renderer & render, ShaderResRef shader)
 {
     m_targetShader = shader;
-    m_lastShader = shader->Get();
+    m_lastShader = *shader; // ->Get();
     UpdateTargets();
 }
 
@@ -37,7 +37,7 @@ void ShaderParameter::SetParam(std::string name, void * ptr)
     m_paramMap[name] = param;
 }
 
-void ShaderParameter::SetSampler(std::string name, TextureSamplerRef sampler)
+void ShaderParameter::SetSampler(std::string name, const TextureSamplerRes &sampler)
 {
     int32_t id = -1;
     if (m_lastShader) {
@@ -54,7 +54,7 @@ void ShaderParameter::SetSampler(std::string name, TextureSamplerRef sampler)
 
 void ShaderParameter::BindParameters(Renderer & render)
 {
-    if (m_targetShader->Get() != m_lastShader || m_refresh)
+    if (*m_targetShader != m_lastShader || m_refresh)
         UpdateTargets();
 
     for (auto it = m_paramMap.begin(); it != m_paramMap.end(); ++it) {
@@ -64,20 +64,20 @@ void ShaderParameter::BindParameters(Renderer & render)
 
     for (auto it = m_textureMap.begin(); it != m_textureMap.end(); ++it) {
         if (it->second.id != -1) {
-            Resource<ATexture>* texture = dynamic_cast<Resource<ATexture>*>(it->second.texture.Get());
-            m_lastShader->SetShaderResourceView(render, it->second.id, static_cast<ID3D11ShaderResourceView*>(**texture));
+            const Resource<ATexture> &texture = it->second.texture;
+            m_lastShader->SetShaderResourceView(render, it->second.id, texture->GetShaderResourceView());
         }
     }
 
     for (auto it = m_smaplerMap.begin(); it != m_smaplerMap.end(); ++it) {
         if (it->second.id != -1)
-            m_lastShader->SetSamplerSatate(render, it->second.id, *(it->second.sampler));
+            m_lastShader->SetSamplerSatate(render, it->second.id, it->second.sampler->GetSamplerState());
     }
 
 }
 
 
-void ShaderParameter::SetATexture(std::string name, Ref<IResource> texture)
+void Grafkit::ShaderParameter::SetATexture(std::string name, Resource<ATexture> texture)
 {
     int32_t id = -1;
     if (m_lastShader) {
@@ -94,7 +94,7 @@ void ShaderParameter::SetATexture(std::string name, Ref<IResource> texture)
 
 void ShaderParameter::UpdateTargets()
 {
-    m_lastShader = m_targetShader->Get();
+    m_lastShader = *m_targetShader;
     for (auto it = m_paramMap.begin(); it != m_paramMap.end(); ++it) {
         it->second.id = m_lastShader->GetParamId(it->first);
     }

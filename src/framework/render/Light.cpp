@@ -37,15 +37,12 @@ Light::~Light() {
 
 void Light::Calculate(Renderer& deviceContext, const ActorRef & parent)
 {
-    if (parent.Invalid())
-        return;
+    assert(parent);
 
     Matrix nodeMatrix = parent->WorldMatrix();
 
     m_position.w = 1.;
-    //m_direction.w = 0.;
     m_light.position = nodeMatrix.Transfrom(m_position);
-    //m_light.direction = nodeMatrix.Transfrom(m_direction);
 }
 
 size_t Light::GetInternalData(void* const & p)
@@ -54,16 +51,6 @@ size_t Light::GetInternalData(void* const & p)
     return sizeof(light2_t);
 }
 
-void Light::Render(Renderer& deviceContext, SceneGraph* const & scene) {
+void Light::Render(Renderer& deviceContext, SceneGraph& scene) {
 }
 
-// ============================================================================================================
-
-//void Light::Serialize(Archive& ar)
-//{
-//    _Serialize(ar);
-//
-//    PERSIST_FIELD(ar, m_position);
-//    //PERSIST_FIELD(ar, m_direction);
-//    PERSIST_FIELD(ar, m_light);
-//}

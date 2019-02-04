@@ -287,9 +287,10 @@ namespace
 }
 
 
-/// ====================================================================================================================================================
-/// Factory class implementation
-/// ====================================================================================================================================================
+// ====================================================================================================================================================
+// Factory class implementation
+// ====================================================================================================================================================
+#if 0
 void MusicBassLoader::Load(IResourceManager* const & resman, IResource* source)
 {
     MusicResRef dest = dynamic_cast<MusicRes*>(source);
@@ -307,4 +308,11 @@ void MusicBassLoader::Load(IResourceManager* const & resman, IResource* source)
 }
 
 void MusicBassLoader::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
+}
+#endif 
+
+void MusicBassLoader::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+void MusicBassLoader::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
 }

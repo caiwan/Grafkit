@@ -63,5 +63,15 @@ struct float4 : DirectX::XMFLOAT4
 typedef DirectX::XMVECTOR dxvector;
 typedef DirectX::XMMATRIX matrix;
 
+
+#include <wrl.h>
+/* Further read:
+    - https://blogs.msdn.microsoft.com/chuckw/2015/01/06/direct3d-win32-game-visual-studio-template/
+    - https://msdn.microsoft.com/en-us/library/hh438466.aspx
+    - https://docs.microsoft.com/hu-hu/cpp/windows/comptr-class?view=vs-2017
+*/
+
+template <typename T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+
 // usage of left-handed coordinate system
 #define USE_LEFT_HANDED_SYSTEM

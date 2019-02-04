@@ -4,14 +4,12 @@
 #include "render/renderer.h"
 #include "utils/asset/AssetFactory.h"
 
-Testing::TestApplicationContext::TestApplicationContext(Grafkit::Renderer& render, Grafkit::IAssetFactory* assetFactory)
-    : m_render(render), m_assetFactory(assetFactory)
+Testing::TestApplicationContext::TestApplicationContext(Grafkit::Renderer & render, std::unique_ptr<Grafkit::IAssetFactory> assetFactory)
+    : m_render(render), m_assetFactory(std::move(assetFactory)), m_resourceManager(std::make_unique<Grafkit::ResourceManager>())
 {
     InitializeWindows(320, 240);
     m_render.Initialize(m_window.getRealWidth(), m_window.getRealHeight(), true, this->m_window.getHWnd(), false);
 }
-
-Testing::TestApplicationContext::~TestApplicationContext() { Release(); }
 
 int Testing::TestApplicationContext::Initialize() {
     m_render.BeginScene();
@@ -30,8 +28,4 @@ void Testing::TestApplicationContext::Release()
 {
     ShutdownWindows();
 }
-
-Grafkit::Renderer& Testing::TestApplicationContext::GetDeviceContext() { return m_render; }
-
-Grafkit::IAssetFactory* Testing::TestApplicationContext::GetAssetFactory() { return m_assetFactory; }
 

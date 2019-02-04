@@ -105,14 +105,14 @@ void Demo::Initialize(Renderer& render)
     //m_mapMetallic->InitializeFloatRGBA(render);
     //m_mapEmission->InitializeFloatRGBA(render);
 
-    m_effect = new EffectComposer();
+    m_effect = EffectComposerRef(new EffectComposer());
 
     //m_effect->AddPass(new EffectPass(m_fxPBR));
     //m_effect->AddPass(new EffectPass(m_fxSSAO));
     //m_effect->AddPass(new EffectPass(m_fxSSAOBlur));
     //m_effect->AddPass(new EffectPass(m_fxBloom));
     //m_effect->AddPass(new EffectPass(m_fxChromaticAbberation));
-    if (m_isFxaa) m_effect->AddPass(new EffectPass(m_fxaa));
+    if (m_isFxaa) m_effect->AddPass(EffectPassRef(new EffectPass(m_fxaa)));
 
     m_effect->Initialize(render);
 
@@ -201,11 +201,11 @@ void Demo::AddCameraId(uint32_t sceneId, std::string cameraUuid, uint32_t camera
 
 void DemoAnimation::Initialize()
 {
-    m_activeScene = new Track("ActiveScene");
+    m_activeScene = TrackRef(new Track("ActiveScene"));
     m_activeScene->CreateChannel("id");
     AddTrack(m_activeScene);
 
-    m_activeCamera = new Track("ActiveCamera");
+    m_activeCamera = TrackRef(new Track("ActiveCamera"));
     m_activeCamera->CreateChannel("id");
     AddTrack(m_activeCamera);
 

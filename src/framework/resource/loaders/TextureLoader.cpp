@@ -31,7 +31,7 @@ DEFINE_EXCEPTION(BitmapLoadException, 1105, "Could not load and create bitmap fr
 // ========================================================================================================================
 // Texture buffer generator
 // ========================================================================================================================
-
+# if 0
 void TextureBufferBuilder::Load(IResourceManager* const & resman, IResource* source)
 {
     TextureResRef dstTexture = dynamic_cast<Texture2DRes*>(source);
@@ -230,5 +230,54 @@ void TextureSamplerBuilder::Load(IResourceManager* const & resman, IResource* so
 
 void TextureSamplerBuilder::Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) {
     // Initialize ?
+}
+
+#endif
+
+// ========================================================================================================================
+// TextureBufferBuilder
+// ========================================================================================================================
+void TextureBufferBuilder::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+void TextureBufferBuilder::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+// ========================================================================================================================
+// TextureFromBitmap
+// ========================================================================================================================
+void TextureFromBitmap::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+void TextureFromBitmap::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+// ========================================================================================================================
+// TextureCubemapFromBitmap
+// ========================================================================================================================
+void TextureCubemapFromBitmap::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+void TextureCubemapFromBitmap::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+// ========================================================================================================================
+// TextureNoiseMapBuilder
+// ========================================================================================================================
+
+void TextureNoiseMapBuilder::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+void TextureNoiseMapBuilder::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+// ========================================================================================================================
+// TextureSamplerBuilder
+// ========================================================================================================================
+
+void TextureSamplerBuilder::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+void TextureSamplerBuilder::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
 }
 

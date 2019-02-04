@@ -42,9 +42,9 @@ namespace Grafkit {
 	private:
 		size_t m_sampleCount;
 
-		ShaderResRef m_computePixelShader;
+		ShaderRes m_computePixelShader;
 
-		ShaderRef m_shaderFullscreenQuad;
+		ShaderRes m_shaderFullscreenQuad;
 		MeshRef m_fullscreenQuad;
 
 		std::vector<std::string> m_inputNames;
@@ -58,9 +58,9 @@ namespace Grafkit {
 
 		// --- snip 
 		// This should be the responsibility of the texture module 
-		ID3D11Texture2D* m_depthStencilBuffer;
-		ID3D11DepthStencilState* m_depthStencilState;
-		ID3D11DepthStencilView * m_depthStencilView;
+		ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
+		ComPtr<ID3D11DepthStencilState> m_depthStencilState;
+		ComPtr<ID3D11DepthStencilView > m_depthStencilView;
 		// --- snap 
 	};
 

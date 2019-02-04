@@ -19,6 +19,20 @@
 
 #include "core/asset.h"
 
+// https://stackoverflow.com/questions/41853159/how-to-detect-if-a-type-is-shared-ptr-at-compile-time
+template <typename T>
+struct is_shared_ptr : std::false_type
+{
+};
+
+template <typename T>
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
+{
+};
+
+template <typename T>
+constexpr bool is_shared_ptr_v = is_shared_ptr<T>::value;
+
 namespace Grafkit
 {
     class IStream;
@@ -40,6 +54,12 @@ namespace Grafkit
 
         template <class T>
         static void Store(const Archive& ar, T* const & obj);
+
+        template <class T>
+        static void Load(Archive& ar, std::shared_ptr<T>& obj);
+
+        template <class T>
+        static void Store(const Archive& ar, const std::shared_ptr<T>& obj);
 
         static Peristence& Instance()
         {
@@ -222,10 +242,17 @@ namespace Grafkit
         Archive& operator&(T& v)
         {
             if constexpr
-                (std::is_pointer_v<T>) { Peristence::Load(*this, v); }
-            else { v.Serialize(*this); }
+                (std::is_pointer_v<T>) {
+                Peristence::Load(*this, v);
+            }
+            else
+                if constexpr
+                    (is_shared_ptr_v<T>) {
+                    Peristence::Load(*this, v);
+                }
+                else { v.Serialize(*this); }
 
-            return *this;
+                return *this;
         }
 
         template <typename T>
@@ -233,14 +260,21 @@ namespace Grafkit
         const Archive& operator&(const T& v) const
         {
             if constexpr
-                (std::is_pointer_v<T>) { Peristence::Store(*this, const_cast<T&>(v)); }
-            else { const_cast<T&>(v).Serialize(*this); }
+                (std::is_pointer_v<T>) {
+                Peristence::Store(*this, const_cast<T&>(v));
+            }
+            else
+                if constexpr
+                    (is_shared_ptr_v<T>) {
+                    Peristence::Store(*this, v);
+                }
+                else { const_cast<T&>(v).Serialize(*this); }
 
-            return *this;
+                return *this;
         }
 
         template <class T, size_t N>
-        Archive& operator&(T (&v)[N])
+        Archive& operator&(T(&v)[N])
         {
             uint32_t len;
             *this & len;
@@ -250,7 +284,7 @@ namespace Grafkit
         }
 
         template <class T, size_t N>
-        const Archive& operator&(const T (&v)[N]) const
+        const Archive& operator&(const T(&v)[N]) const
         {
             uint32_t len = N;
             *this & len;
@@ -407,7 +441,7 @@ namespace Grafkit
 
         const Archive& operator&(const std::string& v) const
         {
-            uint32_t len = uint32_t(v.length()+1);
+            uint32_t len = uint32_t(v.length() + 1);
             *this & len;
             m_stream->Write(v.c_str(), len);
             return *this;
@@ -489,6 +523,22 @@ void Grafkit::Peristence::Store(const Archive& ar, T* const & obj)
     ar << clazzName << version;
     d->_InvokeSerialize(ar);
 }
+
+template <class T>
+void Grafkit::Peristence::Load(Archive& ar, std::shared_ptr<T>& obj)
+{
+    T * tp = nullptr; 
+    Load(ar, tp);
+    obj = std::shared_ptr<T>(obj, tp);
+}
+
+template <class T>
+void Grafkit::Peristence::Store(const Archive& ar, const std::shared_ptr<T> & obj)
+{
+    T * tp = obj.get();
+    Store(ar, tp);
+}
+
 
 
 // ---- 

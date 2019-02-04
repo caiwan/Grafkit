@@ -1,15 +1,42 @@
 #pragma once
 
-#include "core/Object.h"
 
 namespace Grafkit
 {
-    class Clonable;
-    class IResource;
-    class IResourceManager;
-
+    class IAssetFactory;
     typedef Ref<IResource> IResourceRef;
-    //typedef std::shared_ptr<IResource> IResourceRef;
+
+    class IResourceLoader
+    {
+        friend class ResourceManager;
+    public:
+        virtual ~IResourceLoader() = default;
+
+        IResourceLoader() {
+        }
+
+        explicit IResourceLoader(const Uuid& id)
+            : m_id(id) {
+        }
+
+        Uuid GetId() const { return m_id; }
+        void SetId(const Uuid& id) { m_id = id; }
+
+    protected:
+        virtual std::shared_ptr<IResource> CreateResource() = 0;
+        virtual void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory& assetFactory ) = 0;
+        virtual void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory& assetFactory) = 0;
+
+        Uuid m_id;
+    };
+
+
+    struct None
+    {
+        template<class A > void Serialize(A & ar) {}
+    };
+
+# if 0
 
     class IResourceBuilder : public Object
     {
@@ -40,10 +67,7 @@ namespace Grafkit
         template <class A> void Serialize(A &ar) { Object::Serialize(ar); }
     };
 
-    struct None
-    {
-        template<class A > void Serialize(A & ar){}
-    };
+    
 
     template <class R, typename U = None>
     class ResourceBuilder : public IResourceBuilder
@@ -89,4 +113,38 @@ namespace Grafkit
         U m_params;
         Ref<R> m_oldResource;
     };
+
+#endif 
+
+    template <class T, typename P = None>
+    class ResourceLoader : public IResourceLoader
+    {
+    public:
+        typedef T myResource_t;
+        typedef std::shared_ptr<T> myResourceRef_t;
+        typedef P myParameter_t;
+
+        explicit ResourceLoader(const Uuid& id, const P& params = {}) : IResourceLoader(id)
+            , m_params(params) {
+        }
+
+        P GetParams() const { return m_params; }
+        void SetParams(const P& params) { m_params = params; }
+
+    protected:
+        std::shared_ptr<IResource> CreateResource() override { return std::make_shared<ResourceWrapper<T>>(m_id, nullptr); }
+
+        template <class R = myResource_t>
+        Resource<R>
+            static CastResource(const std::shared_ptr<IResource>& resource)
+        {
+            auto ptr = std::dynamic_pointer_cast<ResourceWrapper<T>>(resource);
+            assert(ptr);
+            return Resource<R>(ptr);
+        }
+
+        P m_params;
+    };
+
+
 }

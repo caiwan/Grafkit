@@ -59,13 +59,13 @@ Animation::Track::Track(const char* name, const char* initials)
 
 size_t Animation::Track::CreateChannel(const char* name)
 {
-    m_channels.push_back(new Channel(name));
+    m_channels.push_back(ChannelRef(new Channel(name)));
     return m_channels.size() - 1;
 }
 
 size_t Animation::Track::CreateChannel(std::string name)
 {
-    m_channels.push_back(new Channel(name));
+    m_channels.push_back(ChannelRef(new Channel(name)));
     return m_channels.size() - 1;
 }
 

@@ -40,8 +40,8 @@ namespace Grafkit {
         void Calculate(Renderer& renderer, const ActorRef & parent = nullptr) override;
 
         //skip render, nothing to do with it. 
-        void Render(Renderer& deviceContext, SceneGraph* const & scene) override {}
-        void Build(Renderer& deviceContext, SceneGraph* const & scene) override {}
+        void Render(Renderer& deviceContext, SceneGraph & scene) override {}
+        void Build(Renderer& deviceContext, SceneGraph & scene) override {}
 
         // TODO: rename them
         Matrix& GetViewMatrix() { return m_viewMatrix; }

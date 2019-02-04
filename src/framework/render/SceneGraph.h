@@ -15,38 +15,42 @@ namespace Grafkit {
     {
     public:
         SceneGraph();
-        ~SceneGraph();
+
+        SceneGraph(const SceneGraph& other) = delete;
+        SceneGraph& operator=(const SceneGraph& other) = delete;
+
+        //~SceneGraph();
 
         // Init, shutdown 
         void Initialize();
         void Initialize(ActorRef root); // legacy stuff 
-        void Shutdown() override;
+        //void Shutdown();
 
         void Update();
-        void Render(Renderer & render, CameraRef & camera);
+        void Render(Renderer & render, const CameraRef & camera);
 
         // Add / Get node
-        void AddNode(ActorRef& actor);
-        ActorRef GetNode(std::string name);
+        //void AddNode(const ActorRef& actor);
+        ActorRef GetNode(const std::string &name);
 
-        void SetRootNode(ActorRef &root) { m_root = root; } //TODO: rename node->actor
-        ActorRef GetRootNode() const { return m_root; } //TODO: rename node->actor
+        void SetRootNode(const ActorRef &root) { m_root = root; } 
+        ActorRef GetRootNode() const { return m_root; } 
 
-        size_t GetNodeCount() const { return m_nodes.size(); } //TODO: rename node->actor
-        ActorRef GetNode(size_t id) { return m_nodes.at(id); } //TODO: rename node->actor
+        size_t GetNodeCount() const { return m_nodes.size(); } 
+        ActorRef GetNode(size_t id) { return m_nodes.at(id).first; } 
 
         // --- 
 
         Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
-        ShaderResRef GetVShader() const { return this->m_vertexShader; }
-        ShaderResRef GetPShader() const { return this->m_pixelShader; }
+        ShaderRes & GetVShader() { return m_vertexShader; }
+        ShaderRes & GetPShader() { return m_pixelShader; }
 
-        void SetVShader(ShaderResRef &VS) { this->m_vertexShader = VS; }
-        void SetPShader(ShaderResRef &FS) { this->m_pixelShader = FS; }
+        void SetVShader(const ShaderRes &VS) { m_vertexShader = VS; }
+        void SetPShader(const ShaderRes &FS) { m_pixelShader = FS; }
 
         void BuildScene(Renderer & render);
-        void BuildScene(Renderer & render, ShaderResRef vs, ShaderResRef ps); //legacy stuff
+        void BuildScene(Renderer & render, const ShaderRes &vs, const ShaderRes &ps); //legacy stuff
 
     protected:
 
@@ -65,16 +69,16 @@ namespace Grafkit {
 
         struct WorldMatrices_t m_worldMatrices;
 
-        ShaderResRef m_vertexShader;
-        ShaderResRef m_pixelShader;
+        ShaderRes m_vertexShader;
+        ShaderRes m_pixelShader;
 
-        std::vector<ActorRef> m_nodes;
+        std::vector<std::pair<ActorRef, ActorRef>> m_nodes; //child, parent
         std::map<std::string, ActorRef> m_nodeMap;
 
-        std::set<Entity3D*> m_entities;
+        std::set<Entity3DRef> m_entities;
 
     private:
-        double m_tAnim;
+        //double m_tAnim;
 
         Matrix m_currentWorldMatrix;
         std::stack<Matrix> m_worldMatrixStack;

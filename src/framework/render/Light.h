@@ -56,11 +56,11 @@ namespace Grafkit
         /// Setup the corresponding constant buffer inside the shader
         //void SetShaderCB(ShaderRef &rPShader);
 
-        void Build(Renderer& deviceContext, SceneGraph* const & scene) override {
+        void Build(Renderer& deviceContext, SceneGraph& scene) override {
         }
 
         void Calculate(Renderer& deviceContext, const ActorRef & parent = nullptr) override;
-        void Render(Renderer& deviceContext, SceneGraph* const & scene) override;
+        void Render(Renderer& deviceContext, SceneGraph& scene) override;
 
     protected:
 
@@ -159,13 +159,12 @@ namespace Grafkit
         struct light2_t m_light;
         float4 m_position;
 
+        std::string m_name;
+
         SERIALIZE(Grafkit::Light, 1, ar)
         {
-            Object::Serialize(ar);
+            Entity3D::Serialize(ar);
             ar & m_id & m_light & m_position;
         }
-
-        //protected:
-        //void Serialize(Archive& ar) override;
     };
 }

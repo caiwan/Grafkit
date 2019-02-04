@@ -13,7 +13,7 @@
 
 #ifdef __cplusplus
 
-#include"core/reference.h"
+//#include"core/reference.h"
 #include"core/resource.h"
 #include"core/asset.h"
 #include"core/Object.h"
@@ -23,6 +23,10 @@
 
 #include "utils/persistence/dynamics.h"
 
+template <typename T> using Ref = std::shared_ptr<T>;
+template <typename T> using UniqueRef = std::unique_ptr<T>;
+
+class Referencable{};
 
 // predefine classes to reduce compile time 
 
@@ -37,7 +41,7 @@ namespace Grafkit {
 
 	typedef Ref<Shader> ShaderRef;
 	typedef Resource<Shader> ShaderRes;
-	typedef Ref<ShaderRes> ShaderResRef;
+	typedef ShaderRes ShaderResRef; // !
 
 	// --- 
 	class Animation;
@@ -47,8 +51,8 @@ namespace Grafkit {
 	class SceneGraph;
 	typedef Ref<SceneGraph> SceneGraphRef;
 
-	//class Mesh;
-	//typedef Ref<Mesh> MeshRef;
+	class Mesh;
+	typedef Ref<Mesh> MeshRef;
 
 	class Material;
 	typedef Ref<Material> MaterialRef;
@@ -81,24 +85,24 @@ namespace Grafkit {
 
 	typedef Ref<Texture1D> Texture1DRef;
 	typedef Resource<Texture1D> Texture1DRes;
-	typedef Ref<Texture1DRes> Texture1DResRef;
+	typedef Texture1DRes Texture1DResRef; // !
 
 	typedef Ref<Texture2D> Texture2DRef;
 	typedef Resource<Texture2D> Texture2DRes;
-	typedef Ref<Texture2DRes> Texture2DResRef;
+	typedef Texture2DRes Texture2DResRef; // !
 
 	typedef Ref<Texture2D> TextureRef;
-	typedef Ref<Texture2DRes> TextureResRef;
+	typedef Texture2DRes TextureResRef; // !
 
 	typedef Ref<TextureCube> TextureCubeRef;
 	typedef Resource<TextureCube> TextureCubeRes;
-	typedef Ref<TextureCubeRes> TextureCubeResRef;
+	typedef TextureCubeRes TextureCubeResRef; // !
 
 	class TextureSampler;
 
 	typedef Ref<TextureSampler> TextureSamplerRef;
 	typedef Resource<TextureSampler> TextureSamplerRes;
-	typedef Ref<TextureSamplerRes> TextureSamplerResRef;
+	typedef TextureSamplerRes TextureSamplerResRef; // !
 
 	// ---
 
@@ -109,7 +113,7 @@ namespace Grafkit {
 	class Music;
 	typedef Ref<Music> MusicRef;
 	typedef Resource<Music> MusicRes;
-	typedef Ref<MusicRes> MusicResRef;
+	//typedef Ref<MusicRes> MusicResRef;
 
     // --- 
     class IStream;

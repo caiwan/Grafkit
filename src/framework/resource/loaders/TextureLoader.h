@@ -37,29 +37,17 @@ namespace Grafkit
         uint16_t height;
     };
 
-    class TextureBufferBuilder : public ResourceBuilder<Texture2D, TextureBufferParams>
+    class TextureBufferBuilder : public ResourceLoader<Texture2D, TextureBufferParams>
     {
     public:
-        TextureBufferBuilder() {
+
+        TextureBufferBuilder(const Uuid& id, const TextureBufferParams& params)
+            : ResourceLoader<Texture2D, TextureBufferParams>(id, params) {
         }
 
-        explicit TextureBufferBuilder(const TextureBufferParams& params)
-            : ResourceBuilder<Texture2D, TextureBufferParams>(params) {
-        }
-
-        TextureBufferBuilder(const std::string& name, const std::string& uuid, const TextureBufferParams& params)
-            : ResourceBuilder<Texture2D, TextureBufferParams>(name, uuid, params) {
-        }
-
-        void Load(IResourceManager* const& resman, IResource* source) override;
-        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
-
-        SERIALIZE(TextureBufferBuilder, 1, ar)
-        {
-            assert(0);
-        }
-        //protected:
-        //    void Serialize(Archive& ar) override;
+    protected:
+        void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
+        void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
     };
 
     /**
@@ -67,35 +55,21 @@ namespace Grafkit
 
     struct TextureBitmapParams
     {
+        std::string name;
         std::string filename;
         // resize?
     };
 
-    class TextureFromBitmap : public ResourceBuilder<Texture2D, TextureBitmapParams>
+    class TextureFromBitmap : public ResourceLoader<Texture2D, TextureBitmapParams>
     {
     public:
-
-        TextureFromBitmap() {
+        TextureFromBitmap(const Uuid &id, const TextureBitmapParams& params)
+            : ResourceLoader<Texture2D, TextureBitmapParams>(id, params) {
         }
 
-        explicit TextureFromBitmap(const TextureBitmapParams& params)
-            : ResourceBuilder<Texture2D, TextureBitmapParams>(params) {
-        }
-
-        TextureFromBitmap(const std::string& name, const std::string& uuid, const TextureBitmapParams& params)
-            : ResourceBuilder<Texture2D, TextureBitmapParams>(name, uuid, params) {
-        }
-
-        void Load(IResourceManager* const& resman, IResource* source) override;
-        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
-
-        SERIALIZE(TextureFromBitmap, 1, ar)
-        {
-            assert(0);
-        }
-
-        //protected:
-        //    void Serialize(Archive& ar) override;
+    protected:
+        void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
+        void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
     };
 
 
@@ -105,33 +79,21 @@ namespace Grafkit
 
     struct TextureCubemapParams
     {
+        std::string name;
         std::array<std::string, 6> sourceNames;
     };
 
-    class TextureCubemapFromBitmap : public ResourceBuilder<TextureCube, TextureCubemapParams>
+    class TextureCubemapFromBitmap : public ResourceLoader<TextureCube, TextureCubemapParams>
     {
     public:
-        TextureCubemapFromBitmap() {
+
+        TextureCubemapFromBitmap(const Uuid &id, const TextureCubemapParams& params)
+            : ResourceLoader<TextureCube, TextureCubemapParams>(id, params) {
         }
 
-        explicit TextureCubemapFromBitmap(const TextureCubemapParams& params)
-            : ResourceBuilder<TextureCube, TextureCubemapParams>(params) {
-        }
-
-        TextureCubemapFromBitmap(const std::string& name, const std::string& uuid, const TextureCubemapParams& params)
-            : ResourceBuilder<TextureCube, TextureCubemapParams>(name, uuid, params) {
-        }
-
-        void Load(IResourceManager* const& resman, IResource* source) override;
-        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
-
-        SERIALIZE(TextureCubemapFromBitmap, 1, ar)
-        {
-            assert(0);
-        }
-
-        //protected:
-        //    void Serialize(Archive& ar) override;
+    protected:
+        void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
+        void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
     };
 
     /*
@@ -140,41 +102,30 @@ namespace Grafkit
 
     struct TextureNoiseParams
     {
+        std::string name;
         uint16_t size;
     };
 
-    class TextureNoiseMapBuilder : public ResourceBuilder<Texture2D, TextureNoiseParams>
+    class TextureNoiseMapBuilder : public ResourceLoader<Texture2D, TextureNoiseParams>
     {
     public:
 
-        TextureNoiseMapBuilder() {
+
+        TextureNoiseMapBuilder(const Uuid &id, const TextureNoiseParams& params)
+            : ResourceLoader<Texture2D, TextureNoiseParams>(id, params) {
         }
 
-        explicit TextureNoiseMapBuilder(const TextureNoiseParams& params)
-            : ResourceBuilder<Texture2D, TextureNoiseParams>(params) {
-        }
-
-        TextureNoiseMapBuilder(const std::string& name, const std::string& uuid, const TextureNoiseParams& params)
-            : ResourceBuilder<Texture2D, TextureNoiseParams>(name, uuid, params) {
-        }
-
-        void Load(IResourceManager* const& resman, IResource* source) override;
-        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
-
-        SERIALIZE(TextureNoiseMapBuilder, 1, ar)
-        {
-            assert(0);
-        }
-        //protected:
-        //    void Serialize(Archive& ar) override;
+    protected:
+        void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
+        void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
     };
 
     /**
      *
      */
 
-    //#define TS_NAME_CLAMP "TextureSamplerClamp"
-    //#define TS_NAME_WRAP "TextureSamplerWrap"
+     //#define TS_NAME_CLAMP "TextureSamplerClamp"
+     //#define TS_NAME_WRAP "TextureSamplerWrap"
 
     struct TextureSamplerParams
     {
@@ -187,31 +138,16 @@ namespace Grafkit
         AddressMode mode;
     };
 
-    class TextureSamplerBuilder : public ResourceBuilder<TextureSampler, TextureSamplerParams>
+    class TextureSamplerBuilder : public ResourceLoader<TextureSampler, TextureSamplerParams>
     {
     public:
 
-        TextureSamplerBuilder() {
+        TextureSamplerBuilder(const Uuid& id, const TextureSamplerParams& params)
+            : ResourceLoader<TextureSampler, TextureSamplerParams>(id, params) {
         }
 
-        explicit TextureSamplerBuilder(const TextureSamplerParams& params)
-            : ResourceBuilder<TextureSampler, TextureSamplerParams>(params) {
-        }
-
-        TextureSamplerBuilder(const std::string& name, const std::string& uuid, const TextureSamplerParams& params)
-            : ResourceBuilder<TextureSampler, TextureSamplerParams>(name, uuid, params) {
-        }
-
-
-        void Load(IResourceManager* const& resman, IResource* source) override;
-        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
-
-        SERIALIZE(TextureSamplerBuilder, 1, ar)
-        {
-            assert(0);
-        }
-
-        //protected:
-        //    void Serialize(Archive& ar) override;
+    protected:
+        void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
+        void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
     };
 }

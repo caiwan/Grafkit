@@ -191,7 +191,7 @@ const size_t GrafkitData::cubeIndicesSize = sizeof(_cube_indices);
 
 MeshRef GrafkitData::CreateQuad()
 {
-	MeshRef mesh = new Mesh();
+	MeshRef mesh = MeshRef (new Mesh());
 	mesh->AddPointer("POSITION", sizeof(quad[0]) * 4 * 4, quad);
 	mesh->AddPointer("TEXCOORD", sizeof(quad_texcoord[0]) * 4 * 4, quad_texcoord);
 	mesh->SetIndices(4, 6, quadIndices);
@@ -200,7 +200,7 @@ MeshRef GrafkitData::CreateQuad()
 
 MeshRef GrafkitData::CreateCube()
 {
-	MeshRef mesh = new Mesh();
+	MeshRef mesh = MeshRef (new Mesh());
 	mesh->AddPointer("POSITION", cubeVertexSize, cubeVertices);
 	mesh->AddPointer("TEXCOORD", cubeVertexSize, cubeTextureUVs);
 	mesh->AddPointer("NORMAL", cubeVertexSize, cubeNormals);
@@ -244,7 +244,7 @@ MeshRef GrafkitData::CreateCubes(size_t count)
 		}
 	}
 
-	MeshRef mesh = new Mesh();
+    MeshRef mesh = MeshRef (new Mesh());
 
 	mesh->AddPointer("POSITION", vertcount * sizeof(*vertices), vertices);
 	mesh->AddPointer("TEXCOORD", vertcount * sizeof(*texcoords), texcoords);

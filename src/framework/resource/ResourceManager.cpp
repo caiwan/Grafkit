@@ -15,6 +15,8 @@ DEFINE_EXCEPTION(UpdateResourceExcpetion, 4, "Cannot update resource");
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+#if 0
+
 void IResourceManager::AddResourcePaths()
 {
     /* Base resource paths inside the asset directory */
@@ -201,4 +203,81 @@ std::string IResourceManager::GetResourcePath(std::string resourceClass)
     if (it != m_pathMap.end())
         return it->second;
     return std::string();
+}
+
+#endif
+
+void ResourceManager::Reload(const std::shared_ptr<IResourceLoader>& loader)
+{
+    auto id = loader->GetId();
+    auto it = m_resources.find(id);
+    assert(it != m_resources.end());
+    m_loaders.insert(make_pair(id, loader));
+    m_loaderQueue.push_back(loader);
+}
+
+void ResourceManager::Reload(const Uuid& id)
+{
+    auto loaderIt = m_loaders.find(id);
+    auto resourceIt = m_resources.find(id);
+    if (loaderIt != m_loaders.end() && resourceIt != m_resources.end())
+    {
+        m_loaderQueue.push_back(loaderIt->second);
+        return;
+    }
+    assert(0);
+}
+
+void ResourceManager::Remove(const std::shared_ptr<IResource>& resource)
+{
+    assert(resource);
+    auto it = m_resources.find(resource->GetId());
+    if (it != m_resources.end()) { m_resources.erase(it); }
+}
+
+void ResourceManager::DoPrecalc(Renderer& render, IAssetFactory& assetFactory)
+{
+    if (m_preloadEvents) m_preloadEvents->OnBeginLoad();
+
+    const size_t maxElemCount = m_loaderQueue.size();
+    size_t elemCount = 0;
+
+    // Phase one
+    // This part usually runs on a thread 
+    for (auto& loader : m_loaderQueue)
+    {
+        auto id = loader->GetId();
+        auto resource = GetRaw(id);
+        loader->Load(resource, *this, assetFactory);
+        elemCount++;
+        if (m_preloadEvents) m_preloadEvents->OnElemLoad(elemCount, maxElemCount);
+    }
+
+    // Phase two
+    // This part is invoked in the main thread, and usually when a rendering conext needed
+    // eg. create a d3d texture resource from the previously loaded binary
+    for (auto& loader : m_loaderQueue)
+    {
+        auto resource = GetRaw(loader->GetId());
+        loader->Initialize(resource, *this, assetFactory);
+        elemCount++;
+        if (m_preloadEvents) m_preloadEvents->OnElemLoad(elemCount, maxElemCount);
+    }
+
+    m_loaderQueue.clear();
+    if (m_preloadEvents) m_preloadEvents->OnEndLoad();
+}
+
+std::shared_ptr<IResource> ResourceManager::GetRaw(const Uuid& id) const
+{
+    auto it = m_resources.find(id);
+    if (it != m_resources.end()) { return it->second; }
+    return nullptr;
+}
+
+std::shared_ptr<IResourceLoader> ResourceManager::GetLoaderRaw(const Uuid& id) const
+{
+    auto it = m_loaders.find(id);
+    if (it != m_loaders.end()) { return it->second; }
+    return nullptr;
 }

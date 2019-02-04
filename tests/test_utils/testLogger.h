@@ -6,8 +6,9 @@
 class TestLoggerHandler : public Grafkit::Logger::ILoggerHandler
 {
 public:
-    TestLoggerHandler();
 
-protected:
-    void Write(Grafkit::Logger::message_t* const& message) override;
+    TestLoggerHandler() {
+    }
+
+    void Write(const Grafkit::Logger::message_t& message) override;
 };

@@ -73,7 +73,7 @@ void Camera::Calculate(Renderer & renderer, const ActorRef & parent)
 	}
 
 	m_worldMatrix.Identity();
-	if (parent.Valid()) {
+	if (parent) {
 		m_worldMatrix = m_viewMatrix;
 		m_worldMatrix.Multiply(parent->WorldMatrix());
 	}

@@ -12,11 +12,11 @@
 
 namespace Grafkit
 {
-    class Mesh;
-    typedef Ref<Mesh> MeshRef;
+    //class Mesh;
+    //typedef Ref<Mesh> MeshRef;
 
-    class Material;
-    typedef Ref<Material> MaterialRef;
+    //class Material;
+    //typedef Ref<Material> MaterialRef;
 
     /**
     Stores extended data for a mesh, that makes it a model
@@ -28,7 +28,7 @@ namespace Grafkit
         Model();
         explicit Model(MeshRef mesh);
         explicit Model(MeshRef mesh, MaterialRef material);
-        ~Model();
+        //~Model();
 
         MeshRef GetMesh() const;
         void SetMesh(MeshRef model);
@@ -37,8 +37,8 @@ namespace Grafkit
         void SetMaterial(MaterialRef material);
 
         void Calculate(Renderer& deviceContext, const ActorRef &parent = nullptr) override;
-        void Render(Renderer& deviceContext, SceneGraph* const & scene) override;
-        void Build(Renderer& deviceContext, SceneGraph* const & scene) override;
+        void Render(Renderer& deviceContext, SceneGraph & scene) override;
+        void Build(Renderer& deviceContext, SceneGraph & scene) override;
 
         void SetGeometryShader(ShaderResRef shader);
         ShaderResRef GetGeometryShader() const;
@@ -49,7 +49,6 @@ namespace Grafkit
 
         ShaderResRef m_geometryShader;
 
-        //PERSISTENT_DECL(Grafkit::Model, 1)
         SERIALIZE(Grafkit::Model, 1, ar)
         {
             assert(0);

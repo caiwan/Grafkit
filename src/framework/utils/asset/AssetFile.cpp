@@ -156,14 +156,15 @@ namespace
     }
 }
 
+#if 0
 // TODO: -> Editor
 #ifndef LIVE_RELEASE
 
 namespace LiveReload
 {
-    /*	Innen van:
-        https://developersarea.wordpress.com/2014/09/26/win32-file-watcher-api-to-monitor-directory-changes/
-    */
+/*	Innen van:
+    https://developersarea.wordpress.com/2014/09/26/win32-file-watcher-api-to-monitor-directory-changes/
+*/
 
     class WatchDirectory : public IFileEventWatch, public Thread
     {
@@ -190,7 +191,7 @@ namespace LiveReload
         ~WatchDirectory()
         {
             Terminate();
-            //Join();
+//Join();
             Stop();
 
             if (m_hDir)
@@ -207,8 +208,7 @@ namespace LiveReload
         int Run() override
         {
             LOGGER(Log::Logger().Trace("FS Watcher Thread started"));
-            do { Poll(); }
-            while (!m_isTerminate);
+            do { Poll(); } while (!m_isTerminate);
             LOGGER(Log::Logger().Trace("FS Watcher Thread terminated"));
             return true;
         }
@@ -225,8 +225,8 @@ namespace LiveReload
             FILE_NOTIFY_INFORMATION* pNotify = nullptr;
             PollingOverlap.OffsetHigh = 0;
             PollingOverlap.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-            //while (result)
-            //{
+//while (result)
+//{
             ZeroMemory(buf, 8192);
             result = ReadDirectoryChangesW(
                 m_hDir,// handle to the directory to be watched
@@ -237,7 +237,7 @@ namespace LiveReload
                 FILE_NOTIFY_CHANGE_DIR_NAME |
                 FILE_NOTIFY_CHANGE_SIZE |
                 FILE_NOTIFY_CHANGE_LAST_WRITE |
-                //FILE_NOTIFY_CHANGE_LAST_ACCESS |
+//FILE_NOTIFY_CHANGE_LAST_ACCESS |
                 FILE_NOTIFY_CHANGE_CREATION |
                 0,
                 &nRet,// number of bytes returned
@@ -251,9 +251,9 @@ namespace LiveReload
             if (pollingResult == WAIT_TIMEOUT) { return; }
 
             int offset = 0;
-            //int rename = 0;
-            //char oldName[260];
-            //char newName[260];
+//int rename = 0;
+//char oldName[260];
+//char newName[260];
 
             do
             {
@@ -291,9 +291,8 @@ namespace LiveReload
                 }
 
                 offset += pNotify->NextEntryOffset;
-            }
-            while (pNotify->NextEntryOffset); //(offset != 0);
-            //}
+            } while (pNotify->NextEntryOffset); //(offset != 0);
+//}
         }
 
     private:
@@ -307,28 +306,33 @@ namespace LiveReload
 
 #endif /*LIVE_RELEASE*/
 
+#endif
+
 FileAssetFactory::FileAssetFactory(std::string root) : m_root()
-    , m_eventWatcher(nullptr) { FileAssetFactory::SetBasePath(root); }
+    /*, m_eventWatcher(nullptr)*/ { FileAssetFactory::SetBasePath(root); }
 
 
 FileAssetFactory::~FileAssetFactory()
 {
+#if 0
 #ifndef LIVE_RELEASE
     if (m_eventWatcher) { delete m_eventWatcher; }
+#endif
 #endif
 }
 
 
-StreamRef FileAssetFactory::Get(std::string name)
+StreamRef FileAssetFactory::Get(std::string name) const 
 {
     std::string fullname = TrimSlashes(m_root + name);
     LOGGER(Log::Logger().Info("Creating wrapper for file: %s", fullname.c_str()));
     return std::unique_ptr<IStream>(std::make_unique<InStreamWrapper<std::ifstream>>(fullname));
 }
 
-IAssetFactory::filelist_t FileAssetFactory::GetAssetList() { return this->m_dirlist; }
+#if 0
+IAssetFactory::filelist_t FileAssetFactory::GetAssetList() const { return this->m_dirlist; }
 
-IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter* filter)
+IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter* filter) const 
 {
     filelist_t filelist;
     for (filelist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
@@ -339,8 +343,10 @@ IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter* filter
 
     return filelist;
 }
+#endif
 
-bool FileAssetFactory::PollEvents(IResourceManager* resman)
+#if 0
+bool FileAssetFactory::PollEvents(ResourceManager& resman)
 {
 #ifndef LIVE_RELEASE
     static unsigned char count;
@@ -357,8 +363,7 @@ bool FileAssetFactory::PollEvents(IResourceManager* resman)
                     resman->TriggerReload(w->PopFile());
                 else
                     w->PopFile(); // Todo: find a better way to purge stuff 
-            }
-            while (w->HasItems());
+            } while (w->HasItems());
         }
         count = 30;
         return triggered;
@@ -370,14 +375,17 @@ bool FileAssetFactory::PollEvents(IResourceManager* resman)
 #endif
 }
 
+#endif
+
 void FileAssetFactory::SetBasePath(const std::string& root)
 {
     assert(!root.empty());
 
+# if 0
 #ifndef LIVE_RELEASE
     if (m_eventWatcher) { delete m_eventWatcher; }
 #endif
-
+#endif
     m_root = root + "/";
 
     // TODO: sanitize double slash?
@@ -386,8 +394,10 @@ void FileAssetFactory::SetBasePath(const std::string& root)
     ListDir(root, m_dirlist);
 
     /* Livereload */
+# if 0
 #ifndef LIVE_RELEASE
     m_eventWatcher = new LiveReload::WatchDirectory(root.c_str());
     static_cast<LiveReload::WatchDirectory*>(m_eventWatcher)->Start();
 #endif
+#endif 1
 }

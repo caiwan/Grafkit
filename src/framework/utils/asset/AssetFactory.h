@@ -51,10 +51,12 @@ namespace Grafkit
 
         typedef std::list<std::string> filelist_t;
 
-        virtual StreamRef Get(std::string name) = 0;
+        virtual StreamRef Get(std::string name) const = 0;
 
-        virtual filelist_t GetAssetList() { return std::list<std::string>(); };
-        virtual filelist_t GetAssetList(AssetFileFilter* filter) { return std::list<std::string>(); }
+#if 0
+        virtual filelist_t GetAssetList() const  { return std::list<std::string>(); };
+        virtual filelist_t GetAssetList(AssetFileFilter* filter) const  { return std::list<std::string>(); }
+#endif
     };
 
     // ==============================================================================

@@ -6,12 +6,24 @@
 #include "render/light.h"
 #include "render/camera.h"
 #include "render/model.h"
-#include "render/shader.h"
+//#include "render/shader.h"
+#include "animation/animation.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-// ----------------------------------------------------------------------------
+// =============================================================================================
+
+inline void Grafkit::HasAnimationsRole::UpdateAnimations(float t)
+{
+    for (size_t i = 0; i < m_animations.size(); i++)
+    {
+        AnimationRef & animation = m_animations[i];
+        animation->Update(t);
+    }
+}
+
+// =============================================================================================
 
 Scene::Scene() : HasSceneGraphRole()
     , HasAnimationsRole()
@@ -19,16 +31,11 @@ Scene::Scene() : HasSceneGraphRole()
     , HasLightsRole() {
 }
 
-Scene::~Scene() { Shutdown(); }
-
 void Scene::Initialize()
 {
-    if (m_scenegraph.Invalid())
-        return;
+    assert(m_scenegraph);
 
     InitializeSceneGraph();
-    InitializeCameras();
-    InitializeLights();
 
     for (size_t i = 0; i < m_scenegraph->GetNodeCount(); i++)
     {
@@ -36,32 +43,25 @@ void Scene::Initialize()
 
         for (int j = 0; j < node->GetEntityCount(); j++)
         {
-            Entity3D* entity = node->GetEntity(j);
+            Entity3DRef entity = node->GetEntity(j);
 
             // Lights
-            LightRef light = dynamic_cast<Light*>(entity);
-            if (light.Valid())
+            LightRef light = std::dynamic_pointer_cast<Light>(entity);
+            if (light)
             {
                 AddLight(node, light);
                 break; // We assume if we only have one under a node
             }
 
             // Cameras
-            CameraRef camera = dynamic_cast<Camera*>(entity);
-            if (camera.Valid())
+            CameraRef camera = std::dynamic_pointer_cast<Camera>(entity);
+            if (camera)
             {
                 AddCamera(node, camera);
                 break; // assume if we have only one uder a node
             }
         }
     }
-}
-
-void Scene::Shutdown()
-{
-    ShutdownLights();
-    ShutdownCameras();
-    ShutdownSceneGraph();
 }
 
 void Scene::RenderFrame(Renderer& render, float time)
@@ -71,14 +71,11 @@ void Scene::RenderFrame(Renderer& render, float time)
     RenderScenegraph(render, camera);
 }
 
-
 void Scene::Render(Renderer& render)
 {
     CameraRef camera = GetActiveCamera();
     RenderScenegraph(render, camera);
-    //m_scenegraph->Render(render, GetActiveCamera());
 }
-
 
 void Scene::UpdateScene(Renderer& render, float time)
 {
@@ -96,10 +93,3 @@ void Scene::Build(Renderer& render, ShaderResRef vs, ShaderResRef ps)
     m_scenegraph->SetVShader(vs);
     BuildSceneGraph(render);
 }
-
-// =============================================================================================
-
-//void Scene::Serialize(Archive& ar) {
-//    _Serialize(ar);
-//    assert(0);
-//}

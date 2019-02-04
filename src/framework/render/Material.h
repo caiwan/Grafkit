@@ -117,7 +117,7 @@ namespace Grafkit
         };
 
         Material();
-        ~Material();
+        //~Material();
 
         // qnd thingy
         material_color_t& Colors() { return m_colors; }
@@ -133,7 +133,7 @@ namespace Grafkit
         void AddTexture(TextureResRef texture, texture_type_e slot);
         void RemoveTexture(TextureResRef texture, texture_type_e slot);
 
-        virtual void Render(Renderer& render, ShaderRef& vertexShader, ShaderRef& pixelShader);
+        virtual void Render(Renderer& render, ShaderRes& vertexShader, ShaderRes& pixelShader);
 
         // --- 
         // persisthez kell
@@ -148,16 +148,10 @@ namespace Grafkit
 
         SERIALIZE(Grafkit::Material, 1, ar)
         {
-            Object::Serialize(ar);
             ar & m_colors & m_params;
         }
 
     private:
-        // slight optimalization trick, to avoid bind/set parameters to the same shader twice
-        static Material* g_lastMaterial;
-        Shader* m_lastVShader;
-        Shader* m_lastPShader;
-
         int m_colors_id;
         int m_params_id;
     };

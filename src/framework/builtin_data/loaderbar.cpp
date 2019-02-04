@@ -56,40 +56,27 @@ GrafkitData::LoaderBar::~LoaderBar()
 	ShutdownLoaderBar();
 }
 
-void GrafkitData::LoaderBar::InitializeLoaderBar(Grafkit::Renderer & renderer)
+void GrafkitData::LoaderBar::InitializeLoaderBar(Renderer & renderer)
 {
 	m_fsLoader = CreateShader(renderer);
-	m_loaderbar = new EffectComposer();
-	m_loaderbar->AddPass(new EffectPass(m_fsLoader));
+	m_loaderbar = EffectComposerRef(new EffectComposer());
+	m_loaderbar->AddPass(EffectPassRef(new EffectPass(m_fsLoader)));
 	m_loaderbar->Initialize(renderer, true);
-}
-
-void GrafkitData::LoaderBar::ShutdownLoaderBar()
-{
-	if (m_fsLoader.Valid())
-		if (m_fsLoader->Valid()) {
-			m_fsLoader->Get()->Shutdown();
-			m_fsLoader->AssingnRef(nullptr);
-		}
-	if (m_loaderbar.Valid()) {
-		m_loaderbar->Shutdown();
-		m_loaderbar.AssingnRef(nullptr);
-	}
 }
 
 void GrafkitData::LoaderBar::OnElemLoad(size_t actual, size_t count)
 {
-	UpdateLoaderBar((float)actual / (float)count);
+	UpdateLoaderBar(float(actual) / float(count));
 }
 
-void GrafkitData::LoaderBar::DrawLoaderBar(Grafkit::Renderer & render, float p)
+void GrafkitData::LoaderBar::DrawLoaderBar(Renderer & render, float p)
 {
 	float4 par;
 	render.GetViewportSizef(par.x, par.y);
 	par.z = render.GetAspectRatio();
 	par.w = p;
 
-	m_fsLoader->Get()->SetParamT<float4>(render, "LoaderBar", par);
+	m_fsLoader->SetParamT<float4>(render, "LoaderBar", par);
 
 	//
 	m_loaderbar->BindInput(render);
@@ -105,11 +92,11 @@ std::string GrafkitData::LoaderBar::GetLoaderBarSrc()
 	return std::string(pPSahderSrc);
 }
 
-Grafkit::ShaderResRef GrafkitData::LoaderBar::CreateShader(Grafkit::Renderer & renderer)
+ShaderResRef GrafkitData::LoaderBar::CreateShader(Renderer & renderer)
 {
 	ShaderRef ps = ShaderRef (new PixelShader());
 	std::string psSrc = GetLoaderBarSrc();
 	ps->LoadFromMemory(renderer, "main", psSrc.c_str(), psSrc.length(), "loaderbar");
-	return ShaderResRef(new ShaderRes(ps));
+	return ShaderResRef(ps);
 }
 

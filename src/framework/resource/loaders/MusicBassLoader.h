@@ -12,28 +12,17 @@ namespace Grafkit
         void Serialize(A& ar) { ar & source; }
     };
 
-    class MusicBassLoader : public ResourceBuilder<Music, MusicParams>
+    class MusicBassLoader : public ResourceLoader<Music, MusicParams>
     {
     public:
 
-        MusicBassLoader() {
+
+        MusicBassLoader(const Uuid& id, const MusicParams& params)
+            : ResourceLoader<Music, MusicParams>(id, params) {
         }
 
-        explicit MusicBassLoader(const MusicParams& params)
-            : ResourceBuilder<Music, MusicParams>(params) {
-        }
-
-        MusicBassLoader(const std::string& name, const std::string& uuid, const MusicParams& params)
-            : ResourceBuilder<Music, MusicParams>(name, uuid, params) {
-        }
-
-
-        void Load(IResourceManager* const& resman, IResource* source) override;
-        void Initialize(Renderer& render, IResourceManager* const& resman, IResource* source) override;
-
-        PERSISTENT_DECL(MusicBassLoader, 1);
-
-        //protected:
-        //void Serialize(Archive& ar) override;
+    protected:
+        void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
+        void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) override;
     };
 }

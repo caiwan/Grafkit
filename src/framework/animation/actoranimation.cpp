@@ -30,13 +30,13 @@ void ActorAnimation::Update(double time)
 
 void ActorAnimation::Initialize()
 {
-    m_position = new Track("Position", "xyz");
+    m_position = TrackRef(new Track("Position", "xyz"));
     AddTrack(m_position);
 
-    m_rotation = new Track("Rotation", "rpy");
+    m_rotation = TrackRef(new Track("Rotation", "rpy"));
     AddTrack(m_rotation);
 
-    m_scale = new Track("Scaling", "xyz");
+    m_scale = TrackRef(new Track("Scaling", "xyz"));
     AddTrack(m_scale);
     m_scale->SetFloat3(0, float3(1, 1, 1));
 }

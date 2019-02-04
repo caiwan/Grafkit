@@ -11,39 +11,30 @@
 
 PERSISTENT_IMPL(Grafkit::Mesh);
 
-// --- excpetions 
-DEFINE_EXCEPTION(CreateVertexBufferException, 1301, "Could not create vertex buffer")
-DEFINE_EXCEPTION(CreateIndevBufferException, 1302, "Could not create index buffer")
-
 using namespace Grafkit;
-using namespace FWdebugExceptions;
 
 // ==================================================================
 Mesh::Mesh() :
-    m_indexBuffer(nullptr),
-    m_buffer(), m_vertexCount(0)
-{
+    m_indexBuffer(nullptr)
+    , m_buffer()
+    , m_vertexCount(0) {
 }
 
-Mesh::~Mesh()
-{
+void Mesh::UpdateMesh(double time) {
 }
 
-void Mesh::UpdateMesh(double time)
+void Mesh::RenderMesh(Renderer& render) const
 {
-}
-
-void Mesh::RenderMesh(ID3D11DeviceContext * dev) const
-{
-    dev->IASetVertexBuffers(0, 1, &this->m_buffer.buffer, &this->m_buffer.stride, &this->m_buffer.offset);
-    dev->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+    auto& dev = render.GetDeviceContext();
+    dev->IASetVertexBuffers(0, 1, this->m_buffer.buffer.GetAddressOf(), &this->m_buffer.stride, &this->m_buffer.offset);
+    dev->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
     dev->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     dev->DrawIndexed(GetIndexCount(), 0, 0);
 }
 
-// TODO: ->CopyVertexAttribute
-void Mesh::AddPointer(std::string inputName, uint32_t length, const void * pointer)
+// TODO: Rename: ->CopyVertexAttribute
+void Mesh::AddPointer(std::string inputName, uint32_t length, const void* pointer)
 {
     std::vector<uint8_t> vertexData;
     vertexData.reserve(length);
@@ -51,7 +42,7 @@ void Mesh::AddPointer(std::string inputName, uint32_t length, const void * point
     this->m_vertices[inputName] = vertexData;
 }
 
-// TODO: ->CopyAddAttribute
+// TODO: Rename: ->CopyAddAttribute
 void Mesh::SetIndices(uint32_t vertexCount, uint32_t indexCount, const uint32_t*const indices)
 {
     m_vertexCount = vertexCount;
@@ -60,8 +51,9 @@ void Mesh::SetIndices(uint32_t vertexCount, uint32_t indexCount, const uint32_t*
     copy(indices, indices + indexCount, back_inserter(m_indices));
 }
 
-void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
+void Mesh::Build(Renderer& render, const ShaderRes& shader)
 {
+    assert(shader);
     HRESULT result = 0;
 
     if (m_vertices.empty())
@@ -71,9 +63,6 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 
     StructPack packer;
 
-    if (shader.Invalid()) {
-        THROW_EX_DETAILS(NullPointerException, "Nincs shader betoltve");
-    }
 
     for (uint32_t i = 0; i < elem_count; ++i)
     {
@@ -81,16 +70,13 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
         int field_id = packer.addField(record.width);
 
         auto it = this->m_vertices.find(record.name);
-        if (it != this->m_vertices.end())
-        {
-            packer.addPointer(field_id, it->second.data(), 0, record.width);
-        }
+        if (it != this->m_vertices.end()) { packer.addPointer(field_id, it->second.data(), 0, record.width); }
     }
 
-    void *vertex_buffer_data = packer(m_vertexCount);
+    void* vertex_buffer_data = packer(m_vertexCount);
 
     // --- Create vertex buffer
-    ID3D11Buffer *vertexBuffer = nullptr;
+    ComPtr<ID3D11Buffer> vertexBuffer = nullptr;
 
     D3D11_BUFFER_DESC vertexBufferDesc;
     D3D11_SUBRESOURCE_DATA vertexData;
@@ -111,10 +97,8 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
     vertexData.SysMemSlicePitch = 0;
 
     // Now create the vertex buffer.
-    result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
-    if (FAILED(result)) {
-        THROW_EX(CreateIndevBufferException);
-    }
+    result = render->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
+    if (FAILED(result)) { throw std::runtime_error("Could not create index buffer"); }
 
     packer.dealloc(vertex_buffer_data);
 
@@ -124,13 +108,13 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
     this->m_buffer.offset = 0;
 
     // --- Create index buffer
-    ID3D11Buffer *indexBuffer = nullptr;
+    ComPtr<ID3D11Buffer> indexBuffer = nullptr;
 
-    D3D11_BUFFER_DESC 	indexBufferDesc;
-    D3D11_SUBRESOURCE_DATA 	indexData;
+    D3D11_BUFFER_DESC indexBufferDesc = {};
+    D3D11_SUBRESOURCE_DATA indexData = {};
 
-    ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
-    ZeroMemory(&indexData, sizeof(indexData));
+    //ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
+    //ZeroMemory(&indexData, sizeof(indexData));
 
     // static index buffer
     indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -146,35 +130,18 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
     indexData.SysMemSlicePitch = 0;
 
     // Create the index buffer.
-    result = device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
-    if (FAILED(result)) {
-        THROW_EX(CreateIndevBufferException);
-    }
+    result = render->CreateBuffer(&indexBufferDesc, &indexData, indexBuffer.GetAddressOf());
+    if (FAILED(result)) { throw std::runtime_error("Could not create vertex buffer"); }
 
     this->m_indexBuffer = indexBuffer;
 }
 
-const void* Mesh::GetPointer(std::string inputName) {
+const void* Mesh::GetPointer(const std::string& inputName)
+{
     auto it = m_vertices.find(inputName);
-    if (it != m_vertices.end())
-    {
-        return it->second.data();
-    }
+    if (it != m_vertices.end()) { return it->second.data(); }
 
     return nullptr;
-
 }
 
-const uint32_t* Mesh::GetIndices() const {
-    return m_indices.data();
-}
-
-void Mesh::Shutdown()
-{
-    RELEASE(m_indexBuffer);
-    RELEASE(m_buffer.buffer);
-    OBJECT_RELEASE();
-}
-
-// ==================================================================
-
+const uint32_t* Mesh::GetIndices() const { return m_indices.data(); }

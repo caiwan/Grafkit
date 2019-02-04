@@ -15,7 +15,7 @@ using namespace FWdebugExceptions;
 // =============================================================================================================================
 
 namespace {
-
+# if 0
     class IncludeProvider : public ID3DInclude {
     public:
         explicit IncludeProvider(IResourceManager* const & resman);
@@ -76,10 +76,12 @@ namespace {
 
         return S_OK;
     }
+
+#endif 
 }
 
 // =============================================================================================================================
-
+#if 0
 void IShaderLoader::Load(IResourceManager * const & resman, IResource* source)
 {
     if (m_params.entryPoint.empty())
@@ -127,8 +129,14 @@ void IShaderLoader::Initialize(Renderer& render, IResourceManager* const& resman
     // Nothing to do ATM
 }
 
-Shader* VertexShaderLoader::NewShader() const { return new VertexShader(); }
+#endif 
 
-Shader* PixelShaderLoader::NewShader() const { return new PixelShader(); }
+void IShaderLoader::Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
 
-Shader* GeometryShaderLoader::NewShader() const { return new GeometryShader(); }
+void IShaderLoader::Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory & assetFactory) {
+}
+
+ShaderRef VertexShaderLoader::NewShader() const { return ShaderRef(new VertexShader()); }
+ShaderRef PixelShaderLoader::NewShader() const { return ShaderRef(new PixelShader()); }
+ShaderRef GeometryShaderLoader::NewShader() const { return ShaderRef(new GeometryShader()); }

@@ -1,174 +1,352 @@
-/**
-    Unittest for resource management system
-*/
-
-#include "stdafx.h"
-
+#include <cassert>
 #include <gtest/gtest.h>
 
-//#include "testClass_resource.h"
-// --- 
+#include "render/renderer.h"
+#include "core/resource.h"
+#include "core/asset.h"
+#include "resource/ResourceManager.h"
+#include "resource/ResourceBuilder.h"
+#include "utils/asset/AssetFactory.h"
 
-#if 0
+using namespace Grafkit;
 
-class ResourceManagerTest : public testing::Test {
-
+class DummyAssetFactory : public IAssetFactory
+{
 public:
-    void SetUp() override {
+    void SetBasePath(const std::string& path) override
+    {
+        assert(0);
     }
 
-    void TearDown() override {
+    StreamRef Get(std::string name) const override
+    {
+        assert(0);
+        return {};
+    };
+};
+
+// --- 
+// These are the resources we want to load 
+class TestResouceA
+{
+public:
+    int m_a, m_b;
+};
+
+class TestResouceB
+{
+public:
+    int m_c;
+    double m_d;
+};
+
+class TestBaseResource
+{
+public:
+    int m_a, m_b;
+    virtual void SomePolymorhpicTrait() = 0;
+};
+
+class TestDerivedResourceA : public TestBaseResource
+{
+public:
+    Resource<TestResouceA> m_dependA;
+    int m_c;
+    double m_d;
+
+    void SomePolymorhpicTrait() override {
+    };
+};
+
+class TestDerivedResourceB : public TestBaseResource
+{
+public:
+    Resource<TestResouceB> m_dependB;
+    std::string m_something;
+
+    void SomePolymorhpicTrait() override {
+    };
+};
+
+// ---
+// These are the generators for each resources
+struct TestResouceAParams
+{
+    int a, b;
+};
+
+class TestResouceALoader : public ResourceLoader<TestResouceA, TestResouceAParams>
+{
+public:
+    TestResouceALoader(Uuid id, TestResouceAParams params)
+        : ResourceLoader<TestResouceA, TestResouceAParams>(id, params) {
+    }
+
+    void Load(const std::shared_ptr<IResource>& resource, ResourceManager&, const IAssetFactory&) override
+    {
+        auto newResource = std::make_shared<TestResouceA>();
+
+        if (m_params.a == 42)
+            throw std::runtime_error("Invalid param a");
+
+        newResource->m_a = m_params.a;
+        newResource->m_b = m_params.b;
+        auto myResource = CastResource(resource);
+        myResource.AssignRef(newResource);
+    }
+
+    void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager&, const IAssetFactory&) override {
+    }
+};
+
+class TestResouceBLoader : public ResourceLoader<TestResouceB>
+{
+public:
+
+    explicit TestResouceBLoader(const Uuid& id, const None& params = {})
+        : ResourceLoader<TestResouceB>(id, params) {
+    }
+
+    void Load(const std::shared_ptr<IResource>& resource, ResourceManager&, const IAssetFactory&) override
+    {
+        auto myResource = CastResource(resource);
+        myResource.AssignRef(std::make_shared<TestResouceB>());
+        myResource->m_c = 42;
+        myResource->m_d = 2.16;
+    }
+
+    void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager&, const IAssetFactory&) override {
+    }
+};
+
+struct TestDerivedResourceAParams
+{
+    int a, b, c, d;
+    Uuid resourceAId;
+};
+
+class TestDerivedResourceALoader : public ResourceLoader<TestDerivedResourceA, TestDerivedResourceAParams>
+{
+public:
+
+    TestDerivedResourceALoader(const Uuid& id, const TestDerivedResourceAParams& params)
+        : ResourceLoader<TestDerivedResourceA, TestDerivedResourceAParams>(id, params) {
+    }
+
+    void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory&) override
+    {
+        auto newResource = std::make_shared<TestDerivedResourceA>();
+
+        // For error testing purpuses
+        if (m_params.a != 42)
+            throw std::runtime_error("Invalid param a");
+
+        newResource->m_a = m_params.a;
+        newResource->m_b = m_params.b;
+        newResource->m_c = m_params.c;
+        newResource->m_d = m_params.d;
+
+        auto dependingResource = resourceManager.Get<TestResouceA>(m_params.resourceAId);
+        newResource->m_dependA = dependingResource;
+
+        // It's the loaders responsibility to keep the integrity upon error 
+        auto myResource = CastResource(resource);
+        myResource.AssignRef(newResource);
+    }
+
+    void Initialize(const std::shared_ptr<IResource>&, ResourceManager&, const IAssetFactory&) override {
+    }
+};
+
+struct TestDerivedResourceBParams
+{
+    int a, b;
+    std::string something;
+    Uuid resourceBId;
+};
+
+class TestDerivedResourceBLoader : public ResourceLoader<TestDerivedResourceB, TestDerivedResourceBParams>
+{
+public:
+
+    TestDerivedResourceBLoader(const Uuid& id, const TestDerivedResourceBParams& params)
+        : ResourceLoader<TestDerivedResourceB, TestDerivedResourceBParams>(id, params) {
+    }
+
+    void Load(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory& assetFactory) override
+    {
+        auto myResource = CastResource(resource);
+        myResource.AssignRef(std::make_shared<TestDerivedResourceB>());
+        myResource->m_a = m_params.a;
+        myResource->m_b = m_params.b;
+        myResource->m_something = m_params.something;
+
+        auto dependingResource = resourceManager.Get<TestResouceB>(m_params.resourceBId);
+        myResource->m_dependB = dependingResource;
+    }
+
+    void Initialize(const std::shared_ptr<IResource>& resource, ResourceManager& resourceManager, const IAssetFactory&) override {
     }
 };
 
 
-TEST_F(ResourceManagerTest, TestAssignment) {
-    ThingResourceRef resource = new ThingResource();
+TEST(Resource, LoadObjectTest)
+{
+    // Given
+    Renderer render;
+    DummyAssetFactory assetFactory;
+    auto manager = std::make_unique<ResourceManager>();
 
-    resource->AssingnRef(new Thing());
+    auto resourceA = manager->Load<TestResouceA>(std::make_shared<TestResouceALoader>(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"), TestResouceAParams{1,2}));
+    auto resourceB = manager->Load<TestResouceB>(std::make_shared<TestResouceBLoader>(Uuid("000273ce-bef5-44a9-bf30-d594de396212")));
 
-    ASSERT_TRUE(resource.Valid() && resource->Valid());
+    // When
+    manager->DoPrecalc(render, assetFactory);
+
+    // Then
+    ASSERT_TRUE(*resourceA);
+    ASSERT_TRUE(1 == resourceA->m_a);
+    ASSERT_TRUE(2 == resourceA->m_b);
+
+    ASSERT_TRUE(*resourceB);
+    ASSERT_TRUE(42 == resourceB->m_c);
+    ASSERT_TRUE(2.16 == resourceB->m_d);
 }
 
-TEST_F(ResourceManagerTest, TestAddAndGet) {
-    MyResourceManager *resman = new MyResourceManager();
+TEST(Resource, InheritionAndDependemncyTest)
+{
+    // Given
+    Renderer render;
+    DummyAssetFactory assetFactory;
 
-    ThingResourceRef resource = new ThingResource();
-    ThingRef thing = new Thing();
-    resource->AssingnRef(thing);
+    auto manager = std::make_unique<ResourceManager>();
 
-    resource->SetUuid("theThing");
+    auto resourceA = manager->Load<TestResouceA>(std::make_shared<TestResouceALoader>(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"), TestResouceAParams{3,4}));
+    auto resourceB = manager->Load<TestResouceB>(std::make_shared<TestResouceBLoader>(Uuid("000273ce-bef5-44a9-bf30-d594de396212")));
 
-    ASSERT_TRUE(resource.Valid() && resource->Valid());
+    auto resourceDA = manager->Load<TestDerivedResourceA>(std::make_shared<TestDerivedResourceALoader>(Uuid("3a38e7d1-4971-444a-b840-5bb2bbe09a44"), TestDerivedResourceAParams{42,2,3,4, Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0")}));
+    auto resourceDB = manager->Load<TestDerivedResourceB>(std::make_shared<TestDerivedResourceBLoader>(Uuid("35747964-082b-45d5-a367-cc38042e8150"), TestDerivedResourceBParams{1,2,"Something", Uuid("000273ce-bef5-44a9-bf30-d594de396212")}));
 
-    resman->Add(resource);
+    // When
+    manager->DoPrecalc(render, assetFactory);
 
-    ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
+    // Then
+    ASSERT_TRUE(resourceA.Valid());
+    ASSERT_TRUE(resourceB.Valid());
 
-    ASSERT_TRUE(retresource.Valid() && retresource->Valid());
+    ASSERT_TRUE(resourceDA.Valid());
+    ASSERT_TRUE(42 == resourceDA->m_a);
+    ASSERT_TRUE(2 == resourceDA->m_b);
+    ASSERT_TRUE(3 == resourceDA->m_c);
+    ASSERT_TRUE(4 == resourceDA->m_d);
+    ASSERT_TRUE(*resourceA == *resourceDA->m_dependA);
 
-    ASSERT_TRUE(retresource->Get() == thing);
+    ASSERT_TRUE(resourceDB.Valid());
+    ASSERT_TRUE(0 == std::string("Something").compare(resourceDB->m_something));
+    ASSERT_TRUE(*resourceB == *resourceDB->m_dependB);
 
-    delete resman;
+    // --- Casting 
+    Resource<TestBaseResource> baseA = manager->Get<TestBaseResource>(Uuid("3a38e7d1-4971-444a-b840-5bb2bbe09a44"));
+    Resource<TestBaseResource> baseB = manager->Get<TestBaseResource>(Uuid("35747964-082b-45d5-a367-cc38042e8150"));
+
+    ASSERT_TRUE(baseA);
+    ASSERT_TRUE(baseB);
+
+    Resource<TestDerivedResourceA> objA = baseA.CastTo<TestDerivedResourceA>();
+    Resource<TestDerivedResourceB> objB = baseB.CastTo<TestDerivedResourceB>();
+
+    ASSERT_TRUE(objA);
+    ASSERT_TRUE(objB);
 }
 
-TEST_F(ResourceManagerTest, TestReplace) {
-    MyResourceManager *resman = new MyResourceManager();
+TEST(Resource, LoadWithErrorTest)
+{
+    // Given
+    Renderer render;
+    DummyAssetFactory assetFactory;
 
-    ThingResourceRef resource = new ThingResource();
-    resource->AssingnRef(new Thing());
+    auto manager = std::make_unique<ResourceManager>();
+    auto resourceDA = manager->Load<TestDerivedResourceA>(std::make_shared<TestDerivedResourceALoader>(Uuid("3a38e7d1-4971-444a-b840-5bb2bbe09a44"), TestDerivedResourceAParams{1,2,3,4,Uuid()}));
 
-    resource->SetUuid("theThing");
+    // When
+    try
+    {
+        manager->DoPrecalc(render, assetFactory);
+        FAIL();
+    }
+    catch (std::exception& e) {
+    }
 
-    resman->Add(resource);
-
-    ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
-    ASSERT_TRUE(retresource.Valid() && retresource->Valid());
-
-    ThingRef newThing = new Thing();
-    retresource->AssingnRef(newThing);
-
-    ASSERT_TRUE(retresource->Get() == newThing);
-    ASSERT_TRUE(resource->Get() == newThing);
-
-    delete resman;
+    // Then
+    ASSERT_TRUE(!resourceDA.Empty());
+    ASSERT_TRUE(!resourceDA);
 }
 
+TEST(Resource, ReloadTest)
+{
+    // Given
+    Renderer render;
+    DummyAssetFactory assetFactory;
 
-TEST_F(ResourceManagerTest, TestRemove) {
-    MyResourceManager *resman = new MyResourceManager();
+    auto manager = std::make_unique<ResourceManager>();
 
-    ThingResourceRef resource = new ThingResource();
-    resource->AssingnRef(new Thing());
+    auto resourceA = manager->Load<TestResouceA>(std::make_shared<TestResouceALoader>(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"), TestResouceAParams{1,2}));
 
-    resource->SetUuid("theThing");
+    manager->DoPrecalc(render, assetFactory);
 
-    ASSERT_TRUE(resource.Valid() && resource->Valid());
+    ASSERT_TRUE(*resourceA);
+    ASSERT_TRUE(1 == resourceA->m_a);
+    ASSERT_TRUE(2 == resourceA->m_b);
 
-    resman->Add(resource);
+    // When
+    manager->GetLoader<TestResouceALoader>(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"))->SetParams(TestResouceAParams{3,4});
+    manager->Reload(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"));
 
-    ThingResourceRef retresource;
+    manager->DoPrecalc(render, assetFactory);
 
-    retresource = resman->GetByUuid<ThingResource>("theThing");
-    ASSERT_TRUE(retresource.Valid() && retresource->Valid());
-
-    resman->RemoveByUuid("theThing");
-
-    retresource = resman->GetByUuid<ThingResource>("theThing");
-    ASSERT_TRUE(retresource.Invalid());
-
-    delete resman;
+    // Then
+    ASSERT_TRUE(*resourceA);
+    ASSERT_TRUE(3 == resourceA->m_a);
+    ASSERT_TRUE(4 == resourceA->m_b);
 }
 
-TEST_F(ResourceManagerTest, TestLoad) {
-    // given 
-    ThingResourceRef resource;
-    MyResourceManager *resman = new MyResourceManager();
+TEST(Resource, ReloadWithErrorTest)
+{
+    // Given
+    Renderer render;
+    DummyAssetFactory assetFactory;
+    auto manager = std::make_unique<ResourceManager>();
 
-    resman->Load(new ThingLoader("theLoadedThing", "theThingId" ));
+    auto resourceA = manager->Load<TestResouceA>(std::make_shared<TestResouceALoader>(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"), TestResouceAParams{1,2}));
 
-    resource = resman->GetByUuid<ThingResource>("theThingId");
+    // When
+    manager->DoPrecalc(render, assetFactory);
 
-    ASSERT_TRUE(resource.Valid());
-    ASSERT_TRUE(resource->Invalid());
+    ASSERT_TRUE(*resourceA);
+    ASSERT_TRUE(1 == resourceA->m_a);
+    ASSERT_TRUE(2 == resourceA->m_b);
 
-    // when
-    resman->DoPrecalc();
+    manager->GetLoader<TestResouceALoader>(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"))->SetParams(TestResouceAParams{42, 2});
+    manager->Reload(Uuid("46a44293-aaa3-47f0-b6e5-82abd9ba72c0"));
 
-    // then
-    // it has to be updated without refresh
-    ASSERT_TRUE(resource.Valid());
-    ASSERT_TRUE(resource->Valid());
-
-    resource = resman->GetByUuid<ThingResource>("theThingId");
-
-    ASSERT_TRUE(resource.Valid());
-    ASSERT_TRUE(resource->Valid());
-
-    delete resman;
+    // Then
+    try
+    {
+        manager->DoPrecalc(render, assetFactory);
+        FAIL();
+    }
+    catch (std::exception& e) {
+    }
+    // Should not be replaced
+    ASSERT_TRUE(resourceA.Valid());
+    ASSERT_TRUE(1 == resourceA->m_a);
+    ASSERT_TRUE(2 == resourceA->m_b);
 }
 
-
-TEST_F(ResourceManagerTest, TestCasting) {
-    // given
-    MyResourceManager *resman = new MyResourceManager();
-
-    // when
-    resman->Add(new AnotherThingResource(new AnotherThing(), "anotherThing"));
-
-    ThingResourceRef resource = resman->GetByUuid<ThingResource>("anotherThing");
-
-    // then
-    ASSERT_FALSE(resource.Valid());
-
-    delete resman;
+// 6 Casting and assigning doesn't hurt integrity.
+TEST(Resource, CastingIntegrityTest)
+{
+    auto manager = std::make_unique<ResourceManager>();
+    auto ra = Resource<TestResouceA>(std::make_shared<TestResouceA>());
+    FAIL("Not implemented");
 }
-
-TEST_F(ResourceManagerTest, ReloadTest) {
-    // given
-    MyResourceManager *resman = new MyResourceManager();
-    ThingResourceRef resource = resman->Load<ThingResource>(new ThingLoader("theLoadedThing"));
-
-    ASSERT_TRUE(resource.Valid());
-    ASSERT_TRUE(resource->Invalid());
-
-    resman->DoPrecalc();
-
-    ASSERT_TRUE(resource->Valid());
-
-    (*resource)->SetAsd(999);
-    (*resource)->SetGlejd(999.);
-
-    //when
-    resman->TriggerReload("theLoadedThing");
-
-    //then
-    ASSERT_TRUE(resource.Valid());
-    ASSERT_TRUE(resource->Valid());
-
-    ASSERT_EQ(0x010101, (*resource)->GetAsd());
-    ASSERT_DOUBLE_EQ(2.16f, (*resource)->GetGlejd());
-
-}
-
-#endif 

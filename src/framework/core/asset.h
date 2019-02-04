@@ -46,7 +46,7 @@ namespace Grafkit
             outLength = m_stream.tellg();
             m_stream.seekg(0, m_stream.beg);
             outBuffer = StreamDataPtr(new uint8_t[outLength]);
-            m_stream.read((char*)(outBuffer.get()), outLength);
+            m_stream.read(reinterpret_cast<char*>(outBuffer.get()), outLength);
             m_stream.seekg(0, m_stream.beg);
             return IsSuccess();
         }
@@ -80,7 +80,7 @@ namespace Grafkit
             outLength = m_stream.tellg();
             m_stream.seekg(0, m_stream.beg);
             outBuffer = StreamDataPtr(new uint8_t[outLength]);
-            m_stream.read((char*)(outBuffer.get()), outLength);
+            m_stream.read(reinterpret_cast<char*>(outBuffer.get()), outLength);
             m_stream.seekg(0, m_stream.beg);
             return IsSuccess();
         }

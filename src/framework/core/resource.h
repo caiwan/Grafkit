@@ -4,76 +4,207 @@ A generator interface for assets
 
 #pragma once
 
-#include "core/Object.h"
-#include "reference.h"
+#include <typeindex>
 
 namespace Grafkit
 {
-    class IResource;
-    class IResourceManager;
-    class IResourceBuilder;
-
-    /**
-    A base class for collectable render assets for bulk loading and reloading
-    */
-    class IResource : public Object
+    class Uuid
     {
-        friend class IResourceManager;
     public:
-        IResource(){};
+        Uuid() : m_uuid(Create()) {
+        }
 
-        explicit IResource(const std::string& name) : Object(name){}
-        explicit IResource(const std::string& name, const std::string& uuid) : Object(name, Uuid(uuid)) {}
+        explicit Uuid(const std::string& uuid)
+            : m_uuid(uuid) {
+        }
 
-        virtual ~IResource() = default;
+        explicit Uuid(const char* uuid)
+            : m_uuid(uuid) {
+        }
 
-        virtual const void * GetRaw() const = 0;
+        Uuid(const Uuid& other)
+            : m_uuid(other.m_uuid) {
+        }
+
+        Uuid& operator=(const Uuid& other)
+        {
+            if (this == &other)
+                return *this;
+            m_uuid = other.m_uuid;
+            return *this;
+        }
+
+        bool IsEmpty() const { return m_uuid.empty(); }
+
+        explicit operator std::string() const { return m_uuid; }
+
+        const char* c_str() const { return m_uuid.c_str(); }
+
+        friend bool operator==(const Uuid& lhs, const Uuid& rhs) { return lhs.m_uuid == rhs.m_uuid; }
+        friend bool operator!=(const Uuid& lhs, const Uuid& rhs) { return !(lhs == rhs); }
+
+        friend bool operator<(const Uuid& lhs, const Uuid& rhs) { return lhs.m_uuid < rhs.m_uuid; }
+
+        template <class Archive>
+        void Serialize(Archive& ar) { ar & m_uuid; }
+
+    private:
+        static std::string Create();
+        std::string m_uuid;
     };
 
-    /**
-     *TOOD: Get rid of Ref<T>
-    */
-    template <typename T>
-    class Resource : public IResource, public Ref<T>
+    class IResource;
+    class ResourceManager;
+
+    template <class T>
+    class Resource;
+
+    template <class T>
+    class ResourceWrapper;
+
+    class IResource
+    {
+        friend class ResourceManager;
+
+        template <class T>
+        friend class Resource;
+
+        template <class T>
+        friend class ResourceWrapper;
+
+    public:
+
+        IResource() {
+        }
+
+        explicit IResource(const Uuid& id)
+            : m_id(id) {
+        }
+
+        virtual ~IResource() {
+        }
+
+        Uuid GetId() const { return m_id; }
+
+        virtual std::type_index GetTypeIndex() const = 0;
+
+    protected:
+        void SetId(const Uuid& id) { m_id = id; }
+        Uuid m_id;
+    };
+
+    template <class T>
+    class ResourceWrapper : public IResource
     {
     public:
-        Resource() : IResource()
-            , Ref<T>() {
+        template <class R>
+        friend class ResourceWrapper;
+
+        typedef T value_t;
+        typedef std::shared_ptr<T> valuePtr_t;
+
+        ResourceWrapper() : m_ptr(nullptr) {
         }
 
-        explicit Resource(Resource* ptr) : IResource(ptr)
-            , Ref<T>(ptr) {
+        ResourceWrapper(const ResourceWrapper& other) = delete;
+
+        ResourceWrapper& operator=(const ResourceWrapper& other) = delete;
+
+        explicit ResourceWrapper(std::shared_ptr<T> ptr)
+            : m_ptr(ptr) {
         }
 
-        explicit Resource(Ref<Resource> ref) : IResource(ref)
-            , Ref<T>(ref) {
+        explicit ResourceWrapper(const Uuid& id, std::shared_ptr<T> ptr) : IResource(id)
+            , m_ptr(ptr) {
         }
 
-        explicit Resource(Ref<T> tref) : IResource()
-            , Ref<T>(tref) {
+        virtual ~ResourceWrapper() {
         }
 
-        explicit Resource(T* tptr) : IResource()
-            , Ref<T>(tptr) {
+        std::shared_ptr<T> Get() const { return m_ptr; }
+        void Set(const std::shared_ptr<T>& ptr) { m_ptr = ptr; }
+
+        std::type_index GetTypeIndex() const override { return std::type_index(typeid(*m_ptr.get())); }
+
+    private:
+        std::shared_ptr<T> m_ptr;
+    };
+
+    template <class T>
+    class Resource
+    {
+        template <class U>
+        friend class Resource;
+    public:
+        Resource() = default;
+        Resource(const Resource<T>& other) = default;
+        Resource& operator=(const Resource<T>& other) = default;
+
+        template <class U>
+        explicit Resource(const std::shared_ptr<U>& ptr) { AssignRef(ptr); }
+
+        // Arbitrary replace the underlying resource; a.k.a. replaces all the instances 
+        template <class U>
+        void AssignRef(const std::shared_ptr<U>& ptr)
+        {
+            // Convert ResourceWrapper<R> -> ResourceWrapper<T>
+            if constexpr
+                (std::is_base_of<IResource, U>().value)
+            {
+                static_assert(std::is_base_of<T, typename U::value_t>() || std::is_base_of<typename U::value_t, T>());
+                m_wrapperPtr = std::reinterpret_pointer_cast<ResourceWrapper<T>>(ptr);
+            }
+            // Convert R -> T then wrap it 
+            else
+            {
+                static_assert(std::is_base_of<T, U>() || std::is_base_of<U, T>());
+                if (!ptr)
+                {
+                    m_wrapperPtr->Set(nullptr);
+                    return;
+                }
+                auto myPtr = std::dynamic_pointer_cast<T>(ptr);
+                assert(myPtr);
+                if (!m_wrapperPtr) { m_wrapperPtr = std::make_shared<ResourceWrapper<T>>(myPtr); }
+                else { m_wrapperPtr->Set(myPtr); }
+            }
         }
 
-        explicit Resource(Ref<T> tref, const std::string& name) : IResource(name)
-            , Ref<T>(tref) {
+        std::shared_ptr<T> operator->() const
+        {
+            assert(m_wrapperPtr->Get());
+            return m_wrapperPtr->Get();
         }
 
-        explicit Resource(Ref<T> tref, const std::string& name, const std::string& uuid) : IResource(name, uuid)
-            , Ref<T>(tref) {
+        std::shared_ptr<T> operator*() const
+        {
+            assert(m_wrapperPtr->Get());
+            return m_wrapperPtr->Get();
         }
 
-        explicit operator Ref<T>() { return Ref<T>(dynamic_cast<T*>(this->Get())); }
-        explicit operator T * const &() { return dynamic_cast<T*>(this->Get()); }
-        explicit operator T&() { return *this->Get(); }
+        template <class U>
+        explicit operator Resource<U>() const { return CastTo<U>(); }
 
-        const void * GetRaw() const override { return ptr; }
+        template <class U>
+        Resource<U> CastTo() const
+        {
+            static_assert(std::is_base_of<T, U>() || std::is_base_of<U, T>());
+            if (Invalid())
+                return Resource<U>();
+            auto myPtr = std::reinterpret_pointer_cast<ResourceWrapper<T>>(m_wrapperPtr);
+            return Resource<U>(myPtr);
+        }
 
-    // ???
+        bool Valid() const { return m_wrapperPtr && m_wrapperPtr->Get(); }
+        bool Invalid() const { return !Valid(); }
+        explicit operator bool() const { return Valid(); }
+
+        bool Empty() const { return !m_wrapperPtr; }
+
+        const Uuid GetId() const { return  m_wrapperPtr->GetId(); }
+
     protected:
-        std::string GetClazzName() const override { return {}; }
-        uint16_t GetVersion() const override { return 0; }
+
+        std::shared_ptr<ResourceWrapper<T>> m_wrapperPtr;
     };
 }
