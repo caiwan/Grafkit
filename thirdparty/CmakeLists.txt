@@ -1,0 +1,18 @@
+include(${CMAKE_CURRENT_SOURCE_DIR}/assimp.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/gtest.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/nlohmann_json.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/stb.cmake)
+
+add_subdirectory(bass)
+
+add_custom_target(ExternalDependencies)
+add_dependencies(ExternalDependencies 
+    Assimp
+    bass
+    googletest
+    nlohmann_json
+    stb
+)
+
+set_target_properties(ExternalDependencies PROPERTIES FOLDER ExternalProjectTargets)
+

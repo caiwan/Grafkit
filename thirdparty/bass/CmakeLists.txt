@@ -1,0 +1,28 @@
+# We'll need to just copy all the files
+project(bass)
+
+add_custom_target(bass)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(BASS_ARCHITECTURE "x64")
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+	set(BASS_ARCHITECTURE "")
+endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+
+SET(BASS_INSTALL_DIR ${CMAKE_BINARY_DIR}/externals/ CACHE PATH "" FORCE)
+
+copy_static_files(bass ${BASS_INSTALL_DIR}/include "include" ${CMAKE_CURRENT_SOURCE_DIR}/c/bass.h)
+copy_static_files(bass ${BASS_INSTALL_DIR}/lib "lib" ${CMAKE_CURRENT_SOURCE_DIR}/c/${ARCHITECTURE}/bass.lib)
+copy_static_files(bass ${BASS_INSTALL_DIR}/bin "bin" ${CMAKE_CURRENT_SOURCE_DIR}/${ARCHITECTURE}/bass.dll)
+
+set(BASS_INCLUDE_DIR ${BASS_INSTALL_DIR}/include CACHE PATH "")
+set(BASS_LIB_DIR ${BASS_INSTALL_DIR}/lib CACHE PATH "")
+set(BASS_BIN_DIR ${BASS_INSTALL_DIR}/bin CACHE PATH "")
+set(BASS_LIB_FILE bass.lib CACHE INTERNAL "" FORCE)
+set(BASS_LIBRARY optimized ${BASS_LIB_FILE} debug ${BASS_LIB_FILE} CACHE INTERNAL "" FORCE)
+set(BASS_BINARY ${BASS_BIN_DIR}/bass.dll CACHE INTERNAL "" FORCE)
+
+set_target_properties(bass PROPERTIES FOLDER ExternalProjectTargets/bass)
+
+install(FILES ${BASS_BINARY} DESTINATION "bin")
+install(FILES ${BASS_LIB_DIR}/${BASS_LIB_FILE} DESTINATION "lib")
