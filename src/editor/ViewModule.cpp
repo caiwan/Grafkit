@@ -4,9 +4,10 @@
 
 using namespace Idogep;
 
-
-Idogep::Module::Module() : m_view(nullptr), m_parent(nullptr)
+Idogep::Module::Module(Ref<Module> parent) : m_view(nullptr), m_parent(parent)
 {
+	if (m_parent)
+		parent->AddChildModule(this);
 }
 
 Idogep::Module::~Module()

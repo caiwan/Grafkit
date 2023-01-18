@@ -27,7 +27,8 @@ namespace Idogep {
 		Editor(Ref<Module> parent, Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
 		~Editor();
 
-		void Initialize(Ref<Module> parent);
+		void Initialize();
+		void MediateSiblingModule(Ref<Module> module);
 
 		void InitializeDocument();
 

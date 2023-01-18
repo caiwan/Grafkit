@@ -8,6 +8,8 @@
 #include "utils/ResourcePreloader.h"
 #include "utils/InitializeSerializer.h"
 
+#include "ViewModule.h"
+
 #include "utils/Event.h"
 
 class QCloseEvent;
@@ -17,11 +19,13 @@ namespace Idogep {
 	class Document;
 	class Editor;
 
+	class MainWindow;
 	class Preloader;
 
 	class QGrafkitContextWidget;
 
 	class LoggerQTProxy;
+	class LogModule;
 
 	class EditorApplication : public QObject,
 		protected Grafkit::ResourcePreloader, private Grafkit::ClonableInitializer
@@ -32,7 +36,13 @@ namespace Idogep {
 		EditorApplicationQt(int argc, char **argv);
 		~EditorApplicationQt();
 
-		void StartLoaderThread() override;
+	public:
+		EditorApplication(int argc, char **argv);
+		~EditorApplication();
+
+		int execute();
+
+		//LoggerQTProxy* GetLoggerProxy() { return m_logger; }
 
 		// --- 
 		private slots:
@@ -46,7 +56,11 @@ namespace Idogep {
 	    int ExecuteParentFramework() override;
 	    void NextTick() override;
 
+		void Initialize();
+
 		void BuildEditorModules();
+		void InitializeModules();
+		void BuildDockingWindows();
 
 	public:
 		Event<> onLoaderFinished;
@@ -58,11 +72,22 @@ namespace Idogep {
 		Grafkit::IAssetFactory *m_assetFactory;
 		Grafkit::IAssetFactory *m_projectFileLoader;
 
-		Idogep::LoggerQTProxy *m_logger;
 		Idogep::QGrafkitContextWidget *m_renderWidget;
 
 		Idogep::MainWindow *m_mainWindow;
 
+		Idogep::Preloader *m_preloadWindow;
+
+		Ref<Idogep::Editor> m_editor;
+
+		// modules
+
+		// TODO: merge these two
+		Idogep::LoggerQTProxy *m_logger;
+		Ref<Idogep::LogModule> m_logModule;
+
+	private:
+		static EditorApplication * s_self;
 	};
 
 

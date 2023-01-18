@@ -15,7 +15,6 @@ Idogep::Editor::Editor(Ref<Module> parent, Grafkit::Renderer & render, Grafkit::
 	m_render(render),
 	m_resourceManager(resman), m_document(nullptr), m_reloadRequested(false), m_precalcRequested(false)
 {
-	//m_musicProxy = new MusicProxy();
 	m_commandStack = new CommandStack();
 	m_musicProxy = new MusicProxy();
 }
@@ -26,9 +25,18 @@ Idogep::Editor::~Editor()
 	delete m_commandStack;
 }
 
-void Idogep::Editor::Initialize(Ref<Module> parent)
+void Idogep::Editor::Initialize()
 {
-	InitializeDocument();
+	//NewDocument();
+	//InitializeDocument();
+}
+
+void Idogep::Editor::MediateSiblingModule(Ref<Module> module)
+{
+	EmitsCommandRole* commandEmittingModule = dynamic_cast<EmitsCommandRole*>(module.Get());
+	if (commandEmittingModule) {
+		m_commandStack->ConnectEmitter(commandEmittingModule);
+	}
 }
 
 void Idogep::Editor::InitializeDocument()
