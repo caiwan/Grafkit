@@ -86,8 +86,8 @@ bool Editor::RenderFrame()
 
     if (m_document)
     {
-        static float t;
-        t += .001;
+        float t = m_musicProxy->GetTime();
+
         m_document->m_rootActor->Matrix().Identity();
         //m_document->m_rootActor->Matrix().RotateRPY(0, 0, 0);
         m_document->m_rootActor->Matrix().Translate(0, 0, 0);
@@ -96,7 +96,7 @@ bool Editor::RenderFrame()
         m_document->m_cameraActor->Matrix().RotateRPY(M_PI / 4., 0, M_PI / 4.);
         m_document->m_cameraActor->Matrix().Translate(0, 0, 10);
 
-        (*m_document->m_scene)->RenderFrame(m_render, 0.0f);
+        (*m_document->m_scene)->RenderFrame(m_render, t);
     }
 
     m_render.EndScene();

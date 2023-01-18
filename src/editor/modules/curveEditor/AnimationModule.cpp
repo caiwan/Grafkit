@@ -42,6 +42,7 @@ void AnimationEditorModule::Initialize()
     assert(timer);
 
     m_myView->onTogglePlayback += Delegate(timer, &Timer::TogglePlay);
+    m_myView->onStopPlayback += Delegate(timer, &Timer::Stop);
     // ... 
 
     // manage animation role
