@@ -72,29 +72,25 @@ protected:
 			TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, render, texture);
 			txgen();
 
-			// -- model 
-			model = new Model;
-			model->SetMaterial(new MaterialBase);
-			model->GetMaterial()->SetTexture(texture);
-
-			//shader_texture = new TextureShaderClass();
-			//result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
-
+			// -- load shader
 			shader_vs = new Shader();
 			shader_vs->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
-			
+
 			shader_fs = new Shader();
 			shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
 
-			// shader_vs->setInputLayout(model->getInputLayout);
+			// -- model 
+			model = new Model;
+			model->SetMaterial(new MaterialBase);
+			model->GetMaterial()->AddTexture(texture);	// elobb a texturakat toltod fel, aztad adod hozza a shadert.
+			model->GetMaterial()->SetShader(shader_fs);
+			
 
 			SimpleMeshGenerator generator(render, shader_vs);
 			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
 			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
 			
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
-
-			shader_fs->GetBResource("shaderTexture").SetTexture(texture);
 
 			this->t = 0;
 
