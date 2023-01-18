@@ -25,6 +25,15 @@
     <Filter Include="Source Files\render">
       <UniqueIdentifier>{ed290ede-e844-4f84-8cc1-dbd5389d8512}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BuiltInData">
+      <UniqueIdentifier>{531e785a-b5d6-4267-86b3-6d582afc4556}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\math">
+      <UniqueIdentifier>{aa94052d-8cdc-437a-8e54-d4885f1c0bcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\math">
+      <UniqueIdentifier>{a038acb6-f8f0-4175-8dce-4e89a1c67cd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.hlsl">
@@ -59,14 +68,20 @@
     <ClCompile Include="render\texture.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="graphicsclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="textureShaderClass.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="builtin_data\c64palette.cpp">
+      <Filter>BuiltInData</Filter>
+    </ClCompile>
+    <ClCompile Include="builtin_data\cbm64font.cpp">
+      <Filter>BuiltInData</Filter>
+    </ClCompile>
+    <ClCompile Include="builtin_data\cube.cpp">
+      <Filter>BuiltInData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +123,18 @@
     </ClInclude>
     <ClInclude Include="core\reference.h">
       <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="builtin_data\c64palette.h">
+      <Filter>BuiltInData</Filter>
+    </ClInclude>
+    <ClInclude Include="builtin_data\cbm64Font.h">
+      <Filter>BuiltInData</Filter>
+    </ClInclude>
+    <ClInclude Include="builtin_data\cube.h">
+      <Filter>BuiltInData</Filter>
+    </ClInclude>
+    <ClInclude Include="math\matrix.h">
+      <Filter>Header Files\math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
