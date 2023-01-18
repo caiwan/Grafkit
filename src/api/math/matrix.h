@@ -1,10 +1,13 @@
 #pragma once
 #include "../render/dxtypes.h"
-#include "memory_align.h"
-namespace FWmath {
+#include "../utils/memory_align.h"
+
+namespace Grafkit {
 	/**
 	Extends DirectX::XMMATRIX with operations to make thing easier, and use as a real type.
 	https://msdn.microsoft.com/en-us/library/windows/desktop/ee415594(v=vs.85).aspx
+
+	NOTE THIS FUCKER ALL THE TIME http://stackoverflow.com/questions/11285680/crash-after-m-xmmatrixidentity-aligment-memory-in-classes
 
 	`::matrix` is a shortcut to `DirectX::XMMATRIX`
 	*/
@@ -41,12 +44,18 @@ namespace FWmath {
 			 this->mat = DirectX::XMMatrixIdentity();
 		}
 
+		///@{
 		///translation
 		void Translate(float3 &v)
 		{
-			this->mat = DirectX::XMMatrixTranslation(v.x, v.y, v.z);
-			
+			this->mat = DirectX::XMMatrixTranslation(v.x, v.y, v.z);			
 		}
+
+		void Translate(float x, float y, float z)
+		{
+			this->mat = DirectX::XMMatrixTranslation(x, y, z);
+		}
+		///@}
 
 		///@{
 		/// Multiply

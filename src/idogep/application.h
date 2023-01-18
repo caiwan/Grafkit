@@ -4,7 +4,6 @@
 
 class Application : public ApplicationInterface 
 {
-	
 	public:
 		static Application& Instance(){
 			static Application app;

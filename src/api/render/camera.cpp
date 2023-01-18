@@ -1,26 +1,27 @@
-#include "../math/matrix.h"
+#include "../stdafx.h"
+
 #include "camera.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace FWrender;
+using namespace Grafkit;
 
-Camera::Camera()
+Camera::Camera() : Entity3D()
 {
 	m_fov = M_PI / 4.0f;
 
-	m_aspect = 1;
+	m_znear = 1.0;
+	m_zfar = 1000.;
+
+	m_aspect = 4. / 3.;
 	m_screenHeight = 100;
-	m_screenHeight = 100;
+	m_screenWidth = 100;
 
-	m_position = float3( 0, 0, 0 );
-	m_rotation = float3( 0, 0, 0 );
-}
-
-
-Camera::Camera(const Camera& other)
-{
+	m_position = float3(0, 0, 0);
+	m_lookAt = float3(0, 0, 1);
+	m_up = float3(0, 1, 0);
+	m_rotation = float3(0, 0, 0);
 }
 
 
@@ -29,38 +30,26 @@ Camera::~Camera()
 }
 
 
-void* Camera::operator new(size_t memorySize)
-{
-	size_t alignment;
-	void* memoryBlockPtr;
-
-
-	// Set the memory alignment to 16 byte to support high speed XMMATRIX calculations and prevent crashes.
-	alignment = 16;
-
-	// Allocate the memory.
-	memoryBlockPtr = _aligned_malloc(memorySize, alignment);
-
-	return memoryBlockPtr;
-}
-
-
-void Camera::operator delete(void* memoryBlockPtr)
-{
-	// Free the class memory that had been allocated using the _aligned_malloc function.
-	_aligned_free(memoryBlockPtr);
-
-	return;
-}
-
-
 void Camera::SetPosition(float x, float y, float z)
 {
 	m_position.x = x;
 	m_position.y = y;
 	m_position.z = z;
-	
-	return;
+}
+
+
+void Grafkit::Camera::SetLookAt(float x, float y, float z)
+{
+	m_lookAt.x=x;
+	m_lookAt.y=y;
+	m_lookAt.z=z;
+}
+
+void Grafkit::Camera::SetUp(float x, float y, float z)
+{
+	m_up.x = x;
+	m_up.y = y;
+	m_up.z = z;
 }
 
 
@@ -69,44 +58,23 @@ void Camera::SetRotation(float x, float y, float z)
 	m_rotation.x = x;
 	m_rotation.y = y;
 	m_rotation.z = z;
-
-	return;
 }
 
 
-
 // --- pinakobold
-void Camera::Render()
+void Camera::Calculate(Renderer& renderer)
 {
 	XMFLOAT3 up, lookAt;
 	XMVECTOR upVector, positionVector, lookAtVector;
 	float yaw, pitch, roll;
 	XMMATRIX rotationMatrix;
 
+	upVector = XMLoadFloat3(&m_up);
 
-	// Setup the vector that points upwards.
-	up.x = 0.0f;
-	up.y = 1.0f;
-	up.z = 0.0f;
-
-	// Load it into a XMVECTOR structure.
-	upVector = XMLoadFloat3(&up);
-
-	// Setup the position of the camera in the world.
-
-
-	// Load it into a XMVECTOR structure.
 	positionVector = XMLoadFloat3(&m_position);
 
-	// Setup where the camera is looking by default.
-	lookAt.x = 0.0f;
-	lookAt.y = 0.0f;
-	lookAt.z = 1.0f;
+	lookAtVector = XMLoadFloat3(&m_lookAt);
 
-	// Load it into a XMVECTOR structure.
-	lookAtVector = XMLoadFloat3(&lookAt);
-
-	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
 	pitch = m_rotation.x * 0.0174532925f;
 	yaw   = m_rotation.y * 0.0174532925f;
 	roll  = m_rotation.z * 0.0174532925f;
@@ -120,28 +88,31 @@ void Camera::Render()
 
 	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
 
-	// --- projection --- 
+	// --- projection & ortho --- 
+	renderer.GetScreenSizef(m_screenWidth, m_screenHeight);
+	this->m_aspect = m_screenWidth / m_screenHeight;
 
 	m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
-
-	// Create an orthographic projection matrix for 2D rendering.
-	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
+	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);	
 
 	return;
 }
 
 
-void Camera::GetViewMatrix(FWmath::Matrix& viewMatrix)
-{
-	viewMatrix = m_viewMatrix;
-}
+//void Camera::GetViewMatrix(matrix& viewMatrix)
+//{
+//	viewMatrix = m_viewMatrix;
+//}
+//
+//
+//void Grafkit::Camera::GetProjectionMatrix(matrix & matrix)
+//{
+//	matrix = m_projectionMatrix;
+//}
+//
+//
+//void Grafkit::Camera::GetOrthoMatrix(matrix & matrix)
+//{
+//	matrix = m_orthoMatrix;
+//}
 
-void FWrender::Camera::GetProjectionMatrix(FWmath::Matrix & matrix)
-{
-	matrix = m_projectionMatrix;
-}
-
-void FWrender::Camera::GetOrthoMatrix(FWmath::Matrix & matrix)
-{
-	matrix = m_orthoMatrix;
-}

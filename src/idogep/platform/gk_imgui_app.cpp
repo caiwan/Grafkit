@@ -1,4 +1,6 @@
 #include "gk_imgui_app.h"
+#include <imgui.h>
+#include "imgui_impl_dx11.h"
 
 ApplicationInterface::ApplicationInterface()
 	:
@@ -19,9 +21,12 @@ int ApplicationInterface::init()
 	renderer.Initialize(m_screenWidth, m_screenHeight, false, this->m_window.getHWnd(), false);
 
 	// -- init imgui
+	ImGui_ImplDX11_Init(this->m_window.getHWnd(), renderer.GetDevice(), renderer.GetDeviceContext());
 	
-	// -- create render preview window, and keep track of it 
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->AddFontDefault();
 
+	// -- create render preview window, and keep track of it 
 	CreateUI();
 
 	return 0;
@@ -29,15 +34,23 @@ int ApplicationInterface::init()
 
 int ApplicationInterface::mainloop()
 {
+	UpdateUI();
+	
 	FWrender::Renderer &renderer = RendererInstance();
 
-	renderer.BeginScene();
+	ImGui_ImplDX11_NewFrame();
 	
-	// ... 
+	for (size_t i = 0; i < this->m_windows.size(); i++) {
+		UI::Window* wnd = this->m_windows[i];
+		if (wnd) {
+			wnd->Render();
+		}
+	}
 
+	renderer.BeginScene(1, 1, 0, 1);
+	ImGui::Render();
 	renderer.EndScene();
 
-	UpdateUI();
 	return 0;
 }
 

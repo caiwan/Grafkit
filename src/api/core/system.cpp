@@ -1,24 +1,13 @@
+#include "../stdafx.h"
+
 #include "System.h"
 #include "input.h"
-#include "exceptions.h"
 
-#include "easyloggingpp.h"
+#include "../utils/exceptions.h"
+
+#include "../utils/logger.h"
 
 ///@todo add log mock
-
-#define ELPP_THREAD_SAFE
-
-#ifndef _DEBUG
-#define ELPP_DISABLE_DEBUG_LOGS
-#define ELPP_DISABLE_INFO_LOGS
-#define ELPP_DISABLE_VERBOSE_LOGS
-#define ELPP_DISABLE_TRACE_LOGS
-#endif // _DEBUG
-
-#include "easyloggingpp.h"
-
-INITIALIZE_EASYLOGGINGPP
-
 
 using namespace Grafkit;
 
@@ -26,25 +15,7 @@ System::System()
 	: Window::WindowHandler() , m_window(this), m_Input(nullptr)
 {
 	// init logger 
-	el::Configurations defaultConf;
-	defaultConf.setToDefault();
-
-//#ifdef _DEBUG
-//	defaultConf.setGlobally(el::ConfigurationType::Format, "%logger [%levshort]: %msg - at %fbase function %func line %line tid=%thread");
-//#else 
-	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
-//#endif // _DEBUG
-
-	// intentionally delete logfile 
-	FILE* fp = nullptr; fopen_s(&fp, "log.log", "wb");
-	if (fp) { fputc(' ', fp); fflush(fp); fclose(fp); }
-
-	defaultConf.setGlobally(el::ConfigurationType::Filename, "log.log");
-	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
-	el::Loggers::reconfigureLogger("default", defaultConf);
-
-
-	LOG(INFO) << "---- APPSTART ----";
+	LOGGER(Log::Logger().Info("---- APPSTART ----"));
 }
 
 System::~System()
@@ -76,9 +47,8 @@ int System::execute() {
 		catch (FWdebug::Exception& ex)
 		{
 			///@todo handle exceptions here 
-			//DebugBreak();
 			MessageBoxA(NULL, ex.what(), "Exception", 0);
-			el::base::debug::StackTrace();
+			LOGGER(Log::Logger().Error(ex.what()));
 
 			break;
 		}
@@ -121,7 +91,7 @@ int System::execute() {
 			///@todo handle exceptions here 
 			//  DebugBreak();
 			MessageBoxA(NULL, ex.what(), "Exception", 0);
-			el::base::debug::StackTrace();
+			LOGGER(Log::Logger().Error(ex.what()));
 
 			break;
 		}

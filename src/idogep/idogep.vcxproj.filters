@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -19,6 +11,10 @@
     <Filter Include="libimgui\platform">
       <UniqueIdentifier>{aa4c78b8-abaf-4cc0-af77-015d2cc342c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="application">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.hlsl">
@@ -27,7 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>application</Filter>
     </ClCompile>
     <ClCompile Include="..\..\tools\imgui\imgui.cpp">
       <Filter>libimgui</Filter>
@@ -45,7 +41,10 @@
       <Filter>libimgui\platform</Filter>
     </ClCompile>
     <ClCompile Include="application.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>application</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\gk_window.cpp">
+      <Filter>libimgui\platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -65,7 +64,10 @@
       <Filter>libimgui\platform</Filter>
     </ClInclude>
     <ClInclude Include="application.h">
-      <Filter>Header Files</Filter>
+      <Filter>application</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\gk_window.h">
+      <Filter>libimgui\platform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

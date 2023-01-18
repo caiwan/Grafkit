@@ -1,44 +1,50 @@
 /**
 */
 
-#ifndef _Model_H_
-#define _Model_H_
+#pragma once
+
+#include <vector>
+#include <array>
+
+#include "../utils/memory_align.h"
+#include "../utils/reference.h"
 
 #include "renderer.h"
 #include "dxtypes.h"
-
-#include "reference.h"
 
 #include "mesh.h"
 #include "actor.h"
 #include "texture.h"
 #include "Material.h"
 
-#include <vector>
-#include <array>
 
-namespace FWrender 
+namespace Grafkit 
 {
 	/**
 	Stores extended data for a mesh, that makes it a model
 	*/
 
-#define MODEL_BUCKET "model:"
+#define MODEL_BUCKET "model"
 
 	class Entity3D;
 
-	class Model : /*public virtual Referencable,*/ public FWrender::Mesh, public FWrender::Entity3D
+	__declspec(align(16)) class Model : public Grafkit::Mesh, public Grafkit::Entity3D, public AlignedNew<Model>
+	// class Model : public Grafkit::Mesh, public Grafkit::Entity3D
 	{
-		public:
-			Model();
-			~Model();
+	public:
+		Model();
+		~Model();
 
-			virtual void Render(FWrender::Renderer& deviceContext);
+		MaterialRef &GetMaterial() { return this->m_material; }
+		void SetMaterial(MaterialRef material) { this->m_material = material; }
 
-			virtual const char* GetBucketID() { return MODEL_BUCKET; }
+		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene);
+
+		virtual const char* GetBucketID() { return MODEL_BUCKET; }
+
+	private:
+		MaterialRef m_material;
 	};
 
 	typedef Ref<Model> ModelRef;
 }
-
-#endif //_Model_H_

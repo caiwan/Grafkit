@@ -1,4 +1,5 @@
-#include "..\..\idogep\platform\gk_window.h"
+#include "../stdafx.h"
+
 #include <Windows.h>
 #include <tchar.h>
 #include "window.h"

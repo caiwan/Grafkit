@@ -12,7 +12,7 @@
 #include "window.h"
 #include "input.h"
 
-namespace FWcore 
+namespace Grafkit 
 {
 	class Input;
 
@@ -28,10 +28,10 @@ namespace FWcore
 		virtual int mainloop() = 0;
 		virtual void release() = 0;
 
-		virtual LRESULT CALLBACK MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+
+		LRESULT CALLBACK MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 	protected:
-		//bool Frame();
 		void InitializeWindows(int sreenWidth = 800, int screenHeight = 600, int isFullscreen = 0, int resizeable = 0);
 		void ShutdownWindows();
 
@@ -39,9 +39,6 @@ namespace FWcore
 		Window m_window;
 		Input* m_Input;
 	};
-
-	//static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-	//static System* ApplicationHandle = 0;
 
 }
 

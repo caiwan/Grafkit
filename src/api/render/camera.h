@@ -1,23 +1,24 @@
 
-#ifndef _Camera_H_
-#define _Camera_H_
+#pragma once
 
-#include "dxtypes.h"
-#include "reference.h"
-#include "renderer.h"
 #include "Actor.h"
 
-#include "memory_align.h"
+#include "../utils/memory_align.h"
+#include "../utils/reference.h"
+#include "../math/matrix.h"
 
-using namespace DirectX;
+#include "renderer.h"
 
-namespace FWrender {
+namespace Grafkit {
 
-	class PerspectiveCamera;	///@todo implement this, see trello notes
-	class OrthoCamera;			///@todo implement this, see trello notes
+	class Camera;
+	// class PerspectiveCamera;	///@todo implement this, see trello notes
+	// class OrthoCamera;			///@todo implement this, see trello notes
 
-	__declspec(align(16)) class Camera : public Entity3D, public AlignedNew<Camera>
-	//class Camera : public Entity3D //, virtual public Referencable
+#define CAMERA_BUCKET "camera"
+
+	// 
+	class Camera : public Grafkit::Entity3D
 	{
 	public:
 		Camera();
@@ -51,11 +52,17 @@ namespace FWrender {
 		/// @todo void GetScreenMetrics(float width, float height) { this->m_screenWidth = width, this->m_screenHeight = height; }
 
 		/** Generate matrices */
-		void Render(Renderer& renderer);
+		void Calculate(Renderer& renderer);
 
-		void GetViewMatrix(matrix & matrix);
-		void GetProjectionMatrix(matrix& matrix);
-		void GetOrthoMatrix(matrix& matrix);
+		//skip render, nothing to do with it. 
+		virtual void Render(Grafkit::Renderer& deviceContext, Scene* scene) {}
+
+		///@todo ezzel kell kezdeni valamit a jovoben:
+		Matrix& GetViewMatrix() { return m_viewMatrix; }
+		Matrix& GetProjectionMatrix() { return m_projectionMatrix; }
+		Matrix& GetOrthoMatrix() { return m_orthoMatrix; }
+
+		virtual const char* GetBucketID() { return CAMERA_BUCKET; }
 
 	private:
 		float3 m_position;
@@ -67,10 +74,8 @@ namespace FWrender {
 		float m_aspect, m_screenWidth, m_screenHeight;
 		float m_fov;
 
-		matrix m_viewMatrix;
-		matrix m_projectionMatrix;
-		matrix m_orthoMatrix;
+		Grafkit::Matrix m_viewMatrix;
+		Grafkit::Matrix m_projectionMatrix;
+		Grafkit::Matrix m_orthoMatrix;
 	};
 }
-
-#endif

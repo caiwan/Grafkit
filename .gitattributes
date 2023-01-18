@@ -1,3 +1,6 @@
+* text eol=crlf
+*.png binary
+*.jpg binary
 *.MD filter=lfs diff=lfs merge=lfs -text
 *.md filter=lfs diff=lfs merge=lfs -text
 *.placedolder filter=lfs diff=lfs merge=lfs -text

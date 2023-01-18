@@ -8,12 +8,11 @@
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
+#include "../utils/reference.h"
+#include "../utils/exceptions.h"
+#include "../utils/memory_align.h"
+
 #include "dxtypes.h"
-#include "reference.h"
-
-#include "exceptions.h"
-
-#include "memory_align.h"
 
 #define RENDER_TARGET_MAX 8
 

@@ -62,7 +62,6 @@
     <ClCompile Include="utils\resource.cpp" />
     <ClCompile Include="utils\ResourceBuilder.cpp" />
     <ClCompile Include="utils\ResourceManager.cpp" />
-    <ClCompile Include="utils\struct.cpp" />
     <ClCompile Include="utils\struct_pack.cpp" />
     <ClCompile Include="utils\tree.cpp" />
     <ClCompile Include="utils\XML.cpp" />
@@ -252,6 +251,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)externals\include\; $(SolutionDir)structlib\include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -278,6 +278,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)externals\include\; $(SolutionDir)structlib\include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

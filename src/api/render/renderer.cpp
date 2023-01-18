@@ -1,16 +1,16 @@
+#include "../stdafx.h"
 
 #include "Renderer.h"
-
 #include "memory.h"
 
 using namespace FWdebugExceptions;
-using namespace FWrender;
+using namespace Grafkit;
 
 Renderer::Renderer() :
 	m_swapChain(nullptr),
 	m_device(nullptr),
 	m_deviceContext(nullptr),
-	m_renderTargetView(nullptr),
+	m_renderTargetViewCount(0), m_myRenderTargetView(nullptr),
 	m_depthStencilBuffer(nullptr),
 	m_depthStencilState(nullptr),
 	m_depthStencilView(nullptr),
@@ -36,14 +36,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	DXGI_MODE_DESC* displayModeList;
 	DXGI_ADAPTER_DESC adapterDesc;
 	int error;
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	D3D_FEATURE_LEVEL featureLevel;
-	ID3D11Texture2D* backBufferPtr;
-	D3D11_TEXTURE2D_DESC depthBufferDesc;
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-	D3D11_VIEWPORT viewport;
-	float fieldOfView, screenAspect;
 
 
 	// Store the vsync setting.
@@ -135,6 +128,10 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	factory->Release();
 	factory = 0;
 
+	// -----------------------------------------------------------------------------
+	// --- setup swap chain
+	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+
 	// Initialize the swap chain description.
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 
@@ -215,35 +212,10 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	// update our reference
 	this->AssingnRef(m_device);
 
-	// Create debug layer
-#ifdef _DEBUG
-	ID3D11Debug *d3dDebug = nullptr;
-	if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug)))
-	{
-		ID3D11InfoQueue *d3dInfoQueue = nullptr;
-		if (SUCCEEDED(d3dDebug->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&d3dInfoQueue)))
-		{
+	// -----------------------------------------------------------------------------
+	// setup backbuffer texture + depth buffer 
 
-			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
-			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
-
-			D3D11_MESSAGE_ID hide[] =
-			{
-				D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
-				// Add more message IDs here as needed
-			};
-
-			D3D11_INFO_QUEUE_FILTER filter;
-			memset(&filter, 0, sizeof(filter));
-			filter.DenyList.NumIDs = _countof(hide);
-			filter.DenyList.pIDList = hide;
-			d3dInfoQueue->AddStorageFilterEntries(&filter);
-			d3dInfoQueue->Release();
-		}
-		d3dDebug->Release();
-	}
-#endif
-
+	ID3D11Texture2D* backBufferPtr;
 	// Get the pointer to the back buffer.
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if(FAILED(result))
@@ -251,8 +223,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
+	// -----------------------------------------------------------------------------
 	// Create the render target view with the back buffer pointer.
-	result = m_device->CreateRenderTargetView(backBufferPtr, nullptr, &m_renderTargetView);
+	result = m_device->CreateRenderTargetView(backBufferPtr, nullptr, &m_myRenderTargetView);
 	if(FAILED(result))
 	{
 		throw EX_DETAILS(InitializeRendererException, "TBD");
@@ -262,6 +235,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	backBufferPtr->Release();
 	backBufferPtr = 0;
 
+	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	// Initialize the description of the depth buffer.
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
@@ -284,7 +258,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	{
 		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
-
+	
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	// Initialize the description of the stencil state.
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
 
@@ -335,7 +311,40 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	}
 
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+	SetRenderTargetView();
+	ApplyRenderTargetView();
+
+
+	// -----------------------------------------------------------------------------
+
+	// Create debug layer
+#ifdef _DEBUG
+	ID3D11Debug *d3dDebug = nullptr;
+	if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug)))
+	{
+		ID3D11InfoQueue *d3dInfoQueue = nullptr;
+		if (SUCCEEDED(d3dDebug->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&d3dInfoQueue)))
+		{
+
+			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
+			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
+
+			D3D11_MESSAGE_ID hide[] =
+			{
+				D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
+				// Add more message IDs here as needed
+			};
+
+			D3D11_INFO_QUEUE_FILTER filter;
+			memset(&filter, 0, sizeof(filter));
+			filter.DenyList.NumIDs = _countof(hide);
+			filter.DenyList.pIDList = hide;
+			d3dInfoQueue->AddStorageFilterEntries(&filter);
+			d3dInfoQueue->Release();
+		}
+		d3dDebug->Release();
+	}
+#endif
 
 	// Setup the raster description which will determine how and what polygons will be drawn.
 	D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
@@ -354,16 +363,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// ---------------------------------------------
 
-	// Setup the viewport for rendering.
-	viewport.Width = (float)screenWidth;
-	viewport.Height = (float)screenHeight;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-
-	// Create the viewport.
-	m_deviceContext->RSSetViewports(1, &viewport);
+	SetViewport(screenWidth, screenHeight);
 
 	return true;
 }
@@ -400,10 +400,10 @@ void Renderer::Shutdown()
 		m_depthStencilBuffer = 0;
 	}
 
-	if(m_renderTargetView)
+	if(m_myRenderTargetView)
 	{
-		m_renderTargetView->Release();
-		m_renderTargetView = 0;
+		m_myRenderTargetView->Release();
+		m_myRenderTargetView = 0;
 	}
 
 	if(m_deviceContext)
@@ -441,7 +441,7 @@ void Renderer::GetVideoCardInfo(char* cardName)
 	return;
 }
 
-void FWrender::Renderer::GetScreenSize(int & screenW, int & screenH)
+void Grafkit::Renderer::GetScreenSize(int & screenW, int & screenH)
 {
 	/*static */ D3D11_VIEWPORT viewport;
 	UINT p_viewports[] = { 1 };
@@ -465,7 +465,9 @@ void Renderer::BeginScene(float red, float green, float blue, float alpha)
 	color[3] = alpha;
 
 	// Clear the back buffer.
-	m_deviceContext->ClearRenderTargetView(m_renderTargetView, color);
+	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
+		if (m_renderTargetViews[i]) 
+			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color);
 	
 	// Clear the depth buffer.
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 0.0f, 0);
@@ -473,12 +475,18 @@ void Renderer::BeginScene(float red, float green, float blue, float alpha)
 	return;
 }
 
-const float color_black[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+const float color_Citrus_flavoured_black[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+/*
+[19:05:47] Citrus Lee: cornflower blue :D
+[19:05:52] Citrus Lee: you're welcome :D
+*/
 
 void Renderer::BeginScene()
 {
 	// Clear the back buffer.
-	m_deviceContext->ClearRenderTargetView(m_renderTargetView, color_black);
+	for (size_t i = 0; i < this->m_renderTargetViewCount; i++)
+		if (m_renderTargetViews[i])
+			m_deviceContext->ClearRenderTargetView(m_renderTargetViews[i], color_Citrus_flavoured_black);
 
 	// Clear the depth buffer.
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -502,4 +510,43 @@ void Renderer::EndScene()
 	}
 
 	return;
+}
+
+void Grafkit::Renderer::SetViewport(int screenW, int screenH, int offsetX, int offsetY)
+{
+	D3D11_VIEWPORT viewport;
+	
+	// Setup the viewport for rendering.
+	viewport.Width = (float)screenW;
+	viewport.Height = (float)screenH;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	viewport.TopLeftX = (float)offsetX;
+	viewport.TopLeftY = (float)offsetY;
+	
+		// Create the viewport.
+	m_deviceContext->RSSetViewports(1, &viewport);
+}
+
+void Grafkit::Renderer::SetSurface(int screenW, int screenH)
+{
+	HRESULT result = 0;
+}
+
+void Grafkit::Renderer::SetRenderTargetView(ID3D11RenderTargetView * pRenderTargetView, size_t n)
+{
+	n = n < RENDER_TARGET_MAX ? n : RENDER_TARGET_MAX;
+	if (pRenderTargetView == nullptr) {
+		m_renderTargetViews[0] = m_myRenderTargetView;
+		ApplyRenderTargetView(); // shortcut
+	}
+	else {
+		m_renderTargetViews[n] = pRenderTargetView;
+	}
+}
+
+void Grafkit::Renderer::ApplyRenderTargetView(size_t count)
+{
+	m_renderTargetViewCount = count < RENDER_TARGET_MAX ? count : RENDER_TARGET_MAX;
+	m_deviceContext->OMSetRenderTargets(m_renderTargetViewCount, m_renderTargetViews, m_depthStencilView);
 }
