@@ -19,6 +19,19 @@ namespace FWmath {
 			this->Identity();
 		}
 
+		Matrix(
+			float a1, float a2, float a3, float a4,
+			float b1, float b2, float b3, float b4,
+			float c1, float c2, float c3, float c4,
+			float d1, float d2, float d3, float d4
+		) {
+			this->mat = DirectX::XMMatrixSet(
+				a1, a2, a3, a4,
+				b1, b2, b3, b4,
+				c1, c2, c3, c4,
+				d1, d2, d3, d4
+			);
+		}
 
 		// identity
 		void Identity() {
