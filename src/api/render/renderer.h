@@ -17,7 +17,7 @@
 
 using namespace DirectX;
 
-namespace FWrender {
+namespace Grafkit {
 
 	class Camera;
 	class Model;
@@ -27,15 +27,17 @@ namespace FWrender {
 	// typedefs for reference counting
 	typedef Ref<Camera> CameraRef;
 	typedef Ref<Model> ModelRef;
+
 	// class ShaderRef;
-	typedef Ref<Texture> TextureRef;
+	// typedef Ref<Texture> TextureRef;
+	// class TextureRef;
 
 	/**
 		Core renderer
 		**Hack**: Extended ID3D11Device via reference counting, gives direct access to the deive with `operator ->` .
 	*/
 # if 1 // sometimes it comflicts with MFC's new and delete; please mind it. 
-	__declspec(align(16)) class Renderer : Ref<ID3D11Device>, public AlignedNew<Renderer>
+	__declspec(align(16)) class Renderer : public Ref<ID3D11Device>, public AlignedNew<Renderer>
 #else
 	class Renderer : Ref<ID3D11Device>
 #endif
@@ -63,10 +65,11 @@ namespace FWrender {
 
 		// --- getters
 		ID3D11Device* GetDevice() { return this->m_device; }
-		operator ID3D11Device *() { return this->m_device; }
+		// operator ID3D11Device *() { return this->m_device; }
+		operator ID3D11Device * const &() { return this->m_device; }
 
 		ID3D11DeviceContext* GetDeviceContext() { return this->m_deviceContext; }
-		operator ID3D11DeviceContext*() { return this->m_deviceContext; }
+		operator ID3D11DeviceContext * const &() { return this->m_deviceContext; }
 
 		void GetWorldMatrix(matrix&);
 
@@ -78,8 +81,7 @@ namespace FWrender {
 			this->GetScreenSize(w, h);
 			screenW = (float)w, screenH = (float)h;
 		}
-
-	private:
+	protected:
 		bool m_vsync_enabled;
 		char m_videoCardDescription[128];
 		IDXGISwapChain* m_swapChain;
@@ -97,6 +99,5 @@ namespace FWrender {
 
 DEFINE_EXCEPTION(InitializeRendererException, 0, "Failed to initialize renderer object");
 DEFINE_EXCEPTION(ResizeRenderSurfaceException, 0, "Can not resize render surface");
-
 
 #endif
