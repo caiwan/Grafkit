@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="FWrender::Camera" Collapsed="true">
+    <Position X="4.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACCQAAAACCAAAIoQAAGAQSAYCIAQghAABAAAAUAAAA=</HashCode>
+      <FileName>render\camera.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::Drawable" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>render\renderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::Mesh" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAQAAEAAEAQAAAQARAAAAABAAAAARAAAAAAEAA=</HashCode>
+      <FileName>render\model.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::Model" Collapsed="true">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAQACAAAAAQAAAAAAAQAAACAAAAAAABgAAAAAAAA=</HashCode>
+      <FileName>render\model.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::Renderer" Collapsed="true">
+    <Position X="2.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CACghAAAEAQIAUBAQAEAAQIBAAACAAhABACAGAAABAA=</HashCode>
+      <FileName>render\renderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::Shader" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Struct Name="FWrender::Shader::MatrixBufferType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\shader.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>QAAIAAAAAAQAABAAAAACAUAAACCAAAAABBAEAAAAEAA=</HashCode>
+      <FileName>render\shader.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FWrender::Texture" Collapsed="true">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAACAAAAgwAAAAAAAQAAAAAAAAIAAAIAAAAAAAA=</HashCode>
+      <FileName>render\texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

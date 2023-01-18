@@ -39,6 +39,7 @@
     <None Include="texture.hlsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="FWrender.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\input.cpp">
