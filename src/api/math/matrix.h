@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../render/dxtypes.h"
 
 namespace FWmath {
