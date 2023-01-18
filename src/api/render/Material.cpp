@@ -31,7 +31,6 @@ namespace {
 	const char *map_names [] = 
 	{
 		"diffuse",
-
 		"alpha",
 		"normal",
 		"shiniess",
@@ -39,12 +38,6 @@ namespace {
 		"selfillum",
 		"reflect",
 		"bump",
-		/*
-		"shadowDepthtMap",
-		"sceneDephtMap",
-		"sceneTexture",
-		"glowFilter",
-		*/
 		"aux",
 	};
 }
@@ -59,13 +52,26 @@ void FWrender::MaterialBase::Render(ID3D11DeviceContext * deviceContext)
 	}
 }
 
+// ====================================
+
 TextureRef & FWrender::MaterialBase::GetTexture(texture_type_e bucket, int n)
 {
+	/// @todo bounds check
+	return m_texture_buckets[bucket][n];
 }
 
-void FWrender::MaterialBase::SetTexture(TextureRef texture, int n)
+void FWrender::MaterialBase::SetTexture(TextureRef texture, texture_type_e bucket, int n)
 {
+	/// @todo bounds check
+	m_texture_buckets[bucket][n] = texture;
 }
+
+void FWrender::MaterialBase::AddTexture(TextureRef texture, texture_type_e bucket)
+{
+	m_texture_buckets[bucket].push_back(texture);
+}
+
+// ====================================
 
 void FWrender::MaterialBase::ReflectShader()
 {
@@ -75,7 +81,7 @@ void FWrender::MaterialBase::ReflectShader()
 
 void FWrender::MaterialBase::ReflectTextures()
 {
-	if (this->m_framgentShader.Invalid) {
+	if (this->m_framgentShader.Invalid()) {
 		LOG(TRACE) << "No valid shader was set, abort texture reflection.";
 		return;
 	}
@@ -90,9 +96,19 @@ void FWrender::MaterialBase::ReflectTextures()
 		{
 			for (size_t j = 0; j < m_texture_buckets[i].size(); j++)
 			{
+				Shader::BoundResourceRecord *brecord = nullptr; &(this->m_framgentShader->GetBResource(txname));
 				// search for names
-				sprintf_s(txname, "%s%d", map_names[i], j);
-				Shader::BoundResourceRecord *brecord = &(this->m_framgentShader->GetBResource(txname));
+				if (j == 0) {
+					sprintf_s(txname, "texture_%s", map_names[i]);
+					brecord = &(this->m_framgentShader->GetBResource(txname));
+				}
+
+				if (brecord == nullptr || !brecord->IsValid())
+				{
+					sprintf_s(txname, "texture_%s%d", map_names[i], j);
+					brecord = &(this->m_framgentShader->GetBResource(txname));
+				}
+				
 				if (brecord->IsValid()) {
 					struct reflection_texture_entity entity;
 
@@ -106,9 +122,7 @@ void FWrender::MaterialBase::ReflectTextures()
 				else {
 					LOG(TRACE) << "No reflection point found" << txname;
 				}
-
 			}
 		}
 	}
-
 }

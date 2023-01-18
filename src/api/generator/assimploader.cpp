@@ -54,19 +54,19 @@ namespace {
 		enum texture_type_e tt;
 	}
 	texture_load_map[] = {
-		aiTextureType_NONE,		TMT_aux0,
-		aiTextureType_DIFFUSE,  TMT_map0,
-		aiTextureType_SPECULAR, TMT_specular,
-		aiTextureType_AMBIENT,  TMT_aux01,
-		aiTextureType_EMISSIVE, TMT_aux02,
-		aiTextureType_HEIGHT,   TMT_aux03,
-		aiTextureType_NORMALS,   TMT_normal,
-		aiTextureType_SHININESS, TMT_shiniess,
-		aiTextureType_OPACITY,   TMT_alpha,
-		aiTextureType_DISPLACEMENT, TMT_bump,
-		aiTextureType_LIGHTMAP,		TMT_aux04,
-		aiTextureType_REFLECTION,	TMT_reflect,
-		aiTextureType_UNKNOWN,		TMT_aux05,
+		aiTextureType_NONE,		TT_aux,
+		aiTextureType_DIFFUSE,  TT_diffuse,
+		aiTextureType_SPECULAR, TT_specular,
+		aiTextureType_AMBIENT,  TT_aux,
+		aiTextureType_EMISSIVE, TT_aux,
+		aiTextureType_HEIGHT,   TT_aux,
+		aiTextureType_NORMALS,   TT_normal,
+		aiTextureType_SHININESS, TT_shiniess,
+		aiTextureType_OPACITY,   TT_alpha,
+		aiTextureType_DISPLACEMENT, TT_bump,
+		aiTextureType_LIGHTMAP,		TT_aux,
+		aiTextureType_REFLECTION,	TT_reflect,
+		aiTextureType_UNKNOWN,		TT_aux,
 	};
 }
 

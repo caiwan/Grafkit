@@ -31,14 +31,6 @@ namespace FWrender {
 		TT_reflect,	///< reflection map
 		TT_bump,		///< bump map
 
-		// ezek valoszinuleg post-effektezeshez kellenenek, ami nem itt lesz szamontartva lehetoleg
-		/*
-		TMT_shadowDepthtMap, ///< for depth map shadow
-		TMT_sceneDephtMap,	///< depth map of the scene
-		TMT_sceneTexture,	///< the scne rendered into a texture
-		TMT_glowFilter,	    ///< input of the glow filter
-		*/
-
 		TT_aux, ///< aux texture, used for pretty much everything else
 
 		TT_COUNT	// count
@@ -65,18 +57,28 @@ namespace FWrender {
 		ShaderRef GetShader() { return this->m_framgentShader; }
 		void SetShader(ShaderRef shader) { this->m_framgentShader = shader; ReflectShader(); }
 
-		/// @todo slotok kezelese 
+		///@todo ide be kellene meg jatszani a textura szurot meg, jol.
+
+		/// @todo slotok kezelese -> a texturaknak legyen sajat nevuk is
 		/// @todo bounds check
 		TextureRef &GetTexture(texture_type_e bucket, int n = 0);
-		void SetTexture(TextureRef texture, int n = 0);
+		void SetTexture(TextureRef texture, texture_type_e bucket = TT_diffuse, int n = 0);
+		void AddTexture(TextureRef texture, texture_type_e bucket = TT_diffuse);
 
 		size_t GetTextureBucketCount(texture_type_e bucket) { return this->m_texture_buckets[bucket].size(); }
 
 		virtual void Render(ID3D11DeviceContext* deviceContext);
 
-	protected:
 		/// Setup texture and cbufer locations
+		/// Legyen public arra az esetre, ha megis ... 
 		virtual void ReflectShader();
+
+	protected:
+		/**
+			Will look for textures with name `texture_%type%%count%`
+			- where `%type%` is textur type in string
+			- where `%count%` is bucket count if multiple
+		*/
 		void ReflectTextures();
 
 		struct Material m_mater;
