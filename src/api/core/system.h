@@ -32,7 +32,7 @@ namespace FWcore
 
 	protected:
 		//bool Frame();
-		void InitializeWindows(int sreenWidth = 800, int screenHeight = 600, int isFullscreen = 0);
+		void InitializeWindows(int sreenWidth = 800, int screenHeight = 600, int isFullscreen = 0, int resizeable = 0);
 		void ShutdownWindows();
 
 	protected:
