@@ -40,18 +40,17 @@ namespace Grafkit {
 		Scene();
 		~Scene();
 
-		///@ todo kamerat, es fenyforrasokat itt kezelje(?)
-		///@ accoarding to Gargaj: kell egy preframe process, ami kiszuli a kamerat es a fenyeket, majd azzal rendereli le a tobbi nodeot
+		void PreRender(Grafkit::Renderer & render);
+		void Render(Grafkit::Renderer & render);
 
-		void Render(Grafkit::Renderer & render /*, ShaderRef &FS, ShaderRef &VS*/);
-		void SetRootNode(Actor* root) { m_pScenegraph = root; }
+		void SetRootNode(ActorRef &root) { m_pScenegraph = root; }
 
 		// --- 
 
 		CameraRef& GetCamera() { return this->m_rCamera; }
 
-		void SetCameraNode(Actor* camera);
-		void AddLightNode(Actor* light);
+		void SetCameraNode(ActorRef &camera) { m_pCameraNode = camera; }
+		void AddLightNode(ActorRef &light) { m_pvLightNodes.push_back(light); }
 
 		std::vector<LightRef>& GetLights() { return this->m_rvLights; }
 
@@ -66,11 +65,11 @@ namespace Grafkit {
 		virtual const char* GetBucketID() { return SCENE_BUCKET; }
 
 	protected:
-		Actor* m_pScenegraph;
+		ActorRef m_pScenegraph;
 		// fenyek + camera
 
-		Actor* m_pCameraNode;
-		std::vector<Actor*> m_pvLightNodes;
+		ActorRef m_pCameraNode;
+		std::vector<ActorRef> m_pvLightNodes;
 		
 		std::vector<LightRef> m_rvLights;
 		CameraRef m_rCamera;
@@ -80,7 +79,6 @@ namespace Grafkit {
 		ShaderRef m_fragmentShader;
 
 	private:
-		void PreRender(Grafkit::Renderer & render);
 		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = TREE_MAXDEPTH);
 		void push();
 		void pop();

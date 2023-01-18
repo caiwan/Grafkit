@@ -19,19 +19,15 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
 	m_cureentViewMatrix.Identity();
 	
-	PreRender(render);
-
 	// + kamerat + fenyket at kell tudni adni valahol meg
+
+	//ez itt elviekben jo kell, hogy legyen
+	m_vertexShader->Render(render);
+	m_fragmentShader->Render(render);
 
 	// render scenegraph
 	RenderNode(render, m_pScenegraph);
 }
-
-/*
-void Grafkit::Scene::Render(Grafkit::Renderer &render)
-{
-
-}*/
 
 void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
@@ -56,7 +52,7 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 	push();
 	
 	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
-		RenderNode(render, actor->m_pChildren[i], maxdepth - 1);
+		RenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);
 	}
 	
 	pop();
