@@ -75,12 +75,15 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 	if (maxdepth < 0) return;
 	if (!actor) return;
 
+	push();
+
 	m_currentWorldMatrix.Multiply(actor->Matrix());
 	matrix viewMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
 	m_vertexShader["MatrixBuffer"]["worldMatrix"] = viewMatrix;
 
 	actor->Render(render, this);
-	push();
+	
+	//push();
 	
 	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {
 		RenderNode(render, actor->m_pChildren[i].Get(), maxdepth - 1);

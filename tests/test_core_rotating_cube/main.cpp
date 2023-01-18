@@ -46,6 +46,7 @@ public:
 protected:
 		Renderer render;
 		Ref<Scene> scene;
+		ActorRef m_rootActor;
 
 		float t;
 
@@ -71,7 +72,7 @@ protected:
 
 			// -- camera
 			CameraRef camera = new Camera;
-			camera->SetPosition(0.0f, 0.0f, -5.0f);
+			camera->SetPosition(0.0f, 0.0f, -10.0f);
 
 			// -- texture
 			TextureResRef texture = new TextureRes();
@@ -103,11 +104,24 @@ protected:
 			scene = new Scene();
 			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
 			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
+			
+			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
+			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
+
+			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
+			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
+
+			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
+			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
+			
+
 			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
 
 			ActorRef rootActor = new Actor();
 			rootActor->AddChild(cameraActor);
 			rootActor->AddChild(modelActor);
+
+			m_rootActor = rootActor;
 
 			scene->SetRootNode(rootActor);
 			scene->SetCameraNode(cameraActor);
@@ -133,10 +147,13 @@ protected:
 		int mainloop() {
 			this->render.BeginScene();
 			{				
+				m_rootActor->Matrix().Identity();
+				m_rootActor->Matrix().RotateRPY(t,0,0);
+
 				scene->PreRender(render);
 				scene->Render(render);
 
-				this->t += 0.001;
+				this->t += 0.01;
 			}
 
 			this->render.EndScene();
