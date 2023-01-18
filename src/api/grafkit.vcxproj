@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="FWrender.cd" />
     <None Include="texture.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </EntryPointName>
@@ -31,11 +32,16 @@
     <ClCompile Include="builtin_data\c64palette.cpp" />
     <ClCompile Include="builtin_data\cbm64font.cpp" />
     <ClCompile Include="builtin_data\cube.cpp" />
+    <ClCompile Include="core\exceptions.cpp" />
     <ClCompile Include="core\input.cpp" />
+    <ClCompile Include="core\memory.cpp" />
+    <ClCompile Include="core\memory_alloc.cpp" />
     <ClCompile Include="core\system.cpp" />
     <ClCompile Include="core\window.cpp" />
+    <ClCompile Include="render\Actor.cpp" />
     <ClCompile Include="render\camera.cpp" />
     <ClCompile Include="render\effect.cpp" />
+    <ClCompile Include="render\mesh.cpp" />
     <ClCompile Include="render\model.cpp" />
     <ClCompile Include="render\renderer.cpp" />
     <ClCompile Include="render\shader.cpp" />
@@ -45,20 +51,23 @@
     <ClInclude Include="builtin_data\c64palette.h" />
     <ClInclude Include="builtin_data\cbm64Font.h" />
     <ClInclude Include="builtin_data\cube.h" />
+    <ClInclude Include="core\exceptions.h" />
     <ClInclude Include="core\input.h" />
+    <ClInclude Include="core\memory.h" />
+    <ClInclude Include="core\memory_alloc.h" />
     <ClInclude Include="core\reference.h" />
     <ClInclude Include="core\system.h" />
     <ClInclude Include="core\window.h" />
-    <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="math\matrix.h" />
+    <ClInclude Include="render\Actor.h" />
     <ClInclude Include="render\camera.h" />
     <ClInclude Include="render\dxtypes.h" />
     <ClInclude Include="render\effect.h" />
+    <ClInclude Include="render\mesh.h" />
     <ClInclude Include="render\model.h" />
     <ClInclude Include="render\renderer.h" />
     <ClInclude Include="render\shader.h" />
     <ClInclude Include="render\texture.h" />
-    <ClInclude Include="textureShaderClass.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BFF1AD5F-469C-4EBE-8C53-698DAE473A13}</ProjectGuid>
@@ -133,24 +142,32 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)tools\stb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)tools-build\lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)tools\stb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)tools-build\lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -159,7 +176,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)tools\stb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <MinimalRebuild>true</MinimalRebuild>
+      <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -167,6 +186,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)tools-build\lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -175,7 +197,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)tools\stb</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <MinimalRebuild>true</MinimalRebuild>
+      <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -183,6 +207,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)tools-build\lib</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
