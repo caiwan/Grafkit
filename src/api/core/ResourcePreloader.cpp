@@ -1,8 +1,6 @@
+#include "../stdafx.h"
+
 #include "ResourcePreloader.h"
-
-#include "../utils/logger.h"
-
-#include "../utils/exceptions.h"
 #include "../utils/ResourceBuilder.h"
 
 using FWdebug::Exception;

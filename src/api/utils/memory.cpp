@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 /// http://stackoverflow.com/questions/438515/how-to-track-memory-allocations-in-c-especially-new-delete
 
 #define NO_NEW_OVERDEFINE
@@ -66,6 +68,11 @@ void __cdecl operator delete(void *p){
 	void *pp = p;
 	TRACK(remove("delete", __deleteFile, __deleteLine, p));
 	free(pp);
+}
+
+void deleteTracker(const char * file, int line)
+{
+	//@todo implement
 }
 
 /* *************************************************************************************

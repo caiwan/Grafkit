@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "struct_pack.h"
 
 using namespace FWdebugExceptions;

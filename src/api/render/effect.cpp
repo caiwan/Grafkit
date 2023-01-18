@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "effect.h"
 
 using namespace Grafkit;

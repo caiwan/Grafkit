@@ -20,14 +20,12 @@
 #include <cstdlib>
 #include <varargs.h>
 
-#include "Observer.h"
-
 namespace Grafkit {
 
 	class Logger;
 	class Log;
 
-	class Logger : protected Observable
+	class Logger
 	{
 		friend class Log;
 	public:
@@ -61,8 +59,8 @@ namespace Grafkit {
 
 		// Methods 
 
-		void AddHandler(ILoggerHandler* hdl) { this->AddObserver(hdl); }
-		void RemoveHandler(ILoggerHandler* hdl) { this->RemoveHandler(hdl); }
+		void AddHandler(ILoggerHandler* hdl) { /*this->AddObserver(hdl);*/ }
+		void RemoveHandler(ILoggerHandler* hdl) { /*this->RemoveHandler(hdl);*/ }
 
 		inline void Write(logger_msg_type_e type, const char* const message);
 		

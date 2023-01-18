@@ -1,7 +1,6 @@
-#include "Material.h"
+#include "../stdafx.h"
 
-#include "../utils/exceptions.h"
-#include "../utils/logger.h"
+#include "Material.h"
 
 #include "shader.h"
 #include "texture.h"

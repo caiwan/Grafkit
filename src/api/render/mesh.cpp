@@ -1,7 +1,7 @@
+#include "../stdafx.h"
+
 #include "mesh.h"
 #include "texture.h"
-
-#include "../utils/exceptions.h"
 
 #include "../utils/struct_pack.h"
 

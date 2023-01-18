@@ -1,3 +1,4 @@
+#include "../stdafx.h"
 #include "asset.h"
 
 using namespace Grafkit;

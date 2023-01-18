@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <stack>
@@ -19,8 +21,6 @@
 #include "assimp/material.h"
 #include "assimp/mesh.h"
 #include "assimp/matrix4x4.h"
-
-#include "../math/matrix.h"
 
 #include "assimploader.h"
 

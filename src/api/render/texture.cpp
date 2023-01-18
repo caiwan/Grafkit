@@ -1,80 +1,65 @@
+#include "../stdafx.h"
+
 #include "Texture.h"
 
+using namespace std;
+using namespace Grafkit;
+using namespace Grafkit;
+
+using namespace FWdebugExceptions;
+
+//using Grafkit::Matrix;
+
 using namespace DirectX;
+using namespace Grafkit;
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#undef STB_IMAGE_IMPLEMENTATION
-
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "stb_image_resize.h"
-#undef STB_IMAGE_RESIZE_IMPLEMENTATION
-
-using namespace FWrender;
-
-Texture::Texture() : 
-	m_tex(0),
-	m_texture_resource(0)
-{
-}
-
-Texture::Texture(const Texture &)
+Texture::Texture() //: IResource(),
+	:
+	m_pTex(nullptr),
+	m_pResourceView(nullptr),
+	m_pRenderTargetView(nullptr)
 {
 }
 
 Texture::~Texture()
 {
+	this->Shutdown();
 }
 
+/// @todo a kozos struct kitoltos reszeket ki kell tenni valami kozos helyre 
 
-bool Texture::Initialize(ID3D11Device* device, WCHAR* filename)
+void Grafkit::Texture::Initialize(Renderer & device, BitmapResourceRef bitmap)
 {
+	size_t x = bitmap->GetX(), y = bitmap->GetY(), ch = bitmap->GetCh();
+
 	HRESULT result = 0;
-
-	// filenev elokeszitese wchar -> utf8 az stbi miatt
-	size_t filename_len = wcslen(filename); 
-	char filename_utf8[FILENAME_MAX]; 
-	ZeroMemory(filename_utf8, FILENAME_MAX);
-	if (WideCharToMultiByte(CP_UTF8, 0, filename, filename_len, filename_utf8, FILENAME_MAX, NULL, FALSE) == 0)
-	{
-		///@todo throw exception
-		return false;
-	}
-
-	int x = 0, y = 0, ch = 0;
-	// kikenyszeritett RGBA mod
-	UCHAR *data = stbi_load(filename_utf8, &x, &y, &ch, 0);
-
-	if (!data)
-	{
-		///@todo throw exception
-		return false;
-	}
 
 	// fill etexture description
 	D3D11_TEXTURE2D_DESC desc; ZeroMemory(&desc, sizeof(desc));
-	
+
+	UCHAR* data = (UCHAR*)bitmap->GetData();
+
 	desc.Width = x;
 	desc.Height = y;
 	desc.MipLevels = 1; // 0 = general magatol mipmapet
 	desc.ArraySize = 1; // multitextura szama, cubemap eseten n*6
 
+	/// @todo: ezt a structlibbol kellene potolni
 	switch (ch) {
-		case 1: desc.Format = DXGI_FORMAT_R8_UNORM; break; 
-		case 2: desc.Format = DXGI_FORMAT_R8G8_UNORM; break; 
-		case 3: 
+		case 1: desc.Format = DXGI_FORMAT_R8_UNORM; break;
+		case 2: desc.Format = DXGI_FORMAT_R8G8_UNORM; break;
+		case 3:
 		{
 			UINT* newdata = new UINT[x*y];
 			UCHAR* dst = (UCHAR*)newdata;
 			UCHAR* src = (UCHAR*)data;
-# if 1
 
 			size_t wx = x;
 			size_t wy = y;
 
 			size_t stride_src = wx * 3;
 			size_t stride_dst = wx * 4;
-			
+
 			while (wy--) {
 				while (wx--) {
 					dst[4 * wx + 0] = src[3 * wx + 0];
@@ -86,36 +71,22 @@ bool Texture::Initialize(ID3D11Device* device, WCHAR* filename)
 				dst += stride_dst;
 				wx = x;
 			}
-#else 
-			for (size_t wy = 0; wy < y; wy++)
-			{
-				for (size_t wx = 0; wx < x; wx++)
-				{
-					size_t p = (wx + x * wy);
-					dst[4 * p + 0] = wx % 255;
-					dst[4 * p + 1] = wy % 255;
-					dst[4 * p + 2] = 0x00;
-					dst[4 * p + 3] = 0xff;
-				}
-			}
-#endif 
 
 			ch = 4;
 
-			delete data;
 			data = (UCHAR*)newdata;
-
 			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		} break;
 
-		case 4: desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; break; 
-		
-		default: return false;
+		case 4: desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; break;
+
+		default: 
+			return ;
 	}
 
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
-	desc.Usage = D3D11_USAGE_DEFAULT;	
+	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
@@ -132,17 +103,17 @@ bool Texture::Initialize(ID3D11Device* device, WCHAR* filename)
 	}
 #undef N
 
-	result = device->CreateTexture2D(&desc, initialData, &m_tex);
+	result = device->CreateTexture2D(&desc, initialData, &m_pTex);
 
 	if (FAILED(result)) {
-		delete data;
 		delete[] initialData;
-		return false;
+		throw EX(TextureCreateException);
 	}
 
-	delete data;
+	if (data != bitmap->GetData()) delete data;
 	delete[] initialData;
 
+	LOGGER(LOG(TRACE) << "Texture buffer with" << x << y << ch << "created");
 
 	// --- shderresourceref
 	D3D11_SHADER_RESOURCE_VIEW_DESC resDesc;
@@ -153,21 +124,151 @@ bool Texture::Initialize(ID3D11Device* device, WCHAR* filename)
 	resDesc.Texture2D.MostDetailedMip = 0;
 	resDesc.Texture2D.MipLevels = 1;
 
-	result = device->CreateShaderResourceView(&m_tex[0], &resDesc, &m_texture_resource);
+	result = device->CreateShaderResourceView(&m_pTex[0], &resDesc, &m_pResourceView);
 	if (FAILED(result))
 	{
-		return false;
+		throw EX(ShaderResourceViewException);
+	}
+}
+
+void Grafkit::Texture::Initialize(Renderer & device, size_t w, size_t h)
+{
+	D3D11_TEXTURE2D_DESC textureDesc;
+	HRESULT result;
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+
+	int screenW = 0, ScreenH = 0; device.GetScreenSize(screenW, ScreenH);
+
+	// Initialize the render target texture description.
+	ZeroMemory(&textureDesc, sizeof(textureDesc));
+
+	// Setup the render target texture description.
+	textureDesc.Width = w ? w : screenW;
+	textureDesc.Height = h ? h : ScreenH;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = 0;
+
+	// Create the render target texture.
+	result = device->CreateTexture2D(&textureDesc, nullptr, &m_pTex);
+	if (FAILED(result))
+	{
+		throw EX(TextureCreateException);
 	}
 
-	return true;
+	// Setup the description of the render target view.
+	renderTargetViewDesc.Format = textureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+	// Create the render target view.
+	result = device->CreateRenderTargetView(m_pTex, &renderTargetViewDesc, &m_pRenderTargetView);
+	if (FAILED(result))
+	{
+		throw EX(RenderTargetViewException);
+	}
+
+	// Setup the description of the shader resource view.
+	shaderResourceViewDesc.Format = textureDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	// Create the shader resource view.
+	result = device->CreateShaderResourceView(m_pTex, &shaderResourceViewDesc, &m_pResourceView);
+	if (FAILED(result))
+	{
+		throw EX(ShaderResourceViewException);
+	}
 }
 
 void Texture::Shutdown()
 {
-	if (m_texture_resource) {
-		m_texture_resource->Release();
-		m_texture_resource = 0;
+	if (m_pResourceView) 
+	{
+		m_pResourceView->Release();
+		m_pResourceView = nullptr;
 	}
 
-	// @todo m_tex torlese 
+	if (m_pRenderTargetView)
+	{
+		m_pRenderTargetView->Release(); // ez valamiert nullptr exceptiont dob 
+		m_pRenderTargetView = nullptr;
+	}
+
+	if (m_pTex)
+	{
+		m_pTex->Release();
+		m_pTex = nullptr;
+	}
+
+
+}
+
+void Grafkit::Texture::SetRenderTargetView(Renderer & device, size_t id)
+{
+	if (!m_pRenderTargetView) {
+		throw EX(NoRenderTargetViewException);
+	}
+
+	device.SetRenderTargetView(m_pRenderTargetView, id);
+}
+
+
+
+// ========================================================================================================================
+
+Grafkit::TextureSampler::TextureSampler()
+	: m_pSamplerState(nullptr)
+{
+}
+
+Grafkit::TextureSampler::~TextureSampler()
+{
+	this->Shutdown();
+}
+
+void Grafkit::TextureSampler::Initialize(Renderer & device)
+{
+	HRESULT result = 0;
+
+	// Create a texture sampler state description.
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	// Create the texture sampler state.
+	result = device->CreateSamplerState(&samplerDesc, &m_pSamplerState);
+	if (FAILED(result))
+	{
+		throw new EX(SamplerStateCreateException);
+	}
+}
+
+void Grafkit::TextureSampler::Shutdown()
+{
+	if (m_pSamplerState)
+	{
+		m_pSamplerState->Release();
+		m_pSamplerState = nullptr;
+	}
 }

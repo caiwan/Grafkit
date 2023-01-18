@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "logger.h"
 
 #include "exceptions.h"

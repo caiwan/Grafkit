@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "ResourceManager.h"
 #include "ResourceBuilder.h"
 

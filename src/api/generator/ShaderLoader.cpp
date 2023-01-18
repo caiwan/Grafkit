@@ -1,6 +1,6 @@
-#include "ShaderLoader.h"
+#include "../stdafx.h"
 
-#include "../utils/logger.h"
+#include "ShaderLoader.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;

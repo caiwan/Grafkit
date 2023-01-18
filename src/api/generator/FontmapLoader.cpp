@@ -1,7 +1,8 @@
+#include "../stdafx.h"
+
 #include <cstring>
 
 #include "FontmapLoader.h"
-#include "../utils/exceptions.h"
 
 using namespace FWdebugExceptions;
 using namespace Grafkit;

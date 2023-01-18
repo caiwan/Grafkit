@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "XML.h"
 
 #ifdef UTILS_XML_PARSER

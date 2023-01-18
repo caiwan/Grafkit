@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #define USE_STD_ARRAY
 #include <vector>
 

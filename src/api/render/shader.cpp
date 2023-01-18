@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "shader.h"
 
 #include <string>
@@ -6,9 +8,6 @@
 #include <iostream>
 
 #include <cstdio>
-
-#include "../math/matrix.h"
-#include "../utils/logger.h"
 
 
 using namespace std;

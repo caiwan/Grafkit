@@ -1,3 +1,5 @@
+#include "../stdafx.h"
+
 #include "memory_alloc.h"
 
 #define __STDC_WANT_SECURE_LIB__
