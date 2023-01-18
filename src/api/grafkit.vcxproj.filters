@@ -92,6 +92,9 @@
     <ClCompile Include="core\asset.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="generator\assimploader.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -162,6 +165,9 @@
     </ClInclude>
     <ClInclude Include="core\asset.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\assimploader.h">
+      <Filter>Source Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
