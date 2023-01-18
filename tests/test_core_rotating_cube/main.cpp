@@ -10,17 +10,16 @@
 
 #include "math/matrix.h"
 
-#include "core/asset.h"
-#include "core/AssetFactory.h"
-#include "core/AssetFile.h"
-
-#include "core/ResourceManager.h"
+#include "utils/asset.h"
+#include "utils/AssetFactory.h"
+#include "utils/AssetFile.h"
+		  
+#include "utils/ResourceManager.h"
 
 #include "generator/TextureLoader.h"
 
 using namespace Grafkit;
 
-// #include "textureShaderClass.h"
 #include "builtin_data/cube.h"
 
 class Application : public System, public IResourceManager
@@ -75,8 +74,7 @@ protected:
 			// -- texture
 			TextureResRef texture = new TextureRes();
 
-			TextureFromBitmap txgen( m_file_loader->Get("Normap.jpg"), texture );
-			txgen(this);
+			texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
@@ -95,11 +93,13 @@ protected:
 
 
 			SimpleMeshGenerator generator(render, m_vertexShader);
-			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
-			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
+			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
 			
-			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
+			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
 
+			// --- 
+			this->DoPrecalc();
 
 			// -- setup scene 
 			scene = new Scene();
@@ -151,7 +151,7 @@ protected:
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 
-				m_fragmentShader["SampleType"] = m_textureSampler->GetSamplerState();
+				// ((Shader)(*m_fragmentShader))["SampleType"] = m_textureSampler->GetSamplerState();
 
 				scene->PreRender(render);
 				scene->Render(render);
@@ -167,7 +167,7 @@ protected:
 		FileAssetManager *m_file_loader;
 
 	public:
-		//FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
+		IAssetFactory* GetAssetFactory() { return m_file_loader; };
 		Renderer & GetDeviceContext() { return this->render; };
 };
 

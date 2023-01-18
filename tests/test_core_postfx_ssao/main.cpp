@@ -12,11 +12,11 @@
 
 #include "math/matrix.h"
 
-#include "core/asset.h"
-#include "core/AssetFactory.h"
-#include "core/AssetFile.h"
-
-#include "core/ResourceManager.h"
+#include "utils/asset.h"
+#include "utils/AssetFactory.h"
+#include "utils/AssetFile.h"
+		 
+#include "utils/ResourceManager.h"
 
 #include "generator/TextureLoader.h"
 
@@ -183,7 +183,8 @@ protected:
 		FileAssetManager *m_file_loader;
 
 	public:
-		//FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
+		// Grafkit::IResourceManager* 
+		Grafkit::IAssetFactory* GetAssetFactory() { return m_file_loader; };
 		Renderer & GetDeviceContext() { return this->render; };
 };
 
