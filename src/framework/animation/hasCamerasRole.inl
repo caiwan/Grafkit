@@ -3,12 +3,11 @@
 #include "render/camera.h"
 
 
-inline Grafkit::HasCamerasRole::HasCamerasRole() : m_activeCameraId(0), m_cameras(nullptr)
+inline Grafkit::HasCamerasRole::HasCamerasRole() : m_cameras(nullptr), m_activeCameraId(0)
 {
 }
 
-inline void Grafkit::HasCamerasRole::AddCamera(ActorRef & actor, CameraRef & camera)
-{
+inline void Grafkit::HasCamerasRole::AddCamera(ActorRef & actor, CameraRef & camera) const {
 	m_cameras->AddEntiy(actor, dynamic_cast<Entity3D*>(camera.Get()));
 }
 
@@ -25,6 +24,8 @@ inline void Grafkit::HasCamerasRole::AddCameraFrame(float time, std::string name
 
 inline void Grafkit::HasCamerasRole::AddCameraFrame(float time, size_t id)
 {
+    // TBD
+    assert(0);
 }
 
 inline void Grafkit::HasCamerasRole::InitializeCameras()
@@ -38,7 +39,6 @@ inline void Grafkit::HasCamerasRole::ShutdownCameras()
 	m_cameras = nullptr;
 }
 
-inline void Grafkit::HasCamerasRole::UpdateCamera(Renderer & render)
-{
+inline void Grafkit::HasCamerasRole::UpdateCamera(Renderer & render) const {
 	m_cameras->Calculate(render, m_activeCameraId);
 }

@@ -29,6 +29,14 @@ namespace Grafkit {
 		void SetName(std::string name) { m_name = name; }
 		std::string GetName() const { return m_name; }
 
+        struct Key;
+        class Channel;
+        class Track;
+
+        typedef Ref<Channel> ChannelRef;
+        typedef Ref<Track> TrackRef;
+
+
 	protected:
 		void _serialize(Archive &ar);
 
@@ -148,6 +156,9 @@ namespace Grafkit {
 		std::vector<Ref<Track>> m_tracks;
 
 	};
+
+    //typedef Animation::Key AnimationKey;
+    //typedef Animation::Track AnimationTrack;
 
 }
 

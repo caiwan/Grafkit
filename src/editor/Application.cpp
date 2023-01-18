@@ -23,90 +23,90 @@
 using namespace Idogep;
 using namespace Grafkit;
 
-Idogep::EditorApplication * Idogep::EditorApplication::s_self;
+EditorApplication* EditorApplication::s_self;
 
-Idogep::EditorApplication::EditorApplication(int argc, char **argv) :
-	m_preloadWindow(nullptr), m_editor(nullptr)
+EditorApplication::EditorApplication(int argc, char** argv) :
+                                                            m_preloadWindow(nullptr)
+                                                            , m_editor(nullptr)
 {
-	assert(s_self == nullptr);
+    assert(s_self == nullptr);
 
-	// init the rest of the things 
-	m_logger = new LoggerProxy();
-	Grafkit::Log::Logger().AddHandler(m_logger);
+    // init the rest of the things 
+    m_logger = new LoggerProxy();
+    Log::Logger().AddHandler(m_logger);
 
-	// ... 
-	// Argparse goez here if needed 
+    // ... 
+    // Argparse goez here if needed 
 
-	m_projectFileLoader = new FileAssetFactory("./");
-	m_assetFactory = new AssetFactoryProxy(m_projectFileLoader);
+    m_projectFileLoader = new FileAssetFactory("./");
+    m_assetFactory = new AssetFactoryProxy(m_projectFileLoader);
 
-	s_self = this;
+    s_self = this;
 }
 
 
-Idogep::EditorApplication::~EditorApplication()
+EditorApplication::~EditorApplication()
 {
-	m_render.Shutdown();
-	delete m_assetFactory;
-	delete m_projectFileLoader;
+    m_render.Shutdown();
+    delete m_assetFactory;
+    delete m_projectFileLoader;
 }
 
 
-
-int Idogep::EditorApplication::Execute()
+int EditorApplication::Execute()
 {
-	m_editor = new Editor(nullptr, m_render, this);
-	m_mainWindow = new MainWindow();
-	m_editor->SetView(m_mainWindow);
+    m_editor = new Editor(nullptr, m_render, this);
+    m_mainWindow = new MainWindow();
+    m_editor->SetView(m_mainWindow);
 
-	// --- 
-	// TODO this part should be put out to somewhere later on: 
+    // --- 
+    // TODO this part should be put out to somewhere later on: 
 
-	m_preloadWindow = new Preloader(m_mainWindow);
-	onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
+    m_preloadWindow = new Preloader(m_mainWindow);
+    onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
 
-	SetPreloadListener(m_preloadWindow);
+    SetPreloadListener(m_preloadWindow);
 
-	SplashWidget *sw = new SplashWidget();
+    SplashWidget* sw = new SplashWidget();
 
-	onLoaderFinished += Delegate(sw, &SplashWidget::hide);
-	onLoaderFinished += Delegate(sw, &SplashWidget::deleteLater);
-	onLoaderFinished += Delegate(m_mainWindow, &MainWindow::showMaximized);
-	onLoaderFinished += Delegate(this, &EditorApplication::NextTick);
+    onLoaderFinished += Delegate(sw, &SplashWidget::hide);
+    onLoaderFinished += Delegate(sw, &SplashWidget::deleteLater);
+    onLoaderFinished += Delegate(m_mainWindow, &MainWindow::showMaximized);
+    onLoaderFinished += Delegate(this, &EditorApplication::NextTick);
 
-	// --- 
+    // --- 
 
-	sw->show();
+    sw->show();
 
-	// --- 
+    // --- 
 
-	Initialize();
+    Initialize();
 
-	// qnd hack to wait a bit on splash screen
-	StartLoaderThread();
+    // qnd hack to wait a bit on splash screen
+    StartLoaderThread();
 
-	m_renderWidget = new QGrafkitContextWidget(m_render);
-	m_renderWidget->Initialize();
+    m_renderWidget = new QGrafkitContextWidget(m_render);
+    m_renderWidget->Initialize();
 
-	m_mainWindow->setCentralWidget(m_renderWidget);
+    m_mainWindow->setCentralWidget(m_renderWidget);
 
-	m_editor->NewDocument();
+    m_editor->NewDocument();
 
-	return ExecuteParentFramework();
+    return ExecuteParentFramework();
 }
 
 void EditorApplication::Mainloop()
 {
-	// ennek se feltetlenul itt lenne a helye
-	const bool renderNextFrame = this->m_editor->RenderFrame();
-	if (renderNextFrame)
-		this->NextTick();
+    // ennek se feltetlenul itt lenne a helye
+    const bool renderNextFrame = this->m_editor->RenderFrame();
+    if (renderNextFrame)
+        this->NextTick();
 }
 
-void Idogep::EditorApplication::Preload()
+void EditorApplication::Preload()
 {
-	DoPrecalc();
-	m_editor->InitializeDocument();
+    DoPrecalc();
+    m_editor->InitializeDocument();
 }
 
 // ========================================================================================
@@ -122,88 +122,86 @@ void Idogep::EditorApplication::Preload()
 
 void EditorApplication::Initialize()
 {
-	BuildEditorModules();
-	InitializeModules();
-	BuildDockingWindows();
+    BuildEditorModules();
+    InitializeModules();
+    BuildDockingWindows();
 }
 
 // TODO We shall put this out to a separate builder / mediator object
-void Idogep::EditorApplication::BuildEditorModules()
+void EditorApplication::BuildEditorModules()
 {
-	m_logModule = new LogModule(m_editor, m_logger);
+    m_logModule = new LogModule(m_editor, m_logger);
 
-	// --- 
-	m_outlineViewModule = new OutlineModule(m_editor);
+    // --- 
+    m_outlineViewModule = new OutlineModule(m_editor);
 
-	m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
+    m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
-	// --- 
-	m_animationEditor = new AnimationEditorModule(m_editor);
+    // --- 
+    m_animationEditor = new AnimationEditorModule(m_editor);
 
-	// 
-	dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
-		dynamic_cast<AnimationEditorModule*>(m_animationEditor.Get()), &AnimationEditorModule::AnimationSelectedEvent);
+    // 
+    dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
+        dynamic_cast<AnimationEditorModule*>(m_animationEditor.Get()),
+        &AnimationEditorModule::AnimationSelectedEvent
+    );
 }
 
-void Idogep::EditorApplication::InitializeModules() const
+void EditorApplication::InitializeModules() const
 {
-	std::stack<Ref<Controller>> stack;
-	stack.push(m_editor);
-	while (!stack.empty()) {
-		auto module = stack.top(); stack.pop();
+    std::stack<Ref<Controller>> stack;
+    stack.push(m_editor);
+    while (!stack.empty())
+    {
+        auto module = stack.top();
+        stack.pop();
 
-		EmitsCommandRole* commandEmitter = dynamic_cast<EmitsCommandRole*>(module.Get());
-		if (commandEmitter) {
-			qDebug() << "Connecting command emitter obj=" << reinterpret_cast<void*>(module.Get());
-			m_editor->GetCommandStack()->ConnectEmitter(commandEmitter);
-		}
+        EmitsCommandRole* commandEmitter = dynamic_cast<EmitsCommandRole*>(module.Get());
+        if (commandEmitter)
+        {
+            qDebug() << "Connecting command emitter obj=" << reinterpret_cast<void*>(module.Get());
+            m_editor->GetCommandStack()->ConnectEmitter(commandEmitter);
+        }
 
-		module->Initialize();
+        module->Initialize();
 
-		for (size_t i = 0; i < module->GetChildModuleCount(); i++) {
-			stack.push(module->GetChildModule(i));
-		}
-	}
+        for (size_t i = 0; i < module->GetChildModuleCount(); i++) { stack.push(module->GetChildModule(i)); }
+    }
 }
 
-void Idogep::EditorApplication::BuildDockingWindows() const
+void EditorApplication::BuildDockingWindows() const
 {
-	// 
-	QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_animationEditor->GetView().Get());
-	assert(curveEditorWidget);
+    // 
+    QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_animationEditor->GetView().Get());
+    assert(curveEditorWidget);
 
-	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
+    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
 
-	//
-	QDockWidget* logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
-	assert(logWidget);
+    //
+    QDockWidget* logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
+    assert(logWidget);
 
-	logWidget->setParent(m_mainWindow);
-	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
-	m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
+    logWidget->setParent(m_mainWindow);
+    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
+    m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
 
-	// 
-	QDockWidget* outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
-	assert(outlineWidget);
+    // 
+    QDockWidget* outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
+    assert(outlineWidget);
 
-	outlineWidget->setParent(m_mainWindow);
-	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
+    outlineWidget->setParent(m_mainWindow);
+    m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
 
     // connect redo / undo menus
-	m_editor->GetCommandStack()->onCommandStackChanged += Delegate(m_mainWindow, &Roles::ManageCommandStackRole::CommandStackChangedEvent);
-	m_mainWindow->onUndo += Delegate(m_editor->GetCommandStack(), &CommandStack::Undo);
-	m_mainWindow->onRedo += Delegate(m_editor->GetCommandStack(), &CommandStack::Redo);
+    m_editor->GetCommandStack()->onCommandStackChanged += Delegate(m_mainWindow, &Roles::ManageCommandStackRole::CommandStackChangedEvent);
+    m_mainWindow->onUndo += Delegate(m_editor->GetCommandStack(), &CommandStack::Undo);
+    m_mainWindow->onRedo += Delegate(m_editor->GetCommandStack(), &CommandStack::Redo);
 }
 
 
 // ========================================================================================
 
-Idogep::LoaderThread::LoaderThread(QObject* parent) : QThread(parent)
-{
+LoaderThread::LoaderThread(QObject* parent) : QThread(parent) {
 }
 
-void Idogep::LoaderThread::run()
-{
-	msleep(1000);
-}
-
+void LoaderThread::run() { msleep(1000); }

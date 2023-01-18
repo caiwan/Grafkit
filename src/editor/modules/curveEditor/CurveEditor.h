@@ -1,9 +1,8 @@
 #pragma once
 
-//#include "CurvePointEditor.h"
-
-#include "animation/animation.h"
 #include "utils/ViewModule.h"
+
+#include "models/Curve.h"
 
 namespace Idogep
 {
@@ -11,9 +10,6 @@ namespace Idogep
 
     class CurvePointEditor;
     class CurveEditorView;
-
-    typedef Ref<Grafkit::Animation::Channel> ChannelRef;
-    typedef Grafkit::Animation::Key AnimationKey;
 
 	namespace Roles {
 
@@ -48,13 +44,15 @@ namespace Idogep
 	    ~CurveEditor() override;
 	    void Initialize() override;
 
-		void ChannelSelectedEvent(Ref<Grafkit::Animation::Channel> chanel);
-		void ClearChannels();
+		void ChannelSelectedEvent(Grafkit::Animation::ChannelRef channel) const;
+		void ClearChannels() const;
 
 	    void Recalculate(TimelineArea* const area) const;
-        ChannelRef GetChannel() const;
+	    Grafkit::Animation::ChannelRef GetChannel() const;
 
 	private:
+        void AddCurveToScene() const;
+
 		Ref<CurveEditorView> m_myView;
 		
 	    Roles::ManageCurveAudiogramRole* m_manageAudiogram;

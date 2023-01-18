@@ -103,9 +103,13 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 
 	//CurvePointEditor* curveManager = parent->();
 
+    if (parent->GetChannel().Invalid())
+        return;
+
 	// 2. draw the curves.
 
-	auto channel = parent->GetChannel();
+	//auto channel = parent->GetChannel()->GetChannel();
+    auto channel = parent->GetChannel();
 
 	if (channel.Invalid() || channel->GetKeyCount() == 0)
 		return;

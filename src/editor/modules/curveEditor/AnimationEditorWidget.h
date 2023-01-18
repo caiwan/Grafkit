@@ -28,7 +28,7 @@ namespace Idogep
         ~AnimationEditorWidget();
 
         /* METHODS */
-        void SetGraphicsScene(QGraphicsScene* graphicsScene);
+        void SetGraphicsScene(QGraphicsScene* graphicsScene) const;
 
     protected:
 

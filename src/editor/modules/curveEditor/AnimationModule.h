@@ -1,7 +1,6 @@
 #pragma once
 
 #include "utils/ViewModule.h"
-
 #include "utils/Command.h"
 
 namespace  Idogep
@@ -10,9 +9,12 @@ namespace  Idogep
 	class CurveEditor;
 
 	class TreeItem;
+    class TreeModel;
+
+    class AnimationWrapper;
+    typedef Ref<AnimationWrapper> AnimationWrapperRef;
 
 	// ========================================================================================================
-
 
 	class AnimationEditorModule : public Controller, public EmitsCommandRole
 	{
@@ -29,7 +31,10 @@ namespace  Idogep
 	private:
 		Ref<AnimationEditorView> m_myView;
 		Ref<CurveEditor> m_curveScene;
+
+        AnimationWrapperRef m_animation;
         
+        TreeModel* m_animationListModel;
 	};
 
 }

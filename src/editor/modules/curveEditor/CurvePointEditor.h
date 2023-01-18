@@ -1,9 +1,9 @@
 #pragma once 
 
-#include "animation/animation.h"
-
 #include "utils/Command.h"
 #include "utils/ViewModule.h"
+
+#include "models/Curve.h"
 
 namespace Idogep {
 
@@ -13,11 +13,7 @@ namespace Idogep {
 
     class TimelineArea;
 
-    typedef Ref<Grafkit::Animation::Channel> ChannelRef;
-    typedef Grafkit::Animation::Key AnimationKey;
-
-    typedef std::vector<Ref<CurvePointItem>> CurvePointList;
-    typedef CurvePointList::const_iterator CurvePointIterator;
+    typedef std::vector<CurvePointItem*> CurvePointList;
 
     class CurvePointEditor : public Controller, public EmitsCommandRole
     {
@@ -26,15 +22,12 @@ namespace Idogep {
     public:
         explicit CurvePointEditor(const Ref<Controller>& parent);
 
-        ChannelRef GetChannel() const { return m_channel; }
-        void SetChannel(ChannelRef& channel) { m_channel = channel; Rebuild(); }
+        Grafkit::Animation::ChannelRef GetChannel() const { return m_channel; }
+        void SetChannel(Grafkit::Animation::ChannelRef& channel) { m_channel = channel; Rebuild(); }
 
-        std::pair<CurvePointIterator, CurvePointIterator> GetCurvePointIterators() const { return std::make_pair(m_curvePoints.cbegin(), m_curvePoints.cend()); }
-
-        void AddCurveToScene(CurveEditorView* parent) const;
         void Recalculate(TimelineArea* const area) const;
 
-        //void RefreshPoint(ChannelRef channel, size_t id, AnimationKey key);
+        void UpdateKey(const Grafkit::Animation::ChannelRef& channel, size_t id, const Grafkit::Animation::Key& key);
 
         void Initialize() override;
 
@@ -49,9 +42,15 @@ namespace Idogep {
 
         void EditKeyEvent(CurvePointItem *item);
 
+        bool HasCurvePoints() const { return !m_points.empty(); }
+        size_t GetPointCount() const { return m_points.size(); }
+        CurvePointItem* GetPoint(size_t id) { return m_points[id]; }
+
     private:
-        CurvePointList m_curvePoints;
-        ChannelRef m_channel;
+        Grafkit::Animation::Key EditKey(size_t index, Grafkit::Animation::Key key) const;
+
+        Grafkit::Animation::ChannelRef m_channel;
+        CurvePointList m_points;
     };
 
     class CursorManager

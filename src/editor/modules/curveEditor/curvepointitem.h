@@ -2,14 +2,16 @@
 #include <qgraphicsitem.h>
 
 #include "utils/Event.h"
-#include "animation/animation.h"
 #include "utils/ViewModule.h"
+#include "models/Curve.h"
 
 class QStyleOptionGraphicsItem;
 
 namespace Idogep
 {
     class TimelineArea;
+
+    class CurveSegment;
 
     class CurvePointItem : public QGraphicsItem , public View
     {
@@ -69,7 +71,6 @@ namespace Idogep
         void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
         QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
-
     protected:
         void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
         void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
@@ -87,7 +88,6 @@ namespace Idogep
         void RefreshView(bool force) override;
 
     private:
-
         float m_radix, m_radix2;
 
         bool m_showTangent;
@@ -97,9 +97,28 @@ namespace Idogep
 		Grafkit::Animation::Key m_key;
 		Grafkit::Animation::Key m_originalKey;
 
+
         uint32_t m_nodeType;
         uint32_t m_color;
 
         QSizeF m_scaling;
+
+        Ref<CurveSegment> m_previousSegment;
+        Ref<CurveSegment> m_nextSegment;
+    };
+
+
+    class CurveSegment : public Referencable
+    {
+    public:
+        void RecalculateSegment(TimelineArea const* area);
+
+    private:
+        QPixmap * m_segment;
+
+        Grafkit::Animation::ChannelRef m_channel;
+
+        uint32_t m_startId;
+        uint32_t m_endId;
     };
 }

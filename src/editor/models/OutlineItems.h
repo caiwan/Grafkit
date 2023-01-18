@@ -2,38 +2,35 @@
 
 #include "common.h"
 
-namespace Idogep {
+namespace Idogep
+{
+    class AnimationWrapper;
+    typedef Ref<AnimationWrapper> AnimationWrapperRef;
 
-	class RecievesOutlineTreechangeRole {
+    class Properties;
+    typedef Ref<Properties> PropertiesRef;
 
-	};
+    // shall we have 
+    // multiple animations maybe?
+    class ItemHasAnimationsRole
+    {
+    public:
+        ItemHasAnimationsRole();
+        ~ItemHasAnimationsRole();
 
-	class Properties;
+        void SetAnimation(AnimationWrapperRef animation);
+        AnimationWrapperRef GetAnimation() const;
 
-	// shall we have 
-	// multiple animations maybe?
-	class ItemHasAnimationsRole {
-	public:
-		ItemHasAnimationsRole();
-		~ItemHasAnimationsRole();
+    protected:
+        AnimationWrapperRef m_animation;
+    };
 
-		void SetAnimation(Grafkit::AnimationRef animation);
-		Grafkit::AnimationRef GetAnimation() const ;
-	    
-	    std::string GetParentName() const { return m_parentName; }
-	    void SetParentName(const std::string& parentName) { m_parentName = parentName; }
-
-	protected:
-		std::string m_parentName;
-		Grafkit::AnimationRef m_animation;
-	};
-
-	class HasItemPropertiesRole {
-	public:
-		HasItemPropertiesRole();
-		~HasItemPropertiesRole();
-	protected:
-		Ref<Properties> m_properties;
-	};
-
+    class HasItemPropertiesRole
+    {
+    public:
+        HasItemPropertiesRole();
+        ~HasItemPropertiesRole();
+    protected:
+        Ref<Properties> m_properties;
+    };
 }

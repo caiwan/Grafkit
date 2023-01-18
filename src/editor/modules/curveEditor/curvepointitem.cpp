@@ -34,25 +34,6 @@ CurvePointItem::CurvePointItem(const Animation::Key key, const size_t index, QGr
 	show();
 }
 
-// TODO: might be useful when copy
-//CurvePointItem::CurvePointItem(const CurvePointItem& other)
-//    : QGraphicsItem(other.parentItem())
-//{
-//    m_id = other.m_id;
-//    m_color = other.m_color;
-//    m_nodeType = other.m_nodeType;
-//
-//    m_key = other.m_key;
-//
-//    m_showTangent = false;
-//
-//    m_radix = other.m_radix;
-//    m_radix2 = RADIX_DEFUALT;
-//
-//    setFlag(ItemIsMovable);
-//    setFlag(ItemIsSelectable);
-//}
-
 CurvePointItem::~CurvePointItem() = default;
 
 void CurvePointItem::RecalculatePosition(TimelineArea const* area)

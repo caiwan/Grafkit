@@ -84,16 +84,11 @@ namespace Grafkit {
 
 		void AddAnimation(AnimationRef animation) { m_animations.push_back(animation); }
 
-		size_t GetAnimationCount() { return m_animations.size(); }
+		size_t GetAnimationCount() const { return m_animations.size(); }
 		AnimationRef GetAnimation(size_t id) { return m_animations[id]; }
 
 	protected:
-		void InitializeAnimations() {}
-		void ShutdownAnimations(){}
-
-
 		void UpdateAnimations(float t);
-
 		std::vector<AnimationRef> m_animations;
 
 	};
@@ -105,7 +100,7 @@ namespace Grafkit {
 		HasCamerasRole();
 		virtual ~HasCamerasRole();
 
-		inline void AddCamera(ActorRef &actor, CameraRef &camera);
+		inline void AddCamera(ActorRef &actor, CameraRef &camera) const;
 
 		size_t GetCameraId(std::string name) { m_cameras->GetId(name); }
 
@@ -128,7 +123,7 @@ namespace Grafkit {
 		void InitializeCameras();
 		void ShutdownCameras();
 
-		void UpdateCamera(Renderer & render);
+		void UpdateCamera(Renderer & render) const;
 
 	protected:
 		EntityContainer * m_cameras;

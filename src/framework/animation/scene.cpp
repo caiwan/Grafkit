@@ -64,20 +64,21 @@ void Grafkit::Scene::Shutdown()
 {
 	ShutdownLights();
 	ShutdownCameras();
-	ShutdownAnimations();
 	ShutdownSceneGraph();
 }
 
 void Grafkit::Scene::RenderFrame(Grafkit::Renderer & render, float time)
 {
 	UpdateScene(render, time);
-	RenderScenegraph(render, GetActiveCamera());
+    CameraRef camera = GetActiveCamera();
+	RenderScenegraph(render, camera);
 }
 
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
-	RenderScenegraph(render, GetActiveCamera());
+    CameraRef camera = GetActiveCamera();
+	RenderScenegraph(render, camera);
 	//m_scenegraph->Render(render, GetActiveCamera());
 }
 
