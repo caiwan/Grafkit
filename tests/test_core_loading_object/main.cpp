@@ -8,7 +8,7 @@
 
 #include "math/matrix.h"
 
-
+#include "core/renderassets.h"
 
 using namespace FWrender;
 using FWmath::Matrix;
@@ -16,7 +16,7 @@ using FWmath::Matrix;
 // #include "textureShaderClass.h"
 #include "builtin_data/cube.h"
 
-class Application : public FWcore::System
+class Application : public FWcore::System, FWassets::IRenderAssetManager
 {
 public:
 	Application() : FWcore::System()
@@ -60,15 +60,14 @@ public:
 		camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 		// -- texture
-		TextureRef texture = new Texture();
-		texture->Initialize(render, L"Normap.jpg");
+		TextureRef texture;
+
+		TextureGenFromBitmap txgen(L"Normap.jpg", this, render, texture);
+		txgen();
 
 		// -- model 
 		model = new Model;
 		model->setTexture(texture);
-
-		//shader_texture = new TextureShaderClass();
-		//result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
 
 		shader_vs = new Shader();
 		shader_vs->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
@@ -81,8 +80,8 @@ public:
 		SimpleMeshGenerator generator(render, shader_vs);
 		generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
 		generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
-		generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
+		generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
 		shader_fs->GetBResource("shaderTexture").SetTexture(texture);
 
@@ -93,9 +92,6 @@ public:
 
 	void release() {
 		this->render.Shutdown();
-
-		// delete this->shader_texture;
-
 	};
 
 	int mainloop() {
