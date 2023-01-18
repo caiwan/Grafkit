@@ -108,6 +108,8 @@ protected:
 			rootActor->AddChild(modelActor);
 
 			scene->SetRootNode(rootActor);
+			scene->SetCameraNode(cameraActor);
+			// scene->AddLightNode(lightActor);
 
 			scene->SetVShader(m_vertexShader);
 			scene->SetFShader(m_fragmentShader);
@@ -155,7 +157,8 @@ protected:
 				//shader_fs->Render(render);
 
 				//model->Render(render);
-
+				
+				scene->PreRender(render);
 				scene->Render(render);
 
 				this->t += 0.001;
