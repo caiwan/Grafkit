@@ -29,9 +29,9 @@ namespace FWrender
 	{
 		public:
 			Model();
-			Model(const Model& other);
-
 			~Model();
+
+			virtual void Render(FWrender::Renderer& deviceContext);
 	};
 
 	typedef Ref<Model> ModelRef;

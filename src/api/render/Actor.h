@@ -8,6 +8,8 @@
 #include "Material.h"
 #include "texture.h"
 
+#include "../core/renderassets.h"
+
 #include <vector>
 
 namespace FWrender {
@@ -15,7 +17,7 @@ namespace FWrender {
 	class Entity3DEvents;
 	class Actor;
 
-	class Entity3D : public virtual Referencable
+	class Entity3D : public virtual Referencable, virtual public FWassets::IRenderAsset
 	{
 		friend class Actor;
 		public:
@@ -23,21 +25,29 @@ namespace FWrender {
 			virtual ~Entity3D();
 
 			ShaderRef &GetVertexShader() { return this->m_vertexShader; }
-			TextureRef &GetTexture(int n = 0) { return m_textures[n]; } ///@todo bound check
-			MaterialRef &GetMaterial() { this->m_material; }
+			void SetVertexShader(ShaderRef shader) { this->m_vertexShader = shader; }
+			
+			MaterialRef &GetMaterial() { return this->m_material; }
+			void SetMaterial(MaterialRef material) { this->m_material = material; }
+
+			///@{
+			///Ezek a materialbol veszik ki a shadert, ha megosztott material van, akkor mindenkiet modositja
+			///Kulonben ha zero a material, akkor gaz van
+			ShaderRef GetFragmentShader() { return this->m_material.Valid()?this->m_material->GetShader():ShaderRef(); }
+			void SetFragmentShader(ShaderRef shader) { this->m_vertexShader = shader; }
+			///@}
 
 			Actor * const & GetParent() { return m_parent; }
 
+			virtual void Render(FWrender::Renderer& deviceContext) = 0;
+
 		protected:	
 			Actor* m_parent;
-
 			ShaderRef m_vertexShader;
-
 			MaterialRef m_material;
-			TextureRef m_textures[MULTITEXTURE_MAX];
 
-			/// @todo + transformation
-			/// @todo + bounding box, ha kell 
+			/// @todo + transformation matrix
+			/// @todo + bounding box, ha kell 1
 	};
 
 

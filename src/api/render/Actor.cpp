@@ -12,27 +12,6 @@ FWrender::Entity3D::~Entity3D()
 {
 }
 
-
-void FWrender::Entity3D::setVertexShader(ShaderRef shader)
-{
-	if (shader.Valid() && shader->getShaderType() == ST_Vertex) {
-		this->m_vertexShader = shader;
-	}
-	else {
-		// thorw EX 
-	}
-}
-
-void FWrender::Entity3D::setFragmentShader(ShaderRef shader)
-{
-	if (shader.Valid() && shader->getShaderType() == ST_Pixel) {
-		this->m_vertexShader = shader;
-	}
-	else {
-		// thorw EX 
-	}
-}
-
 // =================================================================
 
 FWrender::Actor::Actor()

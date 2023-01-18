@@ -28,7 +28,7 @@ namespace FWrender
 			Mesh(const Mesh& mesh);
 			virtual ~Mesh();
 
-			void Render(ID3D11DeviceContext* deviceContext);
+			void RenderMesh(ID3D11DeviceContext* deviceContext);
 			
 			/// @todo erre jobb megoldast kell talalni
 			void setVertexCount(int count) { this->m_vertexCount = count; }

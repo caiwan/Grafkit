@@ -27,7 +27,7 @@ FWrender::Mesh::~Mesh()
 	this->Shutdown();
 }
 
-void FWrender::Mesh::Render(ID3D11DeviceContext * dev)
+void FWrender::Mesh::RenderMesh(ID3D11DeviceContext * dev)
 {
 	dev->IASetVertexBuffers(0, 1, &this->m_buffer.buffer, &this->m_buffer.stride, &this->m_buffer.offset);
 	dev->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
