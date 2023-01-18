@@ -7,7 +7,7 @@
 
 #include "shader.h"
 #include "../math/matrix.h"
-#include "easyloggingpp.h"
+#include "logger.h"
 
 using namespace std;
 using namespace Grafkit;
@@ -98,7 +98,7 @@ void Shader::LoadFromMemory(Renderer & device, LPCSTR entry, LPCSTR source, size
 		result = D3DCompile(source, size, nullptr, nullptr, nullptr, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 	else {
-		LOG(WARNING) << "Attempting to load an unknown type of shader" << type;
+		LOGGER(LOG(WARNING) << "Attempting to load an unknown type of shader" << type);
 		throw EX_DETAILS(MissingShaderException, "Attempting to load an unknown type of shader");
 		return;
 	}
@@ -433,7 +433,7 @@ void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file,
 	fclose(fp);
 #endif 
 
-	LOG(ERROR) << compileErrors;
+	LOGGER(LOG(ERROR) << compileErrors);
 
 	errorMessage->Release();
 	errorMessage = 0;
@@ -637,7 +637,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
 		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
 
-		LOG(TRACE) << "Constant buffer record" << cbRecord.m_description.Name << cbRecord.m_description.Size << cbRecord.m_description.Type;
+		LOGGER(LOG(TRACE) << "Constant buffer record" << cbRecord.m_description.Name << cbRecord.m_description.Size << cbRecord.m_description.Type);
 
 		// build up cbuffer variables
 		cbRecord.m_cbVarCount = cbRecord.m_description.Variables;
@@ -661,7 +661,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 				throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain shader reflection type description");
 			}
 
-			LOG(TRACE) << "Shader vairable created " << cbRecord.m_description.Name << cbVar.m_var_desc.Name << cbVar.m_type_desc.Name;
+			LOGGER(LOG(TRACE) << "Shader vairable created " << cbRecord.m_description.Name << cbVar.m_var_desc.Name << cbVar.m_type_desc.Name;);
 
 			cbRecord.m_cbVarMap[cbVar.m_var_desc.Name] = j;
 		}

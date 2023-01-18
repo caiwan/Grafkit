@@ -2,7 +2,7 @@
 
 #include "ResourceBuilder.h"
 
-#include "easyloggingpp.h"
+// #include "logger.h"
 #include "exceptions.h"
 
 using FWdebug::Exception;

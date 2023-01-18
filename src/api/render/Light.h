@@ -6,8 +6,6 @@
 #include "renderer.h"
 #include "shader.h"
 
-#include "../core/resource.h"
-
 ///@todo minden cuccot egy namespace-be kellene bedobni; 
 ///@todo valahogy a materialba kellene belejatszani mindezt
 ///@todo aligned new-t mindenre
@@ -19,7 +17,7 @@ namespace Grafkit{
 	typedef Ref<BaseLight> LightRef; 
 
 	//__declspec(align(16)) class BaseLight : public Grafkit::IResource, public AlignedNew<BaseLight>
-	class BaseLight : public Grafkit::IResource 
+	class BaseLight
 	{
 	public:
 		BaseLight();
