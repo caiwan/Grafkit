@@ -104,7 +104,7 @@ namespace Grafkit {
 		void Initialize(Renderer &render, ShaderRef shader);
 		void Shutdown();
 
-		void BindOutputs(Renderer &render);
+		size_t BindOutputs(Renderer &render);
 		void Render(Renderer &render);
 
 		ShaderRef GetShader() { return m_shader; }

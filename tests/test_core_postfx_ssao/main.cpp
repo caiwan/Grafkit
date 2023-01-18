@@ -129,7 +129,7 @@ protected:
 			m_postfx->Initialize(render);
 
 			ShaderRef ssao_shader = new Shader();
-			ssao_shader->LoadFromFile(render, "TexturePixelShader", L"./ssao.hlsl", ST_Pixel);
+			ssao_shader->LoadFromFile(render, "agnosztikusPanda", L"./ssao.hlsl", ST_Pixel);
 	
 			m_postfx->AddPass(new EffectPass()); m_postfx[0]->Initialize(render, ssao_shader);
 			
@@ -139,8 +139,6 @@ protected:
 
 			m_postfx[0]->SetInput("normals", tx_normals); m_postfx->SetInput(1, tx_normals);
 			m_postfx[0]->SetInput("position", tx_position); m_postfx->SetInput(2, tx_position);
-
-
 
 			// --- 
 

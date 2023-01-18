@@ -65,7 +65,8 @@ namespace Grafkit {
 		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
 		void SetSurface(int screenW, int screenH);
 
-		void SetRenderTargetViewCount(size_t n = 0) { m_renderTargetViewCount = n < RENDER_TARGET_MAX ? n: RENDER_TARGET_MAX; }
+		// void SetRenderTargetViewCount(size_t n = 0) { m_renderTargetViewCount = n < RENDER_TARGET_MAX ? n: RENDER_TARGET_MAX; }
+		void ApplyRenderTargetView(size_t count = 1);
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
 
 		// --- getters

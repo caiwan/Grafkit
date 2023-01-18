@@ -92,13 +92,17 @@ void Grafkit::EffectComposer::Shutdown()
 // ---------------------------------------------------------------------------------------------------
 void Grafkit::EffectComposer::BindInput(Renderer & render)
 {
+	size_t count = 1;
 	render.SetRenderTargetView(m_pTexRead->GetRenderTargetView(), 0);
 
 	for (auto it = m_input_map.begin(); it != m_input_map.end(); it++) {
 		if (it->second.Valid()) {
 			it->second->SetRenderTargetView(render, it->first);
+			count++;
 		}
 	}
+
+	render.ApplyRenderTargetView(count);
 }
 
 // ---------------------------------------------------------------------------------------------------
@@ -134,6 +138,7 @@ void Grafkit::EffectComposer::RenderChain(Renderer & render)
 	{
 		EffectPass *fx = m_effectChain[i].Get();
 		this->m_pTexWrite->SetRenderTargetView(render);
+		render.ApplyRenderTargetView(1);
 		render.BeginScene();
 		{
 			if (fx && fx->GetShader().Valid()) {
@@ -154,11 +159,13 @@ void Grafkit::EffectComposer::Flush(Renderer & render)
 {
 	// present the result 
 	render.SetRenderTargetView();
+	//render.ApplyRenderTargetView(1);
 	render.BeginScene();
 
 	m_shaderFullscreenQuad->Render(render);
-	m_shaderCopyScreen->Render(render);
+
 	m_shaderCopyScreen->GetBRes("effectInput") = m_pTexRead->GetTextureResource();
+	m_shaderCopyScreen->Render(render);
 
 	m_fullscreenquad->RenderMesh(render);
 
@@ -191,13 +198,16 @@ void Grafkit::EffectPass::Shutdown()
 
 // ---------------------------------------------------------------------------------------------------
 
-void Grafkit::EffectPass::BindOutputs(Renderer &render)
+size_t Grafkit::EffectPass::BindOutputs(Renderer &render)
 {
+	size_t count = 0;
 	for (auto it = m_output_map.begin(); it != m_output_map.end(); it++) {
 		if (it->second.Valid()) {
 			it->second->SetRenderTargetView(render, it->first);
+			count++;
 		}
 	}
+	return count;
 }
 
 void Grafkit::EffectPass::Render(Renderer & render)
