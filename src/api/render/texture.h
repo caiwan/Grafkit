@@ -39,7 +39,7 @@ namespace Grafkit
 		friend class TextureResRef;
 	public:
 		TextureRes() : IResource() {}
-		~TextureRes() {}
+		~TextureRes() {} ///@todo nem artana tudni, hogyan mukodnek a destruktorok ilyen extem korulmenyek kozott
 
 		virtual const char* GetBucketID() { return TEXTURE_BUCKET; }
 	};
