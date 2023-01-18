@@ -13,8 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="BuiltInData">
-      <UniqueIdentifier>{531e785a-b5d6-4267-86b3-6d582afc4556}</UniqueIdentifier>
+    <Filter Include="libimgui">
+      <UniqueIdentifier>{383f7c33-9d3c-499b-9464-a3679358d0fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libimgui\platform">
+      <UniqueIdentifier>{aa4c78b8-abaf-4cc0-af77-015d2cc342c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -26,5 +29,43 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\tools\imgui\imgui.cpp">
+      <Filter>libimgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tools\imgui\imgui_demo.cpp">
+      <Filter>libimgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\tools\imgui\imgui_draw.cpp">
+      <Filter>libimgui</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\imgui_impl_dx11.cpp">
+      <Filter>libimgui\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\gk_imgui_app.cpp">
+      <Filter>libimgui\platform</Filter>
+    </ClCompile>
+    <ClCompile Include="application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\tools\imgui\imconfig.h">
+      <Filter>libimgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tools\imgui\imgui.h">
+      <Filter>libimgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\tools\imgui\imgui_internal.h">
+      <Filter>libimgui</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\imgui_impl_dx11.h">
+      <Filter>libimgui\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\gk_imgui_app.h">
+      <Filter>libimgui\platform</Filter>
+    </ClInclude>
+    <ClInclude Include="application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
