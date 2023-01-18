@@ -92,7 +92,6 @@ public:
 				render.GetWorldMatrix(worldMatrix);
 				camera->GetViewMatrix(viewMatrix);
 				camera->GetProjectionMatrix(projectionMatrix);
-				//render.GetProjectionMatrix(projectionMatrix);
 
 				model->Render(render.GetDeviceContext());
 
