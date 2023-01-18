@@ -89,7 +89,7 @@
     <ClCompile Include="core\renderassets.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="core\asset.cpp">
+    <ClCompile Include="core\assets.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="generator\assimploader.cpp">
@@ -163,7 +163,7 @@
     <ClInclude Include="core\renderassets.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="core\asset.h">
+    <ClInclude Include="core\assets.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="generator\assimploader.h">
