@@ -1,4 +1,4 @@
-namespace FWBuiltInData{
+namespace GrafkitData{
 	extern const float * const triangle;
 	extern const unsigned short * const triangleIndices;
 	extern const unsigned short triangleIndicesLen;
