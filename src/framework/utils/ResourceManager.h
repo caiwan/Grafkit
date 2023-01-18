@@ -65,8 +65,8 @@ namespace Grafkit {
         std::map<std::string, std::string> m_pathMap;
         //std::map<std::string, Ref<IResource>> m_nameMap;
         std::map<std::string, Ref<IResource>> m_uuidMap;
-        std::map<std::string, IResourceBuilder*> m_builders;
-        std::map<std::string, std::pair<std::string, IResourceBuilder*>> m_filenamesToBuilder;
+        std::map<std::string, Ref<IResourceBuilder>> m_builders;
+        std::map<std::string, std::pair<std::string, Ref<IResourceBuilder>>> m_filenamesToBuilder;
 
         IPreloadEvents* m_preloadEvents;
     };
@@ -101,7 +101,6 @@ namespace Grafkit {
     template<class T>
     Ref<T> IResourceManager::Load(IResourceBuilder* builder) {
         Load(builder);
-        //T* res = GetByName<T>(builder->GetName());
         T* res = GetByUuid<T>(builder->GetUuid());
         return res;
     }

@@ -235,7 +235,6 @@ TEST_F(ContextPregnancyTest, SceneCameraTest)
     size_t actorCount = scene->GetCameraCount();
     ASSERT_EQ(2, actorCount);
 
-    for (size_t i = 0; i < actorCount; i++) { ASSERT_TRUE(scene->GetCamera(i)) << "Light Node " << i; }
+    for (size_t i = 0; i < actorCount; i++) { ASSERT_TRUE(scene->GetCamera(i)) << "Camera Node " << i; }
 
 }
-

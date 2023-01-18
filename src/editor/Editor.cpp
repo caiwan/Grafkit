@@ -101,7 +101,10 @@ bool Editor::RenderFrame()
     float time = m_musicProxy->GetTime();
 
     if (demo)
+    {
+        demo->PreRender(m_render, time);
         demo->Render(m_render, time);
+    }
 
     if (m_musicProxy->IsPlaying())
         onDemoTimeChanged(time);

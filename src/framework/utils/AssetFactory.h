@@ -42,7 +42,7 @@ namespace Grafkit {
 		virtual ~IAssetFactory() {}
 
 		virtual bool PollEvents(IResourceManager *resman) { return false; }
-	    virtual void SetBasePath(const std::string& path) = 0;
+        virtual void SetBasePath(const std::string& path) = 0;
 
 		typedef std::list<std::string> filelist_t;
 

@@ -14,7 +14,7 @@ namespace Idogep {
 
 	class AssetFactoryProxy : public Grafkit::IAssetFactory {
 	public:
-		AssetFactoryProxy(IAssetFactory * const & parentFactory);
+	    explicit AssetFactoryProxy(IAssetFactory * const & parentFactory);
 
 	    bool PollEvents(Grafkit::IResourceManager *resman) override { return m_parentFactory->PollEvents(resman); }
 
@@ -35,8 +35,8 @@ namespace Idogep {
 	public:
 		QResourceAsset(QByteArray &data) : IAsset(), m_data(data) {}
 
-	    void* GetData() override { return m_data.data(); }
-	    size_t GetSize() override { return m_data.size(); }
+	    void* GetData() const override { return (void*)m_data.data(); }
+	    size_t GetSize() const override { return m_data.size(); }
 
 	private:
 		QByteArray m_data;

@@ -238,11 +238,10 @@ IAssetRef FileAssetFactory::Get(std::string name)
 	FILE* fp = nullptr;
 
 	std::string fullname = m_root + name;
-	fopen_s(&fp, fullname.c_str(), "rb");
-
+	
 	LOGGER(Log::Logger().Info("Accessing file %s", fullname.c_str()));
-
-	if (!fp) {
+    if (0!= fopen_s(&fp, fullname.c_str(), "rb"))
+    {
 		THROW_EX_DETAILS(AssetLoadException, fullname.c_str());
 	}
 
@@ -265,7 +264,7 @@ IAssetFactory::filelist_t FileAssetFactory::GetAssetList()
 IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter * filter)
 {
 	filelist_t filelist;
-	for (filelist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); it++)
+	for (filelist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
 	{
 		if (filter->IsFileInfilter(*it))
 			filelist.push_back(*it);

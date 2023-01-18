@@ -1,29 +1,30 @@
 #pragma once 
-#include <map>
-#include <vector>
-
-#include "utils/exceptions.h"
-
-#include "utils/persistence/persistence.h"
-
-#include "utils/asset.h"
 #include "utils/resource.h"
 #include "utils/ResourceBuilder.h"
-
-
 namespace Grafkit
 {
 
-    class ActorAnimationLoader : public IResourceBuilder
+    class IAnimationLoader : public IResourceBuilder
     {
     public:
-        explicit ActorAnimationLoader(std::string name, std::string sourcename = "", std::string uuid = "")
-            : IResourceBuilder(name, sourcename, uuid) {
+        explicit IAnimationLoader(std::string name, std::string sourcename = "", std::string uuid = "", std::string targetUuid = "")
+            : IResourceBuilder(name, sourcename, uuid), m_target(targetUuid) {
         }
+    protected:
+        std::string m_target;
+    };
+
+    class ActorAnimationLoader : public IAnimationLoader
+    {
+    public:
+        explicit ActorAnimationLoader(std::string name, std::string sourcename = "", std::string uuid = "", std::string targetUuid = "");
 
         IResource* NewResource() override;
         void Load(IResourceManager* const& resman, IResource* source) override;
+
     };
+
+
 
 }
 

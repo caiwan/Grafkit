@@ -2,42 +2,62 @@
 #define __ARCHIVE_H_
 
 #include "persistence.h"
+#include "utils/asset.h"
 
-namespace Grafkit{ 
+namespace Grafkit {
 
-	/**
-		Fileba ment/filebol tolt.
-	*/
-	class ArchiveFile: public Archive
-	{
-		public:
-			ArchiveFile(FILE* stream, bool IsStoring = false);
-			virtual ~ArchiveFile();
+    /**
+        Fileba ment/filebol tolt.
+    */
+    class ArchiveFile : public Archive
+    {
+    public:
+        explicit ArchiveFile(FILE* stream, bool IsStoring = false);
+        virtual ~ArchiveFile();
 
-	    void Write(const void *buffer, size_t length) override;
-	    void Read (void* buffer, size_t length) override;
-	private:
-		FILE * _stream;
-	};
+        void Write(const void *buffer, size_t length) override;
+        void Read(void* buffer, size_t length) override;
+    private:
+        FILE * m_stream;
+    };
 
-	/*
-		Memoriabol tolt be. Csak olvashato.
-	*/
-	class ArchiveMemory : public Archive
-	{
+    /*
+        Memoriabol tolt be. Csak olvashato.
+    */
+    class ArchiveMemory : public Archive
+    {
 
-	public:
-		ArchiveMemory(BYTE* data, size_t length, bool IsStoring = false);
-		virtual ~ArchiveMemory();
+    public:
+        ArchiveMemory(BYTE* data, size_t length, bool IsStoring = false);
+        virtual ~ArchiveMemory();
 
-	    void Write(const void *buffer, size_t length) override {}
-	    void Read(void* buffer, size_t length) override;
+        void Write(const void *buffer, size_t length) override;
+        void Read(void* buffer, size_t length) override;
 
-	private:
-		BYTE* m_data;
-		size_t m_length, m_cursor;
-	};
+    private:
+        BYTE * m_data;
+        size_t m_length, m_cursor;
+    };
 
+    /**
+     * Takes an asset as an archive source
+     */
+    class ArchiveAsset : public Archive
+    {
+    public:
+        explicit ArchiveAsset(const IAssetRef& asset);
+
+    protected:
+        void Write(const void* buffer, size_t length) override;
+        void Read(void* buffer, size_t length) override;
+
+    private:
+        IAssetRef m_asset;
+            
+        size_t m_cursor;
+
+
+    };
 
 };
 

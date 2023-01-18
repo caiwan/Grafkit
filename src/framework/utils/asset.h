@@ -14,8 +14,8 @@ namespace Grafkit {
 		IAsset() {}
 		virtual ~IAsset() {}
 
-		virtual void* GetData() = 0;
-		virtual size_t GetSize() = 0;
+		virtual void* GetData() const = 0;
+		virtual size_t GetSize() const = 0;
 	};
 
 	// ----------

@@ -11,7 +11,6 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-
 // ----------------------------------------------------------------------------
 
 Scene::Scene() : HasSceneGraphRole()
@@ -86,7 +85,7 @@ void Scene::UpdateScene(Renderer& render, float time)
     UpdateAnimations(time);
     UpdateScenegraph();
     UpdateCamera(render);
-    UpdateLights();
+    UpdateLights(render);
 }
 
 void Scene::Build(Renderer& render) { BuildSceneGraph(render); }

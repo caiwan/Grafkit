@@ -1,5 +1,6 @@
 {
   "demo": {
+    "uuid": "acec776b-d2ce-45ac-b082-f7072c46c38f",
     "music": {
       "filename": "alpha_c_-_euh.ogg"
     },
@@ -81,9 +82,9 @@
     ],
     "animations": [
       {
-        "name": "",
-        "uuid": "",
-        "type": "actor",
+        "name": "DemoAnimation",
+        "uuid": "4f545fcf-9713-4055-841b-e0b2415a125b",
+        "type": "demo",
         "target": ""
       }
     ]

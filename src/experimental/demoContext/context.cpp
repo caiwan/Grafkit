@@ -62,13 +62,16 @@ void Context::SaveScema() {
 }
 
 void Context::LoadScema() {
-    SchemaBuilder builder;
-    builder.LoadFromAsset(m_assetFactory->Get("/schema.json"), this);
-    m_demo = builder.GetDemo();
+    m_builder.LoadFromAsset(m_assetFactory->Get("/schema.json"), this);
+    m_demo = m_builder.GetDemo();
     assert(m_demo);
 }
 
-void Context::Intitialize() { m_demo->Initialize(m_render); }
+void Context::Intitialize()
+{
+    IResourceManager *const & resman = this;
+    m_builder.Initialize(resman); m_demo->Initialize(m_render);
+}
 
 void Context::CreateTestStuff()
 {
@@ -82,6 +85,9 @@ void Context::CreateTestStuff()
     demo->SetMusic(music);
     demo->SetPs(ps);
     demo->SetVs(vs);
+
+    demo->AddAnimation(new DemoAnimation());
+    demo->GetAnimation(0)->Initialize();
 
     // -- model 
     ModelRef model = new Model(new Mesh());

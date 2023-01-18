@@ -11,9 +11,9 @@ using namespace Grafkit;
 
 ArchiveFile::ArchiveFile(FILE* stream, bool IsStoring) : 
 	Archive(IsStoring), 
-	_stream(stream)
+	m_stream(stream)
 {
-	if(!_stream) THROW_EX(NullPointerException);
+	if(!m_stream) THROW_EX(NullPointerException);
 }
 
 ArchiveFile::~ArchiveFile() {
@@ -22,36 +22,34 @@ ArchiveFile::~ArchiveFile() {
 
 void ArchiveFile::Write(const void* buffer, size_t length)
 {
-	if(!_stream) THROW_EX(NullPointerException);
-	
-	//Log::Logger().Debug("Write bytes %d at pos %d", length, ftell(_stream));
-
-	fwrite(buffer, length, 1, this->_stream);
+	if(!m_stream) THROW_EX(NullPointerException);
+	fwrite(buffer, length, 1, this->m_stream);
 }
 
 void ArchiveFile::Read(void* buffer, size_t length)
 {
-	if(!_stream) THROW_EX(NullPointerException);
-
-	//Log::Logger().Debug("Read bytes %d at pos %d", length, ftell(_stream));
-
-	fread(buffer, length, 1, this->_stream);
+	if(!m_stream) THROW_EX(NullPointerException);
+	fread(buffer, length, 1, this->m_stream);
 }
 
 /* 
-
+ * 
 */
 
-Grafkit::ArchiveMemory::ArchiveMemory(BYTE * data, size_t length, bool IsStoring) :
+ArchiveMemory::ArchiveMemory(BYTE * data, size_t length, bool IsStoring) :
 	m_data(data), m_length(length), m_cursor(0)
 {
 }
 
-Grafkit::ArchiveMemory::~ArchiveMemory()
+ArchiveMemory::~ArchiveMemory()
 {
 }
 
-void Grafkit::ArchiveMemory::Read(void * buffer, size_t length)
+void ArchiveMemory::Write(const void* buffer, size_t length) {
+    THROW_EX_DETAILS(NotImplementedMethodException, "");
+}
+
+void ArchiveMemory::Read(void * buffer, size_t length)
 {
 	if (length + m_cursor > m_length) {
 #ifdef _DEBUG
@@ -59,8 +57,30 @@ void Grafkit::ArchiveMemory::Read(void * buffer, size_t length)
 #endif
 		THROW_EX(OutOfBoundsException);
 	}
-	//Log::Logger().Debug("Read bytes %d at pos %d", length, m_cursor);
-
 	memcpy_s(buffer, length, &m_data[m_cursor], length);
 	m_cursor += length;
+}
+
+/*
+ *
+*/
+
+ArchiveAsset::ArchiveAsset(const IAssetRef& asset): Archive(false),
+m_asset(asset), m_cursor(0) {
+}
+
+void ArchiveAsset::Write(const void* buffer, size_t length) {
+    THROW_EX(NotImplementedMethodException);
+}
+
+void ArchiveAsset::Read(void* buffer, size_t length) {
+    if (length + m_cursor > m_asset->GetSize()) {
+#ifdef _DEBUG
+        DebugBreak();
+#endif
+        THROW_EX(OutOfBoundsException);
+    }
+    uint8_t* data = static_cast<uint8_t*>(m_asset->GetData());
+    memcpy_s(buffer, length, &data[m_cursor], length);
+    m_cursor += length;
 }

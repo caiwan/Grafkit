@@ -177,21 +177,11 @@ namespace Grafkit
 
     protected:
 
-        void InitializeLights() { m_lights = new EntityContainer(); }
+        inline void InitializeLights();
 
-        void ShutdownLights()
-        {
-            if (m_lights)
-            {
-                delete m_lights;
-                m_lights = nullptr;
-            }
-        }
-
-        void UpdateLights()
-        {
-            assert(0);
-        }
+        inline void ShutdownLights();
+        inline void UpdateLight(Renderer& render, size_t id);
+        inline void UpdateLights(Renderer& render);
 
         EntityContainer* m_lights;
     };
@@ -260,5 +250,6 @@ namespace Grafkit
 #include "EntityContainer.inl"
 
 #include "hasScenegraphRole.inl"
+#include "hasLightsRole.inl"
 #include "hasAnimationsRole.inl"
 #include "hasCamerasRole.inl"

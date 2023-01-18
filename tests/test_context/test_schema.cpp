@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "utils/AssetFile.h"
+#include "utils/ResourceManager.h"
+
 #include "demo.h"
 #include "context.h"
 #include "schema.h"
@@ -16,7 +18,9 @@
 #include "render/light.h"
 
 #include "core/Music.h"
-#include <iso646.h>
+#include "core/system.h"
+
+#include "animation/actoranimation.h"
 
 // --- 
 
@@ -25,18 +29,51 @@ using namespace Grafkit;
 
 #define JSON_PATH "schema.json"
 
+// --- 
+
+namespace NSSchemaTest
+{
+    class TestApplicationWindow : public System
+    {
+    public:
+        explicit TestApplicationWindow(Renderer& render) : m_render(render)
+        {
+            InitializeWindows(320, 240);
+            m_render.Initialize(m_window.getRealWidth(), m_window.getRealHeight(), true, this->m_window.getHWnd(), false);
+        }
+
+        ~TestApplicationWindow() { ShutdownWindows(); }
+
+        int init() override { return 0; }
+
+        int mainloop() override { return 0; }
+
+        void release() override {
+        }
+
+    private:
+        Renderer & m_render;
+    };
+}
+
+using namespace NSSchemaTest;
+
+
 class SchemaTest : public testing::Test
 {
 public:
     SchemaTest() : m_context(nullptr)
+        , m_window(nullptr)
         , m_assetFactory(nullptr)
     {
+        m_window = new TestApplicationWindow(m_render);
         m_assetFactory = new FileAssetFactory("tests/assets/");
     }
 
     ~SchemaTest()
     {
         delete m_assetFactory;
+        delete m_window;
     }
 
     void SetUp() override { m_context = new Context(m_render, m_assetFactory); }
@@ -50,8 +87,15 @@ public:
         try
         {
             SchemaBuilder builder;
-            builder.LoadFromAsset(m_assetFactory->Get(JSON_PATH), dynamic_cast<IResourceManager*>(m_context));
+
+            // shit
+            IResourceManager* resman = dynamic_cast<IResourceManager*>(m_context);
+
+            builder.LoadFromAsset(m_assetFactory->Get(JSON_PATH), resman);
+            m_context->DoPrecalc();
             m_demo = builder.GetDemo();
+            builder.Initialize(resman);
+            m_demo->Initialize(m_render);
         }
         catch (std::exception& e)
         {
@@ -86,12 +130,12 @@ public:
 protected:
     Ref<Demo> m_demo;
     Context* m_context;
+    TestApplicationWindow *m_window;
     Renderer m_render;
     IAssetFactory* m_assetFactory;
 };
 
 // ============================================================================================
-
 
 TEST_F(SchemaTest, JsonLoad)
 {
@@ -108,7 +152,6 @@ TEST_F(SchemaTest, JsonLoad)
 }
 
 // ============================================================================================
-
 
 namespace Uuids
 {
@@ -242,7 +285,6 @@ namespace Uuids
     const char* lightActorUuid = "f95ceb23-3144-4522-8275-8c1433f50595";
     const char* cubeActorUuid = "3bd7e8db-e851-4db2-b333-16e0b3f66019";
 }
-
 
 TEST_F(SchemaTest, ActorMeshTest)
 {
@@ -434,6 +476,8 @@ namespace Uuids
     const char* lightActorAnimationUuid = "19ff02df-04d5-49a4-a091-bd92f185316b";
     const char* cubeActorAnimationUuid = "353732c5-de20-4180-831c-481b0d3caa460";
 
+    const char * demoAnimationUuid = "4f545fcf-9713-4055-841b-e0b2415a125b";
+
 }
 
 
@@ -450,12 +494,12 @@ TEST_F(SchemaTest, ActorAnimations)
     ActorRef lightActor = SafeGetObject<Actor>(Uuids::lightActorUuid);
     ActorRef cubeActor = SafeGetObject<Actor>(Uuids::cubeActorUuid);
 
-    AnimationRef rootActorAnimation = SafeGetObject<Animation>(Uuids::rootActorAnimationUuid);
-    AnimationRef cameraActorAnimation = SafeGetObject<Animation>(Uuids::cameraActorAnimationUuid);
-    AnimationRef camera1ActorAnimation = SafeGetObject<Animation>(Uuids::camera1ActorAnimationUuid);
-    AnimationRef camera2ActorAnimation = SafeGetObject<Animation>(Uuids::camera2ActorAnimationUuid);
-    AnimationRef lightActorAnimation = SafeGetObject<Animation>(Uuids::lightActorAnimationUuid);
-    AnimationRef cubeActorAnimation = SafeGetObject<Animation>(Uuids::cubeActorAnimationUuid);
+    ActorAnimationResRef rootActorAnimation = SafeGetResource<ActorAnimation>(Uuids::rootActorAnimationUuid);
+    ActorAnimationResRef cameraActorAnimation = SafeGetResource<ActorAnimation>(Uuids::cameraActorAnimationUuid);
+    ActorAnimationResRef camera1ActorAnimation = SafeGetResource<ActorAnimation>(Uuids::camera1ActorAnimationUuid);
+    ActorAnimationResRef camera2ActorAnimation = SafeGetResource<ActorAnimation>(Uuids::camera2ActorAnimationUuid);
+    ActorAnimationResRef lightActorAnimation = SafeGetResource<ActorAnimation>(Uuids::lightActorAnimationUuid);
+    ActorAnimationResRef cubeActorAnimation = SafeGetResource<ActorAnimation>(Uuids::cubeActorAnimationUuid);
 
     // then
     ASSERT_TRUE(rootActor);
@@ -472,4 +516,29 @@ TEST_F(SchemaTest, ActorAnimations)
     ASSERT_TRUE(lightActorAnimation);
     ASSERT_TRUE(cubeActorAnimation);
 
+    ASSERT_EQ((*rootActorAnimation)->GetActor().Get(), rootActor.Get());
+    ASSERT_EQ((*cameraActorAnimation)->GetActor().Get(), cameraActor.Get());
+    ASSERT_EQ((*camera1ActorAnimation)->GetActor().Get(), camera1Actor.Get());
+    ASSERT_EQ((*camera2ActorAnimation)->GetActor().Get(), camera2Actor.Get());
+    ASSERT_EQ((*lightActorAnimation)->GetActor().Get(), lightActor.Get());
+    ASSERT_EQ((*cubeActorAnimation)->GetActor().Get(), cubeActor.Get());
+
+}
+
+
+TEST_F(SchemaTest, DemoAnimation)
+{
+    // given
+    BuildDemo();
+
+    // when
+    Ref<Resource<DemoAnimation>> demoAnimation = SafeGetResource<DemoAnimation>(Uuids::demoAnimationUuid);
+
+    // then
+
+    ASSERT_TRUE(demoAnimation);
+    ASSERT_TRUE(*demoAnimation);
+
+    ASSERT_EQ(1, m_demo->GetAnimationCount());
+    ASSERT_EQ((*demoAnimation).Get(), m_demo->GetAnimation(0).Get());
 }

@@ -41,7 +41,7 @@ uint64_t Idogep::MusicProxy::GetSampleCountPerSec()
 {
 	if (HasMusic())
 		return (*m_music)->GetSampleCountPerSec();
-	return 0;
+	return 1;
 }
 
 uint64_t Idogep::MusicProxy::GetTimeSample()

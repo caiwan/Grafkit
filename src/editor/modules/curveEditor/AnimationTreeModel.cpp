@@ -1,3 +1,5 @@
+#include<QDebug>
+
 #include "AnimationTreeModel.h"
 #include "models/Curve.h"
 
@@ -27,6 +29,9 @@ void AnimationTreeModel::Build(TreeItem* parentItem)
         return;
 
     AnimationRef animation = m_animation->GetAnimation();
+
+    qDebug() << "Animation add AnimationItem " << QString::fromStdString(animation->GetName()) << " Ptr:" << animation.Get();
+
     for (size_t i = 0; i < animation->GetTrackCount(); i++)
     {
         Ref<Animation::Track> track = animation->GetTrack(i);

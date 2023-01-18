@@ -1,4 +1,5 @@
 #include "OutlineItems.h"
+#include <QDebug>
 
 #include "curve.h"
 #include "property.h"
@@ -17,7 +18,11 @@ ItemHasAnimationsRole::~ItemHasAnimationsRole()
 {
 }
 
-void ItemHasAnimationsRole::SetAnimation(AnimationWrapperRef animation) { m_animation = animation; }
+void ItemHasAnimationsRole::SetAnimation(AnimationWrapperRef animation)
+{
+    qDebug() << "Animation set OutlineItem " << QString::fromStdString(animation->GetAnimation()->GetName()) << " Ptr:" << animation->GetAnimation().Get();
+    m_animation = animation;
+}
 
 AnimationWrapperRef ItemHasAnimationsRole::GetAnimation() const { return m_animation; }
 

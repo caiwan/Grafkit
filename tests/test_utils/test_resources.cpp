@@ -1,5 +1,5 @@
 /**
-	Unittest for resource management system 
+    Unittest for resource management system
 */
 
 #include "stdafx.h"
@@ -12,115 +12,119 @@
 class ResourceManagerTest : public testing::Test {
 
 public:
-	void SetUp() override {
-	}
+    void SetUp() override {
+    }
 
     void TearDown() override {
-	}   
+    }
 };
 
 
 TEST_F(ResourceManagerTest, TestAssignment) {
-	ThingResourceRef resource = new ThingResource();
+    ThingResourceRef resource = new ThingResource();
 
-	resource->AssingnRef(new Thing());
+    resource->AssingnRef(new Thing());
 
-	ASSERT_TRUE(resource.Valid() && resource->Valid());
+    ASSERT_TRUE(resource.Valid() && resource->Valid());
 }
 
 TEST_F(ResourceManagerTest, TestAddAndGet) {
-	MyResourceManager *resman = new MyResourceManager();
+    MyResourceManager *resman = new MyResourceManager();
 
-	ThingResourceRef resource = new ThingResource();
-	ThingRef thing = new Thing();
-	resource->AssingnRef(thing);
+    ThingResourceRef resource = new ThingResource();
+    ThingRef thing = new Thing();
+    resource->AssingnRef(thing);
 
-	resource->SetUuid("theThing");
+    resource->SetUuid("theThing");
 
-	ASSERT_TRUE(resource.Valid() && resource->Valid());
-    
-	resman->Add(resource);
+    ASSERT_TRUE(resource.Valid() && resource->Valid());
 
-	ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
+    resman->Add(resource);
 
-	ASSERT_TRUE(retresource.Valid() && retresource->Valid());
+    ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
 
-	ASSERT_TRUE(retresource->Get() == thing);
+    ASSERT_TRUE(retresource.Valid() && retresource->Valid());
 
-	delete resman;
+    ASSERT_TRUE(retresource->Get() == thing);
+
+    delete resman;
 }
 
 TEST_F(ResourceManagerTest, TestReplace) {
-	MyResourceManager *resman = new MyResourceManager();
+    MyResourceManager *resman = new MyResourceManager();
 
-	ThingResourceRef resource = new ThingResource();
-	resource->AssingnRef(new Thing());
+    ThingResourceRef resource = new ThingResource();
+    resource->AssingnRef(new Thing());
 
-	resource->SetUuid("theThing");
+    resource->SetUuid("theThing");
 
-	resman->Add(resource);
+    resman->Add(resource);
 
-	ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
-	ASSERT_TRUE(retresource.Valid() && retresource->Valid());
+    ThingResourceRef retresource = resman->GetByUuid<ThingResource>("theThing");
+    ASSERT_TRUE(retresource.Valid() && retresource->Valid());
 
-	ThingRef newThing = new Thing();
-	retresource->AssingnRef(newThing);
+    ThingRef newThing = new Thing();
+    retresource->AssingnRef(newThing);
 
-	ASSERT_TRUE(retresource->Get() == newThing);
-	ASSERT_TRUE(resource->Get() == newThing);
+    ASSERT_TRUE(retresource->Get() == newThing);
+    ASSERT_TRUE(resource->Get() == newThing);
 
-	delete resman;
+    delete resman;
 }
 
 
-TEST_F(ResourceManagerTest, TestRemove ) {
-	MyResourceManager *resman = new MyResourceManager();
+TEST_F(ResourceManagerTest, TestRemove) {
+    MyResourceManager *resman = new MyResourceManager();
 
-	ThingResourceRef resource = new ThingResource();
-	resource->AssingnRef(new Thing());
+    ThingResourceRef resource = new ThingResource();
+    resource->AssingnRef(new Thing());
 
-	resource->SetUuid("theThing");
+    resource->SetUuid("theThing");
 
-	ASSERT_TRUE(resource.Valid() && resource->Valid());
+    ASSERT_TRUE(resource.Valid() && resource->Valid());
 
-	resman->Add(resource);
+    resman->Add(resource);
 
-	ThingResourceRef retresource;
-	
-	retresource = resman->GetByUuid<ThingResource>("theThing");
-	ASSERT_TRUE(retresource.Valid() && retresource->Valid());
+    ThingResourceRef retresource;
 
-	resman->RemoveByUuid("theThing");
+    retresource = resman->GetByUuid<ThingResource>("theThing");
+    ASSERT_TRUE(retresource.Valid() && retresource->Valid());
 
-	retresource = resman->GetByUuid<ThingResource>("theThing");
-	ASSERT_TRUE(retresource.Invalid());
+    resman->RemoveByUuid("theThing");
 
-	delete resman;
+    retresource = resman->GetByUuid<ThingResource>("theThing");
+    ASSERT_TRUE(retresource.Invalid());
+
+    delete resman;
 }
 
 TEST_F(ResourceManagerTest, TestLoad) {
-	ThingResourceRef resource;
-	MyResourceManager *resman = new MyResourceManager();
+    // given 
+    ThingResourceRef resource;
+    MyResourceManager *resman = new MyResourceManager();
 
-	resman->Load(new ThingLoader("theLoadedThing"));
 
-	resource = resman->GetByUuid<ThingResource>("theLoadedThing");
+    resman->Load(new ThingLoader("theLoadedThing"));
 
-	ASSERT_TRUE(resource.Valid());
-	ASSERT_TRUE(resource->Invalid());
+    resource = resman->GetByUuid<ThingResource>("theLoadedThing");
 
-	resman->DoPrecalc();
+    ASSERT_TRUE(resource.Valid());
+    ASSERT_TRUE(resource->Invalid());
 
-	// it has to be updated without refresh
-	ASSERT_TRUE(resource.Valid());
-	ASSERT_TRUE(resource->Valid());
+    // when
+    resman->DoPrecalc();
 
-	resource = resman->GetByUuid<ThingResource>("theLoadedThing");
+    // then
+    // it has to be updated without refresh
+    ASSERT_TRUE(resource.Valid());
+    ASSERT_TRUE(resource->Valid());
 
-	ASSERT_TRUE(resource.Valid());
-	ASSERT_TRUE(resource->Valid());
+    resource = resman->GetByUuid<ThingResource>("theLoadedThing");
 
-	delete resman;
+    ASSERT_TRUE(resource.Valid());
+    ASSERT_TRUE(resource->Valid());
+
+    delete resman;
 }
 
 
@@ -135,6 +139,33 @@ TEST_F(ResourceManagerTest, TestCasting) {
 
     // then
     ASSERT_FALSE(resource.Valid());
- 
+
     delete resman;
+}
+
+TEST_F(ResourceManagerTest, ReloadTest) {
+    // given
+    MyResourceManager *resman = new MyResourceManager();
+    ThingResourceRef resource = resman->Load<ThingResource>(new ThingLoader("theLoadedThing"));
+
+    ASSERT_TRUE(resource.Valid());
+    ASSERT_TRUE(resource->Invalid());
+
+    resman->DoPrecalc();
+
+    ASSERT_TRUE(resource->Valid());
+
+    (*resource)->SetAsd(999);
+    (*resource)->SetGlejd(999.);
+
+    //when
+    resman->TriggerReload("theLoadedThing");
+
+    //then
+    ASSERT_TRUE(resource.Valid());
+    ASSERT_TRUE(resource->Valid());
+
+    ASSERT_EQ(0x010101, (*resource)->GetAsd());
+    ASSERT_DOUBLE_EQ(2.16f, (*resource)->GetGlejd());
+
 }

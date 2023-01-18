@@ -45,8 +45,8 @@ void IResourceManager::Add(Ref<IResource> pResource)
         std::string uuid = pResource->GetUuid();
 
         // case sensitive Windows filesystem crap shit
-        std::string name = pResource->GetName();
-        transform(name.begin(), name.end(), name.begin(), tolower);
+        //std::string name = pResource->GetName();
+        //transform(name.begin(), name.end(), name.begin(), tolower);
 
         //m_nameMap[name] = pResource;
         m_uuidMap[uuid] = pResource;
@@ -150,11 +150,11 @@ void IResourceManager::DoPrecalc()
 
 void IResourceManager::ClearLoadStack()
 {
-    for (auto it = m_builders.begin(); it != m_builders.end(); ++it)
-    {
-        IResourceBuilder* builder = it->second;
-        if (builder) { delete builder; }
-    }
+    //for (auto it = m_builders.begin(); it != m_builders.end(); ++it)
+    //{
+    //    IResourceBuilder* builder = it->second;
+    //    if (builder) { delete builder; }
+    //}
 
     m_builders.clear();
 }

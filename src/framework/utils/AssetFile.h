@@ -24,7 +24,7 @@ namespace Grafkit {
 			return fn;
 		}
 
-		bool HasItems() {
+		bool HasItems() const {
 			return !m_fileReloadList.empty();
 		}
 
@@ -43,7 +43,7 @@ namespace Grafkit {
 	public:
 		class FileAsset;
 
-	    FileAssetFactory(std::string root);
+	    explicit FileAssetFactory(std::string root);
 		~FileAssetFactory();
 
 	    IAssetRef Get(std::string name) override;
@@ -67,8 +67,8 @@ namespace Grafkit {
 		public:
 			FileAsset() : m_size(0), m_data(nullptr) {}
 			~FileAsset();
-		    void* GetData() override { return m_data; }
-		    size_t GetSize() override { return m_size; }
+		    void* GetData() const  override { return m_data; }
+		    size_t GetSize() const override { return m_size; }
 
 		protected:
 			FileAsset(void* data, size_t size) : m_data(data), m_size(size) {}

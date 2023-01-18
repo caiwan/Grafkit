@@ -64,7 +64,7 @@ protected:
         }
     }
 
-    void ValidatChannel(const Animation::ChannelRef &expected, const Animation::ChannelRef actual) const
+    void ValidateChannel(const Animation::ChannelRef &expected, const Animation::ChannelRef actual) const
     {
         ASSERT_TRUE(actual.Valid());
         ASSERT_EQ(expected->GetKeyCount(), actual->GetKeyCount());
@@ -104,7 +104,7 @@ protected:
         {
             Ref<Animation::Channel> expectedChannel = expected->GetChannel(i);
             Ref<Animation::Channel> actualChannel = actual->GetChannel(i);
-            ValidatChannel(expectedChannel, actualChannel);
+            ValidateChannel(expectedChannel, actualChannel);
         }
     }
 
@@ -174,7 +174,7 @@ TEST_F(AnimationPersistenceTest, ChannelTest)
 
     Animation::ChannelRef loadedChannel = Persistent::LoadT<Animation::Channel>(ar);
 
-    ValidatChannel(channel, loadedChannel);
+    ValidateChannel(channel, loadedChannel);
 }
 
 TEST_F(AnimationPersistenceTest, TrackTest)

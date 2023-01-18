@@ -1,9 +1,11 @@
 #pragma once
 #include "utils/ResourcePreloader.h"
 #include "utils/InitializeSerializer.h"
+#include "schema.h"
 
 namespace GkDemo
 {
+    class SchemaBuilder;
     class Demo;
 
     class Context : public Grafkit::ResourcePreloader, Grafkit::ClonableInitializer
@@ -33,6 +35,10 @@ namespace GkDemo
         Demo* m_demo;
 
         Grafkit::IAssetFactory* m_assetFactory;
+
+        SchemaBuilder m_builder;
+        //SchemaExport m_exporter;
+
     };
 
 

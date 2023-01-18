@@ -21,12 +21,14 @@ namespace GkDemo
         Demo();
         ~Demo();
 
-        void Preload(Grafkit::IResourceManager* const & resman);
         void Initialize(Grafkit::Renderer& render);
 
-        int PreRender(Grafkit::Renderer& render, float time) const;
+        int PreRender(Grafkit::Renderer& render, float time);
+        int Render(Grafkit::Renderer& render, float time);
+
+        // --- 
+
         Grafkit::SceneResRef GetActiveScene() const;
-        int Render(Grafkit::Renderer& render, float time) const;
 
         Grafkit::ShaderResRef GetVs() const;
         void SetVs(const Grafkit::ShaderResRef& resource);

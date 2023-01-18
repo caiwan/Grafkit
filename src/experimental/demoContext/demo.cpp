@@ -34,17 +34,11 @@ using namespace GrafkitData;
 Demo::Demo(): m_activeSceneId(0) {
 }
 
-Demo::~Demo() { //(*m_music)->Stop();
-}
-
-void Demo::Preload(IResourceManager* const& resman)
-{
-    assert(0);
+Demo::~Demo() {
 }
 
 void Demo::Initialize(Renderer& render)
 {
-    AddAnimation(new DemoAnimation());
 
     for (size_t i = 0; i < GetSceneCount(); i++)
     {
@@ -55,34 +49,35 @@ void Demo::Initialize(Renderer& render)
             (*scene)->Build(render, m_vs, m_ps);
         }
     }
-
-    for (size_t i = 0; i < GetAnimationCount(); ++i)
-    {
-        AnimationRef animation = GetAnimation(i);
-        animation->Initialize();
-    }
 }
 
 SceneResRef Demo::GetActiveScene() const { return m_scenes.at(m_activeSceneId); }
 
-int Demo::PreRender(Renderer& render, float time) const { return 0; }
+int Demo::PreRender(Renderer& render, float time)
+{
+    UpdateAnimations(time);
+
+    SceneResRef scene = GetActiveScene();
+    if (scene && *scene) { (*scene)->UpdateScene(render, time); }
+
+    return 0;
+}
 
 
-int Demo::Render(Renderer& render, float time) const
+int Demo::Render(Renderer& render, float time)
 {
     // --- 
     render.BeginScene();
 
-    float& t = time;
-
     SceneResRef scene = GetActiveScene();
-    if (scene) { (*scene)->RenderFrame(render, t); }
+    if (scene && *scene) { (*scene)->Render(render); }
 
     render.EndScene();
 
     // ---
     return 0;
 }
+
 
 ShaderResRef Demo::GetPs() const { return m_ps; }
 void Demo::SetPs(const ShaderResRef& resource) { m_ps = resource; }
@@ -96,7 +91,6 @@ void Demo::SetMusic(const MusicResRef& resource) { m_music = resource; }
 void Demo::AddScene(uint32_t id, const SceneResRef& ref)
 {
     if (id >= m_scenes.size()) { fill_n(back_inserter(m_scenes), id - m_scenes.size() + 1, nullptr); }
-
     m_scenes[id] = ref;
 }
 

@@ -9,6 +9,6 @@ using namespace Grafkit;
 IAssetRef IResourceBuilder::GetSourceAsset(IResourceManager * const & assman) const
 {
 	if (assman && assman->GetAssetFactory()) 
-		return assman->GetAssetFactory()->Get(m_srcName);
+		return assman->GetAssetFactory()->Get(m_sourceName);
     return IAssetRef();
 }
