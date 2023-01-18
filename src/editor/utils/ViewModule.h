@@ -18,17 +18,16 @@ namespace Idogep
 
 	namespace Roles
 	{
-		class ViewRefreshQueue;
+		class ViewRefreshEvent;
 	}
 	// ----------------------------------------------------------------
 
 	class View : public Referencable
 	{
-		friend class Roles::ViewRefreshQueue;
+		friend class Roles::ViewRefreshEvent;
 		friend class Controller;
 	public:
-		explicit View() = default;
-		explicit View(Ref<Controller> parentModule);
+		explicit View(Ref<Controller> parentModule = nullptr);
 		virtual ~View();
 
 		void RequestRefreshView(bool force);
@@ -41,7 +40,7 @@ namespace Idogep
 		Ref<Controller> m_module;
 
 	private:
-		//Roles::ViewRefreshQueue* m_refreshQueueObject;
+		Roles::ViewRefreshEvent* m_refreshQueueObject;
 	};
 
 	// ----------------------------------------------------------------
@@ -93,19 +92,22 @@ namespace Idogep {
 		// This suposed to put the refresh ant the end of the message dispatching
 		// queue
 
-		class ViewRefreshQueue : public QObject
+		class ViewRefreshEvent : public QObject
 		{
 			Q_OBJECT
 		public:
-		    explicit ViewRefreshQueue(View* const & view)
-				: m_view(view)
-			{
-			}
+		    explicit ViewRefreshEvent(View* const & view);
+
+            void QueueRefresh(bool isForce);
 
 			public slots :
-				void refreshViewSlot() const;
+				void refreshViewSlot();
 		private:
-			View * const & m_view;
+			View * m_view;
+
+            bool m_isQueued;
+            bool m_isSetForce;
+
 		};
 	}
 }

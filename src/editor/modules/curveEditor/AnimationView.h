@@ -21,7 +21,7 @@ namespace Idogep
     class AnimationEditorView : public View
     {
     public:
-        AnimationEditorView() = default;
+        AnimationEditorView();
 
         virtual void UpdateAnimationModel(TreeModel* model) = 0;
         Event<Grafkit::Animation::ChannelRef> onChannelSelected;
@@ -32,6 +32,7 @@ namespace Idogep
 
     // ========================================================================================================
 
+    // The toolbar up there 
     class PointEditorView : virtual public View
     {
     public:

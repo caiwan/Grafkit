@@ -11,50 +11,52 @@ namespace Idogep
     class CurvePointEditor;
     class CurveEditorView;
 
-	namespace Roles {
+    namespace Roles {
 
-		// Delegate audiogram rendering functions 
-		class ManageCurveAudiogramRole {
-		public:
-			ManageCurveAudiogramRole();
-			virtual ~ManageCurveAudiogramRole();
+        // Delegate audiogram rendering functions 
+        class ManageCurveAudiogramRole {
+        public:
+            ManageCurveAudiogramRole();
+            virtual ~ManageCurveAudiogramRole();
 
-			void GetAudiogram(QImage** image, float startTime, float endTime, int rectWidth, int rectHeight);
-			void ClearAudiogram();
+            void GetAudiogram(QImage** image, float startTime, float endTime, int rectWidth, int rectHeight);
+            void ClearAudiogram();
 
-			Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform;
-		    //virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
+            Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform;
+            //virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
 
-		private:
-			float* m_agBuffer;
-			size_t m_agSampleCount;
+        private:
+            float* m_agBuffer;
+            size_t m_agSampleCount;
 
-			size_t m_agChannelCount;
-			size_t m_agSamplePerSec;
-		};
+            size_t m_agChannelCount;
+            size_t m_agSamplePerSec;
+        };
 
-	}
+    }
     // ============================================================
 
-	class CurveEditor : public Controller, public EmitsCommandRole 
-	{
-	public:
-	    explicit CurveEditor(const Ref<Controller>&& parent);
+    class CurveEditor : public Controller, public EmitsCommandRole
+    {
+    public:
+        explicit CurveEditor(const Ref<Controller>&& parent);
 
-	    ~CurveEditor() override;
-	    void Initialize() override;
+        ~CurveEditor() override;
+        void Initialize() override;
 
-		void ChannelSelectedEvent(Grafkit::Animation::ChannelRef channel) const;
+        void ChannelSelectedEvent(Grafkit::Animation::ChannelRef channel) const;
 
-	    void Recalculate(TimelineArea* const area) const;
-	    Grafkit::Animation::ChannelRef GetChannel() const;
+        void Recalculate(TimelineArea* const area) const;
+        Grafkit::Animation::ChannelRef GetChannel() const;
 
-	private:
+        bool GetAndClearIsRedrawFlag() const;
+
+    private:
         void AddCurveToScene() const;
 
-		Ref<CurveEditorView> m_myView;
-		
-	    Roles::ManageCurveAudiogramRole* m_manageAudiogram;
-		CurvePointEditor *m_pointEditor;
-	};
+        Ref<CurveEditorView> m_myView;
+
+        Roles::ManageCurveAudiogramRole* m_manageAudiogram;
+        CurvePointEditor *m_pointEditor;
+    };
 }

@@ -1,7 +1,8 @@
 #include "CurveEditorView.h"
 
-Idogep::CurveEditorView::CurveEditorView()
-    : m_displayWaveform(true)
-  , m_displayCurve(true)
+Idogep::CurveEditorView::CurveEditorView() : View()
+    , m_displayWaveform(true)
+    , m_displayCurve(true) 
 {
+    // ...
 }

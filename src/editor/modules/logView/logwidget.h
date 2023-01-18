@@ -14,13 +14,13 @@ namespace Idogep {
 	{
 		Q_OBJECT
 	public:
-		explicit LogWidget(QWidget *parent = 0);
+		explicit LogWidget(QWidget *parent = nullptr);
 		~LogWidget();
 
-		void UpdateLog(std::string log);
+	    void UpdateLog(std::string log) override;
 
 	protected:
-		virtual void RefreshView(bool force){}
+	    void RefreshView(bool force) override {}
 
 	private:
 		Ui::LogWidget *ui;

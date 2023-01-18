@@ -14,8 +14,8 @@ using namespace Grafkit;
 
 CurvePointEditor::CurvePointEditor(const Ref<Controller>& parent)
     : Controller(parent)
-    , m_myView(nullptr) 
-{
+    , m_isCurveChangedFlag(false)
+    , m_myView(nullptr) {
 }
 
 void CurvePointEditor::Rebuild()
@@ -25,9 +25,10 @@ void CurvePointEditor::Rebuild()
     m_points.clear();
 
     const size_t keyCount = m_channel->GetKeyCount();
-    for (size_t i = 0; i < keyCount; i++) {
+    for (size_t i = 0; i < keyCount; i++)
+    {
         const auto key = m_channel->GetKey(i);
-        CurvePointItem *point = new CurvePointItem(key, i);
+        CurvePointItem* point = new CurvePointItem(key, i);
 
         m_points.push_back(point);
 
@@ -37,31 +38,18 @@ void CurvePointEditor::Rebuild()
 
         point->SetModule(this);
     }
+    
+    m_isCurveChangedFlag = true;
+
 }
 
-void CurvePointEditor::HidePoints() {
-    for (CurvePointItem* point : m_points)
-    {
-        point->hide();
-    }
-}
+void CurvePointEditor::HidePoints() { for (CurvePointItem* point : m_points) { point->hide(); } }
 
-void CurvePointEditor::ShowPoints() {
-    for (CurvePointItem* point : m_points)
-    {
-        point->show();
-    }
-}
+void CurvePointEditor::ShowPoints() { for (CurvePointItem* point : m_points) { point->show(); } }
 
-void CurvePointEditor::Recalculate(TimelineArea* const area) const
-{
-    for (CurvePointItem* point : m_points)
-    {
-        point->RecalculatePosition(area);
-    }
-}
+void CurvePointEditor::Recalculate(TimelineArea* const area) const { for (CurvePointItem* point : m_points) { point->RecalculatePosition(area); } }
 
-void CurvePointEditor::UpdateKey(const Animation::ChannelRef& channel, size_t index, const Animation::Key& key) 
+void CurvePointEditor::UpdateKey(const Animation::ChannelRef& channel, size_t index, const Animation::Key& key)
 {
     if (channel != m_channel)
         return;
@@ -73,37 +61,38 @@ void CurvePointEditor::UpdateKey(const Animation::ChannelRef& channel, size_t in
     if (index == m_myView->GetPointId())
     {
         PointSelectedEvent(index);
-
     }
+
+    m_isCurveChangedFlag = true;
+
 }
 
-void CurvePointEditor::Initialize(PointEditorView* pointEditorView) {
-    m_myView = pointEditorView;
-}
+void CurvePointEditor::Initialize(PointEditorView* pointEditorView) { m_myView = pointEditorView; }
 
 
 void CurvePointEditor::Initialize()
 {
     assert(m_myView);
     m_myView->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
-    m_myView->onStartEdit+= Delegate(this, &CurvePointEditor::StartEditEvent);
-    m_myView->onCommitEdit+= Delegate(this, &CurvePointEditor::CommitEditEvent);
+    m_myView->onStartEdit += Delegate(this, &CurvePointEditor::StartEditEvent);
+    m_myView->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
 }
 
 // ========================================================================
 
-void CurvePointEditor::StartEditEvent(const size_t& index, const Grafkit::Animation::Key& key)
+void CurvePointEditor::StartEditEvent(const size_t& index, const Animation::Key& key)
 {
     CurvePointItem* point = m_points[index];
     point->SetOriginalKey(key);
+    m_isCurveChangedFlag = true;
 }
 
-void CurvePointEditor::CommitEditEvent(const size_t& index, const Grafkit::Animation::Key& key)
+void CurvePointEditor::CommitEditEvent(const size_t& index, const Animation::Key& key)
 {
     CurvePointItem* point = m_points[index];
     const Animation::Key originalKey = point->GetOriginalKey();
 
-    CurveKeyChangeCommand *cmd = new CurveKeyChangeCommand(m_channel, index, originalKey, key, this);
+    CurveKeyChangeCommand* cmd = new CurveKeyChangeCommand(m_channel, index, originalKey, key, this);
     onNewCommand(cmd);
 }
 
@@ -119,25 +108,40 @@ void CurvePointEditor::CommitRemovePointEvent(const float& key, const float& val
     assert(0);
 }
 
-void CurvePointEditor::EditKeyEvent(const size_t& index, const Grafkit::Animation::Key& key) {
+void CurvePointEditor::EditKeyEvent(const size_t& index, const Animation::Key& key)
+{
     CurvePointItem* point = m_points[index];
     point->SetKey(EditKey(index, key));
     point->RequestRefreshView(false);
-    
+
     PointSelectedEvent(index);
     m_myView->RequestRefreshView(false);
+
+    m_isCurveChangedFlag = true;
 }
 
-void CurvePointEditor::PointSelectedEvent(size_t index) {
-
+void CurvePointEditor::PointSelectedEvent(size_t index)
+{
     m_myView->SetPointId(index);
     m_myView->SetPointKey(m_channel->GetKey(index));
     m_myView->UpdatePointEditor(true);
 }
 
-void CurvePointEditor::PointDeSelectedEvent() {
-    m_myView->UpdatePointEditor(false);
+void CurvePointEditor::PointDeSelectedEvent() { m_myView->UpdatePointEditor(false); }
+
+bool CurvePointEditor::GetAndClearIsCurveChangedFlag()
+{
+    bool b = m_isCurveChangedFlag;
+    m_isCurveChangedFlag = false;
+    return b;
 }
+
+//bool Idogep::CurvePointEditor::GetAndClearIsEditingPointFlag()
+//{
+//    bool b = m_isEditngFlag;
+//    m_isEditngFlag = false;
+//    return b;
+//}
 
 Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
 {
@@ -173,4 +177,3 @@ Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
     m_channel->SetKey(index, key);
     return key;
 }
-

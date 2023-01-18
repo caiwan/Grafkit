@@ -1,6 +1,10 @@
 #include "AnimationView.h"
 
-// Nothing to see here.
+using namespace Idogep;
 
-Idogep::PointEditorView::PointEditorView(): m_pointId(0) {
+AnimationEditorView::AnimationEditorView() : View()
+{
+}
+
+PointEditorView::PointEditorView() : View(), m_pointId(0) {
 }

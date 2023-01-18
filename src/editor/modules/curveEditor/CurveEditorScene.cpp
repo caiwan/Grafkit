@@ -5,8 +5,6 @@
 #include <QGraphicsSceneEvent>
 #include <QDebug>
 
-#include <QPicture>
-
 #include "animation/animation.h"
 
 #include "CurvePointItem.h"
@@ -27,17 +25,18 @@ namespace
 }
 
 CurveEditorScene::CurveEditorScene(QObject* parent) : QGraphicsScene(parent)
-, CurveEditorView()
-, m_area(nullptr)
-, m_cursorItem(nullptr)
-, m_modifyDemoTime(false)
-, m_altPressed(false)
-, m_ctrlPressed(false)
-, m_shiftPressed(false)
-, m_midButton(false)
-, m_rightButton(false)
-, m_areaChanged(false)
-, m_audiogramImage(nullptr)
+    , CurveEditorView()
+    , m_area(nullptr)
+    , m_cursorItem(nullptr)
+    , m_modifyDemoTime(false)
+    , m_altPressed(false)
+    , m_ctrlPressed(false)
+    , m_shiftPressed(false)
+    , m_midButton(false)
+    , m_rightButton(false)
+    , m_isValidAudiogram(false)
+    , m_curvePixmap()
+    , m_audiogramImage(nullptr)
 {
     m_area = new TimelineArea();
     m_cursorItem = new CursorItem();
@@ -58,13 +57,25 @@ void CurveEditorScene::RefreshView(const bool force)
 {
     if (force)
         UpdateAudiogram();
+
+    m_area->SetSceneRect(sceneRect());
+
     update();
+}
+
+bool CurveEditorScene::event(QEvent* event)
+{
+    if (event->type() == QEvent::Resize)
+        RequestRefreshView(true);
+
+    return QGraphicsScene::event(event);
 }
 
 void CurveEditorScene::PlaybackChangedEvent(bool isPlaying) {
 }
 
-void CurveEditorScene::DemoTimeChangedEvent(const float &time) {
+void CurveEditorScene::DemoTimeChangedEvent(const float& time)
+{
     m_cursorItem->SetPosition(time);
     update();
 }
@@ -82,16 +93,12 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
     painter->setBrush(Qt::NoBrush);
 
     setSceneRect(views().at(0)->geometry());
-    m_area->SetSceneRect(sceneRect());
 
     if (m_displayWaveform)
     {
-        UpdateAudiogram();
+        if (!m_audiogramImage || !m_isValidAudiogram) { UpdateAudiogram(); }
 
-        if (m_audiogramImage)
-        {
-            painter->drawImage(r, *m_audiogramImage);
-        }
+        if (m_audiogramImage) { painter->drawImage(r, *m_audiogramImage); }
     }
     m_area->DrawGrid(painter, r);
 
@@ -103,7 +110,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 {
-    const CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
+    CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
     assert(parent);
 
     if (parent->GetChannel().Invalid())
@@ -132,13 +139,13 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 
     // line -inf -> fist point
     auto firstKey = channel->GetKey(0);
-    QPointF firstPoint = m_area->Point2Screen({ firstKey.m_time, firstKey.m_value });
-    if (idmin == 0 && firstPoint.x() > r.x()) { painter->drawLine({ 0, firstPoint.y() }, firstPoint); }
+    QPointF firstPoint = m_area->Point2Screen({firstKey.m_time, firstKey.m_value});
+    if (idmin == 0 && firstPoint.x() > r.x()) { painter->drawLine({0, firstPoint.y()}, firstPoint); }
 
     // line last point -> +inf
     auto lastKey = channel->GetKey(channel->GetKeyCount() - 1);
-    QPointF lastKeyPoint = m_area->Point2Screen({ lastKey.m_time, lastKey.m_value });
-    if (lastKeyPoint.x() < r.x() + r.width()) { painter->drawLine(lastKeyPoint, { r.x() + r.width(), lastKeyPoint.y() }); }
+    QPointF lastKeyPoint = m_area->Point2Screen({lastKey.m_time, lastKey.m_value});
+    if (lastKeyPoint.x() < r.x() + r.width()) { painter->drawLine(lastKeyPoint, {r.x() + r.width(), lastKeyPoint.y()}); }
 
     if (idmax >= channel->GetKeyCount() - 1)
     {
@@ -206,13 +213,13 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
         switch (event->button())
         {
         case Qt::LeftButton:
-        {
-            const float time = m_area->Screen2Point(event->scenePos()).x();
-            onDemoTimeChanged(time);
-            m_cursorItem->SetPosition(time);
-            m_modifyDemoTime = true;
-            break;
-        }
+            {
+                const float time = m_area->Screen2Point(event->scenePos()).x();
+                onDemoTimeChanged(time);
+                m_cursorItem->SetPosition(time);
+                m_modifyDemoTime = true;
+                break;
+            }
         case Qt::MidButton:
             m_midButton = true;
             break;
@@ -227,10 +234,7 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
     bool resetView = m_rightButton && m_ctrlPressed && m_altPressed;
 
-    if (resetView)
-    {
-        m_area->ResetView();
-    }
+    if (resetView) { m_area->ResetView(); }
 
     QGraphicsScene::mousePressEvent(event);
 }
@@ -241,8 +245,10 @@ void CurveEditorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     m_midButton = false;
     m_rightButton = false;
 
-    if (m_areaChanged)
+    if (m_isValidAudiogram)
         UpdateAudiogram();
+
+    m_isValidAudiogram = false;
 
     update();
     QGraphicsScene::mouseReleaseEvent(event);
@@ -262,19 +268,16 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         onDemoTimeChanged(time);
         m_cursorItem->SetPosition(time);
     }
-    if (resetView)
-    {
-        m_area->ResetView();
-    }
+    if (resetView) { m_area->ResetView(); }
     else if (modifyOfs)
     {
         m_area->Pan(delta);
-        m_areaChanged = true;
+        m_isValidAudiogram = false;
     }
     else if (modifyScale)
     {
         m_area->Zoom(delta);
-        m_areaChanged = true;
+        m_isValidAudiogram = false;
     }
 
     update();
@@ -288,8 +291,10 @@ void CurveEditorScene::wheelEvent(QGraphicsSceneWheelEvent* event)
     const float ZOOM_WHEEL_FACTOR = .03125;
     const float delta = static_cast<float>(event->delta()) * ZOOM_WHEEL_FACTOR;
 
-    QPointF p = { delta, delta };
+    QPointF p = {delta, delta};
     m_area->Zoom(p);
+
+    m_isValidAudiogram = false;
 
     update();
 }
@@ -306,6 +311,8 @@ void CurveEditorScene::keyPressEvent(QKeyEvent* event)
         break;
     case Qt::Key_Shift:
         m_shiftPressed = true;
+        break;
+    default:
         break;
     }
 
@@ -324,6 +331,8 @@ void CurveEditorScene::keyReleaseEvent(QKeyEvent* event)
         break;
     case Qt::Key_Shift:
         m_shiftPressed = false;
+        break;
+    default:
         break;
     }
 
@@ -373,50 +382,49 @@ void CurveEditorScene::UpdateAudiogram()
 
     delete m_audiogramImage;
     m_audiogramImage = img;
+
+    m_isValidAudiogram = true;
 }
 
 
 // ------------------------------------------------------------------
-TimelineArea::TimelineArea() : m_grid(nullptr)
+TimelineArea::TimelineArea() : m_gridImage(0, 0)
+    , m_gridValid(false)
 {
     m_scale = QSizeF(64, 64);
     m_offset = QPointF(0, 0);
 }
 
-QPointF TimelineArea::Point2Screen(QPointF point) const
-{
-    return point * m_transfrom;
-}
+QPointF TimelineArea::Point2Screen(QPointF point) const { return point * m_transfrom; }
 
-QPointF TimelineArea::Screen2Point(QPointF point) const
-{
-    return point * m_inverse;
-}
+QPointF TimelineArea::Screen2Point(QPointF point) const { return point * m_inverse; }
 
-QPointF TimelineArea::GetMin() const { return Screen2Point({ m_sceneRect.topLeft() }); }
+QPointF TimelineArea::GetMin() const { return Screen2Point({m_sceneRect.topLeft()}); }
 
-QPointF TimelineArea::GetMax() const { return Screen2Point({ m_sceneRect.bottomRight() }); }
+QPointF TimelineArea::GetMax() const { return Screen2Point({m_sceneRect.bottomRight()}); }
 
 void TimelineArea::DrawGrid(QPainter* const & painter, const QRectF& r)
 {
-    if (!m_grid)
+    if (m_gridImage.size() != r.size().toSize())
     {
-        m_grid = new QPicture();
-        const QPoint topLeft = r.topLeft().toPoint();
-        const QPoint bottomRight = r.bottomRight().toPoint();
-
-        m_grid->setBoundingRect(QRect(topLeft, bottomRight));
-
-        QPainter picturePainter(m_grid);
-        DrawGridToPicture(&picturePainter, r);
+        if (m_gridImage.isNull())
+            m_gridImage = QPixmap(r.width(), r.height());
+        else
+            m_gridImage.scaled(r.width(), r.height());
+        m_gridValid = false;
     }
 
-    const QTransform transform = painter->transform();
-    painter->translate(r.topLeft());
+    if (!m_gridValid)
+    {
+        m_gridImage.fill(Qt::transparent);
+        QPainter picturePainter(&m_gridImage);
 
-    m_grid->play(painter);
+        DrawGridToPicture(&picturePainter, r);
+        picturePainter.end();
+        m_gridValid = true;
+    }
 
-    painter->setTransform(transform);
+    painter->drawPixmap(r.topLeft(), m_gridImage);
 }
 
 void TimelineArea::Pan(const QPointF& p)
@@ -424,6 +432,8 @@ void TimelineArea::Pan(const QPointF& p)
     m_offset += p;
     if (m_offset.x() > 0.)
         m_offset.setX(0.);
+
+    Invalidate();
 }
 
 void TimelineArea::Zoom(const QPointF& z)
@@ -441,8 +451,6 @@ void TimelineArea::Zoom(const QPointF& z)
 
     // Zoom to center
     const QSizeF deltaScale = m_scale - scale;
-    const QPointF min = GetMin();
-    const QPointF max = GetMax();
     const QPointF center = (GetMax() + GetMin()) * .5; // unit
     const QPointF delta = {
         -center.x() * deltaScale.width(),
@@ -450,17 +458,20 @@ void TimelineArea::Zoom(const QPointF& z)
     };
 
     Pan(delta);
+
+    Invalidate();
 }
 
-void TimelineArea::ResetView() {
+void TimelineArea::ResetView()
+{
     m_scale = QSizeF(64, 64);
     m_offset = QPointF(0, 0);
+    Invalidate();
 }
 
 void TimelineArea::Invalidate()
 {
-    delete m_grid;
-    m_grid = nullptr;
+    m_gridValid = false;
 
     // recalc transformation
     m_transfrom = QTransform();
@@ -523,8 +534,7 @@ void TimelineArea::DrawGridToPicture(QPainter* const& painter, const QRectF& r) 
 }
 
 CursorItem::CursorItem() : m_position(0)
-, m_area(nullptr)
-{
+    , m_area(nullptr) {
 }
 
 void CursorItem::DrawCursor(QPainter* const & painter, const QRectF& r)
@@ -553,7 +563,7 @@ void CursorItem::DrawCursor(QPainter* const & painter, const QRectF& r)
     strTime.append(QString::number(fmod(m_position, 60.0f), 'f', 3));
 
     // darw stuff, calc
-    float screenPos = m_area->Point2Screen({ m_position, 0 }).x();
+    float screenPos = m_area->Point2Screen({m_position, 0}).x();
 
     float barOffset = 0.0f;
     // this will stop the label moving at the corners
@@ -577,5 +587,4 @@ void CursorItem::DrawCursor(QPainter* const & painter, const QRectF& r)
     painter->setPen(QColor(255, 255, 255, 96));
     painter->setBrush(QColor(48, 224, 48, 96));
     painter->drawText(QRectF(QPointF(screenPos + barOffset, r.bottom() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
-
 }

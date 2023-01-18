@@ -37,7 +37,7 @@ namespace Idogep {
 
 	class OutlineView : public View {
 	public:
-		OutlineView() = default;
+		OutlineView();
 		virtual void SetModel(SceneGraphViewWidgetModel * modelResource) = 0;
 	};
 

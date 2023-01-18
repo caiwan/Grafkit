@@ -22,6 +22,7 @@ using namespace Grafkit;
 
 CurvePointItem::CurvePointItem(const Animation::Key key, const size_t index, QGraphicsItem* parent)
     : QGraphicsItem(parent)
+    , View()
     , m_id(index)
     , m_key(key)
     , m_areaScaling(1, 1)
@@ -53,7 +54,7 @@ void CurvePointItem::RecalculatePosition(TimelineArea const* area)
     m_areaScaling = area->GetScale(); // save last scaling for paint tangent on
 }
 
-QRectF CurvePointItem::boundingRect() const { return { -BOUNDING_BOX_SCALE / 2, -BOUNDING_BOX_SCALE / 2, BOUNDING_BOX_SCALE, BOUNDING_BOX_SCALE }; }
+QRectF CurvePointItem::boundingRect() const { return {-BOUNDING_BOX_SCALE / 2, -BOUNDING_BOX_SCALE / 2, BOUNDING_BOX_SCALE, BOUNDING_BOX_SCALE}; }
 
 void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
@@ -81,7 +82,7 @@ void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
     {
         const float angle = m_key.m_angle;
         const float radix = m_key.m_radius;
-        const QPointF tangent = { cos(angle * (.5*M_PI)), -sin(angle* (.5*M_PI)) };
+        const QPointF tangent = {cos(angle * (.5 * M_PI)), -sin(angle * (.5 * M_PI))};
 
         painter->setPen(QPen(QColor(255, 48, 48), 1.0, Qt::DashLine));
         painter->setBrush(Qt::NoBrush);
@@ -197,7 +198,7 @@ void CurvePointItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
     //ces->deleteCurvePoint(this);
 }
 
-void CurvePointItem::keyPressEvent(QKeyEvent * event)
+void CurvePointItem::keyPressEvent(QKeyEvent* event)
 {
     if (isSelected())
     {
@@ -206,11 +207,13 @@ void CurvePointItem::keyPressEvent(QKeyEvent * event)
             // This thing does not work as it intended to.
         case KEY_SNAP_X:
             m_showTangent = true;
-            m_snapXAxis = true; break;
+            m_snapXAxis = true;
+            break;
 
         case KEY_SNAP_Y:
             m_showTangent = true;
-            m_snapYAxis = true; break;
+            m_snapYAxis = true;
+            break;
 
         default:
             QGraphicsItem::keyReleaseEvent(event);
@@ -219,14 +222,13 @@ void CurvePointItem::keyPressEvent(QKeyEvent * event)
 
         event->accept();
     }
-    else {
-        QGraphicsItem::keyReleaseEvent(event);
-    }
+    else { QGraphicsItem::keyReleaseEvent(event); }
 }
 
-void CurvePointItem::keyReleaseEvent(QKeyEvent * event)
+void CurvePointItem::keyReleaseEvent(QKeyEvent* event)
 {
-    if (isSelected()) {
+    if (isSelected())
+    {
         switch (event->key())
         {
         case KEY_SNAP_X:
@@ -254,9 +256,7 @@ void CurvePointItem::keyReleaseEvent(QKeyEvent * event)
 
         event->accept();
     }
-    else {
-        QGraphicsItem::keyReleaseEvent(event);
-    }
+    else { QGraphicsItem::keyReleaseEvent(event); }
 }
 
 void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event)
@@ -265,7 +265,7 @@ void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event)
     const float y = event->pos().y();
 
     const float radius = sqrt(x * x + y * y) / 32.0f;
-    const float angle = atan2(-y, x) / (.5*M_PI); // -1 .. 1
+    const float angle = atan2(-y, x) / (.5 * M_PI); // -1 .. 1
 
     if (m_snapXAxis)
         m_key.m_radius += radius - m_lastRadius;

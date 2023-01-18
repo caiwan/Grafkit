@@ -61,4 +61,9 @@ void OutlineModule::DocumentChangedEvent(Document* const& document)
 	m_myView->SetModel(m_myModel);
 }
 
+// --- 
+
+OutlineView::OutlineView() : View(){
+}
+
 

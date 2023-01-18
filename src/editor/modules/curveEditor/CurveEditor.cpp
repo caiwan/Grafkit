@@ -181,6 +181,10 @@ Animation::ChannelRef CurveEditor::GetChannel() const {
     return m_pointEditor->GetChannel();
 }
 
+bool CurveEditor::GetAndClearIsRedrawFlag() const {
+    return m_pointEditor->GetAndClearIsCurveChangedFlag();
+}
+
 void CurveEditor::AddCurveToScene() const
 {
     if (!m_pointEditor->HasCurvePoints())
