@@ -1,2 +1,0 @@
-E:\prog\grafkit2\src\ShaderEditor\Shader@0x014FD5A8(7,21-27): error X3018: invalid subscript 'pos'
-
