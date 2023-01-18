@@ -8,6 +8,7 @@ namespace FWdebug {
 	/// http://en.cppreference.com/w/cpp/error/exception
 
 	/// @todo use std::String
+	/// @todo legyen egy detail mezo is, amibe beleirom, hogy mi a nem jo eppen
 	class Exception 
 	{
 	private:
@@ -58,3 +59,8 @@ namespace FWdebugExceptions {\
 
 // --------------------------------------------------------------------------------
 DEFINE_EXCEPTION(NullPointerException, 1, "Null pointer exception")
+DEFINE_EXCEPTION(InvalidFormatException, 2, "Invalid format exception")
+DEFINE_EXCEPTION(InvalidParameterException, 2, "Invalid parameter exception")
+DEFINE_EXCEPTION(ResourceNotFound, 2, "Resource or asset not found")
+DEFINE_EXCEPTION(FileNotFound, 3, "File not found")
+
