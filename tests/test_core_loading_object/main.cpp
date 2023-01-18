@@ -10,13 +10,12 @@
 
 #include "math/matrix.h"
 
-#include "core/ResourcePreloader.h"
-#include "core/AssetFactory.h"
-#include "core/AssetFile.h"
+#include "utils/AssetFile.h"
+#include "utils/ResourceManager.h"
 
 using namespace Grafkit;
 
-class Application : public Grafkit::System, public Grafkit::AssetPreloader
+class Application : public Grafkit::System, public Grafkit::IResourceManager // Grafkit::AssetPreloader
 {
 public:
 	Application() : Grafkit::System(),
@@ -38,7 +37,7 @@ protected:
 	Renderer render;
 	CameraRef camera;
 	
-	SceneRef scene;
+	SceneResRef scene;
 
 	float t;
 
@@ -60,25 +59,14 @@ protected:
 
 		// init file loader
 		this->m_file_loader = new Grafkit::FileAssetManager("./");
-		this->RegisterRecourceFactory(m_file_loader);
-		this->LoadCache();
-
-		this->GetBuilders();
 
 		// -- camera
 		camera = new Camera();
 		camera->SetPosition(0.0f, 0.0f, -5.0f);
 
-		//// -- load shaderZ
-		//shader_vs = new Shader();
-		//shader_vs->LoadFromFile(render, "TextureVertexShader", L"./shaders/texture.hlsl", ST_Vertex);
-
-		//shader_fs = new Shader();
-		//shader_fs->LoadFromFile(render, "TexturePixelShader", L"./shaders/texture.hlsl", ST_Pixel);
-
 		// -- model 
-		scene = new Scene();
-		this->AddBuilder(new AssimpLoader("./models/tegla.3ds", scene));
+		scene = new SceneRes();
+		scene = this->Load<SceneRes>(new AssimpLoader("./models/tegla.3ds"));
 
 		this->t = 0;
 
@@ -88,7 +76,7 @@ protected:
 	};
 
 	void release() {
-		this->SaveCache();
+		// this->SaveCache();
 
 		this->render.Shutdown();
 	};
@@ -96,36 +84,8 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
-			/*struct {
-				matrix worldMatrix;
-				matrix viewMatrix;
-				matrix projectionMatrix;
-			} matbuff;*/
 
-			// camera->Render(render);
-
-			//render.GetWorldMatrix(matbuff.worldMatrix);
-			// camera->GetViewMatrix(matbuff.viewMatrix);
-			// camera->GetProjectionMatrix(matbuff.projectionMatrix);
-
-			////matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
-			//matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t * 10, t * 15, t * 20);
-
-			//// --- ez a legfontosabb dolog, amit meg meg kell itt tenni mielott atadod a cbuffernek:
-			//matbuff.worldMatrix = XMMatrixTranspose(matbuff.worldMatrix);
-			//matbuff.viewMatrix = XMMatrixTranspose(matbuff.viewMatrix);
-			//matbuff.projectionMatrix = XMMatrixTranspose(matbuff.projectionMatrix);
-			//// ---
-
-			//shader_vs["MatrixBuffer"].Set(&matbuff);
-
-			//shader_vs->Render(render);
-			//shader_fs->Render(render);
-
-			// model->Render(render);
-			// render of scenegraph goez here 
-
-			this->scene->Render(render);
+			(*this->scene)->Render(render);
 
 			this->t += 0.001;
 		}
