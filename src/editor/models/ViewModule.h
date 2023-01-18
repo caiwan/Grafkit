@@ -25,7 +25,7 @@ namespace Idogep {
 
 		void RequestRefreshView(bool force);
 
-		virtual void SetModel(Ref<Referencable> model) = 0;
+		//virtual void SetModel(Ref<Referencable> model) = 0;
 
 	protected:
 		virtual void RefreshView(bool force) = 0;
@@ -53,12 +53,12 @@ namespace Idogep {
 		class ViewRefreshQueue : public QObject {
 			Q_OBJECT
 		public:
-			ViewRefreshQueue(View * const & view);
+			ViewRefreshQueue(View * const & view) : m_view(view) { }
 
 		public /*slots*/:
 			void refreshViewSlot();
 		private:
-			View * m_view;
+			View * const & m_view;
 		};
 
 	}
