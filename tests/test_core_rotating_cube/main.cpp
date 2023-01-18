@@ -48,11 +48,10 @@ public:
 
 			int result = 0;
 
-			result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+			result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR );
 
 			// -- camera
-			camera = new Camera();
-			render.SetupCameraMetrics(camera);
+			camera = new Camera;
 			camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 			// -- texture
@@ -91,9 +90,9 @@ public:
 				camera->Render();
 
 				render.GetWorldMatrix(worldMatrix);
-
 				camera->GetViewMatrix(viewMatrix);
 				camera->GetProjectionMatrix(projectionMatrix);
+				//render.GetProjectionMatrix(projectionMatrix);
 
 				model->Render(render.GetDeviceContext());
 
@@ -103,7 +102,7 @@ public:
 					render.GetDeviceContext(),
 					model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
 					model->GetTexture()
-				);
+					);
 
 				this->t += 0.001;
 			}
