@@ -29,6 +29,8 @@ CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent), C
 {
 	m_area = new TimelineArea();
 	setBackgroundBrush(QColor(48, 48, 48));
+
+    connect(this, SIGNAL(selectionChanged()), this, SLOT(SelectionChangedSlot()));
 }
 
 CurveEditorScene::~CurveEditorScene()
@@ -170,6 +172,22 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 		}
 	}
 
+}
+
+void CurveEditorScene::SelectionChangedSlot() 
+{ 
+    QList<QGraphicsItem*> items = selectedItems();
+    if (!items.empty())
+    {
+        CurvePointItem* item =  dynamic_cast<CurvePointItem*>(items.last());
+        if (item)
+        {
+            onPointSelected(item);
+        }
+    } else
+    {
+        onPointDeSelected();
+    }
 }
 
 void CurveEditorScene::UpdateAudiogram()

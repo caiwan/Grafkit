@@ -1,11 +1,11 @@
 #pragma once 
 
-#include <malloc.h>
 #include <exception>
-#include <map>
-#include <allocators>
 
-#include "logger.h"
+#define _SILENCE_STDEXT_ALLOCATORS_DEPRECATION_WARNING
+#include <allocators>
+// derpricated
+// #include <memory_resource>
 
 
 template<typename TDerived> struct AlignedNew

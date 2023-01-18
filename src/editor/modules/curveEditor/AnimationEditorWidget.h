@@ -19,7 +19,7 @@ namespace Idogep
 
     // ========================================================================================================
 
-    class AnimationEditorWidget : public QDockWidget, public AnimationEditorView
+    class AnimationEditorWidget : public QDockWidget, public AnimationEditorView, public PointEditorView
     {
     Q_OBJECT
 
@@ -33,8 +33,6 @@ namespace Idogep
     protected:
 
         void RefreshView(bool force) override;
-
-   
 		void UpdateAnimationModel(TreeModel* model) override;
 
         // QT specific

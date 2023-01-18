@@ -43,7 +43,8 @@ namespace Idogep {
         void CommitAddPointEvent(float key, float value);
         void CommitRemovePointEvent(float key, float value);
 
-        void EditKeyEvent(CurvePointItem *item);
+        void EditKeyEvent(CurvePointItem *item) const;
+        void EditKeyEvent(size_t index, Grafkit::Animation::Key key);
 
         bool HasCurvePoints() const { return !m_points.empty(); }
         size_t GetPointCount() const { return m_points.size(); }

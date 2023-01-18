@@ -136,6 +136,10 @@ void CurveEditor::Initialize()
 
     m_manageAudiogram->onRequestWaveform += Delegate(musicProxy, &Audiogram::GetWaveform);
 
+    // 
+    ces->onPointDeSelected += Delegate();
+    ces->onPointSelected += Delegate();
+
     m_myView = ces;
     SetView(m_myView);
 }

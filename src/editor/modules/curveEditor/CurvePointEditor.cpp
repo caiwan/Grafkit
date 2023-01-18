@@ -93,16 +93,21 @@ void CurvePointEditor::CommitEditEvent(CurvePointItem* item)
 void CurvePointEditor::CommitAddPointEvent(float key, float value)
 {
     //recalc, readd? 
+    assert(0);
 }
 
 void CurvePointEditor::CommitRemovePointEvent(float key, float value)
 {
     //recalc, readd?
+    assert(0);
 }
 
-void CurvePointEditor::EditKeyEvent(CurvePointItem * item)
-{
+void CurvePointEditor::EditKeyEvent(CurvePointItem * item) const {
     item->SetKey(EditKey(item->GetId(), item->GetKey()));
+}
+
+void CurvePointEditor::EditKeyEvent(size_t index, Grafkit::Animation::Key key) {
+    m_points[index]->SetKey(EditKey(index, key));
 }
 
 Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const

@@ -6,9 +6,9 @@ class QImage;
 namespace Idogep
 {
 	class CurvePointItem;
+
 	namespace Roles
 	{
-
 		class TimelineSceneViewRole
 		{
 		public:
@@ -20,7 +20,6 @@ namespace Idogep
 			virtual void PlaybackChanged(bool isPlaying) = 0;
 			virtual void DemoTimeChanged(float time) = 0;
 		};
-
 	}
 
 	class CurveEditorView: public View, public Roles::TimelineSceneViewRole 
@@ -37,6 +36,10 @@ namespace Idogep
 
         virtual void ClearCurvePoints() = 0;
 		virtual void AddCurvePoint(CurvePointItem* points) = 0;
+
+        Event<CurvePointItem*> onPointSelected;
+        Event<> onPointDeSelected;
+
 
 	protected:
 
