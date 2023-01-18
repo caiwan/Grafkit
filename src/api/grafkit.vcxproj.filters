@@ -77,6 +77,9 @@
     <ClCompile Include="builtin_data\cube.cpp">
       <Filter>BuiltInData</Filter>
     </ClCompile>
+    <ClCompile Include="core\exceptions.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\input.h">
@@ -109,12 +112,6 @@
     <ClInclude Include="render\texture.h">
       <Filter>Header Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="graphicsclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="textureShaderClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="core\reference.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
@@ -129,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="math\matrix.h">
       <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="core\exceptions.h">
+      <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
