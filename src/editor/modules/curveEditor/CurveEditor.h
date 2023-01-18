@@ -42,19 +42,13 @@ namespace Idogep
         explicit CurveEditor();
 
         ~CurveEditor() override;
-        //void Initialize() override;
 
-        //void Initialize(Grafkit::IResourceManager* resourceManager) override;
         void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
 
+        void ChannelSelectedEvent(Grafkit::Animation::TrackRef& track, const size_t& trackid, Grafkit::Animation::ChannelRef& channel);
+        void ChannelDeselectedEvent();
 
-        void ChannelSelectedEvent(Grafkit::Animation::TrackRef& track, const size_t& trackid, Grafkit::Animation::ChannelRef& channel) const;
-        void ChannelDeselectedEvent() const;
-
-        void Recalculate(TimelineArea* const area) const;
-        Grafkit::Animation::ChannelRef GetChannel() const;
-
-        bool GetAndClearIsRedrawFlag() const;
+        void UpdateChannel();
 
     private:
         void AddCurveToScene() const;

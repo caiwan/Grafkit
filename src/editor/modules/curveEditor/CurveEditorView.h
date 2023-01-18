@@ -7,6 +7,7 @@ class QImage;
 namespace Idogep
 {
     class CurvePointItem;
+    class TimelineArea;
 
     namespace Roles
     {
@@ -31,8 +32,8 @@ namespace Idogep
 
         CurveEditorView();
 
-        void HideAnimationCurves() { m_displayCurve = false; }
-        void ShowAnimationCurves() { m_displayCurve = true; }
+        void HideAnimationCurves() { m_isDisplayCurve = false; }
+        void ShowAnimationCurves() { m_isDisplayCurve = true; }
 
         // TODO hide audiogram
         // TODO show audiogram
@@ -46,11 +47,19 @@ namespace Idogep
         Event<const float&, const float&> onCommitAddPointEvent;
         Event<const size_t&> onCommitRemovePointEvent;
 
+        Event<TimelineArea* const &> onRecalculateCurve;
+
+        Grafkit::Animation::ChannelRef GetChannel() const { return m_channel; }
+        void SetChannel(const Grafkit::Animation::ChannelRef& channel) { m_channel = channel; }
+
+       // TODO: 
+        virtual void Invalidate();
 
     protected:
 
-        bool m_displayWaveform;
-        bool m_displayCurve;
+        bool m_isDisplayWaveform;
+        bool m_isDisplayCurve;
 
+        Grafkit::Animation::ChannelRef m_channel;
     };
 }

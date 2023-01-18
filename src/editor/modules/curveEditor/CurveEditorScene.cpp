@@ -94,7 +94,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
     setSceneRect(views().at(0)->geometry());
 
-    if (m_displayWaveform)
+    if (m_isDisplayWaveform)
     {
         if (!m_audiogramImage || !m_isValidAudiogram) { UpdateAudiogram(); }
 
@@ -102,64 +102,50 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
     }
     m_area->DrawGrid(painter, r);
 
-    if (m_displayCurve)
+    if (m_isDisplayCurve)
         DrawCurve(painter, r);
 
     m_cursorItem->DrawCursor(painter, r);
 }
 
-void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
-{
-    CurveEditor* parent = nullptr;
-    //CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
-    assert(parent);
-
-    if (parent->GetChannel().Invalid())
+void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r)
+{   
+    if (m_channel.Invalid() || m_channel->GetKeyCount() == 0)
         return;
 
-    // 2. draw the curves.
-
-    auto channel = parent->GetChannel();
-
-    if (channel.Invalid() || channel->GetKeyCount() == 0)
-        return;
-
-    //parent->Recalculate(m_area);
-    //onRecalculate();
+    onRecalculateCurve(m_area);
 
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(QPen(grey, 1.5f));
 
     // boundaries
-    //QPointF pMin = m_area->Screen2Point(r.topLeft());
     const QPointF pMin = m_area->GetMin();
-    const int idmin = channel->FindKeyIndex(pMin.x());
+    const int idmin = m_channel->FindKeyIndex(pMin.x());
 
-    //QPointF pMax = m_area->Screen2Point(r.bottomRight());
     const QPointF pMax = m_area->GetMax();
-    int idmax = channel->FindKeyIndex(pMax.x()) + 1;
+    int idmax = m_channel->FindKeyIndex(pMax.x()) + 1;
 
     // line -inf -> fist point
-    auto firstKey = channel->GetKey(0);
+    auto firstKey = m_channel->GetKey(0);
     QPointF firstPoint = m_area->Point2Screen({firstKey.m_time, firstKey.m_value});
     if (idmin == 0 && firstPoint.x() > r.x()) { painter->drawLine({0, firstPoint.y()}, firstPoint); }
 
     // line last point -> +inf
-    auto lastKey = channel->GetKey(channel->GetKeyCount() - 1);
+    auto lastKey = m_channel->GetKey(m_channel->GetKeyCount() - 1);
     QPointF lastKeyPoint = m_area->Point2Screen({lastKey.m_time, lastKey.m_value});
     if (lastKeyPoint.x() < r.x() + r.width()) { painter->drawLine(lastKeyPoint, {r.x() + r.width(), lastKeyPoint.y()}); }
 
-    if (idmax >= channel->GetKeyCount() - 1)
+    if (idmax >= m_channel->GetKeyCount() - 1)
     {
-        idmax = channel->GetKeyCount() - 1; // avoid max+1 index
+        idmax = m_channel->GetKeyCount() - 1; // avoid max+1 index
     }
 
     // qnd fix for offset
 
     for (int i = idmin; i < idmax; i++)
     {
-        const auto k0 = channel->GetKey(i);
-        const auto k1 = channel->GetKey(i + 1);
+        const auto k0 = m_channel->GetKey(i);
+        const auto k1 = m_channel->GetKey(i + 1);
 
         // there should be a nice way to optimize this 
         const int stepCount = 32;
@@ -168,12 +154,12 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
         for (int j = 0; j < stepCount; j++)
         {
             const double t = k0.m_time + j * stepWidth;
-            double v = channel->GetValue(t);
+            double v = m_channel->GetValue(t);
 
-            QPointF p1(t, channel->GetValue(t));
+            QPointF p1(t, m_channel->GetValue(t));
             p1 = this->m_area->Point2Screen(p1);
 
-            QPointF p2(t + stepWidth, channel->GetValue(t + stepWidth));
+            QPointF p2(t + stepWidth, m_channel->GetValue(t + stepWidth));
             p2 = this->m_area->Point2Screen(p2);
 
             painter->drawLine(p1, p2);

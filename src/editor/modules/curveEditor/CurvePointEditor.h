@@ -38,7 +38,7 @@ namespace Idogep
 
         void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
 
-        void Recalculate(TimelineArea* const area) const;
+        void Recalculate(TimelineArea* const &area);
 
         void UpdateKey(const Grafkit::Animation::ChannelRef& channel, size_t index, const Grafkit::Animation::Key& key);
         void UpdateChannel(const Grafkit::Animation::TrackRef& track, size_t channelId, const Grafkit::Animation::ChannelRef& channel);

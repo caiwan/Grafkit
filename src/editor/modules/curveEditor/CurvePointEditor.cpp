@@ -18,7 +18,7 @@ CurvePointEditor::CurvePointEditor()
     , m_myView(nullptr) {
 }
 
-void CurvePointEditor::Initialize(Grafkit::IResourceManager* const& resourceManager)
+void CurvePointEditor::Initialize(IResourceManager* const& resourceManager)
 {
     CurveEditorScene *ces = dynamic_cast<CurveEditorScene*>(View::SafeGetView(resourceManager, "CurveEditorView").Get());
     assert(ces);
@@ -30,7 +30,6 @@ void CurvePointEditor::Initialize(Grafkit::IResourceManager* const& resourceMana
     ces->onCommitRemovePointEvent += Delegate(this, &CurvePointEditor::CommitRemovePointEvent);
 
     m_myView = dynamic_cast<PointEditorView*>(View::SafeGetView(resourceManager, "PointEditorView").Get());
-
     assert(m_myView);
 
     m_myView->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
@@ -55,8 +54,6 @@ void CurvePointEditor::Rebuild()
         point->onStartEdit += Delegate(this, &CurvePointEditor::StartEditEvent);
         point->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
         point->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
-
-        //point->SetController(this);
     }
 
     m_isCurveChangedFlag = true;
@@ -67,9 +64,7 @@ void CurvePointEditor::HidePoints() { for (CurvePointItem* point : m_points) { p
 
 void CurvePointEditor::ShowPoints() { for (CurvePointItem* point : m_points) { point->show(); } }
 
-
-
-void CurvePointEditor::Recalculate(TimelineArea* const area) const { for (CurvePointItem* point : m_points) { point->RecalculatePosition(area); } }
+void CurvePointEditor::Recalculate(TimelineArea* const &area) { for (CurvePointItem* point : m_points) { point->RecalculatePosition(area); } }
 
 void CurvePointEditor::UpdateKey(const Animation::ChannelRef& channel, size_t index, const Animation::Key& key)
 {
@@ -95,11 +90,8 @@ void CurvePointEditor::UpdateChannel(const Animation::TrackRef & track, size_t c
         return;
     m_channel = channel;
 
-    Rebuild();
+    //Rebuild();
 }
-
-
-
 
 // ========================================================================
 

@@ -9,7 +9,6 @@
 #include "CurveEditorScene.h"
 #include "CurvePointEditor.h"
 #include "CurvePointItem.h"
-#include "PointEditorWidget.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -98,11 +97,11 @@ CurveEditor::~CurveEditor()
     //delete m_pointEditor;
 }
 
-void CurveEditor::Initialize(Grafkit::IResourceManager* const& resourceManager) {
+void CurveEditor::Initialize(IResourceManager* const& resourceManager) {
     CurveEditorScene *ces = dynamic_cast<CurveEditorScene*>(View::SafeGetView(resourceManager, "CurveEditorView").Get());
     assert(ces);
 
-    Editor* editor = dynamic_cast<Editor*>(Controller::SafeGetController(resourceManager, "Editor").Get());
+    Editor* editor = dynamic_cast<Editor*>(SafeGetController(resourceManager, "Editor").Get());
     assert(editor);
 
     Audiogram* music = editor->GetMusicProxy();
@@ -123,11 +122,15 @@ void CurveEditor::Initialize(Grafkit::IResourceManager* const& resourceManager) 
 
     // -- point editor
     // is it safe to be here?
-    m_pointEditor = dynamic_cast<CurvePointEditor*>(Controller::SafeGetController(resourceManager, "CurvePointEditor").Get());
+    m_pointEditor = dynamic_cast<CurvePointEditor*>(SafeGetController(resourceManager, "CurvePointEditor").Get());
     assert(m_pointEditor);
+
+    ces->onRecalculateCurve += Delegate(m_pointEditor.Get(), &CurvePointEditor::Recalculate);
+
 }
 
-void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t &trackid, Animation::ChannelRef &channel) const
+// ReSharper disable CppMemberFunctionMayBeConst
+void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t &trackid, Animation::ChannelRef &channel)
 {
     // show if was previously hidden
     if (channel == m_pointEditor->GetChannel())
@@ -143,6 +146,7 @@ void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t 
     // throw and build up biew if different curve was selected
     m_myView->ClearCurvePoints();
     m_pointEditor->SetChannel(track, trackid, channel);
+    m_myView->SetChannel(channel);
 
     AddCurveToScene();
 
@@ -150,24 +154,27 @@ void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t 
     m_myView->RequestRefreshView(true);
 }
 
-void CurveEditor::ChannelDeselectedEvent() const
+void CurveEditor::ChannelDeselectedEvent()
 {
     m_myView->HideAnimationCurves();
     m_pointEditor->HidePoints();
     m_myView->RequestRefreshView(false);
 }
 
-void CurveEditor::Recalculate(TimelineArea* const area) const {
-    m_pointEditor->Recalculate(area);
-}
+void CurveEditor::UpdateChannel()
+{
+    Animation::ChannelRef channel = m_pointEditor->GetChannel();
+    m_myView->HideAnimationCurves();
+    m_myView->ClearCurvePoints();
+    m_myView->SetChannel(channel);
 
-Animation::ChannelRef CurveEditor::GetChannel() const {
-    return m_pointEditor->GetChannel();
-}
+    AddCurveToScene();
 
-bool CurveEditor::GetAndClearIsRedrawFlag() const {
-    return m_pointEditor->GetAndClearIsCurveChangedFlag();
+    m_myView->ShowAnimationCurves();
+
+    m_myView->RequestRefreshView(true);
 }
+// ReSharper restore CppMemberFunctionMayBeConst
 
 void CurveEditor::AddCurveToScene() const
 {
@@ -181,3 +188,4 @@ void CurveEditor::AddCurveToScene() const
     }
     m_myView->RequestRefreshView(true);
 }
+
