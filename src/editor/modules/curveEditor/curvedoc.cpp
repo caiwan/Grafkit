@@ -37,7 +37,7 @@ void CurveManager::Rebuild()
 
 	size_t keyCount = m_channel->GetKeyCount();
 	for (size_t i = 0; i < keyCount; i++) {
-		auto key = m_channel->GetKey(i);
+		const auto key = m_channel->GetKey(i);
 		CurvePointItem *point = new CurvePointItem(key, i);
 		m_curvePoints->push_back(point);
 

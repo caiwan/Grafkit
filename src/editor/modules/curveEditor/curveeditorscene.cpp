@@ -245,7 +245,6 @@ TimelineArea::TimelineArea()
 	m_offset = QPointF(0, 0);
 }
 
-# if 1
 QPointF TimelineArea::Point2Screen(QPointF point) const
 {
 	return {
@@ -261,23 +260,6 @@ QPointF TimelineArea::Screen2Point(QPointF point) const
 		(point.y() - m_offset.y() - m_sceneRect.topLeft().y() - m_sceneRect.height() / 2.) / -m_scale.height()
 	};
 }
-#else
-QPointF TimelineArea::Point2Screen(QPointF point) const
-{
-	return {
-		(point.x() * m_scale.width() + m_offset.x()) ,
-		(point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.height() / 2.)
-	};
-}
-
-QPointF TimelineArea::Screen2Point(QPointF point) const
-{
-	return {
-		(point.x() - m_offset.x()) / m_scale.width(),
-		(point.y() - m_offset.y() - m_sceneRect.height() / 2.) / -m_scale.height()
-	};
-}
-#endif
 
 // ReSharper disable CppInconsistentNaming
 void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
