@@ -1,7 +1,7 @@
 #pragma once
-#include "../render/dxtypes.h"
+#include "render/dxtypes.h"
 #include "quaternion.h"
-#include "../utils/memory.h"
+#include "core/memory.h"
 
 namespace Grafkit {
 	/**

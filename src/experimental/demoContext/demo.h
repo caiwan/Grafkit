@@ -1,9 +1,8 @@
 #pragma once
 
 #include "common.h"
-#include "render/renderer.h"
-#include "experimental/renderable.h"
-#include "experimental/scene.h"
+#include "scene/renderable.h"
+#include "scene/scene.h"
 
 namespace Grafkit
 {

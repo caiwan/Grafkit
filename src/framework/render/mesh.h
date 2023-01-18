@@ -1,17 +1,11 @@
-#ifndef _Mesh_H_
-#define _Mesh_H_
+#pragma once
 
-#include <vector>
 #include <list>
 #include <map>
 
-#include "../utils/reference.h"
-#include "../utils/exceptions.h"
+#include "common.h"
 
-#include "../utils/persistence/persistence.h"
-
-#include "renderer.h"
-#include "dxtypes.h"
+#include "utils/persistence/persistence.h"
 
 namespace Grafkit
 {
@@ -77,5 +71,3 @@ namespace Grafkit
 // --- excpetions 
 DEFINE_EXCEPTION(CreateVertexBufferException, 1301, "Could not create vertex buffer")
 DEFINE_EXCEPTION(CreateIndevBufferException, 1302, "Could not create index buffer")
-
-#endif

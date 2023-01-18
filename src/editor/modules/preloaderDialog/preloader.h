@@ -2,7 +2,7 @@
 
 #include <QDialog>
 
-#include "utils/ResourceManager.h"
+#include "resource/ResourceManager.h"
 
 namespace Ui {
 	class Preloader;

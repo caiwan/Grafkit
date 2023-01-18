@@ -3,7 +3,7 @@
 
 #include "outlineModule.h"
 
-#include "experimental/scene.h"
+#include "scene/scene.h"
 #include "demo.h"
 //#include "render/SceneGraph.h"
 

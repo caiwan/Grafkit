@@ -4,7 +4,7 @@
 
 #include "math/matrix.h"
 
-#include "utils/reference.h"
+#include "core/reference.h"
 
 #include "render/Actor.h"
 
@@ -36,7 +36,7 @@ namespace Grafkit
 
     protected:
         void Serialize(Archive& ar) override = 0;
-        void _Serialize(Archive& ar);
+        void _Serialize(Archive& ar) override;
 
     public:
 
@@ -350,5 +350,4 @@ namespace Grafkit
     }
 
     inline void Animation::Channel::CopyTo(const ChannelRef& target, size_t start, size_t end) { for (size_t i = start; i < end; i++) { target->AddKey(m_keys[i]); } }
-
 }

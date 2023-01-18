@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include "ViewModule.h"
-#include "utils/ResourceManager.h"
+#include "resource/ResourceManager.h"
 
 using namespace Idogep;
 using namespace Grafkit;

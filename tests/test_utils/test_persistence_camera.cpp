@@ -42,5 +42,7 @@ TEST(Persistent_Camera, CameraPersistenceTest)
 
     // 
 
+    FAIL() << "Not implemented";
+
     // + Valid
 }

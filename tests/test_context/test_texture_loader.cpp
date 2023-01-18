@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "utils/AssetFile.h"
+#include "utils/asset/AssetFile.h"
 
-#include "experimental/scene.h"
+#include "scene/scene.h"
 
 #include "demo.h"
 #include "context.h"
@@ -15,7 +15,7 @@
 #include "render/material.h"
 #include "render/texture.h""
 
-#include "generator/TextureLoader.h"
+#include "resource/loadersTextureLoader.h"
 
 // --- 
 

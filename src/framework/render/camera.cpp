@@ -7,6 +7,7 @@
 
 PERSISTENT_IMPL(Grafkit::Camera)
 using namespace Grafkit;
+using namespace DirectX;
 
 Camera::Camera(camera_mode mode) :Entity3D()
 {

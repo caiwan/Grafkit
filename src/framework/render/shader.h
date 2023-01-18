@@ -5,11 +5,14 @@
 
 #include <d3d11shader.h>
 
-#include "../utils/exceptions.h"
-#include "../utils/reference.h"
-#include "../utils/resource.h"
+#include "common.h"
 
-#include "dxtypes.h"
+//#include "stdafx.h"
+
+//#include "core/exceptions.h"
+//#include "../utils/reference.h"
+//#include "../utils/resource.h"
+
 #include "renderer.h"
 
 

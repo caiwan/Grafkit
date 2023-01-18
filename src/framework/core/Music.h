@@ -4,8 +4,8 @@
 
 #include "timer.h"
 
-#include "../utils/asset.h"
-#include "../utils/resource.h"
+#include "core/asset.h"
+#include "core/resource.h"
 
 /*
 Music player interface

@@ -1,10 +1,10 @@
 #pragma once
 #include <list>
 
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 
-#include "utils/resource.h"
-#include "utils/ResourceBuilder.h"
+#include "core/resource.h"
+#include "resource/ResourceBuilder.h"
 
 
 struct aiScene;

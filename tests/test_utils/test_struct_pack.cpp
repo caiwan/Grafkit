@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "utils/struct_pack.h"
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;

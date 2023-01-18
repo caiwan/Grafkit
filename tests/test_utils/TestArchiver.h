@@ -1,5 +1,5 @@
 #pragma once
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 #include "utils/persistence/persistence.h"
 
 // ----------------------------------------

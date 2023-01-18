@@ -482,7 +482,7 @@ namespace
 // --- snip 
 // move this to a different file, or tkspline so
 
-#include "utils/reference.h"
+#include"core/reference.h"
 
 #pragma once
 

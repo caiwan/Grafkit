@@ -1,6 +1,3 @@
-/**
-*/
-
 #pragma once 
 
 #define WIN32_LEAN_AND_MEAN
@@ -28,7 +25,6 @@ namespace Grafkit
 		virtual int mainloop() = 0;
 		virtual void release() = 0;
 
-
 		LRESULT MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) override;
 
 	protected:
@@ -40,10 +36,8 @@ namespace Grafkit
 		Input* m_pInput;
 
 		// shortcut for esc
-		bool isEscPressed() { return m_pInput->IsKeyDown(VK_ESCAPE); }
+		bool isEscPressed() const { return m_pInput->IsKeyDown(VK_ESCAPE); }
 
 	};
 
 }
-
-

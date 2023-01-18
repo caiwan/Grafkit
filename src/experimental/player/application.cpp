@@ -4,8 +4,8 @@
 
 #include "core/Music.h"
 
-#include "utils/AssetFile.h"
-#include "utils/ResourceManager.h"
+#include "utils/asset/AssetFile.h"
+#include "resource/ResourceManager.h"
 
 
 using namespace GrafkitData;

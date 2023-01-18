@@ -5,8 +5,8 @@
 #include "core/system.h"
 #include "fwzSetup.h"
 
-#include "utils/AssetFactory.h"
-#include "utils/ResourcePreloader.h"
+#include "utils/asset/AssetFactory.h"
+#include "resource/ResourcePreloader.h"
 
 namespace GkDemo
 {

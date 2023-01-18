@@ -7,10 +7,6 @@ using namespace Grafkit;
 Object::Object() : Referencable()
     , Persistent() { CreateUuid(); }
 
-//Object::Object(const std::string& name) : Referencable()
-//    , Persistent()
-//    , m_name(name) { CreateUuid(); }
-
 Object::Object(const std::string& name, const std::string& uuid) : Referencable()
     , Persistent()
     , m_name(name)

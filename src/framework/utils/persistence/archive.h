@@ -2,7 +2,7 @@
 #define __ARCHIVE_H_
 
 #include "persistence.h"
-#include "utils/asset.h"
+#include "core/asset.h"
 
 namespace Grafkit {
 

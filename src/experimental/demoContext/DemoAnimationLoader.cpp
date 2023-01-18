@@ -1,14 +1,14 @@
 #include "DemoAnimationLoader.h"
 #include "demo.h"
 
-#include "utils/resource.h"
-#include "utils/ResourceManager.h"
-#include "utils/AssetFactory.h"
+#include "core/resource.h"
+#include "resource/ResourceManager.h"
+#include "utils/asset/AssetFactory.h"
 
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 #include "utils/persistence/archive.h"
 #include "utils/persistence/persistence.h"
-#include "utils/asset.h"
+#include "core/asset.h"
 
 using namespace FWdebugExceptions;
 

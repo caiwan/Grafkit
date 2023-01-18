@@ -4,7 +4,7 @@
 #include <map>
 
 #include "common.h"
-#include "utils/memory.h"
+#include "core/memory.h"
 
 #include "dxtypes.h"
 #include "renderer.h"

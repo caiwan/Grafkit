@@ -12,11 +12,11 @@
 #include "assimp/vector3.h"
 #include "assimp/quaternion.h"
 
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 
-#include "utils/asset.h"
-#include "utils/resource.h"
-#include "utils/ResourceBuilder.h"
+#include "core/asset.h"
+#include "core/resource.h"
+#include "resource/ResourceBuilder.h"
 
 #include "render/Scene.h"
 #include "render/model.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "utils/resource.h"
+#include "core/resource.h"
 #include "shaderparameter.h"
 #include "Texture.h"
 

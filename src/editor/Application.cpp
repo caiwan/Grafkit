@@ -4,7 +4,7 @@
 
 #include "context.h"
 
-#include "utils/AssetFile.h"
+#include "utils/asset/AssetFile.h"
 
 #include "main_editor.h"
 #include "editor.h"

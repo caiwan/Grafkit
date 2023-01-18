@@ -1,0 +1,30 @@
+enable_testing()
+
+# find_package(GTest REQUIRED)
+
+set(APPLICATION_NAME IntegrationTest)
+
+file(GLOB_RECURSE SOURCE_FILES *.cpp)
+file(GLOB_RECURSE HEADER_FILES *.h)
+
+include_directories("${CMAKE_SOURCE_DIR}")
+
+add_executable(${APPLICATION_NAME} EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES})
+add_test(Tests ${APPLICATION_NAME})
+
+if ( MSVC )
+    set_target_properties( ${APPLICATION_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
+endif ( MSVC )
+
+target_link_libraries(${APPLICATION_NAME} 
+	Grafkit2
+	${GTEST_BOTH_LIBRARIES}
+	${BASS_LIBRARY_RELEASE}
+)
+
+bass_copy_binaries(${APPLICATION_NAME} "${CMAKE_BINARY_DIR}")
+ASSIMP_COPY_BINARIES(${APPLICATION_NAME})
+
+target_include_directories(${APPLICATION_NAME} PUBLIC include)
+
+set_target_properties(${APPLICATION_NAME} PROPERTIES FOLDER tests)

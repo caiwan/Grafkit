@@ -12,13 +12,13 @@
 //#include "render/effect.h"
 
 #include "render/SceneGraph.h"
-#include "experimental/scene.h"
+#include "scene/scene.h"
 #include "animation/actoranimation.h"
 
-#include "generator/ShaderLoader.h"
+#include "resource/loaders/ShaderLoader.h"
 
-#include "utils/ResourceManager.h"
-#include "generator/MusicBassLoader.h"
+#include "resource/ResourceManager.h"
+#include "resource/loaders/MusicBassLoader.h"
 
 #include "core/Music.h"
 

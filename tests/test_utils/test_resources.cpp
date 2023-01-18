@@ -169,3 +169,5 @@ TEST_F(ResourceManagerTest, ReloadTest) {
     ASSERT_DOUBLE_EQ(2.16f, (*resource)->GetGlejd());
 
 }
+
+

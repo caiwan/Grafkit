@@ -1,10 +1,6 @@
 #pragma once
 
-
-#include "../utils/reference.h"
-
-#include "renderer.h"
-
+#include "common.h"
 
 #define MULTITEXTURE_MAX 16
 
@@ -45,7 +41,7 @@ namespace Grafkit
 		Cubemap() {
 		}
 
-		Cubemap(BitmapRef bitmaps[6]) {
+	    explicit Cubemap(BitmapRef bitmaps[6]) {
 			for (int i = 0; i < 6; i++)
 				m_cube[i] = bitmaps[i];
 		}

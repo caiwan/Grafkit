@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "utils/reference.h"
-#include "utils/memory.h"
+#include"core/reference.h"
+#include "core/memory.h"
 
 #include "renderer.h"
 #include "texture.h"

@@ -17,9 +17,9 @@
 
 #include "stdafx.h" // az assimp sajat memoria basztatoja miatt kell lerakni ide, a sajat memoria basztatonk miatt
 
-#include "utils/AssetFactory.h"
-#include "utils/resource.h"
-#include "utils/ResourceManager.h"
+#include "utils/asset/AssetFactory.h"
+#include "core/resource.h"
+#include "resource/ResourceManager.h"
 
 #include "utils/persistence/archive.h"
 #include "utils/persistence/persistence.h"

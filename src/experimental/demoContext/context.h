@@ -1,6 +1,6 @@
 #pragma once
-#include "utils/ResourcePreloader.h"
-#include "utils/InitializeSerializer.h"
+#include "resource/ResourcePreloader.h"
+#include "utils/ext/InitializeSerializer.h"
 #include "schema.h"
 
 namespace GkDemo

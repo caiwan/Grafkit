@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include <gtest/gtest.h>
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 
 using namespace FWdebugExceptions;
 

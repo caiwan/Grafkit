@@ -3,7 +3,7 @@
 
 #include "shader.h"
 
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 
 #include "builtin_data/cube.h"
 #include "builtin_data/defaultShader.h"

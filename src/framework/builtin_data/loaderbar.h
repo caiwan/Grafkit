@@ -5,7 +5,7 @@
 #include "render/renderer.h"
 #include "render/effect.h"
 
-#include "utils/ResourceManager.h"
+#include "resource/ResourceManager.h"
 
 namespace GrafkitData {
 

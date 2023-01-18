@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "exceptions.h"
+#include "core/exceptions.h"
 
 
 /// ezt kell majd definialni forditaskor 

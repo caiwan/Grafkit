@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "utils/AssetFile.h"
-#include "utils/ResourceManager.h"
+#include "utils/asset/AssetFile.h"
+#include "resource/ResourceManager.h"
 
 #include "demo.h"
 #include "context.h"

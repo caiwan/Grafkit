@@ -2,8 +2,15 @@
 
 #include "stdafx.h"
 
+#include "core/exceptions.h"
+
 #include "persistence.h"
 #include "dynamics.h"
+
+// --- define exceptions 
+
+DEFINE_EXCEPTION(PersistentCreateObjectExcpetion, 0, "Load error: Cannot create object")
+DEFINE_EXCEPTION(PersistentVersionMismatch, 0, "Load error: Version mismatch")
 
 /**
 	Persistent

@@ -86,6 +86,7 @@
 *.gikeep filter=lfs diff=lfs merge=lfs -text
 *.1 filter=lfs diff=lfs merge=lfs -text
 *.obj filter=lfs diff=lfs merge=lfs -text
+*.spp filter=lfs diff=lfs merge=lfs -text
 * text !filter !merge !diff
 *.dae text !filter !merge !diff
 *.fbx text !filter !merge !diff
@@ -102,4 +103,3 @@
 *.tga filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
-*.spp filter=lfs diff=lfs merge=lfs -text

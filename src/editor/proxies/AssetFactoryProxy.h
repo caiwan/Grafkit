@@ -2,8 +2,8 @@
 
 #include <qobject.h>
 
-#include "utils/Asset.h"
-#include "utils/AssetFactory.h"
+#include "core/asset.h"
+#include "utils/asset/AssetFactory.h"
 
 namespace Idogep {
 

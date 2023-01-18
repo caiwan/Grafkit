@@ -1,14 +1,6 @@
 #pragma once
 
-#include "../stdafx.h"
-
-#define WIN32_LEAN_AND_MEAN
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif //NOMINMAX
-#include <windows.h>
-
-#include <process.h>
+#include "core/exceptions.h"
 
 namespace Grafkit
 {
@@ -92,13 +84,7 @@ namespace Grafkit
         explicit MutexLocker(Mutex& mutex, DWORD milli = INFINITE) : m_mutex(&mutex) { m_mutex->Lock(milli); }
         explicit MutexLocker(Mutex* mutex, DWORD milli = INFINITE) : m_mutex(mutex) { m_mutex->Lock(milli); }
 
-        ~MutexLocker()
-        {
-            m_mutex->Unlock();
-            
-            if (m_mutex->IsLocked())
-                assert(0);
-        }
+        ~MutexLocker();
 
         Mutex* GetMutex() const { return m_mutex; }
 

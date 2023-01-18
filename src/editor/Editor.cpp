@@ -1,10 +1,12 @@
+#include "stdafx.h"
 #include "Editor.h"
 
-#include "utils/ResourceManager.h"
+#include "resource/ResourceManager.h"
+#include "utils/asset/AssetFactory.h"
 
-#include "render/shader.h"
+//#include "render/shader.h"
 //#include "render/scene.h"
-#include "experimental/scene.h"
+#include "scene/scene.h"
 
 #include "demo.h"
 #include "context.h"

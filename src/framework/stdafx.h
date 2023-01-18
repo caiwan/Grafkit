@@ -4,30 +4,30 @@
 #define NOMINMAX
 #endif //NOMINMAX
 
+#include <string>
+#include <vector>
+#include <list>
+#include <map>
+
+#include <cassert>
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#pragma warning(push)
+#pragma warning(disable : 4005)
+#pragma warning(disable : 4290)
+#pragma warning(pop)
+
 #ifdef __cplusplus
-
 #include "common.h"
-
-// dx datatypes
+#include "core/reference.h"
+#include "core/memory.h"
+#include "core/thread.h"
+#include "core/exceptions.h"
+#include "core/logger.h"
 #include "render/dxtypes.h"
-
-// serilaizer
+#include "render/renderer.h"
 #include "utils/persistence/dynamics.h"
 #include "utils/persistence/persistence.h"
-
-// thread 
-#include "core/thread.h"
-
-// logger
-#include "utils/logger.h"
-
-// memory management
-#include "utils/memory.h"
-
-//reference counter
-#include "utils/reference.h"
-
-//exceptions 
-#include "utils/exceptions.h"
-
 #endif //__cplusplus

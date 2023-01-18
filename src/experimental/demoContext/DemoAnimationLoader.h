@@ -1,6 +1,6 @@
 #pragma once
 
-#include "experimental/AnimationLoader.h"
+#include "resource/loaders/AnimationLoader.h"
 
 namespace GkDemo
 {

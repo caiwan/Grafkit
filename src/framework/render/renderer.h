@@ -1,10 +1,4 @@
-/**
-	... 
-*/
-#ifndef _Renderer_H_
-#define _Renderer_H_
-
-#include "../stdafx.h"
+#pragma once
 
 #include <chrono>
 
@@ -15,13 +9,13 @@
 
 #include <DXGI1_2.h>
 
-#include "../utils/reference.h"
-#include "../utils/exceptions.h"
-#include "../utils/memory.h"
+#include "dxtypes.h"
+
+#include "core/reference.h"
+#include "core/exceptions.h"
+#include "core/memory.h"
 
 #define RENDER_TARGET_MAX D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT
-
-using namespace DirectX;
 
 namespace Grafkit {
 	/**
@@ -68,24 +62,24 @@ namespace Grafkit {
 		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
 
 		// --- getters
-		ID3D11Device * const & GetDevice() { return this->m_device; }
+        ID3D11Device * const & GetDevice() { return this->m_device; }
 		operator ID3D11Device *&() { return this->m_device; }
 
-		ID3D11DeviceContext * const & GetDeviceContext() { return this->m_deviceContext; }
+        ID3D11DeviceContext * const & GetDeviceContext() { return this->m_deviceContext; }
 		operator ID3D11DeviceContext *&() { return this->m_deviceContext; }
 
 		void GetVideoCardInfo(char* dest);
 
-		void GetScreenSize(int &screenW, int &screenH) { screenW = m_screenW; screenH = m_screenH; }
-		void GetScreenSizef(float &screenW, float &screenH) { screenW = m_screenW; screenH = m_screenH; }
+		void GetScreenSize(int &screenW, int &screenH) const { screenW = m_screenW; screenH = m_screenH; }
+		void GetScreenSizef(float &screenW, float &screenH) const { screenW = m_screenW; screenH = m_screenH; }
 
-		void GetViewportSize(int &viewW, int &viewH) { viewW = m_viewport.Width; viewH = m_viewport.Height; }
-		void GetViewportSize(int &viewW, int &viewH, int &viewX, int &viewY) { viewW = m_viewport.Width; viewH = m_viewport.Height; viewX = m_viewport.TopLeftX; viewY = m_viewport.TopLeftY; }
-		void GetViewportSizef(float &viewW, float &viewH) { viewW = (float)m_viewport.Width; viewH = (float)m_viewport.Height; }
+		void GetViewportSize(int &viewW, int &viewH) const { viewW = m_viewport.Width; viewH = m_viewport.Height; }
+		void GetViewportSize(int &viewW, int &viewH, int &viewX, int &viewY) const { viewW = m_viewport.Width; viewH = m_viewport.Height; viewX = m_viewport.TopLeftX; viewY = m_viewport.TopLeftY; }
+		void GetViewportSizef(float &viewW, float &viewH) const { viewW = (float)m_viewport.Width; viewH = (float)m_viewport.Height; }
 
-		float GetAspectRatio() {return (float)m_viewport.Width / (float)m_viewport.Height;}
+		float GetAspectRatio() const {return (float)m_viewport.Width / (float)m_viewport.Height;}
 
-		float GetDeltaTime() { return m_lastDeltaTime; }
+		float GetDeltaTime() const { return m_lastDeltaTime; }
 
 	protected:
 		bool m_vsync_enabled;
@@ -120,5 +114,3 @@ namespace Grafkit {
 
 DEFINE_EXCEPTION(InitializeRendererException, EX_ERROR_RENDERER + 0, "Failed to initialize renderer object");
 DEFINE_EXCEPTION(ResizeRenderSurfaceException, EX_ERROR_RENDERER + 1, "Can not resize render surface");
-
-#endif

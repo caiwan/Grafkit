@@ -1,6 +1,6 @@
 #include "scenegraphviewwidget.h"
 
-#include "utils/resource.h"
+#include "core/resource.h"
 #include "utils/tree/treemodel.h"
 
 #include "ui_scenegraphviewwidget.h"

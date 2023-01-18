@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include <process.h>
+
 #include "thread.h"
 
 using namespace Grafkit;
@@ -111,4 +113,12 @@ void Mutex::Unlock()
 {
     m_isLocked--;
     ReleaseMutex(m_hMutex);
+}
+
+MutexLocker::~MutexLocker()
+{
+    m_mutex->Unlock();
+
+    if (m_mutex->IsLocked())
+    assert(0);
 }

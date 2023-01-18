@@ -4,8 +4,8 @@
 #include <qthread.h>
 
 #include "render/renderer.h"
-#include "utils/ResourcePreloader.h"
-#include "utils/InitializeSerializer.h"
+#include "resource/ResourcePreloader.h"
+#include "utils/ext/InitializeSerializer.h"
 
 #include "utils/Event.h"
 

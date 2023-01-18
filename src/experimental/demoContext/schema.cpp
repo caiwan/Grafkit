@@ -4,15 +4,15 @@
 #include "demo.h"
 #include "json.hpp"
 
-#include "utils/exceptions.h"
-#include "utils/logger.h"
+#include "core/exceptions.h"
+#include "core/logger.h"
 
-#include "utils/asset.h"
-#include "utils/AssetFactory.h"
-#include "utils/ResourceManager.h"
+#include "core/asset.h"
+#include "utils/asset/AssetFactory.h"
+#include "resource/ResourceManager.h"
 
 #include "render/shader.h"
-#include "generator/ShaderLoader.h"
+#include "resource/loaders/ShaderLoader.h"
 
 #include "render/mesh.h"
 #include "render/model.h"
@@ -25,11 +25,11 @@
 #include "render/actor.h"
 #include "render/SceneGraph.h"
 
-#include "experimental/scene.h"
-#include "experimental/AnimationLoader.h"
+#include "scene/scene.h"
+#include "resource/loaders/AnimationLoader.h"
 
 #include "core/Music.h"
-#include "generator/MusicBassLoader.h"
+#include "resource/loaders/MusicBassLoader.h"
 
 #include "builtin_data/cube.h"
 #include "json_fwd.hpp"
@@ -39,7 +39,7 @@
 #include "DemoAnimationLoader.h"
 #include "MeshLoader.h"
 #include "context.h"
-#include "generator/TextureLoader.h"
+#include "resource/loaders/TextureLoader.h"
 
 #define ANIMATION_ROOT "animation/"
 

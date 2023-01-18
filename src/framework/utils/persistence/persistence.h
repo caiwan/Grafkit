@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include "../exceptions.h"
 #include "dynamics.h"
 
 // http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
@@ -147,8 +146,3 @@ public:\
 #define PERSIST_OBJECT(AR, OBJECT) _PERSIST_OBJECT(AR, decltype(OBJECT), OBJECT, OBJECT)
 #define PERSIST_REFOBJECT(AR, REF) _PERSIST_OBJECT(AR, decltype(REF.Get()), REF.Get(), REF)
 
-
-// --- define exceptions 
-
-DEFINE_EXCEPTION(PersistentCreateObjectExcpetion, 0, "Load error: Cannot create object")
-DEFINE_EXCEPTION(PersistentVersionMismatch, 0, "Load error: Version mismatch")

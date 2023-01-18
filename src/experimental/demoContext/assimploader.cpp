@@ -23,8 +23,8 @@
 #include "math/matrix.h"
 #include "math/quaternion.h"
 
-#include "utils/resource.h"
-#include "utils/ResourceManager.h"
+#include "core/resource.h"
+#include "resource/ResourceManager.h"
 
 #include "render/renderer.h"
 #include "render/texture.h"

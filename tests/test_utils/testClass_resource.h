@@ -1,12 +1,12 @@
 #pragma once
 
-#include <string>
+#include "common.h"
 
-#include "utils/exceptions.h"
+#include "core/exceptions.h"
 
-#include "utils/resource.h"
-#include "utils/ResourceBuilder.h"
-#include "utils/ResourceManager.h"
+#include "core/resource.h"
+#include "resource/ResourceBuilder.h"
+#include "resource/ResourceManager.h"
 
 /**
 Dummy class
@@ -32,6 +32,31 @@ private:
 typedef Ref<Thing> ThingRef;
 typedef Grafkit::Resource<Thing> ThingResource;
 typedef Ref<ThingResource> ThingResourceRef;
+
+/*
+ * Dummy class for inheritence
+ */
+
+class BaseThing : public Grafkit::Object
+{
+public:
+    virtual int GetId() const  = 0;
+
+    PERSISTENT_DECL(BaseThing, 1);
+
+};
+
+class DerivedThing1 : public BaseThing
+{
+public:
+    int GetId() const override { return 1; }
+};
+
+class DerivedThing : public BaseThing
+{
+public:
+    int GetId() const override { return 2; }
+};
 
 /**
 Dummy class2

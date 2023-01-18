@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Renderer.h"
-#include "memory.h"
+#include "core/memory.h"
 
 using namespace FWdebugExceptions;
 using namespace Grafkit;

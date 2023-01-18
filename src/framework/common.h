@@ -1,8 +1,12 @@
 #pragma once 
 
-#include"utils/reference.h"
-#include"utils/resource.h"
+#include"core/reference.h"
+#include"core/resource.h"
+#include"core/asset.h"
 #include"core/Object.h"
+
+#include "render/renderer.h"
+#include "render/dxtypes.h"
 
 // predefine classes to reduce compile time 
 

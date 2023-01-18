@@ -4,7 +4,7 @@
 #include <QList>
 #include <QString>
 
-#include "utils/logger.h"
+#include "core/logger.h"
 
 #include "utils/Event.h"
 

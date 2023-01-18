@@ -20,12 +20,14 @@ using namespace Grafkit;
 using namespace FWdebugExceptions;
 using namespace ArchivePersistent;
 
-TEST(Persistent_Light, LightPersistenceTest)
+TEST(Persistent_Light, DISABLED_LightPersistenceTest)
 {
     TestArchiver ar(256, true);
 
     // given
     //LightRef light = new Light();
+
+    FAIL() << "Not implemented";
 
     // when
 
@@ -33,4 +35,5 @@ TEST(Persistent_Light, LightPersistenceTest)
     size_t pos = ar.GetCrsr();
     ar.ResetCrsr();
     ar.SetDirection(false);
+
 }
