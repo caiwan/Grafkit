@@ -50,8 +50,6 @@ namespace Idogep {
 
 	namespace Roles {
 
-		// TODO: singleton
-
 		class ViewRefreshQueue : public QObject {
 			Q_OBJECT
 		public:
