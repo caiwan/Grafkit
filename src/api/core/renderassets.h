@@ -68,13 +68,13 @@ namespace FWassets{
 	class IRenderAssetManager 
 	{
 		friend class IRenderAsset;
-		friend class IRenderAssetGenerator;
+		friend class IRenderAssetBuilder;
 
 	public:
 		IRenderAssetManager();
 		virtual ~IRenderAssetManager();
 
-		virtual FWassets::IResourceFactory* GetResourceFactory() = 0;
+		//virtual FWassets::IResourceFactory* GetResourceFactory() = 0;
 		virtual FWrender::Renderer & GetDeviceContext() = 0;
 
 	public:
@@ -92,10 +92,9 @@ namespace FWassets{
 		void ChangeName(IRenderAsset* obj, std::string newname);
 		void ChangeUUID(IRenderAsset *obj, Guid newuuid);
 		///@}
+
 		IRenderAsset* GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid);
 		IRenderAsset* GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name);
-
-		//void RegisterBuilderFactory(enum IRenderAsset::RA_type_e type, IRenderAssetBuilderFactory* p_bfac);
 
 	private:
 		typedef std::map<std::string, IRenderAsset*> name_map_t;
@@ -103,8 +102,6 @@ namespace FWassets{
 
 		name_map_t m_mapNames[IRenderAsset::RA_TYPE_COUNT];
 		id_map_t m_mapID[IRenderAsset::RA_TYPE_COUNT];
-
-		//std::vector<IRenderAssetBuilderFactory*> m_builder_factories[IRenderAsset::RA_TYPE_COUNT];
 	};
 
 	///@todo ez az egesz hobelebanc itten e teljes revizionalasra, es ujratervezesre szorul.
@@ -112,17 +109,7 @@ namespace FWassets{
 	/**
 	ez az az interface, ami a bejovo input ertekre - nev, vagy uuid, legeneralja a megfelelo asset buildert
 	*/
-	
-	//class IRenderAssetBuilderFactory {
-	//public:
-	//	IRenderAssetBuilderFactory();
-	//	~IRenderAssetBuilderFactory();
 
-	//	IRenderAssetBuilder* GetObjectByUUID(Guid uuid);
-	//	IRenderAssetBuilder* GetObjectByName(std::string name);
-	//};
-
-	///**
 	//ez az az interface, ami legeneralja az adott assetet, ami eppen nekunk kell 
 	//*/
 	class IRenderAssetBuilder
@@ -134,7 +121,6 @@ namespace FWassets{
 			virtual void operator () (IRenderAssetManager * const & assman) = 0;
 	};
 	
-	///**
 	//A container for render assets
 	//*/
 	//class RenderAssetGeneratorContainer : virtual public Referencable, public Iterable
