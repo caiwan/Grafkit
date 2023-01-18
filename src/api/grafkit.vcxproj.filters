@@ -95,6 +95,9 @@
     <ClCompile Include="generator\assimploader.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
+    <ClCompile Include="render\Material.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -168,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="generator\assimploader.h">
       <Filter>Source Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="render\Material.h">
+      <Filter>Source Files\render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
