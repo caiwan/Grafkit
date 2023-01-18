@@ -7,8 +7,11 @@ namespace FWmath {
 
 	`::matrix` is a shortcut to `DirectX::XMMATRIX`
 	*/
-	class Matrix : public matrix 
+	class Matrix
 	{
+
+	private:
+		matrix mat;
 
 	public:
 		// --- constructors
@@ -25,15 +28,14 @@ namespace FWmath {
 		///translation
 		void Translate(float3 v)
 		{
-			matrix mat = DirectX::XMMatrixTranslation(v.x, v.y, v.z);
-			(*this) *= mat;
+			this->mat = DirectX::XMMatrixTranslation(v.x, v.y, v.z);
+			
 		}
 
 		///scale
 		void Scale(float3 v)
 		{
-			matrix mat = DirectX::XMMatrixScaling(v.x, v.y, v.z);
-			(*this) *= mat;
+			this->mat = DirectX::XMMatrixScaling(v.x, v.y, v.z);
 		}
 
 		/// Mixed scale and translate operation
@@ -49,8 +51,7 @@ namespace FWmath {
 		{
 			dxvector vv;
 			DirectX::XMLoadFloat3(&v);
-			matrix mat = DirectX::XMMatrixRotationNormal(vv, phi);
-			(*this) *= mat;
+			this->mat = DirectX::XMMatrixRotationNormal(vv, phi);
 		}
 
 		/// @todo https://en.wikipedia.org/wiki/Euler_angles
@@ -60,8 +61,7 @@ namespace FWmath {
 		/// Roll-Pitch-Yaw rotation
 		void RotateRPY(float roll, float pitch, float yaw)
 		{
-			matrix mat = DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw);
-			(*this) *= mat;
+			this->mat = DirectX::XMMatrixRotationRollPitchYaw(roll, pitch, yaw);
 		}
 
 
@@ -108,7 +108,7 @@ namespace FWmath {
 
 		/// Transpose matrix
 		void Transpose() {
-			(*this) = XMMatrixTranspose((*this));
+			mat = XMMatrixTranspose(mat);
 		}
 
 		// ===
@@ -117,13 +117,13 @@ namespace FWmath {
 		/// @note operator= valamiert nem mukodik, kiveve, ha ... 
 		Matrix& operator= (const Matrix& m) 
 		{
-			(matrix(*this)) = (const matrix) m;
+			mat = m.mat;
 			return *this;
 		}
 
 		Matrix& operator= (const matrix& m)
 		{
-			(DirectX::XMMATRIX(*this)) = m;
+			mat = m;
 			return *this;
 		}
 
