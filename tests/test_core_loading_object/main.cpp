@@ -62,10 +62,13 @@ public:
 
 			// -- model 
 			model = new Model;
-			result = this->model->Initialize(
+
+			/// @todo modernne kell tenni -> generator 
+			/*result = this->model->Initialize(
 				render, texture,
 				FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
-				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float2*)FWBuiltInData::cubeTextureUVs);
+				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float2*)FWBuiltInData::cubeTextureUVs
+				);*/
 
 			shader_texture = new TextureShaderClass();
 			result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
@@ -76,7 +79,8 @@ public:
 		};
 		
 		void release() {
-			this->render.Shutdown();
+			// ezt itt meg kell baszni
+			// this->render.Shutdown();
 			
 			
 			//delete this->camera;

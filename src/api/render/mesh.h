@@ -39,9 +39,11 @@ namespace FWrender
 
 			void Render(ID3D11DeviceContext* deviceContext);
 			
-
-			void addElement(ID3D11Buffer * pBuffer, int count) { this->m_buffers.push_back(pBuffer); this->m_vertexCount = count; }
-			void addIndices(ID3D11Buffer * pBuffer, int count) { this->m_indexBuffer = pBuffer; this->m_indexCount = count;}
+			/// @todo erre jobb megoldast kell talalni
+			void setVertexCount(int count) { this->m_vertexCount = count; }
+			
+			void addElement(ID3D11Buffer * pBuffer, UINT stride, UINT offset = 0);
+			void addIndices(ID3D11Buffer * pBuffer, UINT count) { this->m_indexBuffer = pBuffer; this->m_indexCount = count;}
 
 			int GetIndexCount() { return m_indexCount; }
 
@@ -50,9 +52,20 @@ namespace FWrender
 			void ShutdownBuffers();
 			void Shutdown();
 
+		protected:
+			struct BufferStateDescriptor {
+				ID3D11Buffer * buffer;
+				UINT stride, offset;
+
+				BufferStateDescriptor() {
+					buffer = NULL;
+					stride, offset = 0;
+				}
+			};
+
 		private:
 			ID3D11Buffer *m_indexBuffer;
-			std::vector<ID3D11Buffer *> m_buffers;
+			std::vector<BufferStateDescriptor> m_buffers;
 			int m_vertexCount, m_indexCount;
 	};
 

@@ -21,7 +21,7 @@ namespace FWrender {
 		Entity3D();
 		virtual ~Entity3D();
 
-		void setScader();
+		void setShader();
 		ShaderRef &getShader();
 
 		const Actor* getParent();

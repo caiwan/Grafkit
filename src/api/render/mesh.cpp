@@ -122,17 +122,27 @@ void FWrender::Mesh::Shutdown()
 //	delete[] indices; indices = 0;
 //}
 
+void FWrender::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
+{
+	BufferStateDescriptor elem;
+	elem.buffer = pBuffer;
+	elem.stride = stride;
+	elem.offset = offset;
+	this->m_buffers.push_back(elem);
+}
+
+
 void FWrender::Mesh::RenderBuffers(ID3D11DeviceContext * deviceContext)
 {
-	unsigned int stride;
-	unsigned int offset;
+	for (size_t i = 0; i<this->m_buffers.size(); ++i)
+	{
+		BufferStateDescriptor &elem = this->m_buffers[i];
 
-	stride = sizeof(VertexType);
-	offset = 0;
-
-	/// @todo --- ezt
-	/// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476456(v=vs.85).aspx
-	deviceContext->IASetVertexBuffers(0, this->m_buffers.size(), &this->m_buffers[0], &stride, &offset);
+		/// @todo --- ezt
+		/// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476456(v=vs.85).aspx
+		deviceContext->IASetVertexBuffers(0, 1, elem.buffer, &elem.stride, &elem.offset); // < megbasz
+	}
+	
 	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
@@ -150,17 +160,12 @@ void FWrender::Mesh::ShutdownBuffers()
 		m_indexBuffer->Release();
 		m_indexBuffer = 0;
 	}
-	// Release the vertex buffer.
-	/*
-	if (m_vertexBuffer)
-	{
-		m_vertexBuffer->Release();
-		m_vertexBuffer = 0;
-	}
-	*/
+
 	for (int i = 0; i < this->m_buffers.size(); i++) {
-		this->m_buffers[i]->Release();
+		this->m_buffers[i].buffer->Release();
 	}
 
 	return;
 }
+
+
