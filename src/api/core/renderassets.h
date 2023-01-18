@@ -17,6 +17,9 @@ A generator interface for assets
 
 #include "exceptions.h"
 
+// egyelore nem szerencsetlenkedunk a guid-dal, de ha megirtam eddig, akkor maradjon
+#define _NO_UUID_
+
 namespace FWassets{
 
 	class IRenderAsset;
@@ -43,16 +46,20 @@ namespace FWassets{
 		std::string GetName() { return this->m_name; }
 		void SetName(std::string name);
 
+#ifndef _NO_UUID_
 		Guid GetUUID() { return this->m_guid; }
 		Guid GenerateUUID();
 		void SetUUID(Guid uuid) { this->m_guid = uuid; }
+	protected:
+		Guid m_guid;
+#endif // _NO_UUID_
 
 		virtual const char* GetBucketID() = 0;
 
 	protected:
 		/// Sets asset manager 
 		std::string m_name;
-		Guid m_guid;
+
 	};
 
 	///@todo a render asset manager asset repositorykat tarol; 
@@ -114,6 +121,8 @@ namespace FWassets{
 
 #endif 
 
+
+
 	///@todod harelease-ben forditod, akkor eleg egy ":"
 //#define ROOT_REPOSITORY ":root"
 
@@ -139,9 +148,41 @@ namespace FWassets{
 
 		//IRenderAssetRepository* GetRepository(std::string name);
 
+		// --- ezek kellenek 
+		size_t AddObject(IRenderAsset* obj);
+		void RemoveObject(IRenderAsset* obj);
+
+#ifndef _NO_UUID_
+		/*Ref<IRenderAsset>*/ IRenderAsset* GetObjectByUUID(std::string bucket, Guid uuid);
+#endif _NO_UUID_
+		/*Ref<IRenderAsset>*/ IRenderAsset* GetObjectByName(std::string bucket, std::string name);
+
 	protected:
 		/*typedef std::map<std::string, IRenderAssetRepository*> repository_map_t;
 		repository_map_t m_repository;*/
+
+		std::vector<Ref<IRenderAsset>> m_assets;
+		
+		typedef std::map<std::string, size_t> name_map_t;
+#ifndef _NO_UUID_
+		typedef std::map<Guid, size_t> id_map_t;
+#endif //_NO_UUID_
+
+		struct bucket_t {
+			std::vector<int> m_ids;
+			name_map_t m_mapNames;
+#ifndef _NO_UUID_
+			id_map_t m_mapID;
+#endif //_NO_UUID_
+		};
+
+		std::vector<bucket_t> m_buckets;
+
+		typedef std::map<std::string, size_t> buket_map_t;
+
+		size_t GetBucket(std::string bucket); 
+		//IRenderAsset *GetAsset(bucket_t* bucket, std::);
+
 	};
 
 	///@todo ez az egesz hobelebanc itten e teljes revizionalasra, es ujratervezesre szorul.
@@ -161,5 +202,7 @@ namespace FWassets{
 }
 
 DEFINE_EXCEPTION(NoAssetFoundByNameException, 1, "No asset found by the given name");
+#ifndef _NO_UUID_
 DEFINE_EXCEPTION(NoAssetFoundByUUIDException, 2, "No asset found by the given UUID");
+#endif //_NO_UUID_
 DEFINE_EXCEPTION(NoAssetBucketFoundException, 3, "No asset bucket found");

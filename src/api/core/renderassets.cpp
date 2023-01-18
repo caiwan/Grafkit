@@ -13,8 +13,10 @@ using namespace FWdebugExceptions;
 FWassets::IRenderAsset::IRenderAsset() 
 	//: m_assman(nullptr)
 {
+#ifndef _NO_UUID_	
 	GuidGenerator gen;
 	this->m_guid = gen.newGuid();
+#endif 
 }
 
 FWassets::IRenderAsset::~IRenderAsset()
@@ -27,6 +29,7 @@ void FWassets::IRenderAsset::SetName(std::string name)
 	m_name = name;
 }
 
+#ifndef _NO_UUID_
 Guid FWassets::IRenderAsset::GenerateUUID()
 {
 	Guid uuid = m_guid;
@@ -38,6 +41,7 @@ Guid FWassets::IRenderAsset::GenerateUUID()
 
 	return this->m_guid;
 }
+#endif
 
 #ifdef _HAS_IRenderAssetRepository 
 // ==================================================================================================================================== 
@@ -186,6 +190,47 @@ FWassets::IRenderAssetManager::IRenderAssetManager()
 FWassets::IRenderAssetManager::~IRenderAssetManager()
 {
 	// ... 
+}
+
+size_t FWassets::IRenderAssetManager::AddObject(IRenderAsset * obj)
+{
+	// ... 
+
+#ifndef _NO_UUID_
+	///@todo ezt majd implementalni kell 
+#endif //_NO_UUID_
+
+	return size_t();
+}
+void FWassets::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
+{
+	// ... 
+
+#ifndef _NO_UUID_
+	///@todo ezt majd implementalni kell 
+#endif //_NO_UUID_
+}
+
+#ifndef _NO_UUID_
+IRenderAsset * FWassets::IRenderAssetManager::GetObjectByUUID(std::string bucket, Guid uuid)
+{
+	///@todo ezt majd implementalni kell 
+	return nullptr;
+}
+#endif _NO_UUID_
+
+IRenderAsset * FWassets::IRenderAssetManager::GetObjectByName(std::string bucket, std::string name)
+{
+	return nullptr;
+}
+
+size_t FWassets::IRenderAssetManager::GetBucket(std::string bucket)
+{
+	// van-e ilyen bucket
+	// ha nincs hozza letre, majd
+	// adja vissza
+	
+	return 0;
 }
 
 //IRenderAssetRepository * FWassets::IRenderAssetManager::GetRepository(std::string name)

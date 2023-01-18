@@ -22,9 +22,10 @@ namespace FWrender
 
 	class TextureAssetRef;
 
-#define TEXTURE_BUCKET ":texture"
+#define TEXTURE_BUCKET "texture"
 
 	// ========================================================================================================================
+	///@todo ezt valahogy ujra kell majd gondolni; nyilvan nem szep, es elegans megoldas ez, sajnos
 	///@todo erre a mokara fel lehetne talalni egy makrot, ami megcsinalja mindezt
 	/**
 	`DHOM` - A wrapper class to embed volatile textures

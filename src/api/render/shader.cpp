@@ -745,12 +745,12 @@ void FWrender::ShaderLoader::operator()(FWassets::IRenderAssetManager * const & 
 {
 	if (m_in.Invalid())
 		throw EX(NullPointerException);
-	try 
+	//try 
 	{
 		ShaderRef shader = new Shader();
 		// load from asset
 		if (m_resource.Valid()) {
-			LOG(TRACE) << "Lading shader from resource" << m_in->GetName() << m_in->GetUUID();
+			LOG(TRACE) << "Lading shader from resource" << m_in->GetName() << "@" << m_entrypoint; // << m_in->GetUUID();
 			shader->LoadFromMemory(assman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)m_resource->GetData(), m_resource->GetSize(), m_type);
 		}
 		else {
@@ -763,18 +763,22 @@ void FWrender::ShaderLoader::operator()(FWassets::IRenderAssetManager * const & 
 			m_in->Release();
 
 		(*m_in) = shader;
+
+		// m_in->SetName(m_in->GetName() + ":" + m_entrypoint);
+
+		assman->AddObject(m_in);
 	}
-	catch (MissingShaderException &e) {
-		// olyan shadert toltottunk be valoszinuleg, aminek nincs meg az az entrypointja, ami eppen kellene
-		// itt kivesszuk azt az assetmanagerbol, es az exceptiont eltesszuk
-		
-		assman->GetRepository(ROOT_REPOSITORY)->RemoveObject(m_in);
-		//assman->RemoveObject(m_in);
-	}
-	catch (ShaderException &e) {
-		// Itt tortent valami a shaderrel, vagy nem fordul le, vagy nincs ilyen entrypoint;
-		// utobbi esetben nem ezeket a drodiokat keressuk
-		assman->GetRepository(ROOT_REPOSITORY)->RemoveObject(m_in);
-		//assman->RemoveObject(m_in);
-	}
+	//catch (MissingShaderException &e) {
+	//	// olyan shadert toltottunk be valoszinuleg, aminek nincs meg az az entrypointja, ami eppen kellene
+	//	// itt kivesszuk azt az assetmanagerbol, es az exceptiont eltesszuk
+	//	
+	//	assman->GetRepository(ROOT_REPOSITORY)->RemoveObject(m_in);
+	//	//assman->RemoveObject(m_in);
+	//}
+	//catch (ShaderException &e) {
+	//	// Itt tortent valami a shaderrel, vagy nem fordul le, vagy nincs ilyen entrypoint;
+	//	// utobbi esetben nem ezeket a drodiokat keressuk
+	//	assman->GetRepository(ROOT_REPOSITORY)->RemoveObject(m_in);
+	//	//assman->RemoveObject(m_in);
+	//}
 }

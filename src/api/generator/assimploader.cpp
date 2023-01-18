@@ -115,7 +115,9 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 	std::string name = path.C_Str();
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		textureAsset = (TextureAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(TEXTURE_BUCKET, name).Get();
+		//textureAsset = (TextureAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(TEXTURE_BUCKET, name).Get();
+		textureAsset = (TextureAsset*)assman->GetObjectByName(TEXTURE_BUCKET, name);
+
 	}
 
 	return textureAsset;
@@ -240,6 +242,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
 			// -> valahol a loaderen kivul kell megtenni a shader kijelolest, illetve betoltest
+			
 			///@todo itt a materialt hozzuk lere valahogy, on-the-fly
 			ShaderAssetRef shader_fs = (ShaderAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 			material->SetShader(shader_fs);
@@ -431,7 +434,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 
 #else // fallback: recursive fill 
 	Actor* root_node = new Actor;
-	assimp_parseScenegraph(asset_repo, scene->mRootNode, &root_node);
+	// assimp_parseScenegraph(asset_repo, scene->mRootNode, &root_node);
 	m_scenegraph->SetRootNode(root_node);
 
 #endif

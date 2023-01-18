@@ -40,7 +40,8 @@ namespace FWrender {
 
 	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
 	///@todo aligned new-t mindenre
-	class MaterialBase //: virtual public FWassets::IRenderAsset
+	///@todo lehet, hogy nem is kell majd igazan ref. szamlalas ehhez 
+	class MaterialBase : public Referencable //: virtual public FWassets::IRenderAsset
 	{
 	public:
 		MaterialBase();

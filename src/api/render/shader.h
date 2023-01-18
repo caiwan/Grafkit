@@ -341,7 +341,7 @@ DEFINE_EXCEPTION(ShaderException, 1200, "Could not compile shader")
 
 #else 0 // NO_ShaderException
 
-#define HAS_ShaderException
+#define _HAS_ShaderException
 
 namespace FWdebugExceptions {
 	class ShaderException {
