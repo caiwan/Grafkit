@@ -4,6 +4,8 @@
 #ifndef _Mesh_H_
 #define _Mesh_H_
 
+
+
 #include "renderer.h"
 #include "dxtypes.h"
 
@@ -19,6 +21,7 @@ namespace FWrender
 	*/
 	class Mesh : public virtual Referencable{
 		public:
+			/*
 			struct VertexType_pos
 			{
 				float3 position;
@@ -32,7 +35,7 @@ namespace FWrender
 				float3 normal;
 				float3 tangent;
 			};
-
+			*/
 		public:
 			Mesh();
 			Mesh(const Mesh& mesh);
@@ -75,26 +78,45 @@ namespace FWrender
 	/**
 	Simple mesh generator. Automatically creates the vertex buffers from vectors 
 	*/
+
+
 	class SimpleMeshGenerator {
-		public: 
-			SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
+	public:
+		SimpleMeshGenerator(ID3D11Device* device) : m_device(device) {}
 
-			MeshRef operator() (
-				int vertexCount, const float3* position,
-				int indexCount, const int* indices,
-				MeshRef input = NULL
-			);
-
-			MeshRef operator() (
-				int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
-				int indexCount, const int* indices,
-				MeshRef input = NULL
-			);
-
-		private:
-			void createIndexBuffer(MeshRef mesh, int indexCount, const int* indices);
-			ID3D11Device *m_device;
+		// void setPtr
+	private:
+		ID3D11Device *m_device;
 	};
+
+# if 0		
+		///@ todo gen from shader layout 
+
+
+		// + operator[]	-ral be lehessen allitani a pointereket
+		// + a operator() -ral csak index + shader input kell
+		// a shaderbol kiszedi az input layout reflectort + ez alapjan osszelinkeli 
+		// es megcsinalja a blobot
+
+		MeshRef operator() (
+			int vertexCount, const float3* position,
+			int indexCount, const int* indices,
+			MeshRef input = NULL
+		);
+
+		MeshRef operator() (
+			int vertexCount, const float3* position, const float3* normal, const float2* uv, const float3* tangent,
+			int indexCount, const int* indices,
+			MeshRef input = NULL
+		);
+
+	private:
+		void createIndexBuffer(MeshRef mesh, int indexCount, const int* indices);
+		
+
+	};
+
+#endif 
 }
 
 // --- excpetions 

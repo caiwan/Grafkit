@@ -64,13 +64,13 @@ public:
 			// -- model 
 			model = new Model;
 
-			SimpleMeshGenerator generator(render);
+			//SimpleMeshGenerator generator(render);
 
-			generator(
-				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, (float3*)FWBuiltInData::cubeNormals,
-				FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
-				model
-			);
+			//generator(
+			//	FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, (float3*)FWBuiltInData::cubeNormals,
+			//	FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
+			//	model
+			//);
 
 			model->setTexture(texture);
 
@@ -82,6 +82,8 @@ public:
 			
 			shader_fs = new Shader();
 			shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+
+			// shader_vs->setInputLayout(model->getInputLayout);
 
 			this->t = 0;
 
@@ -111,7 +113,7 @@ public:
 
 				worldMatrix.RotateRPY(t*10, t*15, t*20);
 
-				(*shader_vs)["MatrixBuffer"].set(NULL);
+				shader_vs["MatrixBuffer"].set(NULL);
 
 				shader_vs->Render(render.GetDeviceContext());
 				shader_fs->Render(render.GetDeviceContext());

@@ -83,6 +83,7 @@ void FWrender::Mesh::ShutdownBuffers()
 
 
 // ========================================================================
+# if 0
 MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 * pPosition, int indexCount, const int * pIndices, MeshRef input_mesh)
 {
 	Mesh* mesh = NULL;
@@ -263,3 +264,4 @@ void FWrender::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCou
 
 	mesh->addIndices(indexBuffer, indexCount);
 }
+#endif 
