@@ -28,6 +28,11 @@ FWrender::Shader::~Shader()
 	this->Shutdown();
 }
 
+#include <string>
+#include <fstream>
+#include <streambuf>
+#include <iostream>
+
 void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
 {
 	HRESULT result = 0;
@@ -45,6 +50,11 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 	if (!file) throw new EX(NullPointerException);
 
 	this->m_type = type;
+
+	std::ifstream t(file);
+	std::string str((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+
+	std::cout << str << std::endl;
 
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
@@ -304,7 +314,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		elementDesc.SemanticName = input_desc.SemanticName;
 		elementDesc.SemanticIndex = input_desc.SemanticIndex;
 		elementDesc.InputSlot = 0;
-		elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;		// 16 bytes alignment
+		elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;	
 		elementDesc.InstanceDataStepRate = 0;
 
