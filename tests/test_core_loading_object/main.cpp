@@ -2,10 +2,10 @@
 
 #include "render/renderer.h"
 #include "render/camera.h"
+#include "render/model.h"
+#include "render/texture.h"
 #include "render/Material.h"
 #include "render/shader.h"
-
-#include "render/Scenegraph.h"
 
 #include "math/matrix.h"
 
@@ -39,9 +39,7 @@ public:
 protected:
 	Renderer render;
 	CameraRef camera;
-	//ModelRef model;
-
-	Scenegraph *scene;
+	ModelRef model;
 
 	float t;
 
@@ -68,8 +66,11 @@ protected:
 		camera = new Camera;
 		camera->SetPosition(0.0f, 0.0f, -5.0f);
 
-		
-		scene = new Scenegraph();
+		// -- texture
+		TextureRef texture;
+
+		TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, texture);
+		txgen();
 
 		// -- load shader
 		shader_vs = new Shader();
@@ -79,13 +80,17 @@ protected:
 		shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
 
 		// -- model 
+		model = new Model;
+		model->SetMaterial(new MaterialBase);
+		model->GetMaterial()->AddTexture(texture);	// elobb a texturakat toltod fel, aztad adod hozza a shadert.
+		model->GetMaterial()->SetShader(shader_fs);
 
-		// ide kell majd egy update model, minden materialra
 
-		//model = new Model;
-		//model->SetMaterial(new MaterialBase);
-		//model->GetMaterial()->AddTexture(texture);	// elobb a texturakat toltod fel, aztad adod hozza a shadert.
-		//model->GetMaterial()->SetShader(shader_fs);
+		SimpleMeshGenerator generator(render, shader_vs);
+		generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
+		generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+
+		generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
 		this->t = 0;
 
@@ -94,7 +99,6 @@ protected:
 
 	void release() {
 		this->render.Shutdown();
-		delete this->scene;
 	};
 
 	int mainloop() {
@@ -139,6 +143,7 @@ private:
 	FWassets::FileResourceManager *m_file_loader;
 public:
 	FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
+	FWrender::Renderer & GetDeviceContext() { return this->render; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
