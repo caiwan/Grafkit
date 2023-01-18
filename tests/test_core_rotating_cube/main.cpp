@@ -8,6 +8,8 @@
 
 #include "math/matrix.h"
 
+
+
 using namespace FWrender;
 using FWmath::Matrix;
 
@@ -92,31 +94,41 @@ public:
 			// delete this->shader_texture;
 
 		};
-		
+
 		int mainloop() {
 			this->render.BeginScene();
 			{
+				struct {
+					matrix worldMatrix;
+					matrix viewMatrix;
+					matrix projectionMatrix;
+				} matbuff;
 
-				Matrix worldMatrix, viewMatrix, projectionMatrix;
+				camera->Render(render);
 
-				camera->Render();
+				//render.GetWorldMatrix(matbuff.worldMatrix);
+				camera->GetViewMatrix(matbuff.viewMatrix);
+				camera->GetProjectionMatrix(matbuff.projectionMatrix);
 
-				render.GetWorldMatrix(worldMatrix);
-				camera->GetViewMatrix(viewMatrix);
-				camera->GetProjectionMatrix(projectionMatrix);
+				//matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
+				matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t*10, t*15, t*20);
 
-				worldMatrix.RotateRPY(t*10, t*15, t*20);
+				// --- ez a legfontosabb dolog, amit meg meg kell itt tenni mielott atadod a cbuffernek:
+				matbuff.worldMatrix = XMMatrixTranspose(matbuff.worldMatrix);
+				matbuff.viewMatrix = XMMatrixTranspose(matbuff.viewMatrix);
+				matbuff.projectionMatrix = XMMatrixTranspose(matbuff.projectionMatrix);
+				// ---
 
-				shader_vs["MatrixBuffer"].set(NULL);
+				shader_vs["MatrixBuffer"].Set(&matbuff);
 
 				shader_vs->Render(render);
 				shader_fs->Render(render);
 
 				model->Render(render);
 
-
 				this->t += 0.001;
 			}
+
 			this->render.EndScene();
 			return 0;
 		};
