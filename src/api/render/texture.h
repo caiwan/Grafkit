@@ -12,6 +12,12 @@
 
 namespace FWrender
 {
+	class Texture;
+	typedef Ref<Texture> TextureRef;
+	//class TextureRef;
+	class TextureAsset;
+	typedef Ref<TextureAsset> TextureAssetRef;
+
 	/**
 	A bitmap resource that contains a raw bitmap. This ig enerated by the generated, and loaded into the texture object.
 	*/
@@ -43,20 +49,22 @@ namespace FWrender
 	*/
 	class ITextureBuilder : public FWassets::IRenderAssetBuilder
 	{
-	public: 
+	public:
 		ITextureBuilder(TextureRef * const in) : IRenderAssetBuilder(), m_in(in) {}
-		virtual ~ITextureBuilder() {} 
-		
+		virtual ~ITextureBuilder() {}
+
 		virtual void operator() (FWassets::IRenderAssetManager * const & assman) = 0;
 
 	protected:
 		TextureRef * const m_in;
 	};
 
+	// ========================================================================================================================
+
 	/**
 	Texture class
 	*/
-	class Texture : virtual public Referencable, public FWassets::IRenderAsset
+	class Texture : virtual public Referencable //, public FWassets::IRenderAsset
 	{
 	public:
 		Texture();
@@ -73,14 +81,33 @@ namespace FWrender
 		operator ID3D11Texture2D* () { return this->m_pTex; }
 		operator ID3D11ShaderResourceView* () { return this->m_pResourceView; }
 
-		virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Texture; }
-
 	private:
 		ID3D11Texture2D * m_pTex;
 		ID3D11ShaderResourceView* m_pResourceView;
 		ID3D11SamplerState *m_pSamplerState;
 	};
 
+	// ========================================================================================================================
+
+	/**
+	`DHOM`
+	A wrapper class to embed volatile textures
+	*/
+
+	class TextureAsset: public FWassets::IRenderAsset, public TextureRef
+	{
+	public:
+		TextureAsset();
+		~TextureAsset();
+
+		virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Texture; }
+	};
+
+	// ========================================================================================================================
+
+	/** 
+	Texture loader from bitmap
+	*/
 	class TextureFromBitmap : public ITextureBuilder
 	{
 		public:
