@@ -23,7 +23,7 @@ namespace FWrender {
 	// typedefs for reference counting
 	typedef Ref<Camera> CameraRef;
 	typedef Ref<Model> ModelRef;
-	typedef Ref<Shader> ShaderRef;
+	// class ShaderRef;
 	typedef Ref<Texture> TextureRef;
 
 	/**
