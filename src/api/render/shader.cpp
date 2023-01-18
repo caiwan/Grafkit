@@ -1,10 +1,12 @@
+#include <string>
+#include <fstream>
+#include <streambuf>
+#include <iostream>
 
 #include <cstdio>
 
 #include "shader.h"
-
 #include "../math/matrix.h"
-
 #include "easyloggingpp.h"
 
 using namespace std;
@@ -27,15 +29,11 @@ Shader::Shader() :
 {
 }
 
+
 Shader::~Shader()
 {
 	this->Shutdown();
 }
-
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <iostream>
 
 void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
 {
@@ -82,6 +80,7 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 	shaderBuffer->Release();
 }
 
+
 void Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
 {
 	HRESULT result = 0;
@@ -127,6 +126,7 @@ void Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCSTR source, 
 	shaderBuffer->Release();
 }
 
+
 void Shader::Shutdown()
 {
 	if (this->m_pReflector)
@@ -138,9 +138,10 @@ void Shader::Shutdown()
 	this->m_inputNames.clear();
 }
 
+
 void Shader::Render(ID3D11DeviceContext * deviceContext)
 {
-
+	/// @todo use switch-case as flow control
 	// go the duck off 
 	if (this->m_type == ST_Vertex) {
 		// duck off the layout
@@ -166,12 +167,30 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 				deviceContext->PSSetConstantBuffers(slot, 1, &buffer);
 			}
 		}
-
 	}
 
 	// duck through the resources
+	if (!this->m_vBResources.empty()) {
+		for (size_t i = 0; i < this->m_vBResources.size(); i++) {
+			BoundResourceRecord &brRecord = this->m_vBResources[i];
+			if (brRecord.m_rBoundTexture.Valid()) {
+				ID3D11ShaderResourceView * ppResV = *(brRecord.m_rBoundTexture);
 
+				/// @todo a `brRecord.m_desc.BindCount`-al kezdj valamit plz
+				if (brRecord.m_desc.BindCount != 1)
+					DebugBreak();
+
+				if (m_type == ST_Vertex) {
+					deviceContext->VSSetShaderResources(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &ppResV);
+				}
+				else if (m_type == ST_Pixel) {
+					deviceContext->PSSetShaderResources(brRecord.m_desc.BindPoint, brRecord.m_desc.BindCount, &ppResV);
+				}
+			}
+		}
+	}
 }
+
 
 void Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 {
@@ -196,6 +215,7 @@ void Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 	this->BuildReflection(device, shaderBuffer);
 }
 
+
 Shader::ConstantBufferRecord& Shader::operator[](const char * name)
 {
 	static ConstantBufferRecord null_object;
@@ -214,6 +234,7 @@ Shader::ConstantBufferRecord& Shader::operator[](const char * name)
 	return this->operator[](it->second);
 }
 
+
 Shader::ConstantBufferRecord & FWrender::Shader::operator[](size_t id)
 {
 	static ConstantBufferRecord null_object;
@@ -224,6 +245,31 @@ Shader::ConstantBufferRecord & FWrender::Shader::operator[](size_t id)
 
 	return this->m_vBuffers[id];
 }
+
+
+Shader::BoundResourceRecord & FWrender::Shader::GetBResource(const char * const name)
+{
+	static BoundResourceRecord null_object;
+
+	bResourceMap_t::iterator it = this->m_mapBResources.find(name);
+	if (it == this->m_mapBResources.end()) {
+		return null_object;
+	}
+
+	return this->GetBResource(it->second);
+}
+
+
+Shader::BoundResourceRecord & FWrender::Shader::GetBResource(size_t id)
+{
+	static BoundResourceRecord null_object;
+	if (id >= this->m_vBResources.size())
+	{
+		return null_object;
+	}
+	return this->m_vBResources[id];
+}
+
 
 void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
 {
@@ -252,7 +298,8 @@ void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file,
 	throw EX_DETAILS(ShaderException, "See shader-error.txt");
 }
 
-void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth) {
+
+void Shader::GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth) {
 	BYTE mask = pd.Mask;
 	int varCount = 0;
 	while (mask)
@@ -376,7 +423,7 @@ void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 		elem.desc = elementDesc;
 
 		// -- determine DXGI format
-		this->getDXGIFormat(input_desc, elementDesc.Format, elem.width);
+		this->GetDXGIFormat(input_desc, elementDesc.Format, elem.width);
 
 		// --- 
 
@@ -421,10 +468,26 @@ void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 		size_t id = this->m_vBuffers.size() - 1;
 		this->m_mapBuffers[cbRecord.m_description.Name] = id;
 	}
+
+	// fetch samplers
+	for (size_t i = 0; i < desc.BoundResources; i++) {
+		D3D11_SHADER_INPUT_BIND_DESC brDesc;
+		result = this->m_pReflector->GetResourceBindingDesc(i, &brDesc);
+
+		if (FAILED(result)) {
+			throw EX(BoundResourceLocateException);
+		}
+
+		size_t id = m_vBResources.size();
+		m_vBResources.push_back(BoundResourceRecord(brDesc));
+		m_mapBResources[brDesc.Name] = id;
+
+		// sampler state ??? 
+	}
 }
 
-// =============================================================================================================================
 
+// =============================================================================================================================
 Shader::ConstantBufferRecord::ConstantBufferRecord() : 
 	m_pDC(NULL),
 	m_buffer(NULL),
@@ -433,6 +496,7 @@ Shader::ConstantBufferRecord::ConstantBufferRecord() :
 {
 	// DebugBreak();
 }
+
 
 Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
 	ConstantBufferRecord()
@@ -478,6 +542,7 @@ Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11S
 	}
 }
 
+
 void Shader::ConstantBufferRecord::Map()
 {
 	HRESULT result = 0;
@@ -489,15 +554,18 @@ void Shader::ConstantBufferRecord::Map()
 
 }
 
+
 inline void Shader::ConstantBufferRecord::Unmap()
 {
 	this->m_pDC->Unmap(this->m_buffer, 0);
 }
 
+
 inline void * Shader::ConstantBufferRecord::GetMappedPtr()
 {
 	return m_mappedResource.pData;
 }
+
 
 void Shader::ConstantBufferRecord::Set(void * data)
 {
@@ -505,6 +573,7 @@ void Shader::ConstantBufferRecord::Set(void * data)
 	memcpy(this->GetMappedPtr(), data, this->m_description.Size);
 	this->Unmap();
 }
+
 
 void Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width)
 {
@@ -518,6 +587,7 @@ void Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width
 	this->Unmap();
 }
 
+
 Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator[](const char * name)
 {
 	static ConstantBufferElement null_object;
@@ -530,6 +600,7 @@ Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator
 
 }
 
+
 Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator[](size_t id)
 {
 	static ConstantBufferElement null_object;
@@ -541,7 +612,6 @@ Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator
 }
 
 
-
 // ============================================================================================================
 // CBelem
 
@@ -550,6 +620,7 @@ Shader::ConstantBufferElement::ConstantBufferElement():
 {
 	// do nothing here. 
 }
+
 
 Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecord * parent_record, ID3D11ShaderReflectionVariable * shader_variable) : ConstantBufferElement()
 {
@@ -580,6 +651,7 @@ Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecor
 
 }
 
+
 D3D11_SHADER_VARIABLE_DESC & const FWrender::Shader::ConstantBufferElement::GetVarDesc()
 {
 	static D3D11_SHADER_VARIABLE_DESC null_obj;
@@ -589,6 +661,7 @@ D3D11_SHADER_VARIABLE_DESC & const FWrender::Shader::ConstantBufferElement::GetV
 	return this->m_var_desc;
 }
 
+
 D3D11_SHADER_TYPE_DESC & const FWrender::Shader::ConstantBufferElement::GetTypeDesc()
 {
 	static D3D11_SHADER_TYPE_DESC null_obj;
@@ -596,4 +669,18 @@ D3D11_SHADER_TYPE_DESC & const FWrender::Shader::ConstantBufferElement::GetTypeD
 		return null_obj;
 
 	return this->m_type_desc;
+}
+
+// ============================================================================================================
+// Bindable/Bindig Resource record
+
+FWrender::Shader::BoundResourceRecord::BoundResourceRecord()
+{
+	ZeroMemory(&m_desc, sizeof(m_desc));
+}
+
+
+FWrender::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc)
+	: m_desc(desc)
+{
 }

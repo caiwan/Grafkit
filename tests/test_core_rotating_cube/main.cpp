@@ -83,6 +83,9 @@ public:
 			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
+
+			shader_fs->GetBResource("shaderTexture").SetTexture(texture);
+
 			this->t = 0;
 
 			return 0;

@@ -99,7 +99,7 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t ind
 	HRESULT result = 0;
 
 	// obtain input layout elements, and collect pointers that were set before
-	size_t elem_count = this->m_shader->getILayoutElemCount();
+	size_t elem_count = this->m_shader->GetILayoutElemCount();
 
 	FWutils::StructPack packer;
 	//packer.setFieldPadding(16);
