@@ -99,7 +99,7 @@ namespace FWrender
 			/**
 			Layout assembler
 			*/
-			MeshRef operator() (size_t vertexCount, size_t indexCount, const int* indices, MeshRef input = NULL);
+			MeshRef operator() (size_t vertexCount, size_t indexCount, const int* const indices, MeshRef input = NULL);
 
 		private:
 			void createIndexBuffer(MeshRef in_mesh, int indexCount, const int* indices);

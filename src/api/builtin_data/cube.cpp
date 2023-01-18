@@ -21,17 +21,17 @@ const unsigned short FWBuiltInData::triangleIndicesLen = 3;
 
 
 static const float _quad_vertices[] = {
-	-1,-1, 0,
-	1,-1, 0,
-	1, 1, 0,
-	-1, 1, 0
+	-1,-1, 0, 0,
+	1,-1, 0, 0,
+	1, 1, 0, 0,
+	-1, 1, 0, 0,
 };
 
 static const float _quad_vertices2[] = {
-	0, 0, 0,
-	1, 0, 0,
-	1, 1, 0,
-	0, 1, 0
+	0, 0, 0, 0,
+	1, 0, 0, 0,
+	1, 1, 0, 0,
+	0, 1, 0, 0,
 };
 
 static const float _quad_texcoord[] = {
@@ -41,7 +41,7 @@ static const float _quad_texcoord[] = {
 	0, 0
 };
 
-static const unsigned short _quad_mesh[] = {
+static const int _quad_mesh[] = {
 	0,1,2, 
 	2,3,0
 };
@@ -49,8 +49,8 @@ static const unsigned short _quad_mesh[] = {
 const float * const FWBuiltInData::quad = _quad_vertices;
 const float * const FWBuiltInData::quad2 = _quad_vertices2;
 const float * const FWBuiltInData::quad_texcoord = _quad_texcoord;
-const unsigned short * const FWBuiltInData::quadIndices = _quad_mesh;
-const unsigned short FWBuiltInData::quadIndicesLen = 4;
+const int * const FWBuiltInData::quadIndices = _quad_mesh;
+const int FWBuiltInData::quadIndicesLen = 4;
 
 #if 1
 // vertex

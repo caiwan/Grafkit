@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CEditorView, CView)
 	ON_WM_RBUTTONUP()
 	ON_WM_SIZE()
 	ON_WM_SETCURSOR()
+	ON_COMMAND(ID_SHADER_COMPILE, &CEditorView::OnShaderCompile)
 END_MESSAGE_MAP()
 
 // CEditorView construction/destruction
@@ -73,9 +74,9 @@ void CEditorView::InitScene(CXDrawingDevice * parent)
 	generator["POSITION"] = FWBuiltInData::quad;
 	generator["TEXCOORD"] = FWBuiltInData::quad_texcoord;
 
-	generator(4, FWBuiltInData::quadIndicesLen, FWBuiltInData::cubeIndices, this->m_fullscreen_quad);
+	generator(4, FWBuiltInData::quadIndicesLen, FWBuiltInData::quadIndices, this->m_fullscreen_quad);
 
-	// ... 
+	this->OnShaderCompile();
 }
 
 void CEditorView::DrawScene(CXDrawingDevice * parent)
@@ -97,7 +98,7 @@ void CEditorView::DrawScene(CXDrawingDevice * parent)
 	this->m_shader_vertex->Render(render);
 	pxshader->Render(render);
 
-	 // .. foyltkov 
+	this->m_fullscreen_quad->Render(render);
 
 }
 
@@ -220,4 +221,19 @@ BOOL CEditorView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 	return CView::OnSetCursor(pWnd, nHitTest, message);
 
+}
+
+
+void CEditorView::OnShaderCompile()
+{
+	CEditorDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	FWrender::Renderer &render = m_xd3d_view;
+
+	theApp.getMainFrame()->getEditor().docFromEditor();
+	pDoc->m_shader_src.CompileShader(render);
+	theApp.getMainFrame()->getEditor().SetFocus();
 }

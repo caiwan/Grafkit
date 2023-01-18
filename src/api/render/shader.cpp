@@ -125,12 +125,8 @@ void FWrender::Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCST
 
 void FWrender::Shader::Shutdown()
 {
-	// duck the constant buffers around
-
-	// ... 
-
-	// duck this off 
-	this->m_pReflector->Release();
+	if (this->m_pReflector)
+		this->m_pReflector->Release();
 
 	if (this->m_pShader) this->m_pShader->Release();
 	if (this->m_vShader) this->m_vShader->Release();

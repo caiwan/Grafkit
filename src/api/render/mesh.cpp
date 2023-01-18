@@ -91,7 +91,7 @@ FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * device, Shader
 {
 }
 
-MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* indices, MeshRef mesh_input)
+MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* const indices, MeshRef mesh_input)
 {
 	if (this->m_shader.Invalid())
 		throw EX(NullPointerException);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "render/renderer.h"
 #include "render/shader.h"
 
 /**
@@ -9,19 +10,19 @@
 class CShaderSrcDoc{
 		// -- class interface
 	public:
-		//CShaderSrcDoc();
-		CShaderSrcDoc(const char* _shader_source = "");
+		CShaderSrcDoc();
+		//CShaderSrcDoc(const char* _shader_source = "");
 		~CShaderSrcDoc();
 
-		int compileShader();
-		void flushErrors();
+		int CompileShader(FWrender::Renderer &render);
+		void FlushErrors();
 
 		const int IsHasErrors() const {return m_is_has_errors;}	///< @return 1 ha tortent hiba a forditas soran, kulonben 0 
 
 		FWrender::ShaderRef GetShader(){return this->m_shader;}
 		
 		void SetShaderSource(TCHAR *in_src) {this->m_shader_source = in_src; }
-		CString GetShaderSource() { return this->m_shader_source;}
+		CString &GetShaderSource() { return this->m_shader_source;}
 
 	protected:
 		CString m_shader_source;

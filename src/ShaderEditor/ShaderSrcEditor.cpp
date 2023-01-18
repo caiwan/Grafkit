@@ -6,6 +6,9 @@
 #include <SciLexer.h>
 #include <Scintilla.h>
 
+#include "exceptions.h"
+
+using namespace FWdebugExceptions;
 using namespace Scintilla;
 
 // keywordok
@@ -447,15 +450,16 @@ CShaderEditorSingle::~CShaderEditorSingle(){
 void CShaderEditorSingle::docFromEditor(){
 	ASSERT(m_pDocument);
 	if (!m_pDocument)
-		//throw new NullPointerException();
-		return;
+		throw EX(NullPointerException);
+
+	CString &shader_code = m_pDocument->GetShaderSource();
+	this->m_wndEditor.docFromEditor(shader_code);
 }
 
 void CShaderEditorSingle::docToEditor(){
 	ASSERT(m_pDocument);
 	if (!m_pDocument)
-		// throw new NullPointerException();
-		return;
+		throw EX(NullPointerException);
 
 	this->m_wndEditor.docToEditor(m_pDocument->GetShaderSource());
 }

@@ -57,6 +57,7 @@ public:
 	virtual void OnInitialUpdate();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+	afx_msg void OnShaderCompile();
 };
 
 #ifndef _DEBUG  // debug version in ShaderEditorView.cpp

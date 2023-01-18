@@ -16,65 +16,54 @@ using namespace FWdebugExceptions;
 //////////////////////////////////////////////////////////////////////
 // Shader dokumentum
 //////////////////////////////////////////////////////////////////////
-/*
-CShaderSrcDoc::CShaderSrcDoc(){
-	m_shader = NULL;
-	m_is_FSS_Only = 0;
-	m_is_has_errors = 0;
-}
-*/
 
-CShaderSrcDoc::CShaderSrcDoc(const char* _shader_source){
-	//
-	//if (!_vss || !_fss) throw new NullPointerException();
-	//m_vss=_vss;
-	//m_fss=_fss;
-	//m_is_FSS_Only=_is_FSS_Only;
-	//m_is_has_errors=0;
-	//m_shader = NULL;
-	//m_is_has_errors = 0;
-
+CShaderSrcDoc::CShaderSrcDoc() : 
+	m_shader_source(""),
+	m_shader(),
+	m_is_has_errors(0)
+{
 }
 
 CShaderSrcDoc::~CShaderSrcDoc(){
-	//delete m_shader;
 }
 
-int CShaderSrcDoc::compileShader(){
-// shader objektum cserevel dolgozik
-	//FWrender::Shader *newshader = NULL;
-	//try{
-	//	this->m_is_has_errors = 1;
+int CShaderSrcDoc::CompileShader(FWrender::Renderer &render){
+	// shader objektum cserevel dolgozik
+	FWrender::ShaderRef newshader;
 
-	//	newshader = new FWrender::Shader();
-	//	newshader->createFromMemory(this->m_vss.c_str(), this->m_fss.c_str());
-	//	
-	//	delete this->m_shader; this->m_shader = NULL;
-	//	this->m_shader = newshader;
+	try{
+		this->m_is_has_errors = 1;
 
-	//	this->m_is_has_errors = 0;
+		newshader = new FWrender::Shader();
+		//newshader->createFromMemory(this->m_vss.c_str(), this->m_fss.c_str());
+		newshader->LoadFromMemory(render, "main", m_shader_source, m_shader_source.GetLength(), FWrender::ST_Pixel);
+	
+		m_shader = newshader;
 
-	//	return 0; // success
-	//} 
-	//catch(FWdebug::ShaderException *e){
-	//	this->fillErrors(e);
+		this->m_is_has_errors = 0;
+	
+	} 
+	catch(ShaderException &e){
+		this->fillErrors(e);
 
 	//	FWcore::writeLog(true, FWcore::MSG_error, "Shader Exception:\n %s", e->what());
-	//	/*MessageBox(NULL, e->getCompilerError(), "ShEX", MB_ICONEXCLAMATION);*/
+		MessageBox(NULL, e.what(), "ShEX", MB_ICONEXCLAMATION);
 	//	
 	//	delete newshader;
 	//	delete e;
 
-	//	return 1;
-	//}
+		///@ todo add logger
+
+		return 1;
+	}
 	//catch(FWdebug::Exception *e){
 	//	throw e;	// tovabb 
 	//}
 
-	return 0;	// fail
+	return 0;
 }
 
-void CShaderSrcDoc::flushErrors(){
+void CShaderSrcDoc::FlushErrors(){
 	//this->m_errors.rewind();	
 }
 
