@@ -21,6 +21,8 @@ namespace  Idogep
 
 		Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform; // ptr, samplecount, channelcount, samplePerSec
 
+		Ref<CurveSceneModule> GetCurveSceneMoule() const;  
+		
 	private:
 		Ref<CurveEditorView> m_myView;
 		Ref<CurveSceneModule> m_curveScene;

@@ -136,7 +136,6 @@ void Idogep::EditorApplication::BuildEditorModules()
 	m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
     // --- 
-
 	m_curveEditor = new CurveEditorModule(m_editor);
 	m_editor->GetCommandStack()->ConnectEmitter(dynamic_cast<EmitsCommandRole*>(m_curveEditor.Get()));
 }

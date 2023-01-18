@@ -47,7 +47,8 @@ void OutlineModule::DocumentChangedEvent(Document* const& document)
 
 	auto newModel = new SceneGraphViewWidgetModel();
 
-	/** TODO ezt az egeszet ki kell innen vagni a francba majd, es valami ertelmessel kellene helyettesiteni
+	/** 
+	TODO ezt az egeszet ki kell innen vagni a francba majd, es valami ertelmessel kellene helyettesiteni
 	*/
 
 	// build shit 

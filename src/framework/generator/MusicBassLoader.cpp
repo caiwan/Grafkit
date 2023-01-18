@@ -5,6 +5,8 @@
 #include "../core/Music.h"
 #include "bass.h"
 
+#include "utils/logger.h"
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
@@ -90,6 +92,7 @@ namespace {
 
 		if (!m_stream) {
 			int errcode = BASS_ErrorGetCode();
+			LOGGER(Log::Logger().Error("Failed to laod music. BASS Error code: %d", errcode));
 			throw new EX(MusicDeviceInitException);
 		}
 
@@ -233,6 +236,7 @@ namespace {
 		// TODO: ez nem jo
 		//const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
 		const int numBytes = BASS_ChannelGetData(m_stream, ptr, buflen * 4 | BASS_DATA_FLOAT);
+		//BASS_RecordFree
 
 		if (numBytes == -1)
 		{

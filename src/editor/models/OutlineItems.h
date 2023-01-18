@@ -12,10 +12,10 @@ namespace Idogep {
 
 	// shall we have 
 	// multiple animations maybe?
-	class HasItemAnimationsRole {
+	class ItemHasAnimationsRole {
 	public:
-		HasItemAnimationsRole();
-		~HasItemAnimationsRole();
+		ItemHasAnimationsRole();
+		~ItemHasAnimationsRole();
 
 		void SetAnimation(Grafkit::AnimationRef animation);
 		Grafkit::AnimationRef GetAnimation() const ;

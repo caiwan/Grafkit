@@ -17,7 +17,7 @@ namespace Idogep {
 		OutlineView();
 
 	    void SetModel(Grafkit::IResource * modelResource) override = 0;
-		Event<TreeItem*> onItemSelected;
+		Event<TreeItem* const &> onItemSelected;
 	};
 
 
@@ -34,6 +34,11 @@ namespace Idogep {
 
 		void DocumentChangedEvent(Document* const & document);
 
+		Event<TreeItem* const &> onItemOpened;
+		Event<TreeItem* const &> onItemSelected;
+
+	private:
+		void ItemSelectedEvent(TreeItem* const & item);
 	private:
 		OutlineView * m_myView;
 		

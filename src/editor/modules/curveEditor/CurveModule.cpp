@@ -49,3 +49,4 @@ void CurveEditorModule::Initialize()
 
 	SetView(m_myView);
 }
+
