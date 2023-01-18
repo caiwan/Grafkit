@@ -47,7 +47,7 @@ Persistent* Persistent::Load(Archive& ar)
 
 	PERSIST_FIELD(ar, ver);
 
-	Log::Logger().Info("Loading object %s %d", className.c_str(), ver);
+	Log::Logger().Debug("Loading object %s %d", className.c_str(), ver);
 
 	//
 	if (ver != obj->GetVersion()) {

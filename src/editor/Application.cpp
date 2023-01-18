@@ -67,7 +67,7 @@ int EditorApplication::Execute()
     onLoaderFinished += Delegate(m_mainWindow, &MainWindow::showMaximized);
     onLoaderFinished += Delegate(this, &EditorApplication::NextTick);
 
-    //sw->show();
+    sw->show();
 
     Initialize();
 

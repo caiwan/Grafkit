@@ -26,12 +26,11 @@ void Idogep::myMessageOutput(QtMsgType type, const QMessageLogContext &context, 
 	case QtFatalMsg:
 		Grafkit::Log::Logger().Error("[QT] %s (%s:%u, %s)", localMsg.constData(), context.file, context.line, context.function);
 		abort();
-		break;
 	}
 }
 
 namespace {
-	static const char *logTexts[] = {
+	const char *logTexts[] = {
 		"", "", "", "Warn: ", "Error: "
 	};
 }

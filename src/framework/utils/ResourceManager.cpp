@@ -99,15 +99,20 @@ void IResourceManager::TriggerReload(std::string filename)
     auto it = m_filenamesToBuilder.find(filename);
     if (it != m_filenamesToBuilder.end())
     {
-        auto value = it->second;
-        IResourceBuilder* builder = value.second;
-        IResource* oldResource = GetByUuid<IResource>(value.first);
-        if (oldResource && builder)
+        auto values = it->second;
+
+        for (auto value : values)
         {
-            LOGGER(Log::Logger().Trace("Reloading modified resource %s => %s", it->first.c_str(), value.first.c_str()));
-            builder->Load(this, oldResource);
-            Add(oldResource);
+            IResourceBuilder* builder = value.second;
+            IResource* oldResource = GetByUuid<IResource>(value.first);
+            if (oldResource && builder)
+            {
+                LOGGER(Log::Logger().Trace("Reloading modified resource %s => %s", it->first.c_str(), value.first.c_str()));
+                builder->Load(this, oldResource);
+                Add(oldResource);
+            }
         }
+
     }
 }
 
@@ -119,7 +124,21 @@ void IResourceManager::Reload(IResourceBuilder* builder)
     resource->SetName(builder->GetName());
     Add(resource);
     m_builders[uuid] = builder;
-    if (!builder->GetSourceName().empty()) { m_filenamesToBuilder[builder->GetSourceName()] = std::pair<std::string, IResourceBuilder*>(uuid, builder); }
+    if (!builder->GetSourceName().empty())
+    {
+        std::string name = builder->GetSourceName();
+        BuilderPair builderPair(uuid, builder);
+        auto it = m_filenamesToBuilder.find(name);
+        if (it != m_filenamesToBuilder.end())
+        {
+            it->second.push_back(builderPair);
+        } else
+        {
+            m_filenamesToBuilder[name] = std::list<BuilderPair>();
+            m_filenamesToBuilder[name].push_back(builderPair); // lol?
+            
+        }
+    }
 }
 
 void IResourceManager::DoPrecalc()

@@ -11,8 +11,10 @@ namespace Grafkit {
 	*/
 	class IFileEventWatch {
 	public:
-		IFileEventWatch() {}
-		virtual ~IFileEventWatch() {}
+		IFileEventWatch(): m_isTerminate(false) {
+	    }
+
+	    virtual ~IFileEventWatch() {}
 
 		std::string PopFile() {
 			MutexLocker lock(&m_queueMutex);
@@ -28,15 +30,19 @@ namespace Grafkit {
 			return !m_fileReloadList.empty();
 		}
 
+        void Terminate() { m_isTerminate = true; }
+
 		virtual void Poll() = 0;
 
 	protected:
 		std::list<std::string> m_fileReloadList;
 		Mutex m_queueMutex;
+
+        bool m_isTerminate;
 	};
 
 	/**
-		Filebol allit elo asseteket	
+		Makes asset directly from files
 	*/
 	class FileAssetFactory : public IAssetFactory
 	{
@@ -71,7 +77,7 @@ namespace Grafkit {
 		    size_t GetSize() const override { return m_size; }
 
 		protected:
-			FileAsset(void* data, size_t size) : m_data(data), m_size(size) {}
+			FileAsset(void* data, size_t size) : m_size(size), m_data(data) {}
 
 		private:
 			size_t m_size;

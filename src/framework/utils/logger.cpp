@@ -16,6 +16,8 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
+#define MUTEX_WAIT INFINITE
+
 #define BUFFER_LEGTH 64*1024
 
 Logger::Logger()
@@ -32,7 +34,7 @@ Logger::Logger()
 
 Logger::~Logger()
 {
-	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); it++) {
+	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); ++it) {
 		delete *it;
 	}
 
@@ -71,7 +73,7 @@ void Logger::Write(logger_msg_type_e type)
 	message_pkg.message = m_buffer;
 	message_pkg.type = type;
 
-	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); it++)
+	for (auto it = this->m_loggers.begin(); it != m_loggers.end(); ++it)
 	{
 		if (*it) (*it)->Write(&message_pkg);
 	}
@@ -87,35 +89,35 @@ void Logger::Write(logger_msg_type_e type)
 
 void Logger::Trace(const char * const message, ...)
 {
-	MutexLocker locker(m_mutex);
+	MutexLocker locker(m_mutex, MUTEX_WAIT);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_TRACE);
 }
 
 void Logger::Debug(const char * const message, ...)
 {
-	MutexLocker locker(m_mutex);
+	MutexLocker locker(m_mutex, MUTEX_WAIT);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_DEBUG);
 }
 
 void Logger::Info(const char * const message, ...)
 {
-	MutexLocker locker(m_mutex);
+	MutexLocker locker(m_mutex, MUTEX_WAIT);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_INFO);
 }
 
 void Logger::Warn(const char * const message, ...)
 {
-	MutexLocker locker(m_mutex);
+	MutexLocker locker(m_mutex, MUTEX_WAIT);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_WARN);
 }
 
 void Logger::Error(const char * const message, ...)
 {
-	MutexLocker locker(m_mutex);
+	MutexLocker locker(m_mutex, MUTEX_WAIT);
 	EXTRACT_VA(message, m_buffer);
 	Write(LOG_ERROR);
 }

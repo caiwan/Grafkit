@@ -25,7 +25,7 @@ namespace {
 
 /// @TODO init + shutdown
 
-ResourcePreloader::ResourcePreloader(IPreloadEvents * pPreloader) : Grafkit::IResourceManager()
+ResourcePreloader::ResourcePreloader(IPreloadEvents * pPreloader) : IResourceManager()
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
 	for (size_t i = 0; i < sizeof(preloadFilters) / sizeof(preloadFilters[0]); i++) {
@@ -43,7 +43,7 @@ ResourcePreloader::~ResourcePreloader()
 
 // ============================================================================================================
 
-void Grafkit::ResourcePreloader::LoadCache()
+void ResourcePreloader::LoadCache()
 {
 	for (size_t i = 0; i < m_filters.size(); i++) 
 	{
@@ -76,7 +76,7 @@ void Grafkit::ResourcePreloader::LoadCache()
 
 }
 
-void Grafkit::ResourcePreloader::SaveCache()
+void ResourcePreloader::SaveCache()
 {
 	/// -- save cached files if any 
 }

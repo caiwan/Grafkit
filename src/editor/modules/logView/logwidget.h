@@ -2,6 +2,7 @@
 #define LOGWIDGET_H
 
 #include <QDockWidget>
+#include <queue>
 
 #include "LogModule.h"
 
@@ -22,7 +23,10 @@ namespace Idogep {
 	protected:
 	    void RefreshView(bool force) override {}
 
+        private slots:
+            void UpdateLogSlot() ;
 	private:
+        std::queue<std::string> m_messages;
 		Ui::LogWidget *ui;
 	};
 }

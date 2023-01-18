@@ -36,7 +36,7 @@ namespace Grafkit
     {
     public:
         //Thread(std::auto_ptr<Runnable> run);
-        Thread(Runnable* run);
+        explicit Thread(Runnable* run);
         Thread();
 
         virtual ~Thread();
@@ -49,16 +49,14 @@ namespace Grafkit
 
     protected:
         virtual int Run() { return 0; }
-
-    protected:
-        Runnable * m_pRunnable;
+        Runnable* m_pRunnable;
 
     private:
         HANDLE m_hThread;
         DWORD m_wThreadID;
 
-        Thread(const Thread&);
-        const Thread& operator=(const Thread&);
+        Thread(const Thread&) = delete;
+        const Thread& operator=(const Thread&) = delete;
 
         // stores return value from run()
         int m_lastResult;
@@ -77,7 +75,7 @@ namespace Grafkit
         Mutex();
         ~Mutex();
 
-        void Lock();
+        void Lock(DWORD milli = INFINITE);
         void Unlock();
 
         bool IsLocked() const { return m_isLocked != 0; }
@@ -91,15 +89,8 @@ namespace Grafkit
     class MutexLocker
     {
     public:
-        explicit MutexLocker(Mutex& mutex) : m_mutex(&mutex) {
-            //assert(!m_mutex->IsLocked());
-            m_mutex->Lock();
-        }
-        explicit MutexLocker(Mutex* mutex) : m_mutex(mutex)
-        {
-            //assert(!m_mutex->IsLocked());
-            m_mutex->Lock();
-        }
+        explicit MutexLocker(Mutex& mutex, DWORD milli = INFINITE) : m_mutex(&mutex) { m_mutex->Lock(milli); }
+        explicit MutexLocker(Mutex* mutex, DWORD milli = INFINITE) : m_mutex(mutex) { m_mutex->Lock(milli); }
 
         ~MutexLocker()
         {
@@ -110,7 +101,7 @@ namespace Grafkit
         Mutex* GetMutex() const { return m_mutex; }
 
     private:
-        Mutex * m_mutex;
+        Mutex* m_mutex;
     };
 }
 

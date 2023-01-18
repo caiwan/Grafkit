@@ -108,6 +108,8 @@ bool Editor::RenderFrame()
     if (m_musicProxy->IsPlaying())
         onDemoTimeChanged(time);
 
+    do {} while (m_context->GetAssetFactory()->PollEvents(m_context));
+
     return true;
 }
 
