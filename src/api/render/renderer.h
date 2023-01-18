@@ -14,21 +14,6 @@
 using namespace DirectX;
 
 namespace FWrender {
-	/**
-	Drawable interface
-	*/
-
-	//class Drawable {
-	//public:
-	//	Drawable();
-	//	virtual ~Drawable();
-
-	//	/**Renders the insides */
-	//	virtual void Render(ID3D11DeviceContext* deviceContext) = 0;
-
-	//	/** deletes/releases resources */
-	//	// virtual void Shutdown() = 0;
-	//};
 
 	class Camera;
 	class Model;
