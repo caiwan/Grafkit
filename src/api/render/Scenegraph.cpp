@@ -11,3 +11,15 @@ FWrender::Scenegraph::~Scenegraph()
 {
 	delete m_pRoot;
 }
+
+void FWrender::Scenegraph::parseNode(TreeNode * node)
+{
+}
+
+void FWrender::Scenegraph::push()
+{
+}
+
+void FWrender::Scenegraph::pop()
+{
+}

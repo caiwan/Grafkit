@@ -1,3 +1,4 @@
+#pragma once
 #include "tree.h"
 
 
@@ -7,6 +8,9 @@ namespace FWrender {
 		public:
 			Scenegraph();
 			~Scenegraph();
+
+			///@todo implement
+			void Render();
 
 		// -- tree parser implementation
 		protected:

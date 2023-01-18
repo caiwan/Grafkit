@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <Link />
+    <Lib>
+      <AdditionalLibraryDirectories>c:\bazdmegakurvaanyadtegeci\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\assimp-vc140-mtd.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet2FileLoader_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Collision_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Common_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Dynamics_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Geometry_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3OpenCL_clew_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <ProjectReference />
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\;$(SolutionDir)build\$(Platform)\$(Configuration)\;c:\bazdmegakurvaanyadtegeci\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\assimp-vc140-mtd.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet2FileLoader_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Collision_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Common_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Dynamics_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Geometry_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3OpenCL_clew_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\LinearMath_Debug.lib;</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
