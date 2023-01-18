@@ -28,13 +28,7 @@ namespace FWcore
 		virtual int mainloop() = 0;
 		virtual void release() = 0;
 
-		/*
-		bool Initialize();
-		void Shutdown();
-		void Run();
-		*/
-
-		LRESULT CALLBACK MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
+		virtual LRESULT CALLBACK MessageHandler(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
 	protected:
 		//bool Frame();
