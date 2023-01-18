@@ -96,7 +96,7 @@ int Idogep::EditorApplication::Execute()
 void EditorApplication::Mainloop()
 {
 	// ennek se feltetlenul itt lenne a helye
-    const bool renderNextFrame = this->m_editor->RenderFrame();
+	const bool renderNextFrame = this->m_editor->RenderFrame();
 	if (renderNextFrame)
 		this->NextTick();
 }
@@ -125,22 +125,24 @@ void EditorApplication::Initialize()
 	BuildDockingWindows();
 }
 
+// TODO We shall put this out to a separate builder / mediator object
 void Idogep::EditorApplication::BuildEditorModules()
 {
 	m_logModule = new LogModule(m_editor, m_logger);
 
-    // --- 
+	// --- 
 	m_outlineViewModule = new OutlineModule(m_editor);
 
 	m_editor->GetCommandStack()->ConnectEmitter(dynamic_cast<EmitsCommandRole*>(m_outlineViewModule.Get()));
 	m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
-    // --- 
+	// --- 
 	m_curveEditor = new CurveEditorModule(m_editor);
 	m_editor->GetCommandStack()->ConnectEmitter(dynamic_cast<EmitsCommandRole*>(m_curveEditor.Get()));
 
 	// 
-	((OutlineModule*)m_outlineViewModule.Get())->onAnimationItemSelected += Delegate((CurveEditorModule*)(m_curveEditor.Get()), &CurveEditorModule::AnimationSelectedEvent);
+    dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
+        dynamic_cast<CurveEditorModule*>(m_curveEditor.Get()), &CurveEditorModule::AnimationSelectedEvent);
 }
 
 void Idogep::EditorApplication::InitializeModules() const
@@ -148,7 +150,7 @@ void Idogep::EditorApplication::InitializeModules() const
 	std::stack<Ref<Module>> stack;
 	stack.push(m_editor);
 	while (!stack.empty()) {
-	    auto module = stack.top(); stack.pop();
+		auto module = stack.top(); stack.pop();
 
 		module->Initialize();
 
@@ -160,13 +162,13 @@ void Idogep::EditorApplication::InitializeModules() const
 
 void Idogep::EditorApplication::BuildDockingWindows() const
 {
-    // 
+	// 
 	QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_curveEditor->GetView().Get());
 	assert(curveEditorWidget);
 
-    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
+	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
 
-    //
+	//
 	QDockWidget* logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
 	assert(logWidget);
 

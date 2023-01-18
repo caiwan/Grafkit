@@ -19,7 +19,12 @@ namespace Idogep {
 
 		void SetAnimation(Grafkit::AnimationRef animation);
 		Grafkit::AnimationRef GetAnimation() const ;
+	    
+	    std::string GetParentName() const { return m_parentName; }
+	    void SetParentName(const std::string& parentName) { m_parentName = parentName; }
+
 	protected:
+		std::string m_parentName;
 		Grafkit::AnimationRef m_animation;
 	};
 

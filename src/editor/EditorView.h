@@ -11,7 +11,7 @@ namespace Idogep {
 	namespace Roles {
 		class ManageCommandStackRole {
 		public:
-			ManageCommandStackRole();
+			ManageCommandStackRole() = default;
 			virtual ~ManageCommandStackRole() = default;
 
 			Event<> onUndo;
@@ -28,8 +28,8 @@ namespace Idogep {
 
 		class ManageFileOperationsRole {
 		public:
-			ManageFileOperationsRole() {}
-			virtual ~ManageFileOperationsRole() = default;
+			ManageFileOperationsRole() = default;
+		    virtual ~ManageFileOperationsRole() = default;
 
 			Event<> onOpen;
 			Event<> onSave;
@@ -44,8 +44,8 @@ namespace Idogep {
 		public Roles::ManageFileOperationsRole
 	{
 	public:
-		EditorView();
-		virtual ~EditorView();
+	    explicit EditorView();
+		virtual ~EditorView() = default;
 
         // ... 
 

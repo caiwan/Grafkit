@@ -12,6 +12,7 @@
 #include "proxies/MusicProxy.h"
 
 #include <QWidget>
+#include "models/OutlineItems.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -25,8 +26,7 @@ CurveEditorModule::CurveEditorModule(const Ref<Module>& parent)
 }
 
 CurveEditorModule::~CurveEditorModule()
-{
-}
+= default;
 
 void CurveEditorModule::Initialize()
 {
@@ -50,8 +50,17 @@ void CurveEditorModule::Initialize()
 	SetView(m_myView);
 }
 
-void Idogep::CurveEditorModule::AnimationSelectedEvent(TreeItem * const & item)
+
+// ========================================================================================================
+
+void Idogep::CurveEditorModule::AnimationSelectedEvent(TreeItem * const item)
 {
-	// Kuki
+	ItemHasAnimationsRole* animationItem = dynamic_cast<ItemHasAnimationsRole*>(item);
+	if (!animationItem)
+	{
+		return; // clean widget instead
+	};
+	m_myView->AnimationChangedEvent(animationItem->GetAnimation(),
+		animationItem->GetParentName());
 }
 

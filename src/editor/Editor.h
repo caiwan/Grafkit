@@ -51,7 +51,7 @@ namespace Idogep {
 		//Event<std::string&> onSaveDialog;
 		Event<Document* const &> onDocumentChanged;
 
-		Grafkit::IResourceManager *GetResourceManager();
+		Grafkit::IResourceManager *GetResourceManager() const;
 
 		Document * const & GetDocument() const { return m_document; }
 		CommandStack * GetCommandStack() const { return m_commandStack; }
@@ -59,7 +59,7 @@ namespace Idogep {
 		MusicProxy * GetMusicProxy() const { return m_musicProxy;  }
 		
 	private:
-		bool DirtyCheck();
+		bool DirtyCheck() const;
 		
 	private:
 		Grafkit::IResourceManager * const & m_resourceManager;

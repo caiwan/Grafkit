@@ -10,73 +10,79 @@ using namespace Grafkit;
 
 // ========================================================================================================
 
-namespace {
-	class AnimationTreeModel : public TreeModel {
-	public:
-		AnimationTreeModel(Grafkit::AnimationRef animation);
+namespace
+{
+    class AnimationTreeModel : public TreeModel
+    {
+    public:
+        AnimationTreeModel(AnimationRef animation);
 
-	protected:
-		virtual QStringList Header();
-		virtual	void Build(TreeItem * parentItem);
+        QString GetParentName() const { return m_parentName; }
+        void SetParentName(const QString& parentName) { m_parentName = parentName; }
 
-	protected:
-		void BuildTrack(TreeItem * const &parentItem, Ref<Animation::Track>& track);
+    protected:
+        QStringList Header() override;
+        void Build(TreeItem* parentItem) override;
 
-	private:
-		Grafkit::AnimationRef m_animation;
-	};
-	AnimationTreeModel::AnimationTreeModel(Grafkit::AnimationRef animation) : m_animation(animation)
-	{
-	}
+        void BuildTrack(TreeItem* const & parentItem, Ref<Animation::Track>& track) const;
 
-	QStringList AnimationTreeModel::Header()
-	{
-		return QStringList() << "Channel";
-	}
+    private:
+        AnimationRef m_animation;
+        QString m_parentName;
+    };
 
-	void AnimationTreeModel::Build(TreeItem * parentItem)
-	{
-		if (m_animation.Invalid())
-			return;
+    AnimationTreeModel::AnimationTreeModel(AnimationRef animation)
+        : m_animation(animation)
+    {
+    }
 
-		for (size_t i = 0; i < m_animation->GetTrackCount(); i++) {
-			Ref<Animation::Track> track = m_animation->GetTrack(i);
+    QStringList AnimationTreeModel::Header() { return QStringList() << m_parentName; }
 
-			QVariantList data;
-			data << QString::fromStdString(track->GetName());
-			TreeItem *item = new TreeItem(data, parentItem);
+    void AnimationTreeModel::Build(TreeItem* parentItem)
+    {
+        if (m_animation.Invalid())
+            return;
 
-			parentItem->addChild(item);
+        for (size_t i = 0; i < m_animation->GetTrackCount(); i++)
+        {
+            Ref<Animation::Track> track = m_animation->GetTrack(i);
 
-			BuildTrack(item, track);
-		}
-	}
-	void AnimationTreeModel::BuildTrack(TreeItem * const & parentItem, Ref<Animation::Track> &track)
-	{
-		for (size_t i = 0; i < track->GetChannelCount(); i++) {
-			Ref<Animation::Channel> channel = track->GetChannel(i);
+            QVariantList data;
+            data << QString::fromStdString(track->GetName());
+            TreeItem* item = new TreeItem(data, parentItem);
 
-			QVariantList data;
-			data << QString::fromStdString(channel->GetName());
-			AnimationChannelItem *item = new AnimationChannelItem(data, parentItem);
-			item->SetChannel(channel);
+            parentItem->addChild(item);
 
-			parentItem->addChild(item);
-		}
-	}
+            BuildTrack(item, track);
+        }
+    }
+
+    void AnimationTreeModel::BuildTrack(TreeItem* const & parentItem, Ref<Animation::Track>& track) const
+    {
+        for (size_t i = 0; i < track->GetChannelCount(); i++)
+        {
+            Ref<Animation::Channel> channel = track->GetChannel(i);
+
+            QVariantList data;
+            data << QString::fromStdString(channel->GetName());
+            AnimationChannelItem* item = new AnimationChannelItem(data, parentItem);
+            item->SetChannel(channel);
+
+            parentItem->addChild(item);
+        }
+    }
 }
 
 // ========================================================================================================
 
-void Idogep::ManageAnimationsRole::AnimationChangedEvent(Grafkit::AnimationRef animation)
+void ManageAnimationsRole::AnimationChangedEvent(AnimationRef animation, const std::string& parentName)
 {
-	// ez majd a model dolga lesz
+	AnimationTreeModel* newModel = new AnimationTreeModel(m_animation);
+	newModel->SetParentName(QString::fromStdString(parentName));
+	newModel->BuildModel();
+    UpdateAnimationModel(newModel);
 
+	delete m_animationListModel;
+	m_animationListModel = newModel;
 	m_animation = animation;
-	TreeModel * oldModel = m_animationListModel;
-	m_animationListModel = new AnimationTreeModel(m_animation);
-	m_animationListModel->BuildModel();
-	UpdateAnimationModel(m_animationListModel);
-	if (oldModel)
-		delete oldModel;
 }

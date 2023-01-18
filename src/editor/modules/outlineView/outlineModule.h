@@ -12,16 +12,8 @@ namespace Idogep {
 
 	class SceneGraphViewWidgetModel;
 
-	class OutlineView : public View {
-	public:
-		OutlineView();
-
-		void SetModel(Grafkit::IResource * modelResource) override = 0;
-		Event<TreeItem* const &> onItemSelected;
-	};
-
-
-	// TODO Item selected
+	class OutlineModule;
+	class OutlineView;
 
 	class OutlineModule : public Module, public EmitsCommandRole
 	{
@@ -34,16 +26,21 @@ namespace Idogep {
 
 		void DocumentChangedEvent(Document * const & document);
 
-		Event<TreeItem * const &> onAnimationItemSelected;
-		// TBD the rest which could be delegated somewhere
-
-	private:
-		void ItemSelectedEvent(TreeItem * const & item);
+		Event<TreeItem * const> onItemSelected;
+		
 	private:
 		OutlineView * m_myView;
 
 		Ref<SceneGraphViewWidgetModel> m_myModel;
 		TreeModel* m_modelBuilder;
+	};
+
+	class OutlineView : public View {
+	public:
+		OutlineView() = default;
+
+		void SetModel(Grafkit::IResource * modelResource) override = 0;
+
 	};
 
 }

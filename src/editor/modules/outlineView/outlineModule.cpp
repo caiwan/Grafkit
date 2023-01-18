@@ -12,11 +12,6 @@ using namespace Idogep;
 using namespace Grafkit;
 
 
-Idogep::OutlineView::OutlineView()
-{
-}
-
-
 // -------------------------------------------------------------------------------------------------------------------
 
 Idogep::OutlineModule::OutlineModule(Ref<Module> parent) : Module(parent), m_myView(nullptr), m_myModel(nullptr), m_modelBuilder(nullptr)
@@ -68,11 +63,4 @@ void OutlineModule::DocumentChangedEvent(Document* const& document)
 	m_myView->SetModel(model);
 }
 
-void Idogep::OutlineModule::ItemSelectedEvent(TreeItem  * const & item)
-{
-	auto *animation = dynamic_cast<ItemHasAnimationsRole*>(item);
-	if (animation) {
-		onAnimationItemSelected(item);
-	}
-}
 

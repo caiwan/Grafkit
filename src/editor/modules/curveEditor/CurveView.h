@@ -34,7 +34,7 @@ namespace  Idogep
 		ManageAnimationsRole();
 		virtual ~ManageAnimationsRole() = default;
 
-		void AnimationChangedEvent(Grafkit::AnimationRef animation);
+		void AnimationChangedEvent(Grafkit::AnimationRef animation, const std::string& parentName);
 
 	protected:
 		Event<Ref<Grafkit::Animation::Channel>> onChannelSelected;
@@ -59,7 +59,6 @@ namespace  Idogep
 
 	class CurveEditorView : public View, public ManagePlaybackRole, public ManageAnimationsRole
 	{
-// ... 
 
 	};
 }
