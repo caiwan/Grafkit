@@ -5,15 +5,13 @@
 
 #include <d3d11shader.h>
 
-#include "reference.h"
-#include "exceptions.h"
+#include "../utils/exceptions.h"
+#include "../utils/reference.h"
+#include "../utils/resource.h"
 
 #include "dxtypes.h"
 #include "renderer.h"
 
-#include "resource.h"
-
-// #include "texture.h"
 
 namespace Grafkit {
 
@@ -306,7 +304,7 @@ namespace Grafkit {
 	// ================================================================================================================================
 
 	typedef Ref<Shader> ShaderRef;
-	typedef FWutils::ICResource<Shader> ShaderResource;
+	typedef Grafkit::ICResource<Shader> ShaderResource;
 	typedef Ref<ShaderResource> ShaderResourceRef;
 
 }

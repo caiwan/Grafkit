@@ -8,7 +8,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)build\$(Platform)\$(Configuration)\;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(solutiondir)src\api;$(solutiondir)structlib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)src\api;</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

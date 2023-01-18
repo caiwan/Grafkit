@@ -1,3 +1,5 @@
+#include "shader.h"
+
 #include <string>
 #include <fstream>
 #include <streambuf>
@@ -5,9 +7,9 @@
 
 #include <cstdio>
 
-#include "shader.h"
 #include "../math/matrix.h"
-#include "logger.h"
+#include "../utils/logger.h"
+
 
 using namespace std;
 using namespace Grafkit;

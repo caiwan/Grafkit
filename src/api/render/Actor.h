@@ -1,18 +1,17 @@
 #pragma once
 
-#include "reference.h"
+#include <vector>
+#include <stack>
+
+#include "../utils/reference.h"
+#include "../utils/resource.h"
+
+#include "../math/matrix.h"
 
 #include "renderer.h"
 #include "shader.h"
 #include "Material.h"
-// #include "texture.h"
 
-
-#include "../math/matrix.h"
-#include "../core/resource.h"
-
-#include <vector>
-#include <stack>
 
 namespace Grafkit {
 

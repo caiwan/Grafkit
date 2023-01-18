@@ -3,8 +3,8 @@
 #include <stack>
 #include <vector>
 
-#include "../core/resource.h"
-#include "../core/ResourceManager.h"
+#include "../utils/resource.h"
+#include "../utils/ResourceManager.h"
 
 #include "../render/renderer.h"
 #include "../render/texture.h"

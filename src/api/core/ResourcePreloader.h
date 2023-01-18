@@ -1,12 +1,12 @@
 #pragma once
 
-#include "exceptions.h"
+#include "../utils/exceptions.h"
 
 #include <vector>
 #include <string>
 
-#include "ResourceManager.h"
-#include "AssetFactory.h"
+#include "../utils/ResourceManager.h"
+#include "../utils/AssetFactory.h"
 
 #include "../render/renderer.h"
 

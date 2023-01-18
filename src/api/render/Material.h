@@ -3,14 +3,14 @@
 #include <vector>
 #include <map>
 
+#include "../utils/resource.h"
+#include "../utils/memory_align.h"
+
 #include "dxtypes.h"
 #include "renderer.h"
 #include "texture.h"
 #include "shader.h"
 
-#include "../core/resource.h"
-
-#include "memory_align.h"
 
 namespace Grafkit {
 

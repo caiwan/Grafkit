@@ -3,9 +3,9 @@
 #include "shader.h"
 #include "texture.h"
 
-#include "exceptions.h"
+#include "../utils/exceptions.h"
 
-#include "easyloggingpp.h"
+#include "../utils/logger.h"
 
 //#include "../core/renderassets.h"
 

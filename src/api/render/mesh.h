@@ -7,14 +7,13 @@
 #include <vector>
 #include <map>
 
+#include "../utils/reference.h"
+#include "../utils/exceptions.h"
+
 #include "renderer.h"
 #include "dxtypes.h"
 
-#include "reference.h"
-#include "exceptions.h"
-
 #include "shader.h"
-
 
 namespace Grafkit 
 {

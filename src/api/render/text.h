@@ -1,11 +1,11 @@
 #pragma once
 
+#include "../utils/reference.h"
+
 #include "texture.h"
 
 #include "renderer.h"
 #include "particle.h"
-
-#include "reference.h"
 
 namespace Grafkit {
 	

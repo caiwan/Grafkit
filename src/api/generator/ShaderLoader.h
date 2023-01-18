@@ -2,20 +2,20 @@
 
 #include "../render/shader.h"
 
-#include "asset.h"
-#include "resource.h"
-#include "ResourceManager.h"
-#include "ResourceBuilder.h"
+#include "../utils/asset.h"
+#include "../utils/resource.h"
+#include "../utils/ResourceManager.h"
+#include "../utils/ResourceBuilder.h"
 
 namespace Grafkit {
 
-	class ShaderLoader : public FWutils::IResourceBuilder
+	class ShaderLoader : public Grafkit::IResourceBuilder
 	{
 	public:
 		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type);
 		~ShaderLoader();
 
-		virtual void Load(FWutils::IResourceManager * const & resman, FWutils::IResource * source);
+		virtual void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source);
 
 	protected:
 		ShaderType_e m_type;

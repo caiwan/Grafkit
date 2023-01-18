@@ -1,6 +1,6 @@
 #include "ShaderLoader.h"
 
-#include "logger.h"
+#include "../utils/logger.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -23,7 +23,7 @@ namespace {
 	};
 }
 
-Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type) : FWutils::IResourceBuilder(name, sourcename),
+Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type) : Grafkit::IResourceBuilder(name, sourcename),
 	m_type(type)
 {
 	if (entrypoint.empty())
@@ -36,7 +36,7 @@ Grafkit::ShaderLoader::~ShaderLoader()
 {
 }
 
-void Grafkit::ShaderLoader::Load(FWutils::IResourceManager * const & resman, FWutils::IResource * source)
+void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source)
 {
 
 	ShaderResourceRef dstSahder = dynamic_cast<ShaderResource*>(source);
@@ -45,7 +45,7 @@ void Grafkit::ShaderLoader::Load(FWutils::IResourceManager * const & resman, FWu
 	}
 	////try 
 	{
-		FWutils::IAssetRef asset = this->GetSourceAsset(resman);
+		Grafkit::IAssetRef asset = this->GetSourceAsset(resman);
 		ShaderRef shader = new Shader();
 		// load from asset
 		if (asset.Valid()) {

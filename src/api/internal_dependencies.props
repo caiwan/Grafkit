@@ -10,7 +10,7 @@
       </AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(solutiondir)src\api;$(solutiondir)structlib\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(solutiondir)src\api;</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />

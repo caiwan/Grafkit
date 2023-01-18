@@ -1,17 +1,18 @@
 #pragma once
+
 #include <stack>
 
-#include "tree.h"
+#include "../utils/tree.h"
+#include "../utils/memory_align.h"
 
 #include "../math/matrix.h"
+
+#include "renderer.h"
+
 #include "Actor.h"
 
 #include "camera.h"
 #include "Light.h"
-
-#include "renderer.h"
-
-#include "memory_align.h"
 
 namespace Grafkit {
 

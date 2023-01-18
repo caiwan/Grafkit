@@ -1,9 +1,9 @@
 #include "mesh.h"
 #include "texture.h"
 
-#include "exceptions.h"
+#include "../utils/exceptions.h"
 
-#include "struct_pack.h"
+#include "../utils/struct_pack.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -91,7 +91,7 @@ MeshRef Grafkit::SimpleMeshGenerator::operator()(size_t vertexCount, size_t inde
 	// obtain input layout elements, and collect pointers that were set before
 	size_t elem_count = this->m_shader->GetILayoutElemCount();
 
-	FWutils::StructPack packer;
+	Grafkit::StructPack packer;
 
 	if (this->m_shader.Invalid()) {
 		/**

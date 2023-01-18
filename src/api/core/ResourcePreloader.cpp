@@ -1,9 +1,9 @@
 #include "ResourcePreloader.h"
 
-#include "ResourceBuilder.h"
+#include "../utils/logger.h"
 
-// #include "logger.h"
-#include "exceptions.h"
+#include "../utils/exceptions.h"
+#include "../utils/ResourceBuilder.h"
 
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
@@ -169,11 +169,11 @@ IAssetRef Grafkit::AssetPreloader::GetResource(std::string filename)
 		}
 		catch (FileNotFoundException &e)
 		{
-			LOG(INFO) << "Could not found file in generator " << i << filename << "moving on";
+			LOGGER(LOG(INFO) << "Could not found file in generator " << i << filename << "moving on");
 			continue;
 		}
 		catch (Exception &e) {
-			LOG(WARNING) << "Other error type of exception was thrown";
+			LOGGER(LOG(WARNING) << "Other error type of exception was thrown");
 			throw e;
 		}
 	}
@@ -189,7 +189,7 @@ void Grafkit::AssetPreloader::DoPrecalc()
 
 	for (std::list<IResourceBuilder*>::iterator it = m_builders.begin(); it != m_builders.end(); it++)
 	{
-		LOG(INFO) << "Loading asset" << (int)i << "of" << (int)len;
+		LOGGER(LOG(INFO) << "Loading asset" << (int)i << "of" << (int)len);
 
 		(**it)(this);
 		

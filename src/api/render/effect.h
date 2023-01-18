@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "reference.h"
-#include "memory_align.h"
+#include "../utils/reference.h"
+#include "../utils/memory_align.h"
 
 #include "renderer.h"
 #include "texture.h"
