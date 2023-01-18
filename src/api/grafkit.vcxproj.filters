@@ -5,19 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Header Files\core">
-      <UniqueIdentifier>{4a826add-ace6-4ffa-955d-607e4afa2dd3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\render">
-      <UniqueIdentifier>{3d3af590-3241-4f22-a7ee-66cf3efc3ea5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\core">
       <UniqueIdentifier>{0dc952d5-4de4-451d-b57d-c9b59ac5ab9d}</UniqueIdentifier>
@@ -30,9 +20,6 @@
     </Filter>
     <Filter Include="Source Files\math">
       <UniqueIdentifier>{aa94052d-8cdc-437a-8e54-d4885f1c0bcd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\math">
-      <UniqueIdentifier>{a038acb6-f8f0-4175-8dce-4e89a1c67cd7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,38 +77,11 @@
     <ClCompile Include="render\mesh.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
+    <ClCompile Include="render\model.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="core\input.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\system.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\window.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="render\camera.h">
-      <Filter>Header Files\render</Filter>
-    </ClInclude>
-    <ClInclude Include="render\dxtypes.h">
-      <Filter>Header Files\render</Filter>
-    </ClInclude>
-    <ClInclude Include="render\effect.h">
-      <Filter>Header Files\render</Filter>
-    </ClInclude>
-    <ClInclude Include="render\renderer.h">
-      <Filter>Header Files\render</Filter>
-    </ClInclude>
-    <ClInclude Include="render\shader.h">
-      <Filter>Header Files\render</Filter>
-    </ClInclude>
-    <ClInclude Include="render\texture.h">
-      <Filter>Header Files\render</Filter>
-    </ClInclude>
-    <ClInclude Include="core\reference.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="builtin_data\c64palette.h">
       <Filter>BuiltInData</Filter>
     </ClInclude>
@@ -131,23 +91,59 @@
     <ClInclude Include="builtin_data\cube.h">
       <Filter>BuiltInData</Filter>
     </ClInclude>
-    <ClInclude Include="math\matrix.h">
-      <Filter>Header Files\math</Filter>
-    </ClInclude>
-    <ClInclude Include="core\exceptions.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\memory_alloc.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\memory.h">
-      <Filter>Header Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="render\Actor.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
+    <ClInclude Include="render\camera.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\dxtypes.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\effect.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
     <ClInclude Include="render\mesh.h">
-      <Filter>Header Files\render</Filter>
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\model.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\renderer.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\shader.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\texture.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="math\matrix.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="core\exceptions.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\input.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\memory.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\memory_alloc.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\reference.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\system.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\window.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\stringutils.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
