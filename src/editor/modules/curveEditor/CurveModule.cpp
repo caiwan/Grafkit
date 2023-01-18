@@ -48,7 +48,7 @@ void CurveEditorModule::Initialize()
 	// ... 
 
     // manage animation role
-    m_myView->onChannelSelected + Delegate(m_curveScene, )
+	m_myView->onChannelSelected += Delegate(m_curveScene.Get(), &CurveSceneModule::ChannelSelectedEvent);
 
 	SetView(m_myView);
 }

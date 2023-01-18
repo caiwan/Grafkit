@@ -2,11 +2,11 @@
 #include "common.h"
 #include "animation/animation.h"
 #include "utils/ViewModule.h"
+#include "curvedoc.h"
 
 namespace Idogep
 {
 	class CurveSceneView;
-
 
 	namespace Roles {
 
@@ -41,13 +41,16 @@ namespace Idogep
 	    ~CurveSceneModule() override;
 	    void Initialize() override;
 
-		void ShowChannelEvent(Ref<Grafkit::Animation::Channel> chanel);
+		void ChannelSelectedEvent(Ref<Grafkit::Animation::Channel> chanel);
 		//void ShowTrackEvent(Ref<Grafkit::Animation::Track> track);
 		void ClearChannels();
+
+	    CurveManager* GetCurveManager() const { return m_curveManager; }
 
 	private:
 		Ref<CurveSceneView> m_myView;
 		
 	    Roles::ManageCurveAudiogramRole* m_manageAudiogram;
+		CurveManager *m_curveManager;
 	};
 }

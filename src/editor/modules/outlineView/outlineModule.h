@@ -31,16 +31,14 @@ namespace Idogep {
 	private:
 		OutlineView * m_myView;
 
-		Ref<SceneGraphViewWidgetModel> m_myModel;
+		SceneGraphViewWidgetModel* m_myModel;
 		TreeModel* m_modelBuilder;
 	};
 
 	class OutlineView : public View {
 	public:
 		OutlineView() = default;
-
-		void SetModel(Grafkit::IResource * modelResource) override = 0;
-
+		virtual void SetModel(SceneGraphViewWidgetModel * modelResource) = 0;
 	};
 
 }

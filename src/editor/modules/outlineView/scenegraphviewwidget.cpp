@@ -22,20 +22,17 @@ SceneGraphViewWidget::SceneGraphViewWidget(QWidget* parent)
 
 SceneGraphViewWidget::~SceneGraphViewWidget() { delete ui; }
 
-void SceneGraphViewWidget::SetModel(IResource* modelResource)
+void SceneGraphViewWidget::SetModel(SceneGraphViewWidgetModel* model)
 {
-    Ref<Resource<SceneGraphViewWidgetModel>> model = dynamic_cast<Resource<SceneGraphViewWidgetModel>*>(modelResource);
-    assert(model.Valid());
-    assert(model->Valid());
-
     // this will force refresh, probaly.
     ui->treeView->setModel(nullptr);
-    ui->treeView->setModel((*model)->GetModel());
+    ui->treeView->setModel(model->GetModel());
 }
 
 
 void SceneGraphViewWidget::RefreshView(bool force)
 {
+    // ...
 }
 
 // ReSharper disable CppInconsistentNaming

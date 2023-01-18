@@ -34,8 +34,8 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 		onRequestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
 	}
 
-    if (!m_audiogramBuffer || !m_audiogramSampleCount)
-        return;
+	if (!m_audiogramBuffer || !m_audiogramSampleCount)
+		return;
 
 	const uint32_t offset = uint32_t(startTime * m_audiogramSamplePerSec) * m_audiogramChannelCount;
 	const uint32_t length = uint32_t((endTime - startTime) * m_audiogramSamplePerSec) * m_audiogramChannelCount;
@@ -95,11 +95,13 @@ void Roles::ManageCurveAudiogramRole::ClearAudiogram()
 CurveSceneModule::CurveSceneModule(const Ref<Module>&& parent) : Module(parent), m_manageAudiogram(nullptr)
 {
 	m_manageAudiogram = new Roles::ManageCurveAudiogramRole();
+	m_curveManager = new CurveManager();
 }
 
 CurveSceneModule::~CurveSceneModule()
 {
 	delete m_manageAudiogram;
+	delete m_curveManager;
 }
 
 void CurveSceneModule::Initialize()
@@ -107,7 +109,7 @@ void CurveSceneModule::Initialize()
 	assert(m_parent);
 	assert(m_parent->GetView());
 
-    CurveEditorWidget* parentWidget = dynamic_cast<CurveEditorWidget* >(m_parent->GetView().Get());
+	CurveEditorWidget* parentWidget = dynamic_cast<CurveEditorWidget*>(m_parent->GetView().Get());
 	assert(parentWidget);
 
 	CurveEditorScene *ces = new CurveEditorScene();
@@ -123,7 +125,7 @@ void CurveSceneModule::Initialize()
 	assert(music);
 	m_manageAudiogram->onRequestWaveform += Delegate(music, &Audiogram::GetWaveform);
 
-    // 
+	// 
 	MusicProxy* musicProxy = editor->GetMusicProxy();
 	assert(musicProxy);
 	musicProxy->onMusicChanged += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::ClearAudiogram);
@@ -133,12 +135,23 @@ void CurveSceneModule::Initialize()
 
 	m_manageAudiogram->onRequestWaveform += Delegate(musicProxy, &Audiogram::GetWaveform);
 
-    // 
+	// 
+
+    //
 	m_myView = ces; SetView(m_myView);
 }
 
-void CurveSceneModule::ShowChannelEvent(Ref<Grafkit::Animation::Channel> chanel)
+void CurveSceneModule::ChannelSelectedEvent(Ref<Grafkit::Animation::Channel> channel)
 {
-	m_myView->SetModel();
-    }
+	m_curveManager->SetChannel(channel);
+	m_myView->ClearCurvePoints();
+	m_curveManager->AddCurveToScene(m_myView);
+	m_myView->ShowAnimationCurves();
+	m_myView->RequestRefreshView(true);
+}
+
+void CurveSceneModule::ClearChannels()
+{
+	m_myView->HideAnimationCurves();
+}
 

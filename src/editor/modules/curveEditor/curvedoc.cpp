@@ -28,18 +28,18 @@ void Roles::EditCurveRole::CommitRemovePoint(float key, float value)
 
 void CurveManager::Rebuild()
 {
-	//delete m_curve;
-	if (m_curve)
-		m_curve->clear();
-
-	m_curve = new QList<Idogep::CurvePointItem*>();
+	//delete m_curvePoints;
+	if (m_curvePoints)
+		m_curvePoints->clear();
+	else
+		m_curvePoints = new QList<Idogep::CurvePointItem*>();
 
 
 	size_t keyCount = m_channel->GetKeyCount();
 	for (size_t i = 0; i < keyCount; i++) {
 		auto key = m_channel->GetKey(i);
 		CurvePointItem *point = new CurvePointItem(key, i);
-		m_curve->push_back(point);
+		m_curvePoints->push_back(point);
 
 #if 0
 		point->onStartEdit += Delegate(this, &ManageCurveRole::StartEdit);
@@ -56,16 +56,22 @@ void CurveManager::Recalculate(TimelineArea* const area)
 
 }
 
-void CurveManager::AddCurveToScene(CurveEditorScene* parent)
+void CurveManager::AddCurveToScene(CurveSceneView* parent)
 {
+	if (!m_curvePoints)
+		return;
 
+	for (size_t i = 0; i < m_curvePoints->size(); i++)
+	{
+		parent->AddCurvePoint(m_curvePoints->at(i));
+	}
 }
 
 
 #if 0
 Idogep::ManageCurveRole::ManageCurveRole() :
 	ManageCurveAudiogramRole(),
-	m_curve(nullptr)
+	m_curvePoints(nullptr)
 {
 }
 
@@ -74,11 +80,11 @@ void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& chann
 
 	m_channel = channel;
 
-	//delete m_curve;
-	if (m_curve)
-		m_curve->clear();
+	//delete m_curvePoints;
+	if (m_curvePoints)
+		m_curvePoints->clear();
 
-	m_curve = new QList<Idogep::CurvePointItem*>();
+	m_curvePoints = new QList<Idogep::CurvePointItem*>();
 
 #if 0
 
@@ -86,7 +92,7 @@ void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& chann
 	for (size_t i = 0; i < keyCount; i++) {
 		auto key = m_channel->GetKey(i);
 		CurvePointItem *point = new CurvePointItem(key, i);
-		m_curve->push_back(point);
+		m_curvePoints->push_back(point);
 
 		point->onStartEdit += Delegate(this, &ManageCurveRole::StartEdit);
 		point->onCommitEdit += Delegate(this, &ManageCurveRole::CommitEdit);
@@ -100,9 +106,9 @@ void Idogep::ManageCurveRole::SetChannel(Ref<Grafkit::Animation::Channel>& chann
 void Idogep::ManageCurveRole::Recalculate()
 {
 #if 0
-	if (m_curve) {
-		for (int i = 0; i < m_curve->size(); i++) {
-			m_curve->at(i)->recalculatePosition();
+	if (m_curvePoints) {
+		for (int i = 0; i < m_curvePoints->size(); i++) {
+			m_curvePoints->at(i)->recalculatePosition();
 			// if you set points visibilityduring the drawing sequence, it will not recieve any events
 		}
 	}
@@ -112,9 +118,9 @@ void Idogep::ManageCurveRole::Recalculate()
 void Idogep::ManageCurveRole::AddCurveToScene(CurveEditorScene * parent)
 {
 #if 0
-	if (m_curve) {
-		for (int i = 0; i < m_curve->size(); i++) {
-			auto point = m_curve->at(i);
+	if (m_curvePoints) {
+		for (int i = 0; i < m_curvePoints->size(); i++) {
+			auto point = m_curvePoints->at(i);
 			parent->addItem(point);
 			point->recalculatePosition();
 			// if you set points visibilityduring the drawing sequence, it will not recieve any events

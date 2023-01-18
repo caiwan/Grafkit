@@ -10,10 +10,11 @@
 #include "curveeditorscene.h"
 #include "curvepointitem.h"
 #include "curvedoc.h"
+#include "CurveSceneModule.h"
 
-//#include "qfmodex.hh"
 
 using namespace Idogep;
+using namespace Grafkit;
 
 namespace {
 	const QColor grey = QColor(192, 192, 192);
@@ -23,14 +24,11 @@ namespace {
 	const QColor purple = QColor(255, 128, 255);
 }
 
-CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent)
+CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent), CurveSceneView()
 , m_area(nullptr)
-, m_displayWaveform(true), m_displayCurve(false)
 , m_audiogramImage(nullptr)
 {
 	m_area = new TimelineArea();
-	
-
 	setBackgroundBrush(QColor(48, 48, 48));
 }
 
@@ -42,8 +40,9 @@ CurveEditorScene::~CurveEditorScene()
 
 void CurveEditorScene::RefreshView(bool force)
 {
+	if (force)
+		UpdateAudiogram();
 	update();
-	// TODO if (force)
 }
 
 void CurveEditorScene::PlaybackChanged(bool isPlaying)
@@ -54,14 +53,14 @@ void CurveEditorScene::DemoTimeChanged(float time)
 {
 }
 
-void CurveEditorScene::SetAnimationChannel(Ref<Grafkit::Animation::Channel> channel)
+void CurveEditorScene::ClearCurvePoints()
 {
-	m_displayCurve = true;
+	clear();
 }
 
-void CurveEditorScene::SetAnimationTrack(Ref<Grafkit::Animation::Track> track)
+void CurveEditorScene::AddCurvePoint(CurvePointItem* pointItem)
 {
-	m_displayCurve = true;
+	addItem(pointItem);
 }
 
 // ---------------------------------------------------------------------
@@ -92,6 +91,8 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 	m_area->SetSceneRect(sceneRect());
 	m_area->DrawGrid(painter, r);
 
+	//painter->/*restore*/();
+
 	if (m_displayCurve)
 		DrawCurve(painter, r);
 
@@ -100,21 +101,37 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r)
 {
+	// TODO: Move this out somewhere else 
+	CurveSceneModule* parent = dynamic_cast<CurveSceneModule*>(m_module.Get());
+	assert(parent);
+
+	CurveManager* curveManager = parent->GetCurveManager();
+
 	// 2. draw the curves.
-	QList<CurvePointItem*> *points = m_document->GetCurvePoints();
+	const QList<CurvePointItem*> * const points = curveManager->GetCurvePoints();
+
+	// debug 
+	{
+		painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0), Qt::SolidPattern));
+	}
 
 	// prevernt crash on NPE
 	if (!points || points->isEmpty())
 		return;
 
-	auto channel = m_document->GetChannel();
+	//debug
+	{
+		painter->fillRect(0, 0, 16, 16, QBrush(QColor(0, 255, 0), Qt::SolidPattern));
+	}
+
+	auto channel = curveManager->GetChannel();
 
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setPen(QPen(grey));
 
 	// boundaries
 	QPointF pMin = m_area->Screen2Point(r.topLeft());
-	int idmin = channel->FindKeyIndex(pMin.x());
+	const int idmin = channel->FindKeyIndex(pMin.x());
 
 	QPointF pMax = m_area->Screen2Point(r.bottomRight());
 	int idmax = channel->FindKeyIndex(pMax.x()) + 1;
@@ -137,29 +154,26 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r)
 	if (idmax >= channel->GetKeyCount() - 1)
 		idmax = channel->GetKeyCount() - 1; // avoid max+1 index
 
+		// debug stuff
+
+
 	for (int i = idmin; i < idmax; i++)
 	{
 		CurvePointItem *point = points->at(i);
 		point->setVisible(true);
 
-		// debug stuff
-		{
-			QRectF boundingRect = point->boundingRect();
-			boundingRect.moveCenter(point->pos());
-			painter->fillRect(boundingRect, QBrush(QColor(255, 0, 0), Qt::Dense6Pattern));
-		}
 
-		auto k0 = channel->GetKey(i);
-		auto k1 = channel->GetKey(i + 1);
+		const auto k0 = channel->GetKey(i);
+		const auto k1 = channel->GetKey(i + 1);
 
 		// valahogy lehetne optiomalgatni ezt is 
-		int steps = 32;
+		const int steps = 32;
 		double stepWidth = 0.;
 		//steps = 64;
 		stepWidth = (k1.m_time - k0.m_time) / steps;
 
 		for (int j = 0; j < steps; j++) {
-			double t = k0.m_time + j * stepWidth;
+			const double t = k0.m_time + j * stepWidth;
 			double v = channel->GetValue(t);
 
 			QPointF p1(t, channel->GetValue(t));
@@ -200,13 +214,13 @@ void CurveEditorScene::UpdateAudiogram()
 TimelineArea::TimelineArea()
 {
 	m_scale = QSizeF(64, 64);
-	m_offset = QPointF(0, 0);
+	m_offset = QPointF(128, 0);
 }
 
 QPointF TimelineArea::Point2Screen(QPointF point) const
 {
 	return {
-		point.x() * m_scale.width() + m_offset.x() + m_sceneRect.topLeft().x(),
+		point.x() * m_scale.width() + m_offset.x() + m_sceneRect.topLeft().x() ,
 		point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.topLeft().y()
 	};
 }

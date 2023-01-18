@@ -5,8 +5,10 @@ class QImage;
 
 namespace Idogep
 {
+	class CurvePointItem;
 	namespace Roles
 	{
+
 		class TimelineSceneViewRole
 		{
 		public:
@@ -19,19 +21,35 @@ namespace Idogep
 			virtual void DemoTimeChanged(float time) = 0;
 		};
 
-		class CurveEditorSceneViewRole
-		{
+		//class CurveEditorSceneViewRole
+		//{
 
-		public:
-			virtual void SetAnimationChannel(Ref<Grafkit::Animation::Channel> channel) = 0;
-			virtual void SetAnimationTrack(Ref<Grafkit::Animation::Track> track) = 0;
-			virtual void HideAnimationCurves() = 0;
+		//public:
+		//	//virtual void SetAnimationChannel(Ref<Grafkit::Animation::Channel> channel) = 0;
+		//	//virtual void SetAnimationTrack(Ref<Grafkit::Animation::Track> track) = 0;
+		//	virtual void HideAnimationCurves() = 0;
 
-		};
+		//};
 	}
-    
-	class CurveSceneView : public View, public Roles::TimelineSceneViewRole, public Roles::CurveEditorSceneViewRole
+
+	class CurveSceneView : public View, public Roles::TimelineSceneViewRole /*, public Roles::CurveEditorSceneViewRole*/
 	{
+	public:
+
+		CurveSceneView();
+
+		void HideAnimationCurves() { m_displayCurve = false; }
+		void ShowAnimationCurves() { m_displayCurve = true; }
+
+		//TODO  hide audiogram
+		// TODO show audiogram
+
+		virtual void ClearCurvePoints() = 0;
+		virtual void AddCurvePoint(CurvePointItem* points) = 0;
+
+	protected:
+		bool m_displayWaveform;
+		bool m_displayCurve;
 
 	};
 }

@@ -10,7 +10,7 @@ namespace Idogep {
 
 	class CurvePointItem;
 	class CurveCursor;
-	class CurveEditorScene;
+	class CurveSceneView;
 
 	class TimelineArea;
 
@@ -36,21 +36,26 @@ namespace Idogep {
 		friend class CurvePointItem;
 
 	public:
-		QList<CurvePointItem*> const * GetCurvePoints() const { return m_curve; }
+		QList<CurvePointItem*> const * GetCurvePoints() const { return m_curvePoints; }
 		Ref<Grafkit::Animation::Channel> GetChannel() const { return m_channel; }
 
 		void SetChannel(Ref<Grafkit::Animation::Channel>& channel) { m_channel = channel; Rebuild(); }
 
 		void Recalculate(TimelineArea* drawingSurfaceArea);
-		void AddCurveToScene(CurveEditorScene* parent);
+		void AddCurveToScene(CurveSceneView* parent);
 
 	protected:
 		void Rebuild();
 
 	private:
-		QList<CurvePointItem*>* m_curve;
+		QList<CurvePointItem*>* m_curvePoints;
 		Ref<Grafkit::Animation::Channel> m_channel;
 	};
+
+    class CursorManager
+    {
+        // ... 
+    };
 
 #if 0
 
@@ -73,7 +78,7 @@ namespace Idogep {
 		ManageCurveRole();
 
 #if 0
-		QList<CurvePointItem*>* GetCurvePoints() { return m_curve; }
+		QList<CurvePointItem*>* GetCurvePoints() { return m_curvePoints; }
 		Ref<Grafkit::Animation::Channel> GetChannel() { return m_channel; }
 #endif 
 		void SetChannel(Ref<Grafkit::Animation::Channel>& channel);
@@ -95,7 +100,7 @@ namespace Idogep {
 
 	private:
 #if 0
-		QList<CurvePointItem*>* m_curve;
+		QList<CurvePointItem*>* m_curvePoints;
 		Ref<Grafkit::Animation::Channel> m_channel;
 #endif
 		Grafkit::Animation::Key m_originalKey;

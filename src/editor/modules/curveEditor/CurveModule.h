@@ -24,8 +24,6 @@ namespace  Idogep
 
 		Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform; // ptr, samplecount, channelcount, samplePerSec
 
-		//Ref<CurveSceneModule> GetCurveSceneMoule() const;  
-		
 		void AnimationSelectedEvent(TreeItem * const item);
 
 	private:

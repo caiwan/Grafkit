@@ -55,12 +55,10 @@ void OutlineModule::DocumentChangedEvent(Document* const& document)
 
 	// replace shit 
 	delete m_myModel;
-	//delete oldModelBuilder;
 	m_myModel = newModel;
 
 	// push
-	const auto model = new Resource<SceneGraphViewWidgetModel>(m_myModel);
-	m_myView->SetModel(model);
+	m_myView->SetModel(m_myModel);
 }
 
 

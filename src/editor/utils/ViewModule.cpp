@@ -26,7 +26,10 @@ View::~View() { delete m_refreshQueueObject; }
 void View::RequestRefreshView(const bool force)
 {
     // Request immediately
-    if (force) { RefreshView(true); }
+    if (force)
+    {
+        RefreshView(true);
+    }
     else
     {
         //QTimer. ... 
