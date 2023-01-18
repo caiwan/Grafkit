@@ -3,6 +3,7 @@
 
 #include "memory.h"
 
+using namespace FWdebugExceptions;
 using namespace FWrender;
 
 Renderer::Renderer() :
@@ -52,42 +53,42 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Use the factory to create an adapter for the primary graphics interface (video card).
 	result = factory->EnumAdapters(0, &adapter);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Enumerate the primary adapter output (monitor).
 	result = adapter->EnumOutputs(0, &adapterOutput);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Get the number of modes that fit the DXGI_FORMAT_R8G8B8A8_UNORM display format for the adapter output (monitor).
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Create a list to hold all the possible display modes for this monitor/video card combination.
 	displayModeList = new DXGI_MODE_DESC[numModes];
 	if(!displayModeList)
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Now fill the display mode list structures.
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Now go through all the display modes and find the one that matches the screen width and height.
@@ -108,14 +109,14 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = adapter->GetDesc(&adapterDesc);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Convert the name of the video card to a character array and store it.
 	error = wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
 	if(error != 0)
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Release the display mode list.
@@ -145,7 +146,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	swapChainDesc.BufferDesc.Height = screenHeight;
 
 	// Set regular 32-bit surface for the back buffer.
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
 	// Set the refresh rate of the back buffer.
 	if(m_vsync_enabled)
@@ -208,7 +209,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// update our reference
@@ -247,14 +248,14 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Create the render target view with the back buffer pointer.
 	result = m_device->CreateRenderTargetView(backBufferPtr, nullptr, &m_renderTargetView);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Release pointer to the back buffer as we no longer need it.
@@ -281,7 +282,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = m_device->CreateTexture2D(&depthBufferDesc, nullptr, &m_depthStencilBuffer);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Initialize the description of the stencil state.
@@ -312,7 +313,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Set the depth stencil state.
@@ -330,7 +331,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
@@ -344,7 +345,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	result = m_device->CreateRasterizerState(&rastDesc, &m_rasterState);
 	if(FAILED(result))
 	{
-		return false;
+		throw EX_DETAILS(InitializeRendererException, "TBD");
 	}
 
 	// Now set the rasterizer state.
