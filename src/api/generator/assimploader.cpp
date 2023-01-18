@@ -210,10 +210,7 @@ void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Ac
 //}
 
 
-Grafkit::AssimpLoader::AssimpLoader(Grafkit::IAssetRef resource, Grafkit::Scene * const & scenegraph)
-	:
-	IResourceBuilder(),
-	m_scenegraph(scenegraph), m_resource(resource)
+Grafkit::AssimpLoader::AssimpLoader(Grafkit::IAssetRef resource, Grafkit::SceneRef & scenegraph) : IResourceBuilder(resource, scenegraph)
 {
 }
 
@@ -224,11 +221,24 @@ Grafkit::AssimpLoader::~AssimpLoader()
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void Grafkit::AssimpLoader::operator()(Grafkit::IResourceManager * const &assman)
+void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const &assman)
 {
+	SceneRef outScene = m_dstResource;
+	if (outScene.Invalid()) {
+		outScene = new Scene();
+	}
+
+	outScene->SetName(m_srcName);
+
+	IAssetRef srcAsset = this->GetSourceAsset(assman);
+
+	if (!srcAsset) {
+		throw EX_DETAILS(AssimpParseException, "Nem tudom betolteni a forras assetet");
+	}
+
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?
-	const aiScene *scene = importer.ReadFileFromMemory(this->m_resource->GetData(), this->m_resource->GetSize(), 
+	const aiScene *scene = importer.ReadFileFromMemory(srcAsset->GetData(), srcAsset->GetSize(),
 		aiProcessPreset_TargetRealtime_Quality | /*aiProcess_GenNormals |*/ 0
 	);
 
@@ -434,6 +444,8 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IResourceManager * const &assman
 
 	// build up scenegraph
 
+
+
 # if 0 // ez pedig tok meno lett volna, ha mukodik rekurzio nelkuk,majd legkozelebb
 
 	struct stack_elem_t {
@@ -473,12 +485,12 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IResourceManager * const &assman
 		}
 	}
 
-	m_scenegraph->SetRootNode(s.actor_node);
+	outScene->SetRootNode(s.actor_node);
 
 #else // fallback: recursive fill 
 	ActorRef root_node = new Actor;
 	// assimp_parseScenegraph(asset_repo, scene->mRootNode, &root_node);
-	m_scenegraph->SetRootNode(root_node);
+	outScene->SetRootNode(root_node);
 
 #endif
 
@@ -494,4 +506,10 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IResourceManager * const &assman
 	if (scene->HasAnimations()) {
 	
 	}
+
+
+	// add to resman
+	assman->Add(outScene);
+
+	m_dstResource = outScene;
 }

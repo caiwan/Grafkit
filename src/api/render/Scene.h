@@ -15,21 +15,8 @@
 
 namespace Grafkit {
 
-	//struct shader_pair_t {
-	//	ShaderRef m_vertexShader;
-	//	ShaderRef m_fragmentShader;
-
-	//	shader_pair_t(ShaderRef vertexShader, ShaderRef fragmentShader) :
-	//		m_vertexShader(vertexShader),
-	//		m_fragmentShader(fragmentShader)
-	//	{
-	//	}
-
-	//	shader_pair_t() :
-	//		m_vertexShader(),
-	//		m_fragmentShader()
-	//	{}
-	//};
+	class Scene;
+	typedef Ref<Scene> SceneRef;
 
 #define SCENE_BUCKET "scene"
 

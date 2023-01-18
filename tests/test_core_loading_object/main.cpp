@@ -11,6 +11,8 @@
 #include "math/matrix.h"
 
 #include "core/ResourcePreloader.h"
+#include "core/AssetFactory.h"
+#include "core/AssetFile.h"
 
 using namespace Grafkit;
 
@@ -36,7 +38,7 @@ protected:
 	Renderer render;
 	CameraRef camera;
 	
-	Scene * scene;
+	SceneRef scene;
 
 	float t;
 
@@ -57,7 +59,7 @@ protected:
 		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 		// init file loader
-		this->m_file_loader = new Grafkit::FileResourceManager("./");
+		this->m_file_loader = new Grafkit::FileAssetManager("./");
 		this->RegisterRecourceFactory(m_file_loader);
 		this->LoadCache();
 
@@ -76,9 +78,7 @@ protected:
 
 		// -- model 
 		scene = new Scene();
-		AssimpLoader * loader = new AssimpLoader(this->m_file_loader->GetResourceByName("./models/tegla.3ds"), scene);
-		//loader(this);
-		this->AddBuilder(loader);
+		this->AddBuilder(new AssimpLoader(this->m_file_loader->Get("./models/tegla.3ds"), scene);
 
 		this->t = 0;
 
@@ -96,17 +96,17 @@ protected:
 	int mainloop() {
 		this->render.BeginScene();
 		{
-			struct {
+			/*struct {
 				matrix worldMatrix;
 				matrix viewMatrix;
 				matrix projectionMatrix;
-			} matbuff;
+			} matbuff;*/
 
-			camera->Render(render);
+			// camera->Render(render);
 
 			//render.GetWorldMatrix(matbuff.worldMatrix);
-			camera->GetViewMatrix(matbuff.viewMatrix);
-			camera->GetProjectionMatrix(matbuff.projectionMatrix);
+			// camera->GetViewMatrix(matbuff.viewMatrix);
+			// camera->GetProjectionMatrix(matbuff.projectionMatrix);
 
 			////matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
 			//matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t * 10, t * 15, t * 20);
@@ -135,10 +135,10 @@ protected:
 	};
 
 private:
-	Grafkit::FileResourceManager *m_file_loader;
+	IAssetFactory *m_file_loader;
 public:
-	//Grafkit::IResourceFactory* GetResourceFactory() { return m_file_loader; }
-	FWrender::Renderer & GetDeviceContext() { return render; }
+	IAssetFactory *GetAssetFactory() { return m_file_loader; }
+	Renderer & GetDeviceContext() { return render; }
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)

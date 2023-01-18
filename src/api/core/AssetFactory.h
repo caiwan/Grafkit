@@ -46,6 +46,7 @@ namespace Grafkit {
 
 		typedef std::list<std::string> filelist_t;
 
+		IAssetRef Get(const char * const name) { return Get(std::string(name)); }
 		virtual IAssetRef Get(std::string name) = 0;
 		//virtual IAssetRef Get(Guid uuid) = 0;
 

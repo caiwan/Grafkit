@@ -9,6 +9,8 @@
 
 namespace Grafkit{
 
+	class IAssetFactory;
+
 	class IResourceManager
 	{
 	public:
@@ -26,7 +28,8 @@ namespace Grafkit{
 		// IResourceManager* GetResoueceManager(std::string &pName);
 
 		// ez kell mindenkeppen:
-		virtual Grafkit::Renderer &GetDeviceContext() = 0;
+		virtual Renderer &GetDeviceContext() = 0;
+		virtual IAssetFactory *GetAssetFactory() = 0;
 
 	private:
 		typedef std::map<std::string, IResourceRef> ResourceMap_t;
@@ -36,7 +39,7 @@ namespace Grafkit{
 	};
 
 	template<class T>
-	inline T* IResourceManager::Get(const std::string &pName) const {
+	inline Ref<T> IResourceManager::Get(const std::string &pName) const {
 		ResourceMap::const_iterator it = m_resources.find(pName);
 
 		if (it != m_resources.end()) {
