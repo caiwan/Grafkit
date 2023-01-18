@@ -116,6 +116,36 @@ void Document::InitTestStuff(Renderer & render)
 	(*m_scene)->AddAnimation(new ActorAnimation(cameraActor));
 	(*m_scene)->AddAnimation(new ActorAnimation(cubeActor));
 
+	for (size_t i = 0; i < (*m_scene)->GetAnimationCount(); ++i)
+	{
+		AnimationRef animation = (*m_scene)->GetAnimation(i);
+
+		for (size_t j = 0; j < animation->GetTrackCount(); ++j)
+		{
+			Ref<Animation::Track> track = animation->GetTrack(j);
+
+			for (size_t k = 0; k < track->GetChannelCount(); ++k)
+			{
+				Ref<Animation::Channel> channel = track->GetChannel(k);
+				for (size_t l = 0; l < 256; ++l)
+				{
+					//const float v = 2 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) + 1;
+				    const float t = 1. + l;
+
+					Animation::Key key(t, 1);
+					key.m_type = Animation::KI_step;
+					//key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
+					channel->AddKey(key);
+
+				    Animation::Key key2(t + .5, 0.);
+					key2.m_type = Animation::KI_step;
+					channel->AddKey(key2);
+				}
+			}
+		}
+
+	}
+
 	(*m_scene)->Initialize();
 	(*m_scene)->Build(render, m_vs, m_ps);
 }

@@ -38,7 +38,7 @@ CurveEditorScene::~CurveEditorScene()
 	delete m_audiogramImage;
 }
 
-void CurveEditorScene::RefreshView(bool force)
+void CurveEditorScene::RefreshView(const bool force)
 {
 	if (force)
 		UpdateAudiogram();
@@ -86,20 +86,20 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 	}
 
 	// because rect() is relative to the widgets parent
-	painter->translate(r.topLeft());
 
 	m_area->SetSceneRect(sceneRect());
-	m_area->DrawGrid(painter, r);
 
-	//painter->/*restore*/();
+	
+	m_area->DrawGrid(painter, r);
 
 	if (m_displayCurve)
 		DrawCurve(painter, r);
 
 	//TOOD draw cursor
+
 }
 
-void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r)
+void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 {
 	// TODO: Move this out somewhere else 
 	CurveSceneModule* parent = dynamic_cast<CurveSceneModule*>(m_module.Get());
@@ -137,10 +137,26 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r)
 	int idmax = channel->FindKeyIndex(pMax.x()) + 1;
 
 	if (idmin == 0 && points->at(0)->x() > r.x())
+	{
 		painter->drawLine(
 			0, points->at(0)->pos().y(),
 			points->at(0)->pos().x(), points->at(0)->pos().y()
 		);
+
+		//debug
+		//{
+		//	painter->fillRect(16, 0, 16, 16, QBrush(QColor(255, 255, 0), Qt::SolidPattern));
+		//}
+
+	}
+	//debug
+	//else
+	//{
+	//	painter->fillRect(16, 0, 16, 16, QBrush(QColor(255, 0, 0), Qt::SolidPattern));
+	//}
+
+	// bool debug shit 
+	int a = 0, b = 0;
 
 	if (points->last()->pos().x() < r.x() + r.width()) {
 		painter->drawLine(
@@ -148,14 +164,26 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r)
 			r.x() + r.width(), points->last()->pos().y()
 		);
 
+		// debug stuff
+
+		//a = 255;
 		points->last()->setVisible(true);
 	}
 
-	if (idmax >= channel->GetKeyCount() - 1)
+	if (idmax >= channel->GetKeyCount() - 1) {
 		idmax = channel->GetKeyCount() - 1; // avoid max+1 index
-
 		// debug stuff
+		//b = 255;
+	}
 
+	//if (a || b)
+	//{
+	//	painter->fillRect(32, 0, 16, 16, QBrush(QColor(0, b, a), Qt::SolidPattern));
+	//}
+	//else
+	//{
+	//	painter->fillRect(32, 0, 16, 16, QBrush(QColor(255, 0, 0), Qt::SolidPattern));
+	//}
 
 	for (int i = idmin; i < idmax; i++)
 	{
@@ -214,14 +242,15 @@ void CurveEditorScene::UpdateAudiogram()
 TimelineArea::TimelineArea()
 {
 	m_scale = QSizeF(64, 64);
-	m_offset = QPointF(128, 0);
+	m_offset = QPointF(0, 0);
 }
 
+# if 1
 QPointF TimelineArea::Point2Screen(QPointF point) const
 {
 	return {
-		point.x() * m_scale.width() + m_offset.x() + m_sceneRect.topLeft().x() ,
-		point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.topLeft().y()
+		(point.x() * m_scale.width() + m_offset.x() + m_sceneRect.topLeft().x()) ,
+		(point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.topLeft().y() + m_sceneRect.height() / 2.)
 	};
 }
 
@@ -229,13 +258,32 @@ QPointF TimelineArea::Screen2Point(QPointF point) const
 {
 	return {
 		(point.x() - m_offset.x() - m_sceneRect.topLeft().x()) / m_scale.width(),
-		(point.y() - m_offset.y() - m_sceneRect.topLeft().y()) / -m_scale.height()
+		(point.y() - m_offset.y() - m_sceneRect.topLeft().y() - m_sceneRect.height() / 2.) / -m_scale.height()
 	};
 }
+#else
+QPointF TimelineArea::Point2Screen(QPointF point) const
+{
+	return {
+		(point.x() * m_scale.width() + m_offset.x()) ,
+		(point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.height() / 2.)
+	};
+}
+
+QPointF TimelineArea::Screen2Point(QPointF point) const
+{
+	return {
+		(point.x() - m_offset.x()) / m_scale.width(),
+		(point.y() - m_offset.y() - m_sceneRect.height() / 2.) / -m_scale.height()
+	};
+}
+#endif
 
 // ReSharper disable CppInconsistentNaming
 void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
 {
+	painter->translate(r.topLeft());
+
 	float sPos = 0.0f;
 	if (r.x() < 0.0f)
 		sPos = -1.0f * fmod(fabs(r.x()), m_scale.width());
@@ -246,6 +294,7 @@ void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
 		painter->setPen(QPen(QColor(56, 56, 56)));
 		painter->drawLine(f, 0.0f, f, m_sceneRect.height());
 	}
+
 	sc = m_scale.width();
 	for (float f = fmod(m_offset.x(), sc); f <= m_sceneRect.width() + fmod(m_offset.x(), sc); f += sc) {
 		painter->setPen(QPen(QColor(64, 64, 64)));
@@ -253,12 +302,13 @@ void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
 	}
 
 	sc = m_scale.height() / 4.0f;
-	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y(), sc); f += sc) {
+	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y() + r.height() / 2, sc); f += sc) {
 		painter->setPen(QPen(QColor(56, 56, 56)));
 		painter->drawLine(0.0f, f, m_sceneRect.width(), f);
 	}
+
 	sc = m_scale.height();
-	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y(), sc); f += sc) {
+	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y() + r.height() / 2, sc); f += sc) {
 		painter->setPen(QPen(QColor(64, 64, 64)));
 		painter->drawLine(0.0f, f, m_sceneRect.width(), f);
 	}
@@ -266,7 +316,9 @@ void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
 	painter->setPen(QPen(QColor(144, 144, 144)));
 	painter->drawLine(m_offset.x(), 0.0f, m_offset.x(), m_sceneRect.height());
 	painter->setPen(QPen(QColor(144, 144, 144)));
-	painter->drawLine(0.0f, m_offset.y(), m_sceneRect.width(), m_offset.y());
+	painter->drawLine(0.0f, m_offset.y() + r.height() / 2, m_sceneRect.width(), m_offset.y() + r.height() / 2);
+
+	painter->restore();
 
 }
 // ReSharper restore CppInconsistentNaming

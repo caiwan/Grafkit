@@ -53,7 +53,7 @@ namespace Grafkit {
 			Key(float t, float value) : m_time(t), m_value(value), m_type(KI_linear), m_tangent(float2(1, 0)) {}
 			Key(Key const &other) : m_time(other.m_time), m_value(other.m_value), m_type(other.m_type), m_tangent(other.m_tangent) {}
 
-			enum KeyInterpolation_e m_type;
+			KeyInterpolation_e m_type;
 
 			float m_time;
 			float m_value;
@@ -66,24 +66,24 @@ namespace Grafkit {
 		class Channel : public Referencable {
 			friend class Animation;
 		public:
-			Channel(const char* name = "");
-			Channel(std::string name);
+			explicit Channel(const char* name = "");
+			explicit Channel(const std::string &name);
 			Channel(Channel &other);
 
-			size_t GetKeyCount() { return m_keys.size(); }
+			size_t GetKeyCount() const { return m_keys.size(); }
 			Key GetKey(size_t i) { return m_keys[i]; }
 
-			float GetValue(float time);
+			float GetValue(float time) const;
 			void SetValue(size_t id, float value);
 
-			void AddKey(Key key) { m_keys.push_back(key); }
-			void SetKey(size_t id, Key key) { m_keys[id] = key; }
-			void InsertKey(size_t afterId, Key key) { auto it = m_keys.begin() + afterId; m_keys.insert(it, key); }
-			void DeleteKey(size_t id, Key key) { auto it = m_keys.begin() + id; m_keys.erase(it); }
+			void AddKey(const Key key) { m_keys.push_back(key); }
+			void SetKey(const size_t id, const Key key) { m_keys[id] = key; }
+			void InsertKey(const size_t afterId, const Key key) { const auto it = m_keys.begin() + afterId; m_keys.insert(it, key); }
+			void DeleteKey(const size_t id, Key key) { const auto it = m_keys.begin() + id; m_keys.erase(it); }
 
 			int FindKeyIndex(float t) const;
 
-			std::string GetName() { return m_name; }
+			std::string GetName() const { return m_name; }
 
 			/** Finds a key inside the track
 			@return 1 if key found
@@ -109,15 +109,15 @@ namespace Grafkit {
 		{
 			friend class Animation;
 		public:
-			Track(const char* name = nullptr, const char* channelInitals = nullptr);
-			Track(const char* name, const std::vector<std::string> channelNames);
-			~Track() {}
+			explicit Track(const char* name = nullptr, const char* channelInitals = nullptr);
+			explicit Track(const char* name, const std::vector<std::string> channelNames);
+			~Track() = default;
 
-			size_t CreateChannel(const char* name);
+		    size_t CreateChannel(const char* name);
 			size_t CreateChannel(std::string name);
 
-			void SetChannel(size_t subId, Ref<Channel> &track) { m_channels[subId] = track; }
-			Ref<Channel> GetChannel(size_t subId) { return m_channels[subId]; }
+			void SetChannel(const size_t subId, Ref<Channel> &track) { m_channels[subId] = track; }
+			Ref<Channel> GetChannel(const size_t subId) { return m_channels[subId]; }
 
 
 			// TODO: independent, generic getter and setter for keys and values
@@ -158,7 +158,7 @@ namespace Grafkit {
 		m_keys.push_back(Key());
 	}
 
-	inline Animation::Channel::Channel(std::string name) : m_name(name)
+	inline Animation::Channel::Channel(const std::string &name) : m_name(name)
 	{
 		m_keys.push_back(Key());
 	}
@@ -170,7 +170,7 @@ namespace Grafkit {
 		}
 	}
 
-	inline float Animation::Channel::GetValue(float time)
+	inline float Animation::Channel::GetValue(const float time) const
 	{
 		float t = 0.f;
 		Key v0, v1, v;
@@ -211,7 +211,7 @@ namespace Grafkit {
 
 	inline int Animation::Channel::FindKeyIndex(float t) const
 	{
-		size_t count = m_keys.size();
+	    const size_t count = m_keys.size();
 		if (count <= 2)
 			return 0;
 
@@ -224,13 +224,13 @@ namespace Grafkit {
 		size_t u = count - 1, l = 0, m = 0;
 		while (u >= l) {
 			m = l + (u - l) / 2;
-			float k0 = m_keys[m].m_time;
-			float k1 = m_keys[m + 1].m_time;
+		    const float k0 = m_keys[m].m_time;
+		    const float k1 = m_keys[m + 1].m_time;
 
 			if (k0 <= t && k1 >= t) {
 				return m;
 			}
-			else if (k0 > t) {
+			if (k0 > t) {
 				u = m - 1;
 			}
 			else {
@@ -253,7 +253,7 @@ namespace Grafkit {
 
 	inline int Animation::Channel::FindKey(float t, Key & v0, Key & v1, float & f) const
 	{
-		size_t count = m_keys.size();
+	    const size_t count = m_keys.size();
 		f = 0.f;
 		if (!count) {
 			return 0;
@@ -279,12 +279,12 @@ namespace Grafkit {
 			return 0;
 		}
 
-		int i = FindKeyIndex(t);
+	    const int i = FindKeyIndex(t);
 
 		if (i == -1)
 			return 0;
 
-		float d = m_keys[i + 1].m_time - m_keys[i].m_time;
+	    const float d = m_keys[i + 1].m_time - m_keys[i].m_time;
 		f = (t - m_keys[i].m_time) / d;
 
 		v0 = m_keys[i];
@@ -330,7 +330,7 @@ namespace Grafkit {
 		if (t >= m_keys.back().m_time)
 			return other.AddKey(m_keys.back());
 
-		int i = FindKeyIndex(t);
+	    const int i = FindKeyIndex(t);
 		if (i > -1) {
 			other.AddKey(m_keys[i]);
 		}
