@@ -7,48 +7,47 @@ namespace GkDemo
 {
     class Demo;
     class Context;
+
+    typedef Ref<Demo> DemoRef;
 }
 
 namespace Idogep {
+    class TreeItem;
+    class TreeModel;
 
-	class Document;
-	class TreeItem;
+    class SceneGraphViewWidgetModel;
 
-	class TreeModel;
+    class OutlineModule;
+    class OutlineView;
 
-	class SceneGraphViewWidgetModel;
+    class OutlineModule : public Controller, public EmitsCommandRole
+    {
 
-	class OutlineModule;
-	class OutlineView;
+    public:
+        explicit OutlineModule();
+        virtual ~OutlineModule();
 
-	class OutlineModule : public Controller, public EmitsCommandRole
-	{
+        void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
+        void DocumentChangedEvent(const GkDemo::DemoRef& demo);
 
-	public:
-		explicit OutlineModule();
-		virtual ~OutlineModule();
+        Event<TreeItem * const> onItemSelected;
 
-	    void Initialize(Grafkit::IResourceManager* const& resourceManager) override;
-		void DocumentChangedEvent(GkDemo::Demo * const & document);
+    private:
+        Ref<OutlineView> m_myView;
 
-		Event<TreeItem * const> onItemSelected;
-		
-	private:
-		Ref<OutlineView> m_myView;
+        SceneGraphViewWidgetModel* m_myModel;
+        TreeModel* m_modelBuilder;
+    };
 
-		SceneGraphViewWidgetModel* m_myModel;
-		TreeModel* m_modelBuilder;
-	};
-
-	class OutlineView : public View {
+    class OutlineView : public View {
         friend class OutlineModule;
-	public:
-		OutlineView();
-		virtual void SetModel(SceneGraphViewWidgetModel * modelResource) = 0;
+    public:
+        OutlineView();
+        virtual void SetModel(SceneGraphViewWidgetModel * modelResource) = 0;
 
-	protected:
-	    void SetOutlineModule(const Ref<OutlineModule>& outlineModule) { m_outlineModule = outlineModule; }
+    protected:
+        void SetOutlineModule(const Ref<OutlineModule>& outlineModule) { m_outlineModule = outlineModule; }
         Ref<OutlineModule> m_outlineModule;
-	};
+    };
 
 }

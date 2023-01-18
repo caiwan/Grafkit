@@ -13,6 +13,11 @@
 			
 namespace Grafkit {
 
+    class Scene;
+    typedef Ref<Scene> SceneRef;
+    typedef Resource<Scene> SceneRes;
+    typedef Ref<SceneRes> SceneResRef;
+
 	class SceneLoader : public IResourceBuilder
 	{
 	public:
@@ -21,7 +26,7 @@ namespace Grafkit {
 
 		void Load(IResourceManager * const & resman, IResource * source) override;
 
-		static void Save(SceneRes scene, std::string dst_name);
+		static void Save(SceneResRef scene, std::string dst_name);
 
 	    IResource* NewResource() override { return new SceneRes(); }
 

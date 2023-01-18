@@ -48,6 +48,9 @@ Animation::Track::Track(const char* name, const std::vector<std::string> channel
 }
 
 
+Animation::Track::Track(const char* name) : m_name(name){
+}
+
 Animation::Track::Track(const char* name, const char* initials)
     : m_name(name)
 {

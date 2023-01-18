@@ -15,7 +15,7 @@ file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inc)
 file(GLOB_RECURSE RC_FILES *.rc *.rc?)
 file(GLOB_RECURSE UI_FILES *.ui)
 
-set(APPLICATION Idogep)
+set(APPLICATION_NAME Idogep)
 
 # Generate code from ui files
 set(CMAKE_AUTOMOC ON) 
@@ -27,21 +27,21 @@ qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 # Generate rules for building source files from the resources
 qt5_add_resources(QRCS res/resources.qrc)
 
-add_executable(${APPLICATION} ${SOURCE_FILES} ${HEADER_FILES} ${UI_HEADERS} ${QRCS})
+add_executable(${APPLICATION_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${UI_HEADERS} ${QRCS})
 
-msvc_set_win32(${APPLICATION})
+msvc_set_win32(${APPLICATION_NAME})
 
 # include_directories("${CMAKE_SOURCE_DIR}")
 # include_directories("${PROJECT_SOURCE_DIR}")
-include_directories("${BASS_INCLUDE_DIR}")
-include_directories("${STB_INCLUDE_DIR}")
+# include_directories("${BASS_INCLUDE_DIR}")
+# include_directories("${STB_INCLUDE_DIR}")
 include_directories("${GK2_INCLUDE_DIR}")
 include_directories("${GK2_ROOT_DIR}/src/experimental/demoContext")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 # message("CFLAGS = ${CMAKE_CXX_FLAGS}")
 
-target_link_libraries(${APPLICATION} 
+target_link_libraries(${APPLICATION_NAME} 
     Grafkit2 
 	DemoContext
     Qt5::Core 
@@ -50,11 +50,11 @@ target_link_libraries(${APPLICATION}
     Qt5::WinMain
 	${BASS_LIBRARY_RELEASE}
 )
-target_include_directories(${APPLICATION} PUBLIC "${CMAKE_SOURCE_DIR}")
+target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES} ${RC_FILES} ${QRCS} ${UI_FILES})
 
-bass_copy_binaries(${APPLICATION} "${CMAKE_CURRENT_BINARY_DIR}")
+bass_copy_binaries(${APPLICATION_NAME} "${CMAKE_CURRENT_BINARY_DIR}")
 
-install(TARGETS ${APPLICATION} DESTINATION "/")
+install(TARGETS ${APPLICATION_NAME} DESTINATION "/")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bass.dll" DESTINATION "/")

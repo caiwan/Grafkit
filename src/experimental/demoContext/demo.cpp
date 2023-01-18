@@ -29,7 +29,9 @@ using namespace GkDemo;
 using namespace Grafkit;
 using namespace GrafkitData;
 
-Demo::Demo() {
+// ============================================================================================
+
+Demo::Demo(): m_activeSceneId(0) {
 }
 
 Demo::~Demo() {
@@ -39,34 +41,43 @@ void Demo::Preload(IResourceManager* const& resman)
 {
     m_vs = resman->Load<ShaderRes>(new VertexShaderLoader("vertexShader", "shaders/vertex.hlsl", ""));
     m_ps = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/flat.hlsl", ""));
-    m_psShowUv = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/fx/uv.hlsl", ""));
 
     m_music = resman->Load<MusicRes>(new MusicBassLoader("music/alpha_c_-_euh.ogg"));
 }
 
-void Demo::Initialize(Renderer& render) { InitTestStuff(render); }
+void Demo::Initialize(Renderer& render)
+{
+    AddAnimation(new DemoAnimation());
+    InitTestStuff(render);
+
+    for (size_t i = 0; i < GetAnimationCount(); ++i)
+    {
+        AnimationRef animation = GetAnimation(i);
+        animation->Initialize();
+    }
+}
+
+SceneResRef Demo::GetActiveScene() const {
+    return m_scenes.at(m_activeSceneId);
+}
 
 int Demo::PreRender(Renderer& render, float time) const {
     return 0;
 }
 
+
 int Demo::Render(Renderer& render, float time) const
 {
     // --- 
-
     render.BeginScene();
 
     float &t = time;
 
-    this->m_rootActor->Matrix().Identity();
-    //this->m_rootActor->Matrix().RotateRPY(0, 0, 0);
-    this->m_rootActor->Matrix().Translate(0, 0, 0);
-
-    this->m_cameraActor->Matrix().Identity();
-    this->m_cameraActor->Matrix().RotateRPY(M_PI / 4., 0, M_PI / 4.);
-    this->m_cameraActor->Matrix().Translate(0, 0, 10);
-
-    (*m_scene)->RenderFrame(render, t);
+    SceneResRef scene = GetActiveScene();
+    if (scene)
+    {
+        (*scene)->RenderFrame(render, t);
+    }
 
     render.EndScene();
 
@@ -78,11 +89,16 @@ ShaderResRef Demo::GetPs() const { return m_ps; }
 
 void Demo::SetPs(const ShaderResRef& resource) { m_ps = resource; }
 
-SceneGraphRef Demo::GetScenegraph() const { return m_scenegraph; }
-
-SceneResRef Demo::GetScene() const { return m_scene; }
-
 MusicResRef Demo::GetMusic() const { return m_music; }
+
+void Demo::AddScene(uint32_t id, const SceneResRef& ref) {
+    if (id >= m_scenes.size())
+    {
+        fill_n(back_inserter(m_scenes), id - m_scenes.size() + 1, nullptr);
+    }
+
+    m_scenes[id] = ref;
+}
 
 // This thing serves testing purposes for the editor.
 void Demo::InitTestStuff(Renderer& render) {
@@ -98,10 +114,6 @@ void Demo::InitTestStuff(Renderer& render) {
 
     ActorRef cameraActor = new Actor(camera);
     cameraActor->SetName("CameraActor");
-
-    cameraActor->Matrix().Identity();
-    cameraActor->Matrix().Translate(0, 0, 10);
-    m_cameraActor = cameraActor;
 
     // Add animation here
 
@@ -123,25 +135,27 @@ void Demo::InitTestStuff(Renderer& render) {
     rootActor->AddChild(cameraActor);
     rootActor->AddChild(cubeActor);
 
-    m_rootActor = rootActor;
-
     // -- scenegraph
-    m_scenegraph = new SceneGraph();
-    m_scenegraph->SetName("Scene");
-    m_scenegraph->SetRootNode(m_rootActor);
+    SceneGraphRef sceneGraph = new SceneGraph();
+    sceneGraph->SetName("Scene");
+    sceneGraph->SetRootNode(rootActor);
 
     // -- scene 
-    m_scene = new SceneRes(new Scene());
-    (*m_scene)->SetSceneGraph(m_scenegraph);
-    (*m_scene)->AddAnimation(new ActorAnimation(rootActor));
-    (*m_scene)->AddAnimation(new ActorAnimation(cameraActor));
-    (*m_scene)->AddAnimation(new ActorAnimation(cubeActor));
+    SceneResRef scene = new SceneRes(new Scene());
+    (*scene)->SetSceneGraph(sceneGraph);
+    (*scene)->AddAnimation(new ActorAnimation(rootActor));
+    (*scene)->AddAnimation(new ActorAnimation(cubeActor));
 
-    for (size_t i = 0; i < (*m_scene)->GetAnimationCount(); ++i)
+    AnimationRef cameraAnimation = new ActorAnimation(cameraActor);
+    (*scene)->AddAnimation(cameraAnimation);
+
+    for (size_t i = 0; i < (*scene)->GetAnimationCount(); ++i)
     {
-        AnimationRef animation = (*m_scene)->GetAnimation(i);
+        AnimationRef animation = (*scene)->GetAnimation(i);
         animation->Initialize();
     }
+
+    cameraAnimation->GetTrack(0)->SetFloat3(0, float3(0,0,10));
 
 #if 0
     for (size_t i = 0; i < (*m_scene)->GetAnimationCount(); ++i)
@@ -176,13 +190,36 @@ void Demo::InitTestStuff(Renderer& render) {
 
 #endif
 
-    (*m_scene)->Initialize();
-    (*m_scene)->Build(render, m_vs, m_ps);
-}
+    (*scene)->Initialize();
+    (*scene)->Build(render, m_vs, m_ps);
 
-void Demo::InitAdvancedTestStuff(Renderer& render) {
+    m_scenes.push_back(scene);
 }
 
 ShaderResRef Demo::GetVs() const { return m_vs; }
 
 void Demo::SetVs(const ShaderResRef& resource) { m_vs = resource; }
+
+// ============================================================================================
+
+PERSISTENT_IMPL(GkDemo::DemoAnimation);
+
+void DemoAnimation::Initialize()
+{
+    m_activeScene = new Track("ActiveScene");
+    m_activeScene->CreateChannel("id");
+    AddTrack(m_activeScene);
+}
+
+void DemoAnimation::Update(double time) {
+    if (m_target)
+    {
+        float id = floor(m_activeScene->GetChannel(0)->GetValue(time));
+        m_target->SetActiveSceneId(static_cast<uint32_t>(id));
+        // ... 
+    }
+}
+
+void DemoAnimation::Serialize(Archive & ar)
+{
+}

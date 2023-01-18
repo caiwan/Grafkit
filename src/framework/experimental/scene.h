@@ -17,6 +17,12 @@ namespace Grafkit
     class CameraContainer;
     class LightContainer;
 
+    class Scene;
+
+    typedef Ref<Scene> SceneRef;
+    typedef Resource<Scene> SceneRes;
+    typedef Ref<SceneRes> SceneResRef;
+
     class EntityContainer
     {
     public:
@@ -98,7 +104,7 @@ namespace Grafkit
         void AddAnimation(AnimationRef animation) { m_animations.push_back(animation); }
 
         size_t GetAnimationCount() const { return m_animations.size(); }
-        AnimationRef GetAnimation(size_t id) { return m_animations[id]; }
+        AnimationRef GetAnimation(size_t id) const { return m_animations.at(id); }
 
     protected:
         void UpdateAnimations(float t);

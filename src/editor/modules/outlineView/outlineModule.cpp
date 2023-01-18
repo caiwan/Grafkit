@@ -1,22 +1,22 @@
 #include "outlineModule.h"
 
-#include "demo.h"
-#include "render/SceneGraph.h"
-#include "experimental/scene.h"
-
 #include "outlineTreeModel.h"
+#include "experimental/scene.h"
+#include "demo.h"
+//#include "render/SceneGraph.h"
 
 #include "scenegraphviewwidget.h"
 
 using namespace Idogep;
 using namespace Grafkit;
 
+using namespace GkDemo;
 
 // -------------------------------------------------------------------------------------------------------------------
 
 OutlineModule::OutlineModule() : Controller()
-    , m_myModel(nullptr)
-    , m_modelBuilder(nullptr) 
+, m_myModel(nullptr)
+, m_modelBuilder(nullptr)
 {
 }
 
@@ -33,16 +33,16 @@ void OutlineModule::Initialize(IResourceManager* const& resourceManager)
     m_myView->m_outlineModule = this; // we sould not do this
 }
 
-void OutlineModule::DocumentChangedEvent(GkDemo::Demo* const& demo)
-{
+// This one is still not standarized yet
+void OutlineModule::DocumentChangedEvent(const DemoRef& demo) {
+
     assert(m_myView);
     assert(demo);
 
     auto newModel = new SceneGraphViewWidgetModel();
 
     // build stuff
-    const SceneResRef scenegraph = demo->GetScene();
-    SceneModel*const newModelBuilder = new SceneModel(scenegraph);
+    DemoModel*const newModelBuilder = new DemoModel(demo);
 
     newModelBuilder->BuildModel();
     newModel->SetModel(newModelBuilder);
@@ -57,5 +57,6 @@ void OutlineModule::DocumentChangedEvent(GkDemo::Demo* const& demo)
 
 // --- 
 
-OutlineView::OutlineView() : View() {
+OutlineView::OutlineView() : View()
+{
 }

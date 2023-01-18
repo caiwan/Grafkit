@@ -45,7 +45,7 @@ void SceneLoader::Load(IResourceManager * const & resman, IResource * source)
 #endif
 }
 
-void SceneLoader::Save(SceneRes scene, std::string dst_name)
+void SceneLoader::Save(SceneResRef scene, std::string dst_name)
 {
 	FILE *fp = nullptr;
 	fopen_s(&fp, dst_name.c_str(), "wb");

@@ -25,8 +25,7 @@ namespace {
 
 		HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes) override
 		{
-			IAssetRef asset;
-			std::string relpath;
+		    std::string relpath;
 			switch (IncludeType) {
 			case D3D_INCLUDE_LOCAL:
 				relpath = m_resman->GetResourcePath("shaderincludelocal") + pFileName;
@@ -40,7 +39,7 @@ namespace {
 			}
 
 			try {
-				asset = m_resman->GetAssetFactory()->Get(relpath);
+				IAssetRef asset = m_resman->GetAssetFactory()->Get(relpath);
 				*ppData = asset->GetData();
 				*pBytes = asset->GetSize();
 
@@ -77,34 +76,34 @@ namespace {
 
 // =============================================================================================================================
 
-Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) :
-	Grafkit::IResourceBuilder(name, sourcename),
+ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint) :
+	IResourceBuilder(name, sourcename),
 	m_entrypoint(entrypoint)
 {
 }
 
-Grafkit::ShaderLoader::~ShaderLoader()
+ShaderLoader::~ShaderLoader()
 {
 }
 
-void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource* source)
+void ShaderLoader::Load(IResourceManager * const & resman, IResource* source)
 {
 	if (m_entrypoint.empty())
 		m_entrypoint = DefaultEntryPointName();
 
-	ShaderResRef dstShader = (ShaderRes*)source;
+	ShaderResRef dstShader = static_cast<ShaderRes*>(source);
 	if (dstShader.Invalid()) {
 		return;
 	}
 
 	try {
-		Grafkit::IAssetRef asset = this->GetSourceAsset(resman);
+		IAssetRef asset = this->GetSourceAsset(resman);
 		ShaderRef shader = NewShader();
 		// load from asset
 		if (asset.Valid()) {
 			LOGGER(Log::Logger().Info("Lading shader from resource %d %s@%s", shader->GetShaderType(), m_name.c_str(), m_entrypoint.c_str()));
 			ID3DInclude * pInclude = new IncludeProvider(resman);
-			shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
+			shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), static_cast<LPCSTR>(asset->GetData()), asset->GetSize(), m_name.c_str(), pInclude, nullptr);
 			delete pInclude;
 		}
 		else {
@@ -131,7 +130,7 @@ void Grafkit::ShaderLoader::Load(Grafkit::IResourceManager * const & resman, Gra
 	}
 }
 
-IResource * Grafkit::ShaderLoader::NewResource()
+IResource * ShaderLoader::NewResource()
 {
 	ShaderRes* res = new ShaderRes();
 	return res;

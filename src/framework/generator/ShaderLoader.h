@@ -8,12 +8,12 @@
 
 namespace Grafkit {
 
-	class ShaderLoader : public Grafkit::IResourceBuilder{
+	class ShaderLoader : public IResourceBuilder{
 	public:
 		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint);
 		~ShaderLoader();
 
-	    void Load(Grafkit::IResourceManager * const & resman, Grafkit::IResource * source) override;
+	    void Load(IResourceManager * const & resman, IResource * source) override;
 
 	    IResource* NewResource() override;
 

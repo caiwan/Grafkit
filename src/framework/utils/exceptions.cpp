@@ -12,7 +12,7 @@ using namespace FWdebug;
 
 ///@todo use std::string !!!
 
-FWdebug::Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const char * details)
+Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const char * details)
     :
     m_formattedMessage(),
     m_line(line),
@@ -21,14 +21,14 @@ FWdebug::Exception::Exception(int errorCode, const char * message, const char * 
     m_message(message),
     m_code(errorCode),
     m_details(),
-    std::exception()
+    exception()
 {
     if (details) {
         m_details.assign(details);
     }
 }
 
-FWdebug::Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const HRESULT hresult)
+Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const HRESULT hresult)
     :
     m_formattedMessage(),
     m_line(line),
@@ -37,7 +37,7 @@ FWdebug::Exception::Exception(int errorCode, const char * message, const char * 
     m_message(message),
     m_code(errorCode),
     m_details(),
-    std::exception()
+    exception()
 {
     _com_error err(hresult);
     LPCTSTR details = err.ErrorMessage();
@@ -45,7 +45,7 @@ FWdebug::Exception::Exception(int errorCode, const char * message, const char * 
     m_details.assign(details);
 }
 
-FWdebug::Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const DWORD dword)
+Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const DWORD dword)
     :
     m_formattedMessage(),
     m_line(line),
@@ -54,7 +54,7 @@ FWdebug::Exception::Exception(int errorCode, const char * message, const char * 
     m_message(message),
     m_code(errorCode),
     m_details(),
-    std::exception()
+    exception()
 {
     LPVOID lpMsgBuf;
     DWORD dw = GetLastError();
@@ -77,14 +77,16 @@ Exception::~Exception()
 {
 }
 
-char const * FWdebug::Exception::what() const
+char const * Exception::what() const
 {
     if (!m_formattedMessage.empty())
         return m_formattedMessage.c_str();
 
     ostringstream stringStream;
     stringStream << this->m_code << ": " << this->m_message;
-    stringStream << " in function " << this->m_function << "in file " << this->m_file << ", at line " << this->m_line;
+    stringStream << " in function " << this->m_function;
+    stringStream << " in file " << this->m_file;
+    stringStream << ", at line " << this->m_line;
 
     if (!m_details.empty())
         stringStream << " " << m_details;

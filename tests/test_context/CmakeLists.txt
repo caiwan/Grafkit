@@ -19,7 +19,14 @@ if ( MSVC )
     set_target_properties( ${APPLICATION_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY  "${CMAKE_BINARY_DIR}" )
 endif ( MSVC )
 
-target_link_libraries(${APPLICATION_NAME} Grafkit2 DemoContext ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(${APPLICATION_NAME} 
+	Grafkit2 
+	DemoContext 
+	${GTEST_BOTH_LIBRARIES}
+	${BASS_LIBRARY_RELEASE}
+)
+
+bass_copy_binaries(${APPLICATION_NAME} "${CMAKE_BINARY_DIR}")
 
 target_include_directories(${APPLICATION_NAME} PUBLIC include)
 

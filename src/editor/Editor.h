@@ -19,6 +19,8 @@ namespace GkDemo
 {
     class Context;
     class Demo;
+
+    typedef Ref<Demo> DemoRef;
 }
 
 namespace Idogep
@@ -55,7 +57,7 @@ namespace Idogep
 
         // Events
         //Event<std::string&> onSaveDialog;
-        Event<GkDemo::Demo* const &> onDocumentChanged;
+        Event<const GkDemo::DemoRef &> onDocumentChanged;
         Event<const float &> onDemoTimeChanged;
 
         // Demo's own manager

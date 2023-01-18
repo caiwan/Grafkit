@@ -29,18 +29,23 @@ namespace GkDemo
         void Build(Grafkit::IResourceManager*const& resourceManager, const Json& json);
         void BuildResources(Grafkit::IResourceManager*const& resourceManager, const Json& json);
 
+        void BuildScenes(Grafkit::IResourceManager * const & resourceManager, const Json & demo);
+
         void BuildAssets(Grafkit::IResourceManager*const& resourceManager, const Json& assets);
-        void AssignModel(::Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        void AssignModel(Grafkit::IResourceManager*const& resourceManager, const Json& json);
 
         void AssignAssets(Grafkit::IResourceManager*const& resourceManager, const Json& json);
 
-        void ExtractActorParent(::Grafkit::IResourceManager*const& resourceManager, const Json& json, const Grafkit::ActorRef& actorRef);
-        void ExtractEntities(::Grafkit::IResourceManager*const& resourceManager, const Json& json, Grafkit::ActorRef& actorRef);
+        void ExtractActorParent(Grafkit::IResourceManager*const& resourceManager, const Json& json, const Grafkit::ActorRef& actorRef);
+        void ExtractEntities(Grafkit::IResourceManager*const& resourceManager, const Json& json, Grafkit::ActorRef& actorRef);
 
         void BuildObject(const Json& json, const Ref<Grafkit::Object>& ref);
-        void BuildMesh(::Grafkit::IResourceManager*const& resourceManager, const Json& json);
-        void BuildSceneGraphs(::Grafkit::IResourceManager*const& resourceManager, const Json& json);
-        void BuildEffects(const Json& effects, Grafkit::IResourceManager*& resourceManager);
+
+        void BuildMesh(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        void BuildMaterial(Grafkit::IResourceManager * const & resourceManager, const Json & it);
+        void BuildShader(Grafkit::IResourceManager * const & resourceManager, const Json shader);
+        void BuildSceneGraphs(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+        void BuildEffects(Grafkit::IResourceManager*& resourceManager, const Json& effects);
 
     private:
         Ref<Demo> m_demo;

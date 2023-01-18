@@ -149,6 +149,7 @@ namespace Grafkit
             friend class Animation;
         public:
             Track();
+            explicit Track(const char* name);
             explicit Track(const char* name, const char* channelInitals);
             explicit Track(const char* name, const std::vector<std::string> channelNames);
             ~Track() = default;
@@ -349,4 +350,5 @@ namespace Grafkit
     }
 
     inline void Animation::Channel::CopyTo(const ChannelRef& target, size_t start, size_t end) { for (size_t i = start; i < end; i++) { target->AddKey(m_keys[i]); } }
+
 }

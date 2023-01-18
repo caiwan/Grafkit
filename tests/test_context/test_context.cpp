@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include "utils/AssetFile.h"
 #include "demo.h"
 #include "context.h"
 #include "schema.h"
-#include "utils/AssetFile.h"
 
 // --- 
 
