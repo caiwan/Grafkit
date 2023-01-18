@@ -22,7 +22,13 @@ namespace
     const QColor blue = QColor(128, 128, 255);
     const QColor green = QColor(128, 255, 128);
     const QColor purple = QColor(255, 128, 255);
+
+    const float ZOOM_MOUSE_DELTA_FACTOR = .03125;
+    const float ZOOM_WHEEL_FACTOR = .03125;
+
+    QSizeF DEFAULT_AREA_SCALE = QSizeF(512, 64);
 }
+
 
 CurveEditorScene::CurveEditorScene(QObject* parent) : QGraphicsScene(parent)
 , CurveEditorView()
@@ -254,12 +260,12 @@ void CurveEditorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
-void CurveEditorScene::HandleMousePan(QGraphicsSceneMouseEvent* event) {
+
+void CurveEditorScene::HandleMousePan(QGraphicsSceneMouseEvent* event)
+{
     bool modifyOfs = m_midButton && !m_ctrlPressed;
     bool modifyScale = m_midButton && m_ctrlPressed;
 
-    bool lockX = m_altPressed;
-    bool lockY = m_shiftPressed;
 
     bool resetView = m_rightButton && m_ctrlPressed && m_altPressed;
 
@@ -270,6 +276,9 @@ void CurveEditorScene::HandleMousePan(QGraphicsSceneMouseEvent* event) {
     }
 
     QPointF delta = event->scenePos() - event->lastScenePos();
+
+    bool lockX = m_altPressed;
+    bool lockY = m_shiftPressed;
 
     if (lockX && !lockY)
         delta.setX(0);
@@ -286,9 +295,8 @@ void CurveEditorScene::HandleMousePan(QGraphicsSceneMouseEvent* event) {
 
     if (modifyScale)
     {
-        m_area->Zoom(delta);
+        m_area->Zoom(delta * ZOOM_MOUSE_DELTA_FACTOR);
         m_isValidAudiogram = false;
-        return;
     }
 }
 
@@ -301,7 +309,6 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         const double time = m_area->Screen2Point(event->scenePos()).x();
         onDemoTimeChanged(time);
         m_cursorItem->SetPosition(time);
-
     }
     //event->accept();
     QGraphicsScene::mouseMoveEvent(event);
@@ -311,10 +318,20 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 void CurveEditorScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
-    const float ZOOM_WHEEL_FACTOR = .03125;
     const float delta = static_cast<float>(event->delta()) * ZOOM_WHEEL_FACTOR;
 
     QPointF p = { delta, delta };
+
+    bool lockX = m_altPressed;
+    bool lockY = m_shiftPressed;
+
+    if (lockX && !lockY)
+        p.setX(0);
+
+    if (lockY && !lockX)
+        p.setY(0);
+
+
     m_area->Zoom(p);
 
     m_isValidAudiogram = false;
@@ -337,15 +354,10 @@ void CurveEditorScene::keyPressEvent(QKeyEvent* event)
         m_shiftPressed = true;
         break;
     default:
-        //event->ignore();
-        //return;
         break;
     }
-
-    //CurveEditorScene::keyPressEvent
     QGraphicsScene::keyPressEvent(event);
-
-    event->accept();
+    //event->accept();
 }
 
 void CurveEditorScene::keyReleaseEvent(QKeyEvent* event)
@@ -362,13 +374,9 @@ void CurveEditorScene::keyReleaseEvent(QKeyEvent* event)
         m_shiftPressed = false;
         break;
     default:
-        //event->ignore();
-        //return;
         break;
     }
     QGraphicsScene::keyReleaseEvent(event);
-
-    //event->accept();
 }
 
 void CurveEditorScene::SelectionChangedSlot()
@@ -381,14 +389,12 @@ void CurveEditorScene::SelectionChangedSlot()
         {
             onPointSelected(item->GetId());
             item->setFocus(Qt::ActiveWindowFocusReason); // to make key events work
-            // or not 
         }
     }
     else
     {
         onPointDeSelected();
         setFocus(Qt::ActiveWindowFocusReason); // to make key events work
-        // or not 
     }
 }
 
@@ -423,8 +429,7 @@ void CurveEditorScene::UpdateAudiogram()
 TimelineArea::TimelineArea() : m_gridImage(0, 0)
 , m_gridValid(false)
 {
-    m_scale = QSizeF(64, 64);
-    m_offset = QPointF(0, 0);
+    ResetView();
 }
 
 QPointF TimelineArea::Point2Screen(QPointF point) const { return point * m_transfrom; }
@@ -442,7 +447,7 @@ void TimelineArea::DrawGrid(QPainter* const & painter, const QRectF& r)
         //if (m_gridImage.isNull())
         m_gridImage = QPixmap(r.width(), r.height());
         //else
-            //m_gridImage.scaled(r.width(), r.height());
+        //m_gridImage.scaled(r.width(), r.height());
         m_gridValid = false;
     }
 
@@ -498,7 +503,7 @@ void TimelineArea::Zoom(const QPointF& z)
 
 void TimelineArea::ResetView()
 {
-    m_scale = QSizeF(64, 64);
+    m_scale = DEFAULT_AREA_SCALE;
     m_offset = QPointF(0, 0);
     Invalidate();
 }

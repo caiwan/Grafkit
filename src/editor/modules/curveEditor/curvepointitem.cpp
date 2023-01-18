@@ -196,7 +196,6 @@ void CurvePointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
     event->accept();
     scene()->update();
-    //QGraphicsItem::mouseMoveEvent(event);
 }
 
 // ezzel lehet a tobbit mozgatni

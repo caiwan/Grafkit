@@ -30,11 +30,9 @@ namespace Idogep
         ~CurvePointItem();
 
         // Operations
-
         void RecalculatePosition(TimelineArea const* area);
 
         // Properties
-
         QPointF GetCoord() const { return { m_key.m_time, m_key.m_value }; }
 
         void SetCoord(QPointF c)
