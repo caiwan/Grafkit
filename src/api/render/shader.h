@@ -10,6 +10,9 @@
 
 #include "dxtypes.h"
 #include "renderer.h"
+
+#include "resource.h"
+
 // #include "texture.h"
 
 namespace Grafkit {
@@ -302,6 +305,10 @@ namespace Grafkit {
 
 	// ================================================================================================================================
 
+	typedef Ref<Shader> ShaderRef;
+	typedef FWutils::ICResource<Shader> ShaderResource;
+	typedef Ref<ShaderResource> ShaderResourceRef;
+
 }
 
 // Definition of exceptions
@@ -331,7 +338,7 @@ DEFINE_EXCEPTION(ShaderException, 1200, "Could not compile shader")
 #define _HAS_ShaderException
 
 namespace FWdebugExceptions {
-	class ShaderException {
+	class ShaderException /*:*/ {
 		// ... 
 
 	};

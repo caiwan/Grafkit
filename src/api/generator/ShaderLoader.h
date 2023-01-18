@@ -2,21 +2,20 @@
 
 #include "../render/shader.h"
 
-#include "../core/asset.h"
-#include "../core/resource.h"
-#include "../core/ResourceBuilder.h"
-#include "../core/ResourceManager.h"
+#include "asset.h"
+#include "resource.h"
+#include "ResourceManager.h"
+#include "ResourceBuilder.h"
 
 namespace Grafkit {
 
-	class ShaderLoader : public Grafkit::IResourceBuilder
+	class ShaderLoader : public FWutils::IResourceBuilder
 	{
 	public:
-		///@todo a shadernel tobb forrasbol, tobbfele tipusu shader, tobb entrypointbol betolheto. Ezt valahogyan kezelni kellene a jovoben.
-		ShaderLoader(std::string name, std::string filename, std::string entrypoint, ShaderType_e type, ShaderResRef & shaderasset);
+		ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type);
 		~ShaderLoader();
 
-		virtual void load (Grafkit::IResourceManager * const & assman);
+		virtual void Load(FWutils::IResourceManager * const & resman, FWutils::IResource * source);
 
 	protected:
 		ShaderType_e m_type;

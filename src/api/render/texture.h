@@ -1,8 +1,8 @@
 #pragma once
 
 #include "reference.h"
-
 #include "renderer.h"
+#include "resource.h"
 
 #define MULTITEXTURE_MAX 16
 
@@ -83,6 +83,12 @@ namespace Grafkit
 
 	// ========================================================================================================================
 
+	typedef Ref<Texture> TextureRef;
+	typedef FWutils::ICResource<Texture> TextureResource;
+	typedef Ref<TextureResource> TextureResourceRef;
+
+	// ========================================================================================================================
+
 	__declspec(align(16)) class TextureSampler : virtual public Referencable, public AlignedNew<Texture>
 	{
 	public:
@@ -98,8 +104,13 @@ namespace Grafkit
 		ID3D11SamplerState *m_pSamplerState;
 	};
 
-	typedef Ref<TextureSampler> TextureSamplerRef_t;
-	typedef TextureSamplerRef_t TextureSamplerRef;
+	// ========================================================================================================================
+
+	typedef Ref<TextureSampler> TextureSamplerRef;
+	typedef FWutils::ICResource<TextureSampler> TextureSamplerResource;
+	typedef Ref<TextureSamplerResource> TextureSamplerResourceRef;
+
+	// ========================================================================================================================
 }
 
 #define EX_ERROR_TEXTURE 1200
@@ -109,3 +120,4 @@ DEFINE_EXCEPTION(ShaderResourceViewException, EX_ERROR_TEXTURE + 2, "Could not c
 DEFINE_EXCEPTION(RenderTargetViewException, EX_ERROR_TEXTURE + 3, "Could not create render target view")
 DEFINE_EXCEPTION(NoRenderTargetViewException, EX_ERROR_TEXTURE + 4, "Texture was not created as bare, and has no render target view")
 DEFINE_EXCEPTION(SamplerStateCreateException, EX_ERROR_TEXTURE + 5, "Could not create sampler state")
+

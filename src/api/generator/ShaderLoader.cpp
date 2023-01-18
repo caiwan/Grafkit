@@ -1,6 +1,6 @@
 #include "ShaderLoader.h"
 
-#include "easyloggingpp.h"
+#include "logger.h"
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
@@ -23,7 +23,7 @@ namespace {
 	};
 }
 
-Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type, ShaderResRef & shaderasset) : Grafkit::IResourceBuilder(name, sourcename, shaderasset),
+Grafkit::ShaderLoader::ShaderLoader(std::string name, std::string sourcename, std::string entrypoint, ShaderType_e type) : FWutils::IResourceBuilder(name, sourcename),
 	m_type(type)
 {
 	if (entrypoint.empty())
@@ -36,36 +36,41 @@ Grafkit::ShaderLoader::~ShaderLoader()
 {
 }
 
-///@todo a shader betoltes menjen on-the-fly, es ne repositorybol
-void Grafkit::ShaderLoader::load(Grafkit::IResourceManager * const & assman)
+void Grafkit::ShaderLoader::Load(FWutils::IResourceManager * const & resman, FWutils::IResource * source)
 {
-	ShaderResRef outShader = (ShaderResRef_t)m_dstResource;
-	
-	if (outShader.Invalid()) {
-		outShader = new ShaderRes();
-	}
 
-	//try 
+	ShaderResourceRef dstSahder = dynamic_cast<ShaderResource*>(source);
+	if (dstSahder.Invalid()) {
+		return;
+	}
+	////try 
 	{
-		IAssetRef asset = this->GetSourceAsset(assman);
+		FWutils::IAssetRef asset = this->GetSourceAsset(resman);
 		ShaderRef shader = new Shader();
 		// load from asset
 		if (asset.Valid()) {
-			LOG(TRACE) << "Lading shader from resource" << m_type << m_name << "@" << m_entrypoint; // << m_in->GetUUID();
-			shader->LoadFromMemory(assman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_type);
+			LOGGER(LOG(TRACE) << "Lading shader from resource" << m_type << m_name << "@" << m_entrypoint;);
+
+			ShaderRef shader = new Shader();
+			/* @todo getDC (!!!) */
+			shader->LoadFromMemory(resman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)asset->GetData(), asset->GetSize(), m_type);
 		}
 		else {
 			///@todo load from compiled shader
 			throw EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a forrasbol valo shader betoltes");
 		}
 
-		// replace shader
-		if (outShader->Valid())
-			outShader->Release();
-
-		(*outShader) = shader;
-
 	}
 
-	m_dstResource = outShader;
+	
+
+	if (dstSahder->Valid()) {
+		dstSahder->Release();
+	}
+
+	//m_dstResource = outShader;
+
+	// 3.
+	// dstSahder->AssingnRef(thing);
+
 }
