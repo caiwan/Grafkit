@@ -55,7 +55,7 @@ void Context::Relocate(std::string path)
     m_myBasePath = path;
 
     m_assetFactory->SetBasePath(path);
-    delete m_demo;
+    //delete m_demo;
     m_demo = nullptr;
     this->ClearLoadStack();
     this->RemoveAll();

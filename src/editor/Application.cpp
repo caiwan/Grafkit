@@ -57,6 +57,8 @@ EditorApplication::~EditorApplication()
 
 int EditorApplication::Execute()
 {
+    InitializeParentFramework();
+
     m_mainWindow = new MainWindow();
     this->Add(new Resource<View>(m_mainWindow, "EditorView", "EditorView"));
 

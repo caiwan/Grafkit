@@ -1,5 +1,5 @@
 # Grafkit 2 library
-Project(Gk2Player)
+project (Grafkit2)
 
 set(APPLICATION_NAME Player)
 
@@ -25,6 +25,6 @@ assign_source_group(${SOURCE_FILES} ${HEADER_FILES})
 
 set_target_properties(${APPLICATION_NAME} PROPERTIES FOLDER experimental)
 
-bass_copy_binaries(${APPLICATION_NAME} "${APPLICATION_NAME}")
+bass_copy_binaries(${APPLICATION_NAME} "${CMAKE_CURRENT_BINARY_DIR}")
 install(TARGETS ${APPLICATION_NAME} DESTINATION "/")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bass.dll" DESTINATION "/")

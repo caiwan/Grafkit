@@ -1,15 +1,17 @@
-#pragma once 
+#pragma once
 #include "utils/resource.h"
 #include "utils/ResourceBuilder.h"
+
 namespace Grafkit
 {
-
     class IAnimationLoader : public IResourceBuilder
     {
     public:
         explicit IAnimationLoader(std::string name, std::string sourcename = "", std::string uuid = "", std::string targetUuid = "")
-            : IResourceBuilder(name, sourcename, uuid), m_target(targetUuid) {
+            : IResourceBuilder(name, sourcename, uuid)
+            , m_target(targetUuid) {
         }
+
     protected:
         std::string m_target;
     };
@@ -21,11 +23,5 @@ namespace Grafkit
 
         IResource* NewResource() override;
         void Load(IResourceManager* const& resman, IResource* source) override;
-
     };
-
-
-
 }
-
-

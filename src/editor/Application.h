@@ -52,6 +52,7 @@ namespace Idogep {
 		Grafkit::Renderer &GetDeviceContext() override { return m_render; }
 		Grafkit::IAssetFactory *GetAssetFactory() override { return m_assetFactory; }
 
+        virtual int InitializeParentFramework() = 0;
 		virtual int ExecuteParentFramework() = 0;
 
 	protected:

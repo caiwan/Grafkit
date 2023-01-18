@@ -14,12 +14,11 @@ namespace GkDemo
     class DemoAnimation;
     typedef Ref<DemoAnimation> SceneAnimationRef;
 
-
     class Demo : public Referencable, public Grafkit::HasAnimationsRole
     {
     public:
         Demo();
-        ~Demo();
+        virtual ~Demo();
 
         void Initialize(Grafkit::Renderer& render);
 

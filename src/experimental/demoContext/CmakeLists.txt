@@ -1,15 +1,10 @@
 # Grafkit 2 library
-Project(DemoContext)
+project (Grafkit2)
 
 set(APPLICATION_NAME DemoContext)
 
 file(GLOB_RECURSE SOURCE_FILES *.cpp *.c *.inc)
 file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inl)
-
-include_directories("${CMAKE_SOURCE_DIR}")
-include_directories("${GK2_INCLUDE_DIR}")
-include_directories("${BASS_INCLUDE_DIR}")
-include_directories("${STB_INCLUDE_DIR}")
 
 msvc_add_pch(stdafx.h stdafx.cpp "${SOURCE_FILES}")
 
@@ -17,8 +12,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /GR")
 # message("CFLAGS = ${CMAKE_CXX_FLAGS}")
 
 add_library(${APPLICATION_NAME} STATIC ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(${APPLICATION_NAME} Grafkit2)
-target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
+target_link_libraries(${APPLICATION_NAME} PUBLIC Grafkit2)
+target_link_libraries(${APPLICATION_NAME} PRIVATE optimized "${ASSIMP_LIBRARY_RELEASE}")
+target_link_libraries(${APPLICATION_NAME} PRIVATE debug "${ASSIMP_LIBRARY_DEBUG}")
+
+# target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
 
 set_target_properties(${APPLICATION_NAME} PROPERTIES DEBUG_POSTFIX "d")
 

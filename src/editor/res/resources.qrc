@@ -1,7 +1,7 @@
 <RCC>
   <qresource prefix="/">
-    <file>css/global.css</file>
-    <file>img/splash.jpg</file>
+	<file alias="global.css">css/global.css</file>
+    <file alias="splash.jpg">img/splash.jpg</file>
   </qresource>
   <qresource prefix="/resources/shaders">
     <file alias="flat.hlsl">shaders/flat.hlsl</file>

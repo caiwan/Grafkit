@@ -1,5 +1,7 @@
 # Grafkit 2 editor - Time machine 
-Project(Idogep)
+project (Grafkit2)
+
+set(APPLICATION_NAME Idogep)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -15,7 +17,7 @@ file(GLOB_RECURSE HEADER_FILES *.h *.hpp *.inc)
 file(GLOB_RECURSE RC_FILES *.rc *.rc?)
 file(GLOB_RECURSE UI_FILES *.ui)
 
-set(APPLICATION_NAME Idogep)
+
 
 # Generate code from ui files
 set(CMAKE_AUTOMOC ON) 
@@ -31,18 +33,17 @@ add_executable(${APPLICATION_NAME} ${SOURCE_FILES} ${HEADER_FILES} ${UI_HEADERS}
 
 msvc_set_win32(${APPLICATION_NAME})
 
-# include_directories("${CMAKE_SOURCE_DIR}")
-# include_directories("${PROJECT_SOURCE_DIR}")
-# include_directories("${BASS_INCLUDE_DIR}")
-# include_directories("${STB_INCLUDE_DIR}")
-include_directories("${GK2_INCLUDE_DIR}")
-include_directories("${GK2_ROOT_DIR}/src/experimental/demoContext")
+# include_directories("${GK2_INCLUDE_DIR}")
+# include_directories("${GK2_ROOT_DIR}/src/experimental/demoContext")
+
+target_include_directories(${APPLICATION_NAME} PUBLIC "${GK2_INCLUDE_DIR}")
+target_include_directories(${APPLICATION_NAME} PUBLIC "${GK2_ROOT_DIR}/src/experimental/demoContext")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /GR")
 # message("CFLAGS = ${CMAKE_CXX_FLAGS}")
 
 target_link_libraries(${APPLICATION_NAME} 
-    Grafkit2 
+#    Grafkit2 
 	DemoContext
     Qt5::Core 
     Qt5::Gui 
@@ -50,7 +51,7 @@ target_link_libraries(${APPLICATION_NAME}
     Qt5::WinMain
 	${BASS_LIBRARY_RELEASE}
 )
-target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
+#target_include_directories(${APPLICATION_NAME} PUBLIC "${CMAKE_SOURCE_DIR}")
 
 assign_source_group(${SOURCE_FILES} ${HEADER_FILES} ${RC_FILES} ${QRCS} ${UI_FILES})
 
@@ -58,3 +59,5 @@ bass_copy_binaries(${APPLICATION_NAME} "${CMAKE_CURRENT_BINARY_DIR}")
 
 install(TARGETS ${APPLICATION_NAME} DESTINATION "/")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bass.dll" DESTINATION "/")
+
+# TODO: -> lib

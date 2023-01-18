@@ -429,10 +429,14 @@ QTextEdit {
 
 QPlainTextEdit {
     background-color: #232629;
-    ;
     color: #eff0f1;
     border-radius: 2px;
     border: 1px solid #76797C;
+}
+
+QPlainTextEdit[class="monospace"]
+{
+	font-family:"Courier New", Courier, monospace;
 }
 
 QHeaderView::section {

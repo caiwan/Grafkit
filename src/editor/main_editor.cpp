@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDebug>
 #include <QTimer>
 #include <QFile>
 
@@ -14,16 +15,25 @@ EditorApplicationQt::EditorApplicationQt(int argc, char** argv) : EditorApplicat
     QCoreApplication::setOrganizationName("IndustrialRevolutioners");
     QCoreApplication::setOrganizationDomain("caiwan.github.io");
     QCoreApplication::setApplicationName(APP_NAME);
-
-    QFile f(":/css/global.css");
-    assert(f.open(QFile::ReadOnly));
-    m_qApp.setStyleSheet(f.readAll());
-    f.close();
 }
 
 EditorApplicationQt::~EditorApplicationQt()
 {
     //... 
+}
+
+
+int EditorApplicationQt::InitializeParentFramework() {
+    QFile f(":/global.css");
+    f.open(QFile::ReadOnly | QFile::Text);
+    if (!f.isOpen())
+    {
+        qDebug() << f.errorString();
+        assert(0);
+    }
+    m_qApp.setStyleSheet(f.readAll());
+    f.close();
+    return 0;
 }
 
 int EditorApplicationQt::ExecuteParentFramework()

@@ -28,6 +28,8 @@ namespace Idogep {
 	    // ReSharper restore CppInconsistentNaming
 
 	private:
+
+	    int InitializeParentFramework() override;
 	    int ExecuteParentFramework() override;
 	    void NextTick() override;
 

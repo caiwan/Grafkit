@@ -49,6 +49,8 @@ if(WIN32)
 		
 		# set(ASSIMP_DLL_BASEDIR "${ASSIMP_ROOT_DIR}/bin")
 		
+		message(STATUS "Found asset importer library: ${ASSIMP_LIBRARY_DIR}")
+		
 		FUNCTION(ASSIMP_COPY_BINARIES TargetProject TargetDirectory)		
 			string(REPLACE "/" "\\" ASSIMP_DLL_BASEDIR "${ASSIMP_ROOT_DIR}/bin")
 			string(REPLACE "/" "\\" TARGET_DIR "${TargetDirectory}")

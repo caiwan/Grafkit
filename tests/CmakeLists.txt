@@ -1,5 +1,14 @@
 include (${GK2_ROOT_DIR}/cmake/create_testapp.cmake)
 
+find_package(GTest REQUIRED)
+
+include_directories("${GK2_INCLUDE_DIR}")
+include_directories("${BASS_INCLUDE_DIR}")
+include_directories("${ASSIMP_INCLUDE_DIR}")
+include_directories("${STB_INCLUDE_DIR}")
+
+include_directories(${GTEST_INCLUDE_DIRS})
+
 subdirs(assets)
 
 # subdirs(test_animation)

@@ -5,15 +5,15 @@ find_package(GTest REQUIRED)
 file(GLOB_RECURSE SOURCE_FILES *.cpp)
 file(GLOB_RECURSE HEADER_FILES *.h)
 
-include_directories("${CMAKE_SOURCE_DIR}")
-include_directories("${GK2_INCLUDE_DIR}")
-include_directories(${GTEST_INCLUDE_DIRS})
+# include_directories("${CMAKE_SOURCE_DIR}")
+# include_directories("${GK2_INCLUDE_DIR}")
+# include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(UnitTests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES})
 add_test(Tests UnitTests)
 
 target_link_libraries(UnitTests Grafkit2 ${GTEST_BOTH_LIBRARIES})
 
-target_include_directories(UnitTests PUBLIC include)
+# target_include_directories(UnitTests PUBLIC include)
 
 set_target_properties(UnitTests PROPERTIES FOLDER tests)
