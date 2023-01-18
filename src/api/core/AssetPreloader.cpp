@@ -7,8 +7,8 @@ namespace {
 		IRenderAsset::RA_type_e type;
 		const char *extensions[8];
 	} rules[] = {
-		{RA_TYPE_Texture, {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
-		{RA_TYPE_Font, {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
+		{ FWassets::IRenderAsset::RA_TYPE_Texture, {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
+		{ FWassets::IRenderAsset::RA_TYPE_Font, {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
 	};
 }
 
@@ -44,35 +44,44 @@ void FWassets::AssetPreloader::LoadCache()
 		if (m_filters[i] == nullptr)
 			continue;
 
-		fileleist_t filelist;
-		for (size_t j = 0; j < this->m_factories.size()) {
-			fileleist_t ret_filelist = this->m_factories[j]->GetResourceList(m_filters[i]);
+		filelist_t filelist;
+		for (size_t j = 0; j < this->m_factories.size(); j++) {
+			filelist_t ret_filelist = this->m_factories[j]->GetResourceList(m_filters[i]);
 			filelist.insert(filelist.end(), ret_filelist.begin(), ret_filelist.end());
 		}
 
-		for (fileleist_t::iterator it = filelist.begin(); it != filelist.end(); it++) 
+		for (filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++) 
 		{
 
 			// + trim path goez here 
 			std::string filename = *it;
 
 			switch (i) {
-			case RA_TYPE_Texture:
+			case FWassets::IRenderAsset::RA_TYPE_Texture :
 			{
 				TextureRef texture = new Texture;
 				texture->SetName(filename);
 
 				/// ennek itten szamtalan hibaja van kerem
-				TextureFromBitmap* generator = new TextureFromBitmap(nullptr, texture);
+				// TextureFromBitmap* generator = new TextureFromBitmap(FWassets::IResourceRef(), texture);
 
 			}
 			break;
 
-			case RA_TYPE_Font:
+			case FWassets::IRenderAsset::RA_TYPE_Font:
 			{}
 			break;
 
 			// a tobbiekkel egyelore nem foglalkozunk; ide jonnek majd azok is
+			//case FWassets::IRenderAsset::RA_TYPE_Material:
+			//{}
+			//break;
+
+			//case FWassets::IRenderAsset::RA_TYPE_Shader:
+			//{}
+			//break;
+
+
 			}
 		}
 	}

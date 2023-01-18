@@ -69,8 +69,8 @@ protected:
 			// -- texture
 			TextureRef texture;
 
-			TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, texture);
-			txgen();
+			TextureFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), &texture);
+			txgen(this);
 
 			// -- load shader
 			shader_vs = new Shader();

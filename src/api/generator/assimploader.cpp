@@ -80,17 +80,7 @@ TextureRef assimpTexture(enum aiTextureType source, aiMaterial* material, int su
 	std::string name = path.C_Str();
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		// obj lut goez here?
 		texture = (Texture*)(assman->GetObjectByName(IRenderAsset::RA_TYPE_Texture, name));
-		
-		///@todo :Ez nem kell majd ide, lehessen felirni a generatorokat az asset managerre is, es o allitsa elo a texturat, ha lehet
-		if (texture.Invalid()) {
-			TextureFromBitmap txgen(assman->GetResourceFactory()->GetResourceByName(name), texture);
-			txgen(assman);
-			
-			texture->SetName(name);
-			assman->AddObject(texture.Get());
-		}
 	}
 
 	return texture;

@@ -59,9 +59,9 @@ int FWassets::ResourceFilter::isFileInfilter(std::string path)
 
 #include "dirent.h"
 
-//typedef FWassets::FileResourceManager::fileleist_t _filelist_t;
+//typedef FWassets::FileResourceManager::filelist_t _filelist_t;
 
-filelist_t listdir(std::string root, filelist_t &dirlist) {
+FWassets::filelist_t listdir(std::string root, FWassets::filelist_t &dirlist) {
 	DIR *dir;
 	struct dirent *ent;
 	if ((dir = opendir(root.c_str())) != NULL) {
@@ -143,7 +143,7 @@ std::list<std::string> FWassets::FileResourceManager::GetResourceList()
 std::list<std::string> FWassets::FileResourceManager::GetResourceList(ResourceFilter * filter)
 {
 	filelist_t filelist;
-	for (fileleist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); it++)
+	for (filelist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); it++)
 	{
 		if (filter->isFileInfilter(*it)) filelist.push_back(*it);
 	}

@@ -28,7 +28,7 @@ namespace FWassets {
 
 	// ----------
 	/// An interface to create filters over resources
-	class ResourceFilter : ResourceFilter
+	class ResourceFilter
 	{
 	public:
 		ResourceFilter(const char ** const & extensions, size_t count);
@@ -44,7 +44,7 @@ namespace FWassets {
 
 	// ----------
 	
-	typedef std::list<std::string> fileleist_t;
+	typedef std::list<std::string> filelist_t;
 
 	/// An interface for resource obtaining mechnaism
 	class IResourceFactory 
@@ -59,8 +59,8 @@ namespace FWassets {
 		virtual IResourceRef GetResourceByName(std::string name) = 0;
 		virtual IResourceRef GetResourceByUUID(Guid uuid) = 0;
 
-		virtual fileleist_t GetResourceList() { return std::list<std::string>(); };
-		virtual fileleist_t GetResourceList(ResourceFilter * filter) {}
+		virtual filelist_t GetResourceList() { return std::list<std::string>(); };
+		virtual filelist_t GetResourceList(ResourceFilter * filter) { return std::list<std::string>(); }
 
 
 	};
@@ -81,12 +81,12 @@ namespace FWassets {
 		virtual IResourceRef GetResourceByName(std::string name);
 		virtual IResourceRef GetResourceByUUID(Guid uuid);
 
-		virtual fileleist_t GetResourceList();
-		virtual fileleist_t GetResourceList(ResourceFilter * filter);
+		virtual filelist_t GetResourceList();
+		virtual filelist_t GetResourceList(ResourceFilter * filter);
 
 	private:
 		std::string m_root;
-		fileleist_t m_dirlist;
+		filelist_t m_dirlist;
 
 	public:
 		class FileResource : public IResource {
