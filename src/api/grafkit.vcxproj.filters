@@ -21,9 +21,6 @@
     <Filter Include="Source Files\math">
       <UniqueIdentifier>{aa94052d-8cdc-437a-8e54-d4885f1c0bcd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\utils">
-      <UniqueIdentifier>{fdc97d4b-3c8b-4298-b16b-24dbab2407c0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\generator">
       <UniqueIdentifier>{c9f4d9de-a7de-45f0-baac-1c34758722b8}</UniqueIdentifier>
     </Filter>
