@@ -11,11 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\assets\postfx\postfxEngine.hlsl">
       <Filter>Resource Files</Filter>
     </None>
@@ -25,5 +20,10 @@
     <None Include="..\..\assets\postfx\texture.hlsl">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main_postfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

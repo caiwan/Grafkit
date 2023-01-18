@@ -175,7 +175,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_load_obj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\api\grafkit.vcxproj">
