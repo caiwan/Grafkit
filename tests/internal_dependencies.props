@@ -6,7 +6,6 @@
   <ItemDefinitionGroup>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)build\$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>$(solutiondir)src\api;$(solutiondir)structlib\include</AdditionalIncludeDirectories>
