@@ -1,2 +1,2 @@
-subdirs(api)
+subdirs(framework)
 subdirs(assimpConv)

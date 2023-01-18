@@ -161,14 +161,9 @@ void Grafkit::AssimpLoader::AssimpLoadMaterials(SceneRef &outScene)
 				}
 			}
 
-			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_DIFFUSE, material->GetDiffuse());
-			//ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_AMBIENT, material->GetAmbient());
-			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_SPECULAR, material->GetSpecular());
-
-			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS, material->GetHardness());
-			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetIntensity());
-
-			ASSIMPMATERIALKEY_FLOAT(curr_mat, AI_MATKEY_REFRACTI, material->GetRefraction());
+			// there is not much to set up atm
+			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_DIFFUSE, material->Colors().diffuse);
+			ASSIMPMATERIALKEY_F4(curr_mat, AI_MATKEY_COLOR_SPECULAR, material->Colors().specular);
 
 			materials.push_back(material);
 			///@todo itt a resource managert kellene hasznalni
@@ -271,8 +266,7 @@ void Grafkit::AssimpLoader::AssimpLoadCameras(SceneRef &outScene)
 
 			aiCamera *curr_camera = aiscene->mCameras[i];
 
-			/// TODO az assimp nem kezeli kulon a perspektiv kamerat
-			CameraRef camera = new Camera();
+			CameraRef camera = new Camera(m_is_lh ? Camera::CAMERA_LH : Camera::CAMERA_RH);
 
 			const char* camera_name = curr_camera->mName.C_Str();
 			LOGGER(Log::Logger().Trace("- #%d %s", i, camera_name));
@@ -282,15 +276,7 @@ void Grafkit::AssimpLoader::AssimpLoadCameras(SceneRef &outScene)
 			camera->SetFOV(curr_camera->mHorizontalFOV);
 			camera->SetClippingPlanes(curr_camera->mClipPlaneNear, curr_camera->mClipPlaneFar);
 
-			// camera <- assmimp camera
-
-			ASSIMP_V3D_F3_SET(curr_camera->mPosition, camera->SetPosition);
-			ASSIMP_V3D_F3_SET(curr_camera->mLookAt, camera->SetLookTo); // aiLookat == lookTowardsVector
-			ASSIMP_V3D_F3_SET(curr_camera->mUp, camera->SetUp);
-
-			// camera->SetUp(0, -1, 0);
-
-			// itt van meg aspekt, amivel kezdeni lehetne valamit
+			camera->SetAspect(curr_camera->mAspect);
 
 			cameras.push_back(camera);
 		}

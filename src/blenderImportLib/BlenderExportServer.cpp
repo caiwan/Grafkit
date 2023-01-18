@@ -222,7 +222,8 @@ bool BlenderExportServer::Parse(json & j)
 					std::string key = v["key"];
 					auto cidit = cameraIdMap.find(key);
 					if (cidit != cameraIdMap.end()) {
-						(*m_scene)->AddCurrentCameraFrame(t, cidit->second);
+						// TODO
+						//(*m_scene)->AddCurrentCameraFrame(t, cidit->second);
 					}
 				}
 			}

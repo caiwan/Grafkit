@@ -39,12 +39,7 @@ public:
 		args.add("help", 'h').description("Shows this help message.").flag(true);
 		args.add("input", 'i').description("Input filename").required(true);
 		args.add("output", 'o').description("Output filename").required(true);
-		//args.add("format", 'f').description("Output format. Overrides file extension.");
-		//args.add("axis", 'x').description("Change axis order of the vertex cordinate system and polarity. (like +x+y+z, +x-z+y, ... )");
-		//args.add("flip", 'p').description("Flips the camera 180 deg around one given axis.");
 		args.add("lh").description("convert to left handed").flag(true);
-		//args.add("textures", 't').description("Strip path from texture filenames").flag(true);
-		//args.add("animation", 'a').description("Merge animations from an external json file").flag(true);
 		args.add("cwd").description("Command work directory, where the py folder is, if execution dir differs");
 	}
 
