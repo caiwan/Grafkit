@@ -1,10 +1,11 @@
 #pragma once
 
 #include "dxtypes.h"
+#include "../core/reference.h"
 
 namespace FWrender
 {
-	class Texture
+	class Texture : public Referencable
 	{
 	public:
 		Texture();
@@ -22,3 +23,6 @@ namespace FWrender
 		ID3D11ShaderResourceView* m_texture_resource;
 	};
 }
+
+// load texture from the texture repository 
+#define LOAD_TEXTURE(filename) 
