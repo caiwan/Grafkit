@@ -78,7 +78,7 @@ public:
 
 			SimpleMeshGenerator generator(render, shader_vs);
 			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
-			// generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
 			this->t = 0;
