@@ -48,7 +48,7 @@ char defaultShader[65536] =
 	
 	"float4 main( float4 position : SV_POSITION, float2 TexCoord : TEXCOORD ) : SV_TARGET\n"
 	"{\n"
-	"  return position;\n"
+	"  return float4(TexCoord, 0,1);\n"
 	"}\n";
 #endif
 

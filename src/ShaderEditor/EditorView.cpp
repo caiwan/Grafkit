@@ -74,7 +74,7 @@ void CEditorView::InitScene(CXDrawingDevice * parent)
 	generator["POSITION"] = FWBuiltInData::quad;
 	generator["TEXCOORD"] = FWBuiltInData::quad_texcoord;
 
-	generator(4, FWBuiltInData::quadIndicesLen, FWBuiltInData::quadIndices, this->m_fullscreen_quad);
+	generator(4, 6, FWBuiltInData::quadIndices, this->m_fullscreen_quad);
 
 	this->OnShaderCompile();
 }

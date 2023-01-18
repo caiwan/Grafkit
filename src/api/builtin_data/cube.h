@@ -7,7 +7,6 @@ namespace FWBuiltInData{
 	extern const float * const quad2;
 	extern const float * const quad_texcoord;
 	extern const   int * const quadIndices;
-	extern const   int quadIndicesLen;
 
 	extern const float * const cubeVertices;
 	extern const float * const cubeNormals;
