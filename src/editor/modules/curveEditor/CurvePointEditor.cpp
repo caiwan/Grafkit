@@ -143,6 +143,7 @@ Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
 {
     const double delta = (1. / 120.);
 
+    // time constraits
     if (index > 0)
     {
         const auto prevKey = m_channel->GetKey(index - 1);
@@ -157,6 +158,17 @@ Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
 
     if (key.m_time < 0.)
         key.m_time = 0;
+
+    // angle constraints
+
+    const float angleEpsilon = 0.f;
+    if (key.m_angle < -1. + angleEpsilon)
+        key.m_angle = -1 + angleEpsilon;
+    else if (key.m_angle > 1 - angleEpsilon)
+        key.m_angle = 1 - angleEpsilon;
+
+    // radius constraints 
+    key.m_radius = std::max(key.m_radius, 0.01f);
 
     m_channel->SetKey(index, key);
     return key;

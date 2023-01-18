@@ -9,6 +9,7 @@
 #include "CurveEditorScene.h"
 #include "CurvePointEditor.h"
 #include "CurvePointItem.h"
+#include "PointEditorWidget.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -137,10 +138,12 @@ void CurveEditor::Initialize()
     m_manageAudiogram->onRequestWaveform += Delegate(musicProxy, &Audiogram::GetWaveform);
 
     // 
-    m_pointEditor->Initialize(parentWidget);
+    PointEditorWidget *pew = new PointEditorWidget();
+    m_pointEditor->Initialize(pew);
+    parentWidget->SetPointEditorWidget(pew);
+
     ces->onPointDeSelected += Delegate(m_pointEditor, &CurvePointEditor::PointDeSelectedEvent);
     ces->onPointSelected += Delegate(m_pointEditor, &CurvePointEditor::PointSelectedEvent);
-    //ces->on
 
     m_myView = ces;
     SetView(m_myView);

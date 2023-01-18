@@ -26,8 +26,8 @@ using namespace Grafkit;
 EditorApplication* EditorApplication::s_self;
 
 EditorApplication::EditorApplication(int argc, char** argv) :
-                                                            m_preloadWindow(nullptr)
-                                                            , m_editor(nullptr)
+    m_preloadWindow(nullptr)
+    , m_editor(nullptr)
 {
     assert(s_self == nullptr);
 

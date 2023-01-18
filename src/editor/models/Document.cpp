@@ -133,8 +133,8 @@ void Document::InitTestStuff(Renderer & render)
 				    const float t = 1. + l;
 
 					Animation::Key key(t, v);
-					//key.m_type = Animation::KI_step;
-					key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
+					key.m_type = Animation::KI_hermite;
+					//key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
 					channel->AddKey(key);
 
 				    //Animation::Key key2(t + .5, 0.);

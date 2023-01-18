@@ -16,8 +16,6 @@ using namespace Grafkit;
 
 #define BOUNDING_BOX_SCALE 16.
 #define RADIX_SCALE 32.
-#define RADIX_DEFUALT (1.f/4.f)
-#define ANGLE_DEFAULT (M_PI/4.f)
 
 CurvePointItem::CurvePointItem(const Animation::Key key, const size_t index, QGraphicsItem* parent)
     : QGraphicsItem(parent)
@@ -30,8 +28,8 @@ CurvePointItem::CurvePointItem(const Animation::Key key, const size_t index, QGr
 
     m_showTangent = false;
 
-    m_radix = m_lastRadix = RADIX_DEFUALT;
-    m_angle = m_lastAngle = ANGLE_DEFAULT;
+    m_lastRadix = 1.;
+    m_lastAngle = 0.;
 
     setFlag(ItemIsMovable);
     setFlag(ItemIsSelectable);
@@ -49,7 +47,7 @@ void CurvePointItem::RecalculatePosition(TimelineArea const* area)
     m_areaScaling = area->Scale(); // save last scaling for paint tangent on
 }
 
-QRectF CurvePointItem::boundingRect() const { return { -BOUNDING_BOX_SCALE/2, -BOUNDING_BOX_SCALE/2, BOUNDING_BOX_SCALE, BOUNDING_BOX_SCALE }; }
+QRectF CurvePointItem::boundingRect() const { return { -BOUNDING_BOX_SCALE / 2, -BOUNDING_BOX_SCALE / 2, BOUNDING_BOX_SCALE, BOUNDING_BOX_SCALE }; }
 
 void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
@@ -57,9 +55,6 @@ void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
     const QColor pointColor = QColor(224, 224, 224, 144);
 
     painter->setRenderHint(QPainter::Antialiasing);
-
-    if (m_radix == 0.0f)
-        m_radix = 0.1f;
 
     painter->setPen(Qt::NoPen);
     if (isSelected())
@@ -80,12 +75,12 @@ void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
     {
         const float angle = m_key.m_angle;
         const float radix = m_key.m_radius;
-        const QPointF tangent = { cos(angle), -sin(angle) };
+        const QPointF tangent = { cos(angle * (.5*M_PI)), -sin(angle* (.5*M_PI)) };
 
         painter->setPen(QPen(QColor(255, 48, 48), 1.0, Qt::DashLine));
         painter->setBrush(Qt::NoBrush);
 
-        
+
         painter->drawLine(QPointF(0, 0), tangent * RADIX_SCALE * radix);
 
         painter->setPen(QPen(QColor(96, 96, 96), 1.0, Qt::DotLine));
@@ -106,7 +101,7 @@ void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
         m_showTangent = true;
         m_lastRadix = m_key.m_radius;
-        m_lastAngle= m_key.m_angle;
+        m_lastAngle = m_key.m_angle;
         onStartEdit(m_id, m_key);
         break;
 
@@ -151,6 +146,9 @@ void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 void CurvePointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
+    if (!isSelected())
+        return;
+
     const CurveEditorScene* ces = dynamic_cast<CurveEditorScene*>(scene());
 
     assert(ces);
@@ -195,31 +193,31 @@ void CurvePointItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
 void CurvePointItem::keyPressEvent(QKeyEvent * event)
 {
-	// itt csak modosito billnetyuket lenene erdemes 
-	QGraphicsItem::keyPressEvent(event);
+    // itt csak modosito billnetyuket lenene erdemes 
+    QGraphicsItem::keyPressEvent(event);
 }
 
 void CurvePointItem::keyReleaseEvent(QKeyEvent * event)
 {
-	//if (isSelected()) {
-	//	switch (event->key())
-	//	{
-	//	case KEY_SET_INTERPOLATION:
-	//		// set interpolation, toggle 
-	//		event->accept();
-	//		break;
-	//	case KEY_SET_TANGENT:
-	//		toggleTangentEditing();
-	//		event->accept();
-	//		break;
-	//	default:
-	//		event->ignore();
-	//		break;
-	//	}
-	//}
-	//else {
-	//	event->ignore();
-	//}
+    //if (isSelected()) {
+    //	switch (event->key())
+    //	{
+    //	case KEY_SET_INTERPOLATION:
+    //		// set interpolation, toggle 
+    //		event->accept();
+    //		break;
+    //	case KEY_SET_TANGENT:
+    //		toggleTangentEditing();
+    //		event->accept();
+    //		break;
+    //	default:
+    //		event->ignore();
+    //		break;
+    //	}
+    //}
+    //else {
+    //	event->ignore();
+    //}
 }
 
 void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event)
@@ -227,29 +225,14 @@ void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event)
     const float x = event->pos().x();
     const float y = event->pos().y();
 
-    // TODO: we should take care of delta
+    m_key.m_radius = sqrt(x * x + y * y) / 32.0f;
+    m_key.m_angle = atan2(-y, x) / (.5*M_PI); // -1 .. 1
 
-    m_radix = std::max(sqrt(x * x + y * y) / 32.0f, 0.01f);
-    m_lastRadix = m_radix;
+    // TODO: we should take care of edit delta
 
-    const float epsilon = 0.005f;
-    float m_angle = atan2(-y, x);
-
-    // TODO: we should take care of the delta
-
-    // cap angle, this should be done in editkey
-    if (m_angle < -M_PI / 2.0f + epsilon)
-        m_angle = -M_PI / 2.0f + epsilon;
-    else if (m_angle > M_PI / 2.0f - epsilon)
-        m_angle = M_PI / 2.0f - epsilon;
-
-    m_lastAngle = m_angle;
-
-    // 
-    m_key.m_radius = m_radix;
-    m_key.m_angle = m_angle;
-
-    onEditKey(m_id, m_key);
+    onEditKey(m_id, m_key); // will check and update constraints
+    m_lastAngle = m_key.m_angle;
+    m_lastRadix = m_key.m_radius;
 }
 
 void CurvePointItem::RefreshView(bool force) { scene()->update(); }
@@ -270,8 +253,8 @@ void CurvePointItem::EditPosition(class QGraphicsSceneMouseEvent* event)
 
 void CurvePointItem::ToggleTangentEditing()
 {
-    if (m_showTangent) { m_lastRadix = 1.0f / 8.0f; }
-    else { m_lastRadix = m_radix; }
+    if (m_showTangent) { m_lastRadix = 1.0f; }
+    else { m_lastRadix = m_key.m_radius; }
 
     m_showTangent = !m_showTangent;
     this->update();

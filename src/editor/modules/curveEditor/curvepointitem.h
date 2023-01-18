@@ -94,8 +94,8 @@ namespace Idogep
         void RefreshView(bool force) override;
 
     private:
-        float m_radix, m_lastRadix;
-        float m_angle, m_lastAngle;
+        float /*m_radix, */m_lastRadix;
+        float /*m_angle, */m_lastAngle;
 
         //QPointF m_angle; // Will take care of it later
 

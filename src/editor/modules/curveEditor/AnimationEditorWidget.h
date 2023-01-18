@@ -17,10 +17,13 @@ namespace Idogep
 {
     class CurveCursor;
 
+    class AnimationEditorModule;
+
     // ========================================================================================================
 
-    class AnimationEditorWidget : public QDockWidget, public AnimationEditorView, public PointEditorView
+    class AnimationEditorWidget : public QDockWidget, public AnimationEditorView
     {
+        friend class AnimationEditorModule;
         Q_OBJECT
     public:
         explicit AnimationEditorWidget(QWidget* parent = nullptr);
@@ -28,17 +31,13 @@ namespace Idogep
 
         /* METHODS */
         void SetGraphicsScene(QGraphicsScene* graphicsScene) const;
+        void SetPointEditorWidget(QWidget * widget);
 
     protected:
-
         void RefreshView(bool force) override;
         void UpdateAnimationModel(TreeModel* model) override;
-        void UpdatePointEditor(bool isSet) override;
 
-    protected:
         void resizeEvent(QResizeEvent* event) override;
-        // ReSharper restore CppInconsistentNaming
-        void SetupPointTypes();
 
         // QT specific
         // ReSharper disable CppInconsistentNaming
@@ -46,15 +45,12 @@ namespace Idogep
         void playPressedSlot() { onTogglePlayback(); }
         void stopPressedSlot() { onStopPlayback(); }
 
-        void keyReturnPressedSlot();
-        void valueReturnPressedSlot();
-        void knotTypeChangedSlot(int index);
-
         void itemClickedSlot(const QModelIndex& index);
         void itemDoubleClickedSlot(const QModelIndex& index);
 
     private:
         Ui::AnimationEditorWidget* ui;
+        // ReSharper restore CppInconsistentNaming
 
     };
 }

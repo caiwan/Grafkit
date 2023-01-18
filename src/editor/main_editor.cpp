@@ -11,12 +11,14 @@ using namespace Idogep;
 
 EditorApplicationQt::EditorApplicationQt(int argc, char** argv) : EditorApplication(argc, argv), m_qApp(argc, argv)
 {
-	QCoreApplication::setOrganizationName("IndustrialRevolutioners");
-	QCoreApplication::setOrganizationDomain("caiwan.github.io");
-	QCoreApplication::setApplicationName(APP_NAME);
+    QCoreApplication::setOrganizationName("IndustrialRevolutioners");
+    QCoreApplication::setOrganizationDomain("caiwan.github.io");
+    QCoreApplication::setApplicationName(APP_NAME);
 
-	QFile f(":/css/global.css"); f.open(QFile::ReadOnly);
-	m_qApp.setStyleSheet(f.readAll()); f.close();
+    QFile f(":/css/global.css");
+    assert(f.open(QFile::ReadOnly));
+    m_qApp.setStyleSheet(f.readAll());
+    f.close();
 }
 
 EditorApplicationQt::~EditorApplicationQt()
@@ -26,31 +28,31 @@ EditorApplicationQt::~EditorApplicationQt()
 
 int EditorApplicationQt::ExecuteParentFramework()
 {
-	return m_qApp.exec();
+    return m_qApp.exec();
 }
 
 void EditorApplicationQt::StartLoaderThread()
 {
     auto *loader = new LoaderThread();
-	onLoaderFinished += Delegate(loader, &LoaderThread::deleteLater);
-	connect(loader, SIGNAL(finished()), this, SLOT(loaderFinishedSlot()));
-	loader->start();
+    onLoaderFinished += Delegate(loader, &LoaderThread::deleteLater);
+    connect(loader, SIGNAL(finished()), this, SLOT(loaderFinishedSlot()));
+    loader->start();
 }
 
 void EditorApplicationQt::NextTick()
 {
-	QTimer::singleShot(0, this, SLOT(mainloopSlot()));
+    QTimer::singleShot(0, this, SLOT(mainloopSlot()));
 }
 
 // ========================================================================================
 
 int main(int argc, char **argv)
 {
-	Q_INIT_RESOURCE(resources);
+    Q_INIT_RESOURCE(resources);
 
-	qInstallMessageHandler(myMessageOutput);
+    qInstallMessageHandler(myMessageOutput);
 
-	auto app = new EditorApplicationQt(argc, argv);
-	return app->Execute();
+    auto app = new EditorApplicationQt(argc, argv);
+    return app->Execute();
 }
 
