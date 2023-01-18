@@ -1,5 +1,6 @@
 #include "System.h"
 #include "input.h"
+#include "exceptions.h"
 
 using namespace FWcore;
 
@@ -11,7 +12,6 @@ System::System()
 
 System::~System()
 {
-	//this->Shutdown();
 }
 
 int System::execute() {
@@ -27,162 +27,73 @@ int System::execute() {
 	// +++ crete graphics device here 
 	
 	// + exception handling
-	result = this->init();
-	if (result != 0) {
-		this->release();
-		return 1;
+	try
+	{
+		result = this->init();
+		if (result != 0) {
+			this->release();
+			return 1;
+		}
+	}
+	catch (FWdebug::Exception* ex)
+	{
+		///@todo handle exceptions here 
+		//DebugBreak();
+		MessageBox(NULL, ex->getError(), L"Exception", 0);
+		delete ex;
+		goto teardown;
 	}
 
 	// ================================================================================================================================
 	// --- mainloop
-	// + exception handling
-	int done = 0;
-	while (!done)
-	{
-		// Handle the windows messages.
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
 
-		// If windows signals to end the application then exit out.
-		if (msg.message == WM_QUIT)
+	try
+	{
+		int done = 0;
+		while (!done)
 		{
-			done = 1;
-		}
-		else
-		{
-			// Otherwise do the frame processing.
-			result = this->mainloop();
-			if (result != 0)
+			// Handle the windows messages.
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+
+			// If windows signals to end the application then exit out.
+			if (msg.message == WM_QUIT)
 			{
 				done = 1;
 			}
+			else
+			{
+				// Otherwise do the frame processing.
+				result = this->mainloop();
+				if (result != 0)
+				{
+					done = 1;
+				}
+			}
+
 		}
 
 	}
-
+	catch (FWdebug::Exception* ex)
+	{
+		///@todo handle exceptions here 
+		//  DebugBreak();
+		MessageBox(NULL, ex->getError(), L"Exception", 0);
+		delete ex;
+		goto teardown;
+	}
 	// ================================================================================================================================
 	// --- teardown
-	this->release();
+
+	teardown: {
+		this->release();
+		this->ShutdownWindows();
+	}
 	return 0;
 }
-
-#if 0
-bool System::Initialize()
-{
-	int screenWidth, screenHeight;
-	bool result;
-
-
-	// Initialize the width and height of the screen to zero before sending the variables into the function.
-	screenWidth = 800;
-	screenHeight = 600;
-
-	// Initialize the windows api.
-	InitializeWindows(screenWidth, screenHeight);
-
-	// Create the input object.  This object will be used to handle reading the keyboard input from the user.
-	m_Input = new Input;
-	if(!m_Input)
-	{
-		return false;
-	}
-
-	// Initialize the input object.
-	m_Input->Initialize();
-
-	// --- snip 
-
-	// Create the graphics object.  This object will handle rendering all the graphics for this application.
-	/*
-	m_Graphics = new GraphicsClass;
-	if(!m_Graphics)
-	{
-		return false;
-	}
-
-	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, this->window.getHWnd());
-	if(!result)
-	{
-		return false;
-	}
-	*/
-
-	// --- snap
-
-	return true;
-}
-
-void System::Shutdown()
-{
-	// Release the graphics object.
-	/*
-	if(m_Graphics)
-	{
-		m_Graphics->Shutdown();
-		delete m_Graphics;
-		m_Graphics = 0;
-	}
-
-	*/
-
-	// Release the input object.
-	if(m_Input)
-	{
-		delete m_Input;
-		m_Input = 0;
-	}
-
-	// Shutdown the window.
-	ShutdownWindows();
-	
-	return;
-}
-
-void System::Run()
-{
-	MSG msg;
-	bool done, result;
-
-
-	// Initialize the message structure.
-	ZeroMemory(&msg, sizeof(MSG));
-	
-	// Loop until there is a quit message from the window or the user.
-	done = false;
-	while(!done)
-	{
-		// Handle the windows messages.
-		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-
-		// If windows signals to end the application then exit out.
-		if(msg.message == WM_QUIT)
-		{
-			done = true;
-		}
-		else
-		{
-			// Otherwise do the frame processing.
-			result = Frame();
-			if(!result)
-			{
-				done = true;
-			}
-		}
-
-	}
-
-	return;
-}
-
-#endif
 
 LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 	{
@@ -212,8 +123,10 @@ LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
 		}
 	}
 
-void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen)
+void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen, int resizeable)
 {
+	///@todo resizeable window
+
 	this->m_window.createWindow(screenWidth, screenHeight, fullscreen);
 	this->m_window.showWindow();
 
@@ -231,10 +144,6 @@ void System::InitializeWindows(int screenWidth, int screenHeight, int fullscreen
 void System::ShutdownWindows()
 {
 	this->m_window.destroyWindow();
-
-	// Release the pointer to this class.
-	//ApplicationHandle = NULL;
-
 	return;
 }
 
