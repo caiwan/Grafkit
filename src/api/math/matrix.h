@@ -127,6 +127,10 @@ namespace FWmath {
 			return *this;
 		}
 
+		matrix& Get() {
+			return mat;
+		}
+
 		// --- getters
 
 	};
