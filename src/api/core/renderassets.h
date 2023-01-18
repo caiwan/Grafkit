@@ -20,7 +20,7 @@ namespace FWassets{
 	class IRenderAsset;
 	class IRenderAssetManager;
 	class IRenderAssetBuilder;
-	class IRenderAssetBuilderFactory;
+	// class IRenderAssetBuilderFactory;
 
 	/**
 	A base class for collectable render assets for bulk loading

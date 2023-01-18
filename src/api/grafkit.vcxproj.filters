@@ -95,6 +95,9 @@
     <ClCompile Include="render\Material.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
+    <ClCompile Include="core\AssetPreloader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -169,5 +172,6 @@
     <ClInclude Include="render\Material.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
+    <ClInclude Include="core\AssetPreloader.h" />
   </ItemGroup>
 </Project>
