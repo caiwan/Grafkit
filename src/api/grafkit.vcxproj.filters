@@ -71,9 +71,6 @@
     <ClCompile Include="render\model.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="render\Scenegraph.cpp">
-      <Filter>Source Files\render</Filter>
-    </ClCompile>
     <ClCompile Include="render\particle.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="core\AssetPreloader.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="render\Scene.cpp">
+      <Filter>Source Files\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,9 +148,6 @@
     <ClInclude Include="core\window.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
-    <ClInclude Include="render\Scenegraph.h">
-      <Filter>Source Files\render</Filter>
-    </ClInclude>
     <ClInclude Include="render\particle.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
@@ -174,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="core\AssetPreloader.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="render\Scene.h">
+      <Filter>Source Files\render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
