@@ -1,4 +1,6 @@
-#include <qapplication.h>
+#include <QApplication>
+
+#include <QDebug>
 
 #include <stack>
 
@@ -133,16 +135,14 @@ void Idogep::EditorApplication::BuildEditorModules()
 	// --- 
 	m_outlineViewModule = new OutlineModule(m_editor);
 
-	m_editor->GetCommandStack()->ConnectEmitter(dynamic_cast<EmitsCommandRole*>(m_outlineViewModule.Get()));
 	m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
 	// --- 
 	m_curveEditor = new CurveEditorModule(m_editor);
-	m_editor->GetCommandStack()->ConnectEmitter(dynamic_cast<EmitsCommandRole*>(m_curveEditor.Get()));
 
 	// 
-    dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
-        dynamic_cast<CurveEditorModule*>(m_curveEditor.Get()), &CurveEditorModule::AnimationSelectedEvent);
+	dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
+		dynamic_cast<CurveEditorModule*>(m_curveEditor.Get()), &CurveEditorModule::AnimationSelectedEvent);
 }
 
 void Idogep::EditorApplication::InitializeModules() const
@@ -151,6 +151,12 @@ void Idogep::EditorApplication::InitializeModules() const
 	stack.push(m_editor);
 	while (!stack.empty()) {
 		auto module = stack.top(); stack.pop();
+
+		EmitsCommandRole* commandEmitter = dynamic_cast<EmitsCommandRole*>(module.Get());
+		if (commandEmitter) {
+			qDebug() << "Connecting command emitter obj=" << reinterpret_cast<void*>(module.Get());
+			m_editor->GetCommandStack()->ConnectEmitter(commandEmitter);
+		}
 
 		module->Initialize();
 
@@ -182,6 +188,11 @@ void Idogep::EditorApplication::BuildDockingWindows() const
 
 	outlineWidget->setParent(m_mainWindow);
 	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
+
+    // connect redo / undo menus
+	m_editor->GetCommandStack()->onCommandStackChanged += Delegate(m_mainWindow, &Roles::ManageCommandStackRole::CommandStackChangedEvent);
+	m_mainWindow->onUndo += Delegate(m_editor->GetCommandStack(), &CommandStack::Undo);
+	m_mainWindow->onRedo += Delegate(m_editor->GetCommandStack(), &CommandStack::Redo);
 }
 
 

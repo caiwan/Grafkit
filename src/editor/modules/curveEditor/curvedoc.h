@@ -14,6 +14,9 @@ namespace Idogep {
 
 	class TimelineArea;
 
+	typedef std::vector<Ref<CurvePointItem>> CurvePointList;
+	typedef CurvePointList::const_iterator CurvePointIterator;
+
 	namespace Roles
 	{
 		class EditCurveRole : public EmitsCommandRole
@@ -45,18 +48,18 @@ namespace Idogep {
 	public:
 	    explicit CurveManager(const Ref<Module>& parent);
 
-		QList<CurvePointItem*> const * GetCurvePoints() const { return m_curvePoints; }
+		std::pair<CurvePointIterator, CurvePointIterator> GetCurvePointIterators() const { return std::make_pair(m_curvePoints.cbegin(), m_curvePoints.cend()); }
 
 		void AddCurveToScene(CurveSceneView* parent) const;
 		void Recalculate(TimelineArea* const area) const;
 
 	    void Initialize() override;
 
-	    protected:
+	protected:
 		void Rebuild() override;
 
 	private:
-		QList<CurvePointItem*>* m_curvePoints;
+		std::vector<Ref<CurvePointItem>> m_curvePoints;
 	};
 
 	class CursorManager

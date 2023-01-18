@@ -4,6 +4,7 @@
 #include "curveeditorscene.h"
 
 #include "curvepointitem.h"
+#include "curvedoc.h"
 
 using namespace Idogep;
 
@@ -262,6 +263,11 @@ void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event) {
 	SetTangent(tangent);
 
 	onEditKey(this);
+}
+
+void Idogep::CurvePointItem::RefreshView(bool force)
+{
+	scene()->update();
 }
 
 void CurvePointItem::EditPosition(class QGraphicsSceneMouseEvent* event) {

@@ -3,6 +3,7 @@
 
 #include "utils/Event.h"
 #include "animation/animation.h"
+#include "utils/ViewModule.h"
 
 class QStyleOptionGraphicsItem;
 
@@ -10,7 +11,7 @@ namespace Idogep
 {
     class TimelineArea;
 
-    class CurvePointItem : public QGraphicsItem
+    class CurvePointItem : public QGraphicsItem , public View
     {
     public:
         //CurvePointItem(QGraphicsItem* parent = nullptr);
@@ -82,6 +83,8 @@ namespace Idogep
 
         void ToggleTangentEditing();
         void EditTangent(QGraphicsSceneMouseEvent* event);
+
+        void RefreshView(bool force) override;
 
     private:
 

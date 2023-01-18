@@ -41,7 +41,7 @@ namespace Idogep
 		Ref<Module> m_module;
 
 	private:
-		Roles::ViewRefreshQueue* m_refreshQueueObject;
+		//Roles::ViewRefreshQueue* m_refreshQueueObject;
 	};
 
 	// ----------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace Idogep {
 		{
 			Q_OBJECT
 		public:
-			ViewRefreshQueue(View* const & view)
+		    explicit ViewRefreshQueue(View* const & view)
 				: m_view(view)
 			{
 			}

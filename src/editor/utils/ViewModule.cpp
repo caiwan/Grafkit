@@ -5,11 +5,11 @@
 using namespace Idogep;
 
 Module::Module(Ref<Module> parent)
-    : Referencable()
+	: Referencable()
 {
-    if (parent.Valid())
-        parent->AddChildModule(this);
-    m_parent = parent;
+	if (parent.Valid())
+		parent->AddChildModule(this);
+	m_parent = parent;
 }
 
 Module::~Module()
@@ -19,22 +19,26 @@ Module::~Module()
 // ------------------------------------------------------------------------
 
 View::View(Ref<Module> parentModule)
-    : m_module(parentModule) { m_refreshQueueObject = new Roles::ViewRefreshQueue(this); }
+	: m_module(parentModule)
+    //, m_refreshQueueObject(nullptr)
+{
+	//m_refreshQueueObject = new Roles::ViewRefreshQueue(this);
+}
 
-View::~View() { delete m_refreshQueueObject; }
+View::~View() { /*delete m_refreshQueueObject;*/ }
 
 void View::RequestRefreshView(const bool force)
 {
-    // Request immediately
-    if (force)
-    {
-        RefreshView(true);
-    }
-    else
-    {
-        //QTimer. ... 
-        RefreshView(false);
-    }
+	// Request immediately
+	if (force)
+	{
+		RefreshView(true);
+	}
+	else
+	{
+		//QTimer. ... 
+		RefreshView(false);
+	}
 }
 
 

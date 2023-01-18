@@ -98,8 +98,8 @@ namespace Idogep {
 	{
 		Q_OBJECT
 	public:
-		LoaderThread(QObject* parent = nullptr);
-		void run();
+	    explicit LoaderThread(QObject* parent = nullptr);
+		void run() override;
 	};
 
 }

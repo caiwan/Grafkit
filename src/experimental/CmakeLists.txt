@@ -1,0 +1,4 @@
+subdirs(player)
+# subdirs(importer)
+# subdirs(importerCli)
+# subdirs(rocketlib)

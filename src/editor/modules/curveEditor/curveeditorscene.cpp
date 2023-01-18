@@ -94,7 +94,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 	if (m_displayCurve)
 		DrawCurve(painter, r);
 
-    // draw cursors here if needed 
+	// draw cursors here if needed 
 }
 
 void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
@@ -105,23 +105,11 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 	CurveManager* curveManager = parent->GetCurveManager();
 
 	// 2. draw the curves.
-	const QList<CurvePointItem*> * const points = curveManager->GetCurvePoints();
-
-	// debug 
-	{
-		painter->fillRect(16, 0, 16, 16, QBrush(QColor(255, 0, 0), Qt::SolidPattern));
-	}
-
-	// prevernt crash on NPE
-	if (!points || points->isEmpty())
-		return;
-
-	//debug
-	{
-		painter->fillRect(16, 0, 16, 16, QBrush(QColor(0, 255, 0), Qt::SolidPattern));
-	}
 
 	auto channel = curveManager->GetChannel();
+
+	if (channel.Invalid() || channel->GetKeyCount() == 0)
+		return;
 
 	curveManager->Recalculate(m_area);
 
@@ -136,22 +124,18 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 	int idmax = channel->FindKeyIndex(pMax.x()) + 1;
 
 	// line -inf -> fist point
-	if (idmin == 0 && points->at(0)->x() > r.x())
+	auto firstKey = channel->GetKey(0);
+	QPointF firstPoint = m_area->Point2Screen({ firstKey.m_time, firstKey.m_value });
+	if (idmin == 0 && firstPoint.x() > r.x())
 	{
-		painter->drawLine(
-			0, points->at(0)->pos().y(),
-			points->at(0)->pos().x(), points->at(0)->pos().y()
-		);
+		painter->drawLine({ 0, firstPoint.y() }, firstPoint);
 	}
 
 	// line last point -> +inf
-	if (points->last()->pos().x() < r.x() + r.width()) {
-		painter->drawLine(
-			points->last()->pos().x(), points->last()->pos().y(),
-			r.x() + r.width(), points->last()->pos().y()
-		);
-		// probaly this does not take any effect
-		points->last()->setVisible(true);
+	auto lastKey = channel->GetKey(channel->GetKeyCount() - 1);
+	QPointF lastKeyPoint = m_area->Point2Screen({ lastKey.m_time, lastKey.m_value });
+	if (lastKeyPoint.x() < r.x() + r.width()) {
+		painter->drawLine( lastKeyPoint,  { r.x() + r.width(), lastKeyPoint.y() } );
 	}
 
 	if (idmax >= channel->GetKeyCount() - 1) {
@@ -162,9 +146,6 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 
 	for (int i = idmin; i < idmax; i++)
 	{
-		CurvePointItem *point = points->at(i);
-		point->setVisible(true);
-
 		const auto k0 = channel->GetKey(i);
 		const auto k1 = channel->GetKey(i + 1);
 
@@ -237,7 +218,7 @@ QPointF TimelineArea::Screen2Point(QPointF point) const
 
 void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
 {
-    const QTransform transform = painter->transform();
+	const QTransform transform = painter->transform();
 	painter->translate(r.topLeft());
 
 	float sPos = 0.0f;

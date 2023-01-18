@@ -1,60 +1,68 @@
-#pragma once 
+#pragma once
 
-#include <list>
+#include <stack>
 
 #include "utils/reference.h"
 
 #include "utils/Event.h"
 
-namespace Idogep {
+namespace Idogep
+{
+    class CommandStack;
 
-	class CommandStack;
+    class Command : public Referencable
+    {
+        friend class CommandStack;
+    public:
+        enum CommandState
+        {
+            DONE
+          , NOT_DONE
+        };
 
-	class Command : public Referencable
-	{
-		friend class CommandStack;
-	public:
-		enum CommandState {
-			DONE, NOT_DONE
-		};
+        Command()
+            : m_status(NOT_DONE)
+        {
+        }
 
-	public:
-		Command() {}
-		virtual ~Command() {}
+        virtual ~Command() = default;
 
-		virtual void Do() = 0;
-		virtual void Undo() = 0;
+        virtual void Do() = 0;
+        virtual void Undo() = 0;
 
-	private:
-		CommandState m_status;
-	};
+        CommandState GetStatus() const { return m_status; }
 
-	class EmitsCommandRole {
-	public:
-	    virtual ~EmitsCommandRole() = default;
-	    Event<Ref<Command>> onNewCommand;
-	};
+    private:
+        CommandState m_status;
+    };
 
-	class CommandStack {
-	public:
-		CommandStack() {}
+    class EmitsCommandRole
+    {
+    public:
+        virtual ~EmitsCommandRole() = default;
+        Event<Ref<Command>> onNewCommand;
+    };
 
-		void ConnectEmitter(EmitsCommandRole* emitter);
+    class CommandStack
+    {
+    public:
+        CommandStack() = default;
 
-		void AddCommand(Ref<Command> command);
-		void Redo();
-		void Undo();
+        void ConnectEmitter(EmitsCommandRole* emitter);
 
-		bool HasUndo() { return m_undoStack.empty(); }
-		bool HasRedo() { return m_redoStack.empty(); }
+        void AddCommand(Ref<Command> command);
+        void Redo();
+        void Undo();
 
-		Event<CommandStack * const &> onCommandStackChanged;
-		Event<Ref<Command>> onNewCommand;
+        bool HasUndo() const { return !m_undoStack.empty(); }
+        bool HasRedo() const { return !m_redoStack.empty(); }
 
-	private:
-		std::list<Ref<Command>> m_undoStack;
-		std::list<Ref<Command>> m_redoStack;
-	};
+        Event<CommandStack * const &> onCommandStackChanged;
+        Event<Ref<Command>> onNewCommand;
 
-
+    private:
+        void ClearStack();
+        std::stack<Ref<Command>> m_undoStack;
+        std::stack<Ref<Command>> m_redoStack;
+    };
 }

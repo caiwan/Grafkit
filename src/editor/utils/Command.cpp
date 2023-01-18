@@ -4,21 +4,22 @@
 void Idogep::CommandStack::ConnectEmitter(EmitsCommandRole * emitter)
 {
 	assert(emitter);
-	//if (emitter)
 	emitter->onNewCommand += Delegate(this, &CommandStack::AddCommand);
 }
 
-void Idogep::CommandStack::AddCommand(Ref<Command> command)
+void Idogep::CommandStack::ClearStack()
 {
-	m_redoStack.clear();
+	while (!m_redoStack.empty()) m_redoStack.pop();
+}
+
+void Idogep::CommandStack::AddCommand(Ref<Command> command)  // NOLINT
+{
+	ClearStack();
 
 	// TODO: exception handling && rollback if needed
 	command->Do();
 
-	m_undoStack.push_back(command);
-
-	if (m_undoStack.size() > 1000)
-		m_undoStack.pop_back();
+	m_undoStack.push(command);
 
 	onCommandStackChanged(this);
 }
@@ -28,8 +29,11 @@ void Idogep::CommandStack::Redo()
 	if (m_redoStack.empty())
 		return;
 
-	auto cmd = m_redoStack.front();
+	auto cmd = m_redoStack.top();
 	cmd->Do();
+
+	m_redoStack.pop();
+	m_undoStack.push(cmd);
 
 	onCommandStackChanged(this);
 }
@@ -39,11 +43,11 @@ void Idogep::CommandStack::Undo()
 	if (m_undoStack.empty())
 		return;
 
-	auto cmd = m_undoStack.front();
+	auto cmd = m_undoStack.top();
 	cmd->Undo();
 
-	m_undoStack.pop_front();
-	m_redoStack.push_back(cmd);
+	m_undoStack.pop();
+	m_redoStack.push(cmd);
 
 	onCommandStackChanged(this);
 }
