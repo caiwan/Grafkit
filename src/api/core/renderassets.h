@@ -22,6 +22,8 @@ namespace FWassets{
 	class IRenderAsset;
 	class IRenderAssetManager;
 	class IRenderAssetBuilder;
+	class IRenderAssetRepository;
+
 
 	/**
 	A base class for collectable render assets for bulk loading
@@ -30,6 +32,7 @@ namespace FWassets{
 	class IRenderAsset : virtual public Referencable
 	{
 		friend class IRenderAssetManager;
+		friend class IRenderAssetRepository;
 		friend class IRenderAssetGenerator;
 
 	public:
@@ -84,7 +87,8 @@ namespace FWassets{
 		Ref<IRenderAsset> GetObjectByUUID(std::string bucket, Guid uuid);
 		Ref<IRenderAsset> GetObjectByName(std::string bucket, std::string name);
 
-		Ref<IRenderAsset> GetObjPtr(size_t id) { return this->m_assets[id]; }
+		Ref<IRenderAsset> GetObjPtrByGlobalID(size_t id) { return this->m_assets[id]; }
+		Ref<IRenderAsset> GetObjPtr(std::string bucket, size_t id); //{ return this->m_assets[id]; }
 
 	protected:
 		std::vector<Ref<IRenderAsset>> m_assets;
@@ -93,6 +97,7 @@ namespace FWassets{
 		typedef std::map<Guid, size_t> id_map_t;
 
 		struct bucket_t {
+			std::vector<int> m_ids;
 			name_map_t m_mapNames;
 			id_map_t m_mapID;
 		};

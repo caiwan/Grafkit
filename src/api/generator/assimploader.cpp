@@ -3,6 +3,8 @@
 #include <stack>
 #include <vector>
 
+#include "../core/renderassets.h"
+
 #include "../render/renderer.h"
 #include "../render/texture.h"
 #include "../render/Material.h"
@@ -24,6 +26,8 @@
 using namespace FWrender;
 using namespace FWdebugExceptions;
 using FWassets::IRenderAsset;
+using FWassets::IRenderAssetRepository;
+using FWassets::IRenderAssetManager;
 
 // ================================================================================================================================================================
 // Assimp helpers
@@ -122,7 +126,7 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 // ================================================================================================================================================================
 
 ///@todo assmant hasznlaj
-void assimp_parseScenegraph(std::vector<ModelRef> &models,  aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH)
+void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH)
 {
 	size_t i=0, j=0, k = 0;
 
@@ -136,7 +140,7 @@ void assimp_parseScenegraph(std::vector<ModelRef> &models,  aiNode* ai_node, Act
 	
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
-		actor->GetEntities().push_back(models[mesh_id]);
+		actor->GetEntities().push_back((Model*)repo->GetObjPtr(MODEL_BUCKET, mesh_id).Get());
 	}
 
 	actor->SetName(ai_node->mName.C_Str());
@@ -145,7 +149,7 @@ void assimp_parseScenegraph(std::vector<ModelRef> &models,  aiNode* ai_node, Act
 	// next nodes
 	for (i = 0; i < ai_node->mNumChildren; i++) {
 		Actor *child = nullptr;
-		assimp_parseScenegraph(models, ai_node->mChildren[i], &child, maxdepth - 1);
+		assimp_parseScenegraph(repo, ai_node->mChildren[i], &child, maxdepth - 1);
 		actor->AddChild(child);
 	}
 
@@ -170,10 +174,10 @@ namespace {
 
 FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::Scene * const & scenegraph) :
 	IRenderAssetBuilder(),
-	m_scenegraph(scenegraph), m_resource(resource),
-	m_name_prefix()
+	m_scenegraph(scenegraph), m_resource(resource)
+	// m_name_prefix()
 {
-	m_name_prefix = GetCounter();
+	// m_name_prefix = GetCounter();
 }
 
 FWmodel::AssimpLoader::~AssimpLoader()
@@ -195,6 +199,8 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 		throw EX_DETAILS(AssimpParseException, importer.GetErrorString());
 	}
 
+	IRenderAssetRepository* asset_repo = assman->GetRepository(GetCounter());
+
 	int i = 0, j = 0, k = 0, l = 0;
 	std::vector<MaterialRef> materials;
 	std::vector<ModelRef> models;
@@ -211,7 +217,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
 			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
-				material->SetName(m_name_prefix+name.C_Str());
+				material->SetName(name.C_Str());
 
 			j = 0;
 			aiReturn texFound = AI_FAILURE;
@@ -237,7 +243,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			material->SetShader(shader_fs);
 
 			materials.push_back(material);
-			//assman->AddObject(material.Get());
+			asset_repo->AddObject(material);
 		}
 	}
 	
@@ -299,7 +305,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			}
 
 			models.push_back(model);
-			//assman->AddObject(model);
+			asset_repo->AddObject(model);
 		}
 	}
 
@@ -321,10 +327,9 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 
 			// --
 			std::string name(curr_camera->mName.C_Str());
-			//this->camera_lookupMap[name] = camera;
 
 			camera->SetName(name);
-
+			asset_repo->AddObject(camera);
 		}
 	}
 
@@ -368,9 +373,10 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			assimp_color_f4(curr_light->mColorSpecular, light->GetSpecular());
 
 
-			light->SetName(m_name_prefix + std::string(curr_light->mName.C_Str()));
+			light->SetName(std::string(curr_light->mName.C_Str()));
 
 			lights.push_back(light);
+			asset_repo->AddObject(light);
 		}
 	}
 
@@ -419,7 +425,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 
 #else // fallback: recursive fill 
 	Actor* root_node = new Actor;
-	assimp_parseScenegraph(models, scene->mRootNode, &root_node);
+	assimp_parseScenegraph(asset_repo, scene->mRootNode, &root_node);
 	m_scenegraph->SetRootNode(root_node);
 
 #endif

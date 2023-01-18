@@ -48,6 +48,7 @@ size_t FWassets::IRenderAssetRepository::AddObject(IRenderAsset * obj)
 	size_t id = this->m_assets.size() - 1;
 
 	///@todo ha van ilyen objektum, akkor visitson. Duplan visitson;
+	bucket_entry->m_ids.push_back(id);
 	bucket_entry->m_mapID[obj->GetUUID()] = id;
 	bucket_entry->m_mapNames[obj->GetName()] = id;
 
@@ -71,6 +72,7 @@ void FWassets::IRenderAssetRepository::RemoveObject(IRenderAsset * obj)
 
 	if (it_id != bucket_entry->m_mapID.end() && it_name != bucket_entry->m_mapNames.end())
 	{
+		///@todo proper remove from this - bucket_entry->m_ids[it_id->second] = -1;
 		bucket_entry->m_mapID.erase(it_id);
 		bucket_entry->m_mapNames.erase(it_name);
 
@@ -149,6 +151,17 @@ Ref<IRenderAsset> FWassets::IRenderAssetRepository::GetObjectByName(std::string 
 		
 		return nullptr;
 	}
+}
+
+Ref<IRenderAsset> FWassets::IRenderAssetRepository::GetObjPtr(std::string bucket, size_t id)
+{
+	bucket_t* pbucket = GetBucket(bucket);
+	if (!pbucket) {
+		return Ref<IRenderAsset>();
+	}
+	
+	int id_ = pbucket->m_ids[id];
+	return id >= 0 ? Ref<IRenderAsset>() : m_assets[id_];
 }
 
 FWassets::IRenderAssetRepository::bucket_t * FWassets::IRenderAssetRepository::GetBucket(std::string bucket)

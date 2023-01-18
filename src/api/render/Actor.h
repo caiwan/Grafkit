@@ -24,7 +24,7 @@ namespace FWrender {
 
 #define ENTITY3D_BUCKET ":entity3d"
 
-	class Entity3D : virtual public FWassets::IRenderAsset
+	class Entity3D : public FWassets::IRenderAsset /*, virtual public Referencable*/
 	{
 	friend class Actor;
 	public:

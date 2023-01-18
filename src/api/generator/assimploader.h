@@ -20,7 +20,6 @@ namespace FWmodel {
 	private:
 		FWassets::IResourceRef m_resource;
 		FWrender::Scene * const & m_scenegraph;
-		std::string m_name_prefix; //name prefix for every created objects
 	};
 
 }

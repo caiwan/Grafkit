@@ -102,7 +102,7 @@ void FWassets::AssetPreloader::LoadCache()
 
 					// get the pointer right from the asset container, and feed it 
 					
-					TextureAssetRef txptr = dynamic_cast<TextureAsset*>(repo->GetObjPtr(repo->AddObject(texture)).Get());
+					TextureAssetRef txptr = dynamic_cast<TextureAsset*>(repo->GetObjPtrByGlobalID(repo->AddObject(texture)).Get());
 					m_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), txptr));
 					
 				}
@@ -133,7 +133,7 @@ void FWassets::AssetPreloader::LoadCache()
 							shader->SetName(name);
 
 						// get the pointer right from the asset container, and feed it 
-						ShaderAssetRef shPtr = dynamic_cast<ShaderAsset*>(repo->GetObjPtr(repo->AddObject(shader)).Get());
+						ShaderAssetRef shPtr = dynamic_cast<ShaderAsset*>(repo->GetObjPtrByGlobalID(repo->AddObject(shader)).Get());
 						m_builders.push_back(new ShaderLoader(loader->GetResourceByName(filename), sh_typ, shPtr));
 					}
 				}
