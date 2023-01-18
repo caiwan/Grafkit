@@ -13,6 +13,8 @@ A generator interface for assets
 
 #include "assets.h"
 
+#include "../render/renderer.h"
+
 namespace FWassets{
 
 	class IRenderAsset;
@@ -62,6 +64,7 @@ namespace FWassets{
 		virtual ~IRenderAssetManager();
 
 		virtual FWassets::IResourceFactory* GetResourceFactory() = 0;
+		virtual FWrender::Renderer & GetDeviceContext() = 0;
 
 	public:
 		void AddObject(IRenderAsset* obj);

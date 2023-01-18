@@ -69,7 +69,7 @@ protected:
 			// -- texture
 			TextureRef texture;
 
-			TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, render, texture);
+			TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, texture);
 			txgen();
 
 			// -- load shader
@@ -143,6 +143,7 @@ protected:
 		FWassets::FileResourceManager *m_file_loader;
 	public:
 		FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
+		FWrender::Renderer & GetDeviceContext() { return this->render; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)

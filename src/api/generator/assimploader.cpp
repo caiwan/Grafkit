@@ -70,16 +70,16 @@ namespace {
 	};
 }
 
-TextureRef assimpTexture(enum aiTextureType what, aiMaterial* material, int subnode)
+TextureRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, FWassets::IRenderAssetManager * const & assman)
 {
 	aiString path;
 	TextureRef texture;
-	aiReturn result = material->GetTexture(what, subnode, &path);
+	aiReturn result = material->GetTexture(source, subnode, &path);
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		// obj lut?
-		/*TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, render, texture);
-		txgen();*/
+		// obj lut goez here?
+		TextureGenFromBitmap txgen(assman->GetResourceFactory()->GetResourceByName("Normap.jpg"), assman, texture); 
+		txgen();
 	}
 
 	return texture;
@@ -128,17 +128,17 @@ void FWmodel::AssimpLoader::operator()()
 
 			this->m_assman->AddObject(material.Get());
 
-			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) material->SetName(name.C_Str());
+			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
+				material->SetName(name.C_Str());
 
 			j = 0;
 			aiReturn texFound = AI_FAILURE;
 
 			// -- -- load textures
 			// textura-> material 
-
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
-					/// itt minden map tipushoz N darab textura terozhat. -> ezt a materialban is meg kell szerkeszteni
+					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, m_assman), texture_load_map[k].tt);
 				}
 			}
 
