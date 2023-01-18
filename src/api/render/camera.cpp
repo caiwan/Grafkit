@@ -1,23 +1,21 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Camera.cpp
-////////////////////////////////////////////////////////////////////////////////
+#include "../math/matrix.h"
 #include "camera.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 using namespace FWrender;
 
 Camera::Camera()
 {
-	/*
-	m_positionX = 0.0f;
-	m_positionY = 0.0f;
-	m_positionZ = 0.0f;
+	m_fov = M_PI / 4.0f;
 
-	m_rotationX = 0.0f;
-	m_rotationY = 0.0f;
-	m_rotationZ = 0.0f;
-	*/
+	m_aspect = 1;
+	m_screenHeight = 100;
+	m_screenHeight = 100;
+
 	m_position = float3( 0, 0, 0 );
-	m_rotation = float3(0, 0, 0);
+	m_rotation = float3( 0, 0, 0 );
 }
 
 
@@ -77,7 +75,7 @@ void Camera::SetRotation(float x, float y, float z)
 
 
 
-
+// --- pinakobold
 void Camera::Render()
 {
 	XMFLOAT3 up, lookAt;
@@ -113,25 +111,37 @@ void Camera::Render()
 	yaw   = m_rotation.y * 0.0174532925f;
 	roll  = m_rotation.z * 0.0174532925f;
 
-	// Create the rotation matrix from the yaw, pitch, and roll values.
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
-	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
 	lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
 	upVector = XMVector3TransformCoord(upVector, rotationMatrix);
 
-	// Translate the rotated camera position to the location of the viewer.
 	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
-	// Finally create the view matrix from the three updated vectors.
 	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+
+	// --- projection --- 
+
+	m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspect, m_znear, m_zfar);
+
+	// Create an orthographic projection matrix for 2D rendering.
+	m_orthoMatrix = XMMatrixOrthographicLH(m_screenWidth, m_screenHeight, m_znear, m_zfar);
 
 	return;
 }
 
 
-void Camera::GetViewMatrix(matrix& viewMatrix)
+void Camera::GetViewMatrix(FWmath::Matrix& viewMatrix)
 {
 	viewMatrix = m_viewMatrix;
-	return;
+}
+
+void FWrender::Camera::GetProjectionMatrix(FWmath::Matrix & matrix)
+{
+	matrix = m_projectionMatrix;
+}
+
+void FWrender::Camera::GetOrthoMatrix(FWmath::Matrix & matrix)
+{
+	matrix = m_orthoMatrix;
 }
