@@ -55,13 +55,12 @@ CurveEditorScene::~CurveEditorScene()
 
 void CurveEditorScene::RefreshView(const bool force)
 {
+    m_area->SetSceneRect(sceneRect());
     if (force)
     {
         Invalidate();
         UpdateAudiogram();
     }
-
-    m_area->SetSceneRect(sceneRect());
 
     update();
 }
@@ -69,7 +68,10 @@ void CurveEditorScene::RefreshView(const bool force)
 bool CurveEditorScene::event(QEvent* event)
 {
     if (event->type() == QEvent::Resize)
+    {
         RequestRefreshView(true);
+        qDebug() << "Resize CES";
+    }
 
     return QGraphicsScene::event(event);
 }
@@ -401,15 +403,17 @@ void TimelineArea::DrawGrid(QPainter* const & painter, const QRectF& r)
 {
     if (m_gridImage.size() != r.size().toSize())
     {
-        if (m_gridImage.isNull())
+        //if (m_gridImage.isNull())
             m_gridImage = QPixmap(r.width(), r.height());
-        else
-            m_gridImage.scaled(r.width(), r.height());
+        //else
+            //m_gridImage.scaled(r.width(), r.height());
         m_gridValid = false;
     }
 
     if (!m_gridValid)
     {
+        //qDebug() << "Redraw grid" << r;
+
         m_gridImage.fill(Qt::transparent);
         QPainter picturePainter(&m_gridImage);
 
