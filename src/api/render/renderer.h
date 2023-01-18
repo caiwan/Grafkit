@@ -32,7 +32,7 @@ namespace FWrender {
 		Core renderer
 		**Hack**: Extended ID3D11Device via reference counting, gives direct access to the deive with `operator ->` .
 	*/
-# if 0 // sometimes it comflicts with MFC's new and delete; please mind it. 
+# if 1 // sometimes it comflicts with MFC's new and delete; please mind it. 
 	__declspec(align(16)) class Renderer : Ref<ID3D11Device>, public AlignedNew<Renderer>
 #else
 	class Renderer : Ref<ID3D11Device>
