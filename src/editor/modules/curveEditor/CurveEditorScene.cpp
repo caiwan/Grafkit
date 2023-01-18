@@ -224,6 +224,8 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
             break;
         default:
+            //event->ignore();
+            //return;
             break;
         }
     }
@@ -232,6 +234,7 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
     if (resetView) { m_area->ResetView(); }
 
+    //event->accept();
     QGraphicsScene::mousePressEvent(event);
 }
 
@@ -247,38 +250,62 @@ void CurveEditorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     m_isValidAudiogram = false;
 
     update();
+    //event->accept();
     QGraphicsScene::mouseReleaseEvent(event);
+}
+
+void CurveEditorScene::HandleMousePan(QGraphicsSceneMouseEvent* event) {
+    bool modifyOfs = m_midButton && !m_ctrlPressed;
+    bool modifyScale = m_midButton && m_ctrlPressed;
+
+    bool lockX = m_altPressed;
+    bool lockY = m_shiftPressed;
+
+    bool resetView = m_rightButton && m_ctrlPressed && m_altPressed;
+
+    if (resetView)
+    {
+        m_area->ResetView();
+        return;
+    }
+
+    QPointF delta = event->scenePos() - event->lastScenePos();
+
+    if (lockX && !lockY)
+        delta.setX(0);
+
+    if (lockY && !lockX)
+        delta.setY(0);
+
+    if (modifyOfs)
+    {
+        m_area->Pan(delta);
+        m_isValidAudiogram = false;
+        return;
+    }
+
+    if (modifyScale)
+    {
+        m_area->Zoom(delta);
+        m_isValidAudiogram = false;
+        return;
+    }
 }
 
 void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    bool modifyOfs = m_midButton && !m_ctrlPressed;
-    bool modifyScale = m_midButton && m_ctrlPressed;
+    HandleMousePan(event);
 
-    bool resetView = m_rightButton && m_ctrlPressed && m_altPressed;
-
-    QPointF delta = event->scenePos() - event->lastScenePos();
     if (m_modifyDemoTime)
     {
         const double time = m_area->Screen2Point(event->scenePos()).x();
         onDemoTimeChanged(time);
         m_cursorItem->SetPosition(time);
-    }
-    if (resetView) { m_area->ResetView(); }
-    else if (modifyOfs)
-    {
-        m_area->Pan(delta);
-        m_isValidAudiogram = false;
-    }
-    else if (modifyScale)
-    {
-        m_area->Zoom(delta);
-        m_isValidAudiogram = false;
-    }
 
-    update();
-
+    }
+    //event->accept();
     QGraphicsScene::mouseMoveEvent(event);
+    update();
 }
 
 
@@ -292,6 +319,7 @@ void CurveEditorScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 
     m_isValidAudiogram = false;
 
+    event->accept();
     update();
 }
 
@@ -309,10 +337,15 @@ void CurveEditorScene::keyPressEvent(QKeyEvent* event)
         m_shiftPressed = true;
         break;
     default:
+        //event->ignore();
+        //return;
         break;
     }
 
+    //CurveEditorScene::keyPressEvent
     QGraphicsScene::keyPressEvent(event);
+
+    event->accept();
 }
 
 void CurveEditorScene::keyReleaseEvent(QKeyEvent* event)
@@ -329,10 +362,13 @@ void CurveEditorScene::keyReleaseEvent(QKeyEvent* event)
         m_shiftPressed = false;
         break;
     default:
+        //event->ignore();
+        //return;
         break;
     }
-
     QGraphicsScene::keyReleaseEvent(event);
+
+    //event->accept();
 }
 
 void CurveEditorScene::SelectionChangedSlot()
@@ -404,7 +440,7 @@ void TimelineArea::DrawGrid(QPainter* const & painter, const QRectF& r)
     if (m_gridImage.size() != r.size().toSize())
     {
         //if (m_gridImage.isNull())
-            m_gridImage = QPixmap(r.width(), r.height());
+        m_gridImage = QPixmap(r.width(), r.height());
         //else
             //m_gridImage.scaled(r.width(), r.height());
         m_gridValid = false;
