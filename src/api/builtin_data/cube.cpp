@@ -281,6 +281,7 @@ static const unsigned short _cube_indices[] = {
 
 const float * const FWBuiltInData::cubeVertices = _cube_vertices;
 const float * const FWBuiltInData::cubeNormals = _cube_normals;
+///@todo add tangents also
 const float * const FWBuiltInData::cubeTextureUVs =_cube_texture_uvs;
 const   int * const FWBuiltInData::cubeIndices = _cube_indices;
 

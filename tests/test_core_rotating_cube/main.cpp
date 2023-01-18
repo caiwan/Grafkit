@@ -64,7 +64,7 @@ public:
 			SimpleMeshGenerator generator(render);
 
 			generator(
-				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, NULL,
+				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, (float3*)FWBuiltInData::cubeNormals,
 				FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
 				model
 			);
