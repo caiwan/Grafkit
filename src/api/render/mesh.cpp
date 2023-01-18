@@ -70,35 +70,53 @@ FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * const & device
 {
 }
 
+/// ~~~ez lesz a fix scemantic, amivel dolgozni fog, ha nincs shader, puszi.~~~ Bassza meg a csincs az otot
+namespace {
+	///@todo ezeknek a nevit tarolni kell majd valahol
+	D3D11_INPUT_ELEMENT_DESC positionLayout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,    2, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT,    3, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT,    4, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+}
+
 MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* const indices, MeshRef mesh_input)
 {
-	if (this->m_shader.Invalid())
-		throw EX(NullPointerException);
-
 	HRESULT result = 0;
 
 	// obtain input layout elements, and collect pointers that were set before
 	size_t elem_count = this->m_shader->GetILayoutElemCount();
 
 	FWutils::StructPack packer;
-	//packer.setFieldPadding(16);
-	//packer.setRecordPadding(16);
 
-
-	for (size_t i = 0; i < elem_count; ++i)
-	{
-		Shader::InputElementRecord &record = this->m_shader->getILayoutElem(i);
-		int field_id = packer.addField(record.width);
-
-		mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
-		if (it != this->m_mapPtr.end())
+	if (this->m_shader.Invalid()) {
+		/**
+		A B-terv itt az lett volna, ha nincs eppen shader input, akkor letrehoz magatol egy input layoutot.
+		Egyetlen szopo dolog van ezzel: ha nincs sahder, akkor input layout sem hozhato letre. Szopo.
+		*/
+		throw EX_DETAILS(NullPointerException, "Nincs shader betoltve");
+	}
+	else {
+		for (size_t i = 0; i < elem_count; ++i)
 		{
-			packer.addPointer(field_id, it->second, 0, record.width);
+			Shader::InputElementRecord &record = this->m_shader->getILayoutElem(i);
+			int field_id = packer.addField(record.width);
+
+			mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
+			if (it != this->m_mapPtr.end())
+			{
+				packer.addPointer(field_id, it->second, 0, record.width);
+			}
 		}
 	}
-
 	MeshRef mesh;
-	if (mesh_input.Valid()) mesh = mesh_input; else mesh = new Mesh();
+	if (mesh_input.Valid()) 
+		mesh = mesh_input; 
+	else 
+		mesh = new Mesh();
 
 	void *vertex_buffer_data = packer(vertexCount);
 

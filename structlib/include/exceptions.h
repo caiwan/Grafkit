@@ -29,10 +29,6 @@ namespace FWdebug {
 
 		inline int getErrorCode() { return this->m_code; }
 		char const* what() const;
-
-	private:
-		// Exception(Exception&){}
-		// void operator = (Exception&){}
 	};
 }
 

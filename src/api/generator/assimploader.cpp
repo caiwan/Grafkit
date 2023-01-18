@@ -80,7 +80,7 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 	std::string name = path.C_Str();
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		textureAsset  = (TextureAsset*)(assman->GetObjectByName(IRenderAsset::RA_TYPE_Texture, name));
+		textureAsset = (TextureAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Texture, name).Get();
 	}
 
 	return textureAsset;
@@ -90,11 +90,23 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 // Head
 // ================================================================================================================================================================
 
-FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::Scenegraph * const & scenegraph) : 
-	IRenderAssetBuilder(), 
-	m_scenegraph(scenegraph), m_resource(resource)
-{
+namespace {
+	static size_t count;
 
+	std::string GetCounter() {
+		char buffer[16];
+		sprintf_s(buffer, "%d:", count);
+		count++;
+		return buffer;
+	}
+}
+
+FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::Scenegraph * const & scenegraph) :
+	IRenderAssetBuilder(),
+	m_scenegraph(scenegraph), m_resource(resource),
+	m_name_prefix()
+{
+	m_name_prefix = GetCounter();
 }
 
 FWmodel::AssimpLoader::~AssimpLoader()
@@ -131,7 +143,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
 			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
-				material->SetName(name.C_Str());
+				material->SetName(m_name_prefix+name.C_Str());
 
 			j = 0;
 			aiReturn texFound = AI_FAILURE;
@@ -151,11 +163,22 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS, material->GetShininess());
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
+			///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre~
+			ShaderAssetRef shader_fs = (ShaderAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Shader, "default.hlsl:vertex").Get();
+			material->SetShader(shader_fs);
+
 			materials.push_back(material);
 			assman->AddObject(material.Get());
 		}
 	}
 	
+	// Itt letre kell hozni egy uj shadert
+	
+	///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre
+	ShaderAssetRef shader_vs = (ShaderAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Shader, "default.hlsl:vertex").Get();
+	
+	//if (shader_vs.Invalid())
+		//throw EX_DETAILS(AssimpParseException, "Could not found default vertex shader");
 
 	// scene loading
 	if (scene->HasMeshes()) 
@@ -164,57 +187,44 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 		{
 			// -- meshes
 			
-			Model *model = new Model();
+			ModelRef model = new Model();
 			aiMesh* curr_mesh = scene->mMeshes[i];
 
 			aiString name;
 			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
-			model->SetName(mesh_name);
+			model->SetName(mesh_name);	///@todo valami modelszamlalora utalo nyom/jel is legyen benne 
 
-			//model->pushVert(reinterpret_cast<vec3float*>(curr_mesh->mVertices), curr_mesh->mNumVertices);
-			//model->pushTextureUV(reinterpret_cast<vec3float*>(curr_mesh->mTextureCoords[0]), curr_mesh->mNumVertices);	///@todo tobbfele texuv is lehet
-			//model->pushNormals(reinterpret_cast<vec3float*>(curr_mesh->mNormals), curr_mesh->mNumVertices);
-			//model->pushTangents(reinterpret_cast<vec3float*>(curr_mesh->mTangents), curr_mesh->mNumVertices);	//ha ilyen is van, akkor eljunk vele
-
-			// ujra kell ezt egy picit tervezni megint :C 
-
-			// shader hol van ? 
-			//SimpleMeshGenerator generator(render, shader_vs);
-			//generator["POSITION"] = //(void*)FWBuiltInData::cubeVertices;
-			//generator["TEXCOORD"] = //(void*)FWBuiltInData::cubeTextureUVs;
-			//generator["NORMAL"] = //(void*)FWBuiltInData::cubeTextureUVs;
-			//generator["TANGENT"] = //(void*)FWBuiltInData::cubeTextureUVs;
-
-			//generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
-
+			///@todo ezeken a neveket ki kell pakolni valahova
+			///@todo kell egy olyan mesh generator, ami nem a shaderbol szedi ossze az input layoutot
+			SimpleMeshGenerator generator(assman->GetDeviceContext(), shader_vs);
+			generator["POSITION"] = curr_mesh->mVertices; 
+			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0];  ///@todo ha tobb textura van akkor toltse be azokat is majd 
+			generator["NORMAL"] = curr_mesh->mNormals;
+			generator["TANGENT"] = curr_mesh->mTangents; 
 
 			// -- faces
-			j = curr_mesh->mNumFaces;
 
-			while (j--) {
+			///@todo az indexek gyujteset lehessen kulturaltabb modon is vegezni valahogy
+			std::vector<int> indices;
+
+			for (j = 0; j < curr_mesh->mNumFaces; j++)
+			{
 				aiFace *curr_face = &curr_mesh->mFaces[j];
-				///*offset = */ model->pushMesh(curr_face->mIndices, curr_face->mNumIndices /*, offset */);
+				for (k = 0; k < curr_face->mNumIndices; k++)
+					indices.push_back(curr_face->mIndices[k]);
 			}
 
-			// -- luukup materials
-			//int mat_index = curr_mesh->mMaterialIndex;
-			//if (materials.size()>mat_index)
-			//{
-			//	//Material *mat = materials[mat_index];
-			//	model->setMaterial(material_table[mat_index].material);
-			//	if (material_table[mat_index].textures) {
-			//		k = material_table[mat_index].textures->size();
-			//		while (k--) {
-			//			model->SetTexture(k, (*material_table[mat_index].textures)[k]);
-			//		}
-			//		delete material_table[mat_index].textures;
-			//		material_table[mat_index].textures = NULL;
-			//	}
-			//}
+			generator(curr_mesh->mNumVertices, indices.size(), &indices[0], model);
 
-			//FWmath::Matrix modelview = model->getModelviewMatrix();
-			//this->models.push(model);
-			//assman->AddObject(model);
+
+			// -- luukup materials
+			int mat_index = curr_mesh->mMaterialIndex;
+			if (materials.size()>mat_index)
+			{
+				model->SetMaterial(materials[mat_index]);
+			}
+
+			assman->AddObject(model);
 		}
 	}
 

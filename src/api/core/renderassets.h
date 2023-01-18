@@ -15,12 +15,13 @@ A generator interface for assets
 
 #include "../render/renderer.h"
 
+#include "exceptions.h"
+
 namespace FWassets{
 
 	class IRenderAsset;
 	class IRenderAssetManager;
 	class IRenderAssetBuilder;
-	// class IRenderAssetBuilderFactory;
 
 	/**
 	A base class for collectable render assets for bulk loading
@@ -42,14 +43,15 @@ namespace FWassets{
 		Guid GenerateUUID();
 		void SetUUID(Guid uuid) { this->m_guid = uuid; }
 
+		/// @todo ezt ki kell venni az osztalybol, es a nevterbe tenni eggyel feljebb
 		enum RA_type_e {
 			RA_TYPE_Texture,
 			RA_TYPE_Font,
 			RA_TYPE_Material,
-			RA_TYPE_Shader,
+			RA_TYPE_Shader,  //RA_TYPE_Shader_VS, RA_TYPE_Shader_PS, RA_TYPE_Shader_GM, RA_TYPE_Shader_CP,
 			RA_TYPE_Entity3D, /// @todo per-modelenkkent kell meg egy bucket; vagy meg kellene kovetelni a teljses nev egyediseget
-			RA_TYPE_Aux0,
-			RA_TYPE_Aux1,
+			//RA_TYPE_Aux0,
+			//RA_TYPE_Aux1,
 			RA_TYPE_COUNT
 		};
 
@@ -94,8 +96,8 @@ namespace FWassets{
 		void ChangeUUID(IRenderAsset *obj, Guid newuuid);
 		///@}
 
-		IRenderAsset* GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid);
-		IRenderAsset* GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name);
+		Ref<IRenderAsset> GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid);
+		Ref<IRenderAsset> GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name);
 
 	protected:
 		std::vector<Ref<IRenderAsset>> m_assets;
@@ -112,9 +114,6 @@ namespace FWassets{
 	/**
 	ez az az interface, ami a bejovo input ertekre - nev, vagy uuid, legeneralja a megfelelo asset buildert
 	*/
-
-	//ez az az interface, ami legeneralja az adott assetet, ami eppen nekunk kell 
-	//*/
 	class IRenderAssetBuilder
 	{
 		public:
@@ -124,20 +123,7 @@ namespace FWassets{
 			virtual void operator () (IRenderAssetManager * const & assman) = 0;
 	};
 	
-	//A container for render assets
-	//*/
-	//class RenderAssetGeneratorContainer : virtual public Referencable, public Iterable
-	//{
-	//	public:
-	//		RenderAssetGeneratorContainer();
-	//		virtual ~RenderAssetGeneratorContainer();
-	//		
-	//		RenderAssetGeneratorContainer& operator<< (IRenderAssetGenerator* ptr);
-
-	//		virtual Iterator* getIterator();
-	//		
-	//	private:
-	//		Node * m_first;
-	//		Node * m_last;
-	//};
 }
+
+DEFINE_EXCEPTION(NoAssetFoundByNameException, 1, "No asset found by the given name");
+DEFINE_EXCEPTION(NoAssetFoundByUUIDException, 2, "No asset found by the given UUID");

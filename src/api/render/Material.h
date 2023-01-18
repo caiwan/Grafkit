@@ -55,16 +55,18 @@ namespace FWrender {
 		float &GetSpecularLevel() { return m_mater.specularLevel; }
 		float &GetShininess() { return m_mater.shininess; }
 
-		ShaderRef GetShader() { return this->m_framgentShader; }
-		void SetShader(ShaderRef shader) { this->m_framgentShader = shader; ReflectShader(); }
+		ShaderAssetRef GetShader() { return this->m_framgentShader; }
+		
+		///@todo a shader reflection meg kell oldani valahogyan
+		void SetShader(ShaderAssetRef shader) { this->m_framgentShader = shader; ReflectShader(); }
 
 		///@todo ide be kellene meg jatszani a textura szurot meg, jol.
 
 		/// @todo slotok kezelese -> a texturaknak legyen sajat nevuk is
 		/// @todo bounds check
-		FWrender::TextureAssetRef &GetTexture(texture_type_e bucket, int n = 0);
-		void SetTexture(FWrender::TextureAssetRef texture, texture_type_e bucket = TT_diffuse, int n = 0);
-		void AddTexture(FWrender::TextureAssetRef texture, texture_type_e bucket = TT_diffuse);
+		TextureAssetRef &GetTexture(texture_type_e bucket, int n = 0);
+		void SetTexture(TextureAssetRef texture, texture_type_e bucket = TT_diffuse, int n = 0);
+		void AddTexture(TextureAssetRef texture, texture_type_e bucket = TT_diffuse);
 
 		size_t GetTextureBucketCount(texture_type_e bucket) { return this->m_texture_buckets[bucket].size(); }
 
@@ -89,19 +91,12 @@ namespace FWrender {
 		struct Material m_mater;
 
 		std::vector<TextureAssetRef> m_texture_buckets[TT_COUNT];
-		ShaderRef m_framgentShader;
+		ShaderAssetRef m_framgentShader;
 
 		struct reflection_texture_entity
 		{
 			FWrender::Shader::BoundResourceRecord *brecord;
 			Texture* texture;
-
-			/*reflection_texture_entity() : brecord(nullptr), texture() {}
-			reflection_texture_entity(reflection_texture_entity &other)
-			{
-				this->brecord = other.brecord;
-				this->texture = other.texture;
-			}*/
 		};
 
 		std::vector<reflection_texture_entity> m_reflected_textures;

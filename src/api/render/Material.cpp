@@ -3,7 +3,11 @@
 #include "shader.h"
 #include "texture.h"
 
+#include "exceptions.h"
+
 #include "easyloggingpp.h"
+
+//#include "../core/renderassets.h"
 
 using FWrender::Renderer;
 using FWrender::Texture;
@@ -11,6 +15,9 @@ using FWrender::Shader;
 using FWrender::TextureAssetRef;
 using FWrender::TextureRef;
 using FWrender::ShaderRef;
+
+using FWdebug::Exception;
+using namespace FWdebugExceptions;
 
 using std::vector;
 
@@ -30,7 +37,7 @@ FWrender::MaterialBase::~MaterialBase()
 
 /** Texture names LUT*/
 namespace {
-	const char *map_names [] = 
+	const char *map_names [FWrender::TT_COUNT] =
 	{
 		"diffuse",
 		"alpha",
@@ -83,10 +90,14 @@ void FWrender::MaterialBase::ReflectShader()
 
 void FWrender::MaterialBase::ReflectTextures()
 {
-	if (this->m_framgentShader.Invalid()) {
-		LOG(TRACE) << "No valid shader was set, abort texture reflection.";
-		return;
+
+	if (this->m_framgentShader.Invalid() || this->m_framgentShader->Invalid()) {
+		throw EX_DETAILS(NullPointerException, "Nincs shader asset, vagy nincs shader beallitva - esetleg nem toltodot be rendesen");
+		//LOG(TRACE) << "No valid shader was set, abort texture reflection.";
+		//return;
 	}
+
+	Shader* shader = m_framgentShader;
 
 	char txname[256];
 
@@ -98,17 +109,17 @@ void FWrender::MaterialBase::ReflectTextures()
 		{
 			for (size_t j = 0; j < m_texture_buckets[i].size(); j++)
 			{
-				Shader::BoundResourceRecord *brecord = nullptr; &(this->m_framgentShader->GetBResource(txname));
+				Shader::BoundResourceRecord *brecord = nullptr; &(shader->GetBResource(txname));
 				// search for names
 				if (j == 0) {
 					sprintf_s(txname, "texture_%s", map_names[i]);
-					brecord = &(this->m_framgentShader->GetBResource(txname));
+					brecord = &(shader->GetBResource(txname));
 				}
 
 				if (brecord == nullptr || !brecord->IsValid())
 				{
 					sprintf_s(txname, "texture_%s%d", map_names[i], j);
-					brecord = &(this->m_framgentShader->GetBResource(txname));
+					brecord = &(shader->GetBResource(txname));
 				}
 				
 				if (brecord->IsValid()) {

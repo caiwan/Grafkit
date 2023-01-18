@@ -31,7 +31,7 @@ FWdebug::Exception::Exception(int errorCode, const char * message, const char * 
 Exception::~Exception()
 {
 	delete[] this->m_formattedMessage;
-	delete[] * (const_cast<char**>(&m_details));
+	delete[] * (const_cast<char**>(&m_details)); ///@todo ez mi a faszs
 }
 
 char const * FWdebug::Exception::what() const

@@ -1,6 +1,8 @@
 #pragma once
+#include <stack>
+#include "../math/matrix.h"
 #include "tree.h"
-
+#include "renderer.h"
 
 namespace FWrender {
 	class Scenegraph : virtual public Referencable, public TreeParser
@@ -10,7 +12,7 @@ namespace FWrender {
 			~Scenegraph();
 
 			///@todo implement
-			void Render();
+			void Render(FWrender::Renderer & render);
 
 		// -- tree parser implementation
 		protected:
@@ -19,6 +21,10 @@ namespace FWrender {
 			virtual void pop();
 
 		private:
+			FWmath::Matrix m_matrix;
+			std::stack<FWmath::Matrix> m_matrix_stack;
+
 			ListTree *m_pRoot;
+			FWrender::Renderer * m_render; ///@todo ezzel itt kezdeni kell valamit
 	};
 }

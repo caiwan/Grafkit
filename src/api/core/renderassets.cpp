@@ -122,16 +122,25 @@ void FWassets::IRenderAssetManager::ChangeUUID(IRenderAsset * obj, Guid newid)
 	this->m_mapID[id][newid] = id;
 }
 
-IRenderAsset * FWassets::IRenderAssetManager::GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid)
+Ref<IRenderAsset> FWassets::IRenderAssetManager::GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid)
 {
 	IRenderAssetManager::id_map_t::iterator it = this->m_mapID[type].find(uuid);
+	if (it == m_mapID[type].end()) {
+		LOG(WARNING) << "Could not find " << uuid.toString().c_str();
+		// mivel mindenkit betoltunk a lemezrol, ezert nem art, ha az assetmanager dob azonal egy hibat, ahelyett, hogy nullobjektumunk lenne
+		throw EX_DETAILS(NoAssetFoundByNameException, uuid.toString().c_str());
+	}
 	return it == m_mapID[type].end() ? nullptr : m_assets[it->second];
 	
 }
 
-IRenderAsset * FWassets::IRenderAssetManager::GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name)
+Ref<IRenderAsset> FWassets::IRenderAssetManager::GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name)
 {
 	IRenderAssetManager::name_map_t::iterator it = this->m_mapNames[type].find(name);
+	if (it == m_mapNames[type].end()) {
+		LOG(WARNING) << "Could not find " << name;
+		throw EX_DETAILS(NoAssetFoundByNameException, name.c_str());
+	}
 	return it == m_mapNames[type].end()? nullptr : m_assets[it->second];
 }
 

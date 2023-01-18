@@ -69,17 +69,18 @@ protected:
 		camera = new Camera();
 		camera->SetPosition(0.0f, 0.0f, -5.0f);
 
-		// -- load shaderZ
-		shader_vs = new Shader();
-		shader_vs->LoadFromFile(render, "TextureVertexShader", L"./shaders/texture.hlsl", ST_Vertex);
+		//// -- load shaderZ
+		//shader_vs = new Shader();
+		//shader_vs->LoadFromFile(render, "TextureVertexShader", L"./shaders/texture.hlsl", ST_Vertex);
 
-		shader_fs = new Shader();
-		shader_fs->LoadFromFile(render, "TexturePixelShader", L"./shaders/texture.hlsl", ST_Pixel);
+		//shader_fs = new Shader();
+		//shader_fs->LoadFromFile(render, "TexturePixelShader", L"./shaders/texture.hlsl", ST_Pixel);
 
 		// -- model 
 		scene = new Scenegraph();
-		AssimpLoader loader(this->m_file_loader->GetResourceByName("./models/tegla.3ds"), scene);
-		loader(this);
+		AssimpLoader * loader = new AssimpLoader(this->m_file_loader->GetResourceByName("./models/tegla.3ds"), scene);
+		//loader(this);
+		this->AddBuilder(loader);
 
 		this->t = 0;
 
@@ -109,22 +110,24 @@ protected:
 			camera->GetViewMatrix(matbuff.viewMatrix);
 			camera->GetProjectionMatrix(matbuff.projectionMatrix);
 
-			//matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
-			matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t * 10, t * 15, t * 20);
+			////matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
+			//matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t * 10, t * 15, t * 20);
 
-			// --- ez a legfontosabb dolog, amit meg meg kell itt tenni mielott atadod a cbuffernek:
-			matbuff.worldMatrix = XMMatrixTranspose(matbuff.worldMatrix);
-			matbuff.viewMatrix = XMMatrixTranspose(matbuff.viewMatrix);
-			matbuff.projectionMatrix = XMMatrixTranspose(matbuff.projectionMatrix);
-			// ---
+			//// --- ez a legfontosabb dolog, amit meg meg kell itt tenni mielott atadod a cbuffernek:
+			//matbuff.worldMatrix = XMMatrixTranspose(matbuff.worldMatrix);
+			//matbuff.viewMatrix = XMMatrixTranspose(matbuff.viewMatrix);
+			//matbuff.projectionMatrix = XMMatrixTranspose(matbuff.projectionMatrix);
+			//// ---
 
-			shader_vs["MatrixBuffer"].Set(&matbuff);
+			//shader_vs["MatrixBuffer"].Set(&matbuff);
 
-			shader_vs->Render(render);
-			shader_fs->Render(render);
+			//shader_vs->Render(render);
+			//shader_fs->Render(render);
 
 			// model->Render(render);
 			// render of scenegraph goez here 
+
+			this->scene->Render(render);
 
 			this->t += 0.001;
 		}

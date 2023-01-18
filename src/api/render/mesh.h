@@ -62,6 +62,7 @@ namespace FWrender
 	typedef Ref<Mesh> MeshRef;
 
 
+	///@todo legyen kepes ne csak meglevo shader input layoutjabol letreehozni dolgokat
 	/**
 	Simple mesh generator. Automatically creates the vertex buffers from vectors 
 	*/
@@ -99,7 +100,7 @@ namespace FWrender
 			/**
 			Layout assembler
 			*/
-			MeshRef operator() (size_t vertexCount, size_t indexCount, const int* const indices, MeshRef input = NULL);
+			MeshRef operator() (size_t vertexCount, size_t indexCount, const int* const indices, MeshRef input = nullptr);
 
 		private:
 			void createIndexBuffer(MeshRef in_mesh, int indexCount, const int* indices);

@@ -16,288 +16,307 @@
 
 #include "texture.h"
 
+#include "../core/renderassets.h"
+
 namespace FWrender {
 
 	class Shader;
-	class ShaderRef;
-
+	
 	enum ShaderType_e {
 		ST_NONE = 0,
 		ST_Vertex,
 		ST_Pixel,
+		ST_Geometry,
 		ST_Compute,
+		
 		ST_COUNT
 	};
 
 	class Shader;
+	class ShaderAsset;
+	class ShaderAssetRef;
 
-	//class ShaderLoader : public FWassets::IRenderAssetGenerator
-	//{
-	//	// implement tis 'ting
-	//};
+	// ================================================================================================================================
 
-	class Shader : virtual public Referencable, virtual public FWassets::IRenderAsset
+	class Shader : virtual public Referencable
 	{
-		friend class ShaderRef;
 
-		public:
-			class ConstantBufferElement;
-			class ConstantBufferRecord;
-			class BoundResourceRecord;
+	public:
+		class ConstantBufferElement;
+		class ConstantBufferRecord;
+		class BoundResourceRecord;
 
-		public:
-			Shader();
-			virtual ~Shader();
+	public:
+		Shader();
+		virtual ~Shader();
 
-			/**
-				@param device device context
-				@param entry entry point of vertex shader
-				@param file source file of vertex shader
-				@param type type of shader @see FWrender::ShaderType_e
-			*/
-			void LoadFromFile(ID3D11Device* const & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
-			void LoadFromMemory(ID3D11Device* const & device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
+		/**
+			@param device device context
+			@param entry entry point of vertex shader
+			@param file source file of vertex shader
+			@param type type of shader @see FWrender::ShaderType_e
+		*/
+		void LoadFromFile(ID3D11Device* const & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
+		void LoadFromMemory(ID3D11Device* const & device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
 
-			void Shutdown();
-			void Render(ID3D11DeviceContext* deviceContext);
+		void Shutdown();
+		void Render(ID3D11DeviceContext* deviceContext);
 
-			enum ShaderType_e GetShaderType() { return this->m_type; }
+		enum ShaderType_e GetShaderType() { return this->m_type; }
 
-			virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Shader; }
+		//virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Shader; }
 
-		private:
-			void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
+	private:
+		void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
 
-		public:
+	public:
 
-			// ==========================================================================================
+		// ==========================================================================================
 
-			/**
-			A struct that extends the input layout descriptor
-			*/
-			struct InputElementRecord{
-				D3D11_INPUT_ELEMENT_DESC desc;
-				UINT width;
-				UINT offset;
+		/**
+		A struct that extends the input layout descriptor
+		*/
+		struct InputElementRecord{
+			D3D11_INPUT_ELEMENT_DESC desc;
+			UINT width;
+			UINT offset;
 
-				InputElementRecord() {}
-			};
+			InputElementRecord() {}
+		};
 
-			ConstantBufferRecord &operator[] (const char* name);
-			ConstantBufferRecord &operator[] (size_t id);
-			size_t GetConstantBufferCount() { return this->m_vBuffers.size(); }
+		ConstantBufferRecord &operator[] (const char* name);
+		ConstantBufferRecord &operator[] (size_t id);
+		size_t GetConstantBufferCount() { return this->m_vBuffers.size(); }
 
-			size_t GetBResourceCount() { return this->m_vBResources.size(); }
-			BoundResourceRecord & GetBResource(const char*const name);
-			BoundResourceRecord & GetBResource(size_t id);
+		size_t GetBResourceCount() { return this->m_vBResources.size(); }
+		BoundResourceRecord & GetBResource(const char*const name);
+		BoundResourceRecord & GetBResource(size_t id);
 
-			size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
-			InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
+		size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
+		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
 
-			// set input layout
-			void setInputLayout(ID3D11InputLayout* pLayout) { this->m_layout = pLayout; }
+		// set input layout
+		void setInputLayout(ID3D11InputLayout* pLayout) { this->m_layout = pLayout; }
 		
-			// set shader resource
+		// set shader resource
 
-			// set out sampler 
+		// set out sampler 
 
-		private:
-			void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
-			void GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth);
-			void BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer);
+	private:
+		void DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry);
+		void GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth);
+		void BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer);
 
-		private:
-			ShaderType_e m_type;
-			ID3D11VertexShader* m_vxShader;
-			ID3D11PixelShader* m_pxShader;
+	private:
+		ShaderType_e m_type;
+		ID3D11VertexShader* m_vxShader;
+		ID3D11PixelShader* m_pxShader;
 
-			ID3D11InputLayout* m_layout;
+		ID3D11InputLayout* m_layout;
 
-			ID3D11ShaderReflection *m_pReflector;
+		ID3D11ShaderReflection *m_pReflector;
 
-			typedef std::vector<InputElementRecord> inputElements_t;
-			inputElements_t m_mapInputElems;
+		typedef std::vector<InputElementRecord> inputElements_t;
+		inputElements_t m_mapInputElems;
 
-			typedef std::map<std::string, size_t> bufferMap_t;
-			bufferMap_t m_mapBuffers;
-			std::vector<ConstantBufferRecord> m_vBuffers;
+		typedef std::map<std::string, size_t> bufferMap_t;
+		bufferMap_t m_mapBuffers;
+		std::vector<ConstantBufferRecord> m_vBuffers;
 
-			std::vector<std::string> m_inputNames;
+		std::vector<std::string> m_inputNames;
 
-			typedef std::map<std::string, size_t> bResourceMap_t;
-			bResourceMap_t m_mapBResources;
-			std::vector<BoundResourceRecord> m_vBResources;
+		typedef std::map<std::string, size_t> bResourceMap_t;
+		bResourceMap_t m_mapBResources;
+		std::vector<BoundResourceRecord> m_vBResources;
 
-		public:
-			// ==========================================================================================
-			/**
-			A class that contains and manages one entire constant buffer with its elements from
-			the reflection record for a certain constant buffer and aids to set variables into it
-			*/
+	public:
+		// ==========================================================================================
+		/**
+		A class that contains and manages one entire constant buffer with its elements from
+		the reflection record for a certain constant buffer and aids to set variables into it
+		*/
 
-			class ConstantBufferRecord
-			{
-				friend class Shader;
+		class ConstantBufferRecord
+		{
+			friend class Shader;
 
-				public:
-					// This class has to have a public accessable default constructor due to std::map
-					ConstantBufferRecord();
-				protected:
-					ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
+			public:
+				// This class has to have a public accessable default constructor due to std::map
+				ConstantBufferRecord();
+			protected:
+				ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
 
-				public:
-					void Set(void* pData);
-					void Set(void* pData, size_t offset, size_t width);
+			public:
+				void Set(void* pData);
+				void Set(void* pData, size_t offset, size_t width);
 
-					size_t GetElementCount() { return this->m_vConstVars.size(); }
-					ConstantBufferElement& operator[](const char* name);
-					ConstantBufferElement& operator[](size_t id);
+				size_t GetElementCount() { return this->m_vConstVars.size(); }
+				ConstantBufferElement& operator[](const char* name);
+				ConstantBufferElement& operator[](size_t id);
 
-					D3D11_SHADER_BUFFER_DESC& const GetBufferDesc() { return this->m_description; }
+				D3D11_SHADER_BUFFER_DESC& const GetBufferDesc() { return this->m_description; }
 
-				private:
-					void Map();
-					void Unmap();
-					void *GetMappedPtr();
+			private:
+				void Map();
+				void Unmap();
+				void *GetMappedPtr();
 
-					ID3D11DeviceContext* m_pDC;
-					D3D11_MAPPED_SUBRESOURCE m_mappedResource;
-					D3D11_SHADER_BUFFER_DESC m_description;
-					ID3D11Buffer *m_buffer;
-					UINT m_slot;
+				ID3D11DeviceContext* m_pDC;
+				D3D11_MAPPED_SUBRESOURCE m_mappedResource;
+				D3D11_SHADER_BUFFER_DESC m_description;
+				ID3D11Buffer *m_buffer;
+				UINT m_slot;
 
-				protected:
-					typedef std::map<std::string, size_t> cb_variableMap_t;
-					cb_variableMap_t m_mapConstVars;
+			protected:
+				typedef std::map<std::string, size_t> cb_variableMap_t;
+				cb_variableMap_t m_mapConstVars;
 
-					// a getterek miatt kell
-					std::vector<ConstantBufferElement> m_vConstVars;
-
-			};
-
-			/**
-			Helps to bind one element from the constant buffer
-			*/
-			class ConstantBufferElement
-			{
-				friend class ConstantBufferRecord;
-				public:
-					ConstantBufferElement();
-
-				protected:
-					ConstantBufferElement(Shader::ConstantBufferRecord* parent_record, ID3D11ShaderReflectionVariable* shader_variable);
-
-				public:
-					/// @todo implement 
-					void operator= (float v);
-
-					void operator= (float3 v);
-					void operator= (float2 v);
-					void operator= (float4 v);
-
-					/// @todo 16-os alignmentet meg kell szerelni
-					//void operator= (FWmath::Matrix v);
-
-					void set(float v1);
-					void set(float v1, float v2);
-					void set(float v1, float v2, float v3);
-					void set(float v1, float v2, float v3, float v4);
-
-					D3D11_SHADER_VARIABLE_DESC & const GetVarDesc();
-					D3D11_SHADER_TYPE_DESC & const GetTypeDesc();
-
-				protected:
-					Shader::ConstantBufferRecord* m_pBufferRecord;
-
-					D3D11_SHADER_VARIABLE_DESC m_var_desc;
-					D3D11_SHADER_TYPE_DESC m_type_desc;
-			};
-
-			/**
-			Azt. 
-			*/
-			class BoundResourceRecord {
-				friend class Shader;
-				public:
-					BoundResourceRecord();
-					BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc);
-
-					D3D11_SHADER_INPUT_BIND_DESC & GetDesc() { return m_desc; }
-					void SetTexture(TextureRef texture = nullptr) { m_rBoundTexture = texture; }
-
-					int IsValid() { return m_is_valid; }
-
-				protected:
-					TextureRef m_rBoundTexture;
-					D3D11_SHADER_INPUT_BIND_DESC m_desc;
-
-					int m_is_valid;
-			};
+				// a getterek miatt kell
+				std::vector<ConstantBufferElement> m_vConstVars;
 
 		};
 
-		/// enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
-		class ShaderRef : public Ref<Shader> {
-			friend class ShaderRef;
+		/**
+		Helps to bind one element from the constant buffer
+		*/
+		class ConstantBufferElement
+		{
+			friend class ConstantBufferRecord;
+			public:
+				ConstantBufferElement();
 
-		public:
-			Shader::ConstantBufferRecord& operator[](const char *name){
-				return this->ptr->operator[](name);
-			}
+			protected:
+				ConstantBufferElement(Shader::ConstantBufferRecord* parent_record, ID3D11ShaderReflectionVariable* shader_variable);
 
-			Shader::ConstantBufferRecord& operator[](size_t id) {
-				return this->ptr->operator[](id);
-			}
+			public:
+				/// @todo implement 
+				void operator= (float v);
 
-			// --- compatibility with Ref<T>
-			ShaderRef & operator=(Shader* pointer)
-			{
-				AssingnRef(pointer);
-				return *this;
-			}
+				void operator= (float3 v);
+				void operator= (float2 v);
+				void operator= (float4 v);
 
-			ShaderRef& operator=(const ShaderRef& other)
-			{
-				if (&other != this && this->ptr != other.ptr) {
-					if (ptr != NULL &&
-						ptr->Release() == 0) {
-						delete ptr;
-					}
+				/// @todo 16-os alignmentet meg kell szerelni
+				//void operator= (FWmath::Matrix v);
 
-					ptr = other.ptr;
+				void set(float v1);
+				void set(float v1, float v2);
+				void set(float v1, float v2, float v3);
+				void set(float v1, float v2, float v3, float v4);
 
-					if (ptr != NULL) {
-						ptr->AddRef();
-					}
-				}
+				D3D11_SHADER_VARIABLE_DESC & const GetVarDesc();
+				D3D11_SHADER_TYPE_DESC & const GetTypeDesc();
 
-				return *this;
-			}
+			protected:
+				Shader::ConstantBufferRecord* m_pBufferRecord;
 
-			template<typename T1> ShaderRef& operator=(const Ref<T1>& other)
-			{
-				if (&other != this && this->ptr != other.Get()) {
-					if (ptr != NULL &&
-						ptr->Release()) {
-						delete ptr;
-					}
-
-					ptr = other.Get();
-
-					if (ptr != NULL) {
-						ptr->AddRef();
-					}
-				}
-
-				return *this;
-			}
+				D3D11_SHADER_VARIABLE_DESC m_var_desc;
+				D3D11_SHADER_TYPE_DESC m_type_desc;
 		};
 
-		//typedef Ref<Shader> ShaderRef;
+		/**
+		Azt. 
+		*/
+		class BoundResourceRecord {
+			friend class Shader;
+			public:
+				BoundResourceRecord();
+				BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc);
 
-		typedef struct {
-			ShaderRef vs, fs;
-		} shader_pair_t;
+				D3D11_SHADER_INPUT_BIND_DESC & GetDesc() { return m_desc; }
+				void SetTexture(TextureRef texture = nullptr) { m_rBoundTexture = texture; }
+
+				int IsValid() { return m_is_valid; }
+
+			protected:
+				TextureRef m_rBoundTexture;
+				D3D11_SHADER_INPUT_BIND_DESC m_desc;
+
+				int m_is_valid;
+		};
+
+	};
+
+	// ================================================================================================================================
+
+	typedef Ref<Shader> ShaderRef_t;
+
+	/**
+	enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
+	- itt most osszevontam az assettel az egeszet, remelem nem lesz miserable failure az egesz
+	*/
+	class ShaderAsset : public ShaderRef_t, public FWassets::IRenderAsset {
+		friend class ShaderAssetRef;
+
+	public:
+		Shader::ConstantBufferRecord& operator[](const char *name) { return this->ptr->operator[](name); }
+		Shader::ConstantBufferRecord& operator[](size_t id) { return this->ptr->operator[](id); }
+
+		ShaderAsset() : IRenderAsset() {}
+		ShaderAsset(Shader* ptr) : IRenderAsset(), ShaderRef_t(ptr) {}
+		ShaderAsset(Ref<Shader> ptr) : IRenderAsset(), ShaderRef_t(ptr) {}
+
+		ShaderAsset& operator = (Shader* in_ptr) { this->AssingnRef(in_ptr); return *this; }
+		ShaderAsset& operator = (ShaderAsset in_ptr) { this->AssingnRef(in_ptr); return *this; }
+
+		~ShaderAsset() {}
+		virtual enum RA_type_e GetBucketID() { 
+			//return (enum RA_type_e)((size_t)RA_TYPE_Shader + (size_t)ptr->GetShaderType());
+			return RA_TYPE_Shader;
+		}
+	};
+
+	typedef ShaderAsset ShaderRef;
+
+	typedef Ref<ShaderAsset> ShaderAssetRef_t;
+
+	class ShaderAssetRef : public ShaderAssetRef_t
+	{
+	public:
+		ShaderAssetRef(): ShaderAssetRef_t(){}
+		ShaderAssetRef(ShaderAsset *ptr) : ShaderAssetRef_t(ptr) {}
+		ShaderAssetRef(ShaderAssetRef& other) : ShaderAssetRef_t(other) {}
+
+		~ShaderAssetRef() {}
+
+		///@todo release modban makrozza ki az exception dobast
+		operator Shader* () { 
+			if (!ptr->ptr)
+				throw EX_DETAILS(FWdebugExceptions::NullPointerException, this->ptr->GetName().c_str());
+
+			return this->ptr->ptr; 
+		}
+		
+		operator ShaderRef () { 
+			if (!ptr->ptr)
+				throw EX_DETAILS(FWdebugExceptions::NullPointerException, this->ptr->GetName().c_str());
+
+			return this->ptr->ptr; 
+		}
+		ShaderAssetRef& operator = (Shader* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+		ShaderAssetRef& operator = (ShaderRef in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+		ShaderAssetRef& operator = (ShaderAssetRef& other) { this->AssingnRef(other); return *this; }
+	};
+
+	// ================================================================================================================================
+
+	class ShaderLoader : public FWassets::IRenderAssetBuilder
+	{
+	public:
+		///@todo leforditott shadert is tudjon elotolteni
+		ShaderLoader(FWassets::IResourceRef resource, ShaderType_e type, ShaderAssetRef shaderasset);
+		~ShaderLoader();// {}
+		
+		void SetEntryPoint(std::string entrypoint);
+
+		virtual void operator () (FWassets::IRenderAssetManager * const & assman);
+
+	protected:
+		FWassets::IResourceRef m_resource;
+		ShaderAssetRef m_in;
+		ShaderType_e m_type;
+		std::string m_entrypoint;
+	};
 
 }
 

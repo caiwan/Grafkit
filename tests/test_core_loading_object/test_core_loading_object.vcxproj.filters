@@ -16,8 +16,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\data\texture.hlsl">
+    <FxCompile Include="..\..\assets\objload\shaders\default.hlsl">
       <Filter>Resource Files</Filter>
-    </None>
+    </FxCompile>
+    <FxCompile Include="..\..\assets\objload\shaders\texture.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

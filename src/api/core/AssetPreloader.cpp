@@ -14,8 +14,17 @@ namespace {
 		const char *basedir;
 		const char *extensions[8];
 	} rules[] = {
-		{ FWassets::IRenderAsset::RA_TYPE_Texture, "./", {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
-		{ FWassets::IRenderAsset::RA_TYPE_Font, "./", {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
+		{ FWassets::IRenderAsset::RA_TYPE_Texture, "./textures/", {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
+		{ FWassets::IRenderAsset::RA_TYPE_Font, "./fonts/", {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
+		{ FWassets::IRenderAsset::RA_TYPE_Shader, "./shaders/",{ "hlsl", "fx", "vs", "fs", "gm", "cp", "ps", nullptr, }, },
+		//{ FWassets::IRenderAsset::RA_TYPE_Shader_VS, "./shaders/",{ "hlsl", "fx", "vs", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
+		//{ FWassets::IRenderAsset::RA_TYPE_Shader_PS, "./shaders/",{ "hlsl", "fx", nullptr, "fs", "ps", nullptr, nullptr, nullptr, }, },
+		//{ FWassets::IRenderAsset::RA_TYPE_Shader_GM, "./shaders/",{ "hlsl", "fx", nullptr, nullptr, "gm", nullptr, nullptr, nullptr, }, },
+		//{ FWassets::IRenderAsset::RA_TYPE_Shader_CP, "./shaders/",{ "hlsl", "fx", nullptr, nullptr, "cp", nullptr, nullptr, }, },
+	};
+
+	const char * shader_postfix[] = {
+	"", "vertex", "pixel", "gemoetry", "compute"
 	};
 }
 
@@ -44,6 +53,12 @@ AssetPreloader::~AssetPreloader()
 using FWrender::TextureFromBitmap;
 using FWrender::TextureAssetRef;
 using FWrender::TextureAsset;
+
+#include "../render/shader.h"
+using FWrender::ShaderLoader;
+using FWrender::ShaderAssetRef;
+using FWrender::ShaderAsset;
+using FWrender::ShaderType_e;
 
 void FWassets::AssetPreloader::LoadCache()
 {
@@ -88,9 +103,32 @@ void FWassets::AssetPreloader::LoadCache()
 				//{}
 				//break;
 
-				//case FWassets::IRenderAsset::RA_TYPE_Shader:
-				//{}
-				//break;
+				///@todo: honnan tudjuk, hogy milyen shadert, es honnan generaltunk le?
+				case IRenderAsset::RA_TYPE_Shader:		/** Vegigprobalunk mindenfele shader tipust*/
+				{
+					///@todo eloforditott shaderekkel is tudjon kezdeni valamit
+
+					//for (ShaderType_e sh_typ = ShaderType_e::ST_NONE; sh_typ < ShaderType_e::ST_COUNT; sh_typ++) 
+					for (size_t j = 0; j < ShaderType_e::ST_COUNT; j++)
+					{
+						ShaderType_e sh_typ = (ShaderType_e)j;
+						if (sh_typ == FWrender::ST_NONE) ///@todo ebbol lenne az includes
+							continue;
+
+						///@todo honnan a bubajbol fogjuk mi azt tudni, hogy eppen milyen shaderek vannak? - ezeket lehet, hogy nem igy kellene csinalni
+						ShaderAsset* shader = new ShaderAsset;
+						if (sh_typ != FWrender::ST_NONE) 
+							shader->SetName(name + ":" + shader_postfix[sh_typ]);
+						else 
+							shader->SetName(name);
+
+						// get the pointer right from the asset container, and feed it 
+						ShaderAssetRef shPtr = dynamic_cast<ShaderAsset*>(m_assets[AddObject(shader)].Get());
+						m_builders.push_back(new ShaderLoader(loader->GetResourceByName(filename), sh_typ, shPtr));
+					}
+				}
+
+				break;
 				}
 			}
 		}
@@ -135,7 +173,10 @@ void FWassets::AssetPreloader::DoPrecalc()
 
 	for (std::list<IRenderAssetBuilder*>::iterator it = m_builders.begin(); it != m_builders.end(); it++)
 	{
+		LOG(INFO) << "Loading asset" << (int)i << "of" << (int)len;
+
 		(**it)(this);
+		
 		if (m_pPreloader) m_pPreloader->OnElemLoad(i, len);
 		i++;
 	}

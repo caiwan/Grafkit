@@ -24,8 +24,8 @@ namespace FWrender {
 			Entity3D();
 			virtual ~Entity3D();
 
-			ShaderRef &GetVertexShader() { return this->m_vertexShader; }
-			void SetVertexShader(ShaderRef shader) { this->m_vertexShader = shader; }
+			ShaderAssetRef &GetVertexShader() { return this->m_vertexShader; }
+			void SetVertexShader(ShaderAssetRef shader) { this->m_vertexShader = shader; }
 			
 			MaterialRef &GetMaterial() { return this->m_material; }
 			void SetMaterial(MaterialRef material) { this->m_material = material; }
@@ -33,7 +33,7 @@ namespace FWrender {
 			///@{
 			///Ezek a materialbol veszik ki a shadert, ha megosztott material van, akkor mindenkiet modositja
 			///Kulonben ha zero a material, akkor gaz van
-			ShaderRef GetFragmentShader() { return this->m_material.Valid()?this->m_material->GetShader():ShaderRef(); }
+			ShaderAssetRef GetFragmentShader() { return this->m_material.Valid()?this->m_material->GetShader():ShaderAssetRef(); }
 			void SetFragmentShader(ShaderRef shader) { this->m_vertexShader = shader; }
 			///@}
 
@@ -43,7 +43,7 @@ namespace FWrender {
 
 		protected:	
 			Actor* m_parent;
-			ShaderRef m_vertexShader;
+			ShaderAssetRef m_vertexShader;
 			MaterialRef m_material;
 
 			/// @todo + transformation matrix

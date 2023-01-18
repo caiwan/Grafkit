@@ -249,7 +249,7 @@ class ListTree : public TreeNode
 		inline void deleteChild(int n){delete this->m_vChildren[n]; this->m_vChildren[n] = NULL;}
 		/// @}
 
-		virtual void parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth = TREE_MAXDEPTH);
+		virtual void parse(TreeParser* parser, enum NP_searchMode_e mode = NP_search_inorder, int maxdepth = TREE_MAXDEPTH);
 		//void parse(TreeParser* parser, int maxdepth=TREE_MAXDEPTH);
 
 	private:

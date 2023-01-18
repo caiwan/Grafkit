@@ -14,17 +14,18 @@ using namespace FWrender;
 
 using FWrender::Shader;
 
+using FWdebug::Exception;
 using namespace FWdebugExceptions;
 
 using FWmath::Matrix;
 
 // =============================================================================================================================
 
-Shader::Shader() : IRenderAsset(),
-	m_pxShader(NULL),
-	m_vxShader(NULL),
-	m_pReflector(NULL),
-	m_layout(NULL),
+Shader::Shader() : //IRenderAsset(),
+	m_pxShader(nullptr),
+	m_vxShader(nullptr),
+	m_pReflector(nullptr),
+	m_layout(nullptr),
 	m_type(ST_NONE)
 {
 }
@@ -38,8 +39,8 @@ Shader::~Shader()
 void Shader::LoadFromFile(ID3D11Device * const & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
 {
 	HRESULT result = 0;
-	ID3D10Blob* errorMessage = NULL;
-	ID3D10Blob* shaderBuffer = NULL;
+	ID3D10Blob* errorMessage = nullptr;
+	ID3D10Blob* shaderBuffer = nullptr;
 
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 	unsigned int numElements = 0;
@@ -54,10 +55,10 @@ void Shader::LoadFromFile(ID3D11Device * const & device, LPCSTR entry, LPCWCHAR 
 
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
-		result = D3DCompileFromFile(file, NULL, NULL, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompileFromFile(file, nullptr, nullptr, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 	else if (type == ST_Pixel) {
-		result = D3DCompileFromFile(file, NULL, NULL, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompileFromFile(file, nullptr, nullptr, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 
 	if (FAILED(result))
@@ -84,8 +85,8 @@ void Shader::LoadFromFile(ID3D11Device * const & device, LPCSTR entry, LPCWCHAR 
 void Shader::LoadFromMemory(ID3D11Device * const & device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
 {
 	HRESULT result = 0;
-	ID3D10Blob* errorMessage = NULL;
-	ID3D10Blob* shaderBuffer = NULL;
+	ID3D10Blob* errorMessage = nullptr;
+	ID3D10Blob* shaderBuffer = nullptr;
 
 	// D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 	unsigned int numElements = 0;
@@ -100,10 +101,15 @@ void Shader::LoadFromMemory(ID3D11Device * const & device, LPCSTR entry, LPCSTR 
 
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
-		result = D3DCompile(source, size, NULL, NULL, NULL, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompile(source, size, nullptr, nullptr, nullptr, entry, "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
 	}
 	else if (type == ST_Pixel) {
-		result = D3DCompile(source, size, NULL, NULL, NULL, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+		result = D3DCompile(source, size, nullptr, nullptr, nullptr, entry, "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &errorMessage);
+	}
+	else {
+		LOG(WARNING) << "Attempting to load an unknown type of shader" << type;
+		throw EX_DETAILS(MissingShaderException, "Attempting to load an unknown type of shader");
+		return;
 	}
 
 	if (FAILED(result))
@@ -129,11 +135,24 @@ void Shader::LoadFromMemory(ID3D11Device * const & device, LPCSTR entry, LPCSTR 
 
 void Shader::Shutdown()
 {
-	if (this->m_pReflector)
+	if (this->m_pReflector){
 		this->m_pReflector->Release();
+		this->m_pReflector = nullptr;
+	}
 
-	if (this->m_pxShader) this->m_pxShader->Release();
-	if (this->m_vxShader) this->m_vxShader->Release();
+	if (this->m_layout) {
+		this->m_layout->Release();
+		this->m_layout = nullptr;
+	}
+
+	if (this->m_pxShader) {
+		this->m_pxShader->Release();
+		this->m_pxShader = nullptr;
+	}
+	if (this->m_vxShader) {
+		this->m_vxShader->Release();
+		this->m_vxShader = nullptr;
+	}
 
 	this->m_inputNames.clear();
 }
@@ -146,10 +165,10 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 	if (this->m_type == ST_Vertex) {
 		// duck off the layout
 		deviceContext->IASetInputLayout(m_layout);
-		deviceContext->VSSetShader(m_vxShader, NULL, 0);
+		deviceContext->VSSetShader(m_vxShader, nullptr, 0);
 	}
 	else if (this->m_type == ST_Pixel) {
-		deviceContext->PSSetShader(m_pxShader, NULL, 0);
+		deviceContext->PSSetShader(m_pxShader, nullptr, 0);
 	}
 
 	// duck the constant buffers around
@@ -197,7 +216,7 @@ void Shader::CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuff
 	HRESULT result = 0;
 	if (this->m_type == ST_Vertex) {
 		// Create the vertex shader from the buffer.
-		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_vxShader);
+		result = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &m_vxShader);
 		if (FAILED(result))
 		{
 			throw EX(VSCrerateException);
@@ -205,7 +224,7 @@ void Shader::CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuff
 	}
 	else if (this->m_type == ST_Pixel) {
 		// Create the pixel shader from the buffer.
-		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), NULL, &m_pxShader);
+		result = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &m_pxShader);
 		if (FAILED(result))
 		{
 			throw EX(FSCrerateException);
@@ -273,29 +292,33 @@ Shader::BoundResourceRecord & FWrender::Shader::GetBResource(size_t id)
 
 void Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCWCHAR file, LPCSTR entry)
 {
-	char* compileErrors = NULL;
+	char* compileErrors = nullptr;
 	unsigned long bufferSize = 0;
 	
 	// duck this rainbow
-	FILE* fp = NULL;
+	FILE* fp = nullptr;
 
 	std::wstring error_string;
 
 	compileErrors = (char*)(errorMessage->GetBufferPointer());
 	bufferSize = errorMessage->GetBufferSize();
 
+#if 0
 	fopen_s(&fp, "shader-error.txt", "w");
 
 	fputs(compileErrors, fp); fputs("\r\n", fp);
 
 	fflush(fp);
 	fclose(fp);
+#endif 
+
+	LOG(ERROR) << compileErrors;
 
 	errorMessage->Release();
 	errorMessage = 0;
 
 	// @todo add compile errors text 
-	throw EX_DETAILS(ShaderException, "See shader-error.txt");
+	throw EX_DETAILS(ShaderException, "See logfiles");
 }
 
 
@@ -311,7 +334,7 @@ void Shader::GetDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, 
 	res = DXGI_FORMAT_UNKNOWN;
 	byteWidth = 0;
 
-	// I should took this mess into a LUT
+	///@todo I should took this mess into a LUT
 	switch (pd.ComponentType) {
 		case D3D_REGISTER_COMPONENT_FLOAT32:
 		{
@@ -396,8 +419,7 @@ void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 	this->m_pReflector->GetDesc(&desc);
 
 	// fetch input descriptors
-	this->m_mapInputElems.clear(); // push_back(elem);
-	// this->m_mapInputElems.insert
+	this->m_mapInputElems.clear();
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
 	for (size_t i = 0; i < desc.InputParameters; i++)
@@ -429,14 +451,9 @@ void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 
 		elements.push_back(elementDesc);
 		
-		// ++ copy fucking name
-		// this->m_inputNames.push_back(elementDesc.SemanticName);
-		// const char* name = this->m_inputNames.back().c_str();
 		const char *name = elementDesc.SemanticName;
 		
-		//this->m_mapInputElems[name] = elem;
 		this->m_mapInputElems.push_back(elem);
-
 	}
 
 	if (this->m_type == ST_Vertex) {
@@ -495,8 +512,8 @@ void Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderBuffer)
 
 // =============================================================================================================================
 Shader::ConstantBufferRecord::ConstantBufferRecord() : 
-	m_pDC(NULL),
-	m_buffer(NULL),
+	m_pDC(nullptr),
+	m_buffer(nullptr),
 	m_description(),
 	m_slot(0) ///@todo slotok 
 {
@@ -520,7 +537,7 @@ Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11S
 		throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain description");
 	}
 
-	ID3D11Buffer* buffer = NULL;
+	ID3D11Buffer* buffer = nullptr;
 	D3D11_BUFFER_DESC bufferDesc;
 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	bufferDesc.ByteWidth = this->m_description.Size;
@@ -529,7 +546,7 @@ Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11S
 	bufferDesc.MiscFlags = 0;
 	bufferDesc.StructureByteStride = 0;
 
-	result = device->CreateBuffer(&bufferDesc, NULL, &this->m_buffer);
+	result = device->CreateBuffer(&bufferDesc, nullptr, &this->m_buffer);
 	if (FAILED(result)) {
 		throw EX(ConstantBufferCreateException);
 	}
@@ -692,4 +709,68 @@ FWrender::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BI
 {
 	LOG(TRACE) << "BoundResource:" << desc.Name << "type: " << desc.Type << desc.BindPoint 
 		<< desc.BindCount << desc.Dimension << desc.NumSamples << desc.ReturnType << desc.uFlags;
+}
+
+// ============================================================================================================
+
+namespace {
+	const char *default_entry_point_names[ShaderType_e::ST_COUNT] = {
+		"main",
+		"mainVertex",
+		"mainPixel",
+		"mainCompute",
+		"mainGeometry"
+	};
+}
+
+FWrender::ShaderLoader::ShaderLoader(FWassets::IResourceRef resource, ShaderType_e type, ShaderAssetRef shaderasset)
+	: FWassets::IRenderAssetBuilder(), 
+	m_resource(resource), m_in(shaderasset), m_type(type)
+{
+	m_entrypoint = default_entry_point_names[type];
+}
+
+FWrender::ShaderLoader::~ShaderLoader()
+{
+	// nothing to do
+}
+
+void FWrender::ShaderLoader::SetEntryPoint(std::string entrypoint)
+{
+	m_entrypoint = entrypoint;
+}
+
+void FWrender::ShaderLoader::operator()(FWassets::IRenderAssetManager * const & assman)
+{
+	if (m_in.Invalid())
+		throw EX(NullPointerException);
+	try 
+	{
+		ShaderRef shader = new Shader();
+		// load from asset
+		if (m_resource.Valid()) {
+			LOG(TRACE) << "Lading shader from resource" << m_in->GetName() << m_in->GetUUID();
+			shader->LoadFromMemory(assman->GetDeviceContext(), m_entrypoint.c_str(), (LPCSTR)m_resource->GetData(), m_resource->GetSize(), m_type);
+		}
+		else {
+			///@todo load from compiled shader
+			throw EX_DETAILS(NotImplementedMethodException, "Egyelore nem tamogatott a forrasbol valo shader betoltes");
+		}
+
+		// replace shader
+		if (m_in->Valid())
+			m_in->Release();
+
+		(*m_in) = shader;
+	}
+	catch (MissingShaderException &e) {
+		// olyan shadert toltottunk be valoszinuleg, aminek nincs meg az az entrypointja, ami eppen kellene
+		// itt kivesszuk azt az assetmanagerbol, es az exceptiont eltesszuk
+		assman->RemoveObject(m_in);
+	}
+	catch (ShaderException &e) {
+		// Itt tortent valami a shaderrel, vagy nem fordul le, vagy nincs ilyen entrypoint;
+		// utobbi esetben nem ezeket a drodiokat keressuk
+		assman->RemoveObject(m_in);
+	}
 }
