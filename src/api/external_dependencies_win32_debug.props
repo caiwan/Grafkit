@@ -6,7 +6,7 @@
   <ItemDefinitionGroup>
     <Link />
     <Lib>
-      <AdditionalLibraryDirectories>c:\bazdmegakurvaanyadtegeci\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>c:\bazdmegakurvaanyadtegeci\;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\assimp-vc140-mtd.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet2FileLoader_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Collision_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Common_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Dynamics_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Geometry_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3OpenCL_clew_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <ProjectReference />

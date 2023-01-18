@@ -18,6 +18,6 @@ Model::~Model()
 
 void FWrender::Model::Render(FWrender::Renderer& deviceContext)
 {
-	this->m_material->Render(deviceContext);
+	if (m_material) this->m_material->Render(deviceContext);
 	this->RenderMesh(deviceContext);
 }
