@@ -13,7 +13,6 @@ using namespace Grafkit;
 // -------------------------------------------------------------------------------------------------------------------
 
 OutlineModule::OutlineModule() : Controller()
-    , m_myView(nullptr)
     , m_myModel(nullptr)
     , m_modelBuilder(nullptr) 
 {
@@ -21,41 +20,26 @@ OutlineModule::OutlineModule() : Controller()
 
 OutlineModule::~OutlineModule()
 {
-    // delete m_myModel;
     delete m_modelBuilder;
 }
 
 void OutlineModule::Initialize(IResourceManager* const& resourceManager)
 {
-#if 0
-    assert(m_parent.Valid());
-    assert(m_parent->GetView().Valid());
+    m_myView = dynamic_cast<OutlineView*>(View::SafeGetView(resourceManager, "OutlineView").Get());
+    assert(m_myView.Valid());
 
-    m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
-
-    const auto parentWidget = dynamic_cast<QWidget*>(m_parent->GetView().Get());
-    assert(parentWidget);
-
-    m_myView = new SceneGraphViewWidget(parentWidget);
-
-    SetView(m_myView);
-#endif
+    m_myView->m_outlineModule = this; // we sould not do this
 }
 
-void OutlineModule::DocumentChangedEvent(GkDemo::Demo* const& document)
+void OutlineModule::DocumentChangedEvent(GkDemo::Demo* const& demo)
 {
     assert(m_myView);
-    assert(document);
+    assert(demo);
 
     auto newModel = new SceneGraphViewWidgetModel();
 
-    /** 
-    TODO ezt az egeszet ki kell innen vagni a francba majd, es valami ertelmessel kellene helyettesiteni
-    */
-
-    // build shit 
-    //const auto oldModelBuilder = m_myModel->GetModel();
-    const auto scenegraph = document->GetScene();
+    // build stuff
+    const auto scenegraph = demo->GetScene();
     const auto newModelBuilder = new SceneModel(scenegraph);
     newModelBuilder->BuildModel();
     newModel->SetModel(newModelBuilder);

@@ -8,10 +8,15 @@
 using namespace Idogep;
 using namespace Grafkit;
 
+SceneGraphViewWidgetModel::SceneGraphViewWidgetModel() :
+    m_model(nullptr) 
+{
+}
+
 SceneGraphViewWidget::SceneGraphViewWidget(QWidget* parent)
     : QDockWidget(parent)
-  , OutlineView()
-  , ui(new Ui::SceneGraphViewWidget)
+    , OutlineView()
+    , ui(new Ui::SceneGraphViewWidget)
 {
     ui->setupUi(this);
     connect(ui->treeView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(itemClickedSlot(const QModelIndex &)));
@@ -36,20 +41,16 @@ void SceneGraphViewWidget::RefreshView(bool force)
 // ReSharper disable CppInconsistentNaming
 void SceneGraphViewWidget::itemClickedSlot(const QModelIndex& index) const
 {
-    assert(0);
-    /*OutlineModule* controller = dynamic_cast<OutlineModule*>(m_module.Get());
-    assert(controller);
-    controller->onItemSelected(static_cast<TreeItem*>(index.internalPointer()));*/
+    assert(m_outlineModule);
+    m_outlineModule->onItemSelected(static_cast<TreeItem*>(index.internalPointer()));
 }
 
 void SceneGraphViewWidget::itemDoubleClickedSlot(const QModelIndex& index) const
 {
-    assert(0);
-
-    /*OutlineModule* controller = dynamic_cast<OutlineModule*>(m_module.Get());
-    assert(controller);*/
-
+    assert(m_outlineModule);
     // TODO Add if needed
+    m_outlineModule->onItemSelected(static_cast<TreeItem*>(index.internalPointer()));
+
 }
 // ReSharper enable CppInconsistentNaming
 

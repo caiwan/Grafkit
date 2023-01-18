@@ -10,7 +10,7 @@ Ref<View> View::SafeGetView(IResourceManager* const& resourceManager, const std:
     Ref<Resource<View>> controller = resourceManager->Get<Resource<View>>(name);
     assert(controller.Valid());
     assert(controller->Valid());
-    return controller;
+    return static_cast<Ref<View>>(*controller);
 }
 
 View::View() : m_refreshQueueObject(nullptr)
@@ -37,7 +37,7 @@ Ref<Controller> Controller::SafeGetController(IResourceManager* const& resourceM
     Ref<Resource<Controller>> controller = resourceManager->Get<Resource<Controller>>(name);
     assert(controller.Valid());
     assert(controller->Valid());
-    return controller;
+    return static_cast<Ref<Controller>>(*controller);
 }
 
 Controller::Controller() {

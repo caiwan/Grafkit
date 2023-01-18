@@ -67,11 +67,7 @@ int EditorApplication::Execute()
     onLoaderFinished += Delegate(m_mainWindow, &MainWindow::showMaximized);
     onLoaderFinished += Delegate(this, &EditorApplication::NextTick);
 
-    // --- 
-
     sw->show();
-
-    // --- 
 
     Initialize();
 
@@ -154,6 +150,8 @@ void EditorApplication::BuildEditorModules()
     this->Add(new Resource<Controller>(m_outlineViewModule, "OutlineModule", "585d0fc1-6cf8-435f-aa38-777e4db40f1d"));
     this->Add(new Resource<View>(new SceneGraphViewWidget(), "OutlineView", "5fbe4ef8-91ca-4cab-99a8-8e811318bcfb"));
 
+    m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
+
     // --- 
     m_animationEditor = new AnimationEditor();
     this->Add(new Resource<Controller>(m_animationEditor, "AnimationEditor", "6de072f7-50d4-4b14-82fd-337ccb758f0a"));
@@ -194,7 +192,7 @@ void EditorApplication::BuildDockingWindows()
 
     //m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
 
-    ////
+    // --- 
     QDockWidget* logWidget = dynamic_cast<QDockWidget*>(View::SafeGetView(this, "LogView").Get());
     assert(logWidget);
 
@@ -202,12 +200,12 @@ void EditorApplication::BuildDockingWindows()
     m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
     //m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
 
-    //// 
-    //QDockWidget* outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
-    //assert(outlineWidget);
+    // -- 
+    QDockWidget* outlineWidget  = dynamic_cast<QDockWidget*>(View::SafeGetView(this, "OutlineView").Get());
+    assert(outlineWidget);
 
-    //outlineWidget->setParent(m_mainWindow);
-    //m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
+    outlineWidget->setParent(m_mainWindow);
+    m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
 
     //// connect redo / undo menus
     //m_editor->GetCommandStack()->onCommandStackChanged += Delegate(m_mainWindow, &Roles::ManageCommandStackRole::CommandStackChangedEvent);

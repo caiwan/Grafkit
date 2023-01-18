@@ -34,16 +34,21 @@ namespace Idogep {
 		Event<TreeItem * const> onItemSelected;
 		
 	private:
-		OutlineView * m_myView;
+		Ref<OutlineView> m_myView;
 
 		SceneGraphViewWidgetModel* m_myModel;
 		TreeModel* m_modelBuilder;
 	};
 
 	class OutlineView : public View {
+        friend class OutlineModule;
 	public:
 		OutlineView();
 		virtual void SetModel(SceneGraphViewWidgetModel * modelResource) = 0;
+
+	protected:
+	    void SetOutlineModule(const Ref<OutlineModule>& outlineModule) { m_outlineModule = outlineModule; }
+        Ref<OutlineModule> m_outlineModule;
 	};
 
 }
