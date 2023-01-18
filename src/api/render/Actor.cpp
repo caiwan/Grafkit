@@ -1,30 +1,30 @@
 #include "Actor.h"
 #include "shader.h"
 
-using namespace FWrender;
+using namespace Grafkit;
 
-FWrender::Entity3D::Entity3D() //: FWassets::IRenderAsset()
+Grafkit::Entity3D::Entity3D() //: Grafkit::IRenderAsset()
 {
 }
 
-FWrender::Entity3D::~Entity3D()
+Grafkit::Entity3D::~Entity3D()
 {
 }
 
 // =================================================================
 
-FWrender::Actor::Actor() : m_viewMatrix()
+Grafkit::Actor::Actor() : m_viewMatrix()
 {
 }
 
-FWrender::Actor::~Actor()
+Grafkit::Actor::~Actor()
 {
 	for (size_t j = 0; j < m_pChildren.size(); j++) {
 		delete m_pChildren[j];
 	}
 }
 
-void FWrender::Actor::Render(FWrender::Renderer & render)
+void Grafkit::Actor::Render(Grafkit::Renderer & render)
 {
 	for (size_t i = 0; i < this->m_pEntities.size(); i++) {
 		/// @todo: modelview update goez here - talan a kamerahoz kell hozzagyogyitani ezt?
@@ -32,7 +32,7 @@ void FWrender::Actor::Render(FWrender::Renderer & render)
 	}
 }
 
-void FWrender::Actor::AddChild(Actor*  child)
+void Grafkit::Actor::AddChild(Actor*  child)
 {
 	m_pChildren.push_back(child);
 	child->m_pParent = this;

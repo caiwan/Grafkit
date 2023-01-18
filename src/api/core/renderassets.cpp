@@ -4,13 +4,13 @@
 
 #include "exceptions.h"
 
-//using namespace FWrender;
-using namespace FWassets;
+//using namespace Grafkit;
+using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 ///@todo ezt ki kell pucolni teljesen
 
-FWassets::IRenderAsset::IRenderAsset() 
+Grafkit::IRenderAsset::IRenderAsset() 
 	//: m_assman(nullptr)
 {
 #ifndef _NO_UUID_	
@@ -19,12 +19,12 @@ FWassets::IRenderAsset::IRenderAsset()
 #endif 
 }
 
-FWassets::IRenderAsset::~IRenderAsset()
+Grafkit::IRenderAsset::~IRenderAsset()
 {
 	///@todo a destruktora ennek nem fasza, a virtualis fuggvenyeket a leszarmazott deletekor viszi magaval. Valami koser megoldas kellene a torlesre, ami megkeruli ezt 
 }
 
-void FWassets::IRenderAsset::SetName(std::string name)
+void Grafkit::IRenderAsset::SetName(std::string name)
 {
 	m_name = name;
 }
@@ -94,7 +94,7 @@ void FWassets::IRenderAssetRepository::RemoveObject(IRenderAsset * obj)
 }
 
 ///@todo ezek ketten nem fognak mukodni egyelore
-//void FWassets::IRenderAssetRepository::ChangeName(IRenderAsset * obj, std::string newname)
+//void Grafkit::IRenderAssetRepository::ChangeName(IRenderAsset * obj, std::string newname)
 //{
 //	size_t bid = obj->GetBucketID();
 //	IRenderAssetManager::name_map_t::iterator it_name = this->m_mapNames[bid].find(obj->GetName());
@@ -105,7 +105,7 @@ void FWassets::IRenderAssetRepository::RemoveObject(IRenderAsset * obj)
 //	this->m_mapNames[id][newname] = id;
 //}
 //
-//void FWassets::IRenderAssetRepository::ChangeUUID(IRenderAsset * obj, Guid newid)
+//void Grafkit::IRenderAssetRepository::ChangeUUID(IRenderAsset * obj, Guid newid)
 //{
 //	size_t bid = obj->GetBucketID();
 //	IRenderAssetManager::id_map_t::iterator it_id = this->m_mapID[bid].find(obj->GetUUID());
@@ -182,17 +182,17 @@ FWassets::IRenderAssetRepository::bucket_t * FWassets::IRenderAssetRepository::G
 #endif // _HAS_IRenderAssetRepository 
 
 // ==================================================================================================================================== 
-FWassets::IRenderAssetManager::IRenderAssetManager()
+Grafkit::IRenderAssetManager::IRenderAssetManager()
 {
 	// ...
 }
 
-FWassets::IRenderAssetManager::~IRenderAssetManager()
+Grafkit::IRenderAssetManager::~IRenderAssetManager()
 {
 	// ... 
 }
 
-size_t FWassets::IRenderAssetManager::AddObject(IRenderAsset * obj)
+size_t Grafkit::IRenderAssetManager::AddObject(IRenderAsset * obj)
 {
 	// ... 
 
@@ -202,7 +202,7 @@ size_t FWassets::IRenderAssetManager::AddObject(IRenderAsset * obj)
 
 	return size_t();
 }
-void FWassets::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
+void Grafkit::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
 {
 	// ... 
 
@@ -219,12 +219,12 @@ IRenderAsset * FWassets::IRenderAssetManager::GetObjectByUUID(std::string bucket
 }
 #endif _NO_UUID_
 
-IRenderAsset * FWassets::IRenderAssetManager::GetObjectByName(std::string bucket, std::string name)
+IRenderAsset * Grafkit::IRenderAssetManager::GetObjectByName(std::string bucket, std::string name)
 {
 	return nullptr;
 }
 
-size_t FWassets::IRenderAssetManager::GetBucket(std::string bucket)
+size_t Grafkit::IRenderAssetManager::GetBucket(std::string bucket)
 {
 	// van-e ilyen bucket
 	// ha nincs hozza letre, majd
@@ -233,7 +233,7 @@ size_t FWassets::IRenderAssetManager::GetBucket(std::string bucket)
 	return 0;
 }
 
-//IRenderAssetRepository * FWassets::IRenderAssetManager::GetRepository(std::string name)
+//IRenderAssetRepository * Grafkit::IRenderAssetManager::GetRepository(std::string name)
 //{
 //	if (!m_repository[name])
 //		m_repository[name] = newRenderAssetRepository();
@@ -245,12 +245,12 @@ size_t FWassets::IRenderAssetManager::GetBucket(std::string bucket)
 // ==================================================================================================================================== 
 
 //
-//FWassets::IRenderAssetGenerator::IRenderAssetGenerator(IRenderAssetManager * const & assman) :
+//Grafkit::IRenderAssetGenerator::IRenderAssetGenerator(IRenderAssetManager * const & assman) :
 //	m_assman(assman)
 //
 //{
 //}
 //
-//FWassets::IRenderAssetGenerator::~IRenderAssetGenerator()
+//Grafkit::IRenderAssetGenerator::~IRenderAssetGenerator()
 //{
 //}

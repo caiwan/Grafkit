@@ -5,29 +5,29 @@
 
 #include "struct_pack.h"
 
-using namespace FWrender;
+using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 
 // ==================================================================
-FWrender::Mesh::Mesh()
+Grafkit::Mesh::Mesh()
 {
 	//m_vertexBuffer = 0;
 	m_indexBuffer = 0;
 
 }
 
-FWrender::Mesh::Mesh(const Mesh & mesh)
+Grafkit::Mesh::Mesh(const Mesh & mesh)
 {
 	///@todo TBD
 }
 
-FWrender::Mesh::~Mesh()
+Grafkit::Mesh::~Mesh()
 {
 	this->Shutdown();
 }
 
-void FWrender::Mesh::RenderMesh(ID3D11DeviceContext * dev)
+void Grafkit::Mesh::RenderMesh(ID3D11DeviceContext * dev)
 {
 	dev->IASetVertexBuffers(0, 1, &this->m_buffer.buffer, &this->m_buffer.stride, &this->m_buffer.offset);
 	dev->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -36,7 +36,7 @@ void FWrender::Mesh::RenderMesh(ID3D11DeviceContext * dev)
 	dev->DrawIndexed(this->m_indexCount, 0, 0);
 }
 
-void FWrender::Mesh::Shutdown()
+void Grafkit::Mesh::Shutdown()
 {
 	if (m_indexBuffer)
 	{
@@ -54,7 +54,7 @@ void FWrender::Mesh::Shutdown()
 	return;
 }
 
-void FWrender::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
+void Grafkit::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
 {
 	BufferStateDescriptor elem;
 	elem.buffer = pBuffer;
@@ -65,7 +65,7 @@ void FWrender::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
 }
 
 // ========================================================================
-FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * const & device, ShaderRef &shader)
+Grafkit::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * const & device, ShaderRef &shader)
 	: m_device(device), m_shader(shader)
 {
 }
@@ -83,7 +83,7 @@ namespace {
 	};
 }
 
-MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* const indices, MeshRef mesh_input)
+MeshRef Grafkit::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* const indices, MeshRef mesh_input)
 {
 	HRESULT result = 0;
 
@@ -156,7 +156,7 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t ind
 	return mesh;
 }
 
-void FWrender::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCount, const int * pIndices)
+void Grafkit::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCount, const int * pIndices)
 {
 	ID3D11Buffer *indexBuffer = NULL;
 

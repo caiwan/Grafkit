@@ -10,9 +10,9 @@
 #include "easyloggingpp.h"
 
 using namespace std;
-using namespace FWrender;
+using namespace Grafkit;
 
-using FWrender::Shader;
+using Grafkit::Shader;
 
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
@@ -254,7 +254,7 @@ Shader::ConstantBufferRecord& Shader::operator[](const char * name)
 }
 
 
-Shader::ConstantBufferRecord & FWrender::Shader::operator[](size_t id)
+Shader::ConstantBufferRecord & Grafkit::Shader::operator[](size_t id)
 {
 	static ConstantBufferRecord null_object;
 
@@ -266,7 +266,7 @@ Shader::ConstantBufferRecord & FWrender::Shader::operator[](size_t id)
 }
 
 
-Shader::BoundResourceRecord & FWrender::Shader::GetBResource(const char * const name)
+Shader::BoundResourceRecord & Grafkit::Shader::GetBResource(const char * const name)
 {
 	static BoundResourceRecord null_object;
 
@@ -279,7 +279,7 @@ Shader::BoundResourceRecord & FWrender::Shader::GetBResource(const char * const 
 }
 
 
-Shader::BoundResourceRecord & FWrender::Shader::GetBResource(size_t id)
+Shader::BoundResourceRecord & Grafkit::Shader::GetBResource(size_t id)
 {
 	static BoundResourceRecord null_object;
 	if (id >= this->m_vBResources.size())
@@ -611,7 +611,7 @@ void Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width
 }
 
 
-Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator[](const char * name)
+Shader::ConstantBufferElement & Grafkit::Shader::ConstantBufferRecord::operator[](const char * name)
 {
 	static ConstantBufferElement null_object;
 
@@ -624,7 +624,7 @@ Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator
 }
 
 
-Shader::ConstantBufferElement & FWrender::Shader::ConstantBufferRecord::operator[](size_t id)
+Shader::ConstantBufferElement & Grafkit::Shader::ConstantBufferRecord::operator[](size_t id)
 {
 	static ConstantBufferElement null_object;
 
@@ -675,7 +675,7 @@ Shader::ConstantBufferElement::ConstantBufferElement(Shader::ConstantBufferRecor
 }
 
 
-D3D11_SHADER_VARIABLE_DESC & const FWrender::Shader::ConstantBufferElement::GetVarDesc()
+D3D11_SHADER_VARIABLE_DESC & const Grafkit::Shader::ConstantBufferElement::GetVarDesc()
 {
 	static D3D11_SHADER_VARIABLE_DESC null_obj;
 	if (!this->m_pBufferRecord)
@@ -685,7 +685,7 @@ D3D11_SHADER_VARIABLE_DESC & const FWrender::Shader::ConstantBufferElement::GetV
 }
 
 
-D3D11_SHADER_TYPE_DESC & const FWrender::Shader::ConstantBufferElement::GetTypeDesc()
+D3D11_SHADER_TYPE_DESC & const Grafkit::Shader::ConstantBufferElement::GetTypeDesc()
 {
 	static D3D11_SHADER_TYPE_DESC null_obj;
 	if (!this->m_pBufferRecord)
@@ -697,14 +697,14 @@ D3D11_SHADER_TYPE_DESC & const FWrender::Shader::ConstantBufferElement::GetTypeD
 // ============================================================================================================
 // Bindable/Bindig Resource record
 
-FWrender::Shader::BoundResourceRecord::BoundResourceRecord() : 
+Grafkit::Shader::BoundResourceRecord::BoundResourceRecord() : 
 	m_is_valid(0)
 {
 	ZeroMemory(&m_desc, sizeof(m_desc));
 }
 
 
-FWrender::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc)
+Grafkit::Shader::BoundResourceRecord::BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc)
 	: m_desc(desc), m_is_valid(1)
 {
 	LOG(TRACE) << "BoundResource:" << desc.Name << "type: " << desc.Type << desc.BindPoint 
@@ -723,25 +723,25 @@ namespace {
 	};
 }
 
-FWrender::ShaderLoader::ShaderLoader(FWassets::IResourceRef resource, ShaderType_e type, ShaderAssetRef shaderasset)
-	: FWassets::IRenderAssetBuilder(), 
+Grafkit::ShaderLoader::ShaderLoader(Grafkit::IResourceRef resource, ShaderType_e type, ShaderAssetRef shaderasset)
+	: Grafkit::IRenderAssetBuilder(), 
 	m_resource(resource), m_in(shaderasset), m_type(type)
 {
 	m_entrypoint = default_entry_point_names[type];
 }
 
-FWrender::ShaderLoader::~ShaderLoader()
+Grafkit::ShaderLoader::~ShaderLoader()
 {
 	// nothing to do
 }
 
-void FWrender::ShaderLoader::SetEntryPoint(std::string entrypoint)
+void Grafkit::ShaderLoader::SetEntryPoint(std::string entrypoint)
 {
 	m_entrypoint = entrypoint;
 }
 
 ///@todo a shader betoltes menjen on-the-fly, es ne repositorybol
-void FWrender::ShaderLoader::operator()(FWassets::IRenderAssetManager * const & assman)
+void Grafkit::ShaderLoader::operator()(Grafkit::IRenderAssetManager * const & assman)
 {
 	if (m_in.Invalid())
 		throw EX(NullPointerException);

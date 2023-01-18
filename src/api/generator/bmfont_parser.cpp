@@ -4,8 +4,8 @@
 #include "exceptions.h"
 
 using namespace FWdebugExceptions;
-using namespace FWtext;
-using namespace FWrender;
+using namespace Grafkit;
+using namespace Grafkit;
 
 BMFontParser::BMFontParser(FontMap* _root) : root(_root){
 }
@@ -149,7 +149,7 @@ void BMFontParser::load(){
 //
 //	///@todo Hasznaljon TextureRef-t
 //	for (i=0; i<this->root->maxPages; i++){
-//		FWrender::TextureRef tex = new FWrender::Texture();
+//		Grafkit::TextureRef tex = new Grafkit::Texture();
 //		tex->setName(name);
 //		this->root->pages << tex;
 //		//k = strlen(name);

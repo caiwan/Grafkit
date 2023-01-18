@@ -8,7 +8,7 @@
 #include "renderassets.h"
 #include "assets.h"
 
-namespace FWassets{
+namespace Grafkit{
 
 	/// Ez lesz majd a betoltocsik
 	class PreloadEvents {
@@ -21,15 +21,15 @@ namespace FWassets{
 	/**
 	Ez egy olyan dolog, ami automatikusan betolt, es cachel objektumokat
 	*/
-	class AssetPreloader : public FWassets::IRenderAssetManager
+	class AssetPreloader : public Grafkit::IRenderAssetManager
 	{
 	public:
 		//AssetPreloader();
 		AssetPreloader(PreloadEvents* pPreloader = nullptr);
 		~AssetPreloader();
 
-		//FWassets::IResourceFactory* GetResourceFactory();
-		virtual FWrender::Renderer & GetDeviceContext() = 0;
+		//Grafkit::IResourceFactory* GetResourceFactory();
+		virtual Grafkit::Renderer & GetDeviceContext() = 0;
 
 		void RegisterRecourceFactory(IResourceFactory* factory) { m_loaders.push_back(factory); }
 

@@ -10,7 +10,7 @@
 
 ///@todo a textura generalas, es a textura kezeles legyen kulon fileban valahol, egymastol fuggetlenul, ha lehet.
 
-namespace FWrender
+namespace Grafkit
 {
 	class Texture;
 
@@ -35,7 +35,7 @@ namespace FWrender
 	- Rendelkezik a referenciatipus tagfuggvenyeivel
 	*/
 
-	class TextureAsset : public FWassets::IRenderAsset, public TextureRef_t
+	class TextureAsset : public Grafkit::IRenderAsset, public TextureRef_t
 	{
 		friend class TextureAssetRef;
 	public:
@@ -76,7 +76,7 @@ namespace FWrender
 	/**
 	A bitmap resource that contains a raw bitmap. This ig enerated by the generated, and loaded into the texture object.
 	*/
-	class BitmapResource : public FWassets::IResource {
+	class BitmapResource : public Grafkit::IResource {
 	public:
 		BitmapResource() : m_bmsize(0), m_ch(0), m_x(0), m_y(0), m_data(nullptr) {}
 		BitmapResource(void* data, size_t x, size_t y, size_t ch) : m_bmsize(0), m_ch(ch), m_x(x), m_y(y), m_data(data) { m_bmsize = x*y*ch; m_stride = x*ch; }
@@ -104,13 +104,13 @@ namespace FWrender
 	/**
 	Texture generator interface
 	*/
-	class ITextureBuilder : public FWassets::IRenderAssetBuilder
+	class ITextureBuilder : public Grafkit::IRenderAssetBuilder
 	{
 	public:
 		ITextureBuilder(TextureAssetRef in) : IRenderAssetBuilder(), m_in(in) {}
 		virtual ~ITextureBuilder() {}
 
-		virtual void operator() (FWassets::IRenderAssetManager * const & assman) = 0;
+		virtual void operator() (Grafkit::IRenderAssetManager * const & assman) = 0;
 
 	protected:
 		TextureAssetRef m_in;
@@ -121,7 +121,7 @@ namespace FWrender
 	/**
 	Texture class
 	*/
-	class Texture : virtual public Referencable //, public FWassets::IRenderAsset
+	class Texture : virtual public Referencable //, public Grafkit::IRenderAsset
 	{
 	public:
 		Texture();
@@ -155,14 +155,14 @@ namespace FWrender
 	class TextureFromBitmap : public ITextureBuilder
 	{
 		public:
-			TextureFromBitmap(FWassets::IResourceRef resource, TextureAssetRef in);
+			TextureFromBitmap(Grafkit::IResourceRef resource, TextureAssetRef in);
 			~TextureFromBitmap();
 
 			void Resize(int x, int y) { m_w = x, m_h = y; }
-			virtual void operator() (FWassets::IRenderAssetManager * const & assman);
+			virtual void operator() (Grafkit::IRenderAssetManager * const & assman);
 
 		protected:
-			FWassets::IResourceRef m_resource;
+			Grafkit::IResourceRef m_resource;
 			int m_w, m_h;
 	};
 

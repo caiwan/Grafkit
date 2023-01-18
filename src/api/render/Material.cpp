@@ -9,26 +9,26 @@
 
 //#include "../core/renderassets.h"
 
-using FWrender::Renderer;
-using FWrender::Texture;
-using FWrender::Shader;
-using FWrender::TextureAssetRef;
-using FWrender::TextureRef;
-using FWrender::ShaderRef;
+using Grafkit::Renderer;
+using Grafkit::Texture;
+using Grafkit::Shader;
+using Grafkit::TextureAssetRef;
+using Grafkit::TextureRef;
+using Grafkit::ShaderRef;
 
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
 
 using std::vector;
 
-FWrender::MaterialBase::MaterialBase()
+Grafkit::MaterialBase::MaterialBase()
 {
 	for (size_t i = 0; i < TT_COUNT; i++) {
 		this->m_texture_buckets[i] = vector<TextureAssetRef>();
 	}
 }
 
-FWrender::MaterialBase::~MaterialBase()
+Grafkit::MaterialBase::~MaterialBase()
 {
 	for (size_t i = 0; i < TT_COUNT; i++) {
 		this->m_texture_buckets[i].clear();
@@ -37,7 +37,7 @@ FWrender::MaterialBase::~MaterialBase()
 
 /** Texture names LUT*/
 namespace {
-	const char *map_names [FWrender::TT_COUNT] =
+	const char *map_names [Grafkit::TT_COUNT] =
 	{
 		"diffuse",
 		"alpha",
@@ -51,7 +51,7 @@ namespace {
 	};
 }
 
-void FWrender::MaterialBase::Render(ID3D11DeviceContext * deviceContext)
+void Grafkit::MaterialBase::Render(ID3D11DeviceContext * deviceContext)
 {
 	// setup cbuffers
 
@@ -63,32 +63,32 @@ void FWrender::MaterialBase::Render(ID3D11DeviceContext * deviceContext)
 
 // ====================================
 
-TextureAssetRef & FWrender::MaterialBase::GetTexture(texture_type_e bucket, int n)
+TextureAssetRef & Grafkit::MaterialBase::GetTexture(texture_type_e bucket, int n)
 {
 	/// @todo bounds check
 	return m_texture_buckets[bucket][n];
 }
 
-void FWrender::MaterialBase::SetTexture(TextureAssetRef texture, texture_type_e bucket, int n)
+void Grafkit::MaterialBase::SetTexture(TextureAssetRef texture, texture_type_e bucket, int n)
 {
 	/// @todo bounds check
 	m_texture_buckets[bucket][n] = texture;
 }
 
-void FWrender::MaterialBase::AddTexture(TextureAssetRef texture, texture_type_e bucket)
+void Grafkit::MaterialBase::AddTexture(TextureAssetRef texture, texture_type_e bucket)
 {
 	m_texture_buckets[bucket].push_back(texture);
 }
 
 // ====================================
 
-void FWrender::MaterialBase::ReflectShader()
+void Grafkit::MaterialBase::ReflectShader()
 {
 	// reflect cbuffer locations 
 	ReflectTextures();
 }
 
-void FWrender::MaterialBase::ReflectTextures()
+void Grafkit::MaterialBase::ReflectTextures()
 {
 
 	if (this->m_framgentShader.Invalid() || this->m_framgentShader->Invalid()) {

@@ -2,22 +2,22 @@
 #include "Actor.h"
 #include "camera.h"
 
-using FWrender::Actor;
-using FWrender::Entity3D;
+using Grafkit::Actor;
+using Grafkit::Entity3D;
 
-FWrender::Scene::Scene():
+Grafkit::Scene::Scene():
 	m_pScenegraph(nullptr)
 {
 }
 
 
-FWrender::Scene::~Scene()
+Grafkit::Scene::~Scene()
 {
 	delete m_pScenegraph;
 }
 
 
-void FWrender::Scene::Render(FWrender::Renderer &render)
+void Grafkit::Scene::Render(Grafkit::Renderer &render)
 {
 	PreRender(render);
 
@@ -27,7 +27,7 @@ void FWrender::Scene::Render(FWrender::Renderer &render)
 	RenderNode(render, m_pScenegraph);
 }
 
-void FWrender::Scene::PreRender(FWrender::Renderer & render)
+void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
 	// fogja a camera nodeot
 	// kiszamolja a framere vonatkozoan a koordinatat
@@ -39,7 +39,7 @@ void FWrender::Scene::PreRender(FWrender::Renderer & render)
 	// minden nodeot prerendererel, ha kell;
 }
 
-void FWrender::Scene::RenderNode(FWrender::Renderer & render, Actor * actor, int maxdepth)
+void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int maxdepth)
 {
 	if (maxdepth < 0) return;
 	if (!actor) return;
@@ -58,12 +58,12 @@ void FWrender::Scene::RenderNode(FWrender::Renderer & render, Actor * actor, int
 	pop();
 }
 
-void FWrender::Scene::push()
+void Grafkit::Scene::push()
 {
 	this->m_viewMatrixStack.push(m_cureentViewMatrix);
 }
 
-void FWrender::Scene::pop()
+void Grafkit::Scene::pop()
 {
 	m_cureentViewMatrix = this->m_viewMatrixStack.top();
 	this->m_viewMatrixStack.pop();

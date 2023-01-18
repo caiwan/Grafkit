@@ -1,6 +1,6 @@
 #include "Input.h"
 
-using namespace FWcore;
+using namespace Grafkit;
 
 Input::Input()
 {

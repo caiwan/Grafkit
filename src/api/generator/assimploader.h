@@ -7,19 +7,19 @@
 #include "../render/model.h"
 #include "../render/texture.h"
 
-namespace FWmodel {
+namespace Grafkit {
 
-	class AssimpLoader : public FWassets::IRenderAssetBuilder
+	class AssimpLoader : public Grafkit::IRenderAssetBuilder
 	{
 	public:
-		AssimpLoader(FWassets::IResourceRef resource, FWrender::Scene * const & scenegraph);
+		AssimpLoader(Grafkit::IResourceRef resource, Grafkit::Scene * const & scenegraph);
 		~AssimpLoader();
 
-		virtual void operator () (FWassets::IRenderAssetManager * const &assman);
+		virtual void operator () (Grafkit::IRenderAssetManager * const &assman);
 
 	private:
-		FWassets::IResourceRef m_resource;
-		FWrender::Scene * const & m_scenegraph;
+		Grafkit::IResourceRef m_resource;
+		Grafkit::Scene * const & m_scenegraph;
 	};
 
 }

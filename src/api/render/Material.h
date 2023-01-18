@@ -9,7 +9,7 @@
 
 #include "../core/renderassets.h"
 
-namespace FWrender {
+namespace Grafkit {
 
 	/// Using materials as a stuct. For now. 
 	struct Material_t {
@@ -41,7 +41,7 @@ namespace FWrender {
 	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
 	///@todo aligned new-t mindenre
 	///@todo lehet, hogy nem is kell majd igazan ref. szamlalas ehhez 
-	class MaterialBase : public Referencable //: virtual public FWassets::IRenderAsset
+	class MaterialBase : public Referencable //: virtual public Grafkit::IRenderAsset
 	{
 	public:
 		MaterialBase();
@@ -96,7 +96,7 @@ namespace FWrender {
 
 		struct reflection_texture_entity
 		{
-			FWrender::Shader::BoundResourceRecord *brecord;
+			Grafkit::Shader::BoundResourceRecord *brecord;
 			Texture* texture;
 		};
 

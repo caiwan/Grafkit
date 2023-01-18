@@ -5,7 +5,7 @@
 
 #include "reference.h"
 
-namespace FWtext {
+namespace Grafkit {
 	
 	class FontMap;
 
@@ -48,7 +48,7 @@ namespace FWtext {
 
 		int maxPages;		///< Number of pages
 
-		std::vector<FWrender::TextureRef> pages; ///< Pages (Containing textures)
+		std::vector<Grafkit::TextureRef> pages; ///< Pages (Containing textures)
 
 		std::vector<int> charIDMap;	///< Id map to resolve chars
 
@@ -100,7 +100,7 @@ namespace FWtext {
 		~FontMap();
 
 		inline int getPageCount() { return this->pages.size(); }
-		inline FWrender::TextureRef getPage(int n) { return this->pages[n]; }
+		inline Grafkit::TextureRef getPage(int n) { return this->pages[n]; }
 
 
 	};

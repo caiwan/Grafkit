@@ -5,7 +5,7 @@
 #include "renderer.h"
 #include "tree.h"
 
-namespace FWrender {
+namespace Grafkit {
 	class Scene //: virtual public Referencable
 	{
 	public:
@@ -15,7 +15,7 @@ namespace FWrender {
 		///@ todo kamerat, es fenyforrasokat itt kezelje(?)
 		///@ accoarding to Gargaj: kell egy preframe process, ami kiszuli a kamerat es a fenyeket, majd azzal rendereli le a tobbi nodeot
 
-		void Render(FWrender::Renderer & render);
+		void Render(Grafkit::Renderer & render);
 
 		void SetRootNode(Actor* root) { m_pScenegraph = root; }
 
@@ -30,8 +30,8 @@ namespace FWrender {
 		CameraRef m_rCamera;
 
 	private:
-		void PreRender(FWrender::Renderer & render);
-		void RenderNode(FWrender::Renderer & render, Actor* actor, int maxdepth = TREE_MAXDEPTH);
+		void PreRender(Grafkit::Renderer & render);
+		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = TREE_MAXDEPTH);
 		void push();
 		void pop();
 

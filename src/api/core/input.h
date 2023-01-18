@@ -4,7 +4,7 @@
 #ifndef _Input_H_
 #define _Input_H_
 
-namespace FWcore {
+namespace Grafkit {
 	class Input
 	{
 	public:

@@ -15,7 +15,7 @@
 #include <vector>
 #include <stack>
 
-namespace FWrender {
+namespace Grafkit {
 
 	class Scene;
 
@@ -24,7 +24,7 @@ namespace FWrender {
 
 //#define ENTITY3D_BUCKET ":entity3d"
 
-	class Entity3D //: public //FWassets::IRenderAsset /*, virtual public Referencable*/
+	class Entity3D //: public //Grafkit::IRenderAsset /*, virtual public Referencable*/
 	{
 	friend class Actor;
 	public:
@@ -48,7 +48,7 @@ namespace FWrender {
 
 		//Actor * const & GetParent() { return m_parent; }
 
-		virtual void Render(FWrender::Renderer& deviceContext) = 0;
+		virtual void Render(Grafkit::Renderer& deviceContext) = 0;
 
 	protected:	
 		//Actor* m_parent;
@@ -78,7 +78,7 @@ namespace FWrender {
 	/**
 	An actor node - ez a scenegraph es a nodeja
 	*/
-	class Actor //: public FWassets::IRenderAsset 
+	class Actor //: public Grafkit::IRenderAsset 
 	{
 	friend class Scene;
 	public:
@@ -86,7 +86,7 @@ namespace FWrender {
 		~Actor();
 
 		FWmath::Matrix& Matrix() { return m_viewMatrix; }
-		virtual void Render(FWrender::Renderer &render);
+		virtual void Render(Grafkit::Renderer &render);
 
 		/// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
 		void AddChild(Actor* child);

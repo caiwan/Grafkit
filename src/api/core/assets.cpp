@@ -5,12 +5,12 @@
 #include "easyloggingpp.h"
 
 
-using namespace FWassets;
+using namespace Grafkit;
 using namespace FWdebugExceptions;
 
 // ====================================================================================
 
-FWassets::ResourceFilter::ResourceFilter(const char ** const & extensions, size_t count)
+Grafkit::ResourceFilter::ResourceFilter(const char ** const & extensions, size_t count)
 {
 	for (size_t i = 0; i < count; i++) {
 		if(extensions[i] && extensions[i][0]) 
@@ -19,7 +19,7 @@ FWassets::ResourceFilter::ResourceFilter(const char ** const & extensions, size_
 }
 
 
-int FWassets::ResourceFilter::trimpath(std::string fullpath, std::string &path, std::string &filename, std::string & extension)
+int Grafkit::ResourceFilter::trimpath(std::string fullpath, std::string &path, std::string &filename, std::string & extension)
 {
 	int result = 0;
 
@@ -50,10 +50,10 @@ int FWassets::ResourceFilter::trimpath(std::string fullpath, std::string &path, 
 	return result;
 }
 
-int FWassets::ResourceFilter::isFileInfilter(std::string path)
+int Grafkit::ResourceFilter::isFileInfilter(std::string path)
 {	
 	std::string dummy0, dummy1, ext;
-	FWassets::ResourceFilter::trimpath(path, dummy0, dummy1, ext);
+	Grafkit::ResourceFilter::trimpath(path, dummy0, dummy1, ext);
 
 	if (ext.empty()) 
 		return 0;
@@ -74,9 +74,9 @@ int FWassets::ResourceFilter::isFileInfilter(std::string path)
 
 #include "dirent.h"
 
-//typedef FWassets::FileResourceManager::filelist_t _filelist_t;
+//typedef Grafkit::FileResourceManager::filelist_t _filelist_t;
 
-FWassets::filelist_t listdir(std::string root, FWassets::filelist_t &dirlist) {
+Grafkit::filelist_t listdir(std::string root, Grafkit::filelist_t &dirlist) {
 	DIR *dir;
 	struct dirent *ent;
 	if ((dir = opendir(root.c_str())) != NULL) {
@@ -104,21 +104,21 @@ FWassets::filelist_t listdir(std::string root, FWassets::filelist_t &dirlist) {
 	return dirlist;
 }
 
-FWassets::FileResourceManager::FileResourceManager(std::string root) : 
+Grafkit::FileResourceManager::FileResourceManager(std::string root) : 
 	m_root(root)
 {
 	listdir(root, m_dirlist);
 }
 
 
-FWassets::FileResourceManager::~FileResourceManager()
+Grafkit::FileResourceManager::~FileResourceManager()
 {
 }
 
 
 // ====================================================================================
 
-IResourceRef FWassets::FileResourceManager::GetResourceByName(std::string name)
+IResourceRef Grafkit::FileResourceManager::GetResourceByName(std::string name)
 {
 	FILE* fp = nullptr;
 
@@ -142,20 +142,20 @@ IResourceRef FWassets::FileResourceManager::GetResourceByName(std::string name)
 }
 
 
-IResourceRef FWassets::FileResourceManager::GetResourceByUUID(Guid uuid)
+IResourceRef Grafkit::FileResourceManager::GetResourceByUUID(Guid uuid)
 {
 	// throw EX_DETAILS(NotImplementedMethodException, "Loading file from uuid is not implemented. Not even close.");
 	return IResourceRef();
 }
 
 
-std::list<std::string> FWassets::FileResourceManager::GetResourceList()
+std::list<std::string> Grafkit::FileResourceManager::GetResourceList()
 {
 	return this->m_dirlist;
 }
 
 
-std::list<std::string> FWassets::FileResourceManager::GetResourceList(ResourceFilter * filter)
+std::list<std::string> Grafkit::FileResourceManager::GetResourceList(ResourceFilter * filter)
 {
 	filelist_t filelist;
 	for (filelist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); it++)
@@ -169,7 +169,7 @@ std::list<std::string> FWassets::FileResourceManager::GetResourceList(ResourceFi
 
 // ==================================================================================== 
 
-inline FWassets::FileResourceManager::FileResource::~FileResource()
+inline Grafkit::FileResourceManager::FileResource::~FileResource()
 {
 	//if (m_data)
 	free(m_data);

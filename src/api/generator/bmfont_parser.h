@@ -4,7 +4,7 @@
 #include "../render/text.h"
 #include "../core/renderassets.h"
 
-namespace FWtext{
+namespace Grafkit{
 
 	class FontMap;
 

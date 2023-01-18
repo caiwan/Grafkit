@@ -9,14 +9,14 @@
 ///@todo minden cuccot egy namespace-be kellene bedobni; 
 ///@todo valahogy a materialba kellene belejatszani mindezt
 ///@todo aligned new-t mindenre
-namespace FWrender{
+namespace Grafkit{
 
 #define LIGHT_BUCKET ":light"
 
 	class BaseLight;
 	typedef Ref<BaseLight> LightRef; 
 
-	class BaseLight : virtual public FWassets::IRenderAsset 
+	class BaseLight : virtual public Grafkit::IRenderAsset 
 	{
 	public:
 		BaseLight();

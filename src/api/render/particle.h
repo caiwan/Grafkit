@@ -3,7 +3,7 @@
 
 #define DEFAULT_PARTICLE_COUNT 4096
 
-namespace FWrender
+namespace Grafkit
 {
 	/** Particle generator
 	*/

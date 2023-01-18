@@ -20,7 +20,7 @@ A generator interface for assets
 // egyelore nem szerencsetlenkedunk a guid-dal, de ha megirtam eddig, akkor maradjon
 #define _NO_UUID_
 
-namespace FWassets{
+namespace Grafkit{
 
 	class IRenderAsset;
 	class IRenderAssetManager;
@@ -140,8 +140,8 @@ namespace FWassets{
 		IRenderAssetManager();
 		virtual ~IRenderAssetManager();
 
-		//virtual FWassets::IResourceFactory* GetResourceFactory() = 0;
-		virtual FWrender::Renderer & GetDeviceContext() = 0;
+		//virtual Grafkit::IResourceFactory* GetResourceFactory() = 0;
+		virtual Grafkit::Renderer & GetDeviceContext() = 0;
 
 		///Arra az esetre, ha valamit kezdeni akarunk vele
 		//virtual IRenderAssetRepository* newRenderAssetRepository() { return new IRenderAssetRepository(); }

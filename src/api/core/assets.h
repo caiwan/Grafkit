@@ -10,7 +10,7 @@
 #include "reference.h"
 #include "guid.h"
 
-namespace FWassets {
+namespace Grafkit {
 
 	class IResource;
 	typedef Ref<IResource> IResourceRef;

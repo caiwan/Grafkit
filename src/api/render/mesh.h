@@ -16,7 +16,7 @@
 #include "shader.h"
 
 
-namespace FWrender 
+namespace Grafkit 
 {
 	/**
 	Stores basic data for a piece of mesh

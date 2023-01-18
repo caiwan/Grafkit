@@ -23,11 +23,11 @@
 
 #include "assimploader.h"
 
-using namespace FWrender;
+using namespace Grafkit;
 using namespace FWdebugExceptions;
-using FWassets::IRenderAsset;
-using FWassets::IRenderAssetRepository;
-using FWassets::IRenderAssetManager;
+using Grafkit::IRenderAsset;
+using Grafkit::IRenderAssetRepository;
+using Grafkit::IRenderAssetManager;
 
 // ================================================================================================================================================================
 // Assimp helpers
@@ -106,7 +106,7 @@ namespace {
 	};
 }
 
-TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, FWassets::IRenderAssetManager * const & assman)
+TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IRenderAssetManager * const & assman)
 {
 	aiString path;
 	TextureAssetRef textureAsset;
@@ -175,7 +175,7 @@ namespace {
 	}
 }
 
-FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::Scene * const & scenegraph) :
+Grafkit::AssimpLoader::AssimpLoader(Grafkit::IResourceRef resource, Grafkit::Scene * const & scenegraph) :
 	IRenderAssetBuilder(),
 	m_scenegraph(scenegraph), m_resource(resource)
 	// m_name_prefix()
@@ -183,14 +183,14 @@ FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::S
 	// m_name_prefix = GetCounter();
 }
 
-FWmodel::AssimpLoader::~AssimpLoader()
+Grafkit::AssimpLoader::~AssimpLoader()
 {
 }
 
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &assman)
+void Grafkit::AssimpLoader::operator()(Grafkit::IRenderAssetManager * const &assman)
 {
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?

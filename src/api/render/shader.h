@@ -18,7 +18,7 @@
 
 #include "../core/renderassets.h"
 
-namespace FWrender {
+namespace Grafkit {
 
 	class Shader;
 	
@@ -54,7 +54,7 @@ namespace FWrender {
 			@param device device context
 			@param entry entry point of vertex shader
 			@param file source file of vertex shader
-			@param type type of shader @see FWrender::ShaderType_e
+			@param type type of shader @see Grafkit::ShaderType_e
 		*/
 		void LoadFromFile(ID3D11Device* const & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
 		void LoadFromMemory(ID3D11Device* const & device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
@@ -64,7 +64,7 @@ namespace FWrender {
 
 		enum ShaderType_e GetShaderType() { return this->m_type; }
 
-		//virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Shader; }
+		//virtual enum RA_type_e GetBucketID() { return Grafkit::IRenderAsset::RA_TYPE_Shader; }
 
 	private:
 		void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
@@ -247,7 +247,7 @@ namespace FWrender {
 	enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
 	- itt most osszevontam az assettel az egeszet, remelem nem lesz miserable failure az egesz
 	*/
-	class ShaderAsset : public ShaderRef_t, public FWassets::IRenderAsset {
+	class ShaderAsset : public ShaderRef_t, public Grafkit::IRenderAsset {
 		friend class ShaderAssetRef;
 
 	public:
@@ -299,19 +299,19 @@ namespace FWrender {
 
 	// ================================================================================================================================
 
-	class ShaderLoader : public FWassets::IRenderAssetBuilder
+	class ShaderLoader : public Grafkit::IRenderAssetBuilder
 	{
 	public:
 		///@todo leforditott shadert is tudjon elotolteni
-		ShaderLoader(FWassets::IResourceRef resource, ShaderType_e type, ShaderAssetRef shaderasset);
+		ShaderLoader(Grafkit::IResourceRef resource, ShaderType_e type, ShaderAssetRef shaderasset);
 		~ShaderLoader();// {}
 		
 		void SetEntryPoint(std::string entrypoint);
 
-		virtual void operator () (FWassets::IRenderAssetManager * const & assman);
+		virtual void operator () (Grafkit::IRenderAssetManager * const & assman);
 
 	protected:
-		FWassets::IResourceRef m_resource;
+		Grafkit::IResourceRef m_resource;
 		ShaderAssetRef m_in;
 		ShaderType_e m_type;
 		std::string m_entrypoint;

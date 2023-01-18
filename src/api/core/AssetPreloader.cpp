@@ -6,22 +6,22 @@
 using FWdebug::Exception;
 using namespace FWdebugExceptions;
 
-using namespace FWassets;
+using namespace Grafkit;
 
 /// ---- ezt lehet kulon fileba kene tenni
 #include "../render/texture.h"
 #include "../render/text.h"
 
-using FWrender::TextureFromBitmap;
-using FWrender::TextureAssetRef;
-using FWrender::TextureAsset;
+using Grafkit::TextureFromBitmap;
+using Grafkit::TextureAssetRef;
+using Grafkit::TextureAsset;
 
 ///@todo a shader betoltes legyen on-the-fly, es ne itt
 #include "../render/shader.h"
-using FWrender::ShaderLoader;
-using FWrender::ShaderAssetRef;
-using FWrender::ShaderAsset;
-using FWrender::ShaderType_e;
+using Grafkit::ShaderLoader;
+using Grafkit::ShaderAssetRef;
+using Grafkit::ShaderAsset;
+using Grafkit::ShaderType_e;
 
 ///@todo kipucolni a kodot
 
@@ -52,7 +52,7 @@ namespace {
 	};*/
 }
 
-AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : FWassets::IRenderAssetManager(), m_pPreloader(nullptr)
+AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IRenderAssetManager(), m_pPreloader(nullptr)
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
 	for (size_t i = 0; i < sizeof(rules) / sizeof(rules[0]); i++) {
@@ -73,7 +73,7 @@ AssetPreloader::~AssetPreloader()
 
 // ============================================================================================================
 
-void FWassets::AssetPreloader::LoadCache()
+void Grafkit::AssetPreloader::LoadCache()
 {
 	/// --- itt becacheli az osszes filet, mait lehet
 
@@ -153,14 +153,14 @@ void FWassets::AssetPreloader::LoadCache()
 
 }
 
-void FWassets::AssetPreloader::SaveCache()
+void Grafkit::AssetPreloader::SaveCache()
 {
 	/// -- save cached files if any 
 }
 
 // ============================================================================================================
 
-IResourceRef FWassets::AssetPreloader::GetResource(std::string filename)
+IResourceRef Grafkit::AssetPreloader::GetResource(std::string filename)
 {
 	for (size_t i = 0; i < this->m_loaders.size(); i++) {
 		try {
@@ -180,7 +180,7 @@ IResourceRef FWassets::AssetPreloader::GetResource(std::string filename)
 	throw EX_DETAILS(FileNotFoundException, filename.c_str());
 }
 
-void FWassets::AssetPreloader::DoPrecalc()
+void Grafkit::AssetPreloader::DoPrecalc()
 {
 	if (m_pPreloader) m_pPreloader->OnBeginLoad();
 	
