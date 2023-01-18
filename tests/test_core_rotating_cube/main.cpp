@@ -54,16 +54,11 @@ protected:
 		ShaderRef m_fragmentShader;
 		
 		int init() {
-			//this->render = new Renderer();
-
 			// --- ezeket kell osszeszedni egy initwindowban
 			const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
 			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
-			// const float SCREEN_DEPTH = 0.1f, SCREEN_NEAR = 1000.f;
 
-			// int result = 0;
-
-			/*result = */ this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
 			this->m_file_loader = new FileAssetManager("./");
