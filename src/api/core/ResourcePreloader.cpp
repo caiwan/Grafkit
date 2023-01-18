@@ -181,6 +181,7 @@ IAssetRef Grafkit::AssetPreloader::GetResource(std::string filename)
 	throw EX_DETAILS(FileNotFoundException, filename.c_str());
 }
 
+///@todo ezt atmozgatni a szulobe + az eventeket is 
 void Grafkit::AssetPreloader::DoPrecalc()
 {
 	if (m_pPreloader) m_pPreloader->OnBeginLoad();
@@ -191,7 +192,8 @@ void Grafkit::AssetPreloader::DoPrecalc()
 	{
 		LOGGER(LOG(INFO) << "Loading asset" << (int)i << "of" << (int)len);
 
-		(**it)(this);
+		// (**it)(this);
+		// (*it)->
 		
 		if (m_pPreloader) m_pPreloader->OnElemLoad(i, len);
 		i++;

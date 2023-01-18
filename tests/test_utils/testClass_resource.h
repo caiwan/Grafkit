@@ -24,7 +24,7 @@ public:
 
 typedef Ref<Thing> ThingRef;
 
-typedef Grafkit::ICResource<Thing> ThingResource;
+typedef Grafkit::Resource<Thing> ThingResource;
 
 typedef Ref<ThingResource> ThingResourceRef;
 
@@ -72,5 +72,10 @@ public:
 
 	virtual Grafkit::IAssetFactory *GetAssetFactory() {
 		return nullptr;
+	}
+
+	virtual Grafkit::Renderer &GetDeviceContext() {
+		static Grafkit::Renderer render;
+		return render;
 	}
 };

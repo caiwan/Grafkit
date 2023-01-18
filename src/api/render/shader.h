@@ -304,7 +304,7 @@ namespace Grafkit {
 	// ================================================================================================================================
 
 	typedef Ref<Shader> ShaderRef;
-	typedef Grafkit::ICResource<Shader> ShaderResource;
+	typedef Grafkit::Resource<Shader> ShaderResource;
 	typedef Ref<ShaderResource> ShaderResourceRef;
 
 }

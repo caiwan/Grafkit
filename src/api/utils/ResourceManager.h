@@ -4,6 +4,8 @@
 #include <map>
 #include <list>
 
+#include "../render/renderer.h"
+
 #include "resource.h"
 #include "ResourceBuilder.h"
 
@@ -31,8 +33,7 @@ namespace Grafkit {
 
 		void ClearLoadStack();
 
-		// ez kell mindenkeppen:
-		// virtual Renderer &GetDeviceContext() = 0; //<<< ezt potolni kell majd 
+		virtual Renderer &GetDeviceContext() = 0;	///@todo, ha kell, akkor egy makroval ki kell venni
 		virtual IAssetFactory *GetAssetFactory() = 0;
 
 	private:

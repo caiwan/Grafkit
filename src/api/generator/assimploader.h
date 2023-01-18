@@ -1,11 +1,11 @@
 #pragma once
 
-#include "exceptions.h"
+#include "../utils/exceptions.h"
 
-#include "../core/asset.h"
-#include "../core/resource.h"
-#include "../core/ResourceBuilder.h"
-
+#include "../utils/asset.h"
+#include "../utils/resource.h"
+#include "../utils/ResourceBuilder.h"
+			   
 #include "../render/Scene.h"
 #include "../render/model.h"
 #include "../render/texture.h"

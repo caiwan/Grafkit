@@ -1,7 +1,7 @@
 #include <cstring>
 
 #include "FontmapLoader.h"
-#include "exceptions.h"
+#include "../utils/exceptions.h"
 
 using namespace FWdebugExceptions;
 using namespace Grafkit;

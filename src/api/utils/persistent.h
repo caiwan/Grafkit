@@ -141,7 +141,7 @@ public:\
 		return VERSION_NO;\
 	}\
 private: \
-	static FWutils::AddClonable _addClonable;
+	static Grafkit::AddClonable _addClonable;
 
 #define PERSISTENT_IMPL(className) \
 	Grafkit::AddClonable className::_addClonable(#className, new className##::Factory());

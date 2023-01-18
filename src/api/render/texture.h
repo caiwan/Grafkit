@@ -1,8 +1,10 @@
 #pragma once
 
-#include "reference.h"
+
+#include "../utils/reference.h"
+#include "../utils/resource.h"
+
 #include "renderer.h"
-#include "resource.h"
 
 #define MULTITEXTURE_MAX 16
 
@@ -10,15 +12,6 @@
 
 namespace Grafkit
 {
-	class Texture;
-
-	typedef Ref<Texture> TextureRef_t;
-	typedef TextureRef_t TextureRef;
-
-	class TextureRes;
-	typedef Ref<TextureRes> TextureResRef_t;
-
-	class TextureResRef;
 
 #define TEXTURE_BUCKET "texture"
 
@@ -84,8 +77,8 @@ namespace Grafkit
 	// ========================================================================================================================
 
 	typedef Ref<Texture> TextureRef;
-	typedef FWutils::ICResource<Texture> TextureResource;
-	typedef Ref<TextureResource> TextureResourceRef;
+	typedef Resource<Texture> TextureRes;
+	typedef Ref<TextureRes> TextureResRef;
 
 	// ========================================================================================================================
 
@@ -107,7 +100,7 @@ namespace Grafkit
 	// ========================================================================================================================
 
 	typedef Ref<TextureSampler> TextureSamplerRef;
-	typedef FWutils::ICResource<TextureSampler> TextureSamplerResource;
+	typedef Grafkit::Resource<TextureSampler> TextureSamplerResource;
 	typedef Ref<TextureSamplerResource> TextureSamplerResourceRef;
 
 	// ========================================================================================================================

@@ -16,8 +16,7 @@ namespace Grafkit{
 	class BaseLight;
 	typedef Ref<BaseLight> LightRef; 
 
-	//__declspec(align(16)) class BaseLight : public Grafkit::IResource, public AlignedNew<BaseLight>
-	class BaseLight
+	class BaseLight : virtual public Referencable
 	{
 	public:
 		BaseLight();

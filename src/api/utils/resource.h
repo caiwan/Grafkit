@@ -33,8 +33,6 @@ namespace Grafkit{
 	/**
 	A base class for collectable render assets for bulk loading and reloading 
 	*/
-
-	// itt meg kell csinalni, hogy beagyazni lehessen barmit ide gyk. 
 	class IResource : virtual public Referencable
 	{
 		friend class IResourceManager;
@@ -69,7 +67,7 @@ namespace Grafkit{
 	Ebbe csomagoljuk bele a resourceokat, amiket elteszunk; lenyeg, hogy ezzel barmibol 
 	lehet majd resouce-t generalni, ha kell 
 	*/
-	template <typename T> class ICResource : public IResource, public Ref<T>
+	template <typename T> class Resource : public IResource, public Ref<T>
 	{
 		// ... 
 	};
