@@ -26,9 +26,12 @@ namespace {
 
 CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent), CurveEditorView()
 , m_area(nullptr)
-, m_audiogramImage(nullptr)
+, m_audiogramImage(nullptr), m_cursorItem(nullptr)
 {
     m_area = new TimelineArea();
+    m_cursorItem = new CursorItem();
+    m_cursorItem->SetArea(m_area);
+
     setBackgroundBrush(QColor(48, 48, 48));
 
     connect(this, SIGNAL(selectionChanged()), this, SLOT(SelectionChangedSlot()));
@@ -95,6 +98,8 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
     if (m_displayCurve)
         DrawCurve(painter, r);
+
+    m_cursorItem->DrawCursor(painter, r);
 
     // draw cursors here if needed 
 }
@@ -172,6 +177,96 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 
 }
 
+void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * event)
+{
+    if (items().empty()) 
+        return;
+
+    QTransform transformation = QTransform();
+    CurvePointItem* itemAtCrsr = dynamic_cast<CurvePointItem*>(itemAt(event->scenePos(), transformation));
+
+    if (!itemAtCrsr) {
+
+        // call event
+
+        //CurvePointItem* cpi = new CurvePointItem(QPointF((event->scenePos().x() - _ofs.x()) / _scale.width(), (event->scenePos().y() - _ofs.y()) / -_scale.height()));
+        //_pointItems->append(cpi);
+
+        //addItem(cpi);
+        //cpi->update();
+        update();
+        //views().at(0)->update();
+    }
+
+    QGraphicsScene::mouseDoubleClickEvent(event);
+}
+
+void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event) 
+{
+    QTransform transformation = QTransform();
+    CurvePointItem* itemAtCrsr = dynamic_cast<CurvePointItem*>(itemAt(event->scenePos(), transformation));
+
+    if (!itemAtCrsr) {
+        switch (event->button()) {
+        case Qt::LeftButton:
+            // event
+            //setDemoTime((event->scenePos().x() - _ofs.x()) / _scale.width());
+            //_widget->setMusicTime((event->scenePos().x() - _ofs.x()) / _scale.width());
+            m_modifyDemoTime = true;
+            break;
+        case Qt::MidButton:
+            m_modifyOfs = true;
+            break;
+        case Qt::RightButton:
+            m_modifyScale = true;
+            break;
+        default:
+            break;
+        }
+    } else
+    {
+        // ... 
+    }
+
+    QGraphicsScene::mousePressEvent(event);
+}
+
+void CurveEditorScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
+{
+    if (m_modifyOfs || m_modifyScale) UpdateAudiogram();
+
+    m_modifyDemoTime = false;
+    m_modifyOfs = false;
+    m_modifyScale = false;
+
+    update();
+    QGraphicsScene::mouseReleaseEvent(event);
+}
+
+void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event) 
+{
+    if (m_modifyOfs) {
+        m_area->Pan(event->scenePos() - event->lastScenePos());
+    }
+    else if (m_modifyScale) {
+        QPointF p = { (event->scenePos() - event->lastScenePos()) };
+        m_area->Zoom(p);
+    } else
+    {
+        // throw event
+
+        //setDemoTime((event->scenePos().x() - _ofs.x()) / _scale.width());
+        //if (_demoTime < 0.0f) setDemoTime(0.0f);
+        //_widget->setMusicTime((event->scenePos().x() - _ofs.x()) / _scale.width());
+        
+    }
+
+    update();
+
+    QGraphicsScene::mouseMoveEvent(event);
+
+}
+
 void CurveEditorScene::keyPressEvent(QKeyEvent* event) {
     QGraphicsScene::keyPressEvent(event);
 }
@@ -204,8 +299,8 @@ void CurveEditorScene::SelectionChangedSlot()
 
 void CurveEditorScene::UpdateAudiogram()
 {
-    const auto offset = m_area->Offset();
-    const auto scale = m_area->Scale();
+    const auto offset = m_area->GetOffset();
+    const auto scale = m_area->GetScale();
 
     const float leftTime = -float(offset.x()) / float(scale.width());
     const float rightTime = leftTime + (float(sceneRect().width()) / float(scale.width()));
@@ -276,7 +371,22 @@ void TimelineArea::DrawGrid(QPainter* const &painter, const QRectF &r)
 
 }
 
-void Idogep::TimelineArea::Invalidate()
+void TimelineArea::Pan(const QPointF& p)
+{
+    m_offset += p;
+    if (m_offset.x() > 0.) m_offset.setX(0.);
+}
+
+void TimelineArea::Zoom(const QPointF & z)
+{
+    m_scale += QSizeF(z.x(), z.y());
+    if (m_scale.width() < 8.0f) m_scale.setWidth(8.0f);
+    if (m_scale.width() > 750.) m_scale.setWidth(750.);
+
+    if (m_scale.height() < 8.0f) m_scale.setHeight(8.0f);
+}
+
+void TimelineArea::Invalidate()
 {
     delete m_grid;
     m_grid = nullptr;
@@ -323,4 +433,28 @@ void TimelineArea::DrawGridToPicture(QPainter* const& painter, const QRectF& r) 
     painter->drawLine(offsetX, 0.0f, offsetX, rectHeight);
     painter->setPen(QPen(QColor(144, 144, 144)));
     painter->drawLine(0.0f, offsetY + r.height() / 2, rectWidth, offsetY + r.height() / 2);
+}
+
+void CursorItem::DrawCursor(QPainter * const & painter, const QRectF & r)
+{
+    QString strTime;
+    int minutes = int(m_position) / 60;
+    if (minutes < 10) strTime.append("0");
+    strTime.append(QString::number(minutes)).append(":");
+    if (fmod(m_position, 60.0f) < 10.0f) strTime.append("0");
+    strTime.append(QString::number(fmod(m_position, 60.0f), 'f', 3));
+
+    float barOffset = 0.0f;
+    QSizeF scale = m_area->GetScale();
+    QPointF offset = m_area->GetOffset();
+
+    if (abs(r.x() + r.width() - (m_position * scale.width() + offset.x())) < 128) barOffset = -56.0f;
+
+    painter->setFont(QFont(QString("Sans"), 8));
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(QColor(48, 224, 48, 96));
+    painter->drawRect(QRectF(QPointF(m_position * scale.width() + offset.x() + barOffset, r.height() - 16.0f), QSizeF(56.0f, 16.0f)));
+    painter->setPen(QColor(255, 255, 255, 96));
+    painter->setBrush(QColor(48, 224, 48, 96));
+    painter->drawText(QRectF(QPointF((m_position * scale.width() + offset.x()) + barOffset, r.height() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
 }

@@ -50,7 +50,7 @@ void CurvePointItem::RecalculatePosition(TimelineArea const* area)
     if (m_key.m_time < 0.f)
         m_key.m_time = 0.f;
     setPos(area->Point2Screen(GetCoord()));
-    m_areaScaling = area->Scale(); // save last scaling for paint tangent on
+    m_areaScaling = area->GetScale(); // save last scaling for paint tangent on
 }
 
 QRectF CurvePointItem::boundingRect() const { return { -BOUNDING_BOX_SCALE / 2, -BOUNDING_BOX_SCALE / 2, BOUNDING_BOX_SCALE, BOUNDING_BOX_SCALE }; }
@@ -203,6 +203,7 @@ void CurvePointItem::keyPressEvent(QKeyEvent * event)
     {
         switch (event->key())
         {
+            // This thing does not work as it intended to.
         case KEY_SNAP_X:
             m_showTangent = true;
             m_snapXAxis = true; break;

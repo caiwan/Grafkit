@@ -42,22 +42,26 @@ namespace {
 	    void GetWaveform(float *& ptr, size_t &length, size_t &channelCount, size_t& samplePerSec) override;
 
 	protected:
-		HSTREAM m_stream;
-		Grafkit::IAssetRef m_asset;
+		//HSTREAM m_sample;
+		IAssetRef m_asset;
+	    HSAMPLE m_sample;
+        HCHANNEL m_channel;
 
 	private:
 		bool m_isMute;
 
 		uint64_t m_length;
 		uint64_t m_samplePerSec;
+        uint64_t m_bytesPerSample;
 
 	};
 
-	MusicBass::MusicBass() : Music(),
-		m_stream(0),
-		m_asset(), m_isMute(false)
-	{
-	}
+	MusicBass::MusicBass() : Music()
+        , //m_sample(0),
+        m_asset()
+        , m_sample(0)
+        , m_isMute(false) {
+    }
 
 	MusicBass::~MusicBass(void)
 	{
@@ -70,7 +74,7 @@ namespace {
 		const void* data = m_asset->GetData();
 	    const size_t dataSize = m_asset->GetSize();
 
-		int res = BASS_Init(-1, 44100, 0, 0, 0);
+		int res = BASS_Init(-1, 44100, 0, nullptr, nullptr);
 
 		bool isNosound = false;
 		if (!res) {
@@ -85,12 +89,14 @@ namespace {
 				throw new EX(MusicDeviceInitException);
 		}
 
-		m_stream = BASS_StreamCreateFile(TRUE, data, 0, dataSize,
-			BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) |
-			0
-		);
+        m_sample = BASS_SampleLoad(true, data, 0, dataSize, 1, BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) | 0);
 
-		if (!m_stream) {
+		//m_sample = BASS_StreamCreateFile(TRUE, data, 0, dataSize,
+		//	BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) |
+		//	0
+		//);
+
+		if (!m_sample) {
 			int errcode = BASS_ErrorGetCode();
 			LOGGER(Log::Logger().Error("Failed to laod music. BASS Error code: %d", errcode));
 			throw new EX(MusicDeviceInitException);
@@ -98,46 +104,50 @@ namespace {
 
 		BASS_Start();
 
-		BASS_CHANNELINFO info;
-		BASS_ChannelGetInfo(m_stream, &info);
+        m_channel = BASS_SampleGetChannel(m_sample, false);
 
-		m_length = BASS_ChannelGetLength(m_stream, BASS_POS_BYTE);
+		BASS_CHANNELINFO info;
+		BASS_ChannelGetInfo(m_channel, &info);
+
+		m_length = BASS_ChannelGetLength(m_channel, BASS_POS_BYTE);
 
 		// length in byte -> samples 
 		int sstride = 2;
 		if (info.flags & BASS_SAMPLE_8BITS) sstride = 1; else if (info.flags & BASS_SAMPLE_FLOAT) sstride = 4;
 
-		m_samplePerSec = info.freq * sstride * info.chans;
+        m_samplePerSec = info.freq;
+        m_bytesPerSample = sstride * info.chans;
 
 	}
 
 	void MusicBass::Shutdown()
 	{
-		BASS_ChannelStop(m_stream);
-		BASS_StreamFree(m_stream);
+		BASS_ChannelStop(m_channel);
+		//BASS_StreamFree(m_sample);
+        BASS_SampleFree(m_sample);
 		BASS_Stop();
 		BASS_Free();
 	}
 
 	void MusicBass::Play()
 	{
-		BASS_ChannelPlay(m_stream, 0);
+		BASS_ChannelPlay(m_sample, 0);
 	}
 
 	void MusicBass::Stop()
 	{
-		BASS_ChannelStop(m_stream);
-        BASS_ChannelSetPosition(m_stream, 0, BASS_POS_BYTE);
+		BASS_ChannelStop(m_channel);
+        BASS_ChannelSetPosition(m_channel, 0, BASS_POS_BYTE);
 	}
 
 	void MusicBass::Pause(int e)
 	{
 	    const int b = IsPlaying();
 		if (!b && !e) {
-			BASS_ChannelPlay(m_stream, 0);
+			BASS_ChannelPlay(m_channel, 0);
 		}
 		else {
-			BASS_ChannelPause(m_stream);
+			BASS_ChannelPause(m_channel);
 		}
 	}
 
@@ -149,31 +159,32 @@ namespace {
 	void MusicBass::ToggleMute()
 	{
 		if (!m_isMute)
-			BASS_ChannelSetAttribute(m_stream, BASS_ATTRIB_VOL, 0.0f);
+			BASS_ChannelSetAttribute(m_channel, BASS_ATTRIB_VOL, 0.0f);
 		else
-			BASS_ChannelSetAttribute(m_stream, BASS_ATTRIB_VOL, 1.0f);
+			BASS_ChannelSetAttribute(m_channel, BASS_ATTRIB_VOL, 1.0f);
 		m_isMute = !m_isMute;
 	}
 
 	uint64_t MusicBass::GetTimeSample()
 	{
-	    const QWORD position = BASS_ChannelGetPosition(m_stream, BASS_POS_BYTE);
+	    QWORD position = BASS_ChannelGetPosition(m_channel, BASS_POS_BYTE);
+        position /= m_bytesPerSample;
 		return position;
 	}
 
 	void MusicBass::SetTimeSample(uint64_t t)
 	{
-		BASS_ChannelSetPosition(m_stream, t, BASS_POS_BYTE);
+		BASS_ChannelSetPosition(m_channel, t * m_bytesPerSample, BASS_POS_BYTE);
 	}
 
 	void MusicBass::SetLoop(int e)
 	{
-		BASS_ChannelFlags(m_stream, BASS_SAMPLE_LOOP * e, BASS_SAMPLE_LOOP);
+		BASS_ChannelFlags(m_channel, BASS_SAMPLE_LOOP * e, BASS_SAMPLE_LOOP);
 	}
 
 	int MusicBass::IsPlaying()
 	{
-		return BASS_ChannelIsActive(m_stream) == BASS_ACTIVE_PLAYING;
+		return BASS_ChannelIsActive(m_channel) == BASS_ACTIVE_PLAYING;
 	}
 
 	// taken from Gargaj 
@@ -212,7 +223,7 @@ namespace {
 			return;
 		}
 
-		/*const int numBytes =*/ BASS_ChannelGetData(m_stream, ptr, len | BASS_DATA_FFT_REMOVEDC);
+		/*const int numBytes =*/ BASS_ChannelGetData(m_channel, ptr, len | BASS_DATA_FFT_REMOVEDC);
 
 	}
 
@@ -222,7 +233,7 @@ namespace {
 		ptr = nullptr;
 		samplePerSec = 0;
 		BASS_CHANNELINFO channelInfo;
-		if (!BASS_ChannelGetInfo(m_stream, &channelInfo))
+		if (!BASS_ChannelGetInfo(m_channel, &channelInfo))
 			return;
 
 		length = m_length;
@@ -234,12 +245,7 @@ namespace {
 
 		memset(ptr, 0, buflen * 4);
 
-		// TODO: ez nem jo
-		//const int numBytes = BASS_ChannelGetData(m_stream, ptr, BASS_DATA_FLOAT);
-		const int numBytes = BASS_ChannelGetData(m_stream, ptr, buflen * 4 | BASS_DATA_FLOAT);
-		//BASS_RecordFree
-
-		if (numBytes == -1)
+        if (!BASS_SampleGetData(m_sample, ptr))
 		{
 			LOGGER(Log::Logger().Error("Could not read waveform data. BASS ERROR: %d", BASS_ErrorGetCode()));
 

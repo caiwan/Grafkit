@@ -30,7 +30,8 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 {
     *image = nullptr;
 
-    // todo: update when audiogramChanged 
+    return;
+
     if (!m_audiogramBuffer)
     {
         onRequestWaveform(m_audiogramBuffer, m_audiogramSampleCount, m_audiogramChannelCount, m_audiogramSamplePerSec);
@@ -39,8 +40,8 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
     if (!m_audiogramBuffer || !m_audiogramSampleCount)
         return;
 
-    const uint32_t offset = uint32_t(startTime * m_audiogramSamplePerSec) * m_audiogramChannelCount;
-    const uint32_t length = uint32_t((endTime - startTime) * m_audiogramSamplePerSec) * m_audiogramChannelCount;
+    const uint32_t offset = std::min(uint32_t(startTime * m_audiogramSamplePerSec) * m_audiogramChannelCount, m_audiogramSampleCount * m_audiogramChannelCount);
+    const uint32_t length = std::min(uint32_t((endTime - startTime) * m_audiogramSamplePerSec) * m_audiogramChannelCount, m_audiogramSampleCount * m_audiogramChannelCount);
 
     float* buffer = &m_audiogramBuffer[offset];
 
@@ -66,7 +67,10 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
             else
             {
                 float* p = &buffer[i + (k / 2)];
-                for (uint32_t l = 0; l < m_audiogramChannelCount; l++) { sum += fabs(p[l]); }
+                for (uint32_t l = 0; l < m_audiogramChannelCount; l++)
+                {
+                    sum += fabs(p[l]);
+                }
             }
         }
 
