@@ -38,6 +38,7 @@ namespace FWrender {
 
 		// --- operations 
 		void BeginScene(float red, float green, float blue, float alpha);
+		void BeginScene();
 		void EndScene();
 
 		// --- getters
