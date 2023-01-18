@@ -85,6 +85,7 @@ namespace Idogep {
 		Ref<Module> m_logModule;
 
 		Ref<Module> m_outlineViewModule;
+		Ref<Module> m_curveEditor;
 
 		// --- singleton element
 		static EditorApplication * s_self;

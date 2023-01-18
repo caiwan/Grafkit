@@ -50,16 +50,33 @@ namespace  Idogep
 	public:
 		ManagePlaybackRole() {}
 		virtual ~ManagePlaybackRole() = default;
-		
-	    Event<> onTogglePlayback;
+
+		// Play pressed
+		// Stop pressed
+
+		// Update cursor from player
+
+		// --- intenral events (triggered from inside)
+		Event<> onPlaybackOptions;
+
+		Event<> onTogglePlayback;
 		Event<> onStopPlayback;
+
+		Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform; // ptr, samplecount, channelcount, samplePerSec
+
+																	 // --- external events (triggered from ouitside)
+		virtual void MusicChanged() = 0;
+
+		virtual void PlaybackChanged(bool isPlaying) = 0;
+		virtual void demoTimeChanged(float time) = 0;
+
 	};
 
 	// ========================================================================================================
 
+
 	class CurveEditorView : public View, public ManagePlaybackRole, public ManageAnimationsRole
 	{
-// ... 
-
+		// ... 
 	};
 }

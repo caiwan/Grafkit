@@ -21,10 +21,7 @@ using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-Idogep::Document::Document() :
-	Roles::HasEffectRole(),
-	Roles::HasSceneGraphRole(),
-	Roles::HasPlaybackRole()
+Document::Document() : m_isDirty(false)
 {
 }
 
@@ -46,9 +43,9 @@ void Document::Initialize(Renderer & render)
 	InitTestStuff(render);
 }
 
-SceneResRef Document::GetScene() const
-{
-}
+//void Document::Shutdown()
+//{
+//}
 
 // ---------------------------------------------------------------
 // in-dev-things

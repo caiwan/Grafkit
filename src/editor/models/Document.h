@@ -19,29 +19,7 @@ namespace Idogep {
 
 	class Music;
 
-	namespace Roles {
-		class HasSceneGraphRole : virtual public Referencable {
-		public:
-			virtual Grafkit::SceneGraphRef GetScenegraph() const = 0;
-			virtual Grafkit::SceneResRef GetScene() const = 0;
-		};
-
-		class HasEffectRole : virtual public Referencable {
-			// ... 
-		};
-
-		class HasPlaybackRole : virtual public Referencable {
-		public:
-			virtual Music * GetMusic() { return m_musicWrapper; }
-		protected:
-			Idogep::Music * m_musicWrapper;
-		};
-	}
-
-	class Document : virtual public Referencable,
-		public Roles::HasSceneGraphRole,
-		public Roles::HasEffectRole,
-		public Roles::HasPlaybackRole
+	class Document : virtual public Referencable
 	{
 		friend class Editor;
 	public:
@@ -55,8 +33,8 @@ namespace Idogep {
 		void SetDirty() { m_isDirty = true; }
 		bool IsDirty() const { return m_isDirty; }
 
-	    Grafkit::SceneGraphRef GetScenegraph() const override { return m_scenegraph; }
-		Grafkit::SceneResRef GetScene() const override { return m_scene; }
+	    Grafkit::SceneGraphRef GetScenegraph() const { return m_scenegraph; }
+		Grafkit::SceneResRef GetScene() const { return m_scene; }
 
 	private:
 		void InitTestStuff(Grafkit::Renderer & render);
@@ -73,8 +51,6 @@ namespace Idogep {
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
-
-
 	};
 
 }

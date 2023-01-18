@@ -1,12 +1,5 @@
 #include <qapplication.h>
 
-#include <qtimer.h>
-
-#include <qmessagebox.h>
-#include <qevent.h>
-
-#include <qdockwidget.h>
-
 #include <stack>
 
 #include "common.h"
@@ -24,9 +17,6 @@
 #include "modules/splashScreen/splashwidget.h"
 #include "modules/preloaderDialog/preloader.h"
 #include "modules/grafkitContext/QGrafkitContextWidget.h"
-
-#include "modules/logView/LogModule.h"
-#include "modules/outlineView/outlineModule.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -118,6 +108,13 @@ void Idogep::EditorApplication::Preload()
 }
 
 // ========================================================================================
+
+#include <QDockWidget>
+
+#include "modules/logView/LogModule.h"
+#include "modules/outlineView/outlineModule.h"
+#include "modules/curveEditor/CurveModule.h"
+
 // This part should be refactored eventutally:
 // should put out to a plugin system
 
@@ -139,6 +136,9 @@ void Idogep::EditorApplication::BuildEditorModules()
 	m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
     // --- 
+
+	m_curveEditor = new CurveEditorModule(m_editor);
+	m_editor->GetCommandStack()->ConnectEmitter(dynamic_cast<EmitsCommandRole*>(m_curveEditor.Get()));
 }
 
 void Idogep::EditorApplication::InitializeModules() const
@@ -158,15 +158,22 @@ void Idogep::EditorApplication::InitializeModules() const
 
 void Idogep::EditorApplication::BuildDockingWindows() const
 {
-    auto logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
+    // 
+	QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_curveEditor->GetView().Get());
+	assert(curveEditorWidget);
+
+    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
+
+    //
+	QDockWidget* logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
 	assert(logWidget);
 
 	logWidget->setParent(m_mainWindow);
 	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
-	//m_mainWindow->tabifyDockWidget(m_logWidget, m_curveEditor);
+	m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
 
 	// 
-    auto outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
+	QDockWidget* outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
 	assert(outlineWidget);
 
 	outlineWidget->setParent(m_mainWindow);
