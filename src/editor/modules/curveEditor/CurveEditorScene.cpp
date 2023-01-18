@@ -206,11 +206,13 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
         switch (event->button())
         {
         case Qt::LeftButton:
-            // event
-            //setDemoTime((event->scenePos().x() - _ofs.x()) / _scale.width());
-            //_widget->setMusicTime((event->scenePos().x() - _ofs.x()) / _scale.width());
+        {
+            const float time = m_area->Screen2Point(event->scenePos()).x();
+            onDemoTimeChanged(time);
+            m_cursorItem->SetPosition(time);
             m_modifyDemoTime = true;
             break;
+        }
         case Qt::MidButton:
             m_midButton = true;
             break;
@@ -222,7 +224,12 @@ void CurveEditorScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
             break;
         }
     }
-    else { // ... 
+
+    bool resetView = m_rightButton && m_ctrlPressed && m_altPressed;
+
+    if (resetView)
+    {
+        m_area->ResetView();
     }
 
     QGraphicsScene::mousePressEvent(event);
@@ -249,11 +256,15 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     bool resetView = m_rightButton && m_ctrlPressed && m_altPressed;
 
     QPointF delta = event->scenePos() - event->lastScenePos();
-
+    if (m_modifyDemoTime)
+    {
+        const double time = m_area->Screen2Point(event->scenePos()).x();
+        onDemoTimeChanged(time);
+        m_cursorItem->SetPosition(time);
+    }
     if (resetView)
     {
-        m_area->SetOffset({ 0,0 });
-        m_area->SetScale({ 64, 64 });
+        m_area->ResetView();
     }
     else if (modifyOfs)
     {
@@ -264,14 +275,6 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     {
         m_area->Zoom(delta);
         m_areaChanged = true;
-    }
-    else
-    {
-        // throw event
-
-        //setDemoTime((event->scenePos().x() - _ofs.x()) / _scale.width());
-        //if (_demoTime < 0.0f) setDemoTime(0.0f);
-        //_widget->setMusicTime((event->scenePos().x() - _ofs.x()) / _scale.width());
     }
 
     update();
@@ -449,6 +452,11 @@ void TimelineArea::Zoom(const QPointF& z)
     Pan(delta);
 }
 
+void TimelineArea::ResetView() {
+    m_scale = QSizeF(64, 64);
+    m_offset = QPointF(0, 0);
+}
+
 void TimelineArea::Invalidate()
 {
     delete m_grid;
@@ -467,12 +475,6 @@ void TimelineArea::Invalidate()
 
 void TimelineArea::DrawGridToPicture(QPainter* const& painter, const QRectF& r) const
 {
-    //float sPos = 0.0f;
-    //if (r.x() < 0.0f)
-    //    sPos = -1.0f * fmod(fabs(r.x()), m_scale.width());
-    //else
-    //    sPos = fmod(fabs(r.x()), m_scale.width());
-
     float sc = 0;
     const float offsetX = m_offset.x();
     const float offsetY = m_offset.y();

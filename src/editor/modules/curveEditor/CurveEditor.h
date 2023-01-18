@@ -23,7 +23,7 @@ namespace Idogep
 			void ClearAudiogram();
 
 			Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform;
-			//virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
+		    //virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) = 0;
 
 		private:
 			float* m_agBuffer;

@@ -20,6 +20,8 @@ namespace Idogep
 
             virtual void PlaybackChangedEvent(bool isPlaying) = 0;
             virtual void DemoTimeChangedEvent(const float &time) = 0;
+
+            Event<double> onDemoTimeChanged;
         };
     }
 

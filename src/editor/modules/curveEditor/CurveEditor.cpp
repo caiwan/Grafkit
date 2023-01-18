@@ -23,7 +23,6 @@ Roles::ManageCurveAudiogramRole::ManageCurveAudiogramRole()
 
 Roles::ManageCurveAudiogramRole::~ManageCurveAudiogramRole() { delete m_agBuffer; }
 
-
 void Roles::ManageCurveAudiogramRole::GetAudiogram(
     QImage** image, float startTime, float endTime, int rectWidth,
     int rectHeight)
@@ -47,7 +46,6 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 
     const size_t valueHop = (readFrames / rectWidth) +((readFrames % rectWidth) % m_agChannelCount);
     const float invFactor = 1. / (m_agChannelCount * valueHop);
-
     const float* b = &m_agBuffer[offset * m_agChannelCount];
     
     size_t x = 0;
@@ -58,15 +56,13 @@ void Roles::ManageCurveAudiogramRole::GetAudiogram(
 
         float vSum = 0.0f;
         const float* p = &b[i * m_agChannelCount];
+
         for (size_t k = 0; k < valueHop * m_agChannelCount; k++)
         {
             if (offset + i + (k / m_agChannelCount) >= m_agSampleCount)
                 break;
-            
-            vSum += fabs(p[k]);
+            vSum += fabs(p[k]) * invFactor;
         }
-
-        vSum *= invFactor;
 
         for (size_t y = 0; y < rectHeight; y++)
         {
@@ -128,6 +124,8 @@ void CurveEditor::Initialize()
     assert(musicProxy);
     musicProxy->onMusicChanged += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::ClearAudiogram);
     musicProxy->onMusicChanged += Delegate(ces, &Roles::TimelineSceneViewRole::MusicChangedEvent);
+    
+    ces->onDemoTimeChanged += Delegate(musicProxy, &MusicProxy::SetTime);
 
     ces->onRequestAudiogram += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::GetAudiogram);
     editor->onDemoTimeChanged += Delegate(ces, &Roles::TimelineSceneViewRole::DemoTimeChangedEvent);
