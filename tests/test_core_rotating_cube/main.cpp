@@ -63,13 +63,6 @@ public:
 
 			// -- model 
 			model = new Model;
-
-			//generator(
-			//	FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, (float3*)FWBuiltInData::cubeNormals,
-			//	FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
-			//	model
-			//);
-
 			model->setTexture(texture);
 
 			//shader_texture = new TextureShaderClass();
@@ -85,7 +78,7 @@ public:
 
 			SimpleMeshGenerator generator(render, shader_vs);
 			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
-			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+			// generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
 			this->t = 0;
@@ -112,14 +105,15 @@ public:
 				camera->GetViewMatrix(viewMatrix);
 				camera->GetProjectionMatrix(projectionMatrix);
 
-				model->Render(render.GetDeviceContext());
-
 				worldMatrix.RotateRPY(t*10, t*15, t*20);
 
 				shader_vs["MatrixBuffer"].set(NULL);
 
-				shader_vs->Render(render.GetDeviceContext());
-				shader_fs->Render(render.GetDeviceContext());
+				shader_vs->Render(render);
+				shader_fs->Render(render);
+
+				model->Render(render);
+
 
 				this->t += 0.001;
 			}
