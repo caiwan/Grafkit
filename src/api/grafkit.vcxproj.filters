@@ -83,9 +83,6 @@
     <ClCompile Include="generator\bmfont_parser.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
-    <ClCompile Include="generator\TextureLoader.cpp">
-      <Filter>Source Files\generator</Filter>
-    </ClCompile>
     <ClCompile Include="core\renderassets.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
@@ -158,9 +155,6 @@
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="generator\bmfont_parser.h">
-      <Filter>Source Files\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="generator\TextureLoader.h">
       <Filter>Source Files\generator</Filter>
     </ClInclude>
     <ClInclude Include="core\renderassets.h">
