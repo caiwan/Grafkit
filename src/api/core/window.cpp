@@ -14,33 +14,6 @@ typedef LRWAPI windowCallBackProc_t(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 namespace {
 	LRWAPI window_callback_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 
-	// fostomlo
-#if 0
-	static std::vector<Window*> windows;
-	
-	void registerHwnd(Window* window) {
-		for (size_t i = 0; i < windows.size(); ++i) {
-			if (windows[i] == window)
-				return;
-		}
-		windows.push_back(window);
-	}
-
-	void unregisterHwnd(Window* window) {
-		for (size_t i = 0; i < windows.size(); ++i) {
-			if (windows[i] == window)
-				windows[i] = 0;
-		}
-	}
-
-	Window *& findWindow(HWND hwnd) {
-		for (size_t i = 0; i < windows.size(); ++i) {
-			if (windows[i] && windows[i]->getHWnd() == hwnd)
-				return windows[i];
-		}
-	}
-#endif
-
 	static Window* window;
 
 	LRWAPI window_callback_proc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
