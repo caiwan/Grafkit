@@ -20,7 +20,7 @@
 INITIALIZE_EASYLOGGINGPP
 
 
-using namespace FWcore;
+using namespace Grafkit;
 
 System::System()
 	: Window::WindowHandler() , m_window(this), m_Input(nullptr)
@@ -34,6 +34,10 @@ System::System()
 //#else 
 	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
 //#endif // _DEBUG
+
+	// intentionally delete logfile 
+	FILE* fp = nullptr; fopen_s(&fp, "log.log", "wb");
+	if (fp) { fputc(' ', fp); fflush(fp); fclose(fp); }
 
 	defaultConf.setGlobally(el::ConfigurationType::Filename, "log.log");
 	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
@@ -74,7 +78,8 @@ int System::execute() {
 			///@todo handle exceptions here 
 			//DebugBreak();
 			MessageBoxA(NULL, ex.what(), "Exception", 0);
-			//goto teardown;
+			el::base::debug::StackTrace();
+
 			break;
 		}
 
@@ -116,17 +121,20 @@ int System::execute() {
 			///@todo handle exceptions here 
 			//  DebugBreak();
 			MessageBoxA(NULL, ex.what(), "Exception", 0);
-			// goto teardown;
+			el::base::debug::StackTrace();
+
 			break;
 		}
 		// ================================================================================================================================
 		// --- teardown
 
 	} while (0);
-	teardown: {
+
+	{
 		this->release();
 		this->ShutdownWindows();
 	}
+
 	return 0;
 }
 
