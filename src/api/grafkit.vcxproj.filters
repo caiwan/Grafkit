@@ -26,9 +26,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="texture.hlsl">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="FWrender.cd" />
   </ItemGroup>
   <ItemGroup>
@@ -65,15 +62,6 @@
     <ClCompile Include="builtin_data\cube.cpp">
       <Filter>BuiltInData</Filter>
     </ClCompile>
-    <ClCompile Include="core\exceptions.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
-    <ClCompile Include="core\memory_alloc.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
-    <ClCompile Include="core\memory.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
     <ClCompile Include="render\Actor.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
@@ -82,18 +70,6 @@
     </ClCompile>
     <ClCompile Include="render\model.cpp">
       <Filter>Source Files\render</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\archive.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\persistent.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\tree.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="utils\XML.cpp">
-      <Filter>Source Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,19 +112,7 @@
     <ClInclude Include="math\matrix.h">
       <Filter>Source Files\math</Filter>
     </ClInclude>
-    <ClInclude Include="core\exceptions.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="core\input.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\memory.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\memory_alloc.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\reference.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="core\system.h">
@@ -156,24 +120,6 @@
     </ClInclude>
     <ClInclude Include="core\window.h">
       <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\stringutils.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\archive.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\dynamics.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\persistent.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\tree.h">
-      <Filter>Source Files\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\XML.h">
-      <Filter>Source Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
