@@ -31,7 +31,7 @@ public:
 	D3DClass(const D3DClass&);
 	~D3DClass();
 
-	void* operator new(unsigned int);
+	void* operator new(size_t);
 	void operator delete(void*);
 
 	bool Initialize(int, int, bool, HWND, bool, float, float);

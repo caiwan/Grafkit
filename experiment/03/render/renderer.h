@@ -18,7 +18,13 @@ namespace FWrender {
 	class Camera;
 	class Model;
 	class Shader;
+	class Texture;
 
+	// typedefs for reference counting
+	typedef Ref<Camera> CameraRef;
+	typedef Ref<Model> ModelRef;
+	typedef Ref<Shader> ShaderRef;
+	typedef Ref<Texture> TextureRef;
 
 	/**
 		Core renderer
@@ -30,7 +36,7 @@ namespace FWrender {
 		Renderer();
 		~Renderer();
 
-		void* operator new(unsigned int);
+		void* operator new(size_t);
 		void operator delete(void*);
 
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear);
@@ -43,8 +49,10 @@ namespace FWrender {
 
 		// --- getters
 		ID3D11Device* GetDevice() { return this->m_device; }
-		ID3D11DeviceContext* GetDeviceContext() { return this->m_deviceContext; }
+		operator ID3D11Device *() { return this->m_device; }
 
+		ID3D11DeviceContext* GetDeviceContext() { return this->m_deviceContext; }
+		operator ID3D11DeviceContext*() { return this->m_deviceContext; }
 
 		void GetProjectionMatrix(XMMATRIX&);
 		void GetWorldMatrix(XMMATRIX&);
