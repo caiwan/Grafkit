@@ -1,10 +1,11 @@
 #include "CurveEditorScene.h"
 
+#include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsSceneEvent>
 #include <QDebug>
 
-#include <QGraphicsView>
+#include <QPicture>
 
 #include "animation/animation.h"
 
@@ -119,7 +120,7 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 	parent->Recalculate(m_area);
 
 	painter->setRenderHint(QPainter::Antialiasing);
-	painter->setPen(QPen(grey));
+	painter->setPen(QPen(grey, 1.5f));
 
 	// boundaries
 	QPointF pMin = m_area->Screen2Point(r.topLeft());
@@ -214,10 +215,10 @@ void CurveEditorScene::UpdateAudiogram()
 
 
 // ------------------------------------------------------------------
-TimelineArea::TimelineArea()
+TimelineArea::TimelineArea(): m_grid(nullptr)
 {
-	m_scale = QSizeF(64, 64);
-	m_offset = QPointF(0, 0);
+    m_scale = QSizeF(64, 64);
+    m_offset = QPointF(0, 0);
 }
 
 QPointF TimelineArea::Point2Screen(QPointF point) const
@@ -236,52 +237,79 @@ QPointF TimelineArea::Screen2Point(QPointF point) const
 	};
 }
 
-
-void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
+void TimelineArea::DrawGrid(QPainter* const &painter, const QRectF &r)
 {
-	const QTransform transform = painter->transform();
-	painter->translate(r.topLeft());
+    if (!m_grid)
+    {
+        m_grid = new QPicture();
+        const QPoint topLeft = { 
+            static_cast<int>(r.topLeft().x()), 
+            static_cast<int>(r.topLeft().x()) }, 
+        bottomRight = { 
+            static_cast<int>(r.bottomRight().x()), 
+            static_cast<int>(r.bottomRight().y()) 
+        };
 
-	float sPos = 0.0f;
-	if (r.x() < 0.0f)
-		sPos = -1.0f * fmod(fabs(r.x()), m_scale.width());
-	else sPos = fmod(fabs(r.x()), m_scale.width());
+        m_grid->setBoundingRect(QRect(topLeft, bottomRight));
+        
+        QPainter picturePainter(m_grid);
+        DrawGridToPicture(&picturePainter, r);
+    }
 
-	float sc = m_scale.width() / 4.0f;
-	const float offsetX = m_offset.x();
-	const float offsetY = m_offset.y();
+    const QTransform transform = painter->transform();
+    painter->translate(r.topLeft());
+    
+    m_grid->play(painter);
+    
+    painter->setTransform(transform);
 
-	const float rectWidth = m_sceneRect.width();
-	const float rectHeight = m_sceneRect.height();
-
-	for (float f = fmod(offsetX, sc); f <= rectWidth + fmod(offsetX, sc); f += sc) {
-		painter->setPen(QPen(QColor(56, 56, 56)));
-		painter->drawLine(f, 0.0f, f, rectHeight);
-	}
-
-	sc = m_scale.width();
-	for (float f = fmod(offsetX, sc); f <= rectWidth + fmod(offsetX, sc); f += sc) {
-		painter->setPen(QPen(QColor(64, 64, 64)));
-		painter->drawLine(f, 0.0f, f, rectHeight);
-	}
-
-	sc = m_scale.height() / 4.0f;
-	for (float f = fmod(offsetY, sc); f <= rectHeight + fmod(offsetY + r.height() / 2, sc); f += sc) {
-		painter->setPen(QPen(QColor(56, 56, 56)));
-		painter->drawLine(0.0f, f, rectWidth, f);
-	}
-
-	sc = m_scale.height();
-	for (float f = fmod(offsetY, sc); f <= rectHeight + fmod(offsetY + r.height() / 2, sc); f += sc) {
-		painter->setPen(QPen(QColor(64, 64, 64)));
-		painter->drawLine(0.0f, f, rectWidth, f);
-	}
-
-	painter->setPen(QPen(QColor(144, 144, 144)));
-	painter->drawLine(offsetX, 0.0f, offsetX, rectHeight);
-	painter->setPen(QPen(QColor(144, 144, 144)));
-	painter->drawLine(0.0f, offsetY + r.height() / 2, rectWidth, offsetY + r.height() / 2);
-
-	painter->setTransform(transform);
 }
 
+void Idogep::TimelineArea::Invalidate()
+{
+    delete m_grid;
+    m_grid = nullptr;
+}
+
+void TimelineArea::DrawGridToPicture(QPainter* const& painter, const QRectF& r) const
+{
+    float sPos = 0.0f;
+    if (r.x() < 0.0f)
+        sPos = -1.0f * fmod(fabs(r.x()), m_scale.width());
+    else sPos = fmod(fabs(r.x()), m_scale.width());
+
+    float sc = m_scale.width() / 4.0f;
+    const float offsetX = m_offset.x();
+    const float offsetY = m_offset.y();
+
+    const float rectWidth = m_sceneRect.width();
+    const float rectHeight = m_sceneRect.height();
+
+    for (float f = fmod(offsetX, sc); f <= rectWidth + fmod(offsetX, sc); f += sc) {
+        painter->setPen(QPen(QColor(56, 56, 56)));
+        painter->drawLine(f, 0.0f, f, rectHeight);
+    }
+
+    sc = m_scale.width();
+    for (float f = fmod(offsetX, sc); f <= rectWidth + fmod(offsetX, sc); f += sc) {
+        painter->setPen(QPen(QColor(64, 64, 64)));
+        painter->drawLine(f, 0.0f, f, rectHeight);
+    }
+
+    sc = m_scale.height() / 4.0f;
+    for (float f = fmod(offsetY, sc); f <= rectHeight + fmod(offsetY + r.height() / 2, sc); f += sc) {
+        painter->setPen(QPen(QColor(56, 56, 56)));
+        painter->drawLine(0.0f, f, rectWidth, f);
+    }
+
+    sc = m_scale.height();
+    for (float f = fmod(offsetY, sc); f <= rectHeight + fmod(offsetY + r.height() / 2, sc); f += sc) {
+        painter->setPen(QPen(QColor(64, 64, 64)));
+        painter->drawLine(0.0f, f, rectWidth, f);
+    }
+
+    painter->setPen(QPen(QColor(144, 144, 144)));
+    painter->drawLine(offsetX, 0.0f, offsetX, rectHeight);
+    painter->setPen(QPen(QColor(144, 144, 144)));
+    painter->drawLine(0.0f, offsetY + r.height() / 2, rectWidth, offsetY + r.height() / 2);
+}
