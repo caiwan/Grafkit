@@ -8,8 +8,9 @@
 #include "dxtypes.h"
 
 #include "../core/reference.h"
+
 #include "mesh.h"
-#include "Actor.h"
+#include "actor.h"
 
 #include <vector>
 #include <array>
@@ -20,9 +21,15 @@ namespace FWrender
 	Stores extended data for a mesh, that makes it a model
 	*/
 
-	class Model : public virtual Referencable, public Entity3D, public Mesh{
+	class Entity3D;
+
+	class Model : public virtual Referencable, 
+		public FWrender::Mesh, public FWrender::Entity3D
+	{
 	public:
 		Model();
+		Model(const Model& other);
+
 		~Model();
 
 		//void addMesh(MeshRef mesh, /*materials, textures*/);

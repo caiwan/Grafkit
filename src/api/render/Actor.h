@@ -5,8 +5,6 @@
 #include "dxtypes.h"
 #include "../core/reference.h"
 
-#include "model.h"
-
 #include <vector>
 
 namespace FWrender {
