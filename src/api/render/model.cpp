@@ -1,7 +1,7 @@
 #include "model.h"
-#include "texture.h"
+#include "Scene.h"
 
-using namespace FWrender;
+using namespace Grafkit;
 
 // ==================================================================
 
@@ -16,8 +16,13 @@ Model::~Model()
 
 // ==================================================================
 
-void FWrender::Model::Render(FWrender::Renderer& deviceContext)
+void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* scene)
 {
-	if (m_material) this->m_material->Render(deviceContext);
-	this->RenderMesh(deviceContext);
+	if (m_material) 
+		this->m_material->Render(render, scene->GetFShader());
+
+	scene->GetFShader()->Render(render);
+	scene->GetVShader()->Render(render);
+
+	this->RenderMesh(render);
 }
