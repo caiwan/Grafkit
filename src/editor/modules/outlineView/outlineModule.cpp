@@ -2,7 +2,7 @@
 
 #include "demo.h"
 #include "render/SceneGraph.h"
-#include "animation/scene.h"
+#include "experimental/scene.h"
 
 #include "outlineTreeModel.h"
 

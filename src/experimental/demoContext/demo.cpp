@@ -11,7 +11,7 @@
 #include "render/texture.h"
 
 #include "render/SceneGraph.h"
-#include "animation/scene.h"
+#include "experimental/scene.h"
 #include "animation/actoranimation.h"
 
 #include "generator/ShaderLoader.h"

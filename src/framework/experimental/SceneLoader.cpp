@@ -5,7 +5,7 @@
 #include "render/model.h"
 #include "render/texture.h"
 #include "render/Material.h"
-#include "animation/scene.h"
+#include "experimental/scene.h"
 #include "animation/animation.h"
 
 #include "utils/persistence/archive.h"

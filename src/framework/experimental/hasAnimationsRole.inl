@@ -1,5 +1,5 @@
 #pragma once 
-#include "animation.h"
+#include "animation/animation.h"
 
 inline void Grafkit::HasAnimationsRole::UpdateAnimations(float t)
 {
