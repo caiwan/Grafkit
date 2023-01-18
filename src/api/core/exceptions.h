@@ -13,11 +13,11 @@ namespace FWdebug {
 	{
 	private:
 		int m_code, m_line;
-		LPCWCHAR m_message, m_file, m_function;
+		LPCWCHAR m_message, m_file, m_function, m_details;
 		WCHAR *m_formattedMessage;
 		
 	public:
-		Exception(int errorCode, LPCWCHAR message, LPCWCHAR file, LPCWCHAR function, int line);
+		Exception(int errorCode, LPCWCHAR message, LPCWCHAR file, LPCWCHAR function, int line, LPCWCHAR deatils=NULL);
 		virtual ~Exception();
 
 		inline int getCode() { return this->m_code; }
@@ -40,6 +40,7 @@ namespace FWdebug {
 
 // wrapper for exception
 #define EX(x) x(EX_WHERE)
+#define EX_DETAILS(x, details) x(EX_WHERE, details)
 
 // --------------------------------------------------------------------------------
 /**
@@ -53,7 +54,7 @@ namespace FWdebugExceptions {
 namespace FWdebugExceptions {\
 	class _class_ : public FWdebug::Exception{\
 		public:\
-			_class_ (const LPCWCHAR file, const LPCWCHAR function, int line) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line) {} \
+			_class_ (const LPCWCHAR file, const LPCWCHAR function, int line, LPCWCHAR details=NULL) : FWdebug::Exception(_id_, WIDE1(_message_), file, function, line, details) {} \
 	};\
 }
 

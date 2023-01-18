@@ -235,6 +235,8 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	unsigned long bufferSize, i;
 	ofstream fout;
 
+	std::wstring error_string();
+
 	compileErrors = (char*)(errorMessage->GetBufferPointer());
 	bufferSize = errorMessage->GetBufferSize();
 	fout.open("shader-error.txt");
@@ -242,7 +244,9 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	for (i = 0; i<bufferSize; i++)
 	{
 		if (compileErrors[i])
+			// fuckings ebbe bele most keresztbe
 			fout << compileErrors[i];
+			// error_string += compileErrors[i];
 	}
 
 	fout.close();
@@ -250,7 +254,8 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	errorMessage->Release();
 	errorMessage = 0;
 
-	throw new EX(ShaderException);
+	// @todo add compile errors text 
+	throw new EX_DETAILS(ShaderException, L"See shader-error.txt");
 }
 
 void FWrender::Shader::BuildReflection(ID3D11Device* device)
