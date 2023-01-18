@@ -1,44 +1,31 @@
 #pragma once 
 
-#include "utils/Command.h"
-#include "utils/ViewModule.h"
+#include "ViewModule.h"
 
 namespace Idogep {
 
-	class Document;
 	class TreeItem;
-
-	class TreeModel;
-	
-	class SceneGraphViewWidgetModel;
 
 	class OutlineView : public View {
 	public:
 		OutlineView();
 
-	    void SetModel(Grafkit::IResource * modelResource) override = 0;
+		void SetModel(Ref<Referencable> model);
+
 		Event<TreeItem*> onItemSelected;
+		//Event<TreeItem*> onItemHighlighted;
 	};
 
-
-    // TODO Item selected
-
-	class OutlineModule : public Module , public EmitsCommandRole
-	{
+	class OutlineModule : public Module {
 
 	public:
-	    explicit OutlineModule(Ref<Module> parent);
-		virtual ~OutlineModule();
-		
-	    void Initialize() override;
+		OutlineModule();
+		virtual void Initialize() = 0;
 
-		void DocumentChangedEvent(Document* const & document);
+		virtual void MediateSiblingModule(Ref<Module> other);
 
 	private:
-		OutlineView * m_myView;
-		
-		Ref<SceneGraphViewWidgetModel> m_myModel;
-		TreeModel* m_modelBuilder;
+		OutlineView m_myView;
 	};
 
 }
