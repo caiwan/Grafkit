@@ -1,122 +1,81 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="FWrender::Camera">
-    <Position X="8.75" Y="0.5" Width="1.5" />
+  <Class Name="Grafkit::AssetFileFilter">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Typedef Name="Grafkit::AssetFileFilter::extFilter_t" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>core\AssetFactory.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AACCQAAAACCAAAIoQAAGAQSAYCIAQghAABAAAAUAAAA=</HashCode>
-      <FileName>render\camera.h</FileName>
+      <HashCode>AAAEABAAAAAAAABAAAAAAAAAgAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>core\AssetFactory.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FWrender::Mesh">
+  <Class Name="Grafkit::IAssetFactory">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <NestedTypes>
-      <Struct Name="FWrender::Mesh::BufferStateDescriptor" Collapsed="true">
+      <Typedef Name="Grafkit::IAssetFactory::filelist_t" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>render\mesh.h</NewMemberFileName>
+          <NewMemberFileName>core\AssetFactory.h</NewMemberFileName>
         </TypeIdentifier>
-      </Struct>
+      </Typedef>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAUQAAEAAEAQAAAQAQAAAAAAAAAAARAAAAEACAA=</HashCode>
-      <FileName>render\mesh.h</FileName>
+      <HashCode>AAAAAAAAAAACAABAACAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>core\AssetFactory.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FWrender::Renderer">
-    <Position X="14.25" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>CACghAAAEAQIAUBAQAEAAQIBAAACAAhABACAGAAABAA=</HashCode>
-      <FileName>render\renderer.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="FWrender::Shader">
-    <Position X="10.5" Y="0.5" Width="1.5" />
+  <Class Name="Grafkit::FileAssetManager">
+    <Position X="2.75" Y="0.5" Width="1.5" />
     <NestedTypes>
-      <Class Name="FWrender::Shader::ConstantBufferRecord" Collapsed="true">
+      <Class Name="Grafkit::FileAssetManager::FileAsset" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>render\shader.h</NewMemberFileName>
+          <NewMemberFileName>core\AssetFile.h</NewMemberFileName>
         </TypeIdentifier>
       </Class>
-      <Struct Name="FWrender::Shader::InputElementRecord" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>render\shader.h</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-      <Typedef Name="FWrender::Shader::inputElementMap_t" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>render\shader.h</NewMemberFileName>
-        </TypeIdentifier>
-      </Typedef>
-      <Typedef Name="FWrender::Shader::bufferMap_t" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>render\shader.h</NewMemberFileName>
-        </TypeIdentifier>
-      </Typedef>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>QAAEIACAAgQAAQAAAAACAQAABAEACAAQBBAAAAAAEQA=</HashCode>
-      <FileName>render\shader.h</FileName>
+      <HashCode>AIAAAAAAAAAAAABAAGAAAAAAAAAAAAAAAAABAACAAAA=</HashCode>
+      <FileName>core\AssetFile.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="FWrender::Texture">
-    <Position X="12.25" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAYAAAAAAAAgwAAAAAAAQAAAAAAAAIAEBIAAAAEQAA=</HashCode>
-      <FileName>render\texture.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="FWrender::Model">
-    <Position X="0.5" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAgAAgAAAAAAAg=</HashCode>
-      <FileName>render\model.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="FWrender::SimpleMeshGenerator">
-    <Position X="10.5" Y="6" Width="1.5" />
+  <Class Name="Grafkit::IResourceManager">
+    <Position X="0.5" Y="3.25" Width="2.25" />
     <NestedTypes>
-      <Class Name="FWrender::SimpleMeshGenerator::MeshAttribSetter" Collapsed="true">
+      <Typedef Name="Grafkit::IResourceManager::ResourceMap_t" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>render\mesh.h</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-      <Typedef Name="FWrender::SimpleMeshGenerator::mapPtr_t" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>render\mesh.h</NewMemberFileName>
+          <NewMemberFileName>core\ResourceManager.h</NewMemberFileName>
         </TypeIdentifier>
       </Typedef>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AQAAAAAAQAAAAAAAEAAAAAgAIAEAAAAAAAAACABAAAA=</HashCode>
-      <FileName>render\mesh.h</FileName>
+      <HashCode>QAIAAAAAAAAAAABAAAEADAAAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>core\ResourceManager.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Typedef Name="FWrender::CameraRef" Collapsed="true">
-    <Position X="8.75" Y="6.5" Width="1.5" />
+  <Class Name="Grafkit::IResourceBuilder">
+    <Position X="5.75" Y="3" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>render\renderer.h</FileName>
+      <HashCode>AAAAAAAAACAAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>core\ResourceBuilder.h</FileName>
     </TypeIdentifier>
-  </Typedef>
-  <Typedef Name="FWrender::ModelRef" Collapsed="true">
-    <Position X="2.25" Y="6.25" Width="1.5" />
+  </Class>
+  <Class Name="Grafkit::PreloadEvents">
+    <Position X="5.75" Y="4.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>render\model.h</FileName>
+      <HashCode>ABAAAAAACAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>core\ResourcePreloader.h</FileName>
     </TypeIdentifier>
-  </Typedef>
-  <Typedef Name="FWrender::TextureRef" Collapsed="true">
-    <Position X="12.25" Y="3.25" Width="1.5" />
+  </Class>
+  <Class Name="Grafkit::AssetPreloader">
+    <Position X="3.5" Y="3.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>render\renderer.h</FileName>
+      <HashCode>ACAAAgAgAAQgAAAAAAEAgAAAAAEAAAAEAAACCAABACA=</HashCode>
+      <FileName>core\ResourcePreloader.h</FileName>
     </TypeIdentifier>
-  </Typedef>
-  <Typedef Name="FWrender::MeshRef" Collapsed="true">
-    <Position X="2.25" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>render\mesh.h</FileName>
-    </TypeIdentifier>
-  </Typedef>
+  </Class>
   <Font Name="Tahoma" Size="8.25" />
 </ClassDiagram>

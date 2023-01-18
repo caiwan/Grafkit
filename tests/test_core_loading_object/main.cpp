@@ -10,16 +10,14 @@
 
 #include "math/matrix.h"
 
-#include "core/AssetPreloader.h"
+#include "core/ResourcePreloader.h"
 
-using namespace FWrender;
-using FWmodel::AssimpLoader;
-using FWmath::Matrix;
+using namespace Grafkit;
 
-class Application : public FWcore::System, public FWassets::AssetPreloader
+class Application : public Grafkit::System, public Grafkit::AssetPreloader
 {
 public:
-	Application() : FWcore::System(),
+	Application() : Grafkit::System(),
 		m_file_loader(nullptr)
 	{
 		int screenWidth, screenHeight;
@@ -59,7 +57,7 @@ protected:
 		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 		// init file loader
-		this->m_file_loader = new FWassets::FileResourceManager("./");
+		this->m_file_loader = new Grafkit::FileResourceManager("./");
 		this->RegisterRecourceFactory(m_file_loader);
 		this->LoadCache();
 
@@ -137,9 +135,9 @@ protected:
 	};
 
 private:
-	FWassets::FileResourceManager *m_file_loader;
+	Grafkit::FileResourceManager *m_file_loader;
 public:
-	//FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; }
+	//Grafkit::IResourceFactory* GetResourceFactory() { return m_file_loader; }
 	FWrender::Renderer & GetDeviceContext() { return render; }
 };
 
