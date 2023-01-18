@@ -212,6 +212,7 @@ public:
 		if (ptr != NULL &&
 			ptr->Release() == 0) {
 			delete ptr;
+			ptr = NULL;
 		}
 	}
 

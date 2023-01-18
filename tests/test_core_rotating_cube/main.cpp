@@ -75,10 +75,12 @@ public:
 		
 		void release() {
 			this->render.Shutdown();
-			delete this->camera;
-			delete this->model;
+			
+			
+			//delete this->camera;
+			//delete this->model;  // this sucks so hard 
 			delete this->shader_texture;
-			//delete this->render;
+
 		};
 		
 		int mainloop() {
