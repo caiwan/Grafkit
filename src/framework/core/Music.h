@@ -19,7 +19,7 @@ namespace Grafkit {
 		virtual ~Audiogram() {}
 
 		virtual void GetFFT(float* ptr, int segcount) {}
-		virtual void GetWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec) { ptr = nullptr; length = 0; }
+		virtual void GetWaveform(float *&ptr, size_t &length, size_t &channelCount, size_t &samplePerSec) { ptr = nullptr; }
 	};
 
 	class Music : virtual public Referencable, public Timer, public Audiogram
