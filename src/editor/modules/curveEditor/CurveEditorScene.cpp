@@ -182,7 +182,7 @@ void CurveEditorScene::SelectionChangedSlot()
         CurvePointItem* item =  dynamic_cast<CurvePointItem*>(items.last());
         if (item)
         {
-            onPointSelected(item);
+            onPointSelected(item->GetId());
         }
     } else
     {

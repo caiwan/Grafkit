@@ -13,6 +13,8 @@ namespace Idogep {
 
     class TimelineArea;
 
+    class PointEditorView;
+
     typedef std::vector<CurvePointItem*> CurvePointList;
 
     class CurvePointEditor : public Controller, public EmitsCommandRole
@@ -28,6 +30,8 @@ namespace Idogep {
         void Recalculate(TimelineArea* const area) const;
 
         void UpdateKey(const Grafkit::Animation::ChannelRef& channel, size_t id, const Grafkit::Animation::Key& key);
+        
+        void Initialize(PointEditorView *pointEditorView);
 
         void Initialize() override;
 
@@ -43,19 +47,26 @@ namespace Idogep {
         void CommitAddPointEvent(float key, float value);
         void CommitRemovePointEvent(float key, float value);
 
-        void EditKeyEvent(CurvePointItem *item) const;
+        void EditKeyPointItemEvent(CurvePointItem * item);
         void EditKeyEvent(size_t index, Grafkit::Animation::Key key);
 
         bool HasCurvePoints() const { return !m_points.empty(); }
         size_t GetPointCount() const { return m_points.size(); }
         CurvePointItem* GetPoint(size_t id) { return m_points[id]; }
 
+        void PointSelectedEvent(size_t id);
+        void PointDeSelectedEvent();
+
     private:
         Grafkit::Animation::Key EditKey(size_t index, Grafkit::Animation::Key key) const;
 
         Grafkit::Animation::ChannelRef m_channel;
         CurvePointList m_points;
+
+        PointEditorView *m_myView;
     };
+
+    // --- 
 
     class CursorManager
     {

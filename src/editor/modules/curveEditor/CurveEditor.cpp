@@ -114,8 +114,8 @@ void CurveEditor::Initialize()
     assert(parentWidget);
 
     CurveEditorScene *ces = new CurveEditorScene();
-
     parentWidget->SetGraphicsScene(ces);
+
 
     // manage playback role 
     Editor* editor = dynamic_cast<Editor*>(GetRootModule().Get());
@@ -137,8 +137,10 @@ void CurveEditor::Initialize()
     m_manageAudiogram->onRequestWaveform += Delegate(musicProxy, &Audiogram::GetWaveform);
 
     // 
-    ces->onPointDeSelected += Delegate();
-    ces->onPointSelected += Delegate();
+    m_pointEditor->Initialize(parentWidget);
+    ces->onPointDeSelected += Delegate(m_pointEditor, &CurvePointEditor::PointDeSelectedEvent);
+    ces->onPointSelected += Delegate(m_pointEditor, &CurvePointEditor::PointSelectedEvent);
+    //ces->on
 
     m_myView = ces;
     SetView(m_myView);

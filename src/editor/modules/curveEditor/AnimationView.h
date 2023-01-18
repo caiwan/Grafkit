@@ -28,29 +28,26 @@ namespace Idogep
         Event<> onStopPlayback;
     };
 
+    // ========================================================================================================
+
     class PointEditorView : virtual public View
     {
     public:
         PointEditorView();
 
-        // events and stuff 
+        virtual void UpdatePointEditor(bool isSet) = 0;
 
-        // set point
-        void PointSet(size_t id, const Grafkit::Animation::Key&);
-        void PointUnSet();
+        size_t GetPointId() const { return m_pointId; }
+        void SetPointId(const size_t pointId) { m_pointId = pointId; }
 
-        // changed event
-        size_t GetId() const { return m_id; }
-        void SetId(const size_t id) { m_id = id; }
+        Grafkit::Animation::Key GetPointKey() const { return m_pointKey; }
+        void SetPointKey(const Grafkit::Animation::Key& pointKey) { m_pointKey = pointKey; }
 
-        Grafkit::Animation::Key GetKey() const { return m_key; }
-        void SetKey(const Grafkit::Animation::Key& key) { m_key = key; }
+        Event<size_t, Grafkit::Animation::Key> onEditKeyEvent;
 
     protected:
-        //virtual void UpdatePointEditorView() = 0;
-
-    private:
-        size_t m_id;
-        Grafkit::Animation::Key m_key;
+        size_t m_pointId;
+        Grafkit::Animation::Key m_pointKey;
     };
+
 }

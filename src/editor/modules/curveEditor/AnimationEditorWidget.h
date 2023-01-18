@@ -21,8 +21,7 @@ namespace Idogep
 
     class AnimationEditorWidget : public QDockWidget, public AnimationEditorView, public PointEditorView
     {
-    Q_OBJECT
-
+        Q_OBJECT
     public:
         explicit AnimationEditorWidget(QWidget* parent = nullptr);
         ~AnimationEditorWidget();
@@ -33,7 +32,13 @@ namespace Idogep
     protected:
 
         void RefreshView(bool force) override;
-		void UpdateAnimationModel(TreeModel* model) override;
+        void UpdateAnimationModel(TreeModel* model) override;
+        void UpdatePointEditor(bool isSet) override;
+
+    protected:
+        void resizeEvent(QResizeEvent* event) override;
+        // ReSharper restore CppInconsistentNaming
+        void SetupPointTypes();
 
         // QT specific
         // ReSharper disable CppInconsistentNaming
@@ -41,15 +46,15 @@ namespace Idogep
         void playPressedSlot() { onTogglePlayback(); }
         void stopPressedSlot() { onStopPlayback(); }
 
-		void itemClickedSlot(const QModelIndex& index);
+        void keyReturnPressedSlot();
+        void valueReturnPressedSlot();
+        void knotTypeChangedSlot(int index);
+
+        void itemClickedSlot(const QModelIndex& index);
         void itemDoubleClickedSlot(const QModelIndex& index);
-        
-    protected:
-        void resizeEvent(QResizeEvent* event) override;
-        // ReSharper restore CppInconsistentNaming
 
     private:
         Ui::AnimationEditorWidget* ui;
-  
-	};
+
+    };
 }

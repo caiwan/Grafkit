@@ -6,12 +6,15 @@
 #include "curveeditorscene.h"
 #include "curvepointitem.h"
 
+#include "AnimationView.h"
+
 using namespace Idogep;
 using namespace Grafkit;
 
 
 CurvePointEditor::CurvePointEditor(const Ref<Controller>& parent)
     : Controller(parent)
+    , m_myView(nullptr) 
 {
 }
 
@@ -30,7 +33,7 @@ void CurvePointEditor::Rebuild()
 
         point->onStartEdit += Delegate(this, &CurvePointEditor::StartEditEvent);
         point->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
-        point->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
+        point->onEditKey += Delegate(this, &CurvePointEditor::EditKeyPointItemEvent);
 
         point->SetModule(this);
     }
@@ -65,11 +68,18 @@ void CurvePointEditor::UpdateKey(const Animation::ChannelRef& channel, size_t id
 
     m_points.at(id)->SetKey(key);
     m_points.at(id)->RequestRefreshView(false);
+    m_myView->RequestRefreshView(false);
 }
+
+void CurvePointEditor::Initialize(PointEditorView* pointEditorView) {
+    m_myView = pointEditorView;
+}
+
 
 void CurvePointEditor::Initialize()
 {
-    // ... 
+    assert(m_myView);
+    m_myView->onEditKeyEvent += Delegate(this, &CurvePointEditor::EditKeyEvent);
 }
 
 // ========================================================================
@@ -102,12 +112,27 @@ void CurvePointEditor::CommitRemovePointEvent(float key, float value)
     assert(0);
 }
 
-void CurvePointEditor::EditKeyEvent(CurvePointItem * item) const {
+void CurvePointEditor::EditKeyPointItemEvent(CurvePointItem * item) 
+{
     item->SetKey(EditKey(item->GetId(), item->GetKey()));
+    PointSelectedEvent(item->GetId()); // makes the point edotor updated
 }
 
 void CurvePointEditor::EditKeyEvent(size_t index, Grafkit::Animation::Key key) {
-    m_points[index]->SetKey(EditKey(index, key));
+    CurvePointItem* point = m_points[index];
+    point->SetKey(EditKey(index, key));
+    point->RequestRefreshView(false);
+    m_myView->RequestRefreshView(false);
+}
+
+void CurvePointEditor::PointSelectedEvent(size_t id) {
+    m_myView->SetPointId(id);
+    m_myView->SetPointKey(m_channel->GetKey(id));
+    m_myView->UpdatePointEditor(true);
+}
+
+void CurvePointEditor::PointDeSelectedEvent() {
+    m_myView->UpdatePointEditor(false);
 }
 
 Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
@@ -132,3 +157,4 @@ Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
     m_channel->SetKey(index, key);
     return key;
 }
+

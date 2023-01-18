@@ -129,17 +129,17 @@ void Document::InitTestStuff(Renderer & render)
 				Ref<Animation::Channel> channel = track->GetChannel(k);
 				for (size_t l = 0; l < 256; ++l)
 				{
-					//const float v = 2 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) + 1;
+					const float v = 2 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 1;
 				    const float t = 1. + l;
 
-					Animation::Key key(t, 1);
-					key.m_type = Animation::KI_step;
-					//key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
+					Animation::Key key(t, v);
+					//key.m_type = Animation::KI_step;
+					key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
 					channel->AddKey(key);
 
-				    Animation::Key key2(t + .5, 0.);
-					key2.m_type = Animation::KI_step;
-					channel->AddKey(key2);
+				    //Animation::Key key2(t + .5, 0.);
+					//key2.m_type = Animation::KI_step;
+					//channel->AddKey(key2);
 				}
 			}
 		}
