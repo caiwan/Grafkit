@@ -10,8 +10,8 @@
 #include "renderer.h"
 #include "dxtypes.h"
 
-#include "../core/reference.h"
-#include "../core/exceptions.h"
+#include "reference.h"
+#include "exceptions.h"
 
 #include "shader.h"
 

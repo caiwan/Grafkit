@@ -7,10 +7,11 @@
 // #pragma lib(dxguid.lib.)
 #include <d3d11shader.h>
 
-#include "../core/reference.h"
 #include "dxtypes.h"
 #include "../render/renderer.h"
-#include "../core/exceptions.h"
+
+#include "reference.h"
+#include "exceptions.h"
 
 #include "../utils/stringutils.h"
 

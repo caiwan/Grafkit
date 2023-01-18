@@ -10,16 +10,6 @@
   <Class Name="FWrender::Mesh">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <NestedTypes>
-      <Struct Name="FWrender::Mesh::VertexType_pos" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>render\mesh.h</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-      <Struct Name="FWrender::Mesh::VertexType_pos_tex" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>render\mesh.h</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
       <Struct Name="FWrender::Mesh::BufferStateDescriptor" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>render\mesh.h</NewMemberFileName>
@@ -27,7 +17,7 @@
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>ACAAAAUQAAEAAEAQAAAQARAAAAAAAAAAARAAAAEACAA=</HashCode>
+      <HashCode>AAAAAAUQAAEAAEAQAAAQAQAAAAAAAAAAARAAAAEACAA=</HashCode>
       <FileName>render\mesh.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -41,47 +31,62 @@
   <Class Name="FWrender::Shader">
     <Position X="10.5" Y="0.5" Width="1.5" />
     <NestedTypes>
-      <Struct Name="FWrender::Shader::MatrixBufferType" Collapsed="true">
+      <Class Name="FWrender::Shader::ConstantBufferRecord" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\shader.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Struct Name="FWrender::Shader::InputElementRecord" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>render\shader.h</NewMemberFileName>
         </TypeIdentifier>
       </Struct>
-      <Enum Name="FWrender::Shader::ShaderType_e" Collapsed="true">
+      <Typedef Name="FWrender::Shader::inputElementMap_t" Collapsed="true">
         <TypeIdentifier>
-          <NewMemberFileName>render\renderer.h</NewMemberFileName>
+          <NewMemberFileName>render\shader.h</NewMemberFileName>
         </TypeIdentifier>
-      </Enum>
+      </Typedef>
+      <Typedef Name="FWrender::Shader::bufferMap_t" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\shader.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>QAAIAAAAAAQAABAAAAACAUAAACCAAAAABBAEAAAAEAA=</HashCode>
+      <HashCode>QAAEIACAAgQAAQAAAAACAQAABAEACAAQBBAAAAAAEQA=</HashCode>
       <FileName>render\shader.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FWrender::Texture">
     <Position X="12.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAQAAACAAAAgwAAAAAAAQAAAAAAAAIAAAIAAAAAAAA=</HashCode>
+      <HashCode>AAAYAAAAAAAAgwAAAAAAAQAAAAAAAAIAEBIAAAAEQAA=</HashCode>
       <FileName>render\texture.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FWrender::Model">
     <Position X="0.5" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
-      <FileName>render\renderer.h</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="FWrender::ParameterManager">
-    <Position X="10.5" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>render\shader.h</FileName>
+      <HashCode>AQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAgAAgAAAAAAAg=</HashCode>
+      <FileName>render\model.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="FWrender::SimpleMeshGenerator">
     <Position X="10.5" Y="6" Width="1.5" />
+    <NestedTypes>
+      <Class Name="FWrender::SimpleMeshGenerator::MeshAttribSetter" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\mesh.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Typedef Name="FWrender::SimpleMeshGenerator::mapPtr_t" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>render\mesh.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAAAAAAAAEAAAAAgAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <HashCode>AQAAAAAAQAAAAAAAEAAAAAgAIAEAAAAAAAAACABAAAA=</HashCode>
       <FileName>render\mesh.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -96,14 +101,7 @@
     <Position X="2.25" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>render\renderer.h</FileName>
-    </TypeIdentifier>
-  </Typedef>
-  <Typedef Name="FWrender::ShaderRef" Collapsed="true">
-    <Position X="10.5" Y="4" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>render\renderer.h</FileName>
+      <FileName>render\model.h</FileName>
     </TypeIdentifier>
   </Typedef>
   <Typedef Name="FWrender::TextureRef" Collapsed="true">

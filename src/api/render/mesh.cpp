@@ -1,7 +1,7 @@
 #include "mesh.h"
 #include "texture.h"
 
-#include "../core/exceptions.h"
+#include "exceptions.h"
 
 using namespace FWrender;
 using namespace FWdebugExceptions;
@@ -148,10 +148,16 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t ind
 		if (src_ptr) {
 			BYTE* dst_ptr = dst_struct + 16 * j;
 			while (i--) {
-				size_t k = src_width;
-				while (k--) {
-					dst_ptr[k] = src_ptr[k];
-				}
+				/// @todo ezzel kell kezdeni valamit surgosen 
+				//size_t k = src_width;
+				//while (k--) {
+				//	dst_ptr[k] = i; // src_ptr[k];
+				//}
+				//dst_ptr[0] = i;
+				//dst_ptr[4] = j;
+
+				memcpy(dst_ptr, src_ptr, src_width);
+
 				dst_ptr += struct_width;
 				src_ptr += src_width;
 			}

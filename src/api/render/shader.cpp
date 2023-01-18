@@ -182,7 +182,7 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	errorMessage = 0;
 
 	// @todo add compile errors text 
-	throw new EX_DETAILS(ShaderException, L"See shader-error.txt");
+	throw EX_DETAILS(ShaderException, "See shader-error.txt");
 }
 
 void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth) {
@@ -370,7 +370,7 @@ FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* devic
 	result = pConstBuffer->GetDesc(&this->m_description);
 
 	if (FAILED(result)) {
-		throw EX_DETAILS(ConstantBufferLocateException, L"Could not obtain description");
+		throw EX_DETAILS(ConstantBufferLocateException, "Could not obtain description");
 	}
 
 	ID3D11Buffer* buffer = NULL;
@@ -402,7 +402,7 @@ void FWrender::Shader::ConstantBufferRecord::set(void * data)
 
 	result = this->m_pDC->Map(this->m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
 	if (FAILED(result)) {
-		throw EX_DETAILS(ConstantBufferLocateException, L"Cannot map resource");
+		throw EX_DETAILS(ConstantBufferLocateException, "Cannot map resource");
 	}
 
 	memcpy(MappedResource.pData, data, this->m_description.Size);

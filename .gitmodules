@@ -1,0 +1,3 @@
+[submodule "structlib"]
+	path = structlib
+	url = git@bitbucket.org:industrialrevolutioners/structlib.git

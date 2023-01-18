@@ -3,7 +3,7 @@
 
 #include "renderer.h"
 #include "dxtypes.h"
-#include "../core/reference.h"
+#include "reference.h"
 #include "shader.h"
 
 #include <vector>
