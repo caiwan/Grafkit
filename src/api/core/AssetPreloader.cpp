@@ -5,10 +5,11 @@ using namespace FWassets;
 namespace {
 	struct {
 		IRenderAsset::RA_type_e type;
+		const char *basedir;
 		const char *extensions[8];
 	} rules[] = {
-		{ FWassets::IRenderAsset::RA_TYPE_Texture, {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
-		{ FWassets::IRenderAsset::RA_TYPE_Font, {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
+		{ FWassets::IRenderAsset::RA_TYPE_Texture, "./", {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
+		{ FWassets::IRenderAsset::RA_TYPE_Font, "./", {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
 	};
 }
 
@@ -50,7 +51,7 @@ void FWassets::AssetPreloader::LoadCache()
 			filelist.insert(filelist.end(), ret_filelist.begin(), ret_filelist.end());
 		}
 
-		for (filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++) 
+		if (!filelist.empty()) for (filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++) 
 		{
 
 			// + trim path goez here 

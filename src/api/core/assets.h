@@ -34,6 +34,12 @@ namespace FWassets {
 		ResourceFilter(const char ** const & extensions, size_t count);
 		virtual ~ResourceFilter() {}
 
+		/**
+		Trims out filepath, filename, and extension (if any) from the given full filename
+		*/
+		static int trimpath(std::string fullpath, std::string &path, std::string &filename, std::string &extension);
+
+		/// 
 		int isFileInfilter(std::string path);
 
 	private:

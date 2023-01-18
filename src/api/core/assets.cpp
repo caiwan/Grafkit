@@ -13,43 +13,47 @@ using namespace FWdebugExceptions;
 FWassets::ResourceFilter::ResourceFilter(const char ** const & extensions, size_t count)
 {
 	for (size_t i = 0; i < count; i++) {
-		if(extensions[i] || extensions[i][0]) 
+		if(extensions[i] && extensions[i][0]) 
 			this->m_filterExtensions.insert(extensions[i]);
 	}
 }
 
 
+int FWassets::ResourceFilter::trimpath(std::string fullpath, std::string &path, std::string &filename, std::string & extension)
+{
+	int result = 0; //, rcc = 0;
+
+	size_t in_len = fullpath.length();
+	const char * in_str = fullpath.c_str();
+	const char delim = '.';
+
+	size_t n = in_len + 1;
+	while (n--) if (in_str[n] == delim) break;
+
+	const char * fext = nullptr;
+	if (!n)  result |= 1 << 0; else  fext = &in_str[n + 1];
+	if (fext) extension = fext; else result |= 1 << 1;
+
+	/// @todo path levalasztasa goez here
+
+	return result;
+}
+
 int FWassets::ResourceFilter::isFileInfilter(std::string path)
 {	
-	// miezittkerem
-	char * in_str = new char[path.length()+1];
-	strcpy_s(in_str, path.length(), path.c_str());
-	rsize_t strmax = path.length();
-	char * pch = nullptr, *pchs[256], *next = nullptr;
-	const char *delim = ".";
+	std::string dummy0, dummy1, ext;
+	FWassets::ResourceFilter::trimpath(path, dummy0, dummy1, ext);
 
-	size_t count = 0;
-	do 
-	{
-		// ez buzi ez teljesen 
-		pch = strtok_s (in_str, delim, &next);
-		pchs[count] = pch;
-	} while (pch != NULL);
-
-	if (count == 0) 
+	if (ext.empty()) 
 		return 0;
-
-	char *& fext = pchs[count - 1];
 
 	int found = 0;
 	for (extFilter_t::iterator it = m_filterExtensions.begin(); it != m_filterExtensions.end(); it++) {
-		if (*it == fext) {
+		if (*it == ext) {
 			found = 1;
 			break;
 		}
 	}
-
-	delete in_str;
 
 	return found;
 }

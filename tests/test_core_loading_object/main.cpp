@@ -10,14 +10,13 @@
 
 #include "math/matrix.h"
 
-#include "core/renderassets.h"
-#include "core/assets.h"
+#include "core/AssetPreloader.h"
 
 using namespace FWrender;
 using FWmodel::AssimpLoader;
 using FWmath::Matrix;
 
-class Application : public FWcore::System, public FWassets::IRenderAssetManager
+class Application : public FWcore::System, public FWassets::AssetPreloader //public FWassets::IRenderAssetManager
 {
 public:
 	Application() : FWcore::System(),
@@ -61,6 +60,10 @@ protected:
 
 		// init file loader
 		this->m_file_loader = new FWassets::FileResourceManager("./");
+		this->RegisterRecourceFactory(m_file_loader);
+		this->LoadCache();
+
+		// -> obtain stuffz
 
 		// -- camera
 		camera = new Camera();
@@ -84,6 +87,8 @@ protected:
 	};
 
 	void release() {
+		this->SaveCache();
+
 		this->render.Shutdown();
 	};
 
@@ -129,7 +134,7 @@ protected:
 private:
 	FWassets::FileResourceManager *m_file_loader;
 public:
-	FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; }
+	//FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; }
 	FWrender::Renderer & GetDeviceContext() { return render; }
 };
 
