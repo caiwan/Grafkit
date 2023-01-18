@@ -1,7 +1,8 @@
 #pragma once
 
 #include "core/Music.h"
-#include "utils/Event.h"
+#include "models/Music.h"
+#include "Event.h"
 
 namespace Idogep
 {
@@ -16,9 +17,14 @@ namespace Idogep
         void Pause(int e) override;
         void Update() override;
 
-        void Initialize(Grafkit::IAssetRef asset) override{}
-        void Shutdown() override{}
-        void ToggleMute() override;
+	class MusicProxy : public Music
+	{
+		friend class Editor;
+	public:
+		virtual void Play();
+		virtual void Stop();
+		virtual void Pause(int e);
+		virtual void Update();
 
         uint64_t GetSampleCount() override;
         uint64_t GetSampleCountPerSec() override;

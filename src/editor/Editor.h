@@ -7,10 +7,6 @@
 #include "utils/Event.h"
 #include "utils/Command.h"
 
-#include "utils/ViewModule.h"
-
-#include "EditorView.h"
-
 namespace Grafkit {
 	class IResourceManager;
 }

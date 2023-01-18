@@ -15,7 +15,7 @@ class QPlainTextEdit;
 namespace Idogep {
 	extern void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
-	class LoggerProxy : public Grafkit::Logger::ILoggerHandler
+	class LoggerQTProxy : public Grafkit::Logger::ILoggerHandler
 	{
 	public:
 		LoggerProxy() {}

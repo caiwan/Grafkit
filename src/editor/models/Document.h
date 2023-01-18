@@ -13,13 +13,22 @@ namespace Idogep {
 
 	class Editor;
 	class Document;
-
+	
 	class TreeModel;
 	class SceneModel;
 
-	class Music;
+	namespace Role {
+		class HasSceneGraphRole {
+		public:
+			virtual Grafkit::SceneGraphRef GetScenegraph() = 0;
+		};
 
-	class Document : virtual public Referencable
+		class HasEffectRole {
+
+		};
+	}
+
+	class Document : public HasSceneGraphRole
 	{
 		friend class Editor;
 	public:
@@ -33,9 +42,7 @@ namespace Idogep {
 		void SetDirty() { m_isDirty = true; }
 		bool IsDirty() const { return m_isDirty; }
 
-		Grafkit::SceneGraphRef GetScenegraph() const;
-		Grafkit::SceneResRef GetScene() const;
-		Grafkit::MusicResRef GetMusic() const;
+		virtual Grafkit::SceneGraphRef GetScenegraph() { return m_scenegraph; }
 
 	private:
 		void InitTestStuff(Grafkit::Renderer & render);
@@ -51,8 +58,6 @@ namespace Idogep {
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
-
-		Grafkit::MusicResRef m_music;
 	};
 
 }

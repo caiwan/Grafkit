@@ -54,7 +54,7 @@ SceneResRef Document::GetScene() const
 	return m_scene;
 }
 
-MusicResRef Document::GetMusic() const
+TreeModel * Idogep::Document::GetOutline()
 {
 	return m_music;
 }
