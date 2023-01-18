@@ -6,13 +6,17 @@
   <ItemDefinitionGroup>
     <Link />
     <Lib>
-      <AdditionalLibraryDirectories>c:\bazdmegakurvaanyadtegeci\;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\assimp-vc140-mtd.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet2FileLoader_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Collision_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Common_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Dynamics_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Geometry_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3OpenCL_clew_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mtd.lib;Bullet2FileLoader_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Common_Debug.lib;Bullet3Dynamics_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3OpenCL_clew_Debug.lib;LinearMath_Debug.lib;%(AdditionalDependencies)
+	  </AdditionalDependencies>
     </Lib>
     <ProjectReference />
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\;$(SolutionDir)build\$(Platform)\$(Configuration)\;c:\bazdmegakurvaanyadtegeci\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\assimp-vc140-mtd.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet2FileLoader_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Collision_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Common_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Dynamics_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3Geometry_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\Bullet3OpenCL_clew_Debug.lib;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\LinearMath_Debug.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\$(Platform)\$(Configuration)\;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mtd.lib;Bullet2FileLoader_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Common_Debug.lib;Bullet3Dynamics_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3OpenCL_clew_Debug.lib;LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

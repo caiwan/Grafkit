@@ -25,58 +25,100 @@
     <ClCompile Include="builtin_data\c64palette.cpp" />
     <ClCompile Include="builtin_data\cbm64font.cpp" />
     <ClCompile Include="builtin_data\cube.cpp" />
-    <ClCompile Include="core\assets.cpp" />
+    <ClCompile Include="core\ResourcePreloader.cpp" />
     <ClCompile Include="core\input.cpp" />
     <ClCompile Include="core\system.cpp" />
     <ClCompile Include="core\window.cpp" />
     <ClCompile Include="generator\assimploader.cpp" />
-    <ClCompile Include="generator\bmfont_parser.cpp" />
+    <ClCompile Include="generator\FontmapLoader.cpp" />
+    <ClCompile Include="generator\ShaderLoader.cpp" />
     <ClCompile Include="generator\TextureLoader.cpp" />
     <ClCompile Include="render\Actor.cpp" />
     <ClCompile Include="render\camera.cpp" />
     <ClCompile Include="render\effect.cpp" />
+    <ClCompile Include="render\Light.cpp" />
     <ClCompile Include="render\Material.cpp" />
     <ClCompile Include="render\mesh.cpp" />
     <ClCompile Include="render\model.cpp" />
     <ClCompile Include="render\particle.cpp" />
-    <ClCompile Include="core\renderassets.cpp" />
     <ClCompile Include="render\renderer.cpp" />
-    <ClCompile Include="render\Scenegraph.cpp" />
+    <ClCompile Include="render\Scene.cpp" />
     <ClCompile Include="render\shader.cpp" />
     <ClCompile Include="render\text.cpp" />
     <ClCompile Include="render\texture.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="utils\archive.cpp" />
+    <ClCompile Include="utils\asset.cpp" />
+    <ClCompile Include="utils\AssetFactory.cpp" />
+    <ClCompile Include="utils\AssetFile.cpp" />
+    <ClCompile Include="utils\exceptions.cpp" />
+    <ClCompile Include="utils\guid.cpp" />
+    <ClCompile Include="utils\json.cpp" />
+    <ClCompile Include="utils\logger.cpp" />
+    <ClCompile Include="utils\memory.cpp" />
+    <ClCompile Include="utils\memory_alloc.cpp" />
+    <ClCompile Include="utils\node.cpp" />
+    <ClCompile Include="utils\persistent.cpp" />
+    <ClCompile Include="utils\resource.cpp" />
+    <ClCompile Include="utils\ResourceBuilder.cpp" />
+    <ClCompile Include="utils\ResourceManager.cpp" />
+    <ClCompile Include="utils\struct.cpp" />
+    <ClCompile Include="utils\struct_pack.cpp" />
+    <ClCompile Include="utils\tree.cpp" />
+    <ClCompile Include="utils\XML.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h" />
     <ClInclude Include="builtin_data\cbm64Font.h" />
     <ClInclude Include="builtin_data\cube.h" />
-    <ClInclude Include="core\assets.h" />
+    <ClInclude Include="core\ResourcePreloader.h" />
+    <ClInclude Include="core\asset.h" />
     <ClInclude Include="core\input.h" />
     <ClInclude Include="core\system.h" />
     <ClInclude Include="core\window.h" />
     <ClInclude Include="generator\assimploader.h" />
-    <ClInclude Include="generator\bmfont_parser.h" />
+    <ClInclude Include="generator\FontmapLoader.h" />
+    <ClInclude Include="generator\ShaderLoader.h" />
     <ClInclude Include="generator\TextureLoader.h" />
     <ClInclude Include="math\matrix.h" />
     <ClInclude Include="render\Actor.h" />
     <ClInclude Include="render\camera.h" />
     <ClInclude Include="render\dxtypes.h" />
     <ClInclude Include="render\effect.h" />
+    <ClInclude Include="render\Light.h" />
     <ClInclude Include="render\Material.h" />
     <ClInclude Include="render\mesh.h" />
     <ClInclude Include="render\model.h" />
     <ClInclude Include="render\particle.h" />
-    <ClInclude Include="core\renderassets.h" />
     <ClInclude Include="render\renderer.h" />
-    <ClInclude Include="render\Scenegraph.h" />
+    <ClInclude Include="render\Scene.h" />
     <ClInclude Include="render\shader.h" />
     <ClInclude Include="render\text.h" />
     <ClInclude Include="render\texture.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\structlib\structlib.vcxproj">
-      <Project>{67008a74-f4f3-482b-8b25-ca93088bf79b}</Project>
-    </ProjectReference>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="utils\archive.h" />
+    <ClInclude Include="utils\asset.h" />
+    <ClInclude Include="utils\AssetFactory.h" />
+    <ClInclude Include="utils\AssetFile.h" />
+    <ClInclude Include="utils\dirent.h" />
+    <ClInclude Include="utils\dynamics.h" />
+    <ClInclude Include="utils\exceptions.h" />
+    <ClInclude Include="utils\guid.h" />
+    <ClInclude Include="utils\iterator.h" />
+    <ClInclude Include="utils\json.h" />
+    <ClInclude Include="utils\logger.h" />
+    <ClInclude Include="utils\memory.h" />
+    <ClInclude Include="utils\memory_align.h" />
+    <ClInclude Include="utils\memory_alloc.h" />
+    <ClInclude Include="utils\node.h" />
+    <ClInclude Include="utils\persistent.h" />
+    <ClInclude Include="utils\reference.h" />
+    <ClInclude Include="utils\resource.h" />
+    <ClInclude Include="utils\ResourceBuilder.h" />
+    <ClInclude Include="utils\ResourceManager.h" />
+    <ClInclude Include="utils\struct_pack.h" />
+    <ClInclude Include="utils\tree.h" />
+    <ClInclude Include="utils\XML.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BFF1AD5F-469C-4EBE-8C53-698DAE473A13}</ProjectGuid>
@@ -173,9 +215,11 @@
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -190,9 +234,11 @@
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -212,9 +258,11 @@
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -234,9 +282,11 @@
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

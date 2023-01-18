@@ -6,13 +6,19 @@
   <ItemDefinitionGroup>
     <Link />
     <Lib>
-      <AdditionalLibraryDirectories>c:\bazdmegakurvaanyadtegeci\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\assimp-vc140-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mtd.lib;Bullet2FileLoader_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Common_Debug.lib;Bullet3Dynamics_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3OpenCL_clew_Debug.lib;LinearMath_Debug.lib;%(AdditionalDependencies)
+	  </AdditionalDependencies>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
     </Lib>
     <ProjectReference />
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\;$(SolutionDir)build\$(Platform)\$(Configuration)\;c:\bazdmegakurvaanyadtegeci\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\assimp-vc140-mtd.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\$(Platform)\$(Configuration)\;$(SolutionDir)externals\lib\$(Configuration)_$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mtd.lib;Bullet2FileLoader_Debug.lib;Bullet3Collision_Debug.lib;Bullet3Common_Debug.lib;Bullet3Dynamics_Debug.lib;Bullet3Geometry_Debug.lib;Bullet3OpenCL_clew_Debug.lib;LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
