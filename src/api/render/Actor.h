@@ -5,6 +5,8 @@
 #include "dxtypes.h"
 #include "reference.h"
 #include "shader.h"
+#include "Material.h"
+#include "texture.h"
 
 #include <vector>
 
@@ -20,21 +22,19 @@ namespace FWrender {
 			Entity3D();
 			virtual ~Entity3D();
 
-			void setVertexShader(ShaderRef shader);
-			ShaderRef &getVertexShader() { return this->m_vertexShader; }
+			ShaderRef &GetVertexShader() { return this->m_vertexShader; }
+			TextureRef &GetTexture(int n = 0) { return m_textures[n]; } ///@todo bound check
+			MaterialRef &GetMaterial() { this->m_material; }
 
-			void setFragmentShader(ShaderRef shader);
-			ShaderRef &getFragmentShader() { return this->m_vertexShader; }
+			Actor * const & GetParent() { return m_parent; }
 
-			void setShader(ShaderRef vs, ShaderRef fs) { this->setVertexShader(vs), this->setFragmentShader(fs); }
+		protected:	
+			Actor* m_parent;
 
-			const Actor* getParent() { return m_parent; }
-
-		protected:
 			ShaderRef m_vertexShader;
-			ShaderRef m_fragmentShader;
-			
-			const Actor* m_parent;
+
+			MaterialRef m_material;
+			TextureRef m_textures[MULTITEXTURE_MAX];
 
 			/// @todo + transformation
 			/// @todo + bounding box, ha kell 

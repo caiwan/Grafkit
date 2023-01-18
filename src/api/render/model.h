@@ -7,11 +7,12 @@
 #include "renderer.h"
 #include "dxtypes.h"
 
-#include "../core/reference.h"
+#include "reference.h"
 
 #include "mesh.h"
 #include "actor.h"
 #include "texture.h"
+#include "Material.h"
 
 #include <vector>
 #include <array>
@@ -31,14 +32,6 @@ namespace FWrender
 			Model(const Model& other);
 
 			~Model();
-
-			void setTexture(TextureRef texture, int n = 0);
-			TextureRef& getTexture(int n = 0);
-
-		private:
-			// + material
-			TextureRef m_textures[MULTITEXTURE_MAX];
-
 	};
 
 	typedef Ref<Model> ModelRef;
