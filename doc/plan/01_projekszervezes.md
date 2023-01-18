@@ -26,7 +26,6 @@
 **TODO** - a shader effekteknek is kell valahova valamilyen könyvtár, amiben ellennének, ne az assetsben legyen külön. 
 
 
-
 ## API szinten
 
 ### Névterek
