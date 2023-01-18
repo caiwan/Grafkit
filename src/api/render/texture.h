@@ -121,7 +121,7 @@ namespace Grafkit
 		operator ID3D11ShaderResourceView* () { return this->m_pResourceView; }
 		operator ID3D11RenderTargetView* () { return this->m_pRenderTargetView; }
 
-		void SetRenderTargetView(Renderer & device);
+		void SetRenderTargetView(Renderer & device, size_t id =0);
 
 	private:
 		ID3D11Texture2D * m_pTex;

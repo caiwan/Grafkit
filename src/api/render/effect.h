@@ -24,7 +24,7 @@ namespace Grafkit {
 	{
 	public:
 		EffectComposer();
-		~EffectComposer();
+		virtual ~EffectComposer();
 
 		void Initialize(Renderer &render);
 		void Shutdown();
@@ -35,11 +35,15 @@ namespace Grafkit {
 
 		/** Beallitja az elso read buffert a rendererenek, a render passhoz
 		*/
-		void BindInput(Renderer &render);
+		virtual void BindInput(Renderer &render, size_t in = 0);
 
 		/** Vegigmegy a render chainen
 		*/
-		void Render(Renderer &render);
+		virtual void Render(Renderer &render);
+
+		void setInput(size_t bind, TextureRef tex) { m_input_map[bind] = tex; }
+		TextureRef getInput(size_t bind) { auto it = m_input_map.find(bind); return it == m_input_map.end() ? TextureRef() : it->second; }
+		void clearInput() { m_input_map.clear(); }
 
 	protected:
 		/**
@@ -52,7 +56,12 @@ namespace Grafkit {
 		*/
 		void FlushBuffers();
 
-	private:
+		/**
+		Lerendereli a chaint
+		*/
+		void RenderChain(Renderer &render);
+
+	protected:
 
 		TextureRef m_texOut[3];
 		Texture *m_pTexRead, *m_pTexWrite, *m_pTexBack;
@@ -64,6 +73,11 @@ namespace Grafkit {
 
 		std::vector<EffectPassRef> m_effectChain;
 		typedef std::vector<EffectPassRef>::iterator fx_chain_it_t;
+
+		typedef std::map<size_t, TextureRef> bind_map_t;
+		typedef bind_map_t::iterator bind_map_it_t;
+
+		bind_map_t m_input_map;
 	};
 
 	// ---------------------------------------------------------------------------------------------------
@@ -89,12 +103,30 @@ namespace Grafkit {
 		void Initialize(Renderer &render, ShaderRef shader);
 		void Shutdown();
 
+		void BindOutputs(Renderer &render);
 		void Render(Renderer &render);
 
 		ShaderRef GetShader() { return m_shader; }
 
+		void setOutput(size_t bind, TextureRef tex) {m_output_map[bind] = tex; }
+		void setInput(std::string name, TextureRef tex) { m_input_map[name] = tex; }
+
+		void clearOutputs() { m_output_map.clear();  }
+		void clearInputs() { m_input_map.clear(); }
+
+		TextureRef getOutput(size_t bind); 
+		TextureRef getInput(std::string name);
+
 	private:
 		ShaderRef m_shader;
+
+		typedef std::map<size_t, TextureRef> bind_map_t;
+		typedef bind_map_t::iterator bind_map_it_t;
+		typedef std::map<std::string, TextureRef> name_map_t;
+		typedef name_map_t::iterator name_map_it_t;
+
+		bind_map_t m_output_map;
+		name_map_t m_input_map;
 
 	};
 
