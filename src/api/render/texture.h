@@ -1,10 +1,9 @@
 #pragma once
 
-#include <string>
-#include "renderer.h"
+#include "reference.h"
 
-#include "../core/renderassets.h"
-#include "../core/assets.h"
+#include "renderer.h"
+#include "../core/resource.h"
 
 #define MULTITEXTURE_MAX 16
 
@@ -17,10 +16,10 @@ namespace Grafkit
 	typedef Ref<Texture> TextureRef_t;
 	typedef TextureRef_t TextureRef;
 
-	class TextureAsset;
-	typedef Ref<TextureAsset> TextureAssetRef_t;
+	class TextureRes;
+	typedef Ref<TextureRes> TextureResRef_t;
 
-	class TextureAssetRef;
+	class TextureResRef;
 
 #define TEXTURE_BUCKET "texture"
 
@@ -35,40 +34,40 @@ namespace Grafkit
 	- Rendelkezik a referenciatipus tagfuggvenyeivel
 	*/
 
-	class TextureAsset : public Grafkit::IRenderAsset, public TextureRef_t
+	class TextureRes : public Grafkit::IResource, public TextureRef_t
 	{
-		friend class TextureAssetRef;
+		friend class TextureResRef;
 	public:
-		TextureAsset();
-		~TextureAsset();
+		TextureRes() : IResource() {}
+		~TextureRes() {}
 
 		virtual const char* GetBucketID() { return TEXTURE_BUCKET; }
 	};
 
 	/**
-	Egy wrapper, *ami elviekben segit elerni* a texurat a texture asset objektum belsejebol. A `TextureAsset` referenciatipusat orokiti tovabb.
-	- van egy ptr adattagja, ami a `TextureAsset`-re mutat, illetve elvegzi annak referenciaszamlalasat
+	Egy wrapper, *ami elviekben segit elerni* a texurat a texture asset objektum belsejebol. A `TextureRes` referenciatipusat orokiti tovabb.
+	- van egy ptr adattagja, ami a `TextureRes`-re mutat, illetve elvegzi annak referenciaszamlalasat
 	- a `this->ptr` ide mutat, es a this->ptr->ptr mutat a Texturarar kozvetlen
 	- ezt delegacio segiti
-	
+
 	**Remeljuk osszeszoritott farpofakkal, hogy mindez mukodik.**
 	- Azt kell eszben tartani, hogy a `.` operator a refet eri el, ami az assetet fedezi
-	- a `->` operator a texture refet eri el, ami a texturat fedezi. 
-	
+	- a `->` operator a texture refet eri el, ami a texturat fedezi.
+
 	*/
-	class TextureAssetRef : public TextureAssetRef_t
+	class TextureResRef : public TextureResRef_t
 	{
 		// add conversion to Texture*
 	public:
-		TextureAssetRef() {}
-		TextureAssetRef(TextureAssetRef& other) { this->AssingnRef(other); }
-		TextureAssetRef(TextureAsset* other) { this->AssingnRef(other); }
+		TextureResRef() {}
+		TextureResRef(TextureResRef& other) { this->AssingnRef(other); }
+		TextureResRef(TextureRes* other) { this->AssingnRef(other); }
 
 		operator Texture* () { return this->ptr->ptr; }
 		operator TextureRef () { return this->ptr->ptr; }
-		TextureAssetRef& operator = (Texture* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
-		TextureAssetRef& operator = (TextureAsset* in_ptr) { this->AssingnRef(in_ptr); return *this; }
-		TextureAssetRef& operator = (TextureAssetRef& other) { this->AssingnRef(other); return *this; }
+		TextureResRef& operator = (Texture* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+		TextureResRef& operator = (TextureRes* in_ptr) { this->AssingnRef(in_ptr); return *this; }
+		TextureResRef& operator = (TextureResRef& other) { this->AssingnRef(other); return *this; }
 	};
 
 	// ========================================================================================================================
@@ -76,9 +75,9 @@ namespace Grafkit
 	/**
 	A bitmap resource that contains a raw bitmap. This ig enerated by the generated, and loaded into the texture object.
 	*/
-	class BitmapResource : public Grafkit::IResource {
+	class BitmapResource : public Referencable {
 	public:
-		BitmapResource() : m_bmsize(0), m_ch(0), m_x(0), m_y(0), m_data(nullptr) {}
+		BitmapResource() : m_bmsize(0), m_ch(0), m_x(0), m_y(0), m_data(nullptr), m_stride(0) {}
 		BitmapResource(void* data, size_t x, size_t y, size_t ch) : m_bmsize(0), m_ch(ch), m_x(x), m_y(y), m_data(data) { m_bmsize = x*y*ch; m_stride = x*ch; }
 		~BitmapResource() { free(m_data); }
 
@@ -102,86 +101,59 @@ namespace Grafkit
 	// ========================================================================================================================
 
 	/**
-	Texture generator interface
-	*/
-	class ITextureBuilder : public Grafkit::IRenderAssetBuilder
-	{
-	public:
-		ITextureBuilder(TextureAssetRef in) : IRenderAssetBuilder(), m_in(in) {}
-		virtual ~ITextureBuilder() {}
-
-		virtual void operator() (Grafkit::IRenderAssetManager * const & assman) = 0;
-
-	protected:
-		TextureAssetRef m_in;
-	};
-
-	// ========================================================================================================================
-
-	/**
 	Texture class
 	*/
-	class Texture : virtual public Referencable //, public Grafkit::IRenderAsset
+	__declspec(align(16)) class Texture : virtual public Referencable, public AlignedNew<Texture>
 	{
 	public:
 		Texture();
-		Texture(const Texture&);
 		~Texture();
 
-		void Initialize(ID3D11Device * const & device, BitmapResourceRef bitmap);
+		void Initialize(Renderer & device, BitmapResourceRef bitmap);
+		void Initialize(Renderer & device, size_t w = 0, size_t h = 0);
 		void Shutdown();
 
 		ID3D11Texture2D* GetTexture2D() { return this->m_pTex; }
 		ID3D11ShaderResourceView* GetTextureResource() { return this->m_pResourceView; }
-		ID3D11SamplerState*	GetSamplerState() { return this->m_pSamplerState; }
+		ID3D11RenderTargetView* GetRenderTargetView() { return this->m_pRenderTargetView; }
 
 		operator ID3D11Texture2D* () { return this->m_pTex; }
 		operator ID3D11ShaderResourceView* () { return this->m_pResourceView; }
+		operator ID3D11RenderTargetView* () { return this->m_pRenderTargetView; }
+
+		void SetRenderTargetView(Renderer & device);
 
 	private:
 		ID3D11Texture2D * m_pTex;
 		ID3D11ShaderResourceView* m_pResourceView;
-		ID3D11SamplerState *m_pSamplerState;
+		ID3D11RenderTargetView* m_pRenderTargetView;
 	};
 
 	// ========================================================================================================================
 
-	/** 
-	Texture loader from bitmap
-
-	Ide kijegyzetelem, hogy mije van ennek, es hogyan kell vele banni:
-
-	*/
-	class TextureFromBitmap : public ITextureBuilder
+	__declspec(align(16)) class TextureSampler : virtual public Referencable, public AlignedNew<Texture>
 	{
-		public:
-			TextureFromBitmap(Grafkit::IResourceRef resource, TextureAssetRef in);
-			~TextureFromBitmap();
+	public:
+		TextureSampler();
+		~TextureSampler();
 
-			void Resize(int x, int y) { m_w = x, m_h = y; }
-			virtual void operator() (Grafkit::IRenderAssetManager * const & assman);
+		void Initialize(Renderer & device);
+		void Shutdown();
 
-		protected:
-			Grafkit::IResourceRef m_resource;
-			int m_w, m_h;
+		ID3D11SamplerState*	GetSamplerState() { return this->m_pSamplerState; }
+
+	private:
+		ID3D11SamplerState *m_pSamplerState;
 	};
 
-	/** Render target texture 
-	*/
-	class RenderTarget : public Referencable
-	{
-		///@todo implement this
-	};
+	typedef Ref<TextureSampler> TextureSamplerRef_t;
+	typedef TextureSamplerRef_t TextureSamplerRef;
 }
 
-// load texture from the texture repository 
-#define LOAD_TEXTURE(render, filename, input)\
-{\
-	TextureFromBitmap txgen(filename);\
-	txgen(render, input);\
-}
+#define EX_ERROR_TEXTURE 1200
 
-DEFINE_EXCEPTION(BitmapLoadException, 1105, "Could not load and create bitmap from file")
-DEFINE_EXCEPTION(TextureCreateException, 1105, "Could not create texture")
-DEFINE_EXCEPTION(ShaderResourceViewException, 1105, "Could not create shader resource view")
-DEFINE_EXCEPTION(SamplerStateCreateException, 1105, "Could not create sampler state")
+DEFINE_EXCEPTION(TextureCreateException, EX_ERROR_TEXTURE + 1, "Could not create texture")
+DEFINE_EXCEPTION(ShaderResourceViewException, EX_ERROR_TEXTURE + 2, "Could not create shader resource view")
+DEFINE_EXCEPTION(RenderTargetViewException, EX_ERROR_TEXTURE + 3, "Could not create render target view")
+DEFINE_EXCEPTION(NoRenderTargetViewException, EX_ERROR_TEXTURE + 4, "Texture was not created as bare, and has no render target view")
+DEFINE_EXCEPTION(SamplerStateCreateException, EX_ERROR_TEXTURE + 5, "Could not create sampler state")
