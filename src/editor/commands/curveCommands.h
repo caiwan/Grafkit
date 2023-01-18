@@ -13,10 +13,8 @@ namespace Idogep
 	{
 	public:
 		CurveKeyChangeCommand(Ref<Grafkit::Animation::Channel> & channel, size_t keyId, Grafkit::Animation::Key oldKey, Grafkit::Animation::Key newKey, View * const & enclosingView);
-		virtual void Do();
-		virtual void Undo();
-
-		//Event<bool> onRefreshView;
+	    void Do() override;
+	    void Undo() override;
 
 	private:
 		Ref<Grafkit::Animation::Channel> &m_channel;

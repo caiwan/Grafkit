@@ -8,95 +8,95 @@ class QStyleOptionGraphicsItem;
 
 namespace Idogep
 {
-	class TimelineArea;
+    class TimelineArea;
 
-	class CurvePointItem : public QGraphicsItem
-	{
-	public:
-		//CurvePointItem(QGraphicsItem* parent = nullptr);
-		explicit CurvePointItem(Grafkit::Animation::Key key, size_t index, QGraphicsItem* parent = nullptr);
+    class CurvePointItem : public QGraphicsItem
+    {
+    public:
+        //CurvePointItem(QGraphicsItem* parent = nullptr);
+        explicit CurvePointItem(Grafkit::Animation::Key key, size_t index, QGraphicsItem* parent = nullptr);
 
-		// may be useful when copy and paste
-		//CurvePointItem(const CurvePointItem& other);
+        // may be useful when copy and paste
+        //CurvePointItem(const CurvePointItem& other);
 
-		~CurvePointItem();
+        ~CurvePointItem();
 
         // Operations
 
-		void RecalculatePosition(TimelineArea const * area);
+        void RecalculatePosition(TimelineArea const* area);
 
         // Properties
+		float GetTime() const { return m_key.m_time; }
+		void SetTime(const float t) { m_key.m_time = t; }
 
-		QPointF Coord() const { return QPointF(m_key.m_time, m_key.m_value); }
-		void SetCoord(QPointF c) { m_key.m_time = c.x(); m_key.m_value = c.y(); }
+		float GetValue() const { return m_key.m_value; }
+		void SetValue(const float v) { m_key.m_value = v; }
 
-		QPointF Tangent() const { return QPointF(m_key.m_tangent.x, m_key.m_tangent.y); }
-		void SetTangent(QPointF t) { m_key.m_tangent.x = t.x(); m_key.m_tangent.y = t.y(); }
+		QPointF GetCoord() const { return { m_key.m_time, m_key.m_value }; }
 
-        // events
-		Event<CurvePointItem*> onMovePoint;
-		Event<CurvePointItem*> onMoveTangent;
-		Event<CurvePointItem*> onStartEdit;
-		Event<CurvePointItem*> onCommitEdit;
+		void SetCoord(QPointF c)
+		{
+			m_key.m_time = c.x();
+			m_key.m_value = c.y();
+		}
+
+		QPointF GetTangent() const { return { m_key.m_tangent.x, m_key.m_tangent.y }; }
+
+		void SetTangent(QPointF t)
+		{
+			m_key.m_tangent.x = t.x();
+			m_key.m_tangent.y = t.y();
+		}
 
 		// --- 
-		QRectF boundingRect() const override;
-		void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
-		QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-#if 0
-		// TODO: refactor rendesen ezeket:
-		float time() const { return m_key.m_time; }
-		void setTime(float t) { m_key.m_time = t; }
-		float value() const { return m_key.m_value; }
-		void setValue(float v) { m_key.m_value = v; }
 
 		Grafkit::Animation::Key GetKey() const { return m_key; }
-		void SetKey(Grafkit::Animation::Key key) { m_key = key; }
+		void SetKey(const Grafkit::Animation::Key& key) { m_key = key; }
 
-		// ... 
+        Grafkit::Animation::Key GetOriginalKey() const { return m_originalKey; }
+        
+        uint32_t GetId() const { return m_id; }
+        void SetId(const uint32_t id) { m_id = id; }
 
-		uint32_t index() { return m_id; }
-		void setIndex(uint32_t id) { m_id = id; }
+        // events
+        Event<CurvePointItem*> onEditKey;
+        Event<CurvePointItem*> onStartEdit;
+        Event<CurvePointItem*> onCommitEdit;
 
-		uint32_t nodeType() { return m_nodeType; }
-		void setNodeType(uint32_t nt) { m_nodeType = nt; }
-
-		uint32_t color() { return m_color; }
-		void setColor(uint32_t color) { m_color = color; }
-
+        // --- 
+        QRectF boundingRect() const override;
+        void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+        QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
 
-	protected:
-		virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
-		virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+    protected:
+        void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+        void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
-		virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-		void fakeMouseMoveEvent(QGraphicsSceneMouseEvent* event);
+        void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+        void FakeMouseMoveEvent(QGraphicsSceneMouseEvent* event);
 
-		virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
+        void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
 
-		//virtual void keyPressEvent(QKeyEvent * event);
-		//virtual void keyReleaseEvent(QKeyEvent * event);
+        void EditPosition(QGraphicsSceneMouseEvent* event);
 
-		void editTangent(QGraphicsSceneMouseEvent* event);
-		void editPosition(QGraphicsSceneMouseEvent* event);
+        void ToggleTangentEditing();
+        void EditTangent(QGraphicsSceneMouseEvent* event);
 
-		void toggleTangentEditing();
+    private:
 
-	private:
-#endif
-		//QPointF m_coord, m_tangent;
-		float m_radix, m_radix2;
+        float m_radix, m_radix2;
 
-		bool m_showTangent;
+        bool m_showTangent;
 
-		uint32_t m_id;
+        uint32_t m_id;
 
 		Grafkit::Animation::Key m_key;
+		Grafkit::Animation::Key m_originalKey;
 
-		uint32_t m_nodeType;
-		uint32_t m_color;
+        uint32_t m_nodeType;
+        uint32_t m_color;
 
-		QSizeF m_scaling;
-	};
+        QSizeF m_scaling;
+    };
 }
