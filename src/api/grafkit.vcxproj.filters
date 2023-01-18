@@ -24,6 +24,9 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{fdc97d4b-3c8b-4298-b16b-24dbab2407c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\generator">
+      <UniqueIdentifier>{c9f4d9de-a7de-45f0-baac-1c34758722b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="FWrender.cd" />
@@ -70,6 +73,18 @@
     </ClCompile>
     <ClCompile Include="render\model.cpp">
       <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\Scenegraph.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\particle.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\text.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\bmfont_parser.cpp">
+      <Filter>Source Files\generator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +135,18 @@
     </ClInclude>
     <ClInclude Include="core\window.h">
       <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="render\Scenegraph.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\particle.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\text.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\bmfont_parser.h">
+      <Filter>Source Files\generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

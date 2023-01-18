@@ -50,7 +50,8 @@ namespace FWrender {
 
 
 	/**
-
+	An actor node 
+	Todo: advanced architectural design goez here 
 	*/
 	class Actor : public virtual Referencable
 	{
