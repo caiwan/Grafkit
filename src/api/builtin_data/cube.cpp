@@ -15,9 +15,9 @@ static const unsigned short _triangleIndices[] = {
 	3,4,5,
  };
 
-const float * const FWBuiltInData::triangle = _triangle;
-const unsigned short * const  FWBuiltInData::triangleIndices = _triangleIndices;
-const unsigned short FWBuiltInData::triangleIndicesLen = 3;
+const float * const GrafkitData::triangle = _triangle;
+const unsigned short * const  GrafkitData::triangleIndices = _triangleIndices;
+const unsigned short GrafkitData::triangleIndicesLen = 3;
 
 
 static const float _quad_vertices[] = {
@@ -42,15 +42,14 @@ static const float _quad_texcoord[] = {
 };
 
 static const int _quad_mesh[] = {
-	0,1,2, 
-	2,3,0
+	0,3,2,
+	2,1,0
 };
 
-const float * const FWBuiltInData::quad = _quad_vertices;
-const float * const FWBuiltInData::quad2 = _quad_vertices2;
-const float * const FWBuiltInData::quad_texcoord = _quad_texcoord;
-const int * const FWBuiltInData::quadIndices = _quad_mesh;
-const int FWBuiltInData::quadIndicesLen = 4;
+const float * const GrafkitData::quad = _quad_vertices;
+const float * const GrafkitData::quad2 = _quad_vertices2;
+const float * const GrafkitData::quad_texcoord = _quad_texcoord;
+const int * const GrafkitData::quadIndices = _quad_mesh;
 
 #if 1
 // vertex
@@ -90,35 +89,35 @@ static const float _cube_vertices[] = {
 // normals
 static const float _cube_normals[] = {
 		
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f,
-		
-		0.0f, 0.0f,-1.0f,
-		0.0f, 0.0f,-1.0f,
-		0.0f, 0.0f,-1.0f,
-		0.0f, 0.0f,-1.0f,
-		
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		
-		0.0f,-1.0f, 0.0f,
-		0.0f,-1.0f, 0.0f,
-		0.0f,-1.0f, 0.0f,
-		0.0f,-1.0f, 0.0f,
-		
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,
-		
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f,
-		-1.0f, 0.0f, 0.0f
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+						  
+		0.0f, 0.0f,-1.0f, 0.0f,
+		0.0f, 0.0f,-1.0f, 0.0f,
+		0.0f, 0.0f,-1.0f, 0.0f,
+		0.0f, 0.0f,-1.0f, 0.0f,
+						  
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+						  
+		0.0f,-1.0f, 0.0f, 0.0f,
+		0.0f,-1.0f, 0.0f, 0.0f,
+		0.0f,-1.0f, 0.0f, 0.0f,
+		0.0f,-1.0f, 0.0f, 0.0f,
+						  
+		1.0f, 0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f, 0.0f,
+						  
+		-1.0f, 0.0f, 0.0f,0.0f,
+		-1.0f, 0.0f, 0.0f,0.0f,
+		-1.0f, 0.0f, 0.0f,0.0f,
+		-1.0f, 0.0f, 0.0f,0.0f,
 };
 
 // texture
@@ -279,14 +278,14 @@ static const unsigned short _cube_indices[] = {
 #endif
 
 
-const float * const FWBuiltInData::cubeVertices = _cube_vertices;
-const float * const FWBuiltInData::cubeNormals = _cube_normals;
+const float * const GrafkitData::cubeVertices = _cube_vertices;
+const float * const GrafkitData::cubeNormals = _cube_normals;
 ///@todo add tangents also
-const float * const FWBuiltInData::cubeTextureUVs =_cube_texture_uvs;
-const   int * const FWBuiltInData::cubeIndices = _cube_indices;
+const float * const GrafkitData::cubeTextureUVs =_cube_texture_uvs;
+const   int * const GrafkitData::cubeIndices = _cube_indices;
 
 static const unsigned int _cube_vertex_length = sizeof(_cube_vertices)/sizeof(*_cube_vertices) / 4;
 static const unsigned int _cube_indices_length = sizeof(_cube_indices)/sizeof(*_cube_indices);
 
-const unsigned int FWBuiltInData::cubeVertexLength = _cube_vertex_length;
-const unsigned int FWBuiltInData::cubeIndicesLength = _cube_indices_length;
+const unsigned int GrafkitData::cubeVertexLength = _cube_vertex_length;
+const unsigned int GrafkitData::cubeIndicesLength = _cube_indices_length;
