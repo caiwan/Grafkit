@@ -1,8 +1,8 @@
 #pragma once
 
 #include "dxtypes.h"
-#include "../core/reference.h"
-#include "../core/exceptions.h"
+#include "reference.h"
+#include "exceptions.h"
 
 #define MULTITEXTURE_MAX 16
 
@@ -18,17 +18,17 @@ namespace FWrender
 		bool Initialize(ID3D11Device* device, WCHAR* filename);
 		void Shutdown();
 
-		ID3D11Texture2D* GetTexture2D() { return this->m_tex; }
-		ID3D11ShaderResourceView* GetTextureResource() { return this->m_texture_resource; }
-		ID3D11SamplerState*	GetSamplerState() { return this->m_sampleState; }
+		ID3D11Texture2D* GetTexture2D() { return this->m_pTex; }
+		ID3D11ShaderResourceView* GetTextureResource() { return this->m_pResourceView; }
+		ID3D11SamplerState*	GetSamplerState() { return this->m_pSamplerState; }
 
-		operator ID3D11Texture2D* () { return this->m_tex; }
-		operator ID3D11ShaderResourceView* () { return this->m_texture_resource; }
+		operator ID3D11Texture2D* () { return this->m_pTex; }
+		operator ID3D11ShaderResourceView* () { return this->m_pResourceView; }
 
 	private:
-		ID3D11Texture2D *m_tex;
-		ID3D11ShaderResourceView* m_texture_resource;
-		ID3D11SamplerState *m_sampleState;
+		ID3D11Texture2D * m_pTex;
+		ID3D11ShaderResourceView* m_pResourceView;
+		ID3D11SamplerState *m_pSamplerState;
 	};
 }
 
