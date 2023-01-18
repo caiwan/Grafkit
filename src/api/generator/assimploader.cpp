@@ -210,7 +210,7 @@ Grafkit::AssimpLoader::~AssimpLoader()
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const &assman)
+void Grafkit::AssimpLoader::load(Grafkit::IResourceManager * const & assman)
 {
 	SceneRef outScene = m_dstResource;
 	if (outScene.Invalid()) {

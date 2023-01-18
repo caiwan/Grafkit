@@ -304,65 +304,68 @@ namespace Grafkit {
 
 	
 
-	typedef Ref<Shader> ShaderRef_t;
+//	typedef Ref<Shader> ShaderRef_t;
+//
+//#define SHADER_BUCKET "shader"
+//
+//	/**
+//	enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
+//	- itt most osszevontam az assettel az egeszet, remelem nem lesz miserable failure az egesz
+//	*/
+//	class ShaderRes : public ShaderRef_t, public Grafkit::IResource {
+//		friend class ShaderResRef;
+//
+//	public:
+//		inline Shader::ShaderParamManager operator[](const char *name) { return this->ptr->operator[](name); }
+//		inline Shader::ShaderParamManager operator[](size_t id) { return this->ptr->operator[](id); }
+//
+//		ShaderRes() : IResource() {}
+//		ShaderRes(Shader* ptr) : IResource(), ShaderRef_t(ptr) {}
+//		ShaderRes(Ref<Shader> ptr) : IResource(), ShaderRef_t(ptr) {}
+//
+//		ShaderRes& operator = (Shader* in_ptr) { this->AssingnRef(in_ptr); return *this; }
+//		ShaderRes& operator = (ShaderRes &in_ptr) { this->AssingnRef(in_ptr); return *this; }
+//
+//		~ShaderRes() {}
+//		virtual const char* GetBucketID() { return SHADER_BUCKET; }
+//	};
+//
+//	typedef ShaderRes ShaderRef;
+//
+//	typedef Ref<ShaderRes> ShaderResRef_t;
+//
+//	class ShaderResRef : public ShaderResRef_t
+//	{
+//	public:
+//		ShaderResRef(): ShaderResRef_t(){}
+//		ShaderResRef(ShaderRes *ptr) : ShaderResRef_t(ptr) {}
+//		ShaderResRef(ShaderResRef& other) : ShaderResRef_t(other) {}
+//
+//		~ShaderResRef() {}
+//
+//		///@todo release modban makrozza ki az exception dobast
+//		operator Shader* () { 
+//			if (!ptr->ptr)
+//				throw EX_DETAILS(FWdebugExceptions::NullPointerException, this->ptr->GetName().c_str());
+//
+//			return this->ptr->ptr; 
+//		}
+//		
+//		operator ShaderRef () { 
+//			if (!ptr->ptr)
+//				throw EX_DETAILS(FWdebugExceptions::NullPointerException, this->ptr->GetName().c_str());
+//
+//			return this->ptr->ptr; 
+//		}
+//
+//		ShaderResRef& operator = (Shader* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+//		ShaderResRef& operator = (ShaderRef &in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+//		ShaderResRef& operator = (ShaderRes *in_ptr) { this->AssingnRef(in_ptr); return *this; }
+//		ShaderResRef& operator = (ShaderResRef& other) { this->AssingnRef(other); return *this; }
+//	};
 
-#define SHADER_BUCKET "shader"
-
-	/**
-	enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
-	- itt most osszevontam az assettel az egeszet, remelem nem lesz miserable failure az egesz
-	*/
-	class ShaderRes : public ShaderRef_t, public Grafkit::IResource {
-		friend class ShaderResRef;
-
-	public:
-		inline Shader::ShaderParamManager operator[](const char *name) { return this->ptr->operator[](name); }
-		inline Shader::ShaderParamManager operator[](size_t id) { return this->ptr->operator[](id); }
-
-		ShaderRes() : IResource() {}
-		ShaderRes(Shader* ptr) : IResource(), ShaderRef_t(ptr) {}
-		ShaderRes(Ref<Shader> ptr) : IResource(), ShaderRef_t(ptr) {}
-
-		ShaderRes& operator = (Shader* in_ptr) { this->AssingnRef(in_ptr); return *this; }
-		ShaderRes& operator = (ShaderRes &in_ptr) { this->AssingnRef(in_ptr); return *this; }
-
-		~ShaderRes() {}
-		virtual const char* GetBucketID() { return SHADER_BUCKET; }
-	};
-
-	typedef ShaderRes ShaderRef;
-
-	typedef Ref<ShaderRes> ShaderResRef_t;
-
-	class ShaderResRef : public ShaderResRef_t
-	{
-	public:
-		ShaderResRef(): ShaderResRef_t(){}
-		ShaderResRef(ShaderRes *ptr) : ShaderResRef_t(ptr) {}
-		ShaderResRef(ShaderResRef& other) : ShaderResRef_t(other) {}
-
-		~ShaderResRef() {}
-
-		///@todo release modban makrozza ki az exception dobast
-		operator Shader* () { 
-			if (!ptr->ptr)
-				throw EX_DETAILS(FWdebugExceptions::NullPointerException, this->ptr->GetName().c_str());
-
-			return this->ptr->ptr; 
-		}
-		
-		operator ShaderRef () { 
-			if (!ptr->ptr)
-				throw EX_DETAILS(FWdebugExceptions::NullPointerException, this->ptr->GetName().c_str());
-
-			return this->ptr->ptr; 
-		}
-
-		ShaderResRef& operator = (Shader* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
-		ShaderResRef& operator = (ShaderRef &in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
-		ShaderResRef& operator = (ShaderRes *in_ptr) { this->AssingnRef(in_ptr); return *this; }
-		ShaderResRef& operator = (ShaderResRef& other) { this->AssingnRef(other); return *this; }
-	};
+	typedef IResourceContainer<Shader> ShaderResource;
+	typedef Ref<ShaderResource> ShaderResourceRef;
 
 	// ================================================================================================================================
 

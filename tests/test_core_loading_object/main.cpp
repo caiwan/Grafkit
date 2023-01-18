@@ -78,7 +78,7 @@ protected:
 
 		// -- model 
 		scene = new Scene();
-		this->AddBuilder(new AssimpLoader(this->m_file_loader->Get("./models/tegla.3ds"), scene);
+		this->AddBuilder(new AssimpLoader("./models/tegla.3ds", scene));
 
 		this->t = 0;
 
