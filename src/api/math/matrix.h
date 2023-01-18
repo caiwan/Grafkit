@@ -1,5 +1,6 @@
+#pragma once
 #include "../render/dxtypes.h"
-
+#include "memory_align.h"
 namespace FWmath {
 	/**
 	Extends DirectX::XMMATRIX with operations to make thing easier, and use as a real type.
@@ -7,7 +8,9 @@ namespace FWmath {
 
 	`::matrix` is a shortcut to `DirectX::XMMATRIX`
 	*/
-	class Matrix
+
+	__declspec(align(16)) class Matrix : public AlignedNew<Matrix>
+//	class Matrix
 	{
 
 	private:
@@ -35,18 +38,31 @@ namespace FWmath {
 
 		// identity
 		void Identity() {
-			 (*this) = DirectX::XMMatrixIdentity();
+			 this->mat = DirectX::XMMatrixIdentity();
 		}
 
 		///translation
-		void Translate(float3 v)
+		void Translate(float3 &v)
 		{
 			this->mat = DirectX::XMMatrixTranslation(v.x, v.y, v.z);
 			
 		}
 
-		///scale
-		void Scale(float3 v)
+		///@{
+		/// Multiply
+		void Multiply(matrix &m)
+		{
+			this->mat = DirectX::XMMatrixMultiply(this->mat, m);
+		}
+
+		void Multiply(Matrix &m)
+		{
+			this->mat = DirectX::XMMatrixMultiply(m.mat, this->mat);
+		}
+		///@}
+
+		/// banana for
+		void Scale(float3 &v)
 		{
 			this->mat = DirectX::XMMatrixScaling(v.x, v.y, v.z);
 		}
