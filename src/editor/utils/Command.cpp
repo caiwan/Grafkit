@@ -9,12 +9,13 @@ void Idogep::CommandStack::ConnectEmitter(EmitsCommandRole * emitter)
 
 void Idogep::CommandStack::ClearStack()
 {
-	while (!m_redoStack.empty()) m_redoStack.pop();
+    while (!m_redoStack.empty()) m_redoStack.pop();
+    while (!m_undoStack.empty()) m_undoStack.pop();
 }
 
-void Idogep::CommandStack::AddCommand(Ref<Command> command)  // NOLINT
+void Idogep::CommandStack::AddCommand(CommandRef command)  // NOLINT
 {
-	ClearStack();
+    while (!m_redoStack.empty()) m_redoStack.pop();
 
 	// TODO: exception handling && rollback if needed
 	command->Do();

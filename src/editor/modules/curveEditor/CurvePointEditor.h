@@ -28,15 +28,18 @@ namespace Idogep
 
         Grafkit::Animation::ChannelRef GetChannel() const { return m_channel; }
 
-        void SetChannel(Grafkit::Animation::ChannelRef& channel)
+        void SetChannel(Grafkit::Animation::TrackRef& track, const size_t &channelId, Grafkit::Animation::ChannelRef& channel)
         {
+            m_track = track;
+            m_channelId = channelId;
             m_channel = channel;
-            Rebuild();
+            Rebuild(); //... Folyt kov.
         }
 
         void Recalculate(TimelineArea* const area) const;
 
         void UpdateKey(const Grafkit::Animation::ChannelRef& channel, size_t index, const Grafkit::Animation::Key& key);
+        void UpdateChannel(const Grafkit::Animation::TrackRef& track, size_t channelId, const Grafkit::Animation::ChannelRef& channel);
 
         void Initialize(PointEditorView* pointEditorView);
 
@@ -52,7 +55,7 @@ namespace Idogep
         void CommitEditEvent(const size_t& index, const Grafkit::Animation::Key& key);
 
         void CommitAddPointEvent(const float& key, const float& value);
-        void CommitRemovePointEvent(const float& key, const float& value);
+        void CommitRemovePointEvent(const size_t& index);
 
         void EditKeyEvent(const size_t& index, const Grafkit::Animation::Key& key);
 
@@ -69,6 +72,10 @@ namespace Idogep
         Grafkit::Animation::Key EditKey(size_t index, Grafkit::Animation::Key key) const;
 
         Grafkit::Animation::ChannelRef m_channel;
+        Grafkit::Animation::TrackRef m_track;
+
+        size_t m_channelId;
+
         CurvePointList m_points;
 
         bool m_isCurveChangedFlag;

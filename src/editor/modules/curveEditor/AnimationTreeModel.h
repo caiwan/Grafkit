@@ -18,12 +18,15 @@ namespace Idogep
     class AnimationChannelItem : public TreeItem {
     public:
 
-        AnimationChannelItem(const QList<QVariant>& data, TreeItem* parentItem);
+        AnimationChannelItem(const QList<QVariant>& data, TreeItem* parentItem, const Grafkit::Animation::TrackRef& track, size_t trackId, const Grafkit::Animation::ChannelRef& channel);
 
+        Grafkit::Animation::TrackRef GetTrack() const { return m_track; }
+        size_t GetTrackId() const { return m_trackId; }
         Grafkit::Animation::ChannelRef GetChannel() const { return m_channel; }
-        void SetChannel(Grafkit::Animation::ChannelRef& channel) { m_channel = channel; }
 
     private:
+        Grafkit::Animation::TrackRef m_track;
+        size_t m_trackId;
         Grafkit::Animation::ChannelRef m_channel;
     };
 

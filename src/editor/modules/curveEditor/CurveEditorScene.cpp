@@ -189,15 +189,13 @@ void CurveEditorScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
     if (!itemAtCrsr)
     {
-        // call event
-
-        //CurvePointItem* cpi = new CurvePointItem(QPointF((event->scenePos().x() - _ofs.x()) / _scale.width(), (event->scenePos().y() - _ofs.y()) / -_scale.height()));
-        //_pointItems->append(cpi);
-
-        //addItem(cpi);
-        //cpi->update();
+        QPointF p = m_area->Screen2Point(event->screenPos());
+        onCommitAddPointEvent(p.x(), p.y());
         update();
-        //views().at(0)->update();
+    } else
+    {
+        onCommitRemovePointEvent(itemAtCrsr->GetId());
+        update();
     }
 
     QGraphicsScene::mouseDoubleClickEvent(event);

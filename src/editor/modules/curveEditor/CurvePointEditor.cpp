@@ -67,6 +67,15 @@ void CurvePointEditor::UpdateKey(const Animation::ChannelRef& channel, size_t in
 
 }
 
+void CurvePointEditor::UpdateChannel(const Animation::TrackRef & track, size_t channelId, const Animation::ChannelRef & channel)
+{
+    if (m_track != track || channelId != m_channelId)
+        return;
+    m_channel = channel;
+
+    Rebuild();
+}
+
 void CurvePointEditor::Initialize(PointEditorView* pointEditorView) { m_myView = pointEditorView; }
 
 
@@ -98,14 +107,26 @@ void CurvePointEditor::CommitEditEvent(const size_t& index, const Animation::Key
 
 void CurvePointEditor::CommitAddPointEvent(const float& key, const float& value)
 {
-    //recalc, readd? 
-    assert(0);
+    Animation::ChannelRef oldChannel= new Animation::Channel(m_channel);
+    
+    Animation::Key newKey(m_channel->GetKey(key)); // use previous key as prototype
+    newKey.m_time = key, newKey.m_value = value;
+    
+    m_channel->AddKey(newKey);
+
+    Ref<CurveChangeCommand> cmd= new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this); 
+    onNewCommand(cmd);
+
 }
 
-void CurvePointEditor::CommitRemovePointEvent(const float& key, const float& value)
+void CurvePointEditor::CommitRemovePointEvent(const size_t& index)
 {
-    //recalc, readd?
-    assert(0);
+    Animation::ChannelRef oldChannel = new Animation::Channel(m_channel);
+    
+    m_channel->DeleteKey(index);
+
+    Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this);
+    onNewCommand(cmd);
 }
 
 void CurvePointEditor::EditKeyEvent(const size_t& index, const Animation::Key& key)

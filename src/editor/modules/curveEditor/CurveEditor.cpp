@@ -140,11 +140,14 @@ void CurveEditor::Initialize()
     ces->onPointDeSelected += Delegate(m_pointEditor, &CurvePointEditor::PointDeSelectedEvent);
     ces->onPointSelected += Delegate(m_pointEditor, &CurvePointEditor::PointSelectedEvent);
 
+    ces->onCommitAddPointEvent += Delegate(m_pointEditor, &CurvePointEditor::CommitAddPointEvent);
+    ces->onCommitRemovePointEvent += Delegate(m_pointEditor, &CurvePointEditor::CommitRemovePointEvent);
+
     m_myView = ces;
     SetView(m_myView);
 }
 
-void CurveEditor::ChannelSelectedEvent(Animation::ChannelRef channel) const
+void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t &trackid, Animation::ChannelRef &channel) const
 {
     // show if was previously hidden
     if (channel == m_pointEditor->GetChannel())
@@ -155,22 +158,28 @@ void CurveEditor::ChannelSelectedEvent(Animation::ChannelRef channel) const
         return;
     }
 
-    // hide all if none selected
     m_myView->HideAnimationCurves();
-    if (!channel) {
+    /*if (!channel) {
         m_pointEditor->HidePoints();
         m_myView->RequestRefreshView(false);
         return;
-    }
+    }*/
 
     // throw and build up biew if different curve was selected
     m_myView->ClearCurvePoints();
-    m_pointEditor->SetChannel(channel);
+    m_pointEditor->SetChannel(track, trackid, channel);
 
     AddCurveToScene();
 
     m_myView->ShowAnimationCurves();
     m_myView->RequestRefreshView(true);
+}
+
+void CurveEditor::ChannelDeselectedEvent() const
+{
+    m_myView->HideAnimationCurves();
+    m_pointEditor->HidePoints();
+    m_myView->RequestRefreshView(false);
 }
 
 void CurveEditor::Recalculate(TimelineArea* const area) const {

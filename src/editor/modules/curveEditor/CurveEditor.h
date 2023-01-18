@@ -44,7 +44,8 @@ namespace Idogep
         ~CurveEditor() override;
         void Initialize() override;
 
-        void ChannelSelectedEvent(Grafkit::Animation::ChannelRef channel) const;
+        void ChannelSelectedEvent(Grafkit::Animation::TrackRef& track, const size_t& trackid, Grafkit::Animation::ChannelRef& channel) const;
+        void ChannelDeselectedEvent() const;
 
         void Recalculate(TimelineArea* const area) const;
         Grafkit::Animation::ChannelRef GetChannel() const;

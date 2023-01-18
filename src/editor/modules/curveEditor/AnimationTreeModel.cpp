@@ -6,12 +6,12 @@ using namespace Grafkit;
 
 // ========================================================================================================
 
-
-AnimationChannelItem::AnimationChannelItem(const QList<QVariant>& data, TreeItem* parentItem): TreeItem(data, parentItem) {
+AnimationChannelItem::AnimationChannelItem(const QList<QVariant>& data, TreeItem* parentItem, const Grafkit::Animation::TrackRef& track, size_t trackId, const Grafkit::Animation::ChannelRef& channel): TreeItem(data, parentItem)
+    , m_track(track)
+    , m_trackId(trackId)
+    , m_channel(channel) {
 }
-
 // ========================================================================================================
-
 
 AnimationTreeModel::AnimationTreeModel(AnimationWrapperRef animation)
     : m_animation(animation)
@@ -49,9 +49,7 @@ void AnimationTreeModel::BuildTrack(TreeItem * const & parentItem, Animation::Tr
 
         QVariantList data;
         data << QString::fromStdString(channel->GetName());
-        AnimationChannelItem* item = new AnimationChannelItem(data, parentItem);
-        item->SetChannel(channel);
-
+        AnimationChannelItem* item = new AnimationChannelItem(data, parentItem, track, i, track->GetChannel(i));
         parentItem->addChild(item);
     }
 }

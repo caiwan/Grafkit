@@ -36,11 +36,13 @@ namespace Idogep
         CommandState m_status;
     };
 
+    typedef Ref<Command> CommandRef;
+
     class EmitsCommandRole
     {
     public:
         virtual ~EmitsCommandRole() = default;
-        Event<Ref<Command>> onNewCommand;
+        Event<CommandRef> onNewCommand;
     };
 
     class CommandStack
@@ -50,19 +52,20 @@ namespace Idogep
 
         void ConnectEmitter(EmitsCommandRole* emitter);
 
-        void AddCommand(Ref<Command> command);
+        void AddCommand(CommandRef command);
         void Redo();
         void Undo();
 
         bool HasUndo() const { return !m_undoStack.empty(); }
         bool HasRedo() const { return !m_redoStack.empty(); }
 
+        void ClearStack();
+
         Event<CommandStack * const &> onCommandStackChanged;
-        Event<Ref<Command>> onNewCommand;
+        Event<CommandRef> onNewCommand;
 
     private:
-        void ClearStack();
-        std::stack<Ref<Command>> m_undoStack;
-        std::stack<Ref<Command>> m_redoStack;
+        std::stack<CommandRef> m_undoStack;
+        std::stack<CommandRef> m_redoStack;
     };
 }

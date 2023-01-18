@@ -101,24 +101,25 @@ namespace Grafkit
         public:
             explicit Channel(const char* name = "");
             explicit Channel(const std::string& name);
-            Channel(Channel& other);
+            Channel(const Channel& other);
+            Channel(const ChannelRef& other);
 
             size_t GetKeyCount() const { return m_keys.size(); }
             Key GetKey(size_t i) { return m_keys[i]; }
 
-            float GetValue(float time) const;
-            void SetValue(size_t id, float value);
+            float GetValue(const float &time) const;
+            void SetValue(const size_t &id, const float &value);
 
             void AddKey(const Key key) { m_keys.push_back(key); }
             void SetKey(const size_t id, const Key key) { m_keys[id] = key; }
 
-            void InsertKey(const size_t afterId, const Key key)
+            void InsertKey(const size_t &afterId, const Key &key)
             {
                 const auto it = m_keys.begin() + afterId;
                 m_keys.insert(it, key);
             }
 
-            void DeleteKey(const size_t id, Key key)
+            void DeleteKey(const size_t &id)
             {
                 const auto it = m_keys.begin() + id;
                 m_keys.erase(it);
@@ -138,6 +139,7 @@ namespace Grafkit
             void Clear() { m_keys.clear(); }
 
             void CopyKey(float t, Channel& other);
+            void CopyTo(const ChannelRef& target, size_t start, size_t end);
 
 
         protected:
@@ -199,9 +201,11 @@ namespace Grafkit
 
     inline Animation::Channel::Channel(const std::string& name) : m_name(name) { m_keys.push_back(Key()); }
 
-    inline Animation::Channel::Channel(Channel& other) { for (size_t i = 0; i < other.m_keys.size(); i++) { m_keys.push_back(Key(other.m_keys.at(i))); } }
+    inline Animation::Channel::Channel(const Channel& other) { for (size_t i = 0; i < other.m_keys.size(); i++) { m_keys.push_back(Key(other.m_keys.at(i))); } }
 
-    inline float Animation::Channel::GetValue(const float time) const
+    inline Animation::Channel::Channel(const ChannelRef& other) : m_name(other->m_name) { for (size_t i = 0; i < other->m_keys.size(); i++) { m_keys.push_back(Key(other->m_keys.at(i))); } }
+
+    inline float Animation::Channel::GetValue(const float &time) const
     {
         float t = 0.f;
         Key v0, v1, v;
@@ -237,7 +241,7 @@ namespace Grafkit
         return v0.m_value * (1. - t) + v1.m_value * t;
     }
 
-    inline void Animation::Channel::SetValue(size_t id, float v) { m_keys[id].m_value = v; }
+    inline void Animation::Channel::SetValue(const size_t &id, const float &v) { m_keys[id].m_value = v; }
 
     inline int Animation::Channel::FindKeyIndex(float t) const
     {
@@ -350,4 +354,6 @@ namespace Grafkit
         const int i = FindKeyIndex(t);
         if (i > -1) { other.AddKey(m_keys[i]); }
     }
+
+    inline void Animation::Channel::CopyTo(const ChannelRef& target, size_t start, size_t end) { for (size_t i = start; i < end; i++) { target->AddKey(m_keys[i]); } }
 }

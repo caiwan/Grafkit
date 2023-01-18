@@ -27,6 +27,7 @@ AnimationEditorModule::~AnimationEditorModule()
 
 void AnimationEditorModule::Initialize()
 {
+    // TODO: Put this to Application
     assert(m_parent);
     assert(m_parent->GetView());
 
@@ -47,6 +48,7 @@ void AnimationEditorModule::Initialize()
 
     // manage animation role
     m_myView->onChannelSelected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelSelectedEvent);
+    m_myView->onChannelDeselected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelDeselectedEvent);
 
     SetView(m_myView);
 }
@@ -63,7 +65,7 @@ void AnimationEditorModule::AnimationSelectedEvent(TreeItem* const item)
     ItemHasAnimationsRole* animationItem = dynamic_cast<ItemHasAnimationsRole*>(item);
     if (!animationItem || !animationItem->GetAnimation()) // hide elements
     {
-        m_myView->onChannelSelected(nullptr);
+        m_myView->onChannelDeselected();
         m_myView->UpdateAnimationModel(nullptr);
         return;
     }

@@ -24,7 +24,8 @@ namespace Idogep
         AnimationEditorView();
 
         virtual void UpdateAnimationModel(TreeModel* model) = 0;
-        Event<Grafkit::Animation::ChannelRef> onChannelSelected;
+        Event<Grafkit::Animation::TrackRef&, const size_t&, Grafkit::Animation::ChannelRef&> onChannelSelected;
+        Event<> onChannelDeselected;
 
         Event<> onTogglePlayback;
         Event<> onStopPlayback;

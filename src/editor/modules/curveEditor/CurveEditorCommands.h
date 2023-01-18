@@ -24,12 +24,22 @@ namespace Idogep
         CurvePointEditor *m_controller;
 	};
 
-	class CurveKeyAddCommand {
+	class CurveChangeCommand : public Command
+    {
+	public:
+	    CurveChangeCommand(const Grafkit::Animation::TrackRef& track, size_t id, const Grafkit::Animation::ChannelRef& oldChannel, const Grafkit::Animation::ChannelRef& newChannel, CurvePointEditor* controller);
+        ~CurveChangeCommand();
+        void Do() override;
+        void Undo() override;
 
+    private :
+        Grafkit::Animation::TrackRef m_track;
+        size_t m_id;
+        Grafkit::Animation::ChannelRef m_oldChannel;
+        Grafkit::Animation::ChannelRef m_newChannel;
+
+        CurvePointEditor *m_controller;
 	};
 
-	class CurveKeyRemoveCommand {
-
-	};
 
 }

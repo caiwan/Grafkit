@@ -43,6 +43,9 @@ namespace Idogep
         Event<size_t> onPointSelected;
         Event<> onPointDeSelected;
 
+        Event<const float&, const float&> onCommitAddPointEvent;
+        Event<const size_t&> onCommitRemovePointEvent;
+
 
     protected:
 
