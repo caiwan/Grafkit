@@ -163,6 +163,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS, material->GetShininess());
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
+			// -> valahol a loaderen kivul kell megtenni a shader kijelolest, illetve betoltest
 			///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre~
 			ShaderAssetRef shader_fs = (ShaderAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Shader, "default.hlsl:vertex").Get();
 			material->SetShader(shader_fs);
@@ -172,14 +173,17 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 		}
 	}
 	
-	// Itt letre kell hozni egy uj shadert
+	// Itt letre kell hozni egy uj shadert -> igazabol ezt valahol kivul kellene megtenni
 	
 	///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre
 	ShaderAssetRef shader_vs = (ShaderAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Shader, "default.hlsl:vertex").Get();
 	
-	//if (shader_vs.Invalid())
-		//throw EX_DETAILS(AssimpParseException, "Could not found default vertex shader");
+	/*
+	if (shader_vs.Invalid())
+		throw EX_DETAILS(AssimpParseException, "Could not found default vertex shader"); 
+	*/
 
+	// ----------------------------------------
 	// scene loading
 	if (scene->HasMeshes()) 
 	{
@@ -201,6 +205,9 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0];  ///@todo ha tobb textura van akkor toltse be azokat is majd 
 			generator["NORMAL"] = curr_mesh->mNormals;
 			generator["TANGENT"] = curr_mesh->mTangents; 
+
+			// -> a generalas reszet is a pointerek es a shader beallitasa utan 
+			///@todo a shadert lehessen a generalas elott geallitani, ne pedig a generator konstruktoraban, sot; ezzel lehetove kellene tenni, hogy csaerelheto legyen a shader a scenegraph eloallitasa utan, de meg a redner elott a preloader szekvenciaban~
 
 			// -- faces
 
@@ -232,6 +239,6 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 
 	// load lights
 
-	// build scenegraph
+	// build up scenegraph
 }
 

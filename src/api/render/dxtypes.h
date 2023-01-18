@@ -17,13 +17,5 @@ typedef DirectX::XMFLOAT4 float4;
 typedef DirectX::XMVECTOR dxvector;
 typedef DirectX::XMMATRIX matrix;
 
-
-// ---- predefs
-
-namespace FWmath
-{
-	class Matrix;
-}
-
 // usage of left-handed coordinate system
 #define USE_LEFT_HANDED_SYSTEM
