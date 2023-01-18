@@ -60,8 +60,9 @@ public:
 			camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 			// -- texture
+			TextureGenFromBitmap txgen(render);
 			TextureRef texture = new Texture();
-			texture->Initialize(render, L"Normap.jpg");
+			//texture->Initialize(render, L"Normap.jpg");
 
 			// -- model 
 			model = new Model;
