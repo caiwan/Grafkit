@@ -9,6 +9,10 @@
 using namespace DirectX;
 
 namespace FWrender {
+
+	class PerspectiveCamera;	///@todo implement this, see trello notes
+	class OrthoCamera;			///@todo implement this, see trello notes
+
 	class Camera : public Entity3D, virtual public Referencable
 	{
 	public:
