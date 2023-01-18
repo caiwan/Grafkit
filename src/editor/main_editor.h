@@ -81,10 +81,10 @@ namespace Idogep {
 		Ref<Idogep::Editor> m_editor;
 
 		// modules
-
-		// TODO: merge these two
 		LoggerProxy *m_logger;
 		Ref<Module> m_logModule;
+
+		Ref<Module> m_outlineViewModule;
 
 	private:
 		static EditorApplication * s_self;

@@ -25,6 +25,7 @@
 #include "modules/grafkitContext/QGrafkitContextWidget.h"
 
 #include "modules/logView/LogModule.h"
+#include "modules/outlineView/outlineModule.h"
 
 using namespace Idogep;
 
@@ -115,10 +116,13 @@ void Idogep::EditorApplication::preload()
 	m_editor->InitializeDocument();
 }
 
+// ========================================================================================
+// This part should be refactored evetnutally:
 
 void Idogep::EditorApplication::BuildEditorModules()
 {
 	m_logModule = new LogModule(m_editor, m_logger);
+	m_outlineViewModule = new OutlineModule(m_editor);
 }
 
 void Idogep::EditorApplication::InitializeModules() {
@@ -143,6 +147,13 @@ void Idogep::EditorApplication::BuildDockingWindows()
 	logWidget->setParent(m_mainWindow);
 	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
 	//m_mainWindow->tabifyDockWidget(m_logWidget, m_curveEditor);
+
+	// 
+	QDockWidget *outlineWidget = dynamic_cast<QDockWidget*>(m_outlineViewModule->GetView().Get());
+	assert(outlineWidget);
+
+	outlineWidget->setParent(m_mainWindow);
+	m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
 }
 
 

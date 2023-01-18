@@ -9,7 +9,7 @@
 
 #include "ViewModule.h"
 
-#include "mediators/EditingMediator.h"
+#include "roles/EditorView.h"
 
 namespace Grafkit {
 	class IResourceManager;
