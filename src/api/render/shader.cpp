@@ -142,17 +142,19 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 
 }
 
-FWrender::Shader::ConstantBufferRecord FWrender::Shader::operator[](const char * name)
+FWrender::Shader::ConstantBufferRecord& FWrender::Shader::operator[](const char * name)
 {
+	static ConstantBufferRecord null_object;
+
 	if (this->m_mapBuffers.empty()) {
 		// no recorded items, keep moving on
-		return ConstantBufferRecord();
+		return null_object;
 	}
 
 	bufferMap_t::iterator it = this->m_mapBuffers.find(name);
 	if (it == this->m_mapBuffers.end()) {
 		// no item found, moving on
-		return ConstantBufferRecord();
+		return null_object;
 	}
 
 	return it->second;
@@ -357,11 +359,17 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 
 // =============================================================================================================================
 
-FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
+FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord() : 
 	m_pDC(NULL),
 	m_buffer(NULL),
 	m_description(),
 	m_slot(0) ///@todo slotok 
+{
+	// DebugBreak();
+}
+
+FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
+	ConstantBufferRecord()
 {
 	// create a dummy object w/o parsing
 	if (!device || !pConstBuffer)
@@ -399,14 +407,14 @@ void FWrender::Shader::ConstantBufferRecord::set(void * data)
 		return;
 
 	HRESULT result = 0;
-	D3D11_MAPPED_SUBRESOURCE MappedResource;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-	result = this->m_pDC->Map(this->m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
+	result = this->m_pDC->Map(this->m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result)) {
 		throw EX_DETAILS(ConstantBufferLocateException, "Cannot map resource");
 	}
 
-	memcpy(MappedResource.pData, data, this->m_description.Size);
+	memcpy(mappedResource.pData, data, this->m_description.Size);
 
 	this->m_pDC->Unmap(this->m_buffer, 0);
 }

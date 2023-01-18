@@ -57,7 +57,7 @@ namespace FWrender {
 		
 		public:
 			// This class has to have a public accessable default constructor due to std::map
-			ConstantBufferRecord() : ConstantBufferRecord(NULL, NULL) {}
+			ConstantBufferRecord(); /* : ConstantBufferRecord(NULL, NULL) {}*/
 		protected:
 			ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
 
@@ -86,8 +86,8 @@ namespace FWrender {
 			UINT m_slot;
 
 		private:
-			ConstantBufferRecord(ConstantBufferRecord&) {}
-			void operator= (ConstantBufferRecord&) {}
+			// ConstantBufferRecord(ConstantBufferRecord& other) {}
+			// void operator= (ConstantBufferRecord&) {}
 		};
 
 		/**
@@ -101,7 +101,7 @@ namespace FWrender {
 			InputElementRecord() {}
 		};
 
-		ConstantBufferRecord operator[] (const char* name);
+		ConstantBufferRecord &operator[] (const char* name);
 
 		size_t getILayoutElemCount() { return this->m_mapInputElems.size(); }
 		InputElementRecord getILayoutElem(size_t index) { return this->m_mapInputElems[index]; }
