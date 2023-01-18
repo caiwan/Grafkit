@@ -31,10 +31,10 @@ namespace FWrender {
 
 	class Shader;
 
-	class ShaderLoader : public FWassets::IRenderAssetGenerator
-	{
-		// implement tis 'ting
-	};
+	//class ShaderLoader : public FWassets::IRenderAssetGenerator
+	//{
+	//	// implement tis 'ting
+	//};
 
 	class Shader : virtual public Referencable, virtual public FWassets::IRenderAsset
 	{

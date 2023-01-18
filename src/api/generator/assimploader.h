@@ -9,13 +9,13 @@
 
 namespace FWmodel {
 
-	class AssimpLoader : public FWassets::IRenderAssetGenerator
+	class AssimpLoader : public FWassets::IRenderAssetBuilder
 	{
 	public:
-		AssimpLoader(FWassets::IResourceRef resource, FWassets::IRenderAssetManager * const &assman, FWrender::Scenegraph * const & scenegraph);
+		AssimpLoader(FWassets::IResourceRef resource, FWrender::Scenegraph * const & scenegraph);
 		~AssimpLoader();
 
-		virtual void operator () ();
+		virtual void operator () (FWassets::IRenderAssetManager * const &assman);
 
 	private:
 		FWassets::IResourceRef m_resource;

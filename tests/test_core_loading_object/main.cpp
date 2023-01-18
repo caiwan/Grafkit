@@ -75,8 +75,8 @@ protected:
 
 		// -- model 
 		scene = new Scenegraph();
-		AssimpLoader loader(this->m_file_loader->GetResourceByName("tegla.3ds"), this, scene);
-		loader();
+		AssimpLoader loader(this->m_file_loader->GetResourceByName("tegla.3ds"), scene);
+		loader(this);
 
 		this->t = 0;
 

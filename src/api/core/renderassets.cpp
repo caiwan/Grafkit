@@ -31,7 +31,7 @@ void FWassets::IRenderAsset::SetName(std::string name)
 	m_name = name;
 }
 
-Guid FWassets::IRenderAsset::GenerateGUID()
+Guid FWassets::IRenderAsset::GenerateUUID()
 {
 	Guid uuid = m_guid;
 	
@@ -121,13 +121,13 @@ IRenderAsset * FWassets::IRenderAssetManager::GetObjectByName(enum IRenderAsset:
 }
 
 // ==================================================================================================================================== 
-
-FWassets::IRenderAssetGenerator::IRenderAssetGenerator(IRenderAssetManager * const & assman) :
-	m_assman(assman)
-
-{
-}
-
-FWassets::IRenderAssetGenerator::~IRenderAssetGenerator()
-{
-}
+//
+//FWassets::IRenderAssetGenerator::IRenderAssetGenerator(IRenderAssetManager * const & assman) :
+//	m_assman(assman)
+//
+//{
+//}
+//
+//FWassets::IRenderAssetGenerator::~IRenderAssetGenerator()
+//{
+//}

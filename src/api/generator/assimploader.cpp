@@ -85,8 +85,8 @@ TextureRef assimpTexture(enum aiTextureType source, aiMaterial* material, int su
 		
 		///@todo :Ez nem kell majd ide, lehessen felirni a generatorokat az asset managerre is, es o allitsa elo a texturat, ha lehet
 		if (texture.Invalid()) {
-			TextureGenFromBitmap txgen(assman->GetResourceFactory()->GetResourceByName(name), assman, texture);
-			txgen();
+			TextureFromBitmap txgen(assman->GetResourceFactory()->GetResourceByName(name), texture);
+			txgen(assman);
 			
 			texture->SetName(name);
 			assman->AddObject(texture.Get());
@@ -100,8 +100,8 @@ TextureRef assimpTexture(enum aiTextureType source, aiMaterial* material, int su
 // Head
 // ================================================================================================================================================================
 
-FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWassets::IRenderAssetManager * const & assman, FWrender::Scenegraph * const & scenegraph) : 
-	IRenderAssetGenerator(assman), 
+FWmodel::AssimpLoader::AssimpLoader(FWassets::IResourceRef resource, FWrender::Scenegraph * const & scenegraph) : 
+	IRenderAssetBuilder(), 
 	m_scenegraph(scenegraph), m_resource(resource)
 {
 
@@ -114,7 +114,7 @@ FWmodel::AssimpLoader::~AssimpLoader()
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void FWmodel::AssimpLoader::operator()()
+void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &assman)
 {
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?
@@ -150,7 +150,7 @@ void FWmodel::AssimpLoader::operator()()
 			// textura-> material 
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
-					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, m_assman), texture_load_map[k].tt);
+					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, assman), texture_load_map[k].tt);
 				}
 			}
 
@@ -162,7 +162,7 @@ void FWmodel::AssimpLoader::operator()()
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
 			materials.push_back(material);
-			this->m_assman->AddObject(material.Get());
+			assman->AddObject(material.Get());
 		}
 	}
 	
@@ -181,17 +181,21 @@ void FWmodel::AssimpLoader::operator()()
 			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
 			model->SetName(mesh_name);
 
-			///@todo 
 			//model->pushVert(reinterpret_cast<vec3float*>(curr_mesh->mVertices), curr_mesh->mNumVertices);
 			//model->pushTextureUV(reinterpret_cast<vec3float*>(curr_mesh->mTextureCoords[0]), curr_mesh->mNumVertices);	///@todo tobbfele texuv is lehet
 			//model->pushNormals(reinterpret_cast<vec3float*>(curr_mesh->mNormals), curr_mesh->mNumVertices);
 			//model->pushTangents(reinterpret_cast<vec3float*>(curr_mesh->mTangents), curr_mesh->mNumVertices);	//ha ilyen is van, akkor eljunk vele
 
-			/*SimpleMeshGenerator generator(render, shader_vs);
-			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
-			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+			// ujra kell ezt egy picit tervezni megint :C 
 
-			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);*/
+			// shader hol van ? 
+			//SimpleMeshGenerator generator(render, shader_vs);
+			//generator["POSITION"] = //(void*)FWBuiltInData::cubeVertices;
+			//generator["TEXCOORD"] = //(void*)FWBuiltInData::cubeTextureUVs;
+			//generator["NORMAL"] = //(void*)FWBuiltInData::cubeTextureUVs;
+			//generator["TANGENT"] = //(void*)FWBuiltInData::cubeTextureUVs;
+
+			//generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
 
 			// -- faces
@@ -220,7 +224,7 @@ void FWmodel::AssimpLoader::operator()()
 
 			//FWmath::Matrix modelview = model->getModelviewMatrix();
 			//this->models.push(model);
-			m_assman->AddObject(model);
+			//assman->AddObject(model);
 		}
 	}
 
