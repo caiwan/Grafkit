@@ -77,23 +77,9 @@ TextureRef assimpTexture(enum aiTextureType what, aiMaterial* material, int subn
 	aiReturn result = material->GetTexture(what, subnode, &path);
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		texture = new Texture();
-		texture->SetName(path.C_Str());
-
-		// texture lookup
-
-		// ide jon a textura generator, vagy lookup, attol fuggoen, hogy mink van eppen
-
-		/*
-		texture->setMinFilter(FWrender::TF_LINEAR_MIPMAP_LINEAR);
-		texture->setMagFilter(FWrender::TF_LINEAR);
-		texture->setIsGenerateMipmap(1);
-		texture->setIsUseAnisotropic(1);
-
-		texture->setTextureType(targetType);
-		*/
-
-		// LOAD_TEXTURE(texture);
+		// obj lut?
+		/*TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, render, texture);
+		txgen();*/
 	}
 
 	return texture;
@@ -150,32 +136,6 @@ void FWmodel::AssimpLoader::operator()()
 			// -- -- load textures
 			// textura-> material 
 
-			/*do
-			{
-				/// @todo ezt egy for ciklussal is meg lehetne oldani majd, sot. 
-				TextureRef diffuse = assimpTexture(aiTextureType_DIFFUSE, scene->mMaterials[i], j);
-				TextureRef normal = assimpTexture(aiTextureType_NORMALS, scene->mMaterials[i], j);
-				TextureRef specular = assimpTexture(aiTextureType_SPECULAR, scene->mMaterials[i], j);
-
-				texFound = AI_FAILURE;
-
-				if (diffuse) {
-					material->SetTexture(diffuse, 0);	///@todo textura slotok
-					texFound = AI_SUCCESS;
-				}
-
-				if (specular) {
-					material->SetTexture(specular, 1);
-					texFound = AI_SUCCESS;
-				}
-
-				if (normal) {
-					material->SetTexture(normal, 2);
-					texFound = AI_SUCCESS;
-				}
-				j++;
-			} while (texFound == AI_SUCCESS);*/
-
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
 					/// itt minden map tipushoz N darab textura terozhat. -> ezt a materialban is meg kell szerkeszteni
@@ -213,6 +173,13 @@ void FWmodel::AssimpLoader::operator()()
 			//model->pushTextureUV(reinterpret_cast<vec3float*>(curr_mesh->mTextureCoords[0]), curr_mesh->mNumVertices);	///@todo tobbfele texuv is lehet
 			//model->pushNormals(reinterpret_cast<vec3float*>(curr_mesh->mNormals), curr_mesh->mNumVertices);
 			//model->pushTangents(reinterpret_cast<vec3float*>(curr_mesh->mTangents), curr_mesh->mNumVertices);	//ha ilyen is van, akkor eljunk vele
+
+			/*SimpleMeshGenerator generator(render, shader_vs);
+			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
+			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+
+			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);*/
+
 
 			// -- faces
 			j = curr_mesh->mNumFaces;

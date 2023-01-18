@@ -10,9 +10,9 @@ namespace FWrender {
 
 		// -- tree parser implementation
 		protected:
-			virtual void parseNode(TreeNode* node) = 0;
-			virtual void push() = 0;	///< enter subtree
-			virtual void pop() = 0;		///< leave subtree
+			virtual void parseNode(TreeNode* node);
+			virtual void push();
+			virtual void pop();
 
 		private:
 			ListTree *m_pRoot;

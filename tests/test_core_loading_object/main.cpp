@@ -2,13 +2,15 @@
 
 #include "render/renderer.h"
 #include "render/camera.h"
-#include "render/model.h"
-#include "render/texture.h"
+#include "render/Material.h"
 #include "render/shader.h"
+
+#include "render/Scenegraph.h"
 
 #include "math/matrix.h"
 
 #include "core/renderassets.h"
+#include "core/assets.h"
 
 using namespace FWrender;
 using FWmath::Matrix;
@@ -19,7 +21,8 @@ using FWmath::Matrix;
 class Application : public FWcore::System, FWassets::IRenderAssetManager
 {
 public:
-	Application() : FWcore::System()
+	Application() : FWcore::System(),
+		m_file_loader(nullptr)
 	{
 		int screenWidth, screenHeight;
 
@@ -33,9 +36,12 @@ public:
 	~Application() {
 	}
 
+protected:
 	Renderer render;
 	CameraRef camera;
-	ModelRef model;
+	//ModelRef model;
+
+	Scenegraph *scene;
 
 	float t;
 
@@ -55,35 +61,31 @@ public:
 
 		result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
+		// init file loader
+		this->m_file_loader = new FWassets::FileResourceManager("./");
+
 		// -- camera
 		camera = new Camera;
 		camera->SetPosition(0.0f, 0.0f, -5.0f);
 
-		// -- texture
-		TextureRef texture;
+		
+		scene = new Scenegraph();
 
-		TextureGenFromBitmap txgen(L"Normap.jpg", this, render, texture);
-		txgen();
-
-		// -- model 
-		model = new Model;
-		model->setTexture(texture);
-
+		// -- load shader
 		shader_vs = new Shader();
 		shader_vs->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
 
 		shader_fs = new Shader();
 		shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
 
-		// shader_vs->setInputLayout(model->getInputLayout);
+		// -- model 
 
-		SimpleMeshGenerator generator(render, shader_vs);
-		generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
-		generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+		// ide kell majd egy update model, minden materialra
 
-		generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
-
-		shader_fs->GetBResource("shaderTexture").SetTexture(texture);
+		//model = new Model;
+		//model->SetMaterial(new MaterialBase);
+		//model->GetMaterial()->AddTexture(texture);	// elobb a texturakat toltod fel, aztad adod hozza a shadert.
+		//model->GetMaterial()->SetShader(shader_fs);
 
 		this->t = 0;
 
@@ -92,6 +94,7 @@ public:
 
 	void release() {
 		this->render.Shutdown();
+		delete this->scene;
 	};
 
 	int mainloop() {
@@ -132,6 +135,10 @@ public:
 		return 0;
 	};
 
+private:
+	FWassets::FileResourceManager *m_file_loader;
+public:
+	FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
