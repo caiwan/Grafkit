@@ -80,6 +80,12 @@
     <ClCompile Include="core\exceptions.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="core\memory_alloc.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\memory.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\input.h">
@@ -128,6 +134,12 @@
       <Filter>Header Files\math</Filter>
     </ClInclude>
     <ClInclude Include="core\exceptions.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\memory_alloc.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\memory.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>
