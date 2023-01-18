@@ -4,12 +4,14 @@
 #ifndef _Model_H_
 #define _Model_H_
 
-#include "texture.h"
+#include "renderer.h"
 #include "dxtypes.h"
+
+#include "../core/reference.h"
 
 namespace FWrender {
 
-	class Model
+	class Model : public Referencable
 	{
 	private:
 		struct VertexType
@@ -23,24 +25,26 @@ namespace FWrender {
 		Model(const Model&);
 		~Model();
 
-		bool Initialize(ID3D11Device*, WCHAR* textureFilename);
-		void Shutdown();
-		void Render(ID3D11DeviceContext*);
+		bool Initialize(
+			ID3D11Device* device, 
+			FWrender::TextureRef texture,
+			int indicesCount, const int* indices,
+			int verticesCount, const float3* position, const float2* uv
+		);
+		
+		inline void Shutdown();
+		void Render(ID3D11DeviceContext* deviceContext);
 
-		int GetIndexCount();
+		int GetIndexCount() { return m_indexCount; }
 
-		bool LoadTexture(ID3D11Device*, WCHAR*);
-		void ReleaseTexture();
-
-		ID3D11ShaderResourceView* GetTexture() { return m_texture ? m_texture->GetTexture() : 0; }
+		ID3D11ShaderResourceView* GetTexture();
 
 	private:
-		bool InitializeBuffers(ID3D11Device*);
 		void ShutdownBuffers();
-		void RenderBuffers(ID3D11DeviceContext*);
+		void RenderBuffers(ID3D11DeviceContext* deviceContext);
 
 	private:
-		FWrender::Texture* m_texture;
+		FWrender::TextureRef m_texture;
 
 		ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 		int m_vertexCount, m_indexCount;
