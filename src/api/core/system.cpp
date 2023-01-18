@@ -4,6 +4,8 @@
 
 #include "easyloggingpp.h"
 
+///@todo add log mock
+
 #define ELPP_THREAD_SAFE
 
 #ifndef _DEBUG
@@ -33,10 +35,12 @@ System::System()
 	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
 //#endif // _DEBUG
 
+	defaultConf.setGlobally(el::ConfigurationType::Filename, "log.log");
 	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
 	el::Loggers::reconfigureLogger("default", defaultConf);
 
-	// LOG(TRACE) << SOMETHING;
+
+	LOG(INFO) << "---- APPSTART ----";
 }
 
 System::~System()
