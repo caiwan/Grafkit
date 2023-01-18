@@ -4,13 +4,14 @@
 #include "render/camera.h"
 #include "render/model.h"
 #include "render/texture.h"
+#include "render/shader.h"
 
 #include "math/matrix.h"
 
 using namespace FWrender;
 using FWmath::Matrix;
 
-#include "textureShaderClass.h"
+// #include "textureShaderClass.h"
 #include "builtin_data/cube.h"
 
 class Application : public FWcore::System
@@ -36,7 +37,9 @@ public:
 
 		float t;
 
-		TextureShaderClass *shader_texture;
+		// TextureShaderClass *shader_texture;
+		ShaderRef shader_vs;
+		ShaderRef shader_fs;
 		
 		int init() {
 			//this->render = new Renderer();
@@ -71,8 +74,14 @@ public:
 
 			model->setTexture(texture);
 
-			shader_texture = new TextureShaderClass();
-			result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
+			//shader_texture = new TextureShaderClass();
+			//result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
+
+			shader_vs = new Shader();
+			shader_vs->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+			
+			shader_fs = new Shader();
+			shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
 
 			this->t = 0;
 
@@ -82,7 +91,7 @@ public:
 		void release() {
 			this->render.Shutdown();
 			
-			delete this->shader_texture;
+			// delete this->shader_texture;
 
 		};
 		
@@ -102,12 +111,13 @@ public:
 
 				worldMatrix.RotateRPY(t*10, t*15, t*20);
 
+				/*
 				shader_texture->Render(
 					render.GetDeviceContext(),
 					model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
 					(*model->getTexture().Get())
 					);
-
+				*/
 				this->t += 0.001;
 			}
 			this->render.EndScene();
