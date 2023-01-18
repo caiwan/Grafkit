@@ -135,7 +135,6 @@ TEST_F(ResourceManagerTest, TestCasting) {
 
     // then
     ASSERT_FALSE(resource.Valid());
-    ASSERT_FALSE(resource->Valid());
-
+ 
     delete resman;
 }

@@ -3,7 +3,7 @@
 #include <QtGui>
 #include <QDockWidget>
 
-#include "AnimationView.h"
+#include "AnimationModule.h"
 
 namespace Ui
 {

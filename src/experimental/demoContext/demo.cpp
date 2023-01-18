@@ -124,7 +124,6 @@ void Demo::InitTestStuff(Renderer& render) {
     // -- scene 
     m_scene = new SceneRes(new Scene());
     (*m_scene)->SetSceneGraph(m_scenegraph);
-
     (*m_scene)->AddAnimation(new ActorAnimation(rootActor));
     (*m_scene)->AddAnimation(new ActorAnimation(cameraActor));
     (*m_scene)->AddAnimation(new ActorAnimation(cubeActor));

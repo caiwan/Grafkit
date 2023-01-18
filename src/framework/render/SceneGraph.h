@@ -10,86 +10,83 @@
 #include "renderer.h"
 
 namespace Grafkit {
-	__declspec(align(16))
-		class SceneGraph : virtual public Referencable, public AlignedNew<SceneGraph>, public Persistent
-	{
-	public:
-		SceneGraph();
-		~SceneGraph();
+    __declspec(align(16))
+        class SceneGraph : virtual public Referencable, public AlignedNew<SceneGraph>, public Persistent
+    {
+    public:
+        SceneGraph();
+        ~SceneGraph();
 
-		// Init, shutdown 
-		void Initialize();
-		void Initialize(ActorRef root); // legacy stuff 
-		void Shutdown();
+        // Init, shutdown 
+        void Initialize();
+        void Initialize(ActorRef root); // legacy stuff 
+        void Shutdown();
 
-		void Update();
-		void Render(Grafkit::Renderer & render, CameraRef & camera);
+        void Update();
+        void Render(Renderer & render, CameraRef & camera);
 
-		// Add / Get node
-		void AddNode(ActorRef& actor);
-		ActorRef GetNode(std::string name);
+        // Add / Get node
+        void AddNode(ActorRef& actor);
+        ActorRef GetNode(std::string name);
 
-		void SetRootNode(ActorRef &root) { m_root = root; }
-		ActorRef GetRootNode() { return m_root; }
+        void SetRootNode(ActorRef &root) { m_root = root; }
+        ActorRef GetRootNode() const { return m_root; }
 
-		size_t GetNodeCount() { return m_nodes.size(); }
-		ActorRef GetNode(size_t id) { return m_nodes[id]; }
+        size_t GetNodeCount() const { return m_nodes.size(); }
+        ActorRef GetNode(size_t id) { return m_nodes[id]; }
 
-		std::string GetName() { return m_name; }
-		void SetName(std::string name) { m_name = name; }
+        std::string GetName() const { return m_name; }
+        void SetName(std::string name) { m_name = name; }
 
-		// --- 
+        // --- 
 
-		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
+        Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
-		ShaderResRef GetVShader() { return this->m_vertexShader; }
-		ShaderResRef GetPShader() { return this->m_pixelShader; }
+        ShaderResRef GetVShader() const { return this->m_vertexShader; }
+        ShaderResRef GetPShader() const { return this->m_pixelShader; }
 
-		void SetVShader(ShaderResRef &VS) { this->m_vertexShader = VS; }
-		void SetPShader(ShaderResRef &FS) { this->m_pixelShader = FS; }
+        void SetVShader(ShaderResRef &VS) { this->m_vertexShader = VS; }
+        void SetPShader(ShaderResRef &FS) { this->m_pixelShader = FS; }
 
-		void BuildScene(Grafkit::Renderer & render);
-		void BuildScene(Grafkit::Renderer & render, ShaderResRef vs, ShaderResRef ps); //legacy stuff
+        void BuildScene(Renderer & render);
+        void BuildScene(Renderer & render, ShaderResRef vs, ShaderResRef ps); //legacy stuff
 
-	protected:
+    protected:
 
-		// we'll see if we need this or not 
-		// or if we have to move it into another layer 
+        // we'll see if we need this or not 
+        // or if we have to move it into another layer 
 
-		struct WorldMatrices_t {
-			matrix worldMatrix;
-			matrix viewMatrix;
-			matrix projectionMatrix;
-		};
+        struct WorldMatrices_t {
+            matrix worldMatrix;
+            matrix viewMatrix;
+            matrix projectionMatrix;
+        };
 
-		struct WorldMatrices_t GetWorldMatrices() { return m_worldMatrices; }
+        struct WorldMatrices_t GetWorldMatrices() const { return m_worldMatrices; }
 
-	protected:
+        ActorRef m_root;
 
-		ActorRef m_root;
+        struct WorldMatrices_t m_worldMatrices;
 
-		struct WorldMatrices_t m_worldMatrices;
+        ShaderResRef m_vertexShader;
+        ShaderResRef m_pixelShader;
 
-		ShaderResRef m_vertexShader;
-		ShaderResRef m_pixelShader;
+        std::vector<ActorRef> m_nodes;
+        std::map<std::string, ActorRef> m_nodeMap;
 
-		std::vector<ActorRef> m_nodes;
-		std::map<std::string, ActorRef> m_nodeMap;
+        std::set<Entity3D*> m_entities;
 
-		std::set<Entity3D*> m_entities;
+        std::string m_name;
 
-		std::string m_name;
+    private:
+        double m_tAnim;
 
-	private:
-		double m_tAnim;
+        Matrix m_currentWorldMatrix;
+        std::stack<Matrix> m_worldMatrixStack;
 
-	private:
-		Grafkit::Matrix m_currentWorldMatrix;
-		std::stack<Grafkit::Matrix> m_worldMatrixStack;
-
-		// -- persistent
-	protected:
-		    void serialize(Archive& ar) override;
-		PERSISTENT_DECL(Grafkit::SceneGraph, 1);
-	};
+        // -- persistent
+    public:
+        void Serialize(Archive& ar) override;
+        PERSISTENT_DECL(Grafkit::SceneGraph, 1);
+    };
 }

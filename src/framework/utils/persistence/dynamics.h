@@ -3,10 +3,6 @@
 
 #include <map>
 
-#ifdef DEBUG
-#include "../logger.h"
-#endif
-
 /// http://www.codeproject.com/Tips/495191/Serialization-implementation-in-Cplusplus
 
 namespace Grafkit {
@@ -18,7 +14,8 @@ namespace Grafkit {
     {
         friend class Clonables;
     public:
-        virtual Clonable* createObj() const = 0;
+        virtual ~Clonable() = default;
+        virtual Clonable* CreateObj() const = 0;
     };
 
     /**
@@ -47,7 +44,7 @@ namespace Grafkit {
             return instance;    // Instantiated on first use.
         }
 
-        void addClonable(const char* className, Clonable* clone)
+        void AddClonable(const char* className, Clonable* clone)
         {
             std::string name = className;
 
@@ -57,7 +54,7 @@ namespace Grafkit {
             }
         }
 
-        const Clonable* find(const char *className)
+        const Clonable* Find(const char *className)
         {
             std::string name = className;
             auto it = m_clonables.find(name);
@@ -67,22 +64,14 @@ namespace Grafkit {
             return clone;
         }
 
-        Clonable* create(const char *className)
+        Clonable* Create(const char *className)
         {
-            const Clonable* clone = find(className);
+            const Clonable* clone = Find(className);
             if (clone)
-                return clone->createObj();
+                return clone->CreateObj();
 
             return nullptr;
         }
-
-#ifdef DEBUG
-        void dumpClonables() {
-            for (auto it = m_clonables.begin(); it != m_clonables.end(); ++it) {
-                Log::Logger().Debug("- Has Clonable factory of %s", it->first.c_str());
-            }
-        }
-#endif //DEBUG
     };
 
     /**
@@ -90,7 +79,7 @@ namespace Grafkit {
     class AddClonable {
     public:
         AddClonable(const char* className, Clonable* clone) {
-            Clonables::Instance().addClonable(className, clone);
+            Clonables::Instance().AddClonable(className, clone);
         }
     };
 
@@ -102,7 +91,7 @@ namespace Grafkit {
 
 #define CLONEABLE_DECL(className)\
 public: \
-virtual Grafkit::Clonable* createObj() const \
+virtual Grafkit::Clonable* CreateObj() const \
 	{ \
 		return new className(); \
 	}
@@ -112,7 +101,7 @@ virtual Grafkit::Clonable* createObj() const \
 public: \
 class Factory : public Grafkit::Clonable { \
 public: \
-	virtual Grafkit::Clonable* createObj() const \
+	virtual Grafkit::Clonable* CreateObj() const \
 	{ \
 		return new className(); \
 	} \

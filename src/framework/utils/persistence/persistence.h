@@ -10,17 +10,19 @@ namespace Grafkit{
 
 	class Persistent : public Clonable
 	{
-		friend class PersistObject;
 		public:
-			static Persistent* load(Archive& ar);
-			void store(Archive& ar);
+            Persistent() {}
+            virtual ~Persistent() {}
+
+			static Persistent* Load(Archive& ar);
+			void Store(Archive& ar);
 
 		protected:
-			virtual void serialize(Archive& ar) = 0;
+			virtual void Serialize(Archive& ar) = 0;
 
 			///@todo use typeid(T).name() instead, and do the lookup by that;
-			virtual std::string getClassName() const = 0;
-			virtual int version() const { return 0; }
+			virtual std::string GetClazzName() const = 0; // collision w/ Winapi macro
+			virtual int GetVersion() const { return 0; }
 	};
 
 	class Archive
@@ -71,8 +73,6 @@ namespace Grafkit{
 			void StoreObject(Persistent * object);
 			Persistent* LoadObject();
 
-			//Persistent * PersistObject(Persistent * object);
-
 			int IsStoring() const { return m_isStoring; }
 			void SetDirection(bool IsStoring) { m_isStoring = IsStoring; }
 
@@ -90,11 +90,11 @@ namespace Grafkit{
 public: \
 	CLONEABLE_FACTORY_DECL(className)\
 public:\
-	virtual std::string getClassName() const\
+	std::string GetClazzName() const override \
 	{ \
 		return #className; \
 	} \
-	virtual int version() const \
+	int GetVersion() const override \
 	{ \
 		return VERSION_NO;\
 	}

@@ -65,8 +65,8 @@ namespace Grafkit {
 		inline void ShutdownSceneGraph();
 
 		inline void UpdateScenegraph();
-		inline void RenderScenegraph(Grafkit::Renderer & render, CameraRef & camera);
-		inline void BuildSceneGraph(Grafkit::Renderer & deviceContext);
+		inline void RenderScenegraph(Renderer & render, CameraRef & camera);
+		inline void BuildSceneGraph(Renderer & deviceContext);
 
 	protected:
 		SceneGraphRef m_scenegraph;
@@ -162,24 +162,23 @@ namespace Grafkit {
 		void Initialize();
 		void Shutdown();
 
-		void Build(Grafkit::Renderer & render);
-		void Build(Grafkit::Renderer & render, ShaderResRef vs, ShaderResRef ps); // legacy stuff
+		void Build(Renderer & render);
+		void Build(Renderer & render, ShaderResRef vs, ShaderResRef ps); // legacy stuff
 
-		void UpdateScene(Grafkit::Renderer & render, float time);
+		void UpdateScene(Renderer & render, float time);
 
-		void RenderFrame(Grafkit::Renderer & render, float time);
-		void Render(Grafkit::Renderer & render);
-
+		void RenderFrame(Renderer & render, float time);
+		void Render(Renderer & render);
 
 		// -- persistent
-	protected:
-	    void serialize(Archive& ar) override;
 		PERSISTENT_DECL(Grafkit::Scene, 1);
+	protected:
+	    void Serialize(Archive& ar) override;
 	};
 
 
 	// ---------------------------------------------------------------------------
-	// 
+	// -> Demo CTX.
 	class SceneRenderBuffers {
 	public:
 		//void Precalc(/* + resman */); // + resman

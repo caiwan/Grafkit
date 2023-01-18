@@ -3,15 +3,16 @@
 #include "struct_pack.h"
 
 using namespace FWdebugExceptions;
+using namespace Grafkit;
 
-Grafkit::StructPack::StructPack() : 
-	m_buffer(NULL),
-	m_field_padding(0),
-	m_record_align(1)
+StructPack::StructPack() : 
+	m_buffer(nullptr),
+	m_record_align(1),
+	m_field_padding(0)
 {
 }
 
-int Grafkit::StructPack::addField(size_t width)
+int StructPack::addField(size_t width)
 {
 	if (!width)
 		throw EX(ZeroOffsetException);
@@ -28,7 +29,7 @@ int Grafkit::StructPack::addField(size_t width)
 	return id;
 }
 
-void Grafkit::StructPack::addPointer(int id, const void * pointer, size_t offset, size_t stride)
+void StructPack::addPointer(int id, const void * pointer, size_t offset, size_t stride)
 {
 	if (m_buffer) 
 		throw EX(InvalidOperationException);
@@ -50,7 +51,7 @@ void Grafkit::StructPack::addPointer(int id, const void * pointer, size_t offset
 
 }
 
-void * Grafkit::StructPack::operator()(size_t count)
+void * StructPack::operator()(size_t count)
 {
 	// + throw if count zero 
 	this->m_record_count = count;
@@ -60,7 +61,7 @@ void * Grafkit::StructPack::operator()(size_t count)
 	}
 	
 	this->calcSize();
-	this->m_buffer = (unsigned char*)this->alloc(this->getBufferSize());
+	this->m_buffer = static_cast<unsigned char*>(this->alloc(this->getBufferSize()));
 	this->zeroMemory(this->m_buffer, this->getBufferSize());
 
 	for (size_t i = 0; i < this->m_elems.size(); i++)
@@ -73,7 +74,7 @@ void * Grafkit::StructPack::operator()(size_t count)
 		if (!elem.in_ptr)
 			continue;
 		
-		const unsigned char* src_struct = (const unsigned char*)elem.in_ptr + elem.in_offset;
+		const unsigned char* src_struct = static_cast<const unsigned char*>(elem.in_ptr) + elem.in_offset;
 
 		size_t j = count;
 		while (j--) {
@@ -97,7 +98,7 @@ void * Grafkit::StructPack::operator()(size_t count)
 
 // ========================================================
 
-void Grafkit::StructPack::calcSize()
+void StructPack::calcSize()
 {
 	// @todo check alignment && padding 
 
@@ -155,7 +156,7 @@ void Grafkit::StructPack::zeroMemory(void * ptr, size_t size)
 
 #define ALIGNMENT 16
 
-void * Grafkit::StructPack::alloc(size_t size)
+void * StructPack::alloc(size_t size)
 {
 	const size_t alignment = ALIGNMENT;
 
@@ -169,12 +170,12 @@ void * Grafkit::StructPack::alloc(size_t size)
 	return ptr;
 }
 
-void Grafkit::StructPack::dealloc(void * ptr)
+void StructPack::dealloc(void * ptr)
 {
 	_aligned_free(ptr);
 }
 
-void Grafkit::StructPack::zeroMemory(void * ptr, size_t size)
+void StructPack::zeroMemory(void * ptr, size_t size)
 {
 	memset(ptr, 0, size);
 }

@@ -49,5 +49,5 @@ void CurveChangeCommand::Do()
 void CurveChangeCommand::Undo()
 {
     m_track->SetChannel(m_id, m_oldChannel);
-    m_controller->UpdateChannel(m_track, m_id, m_newChannel);
+    m_controller->UpdateChannel(m_track, m_id, m_oldChannel);
 }

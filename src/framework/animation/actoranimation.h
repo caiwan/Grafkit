@@ -8,9 +8,9 @@ namespace Grafkit {
 
 	public:
 		ActorAnimation();
-		ActorAnimation(ActorRef actor);
+	    explicit ActorAnimation(ActorRef actor);
 
-		ActorRef GetActor() { return m_actor; };
+		ActorRef GetActor() const { return m_actor; };
 		void SetActor(ActorRef actor) { m_actor = actor; };
 
 	    void Update(double time) override;
@@ -18,12 +18,15 @@ namespace Grafkit {
 	private:
 		void CreateTrack();
 
-	private:
-		Ref <Animation::Track> m_position;
-		Ref <Animation::Track> m_rotation;
-		Ref <Animation::Track> m_scale;
+	    Ref <Track> m_position;
+		Ref <Track> m_rotation;
+		Ref <Track> m_scale;
 
 		ActorRef m_actor;
+
+        PERSISTENT_DECL(Grafkit::ActorAnimation, 1)
+	protected:
+	    void Serialize(Archive& ar) override;
 	};
 
 }

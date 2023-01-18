@@ -1,5 +1,5 @@
 #pragma once
-#include "AnimationView.h"
+#include "CurvePointEditor.h"
 
 #include <QWidget>
 
@@ -20,8 +20,10 @@ namespace Idogep
         explicit PointEditorWidget(QWidget *parent = 0);
         ~PointEditorWidget();
         
-        void RefreshView(bool force) override;
         void UpdatePointEditor(bool isSet) override;
+
+    protected:
+        void RefreshView(bool force) override;
 
     private slots:
         void keyReturnPressedSlot();

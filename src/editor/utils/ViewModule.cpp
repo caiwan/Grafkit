@@ -50,21 +50,24 @@ Controller::~Controller() {
 // ----------------------------------------------------
 
 Roles::ViewRefreshEvent::ViewRefreshEvent(View* const& view) : m_view(view)
-, m_isQueued(false)
+, m_isQueued(0)
 , m_isSetForce(false) {
 }
 
 void Roles::ViewRefreshEvent::refreshViewSlot()
 {
+    // keep it resistant to spam refreshes and porcess the very last one
+    if (--m_isQueued > 1)
+    {
+        return;
+    }
+
     m_view->RefreshView(m_isSetForce);
-    m_isQueued = false;
 }
 
 void Roles::ViewRefreshEvent::QueueRefresh(bool isForce)
 {
-    if (m_isQueued)
-        return;
     m_isSetForce = isForce;
-    m_isQueued = true; // prevent spam
+    m_isQueued++;
     QTimer::singleShot(0, this, SLOT(refreshViewSlot()));
 }

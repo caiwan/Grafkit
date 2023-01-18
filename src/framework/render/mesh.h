@@ -13,61 +13,61 @@
 #include "renderer.h"
 #include "dxtypes.h"
 
-namespace Grafkit 
+namespace Grafkit
 {
-	/**
-	Stores basic data for a piece of mesh
-	*/
-	class Mesh : public virtual Referencable, public Persistent
-	{
-	public:
-		Mesh();
-		Mesh(const Mesh& mesh);
-		virtual ~Mesh();
+    /**
+    Stores basic data for a piece of mesh
+    */
+    class Mesh : public virtual Referencable, public Persistent
+    {
+    public:
+        Mesh();
+        Mesh(const Mesh& mesh);
+        virtual ~Mesh();
 
-		virtual void UpdateMesh(double time);
-		void RenderMesh(ID3D11DeviceContext* deviceContext);
-			
-		void AddPointer(std::string inputName, size_t length, const void* pointer);
-		void SetIndices(size_t vertexCount, size_t indexCount, const int* const indices);
-		void Build(ID3D11Device *const& device, ShaderRef &vertexShader);
+        virtual void UpdateMesh(double time);
+        void RenderMesh(ID3D11DeviceContext* deviceContext);
 
-		size_t GetIndexCount() { return m_indexCount; }
+        void AddPointer(std::string inputName, size_t length, const void* pointer);
+        void SetIndices(size_t vertexCount, size_t indexCount, const int* const indices);
+        void Build(ID3D11Device *const& device, ShaderRef &vertexShader);
 
-	protected:
-		void Shutdown();
+        size_t GetIndexCount() const { return m_indexCount; }
 
-	protected:
-		struct BufferStateDescriptor {
-			ID3D11Buffer *buffer;
-			UINT stride, offset;
-			BufferStateDescriptor() : buffer(nullptr), stride(0), offset(0) {
-			}
-		};
+    protected:
+        void Shutdown();
 
-		PERSISTENT_DECL(Grafkit::Mesh, 1);
-	protected:
-	    void serialize(Archive& ar) override { _serialize(ar); }
-		void _serialize(Archive& ar);
+        struct BufferStateDescriptor {
+            ID3D11Buffer *buffer;
+            UINT stride, offset;
+            BufferStateDescriptor() : buffer(nullptr), stride(0), offset(0) {
+            }
+        };
 
-	private:
-		ID3D11Buffer *m_indexBuffer;
-		BufferStateDescriptor m_buffer;
-		size_t m_vertexCount, m_indexCount;
-		UINT *m_indices;
+        PERSISTENT_DECL(Grafkit::Mesh, 1);
 
-		std::map<std::string, const void*> m_mapPtr;
+    protected:
+        void Serialize(Archive& ar) override { _Serialize(ar); }
+        void _Serialize(Archive& ar);
 
-		struct vertex_pointer_t {
-			std::string name;
-			INT length;
-			void * data;
-		};
+    private:
+        ID3D11Buffer * m_indexBuffer;
+        BufferStateDescriptor m_buffer;
+        size_t m_vertexCount, m_indexCount;
+        UINT *m_indices;
 
-		std::list<vertex_pointer_t> m_vertexPointers;
-	};
+        std::map<std::string, const void*> m_mapPtr;
 
-	typedef Ref<Mesh> MeshRef;
+        struct vertex_pointer_t {
+            std::string name;
+            uint32_t length;
+            uint8_t * data;
+        };
+
+        std::list<vertex_pointer_t> m_vertexPointers;
+    };
+
+    typedef Ref<Mesh> MeshRef;
 
 }
 

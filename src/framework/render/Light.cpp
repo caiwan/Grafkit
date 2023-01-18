@@ -4,54 +4,66 @@
 
 #include "SceneGraph.h"
 
+PERSISTENT_IMPL(Grafkit::Light)
+
 using namespace Grafkit;
 
-#define PERSISTENT_IMPL(Light);
-
-Grafkit::Light::Light(light_type_t t) : Entity3D(), m_type(t), m_id(0)
+Light::Light() : Entity3D()
+    , m_type(LT_point)
+    , m_id(0)
 {
-	m_position = float4(0, 0, 0, 1);
-	//m_direction = float4(0, 0, -1, 0);
-	ZeroMemory(&m_light, sizeof(m_light));
-	m_light.la = 1.0;
-	m_light.intensity = 1.;
-	m_light.color = float4(1, 1, 1, 1);
+    m_position = float4(0, 0, 0, 1);
+    //m_direction = float4(0, 0, -1, 0);
+    ZeroMemory(&m_light, sizeof(m_light));
+    m_light.la = 1.0;
+    m_light.intensity = 1.;
+    m_light.color = float4(1, 1, 1, 1);
 }
 
-Light::~Light()
+Light::Light(light_type_t t) : Entity3D()
+    , m_type(t)
+    , m_id(0)
 {
+    m_position = float4(0, 0, 0, 1);
+    //m_direction = float4(0, 0, -1, 0);
+    ZeroMemory(&m_light, sizeof(m_light));
+    m_light.la = 1.0;
+    m_light.intensity = 1.;
+    m_light.color = float4(1, 1, 1, 1);
 }
 
-void Grafkit::Light::Calculate(Grafkit::Renderer & deviceContext, ActorRef parent)
-{
-	if (parent.Invalid())
-		return;
-
-	Matrix &nodeMatrix = parent->WorldMatrix();
-
-	m_position.w = 1.;
-	//m_direction.w = 0.;
-	m_light.position = nodeMatrix.Transfrom(m_position);
-	//m_light.direction = nodeMatrix.Transfrom(m_direction);
+Light::~Light() {
 }
 
-size_t Grafkit::Light::GetInternalData(void * const & p)
+void Light::Calculate(Renderer& deviceContext, ActorRef parent)
 {
-	CopyMemory(p, &m_light, sizeof(light2_t));
-	return sizeof(light2_t);
+    if (parent.Invalid())
+        return;
+
+    Matrix nodeMatrix = parent->WorldMatrix();
+
+    m_position.w = 1.;
+    //m_direction.w = 0.;
+    m_light.position = nodeMatrix.Transfrom(m_position);
+    //m_light.direction = nodeMatrix.Transfrom(m_direction);
 }
 
-void Grafkit::Light::serialize(Archive & ar)
+size_t Light::GetInternalData(void* const & p)
 {
-	Entity3D::_serialize(ar);
-
-	PERSIST_FIELD(ar, m_position);
-	//PERSIST_FIELD(ar, m_direction);
-	PERSIST_FIELD(ar, m_light);
+    CopyMemory(p, &m_light, sizeof(light2_t));
+    return sizeof(light2_t);
 }
 
-void Grafkit::Light::Render(Grafkit::Renderer & deviceContext, SceneGraph * const & scene)
-{
+void Light::Render(Renderer& deviceContext, SceneGraph* const & scene) {
 }
 
 // ============================================================================================================
+
+void Light::Serialize(Archive& ar)
+{
+    _Serialize(ar);
+
+    PERSIST_FIELD(ar, m_position);
+    //PERSIST_FIELD(ar, m_direction);
+    PERSIST_FIELD(ar, m_light);
+}

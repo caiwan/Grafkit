@@ -25,7 +25,8 @@ PointEditorWidget::PointEditorWidget(QWidget *parent) :
     connect(ui->edit_radius, SIGNAL(returnPressed()), this, SLOT(radiusReturnPressedSlot()));
     connect(ui->edit_angle, SIGNAL(returnPressed()), this, SLOT(angleReturnPressedSlot()));
     connect(ui->edit_knotType, SIGNAL(currentIndexChanged(int)), this, SLOT(knotTypeChangedSlot(int)));
-    UpdatePointEditor(false);
+
+    PointEditorWidget::UpdatePointEditor(false);
 
 }
 
@@ -46,7 +47,7 @@ void PointEditorWidget::UpdatePointEditor(bool isSet)
         this->ui->edit_knotType->setDisabled(true);
         return;
     }
-    Grafkit::Animation::Key key = GetPointKey();
+    Animation::Key key = GetPointKey();
 
     this->ui->edit_key->setText(QString::number(key.m_time));
     this->ui->edit_value->setText(QString::number(key.m_value));
@@ -108,7 +109,7 @@ void PointEditorWidget::knotTypeChangedSlot(int idex)
 {
     // start edit 
     int knot_type = ui->edit_knotType->currentIndex();
-    m_pointKey.m_type = static_cast<Grafkit::Animation::KeyInterpolation_e>(knot_type);
+    m_pointKey.m_type = static_cast<Animation::KeyInterpolation_e>(knot_type);
     onEditKey(m_pointId, m_pointKey);
     onCommitEdit(m_pointId, m_pointKey);
 }

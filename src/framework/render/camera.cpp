@@ -5,14 +5,10 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+PERSISTENT_IMPL(Grafkit::Camera)
 using namespace Grafkit;
 
-//#define CAMERA_RH
-
-PERSISTENT_IMPL(Grafkit::Camera)
-
-
-Grafkit::Camera::Camera(camera_mode mode) :Entity3D()
+Camera::Camera(camera_mode mode) :Entity3D()
 {
 	m_type = PERSPECTIVE;
 	m_mode = mode;
@@ -26,11 +22,24 @@ Grafkit::Camera::Camera(camera_mode mode) :Entity3D()
 	m_screenWidth = 100;
 }
 
+Camera::Camera() {
+    m_type = PERSPECTIVE;
+    m_mode = CAMERA_LH;
+    m_hFov = M_PI / 4.0f;
+
+    m_znear = 1.0;
+    m_zfar = 1000.;
+
+    m_aspect = 4. / 3.;
+    m_screenHeight = 100;
+    m_screenWidth = 100;
+}
+
 Camera::~Camera()
 {
 }
 
-void Grafkit::Camera::Calculate(Renderer & renderer, ActorRef parent)
+void Camera::Calculate(Renderer & renderer, ActorRef parent)
 {
 	renderer.GetViewportSizef(m_screenWidth, m_screenHeight);
 	this->m_aspect = m_screenWidth / m_screenHeight;
@@ -70,9 +79,9 @@ void Grafkit::Camera::Calculate(Renderer & renderer, ActorRef parent)
 }
 
 
-void Grafkit::Camera::serialize(Archive & ar)
+void Camera::Serialize(Archive & ar)
 {
-	this->Entity3D::_serialize(ar);
+	_Serialize(ar);
 
 	PERSIST_FIELD(ar, m_type);
 	PERSIST_FIELD(ar, m_mode);

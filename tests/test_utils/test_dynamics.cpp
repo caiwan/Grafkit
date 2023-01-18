@@ -6,18 +6,18 @@
 
 #include "testClass_dynamics.h"
 
-
 using namespace Grafkit;
 
-#define CLONEABLE_TestClassName "_dummy_test_clazz"
+#define CLONEABLE_TestClassName "_dummy_test_class"
 
 // ======
-template <typename T> inline void TEST_genclass(const char* name) {
-	const Clonable *item = Clonables::Instance().find(name);
+template <typename T>
+void TEST_genclass(const char* name) {
+	const Clonable *item = Clonables::Instance().Find(name);
 	ASSERT_TRUE(item != NULL);
 
 	// generating new item 
-	Clonable *elem = Clonables::Instance().create(name);
+	Clonable *elem = Clonables::Instance().Create(name);
 	ASSERT_TRUE(elem != NULL);
 	ASSERT_TRUE(elem != item);
 	ASSERT_TRUE(dynamic_cast<T*>(elem) != NULL);
@@ -27,7 +27,7 @@ template <typename T> inline void TEST_genclass(const char* name) {
 
 // ======
 #define CLONEABLE_TestCloneableFactoryName "_dummy_test_clazz_factory_clonable"
-static Grafkit::AddClonable _addClonable_2(CLONEABLE_TestCloneableFactoryName, new ArchiveFactoryTestClass::Factory());
+static AddClonable _addClonable_2(CLONEABLE_TestCloneableFactoryName, new ArchiveFactoryTestClass::Factory());
 
 TEST(Dynamics, given_NoCloable_when_AddFactory_then_GetFactory) {
 	TEST_genclass<ArchiveFactoryTestClass>(CLONEABLE_TestCloneableFactoryName);

@@ -2,7 +2,6 @@
 #include "proxies/MusicProxy.h"
 
 #include "CurveEditor.h"
-#include "CurveEditorView.h"
 
 // impl
 #include "AnimationEditorWidget.h"
@@ -12,7 +11,6 @@
 
 using namespace Idogep;
 using namespace Grafkit;
-
 
 Roles::ManageCurveAudiogramRole::ManageCurveAudiogramRole()
     : m_agBuffer(nullptr)
@@ -189,3 +187,11 @@ void CurveEditor::AddCurveToScene() const
     m_myView->RequestRefreshView(true);
 }
 
+// ==========================================================================================
+
+CurveEditorView::CurveEditorView() : View()
+, m_isDisplayWaveform(true)
+, m_isDisplayCurve(true)
+{
+    // ...
+}

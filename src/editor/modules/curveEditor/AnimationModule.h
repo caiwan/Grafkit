@@ -1,5 +1,7 @@
 #pragma once
 
+#include "animation/animation.h"
+
 #include "utils/ViewModule.h"
 #include "utils/Command.h"
 
@@ -7,6 +9,7 @@ namespace  Idogep
 {
 	class AnimationEditorView;
 	class CurveEditor;
+    class CurveCursor;
 
 	class TreeItem;
     class TreeModel;
@@ -36,5 +39,20 @@ namespace  Idogep
         
         TreeModel* m_animationListModel;
 	};
+
+    // ========================================================================================================
+
+    class AnimationEditorView : public View
+    {
+    public:
+        AnimationEditorView();
+
+        virtual void UpdateAnimationModel(TreeModel* model) = 0;
+        Event<Grafkit::Animation::TrackRef&, const size_t&, Grafkit::Animation::ChannelRef&> onChannelSelected;
+        Event<> onChannelDeselected;
+
+        Event<> onTogglePlayback;
+        Event<> onStopPlayback;
+    };
 
 }

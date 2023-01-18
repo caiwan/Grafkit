@@ -6,22 +6,22 @@
 #include "camera.h"
 #include "Light.h"
 
+PERSISTENT_IMPL(Grafkit::SceneGraph);
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-PERSISTENT_IMPL(Grafkit::SceneGraph);
-
-Grafkit::SceneGraph::SceneGraph() :
+SceneGraph::SceneGraph() :
 	m_root(nullptr)
 {
 }
 
-Grafkit::SceneGraph::~SceneGraph()
+SceneGraph::~SceneGraph()
 {
 	Shutdown();
 }
 
-void Grafkit::SceneGraph::Initialize()
+void SceneGraph::Initialize()
 {
 	std::stack<ActorRef> stack;
 	stack.push(m_root);
@@ -37,13 +37,13 @@ void Grafkit::SceneGraph::Initialize()
 	}
 }
 
-void Grafkit::SceneGraph::Initialize(ActorRef root)
+void SceneGraph::Initialize(ActorRef root)
 {
 	m_root = root;
 	Initialize();
 }
 
-void Grafkit::SceneGraph::Shutdown()
+void SceneGraph::Shutdown()
 {
 	m_nodeMap.clear();
 
@@ -56,14 +56,14 @@ void Grafkit::SceneGraph::Shutdown()
 
 }
 
-void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & render) {
+void SceneGraph::BuildScene(Renderer & render) {
 	
 	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
 		(*it)->Build(render, this);
 	}
 }
 
-void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & render, ShaderResRef vs, ShaderResRef ps)
+void SceneGraph::BuildScene(Renderer & render, ShaderResRef vs, ShaderResRef ps)
 {
 	if (vs.Valid())
 		m_vertexShader = vs;
@@ -79,7 +79,7 @@ void Grafkit::SceneGraph::BuildScene(Grafkit::Renderer & render, ShaderResRef vs
  * RENDER
  *****************************************************************************/
 
-void Grafkit::SceneGraph::Update()
+void SceneGraph::Update()
 {
 	for (size_t i = 0; i < m_nodes.size(); i++) {
 		const ActorRef &actor = m_nodes[i];
@@ -98,7 +98,7 @@ void Grafkit::SceneGraph::Update()
 	}
 }
 
-void Grafkit::SceneGraph::Render(Grafkit::Renderer & render, CameraRef & camera)
+void SceneGraph::Render(Renderer & render, CameraRef & camera)
 {
 	m_worldMatrices.viewMatrix = XMMatrixTranspose(camera->GetWorldMatrix().Get());
 	m_worldMatrices.projectionMatrix = XMMatrixTranspose(camera->GetPerspectiveMatrix().Get());
@@ -133,7 +133,7 @@ void Grafkit::SceneGraph::Render(Grafkit::Renderer & render, CameraRef & camera)
 	ps->Unbind(render);
 }
 
-void Grafkit::SceneGraph::AddNode(ActorRef & node)
+void SceneGraph::AddNode(ActorRef & node)
 {
 	if (node.Invalid())
 		return;
@@ -148,7 +148,7 @@ void Grafkit::SceneGraph::AddNode(ActorRef & node)
 
 }
 
-ActorRef Grafkit::SceneGraph::GetNode(std::string name)
+ActorRef SceneGraph::GetNode(std::string name)
 {
 	auto it = m_nodeMap.find(name);
 	if (it != m_nodeMap.end())
@@ -156,8 +156,9 @@ ActorRef Grafkit::SceneGraph::GetNode(std::string name)
 	return nullptr;
 }
 
-void Grafkit::SceneGraph::serialize(Archive & ar)
+void SceneGraph::Serialize(Archive & ar)
 {
 	// actorok, entityk exportja, importja goez here 
 	// a regi scene loaderbol ki kell szedni es ide be kell rakosgatni
+    assert(0);
 }

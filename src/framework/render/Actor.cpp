@@ -4,92 +4,55 @@
 #include "shader.h"
 #include "SceneGraph.h"
 
+PERSISTENT_IMPL(Grafkit::Actor)
+
 using namespace Grafkit;
 
-void Grafkit::Entity3D::_serialize(Archive & ar)
-{
-	PERSIST_STRING(ar, m_name);
-}
-
-Grafkit::Entity3D::Entity3D() //: Grafkit::IResource()
+Entity3D::Entity3D() //: Grafkit::IResource()
 {
 }
 
-Grafkit::Entity3D::~Entity3D()
+Entity3D::~Entity3D() {
+}
+
+
+void Entity3D::_Serialize(Archive& ar)
 {
+    PERSIST_STRING(ar, m_name);
 }
 
 // =================================================================
 
-PERSISTENT_IMPL(Grafkit::Actor)
 
-Grafkit::Actor::Actor() : Persistent(),
-	m_viewMatrix(), m_transformMatrix(), m_ishidden(0)
-{
+Actor::Actor() : Persistent()
+    , m_viewMatrix()
+    , m_transformMatrix()
+    , m_ishidden(0) {
 }
 
-Grafkit::Actor::Actor(Ref<Entity3D> entity) : Persistent(),
-	m_viewMatrix(), m_transformMatrix(), m_ishidden(0)
+Actor::Actor(Ref<Entity3D> entity) : Persistent()
+    , m_viewMatrix()
+    , m_transformMatrix()
+    , m_ishidden(0)
 {
-	AddEntity(entity);
+    AddEntity(entity);
 }
 
-Grafkit::Actor::~Actor()
-{
+Actor::~Actor() {
 }
 
-void Grafkit::Actor::Render(Grafkit::Renderer & render, SceneGraph * scene)
+void Actor::Render(Renderer& render, SceneGraph* scene) { for (size_t i = 0; i < this->m_pEntities.size(); i++) { m_pEntities[i]->Render(render, scene); } }
+
+void Actor::AddChild(Actor* child)
 {
-	for (size_t i = 0; i < this->m_pEntities.size(); i++) {
-		m_pEntities[i]->Render(render, scene);
-	}
+    m_pChildren.push_back(child);
+    child->m_pParent = this;
 }
 
-void Grafkit::Actor::AddChild(Actor* child)
+void Actor::Serialize(Archive& ar)
 {
-	m_pChildren.push_back(child);
-	child->m_pParent = this;
+    PERSIST_STRING(ar, m_name);
+
+    PERSIST_FIELD(ar, m_viewMatrix);
+    PERSIST_FIELD(ar, m_transformMatrix);
 }
-
-void Grafkit::Actor::serialize(Archive & ar)
-{
-	PERSIST_STRING(ar, m_name);
-
-	PERSIST_FIELD(ar, m_viewMatrix);
-	PERSIST_FIELD(ar, m_transformMatrix);
-
-}
-
-
-// ================================================================
-
-//Grafkit::ActorEventHandler::ActorEventHandler()
-//{
-//}
-//
-//
-//Grafkit::ActorEventHandler::~ActorEventHandler()
-//{
-//}
-//
-//void Grafkit::ActorEventHandler::PushShader(SceneGraph * const & scene)
-//{
-//	otherPShader = scene->GetPShader();
-//	otherVShader = scene->GetPShader();
-//	
-//	if (myVShader.Invalid() || myPShader.Invalid())
-//		return;
-//
-//	if (myVShader->Invalid() || myPShader->Invalid())
-//		return;
-//
-//	scene->SetPShader(myPShader);
-//	scene->SetVShader(myVShader);
-//
-//}
-//
-//void Grafkit::ActorEventHandler::PopShader(SceneGraph * const & scene)
-//{
-//	scene->SetPShader(otherPShader);
-//	scene->SetVShader(otherVShader);
-//}

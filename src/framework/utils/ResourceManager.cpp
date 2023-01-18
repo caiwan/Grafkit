@@ -41,7 +41,9 @@ void IResourceManager::Add(Ref<IResource> pResource)
 
 void IResourceManager::Remove(const std::string& pName)
 {
-    auto it = m_resources.find(pName);
+    std::string name = pName;
+    transform(name.begin(), name.end(), name.begin(), tolower);
+    auto it = m_resources.find(name);
     if (it != m_resources.end()) { m_resources.erase(it); }
 }
 

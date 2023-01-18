@@ -43,10 +43,10 @@ namespace Grafkit {
 		
 		//-- getters 
 
-		void* getBuffer() { return this->m_buffer; }		///< @return the created buffer pointer. Has to be freed outside the class.
-		size_t getCount() { return m_record_count; }		///< @return the count of records
-		size_t getRecordWidth() { return m_record_width; }	///< @retturn size of a record
-		size_t getBufferSize() { return m_record_count * m_record_width; } ///< @return entire buffer size
+		void* getBuffer() const { return this->m_buffer; }		///< @return the created buffer pointer. Has to be freed outside the class.
+		size_t getCount() const { return m_record_count; }		///< @return the count of records
+		size_t getRecordWidth() const { return m_record_width; }	///< @retturn size of a record
+		size_t getBufferSize() const { return m_record_count * m_record_width; } ///< @return entire buffer size
 
 	private:
 		/// Calculates sizes and fills internal offsets 

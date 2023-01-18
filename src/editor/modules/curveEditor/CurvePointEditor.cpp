@@ -1,12 +1,15 @@
 #include "CurvePointEditor.h"
 
+#include <QDebug>
+
 #include "utils/Command.h"
 #include "CurveEditorCommands.h"
 
 #include "curveeditorscene.h"
 #include "curvepointitem.h"
 
-#include "AnimationView.h"
+#include "AnimationModule.h"
+#include <qmessagebox.h>
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -88,12 +91,16 @@ void CurvePointEditor::UpdateChannel(const Animation::TrackRef & track, size_t c
 {
     if (m_track != track || channelId != m_channelId)
         return;
-    m_channel = channel;
 
-    //Rebuild();
+    //m_channel = channel;
+    m_channel->Clear();
+    channel->CopyTo(m_channel, 0, channel->GetKeyCount());
+    
+    Rebuild();
+    onUpdateChannel();
 }
 
-// ========================================================================
+// -------------------------------------------------------------------------------------------
 
 void CurvePointEditor::StartEditEvent(const size_t& index, const Animation::Key& key)
 {
@@ -110,6 +117,7 @@ void CurvePointEditor::CommitEditEvent(const size_t& index, const Animation::Key
 
     CurveKeyChangeCommand* cmd = new CurveKeyChangeCommand(m_channel, index, originalKey, key, this);
     onNewCommand(cmd);
+    onInvlaidateCurve();
 }
 
 void CurvePointEditor::CommitAddPointEvent(const float& key, const float& value)
@@ -118,14 +126,14 @@ void CurvePointEditor::CommitAddPointEvent(const float& key, const float& value)
 
     int index = m_channel->FindKeyIndex(key);
 
-    assert(index != -1);
-
-    Animation::Key newKey(m_channel->GetKey(index)); // use previous key as prototype
+    Animation::Key newKey(m_channel->GetKey(std::max(index,0))); // use previous key as prototype, or the preceedign if -1
     newKey.m_time = key, newKey.m_value = value;
 
-    m_channel->AddKey(newKey);
+    m_channel->InsertKey(index + 1 , newKey);
 
-    Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this);
+    Animation::ChannelRef newChannel = new Animation::Channel(m_channel);
+
+    Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, newChannel, this);
     onNewCommand(cmd);
     Rebuild();
     onUpdateChannel();
@@ -133,11 +141,18 @@ void CurvePointEditor::CommitAddPointEvent(const float& key, const float& value)
 
 void CurvePointEditor::CommitRemovePointEvent(const size_t& index)
 {
+    if (m_channel->GetKeyCount() == 1)
+    {
+        QMessageBox::critical(nullptr, "Az ellen nem ved", "You're about to remove the last control point. I'm here to prevent you from this terrible action.");
+        return;
+    }
+
     Animation::ChannelRef oldChannel = new Animation::Channel(m_channel);
 
     m_channel->DeleteKey(index);
 
-    Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this);
+    Animation::ChannelRef newChannel = new Animation::Channel(m_channel);
+    Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, newChannel, this);
     onNewCommand(cmd);
     Rebuild();
     onUpdateChannel();
@@ -197,4 +212,9 @@ Animation::Key CurvePointEditor::EditKey(size_t index, Animation::Key key) const
 
     m_channel->SetKey(index, key);
     return key;
+}
+
+// ===========================================================================================
+
+PointEditorView::PointEditorView() : View(), m_pointId(0) {
 }

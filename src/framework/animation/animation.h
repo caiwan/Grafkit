@@ -16,14 +16,12 @@ namespace Grafkit
     /**
     Common anim. interface
     */
-    class Animation : public virtual Referencable
+    class Animation : public virtual Referencable, public Persistent
     {
     public:
-        Animation() {
-        }
+        Animation();
 
-        virtual ~Animation() {
-        }
+        virtual ~Animation();
 
         virtual void Update(double time) = 0;
 
@@ -37,13 +35,11 @@ namespace Grafkit
         typedef Ref<Channel> ChannelRef;
         typedef Ref<Track> TrackRef;
 
-
     protected:
-        void _serialize(Archive& ar);
-
-    private:
         std::string m_name;
-        float m_duration;
+
+        void Serialize(Archive& ar) override = 0;
+        void _Serialize(Archive& ar);
 
     public:
 
@@ -60,46 +56,55 @@ namespace Grafkit
         /** Tamplate for anim keys */
         struct Key
         {
-            Key() : m_type(KI_linear)
-                , m_time(0)
+            Key() : m_time(0)
                 , m_value(0.)
                 , m_radius(1.)
-                , m_angle(0.) {
+                , m_angle(0.)
+                , m_type(KI_linear) {
             }
 
-            Key(float t, float value) : m_type(KI_linear)
-                , m_time(t)
+            Key(float t, float value) : m_time(t)
                 , m_value(value)
                 , m_radius(1.)
-                , m_angle(0.) {
+                , m_angle(0.)
+                , m_type(KI_linear) {
             }
 
-            Key(Key const& other) : m_type(other.m_type)
-                , m_time(other.m_time)
+            Key(Key const& other) : m_time(other.m_time)
                 , m_value(other.m_value)
                 , m_radius(other.m_radius)
-                , m_angle(other.m_angle) {
+                , m_angle(other.m_angle)
+                , m_type(other.m_type) {
             }
 
-            KeyInterpolation_e m_type;
+            Key(float time, float value, float radius, float angle, KeyInterpolation_e type)
+                : m_time(time)
+                , m_value(value)
+                , m_radius(radius)
+                , m_angle(angle)
+                , m_type(type) {
+            }
 
             float m_time;
             float m_value;
             float m_radius;
             float m_angle;
+
+            KeyInterpolation_e m_type;
         };
 
         /**
             Template for animation track
         */
-        class Channel : public Referencable
+        class Channel : public Referencable, public Persistent
         {
             friend class Animation;
         public:
             explicit Channel(const char* name = "");
             explicit Channel(const std::string& name);
+            explicit Channel(const ChannelRef& other);
+
             Channel(const Channel& other);
-            Channel(const ChannelRef& other);
 
             size_t GetKeyCount() const { return m_keys.size(); }
             Key GetKey(size_t i) { return m_keys[i]; }
@@ -110,17 +115,9 @@ namespace Grafkit
             void AddKey(const Key key) { m_keys.push_back(key); }
             void SetKey(const size_t id, const Key key) { m_keys[id] = key; }
 
-            void InsertKey(const size_t &afterId, const Key &key)
-            {
-                const auto it = m_keys.begin() + afterId;
-                m_keys.insert(it, key);
-            }
+            void InsertKey(const size_t& beforeId, const Key& key);
 
-            void DeleteKey(const size_t &id)
-            {
-                const auto it = m_keys.begin() + id;
-                m_keys.erase(it);
-            }
+            void DeleteKey(const size_t& id);
 
             int FindKeyIndex(float t) const;
 
@@ -131,23 +128,25 @@ namespace Grafkit
             */
             int FindKey(float t, Key& v0, Key& v1, float& f) const;
 
-        public:
             void serialize(Archive& ar);
             void Clear() { m_keys.clear(); }
 
             void CopyKey(float t, Channel& other);
             void CopyTo(const ChannelRef& target, size_t start, size_t end);
 
-
         protected:
             std::vector<Key> m_keys;
             std::string m_name;
+
+            PERSISTENT_DECL(Grafkit::Animation::Channel, 1);
+        protected:
+            void Serialize(Archive& ar) override;
         };
 
         /**
             N-dimension container for multiple tracks
         */
-        class Track : virtual public Referencable
+        class Track : virtual public Referencable, public Persistent
         {
             friend class Animation;
         public:
@@ -176,7 +175,14 @@ namespace Grafkit
         protected:
             std::string m_name;
             std::vector<Ref<Channel>> m_channels;
+
+            PERSISTENT_DECL(Grafkit::Animation::Track, 1)
+
+        protected:
+            void Serialize(Archive& ar) override;
         };
+
+        // -- Animation
 
         Ref<Track> GetTrack(size_t id) { return m_tracks[id]; }
         size_t GetTrackCount() const { return m_tracks.size(); }
@@ -185,10 +191,9 @@ namespace Grafkit
         void AddTrack(Ref<Track> track) { m_tracks.push_back(track); }
 
         std::vector<Ref<Track>> m_tracks;
-    };
 
-    //typedef Animation::Key AnimationKey;
-    //typedef Animation::Track AnimationTrack;
+
+    };
 }
 
 /* ============================================================================================== */
@@ -232,7 +237,7 @@ namespace Grafkit
                 (-2.0f * t3 + 3.0f * t2) * v1.m_value +
                 (t3 - 2.0f * t2 + t) * v0.m_angle * v0.m_radius +
                 (t3 - t2) * v1.m_angle * v1.m_radius
-            );
+                );
         }
 
         return v0.m_value * (1. - t) + v1.m_value * t;
@@ -243,15 +248,15 @@ namespace Grafkit
     inline int Animation::Channel::FindKeyIndex(float t) const
     {
         const size_t count = m_keys.size();
-        if (count <= 2)
-            return 0;
+        if (count == 0)
+            return -1;
 
         if (m_keys[0].m_time > t)
-            return 0;
-        if (m_keys[count - 1].m_time < t)
+            return -1;
+
+        if (m_keys[count - 1].m_time <= t)
             return count - 1;
 
-#if 1
         size_t u = count - 1, l = 0, m = 0;
         while (u >= l)
         {
@@ -265,14 +270,6 @@ namespace Grafkit
         }
         return -1;
 
-#else
-		for (size_t i = 0; i < count - 1; i++) {
-			if (m_keys[i].m_time <= t && m_keys[i + 1].m_time >= t)
-				return i;
-		}
-
-		return -1;
-#endif
     }
 
 
@@ -280,7 +277,7 @@ namespace Grafkit
     {
         const size_t count = m_keys.size();
         f = 0.f;
-        if (!count) { return 0; }
+        if (!count) { return -1; }
 
         if (count == 1)
         {
@@ -296,6 +293,7 @@ namespace Grafkit
             v1 = m_keys[1];
             return 0;
         }
+
         if (m_keys[count - 1].m_time <= t)
         {
             f = 1.;

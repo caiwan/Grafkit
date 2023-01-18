@@ -8,51 +8,17 @@
 #include "utils/struct_pack.h"
 #include "utils/persistence/persistence.h"
 
+PERSISTENT_IMPL(Grafkit::Mesh);
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-PERSISTENT_IMPL(Grafkit::Mesh);
-
-void Mesh::_serialize(Archive & ar)
-{
-	PERSIST_FIELD(ar, m_vertexCount);
-	PERSIST_VECTOR(ar, m_indices, m_indexCount);
-
-	unsigned int ptr_count = this->m_vertexPointers.size();
-
-	PERSIST_FIELD(ar, ptr_count);
-
-	// store pointer table
-	if (ar.IsStoring()) {
-		for (auto it = m_vertexPointers.begin(); it != m_vertexPointers.end(); ++it) {
-			const UCHAR* ptr = static_cast<UCHAR*>(it->data);
-			size_t size = it->length;
-			std::string name = it->name.c_str();
-			PERSIST_STRING(ar, name);
-			PERSIST_VECTOR(ar, ptr, size);
-		}
-	}
-	// load pointer table
-	else {
-		for (size_t i = 0; i < ptr_count; i++) {
-			UCHAR* ptr = nullptr;
-			size_t size = 0; 
-			std::string name;
-			PERSIST_STRING(ar, name);
-			PERSIST_VECTOR(ar, ptr, size);
-			
-			this->AddPointer(name, size, ptr);
-			delete[] ptr;	///TODO: ez itt felesleges, eleg lenne egyszer torolni csak
-		}
-	}
-}
-
 // ==================================================================
 Mesh::Mesh() :
-	m_buffer(),
 	m_indexBuffer(nullptr),
-	m_indexCount(0),
+	m_buffer(),
 	m_vertexCount(0),
+	m_indexCount(0),
 	m_indices(nullptr)
 {
 }
@@ -120,7 +86,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 
 	for (size_t i = 0; i < elem_count; ++i)
 	{
-		Shader::InputElementRecord &record = shader->GetILayoutElem(i);
+		Shader::InputElementRecord record = shader->GetILayoutElem(i);
 		int field_id = packer.addField(record.width);
 
 		auto it = this->m_mapPtr.find(record.name);
@@ -133,7 +99,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	void *vertex_buffer_data = packer(m_vertexCount);
 
 	// --- Create vertex buffer
-	ID3D11Buffer *vertexBuffer = NULL;
+	ID3D11Buffer *vertexBuffer = nullptr;
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData;
@@ -167,7 +133,7 @@ void Mesh::Build(ID3D11Device * const & device, ShaderRef & shader)
 	this->m_buffer.offset = 0;
 
 	// --- Create index buffer
-	ID3D11Buffer *indexBuffer = NULL;
+	ID3D11Buffer *indexBuffer = nullptr;
 
 	D3D11_BUFFER_DESC 	indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA 	indexData;
@@ -207,4 +173,41 @@ void Mesh::Shutdown()
 	}
 
 	delete[] m_indices;
+}
+
+
+// ==================================================================
+
+void Mesh::_Serialize(Archive & ar)
+{
+    PERSIST_FIELD(ar, m_vertexCount);
+    PERSIST_VECTOR(ar, m_indices, m_indexCount);
+
+    unsigned int ptr_count = this->m_vertexPointers.size();
+
+    PERSIST_FIELD(ar, ptr_count);
+
+    // store pointer table
+    if (ar.IsStoring()) {
+        for (auto it = m_vertexPointers.begin(); it != m_vertexPointers.end(); ++it) {
+            const UCHAR* ptr = static_cast<UCHAR*>(it->data);
+            size_t size = it->length;
+            std::string name = it->name.c_str();
+            PERSIST_STRING(ar, name);
+            PERSIST_VECTOR(ar, ptr, size);
+        }
+    }
+    // load pointer table
+    else {
+        for (size_t i = 0; i < ptr_count; i++) {
+            UCHAR* ptr = nullptr;
+            size_t size = 0;
+            std::string name;
+            PERSIST_STRING(ar, name);
+            PERSIST_VECTOR(ar, ptr, size);
+
+            this->AddPointer(name, size, ptr);
+            delete[] ptr;	///TODO: ez itt felesleges, eleg lenne egyszer torolni csak
+        }
+    }
 }

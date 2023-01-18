@@ -1,21 +1,22 @@
 #include "actoranimation.h"
 
-using namespace Grafkit;
-
 #include "animation.h"
 
+PERSISTENT_IMPL(Grafkit::ActorAnimation);
 
-Grafkit::ActorAnimation::ActorAnimation() : Animation()
+using namespace Grafkit;
+
+ActorAnimation::ActorAnimation() : Animation()
 {
 	CreateTrack();
 }
 
-Grafkit::ActorAnimation::ActorAnimation(ActorRef actor) : Animation(), m_actor(actor)
+ActorAnimation::ActorAnimation(ActorRef actor) : Animation(), m_actor(actor)
 {
 	CreateTrack();
 }
 
-void Grafkit::ActorAnimation::Update(double time)
+void ActorAnimation::Update(double time)
 {
 	const float3 t = m_position->GetFloat3(time);
 	const float3 r = m_rotation->GetFloat3(time);
@@ -27,15 +28,19 @@ void Grafkit::ActorAnimation::Update(double time)
 	m_actor->Transform().Translate(t);
 }
 
-void Grafkit::ActorAnimation::CreateTrack()
+void ActorAnimation::CreateTrack()
 {
-	m_position = new Animation::Track("Position", "xyz");
+	m_position = new Track("Position", "xyz");
 	AddTrack(m_position);
 
-	m_rotation = new Animation::Track("Rotation", "rpy");
+	m_rotation = new Track("Rotation", "rpy");
 	AddTrack(m_rotation);
 
-	m_scale = new Animation::Track("Scaling", "xyz");
+	m_scale = new Track("Scaling", "xyz");
 	AddTrack(m_scale);
 	m_scale->SetFloat3(0, float3(1, 1, 1));
+}
+
+void ActorAnimation::Serialize(Archive& ar) {
+    assert(0);
 }

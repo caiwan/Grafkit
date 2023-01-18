@@ -51,7 +51,7 @@ void AnimationEditor::Initialize(IResourceManager* const& resourceManager)
     m_myView->onStopPlayback += Delegate(timer, &Timer::Stop);
 }
 
-// ===========================================================================================
+// -------------------------------------------------------------------------------------------
 
 void AnimationEditor::AnimationSelectedEvent(TreeItem* const item)
 {
@@ -74,4 +74,12 @@ void AnimationEditor::AnimationSelectedEvent(TreeItem* const item)
 
     m_animationListModel = animation->GetAnimationListModel();
     m_myView->UpdateAnimationModel(m_animationListModel);
+}
+
+
+// ===========================================================================================
+
+
+AnimationEditorView::AnimationEditorView() : View()
+{
 }

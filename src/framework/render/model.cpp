@@ -10,16 +10,11 @@
 #include "model.h"
 
 
+PERSISTENT_IMPL(Grafkit::Model);
+
 using namespace Grafkit;
 
 // ==================================================================
-PERSISTENT_IMPL(Grafkit::Model);
-
-void Model::_serialize(Archive& ar)
-{
-    this->Entity3D::_serialize(ar);
-    PERSIST_REFOBJECT(ar, m_mesh);
-}
 
 Model::Model() {
 }
@@ -75,3 +70,10 @@ void Model::Build(Renderer& deviceContext, SceneGraph* const & scene)
 void Model::SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; }
 
 ShaderResRef Model::GetGeometryShader() const { return m_geometryShader; }
+
+
+void Model::_Serialize(Archive& ar)
+{
+    _Serialize(ar);
+    PERSIST_REFOBJECT(ar, m_mesh);
+}

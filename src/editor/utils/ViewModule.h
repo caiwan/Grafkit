@@ -81,7 +81,7 @@ namespace Idogep {
         private:
             View * m_view;
 
-            bool m_isQueued;
+            size_t m_isQueued;
             bool m_isSetForce;
 
         };

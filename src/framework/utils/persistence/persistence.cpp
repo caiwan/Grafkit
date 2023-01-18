@@ -13,27 +13,27 @@ using namespace FWdebugExceptions;
 using namespace Grafkit;
 using namespace std;
 
-void Persistent::store(Archive& ar)
+void Persistent::Store(Archive& ar)
 {
-	string className = this->getClassName();
-	UCHAR ver = this->version();
+	string className = this->GetClazzName();
+	UCHAR ver = this->GetVersion();
 
 	Log::Logger().Info("Storing object %s %d", className.c_str(), ver);
 
 	PERSIST_STRING(ar, className);
 	PERSIST_FIELD(ar, ver);
 
-	this->serialize(ar);
+	this->Serialize(ar);
 }
 
-Persistent* Persistent::load(Archive& ar)
+Persistent* Persistent::Load(Archive& ar)
 {
 	string className;
 	UCHAR ver = 0;
 	PERSIST_STRING(ar, className);
 
-	Clonable* clone = Clonables::Instance().create(className.c_str());
-	if (clone == NULL) {
+	Clonable* clone = Clonables::Instance().Create(className.c_str());
+	if (clone == nullptr) {
 #ifdef DEBUG
 		Clonables::Instance().dumpClonables();
 #endif
@@ -41,7 +41,7 @@ Persistent* Persistent::load(Archive& ar)
 	}
 
 	Persistent * obj = dynamic_cast<Persistent *>(clone);
-	if (obj == NULL) {
+	if (obj == nullptr) {
 		throw new EX_DETAILS(PersistentCreateObjectExcpetion, className.c_str());
 	}
 
@@ -50,11 +50,11 @@ Persistent* Persistent::load(Archive& ar)
 	Log::Logger().Info("Loading object %s %d", className.c_str(), ver);
 
 	//
-	if (ver != obj->version()) {
+	if (ver != obj->GetVersion()) {
 		throw new EX(PersistentVersionMismatch);
 	}
 
-	obj->serialize(ar);
+	obj->Serialize(ar);
 
 	return obj;
 }
@@ -73,7 +73,7 @@ Archive::~Archive()
 
 }
 
-size_t Grafkit::Archive::WriteString(const char * input)
+size_t Archive::WriteString(const char * input)
 {
 	USHORT slen = strlen(input);
 	this->Write(&slen, sizeof(slen));
@@ -81,7 +81,7 @@ size_t Grafkit::Archive::WriteString(const char * input)
 	return slen;
 }
 
-size_t Grafkit::Archive::ReadString(char*& output)
+size_t Archive::ReadString(char*& output)
 {
 	USHORT slen = 0;
 	this->Read(&slen, sizeof(slen));
@@ -90,7 +90,7 @@ size_t Grafkit::Archive::ReadString(char*& output)
 	return slen;
 }
 
-void Grafkit::Archive::PersistString(const char *& str)
+void Archive::PersistString(const char *& str)
 {
 	if (m_isStoring) {
 		WriteString(str);
@@ -102,7 +102,7 @@ void Grafkit::Archive::PersistString(const char *& str)
 	}
 }
 
-void Grafkit::Archive::PersistString(std::string &str)
+void Archive::PersistString(string &str)
 {
 	if (m_isStoring) {
 		WriteString(str.c_str());
@@ -115,21 +115,22 @@ void Grafkit::Archive::PersistString(std::string &str)
 	}
 }
 
-void Grafkit::Archive::StoreObject(Persistent * object)
+void Archive::StoreObject(Persistent * object)
 {
 	UCHAR isNotNull = object != nullptr;
 	PersistField(isNotNull);
 
 	if (isNotNull)
-		object->store(*this);
+		object->Store(*this);
 }
 
-Persistent * Grafkit::Archive::LoadObject()
+Persistent * Archive::LoadObject()
 {
 	UCHAR isNotNull = 0;
 	PersistField(isNotNull);
 
 	if (isNotNull)
-		return Persistent::load(*this);
+		return Persistent::Load(*this);
+    return nullptr;
 }
 
