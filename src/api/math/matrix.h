@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../render/dxtypes.h"
 
 namespace FWmath {
@@ -107,6 +105,11 @@ namespace FWmath {
 		}
 
 		// --- lookat
+
+		/// Transpose matrix
+		void Transpose() {
+			(*this) = XMMatrixTranspose((*this));
+		}
 
 		// ===
 		// --- operations
