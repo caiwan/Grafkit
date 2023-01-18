@@ -30,6 +30,14 @@ using namespace Idogep;
 
 EditorApplicationQt::EditorApplicationQt(int argc, char** argv) : EditorApplication(argc, argv), m_qApp(argc, argv)
 {
+	assert(s_self == nullptr);
+
+	// connect signals and slots
+
+	// init the rest of the things 
+	m_logger = new LoggerProxy();
+	Grafkit::Log::Logger().AddHandler(m_logger);
+
 	QCoreApplication::setOrganizationName("IndustrialRevolutioners");
 	QCoreApplication::setOrganizationDomain("caiwan.github.io");
 	QCoreApplication::setApplicationName(APP_NAME);
@@ -47,6 +55,7 @@ int EditorApplicationQt::ExecuteParentFramework()
 {
 	m_editor = new Editor(nullptr, m_render, this);
 	m_mainWindow = new MainWindow();
+	m_editor->SetView(m_mainWindow);
 
 	m_preloadWindow = new Preloader(m_mainWindow);
 	onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
@@ -109,7 +118,7 @@ void Idogep::EditorApplication::preload()
 
 void Idogep::EditorApplication::BuildEditorModules()
 {
-	m_logModule = new LogModule(m_editor);
+	m_logModule = new LogModule(m_editor, m_logger);
 }
 
 void Idogep::EditorApplication::InitializeModules() {
@@ -129,7 +138,7 @@ void Idogep::EditorApplication::InitializeModules() {
 void Idogep::EditorApplication::BuildDockingWindows()
 {
 	QDockWidget *logWidget = dynamic_cast<QDockWidget*>(m_logModule->GetView().Get());
-	DEBUG_ASSERT(logWidget);
+	assert(logWidget);
 
 	logWidget->setParent(m_mainWindow);
 	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);

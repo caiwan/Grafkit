@@ -4,10 +4,11 @@
 
 using namespace Idogep;
 
-Idogep::Module::Module(Ref<Module> parent) : m_view(nullptr), m_parent(parent)
+Idogep::Module::Module(Ref<Module> parent) : Referencable()
 {
-	if (m_parent)
+	if (parent.Valid())
 		parent->AddChildModule(this);
+	m_parent = parent;
 }
 
 Idogep::Module::~Module()

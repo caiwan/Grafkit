@@ -19,7 +19,7 @@ namespace Idogep {
 	}
 
 	// ----------------------------------------------------------------
-	class Module : public virtual Referencable {
+	class Module : public Referencable {
 	public:
 
 		Module(Ref<Module> parent = nullptr);
@@ -38,21 +38,21 @@ namespace Idogep {
 
 		Ref<Module> GetRootModule() { return m_parent ? m_parent->GetRootModule() : this; }
 
-	protected:
 		void SetParentModule(Ref<Module> parent) { m_parent = parent; }
-		void AddChildModule(Ref<Module> child) { m_children.push_back(child); child->SetParentModule(this); }
+		void AddChildModule(Ref<Module> child) { m_children.push_back(child);}
+
 		void SetView(Ref<View>view) { m_view = view; }
 
 	protected:
 		Ref<Module> m_parent;
-		std::vector<Module*> m_children;
+		std::vector<Ref<Module>> m_children;
 		Ref<View> m_view;
 
 	};
 
 	// ----------------------------------------------------------------
 
-	class View : public virtual Referencable {
+	class View : public Referencable {
 		friend class Roles::ViewRefreshQueue;
 		friend class Module;
 	public:

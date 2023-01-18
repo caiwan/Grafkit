@@ -10,7 +10,7 @@ namespace Ui {
 }
 
 namespace Idogep {
-	class LogWidget : public QDockWidget, public virtual Referencable, public LogView
+	class LogWidget : public QDockWidget, public LogView
 	{
 		Q_OBJECT
 	public:
