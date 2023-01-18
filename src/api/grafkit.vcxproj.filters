@@ -86,8 +86,11 @@
     <ClCompile Include="generator\TextureLoader.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
-    <ClCompile Include="render\renderassets.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="core\renderassets.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset.cpp">
+      <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,8 +157,11 @@
     <ClInclude Include="generator\TextureLoader.h">
       <Filter>Source Files\generator</Filter>
     </ClInclude>
-    <ClInclude Include="render\renderassets.h">
-      <Filter>Source Files\render</Filter>
+    <ClInclude Include="core\renderassets.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset.h">
+      <Filter>Source Files\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
