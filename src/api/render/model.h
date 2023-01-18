@@ -35,8 +35,8 @@ namespace FWrender
 
 		//void addMesh(MeshRef mesh, /*materials, textures*/);
 
-		inline void setTexture(TextureRef texture, int n = 0);
-		inline TextureRef& getTexture(int n = 0);
+		void setTexture(TextureRef texture, int n = 0);
+		TextureRef& getTexture(int n = 0);
 
 	private:
 		// + material
@@ -47,4 +47,4 @@ namespace FWrender
 	typedef Ref<Model> ModelRef;
 }
 
-#endif
+#endif //_Model_H_
