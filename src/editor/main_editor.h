@@ -3,7 +3,12 @@
 #include <qapplication.h>
 #include <qthread.h>
 
-#include "Application.h"
+#include "render/renderer.h"
+#include "utils/ResourceManager.h"
+#include "utils/ResourcePreloader.h"
+#include "utils/InitializeSerializer.h"
+
+#include "utils/Event.h"
 
 class QCloseEvent;
 

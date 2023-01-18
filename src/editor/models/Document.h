@@ -17,6 +17,8 @@ namespace Idogep {
 	class TreeModel;
 	class SceneModel;
 
+	class Music;
+
 	namespace Role {
 		class HasSceneGraphRole {
 		public:
@@ -24,11 +26,21 @@ namespace Idogep {
 		};
 
 		class HasEffectRole {
+			// ... 
+		};
 
+		class HasPlaybackRole {
+		public:
+			virtual Music * GetMusic() { return m_musicWrapper; }
+		protected:
+			Idogep::Music * m_musicWrapper;
 		};
 	}
 
-	class Document : public HasSceneGraphRole
+	class Document : 
+		public Role::HasSceneGraphRole,
+		public Role::HasEffectRole,
+		public Role::HasPlaybackRole
 	{
 		friend class Editor;
 	public:
@@ -58,6 +70,8 @@ namespace Idogep {
 
 		Grafkit::ActorRef m_rootActor;
 		Grafkit::ActorRef m_cameraActor;
+
+
 	};
 
 }

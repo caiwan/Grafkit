@@ -2,7 +2,7 @@
 
 #include "core/Music.h"
 #include "models/Music.h"
-#include "Event.h"
+#include "utils/Event.h"
 
 namespace Idogep
 {

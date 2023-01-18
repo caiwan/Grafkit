@@ -15,14 +15,16 @@
 #include "generator/ShaderLoader.h"
 
 #include "utils/ResourceManager.h"
-#include "generator/MusicBassLoader.h"
 
 using namespace Idogep;
 using namespace Grafkit;
 
 #include "builtin_data/cube.h"
 
-Document::Document() : m_isDirty(false)
+Idogep::Document::Document() :
+	Role::HasEffectRole(),
+	Role::HasSceneGraphRole(),
+	Role::HasPlaybackRole()
 {
 }
 
@@ -44,19 +46,8 @@ void Document::Initialize(Renderer & render)
 	InitTestStuff(render);
 }
 
-SceneGraphRef Document::GetScenegraph() const
-{
-	return m_scenegraph;
-}
-
 SceneResRef Document::GetScene() const
 {
-	return m_scene;
-}
-
-TreeModel * Idogep::Document::GetOutline()
-{
-	return m_music;
 }
 
 // ---------------------------------------------------------------

@@ -7,6 +7,11 @@
 #include "Application.h"
 #include "proxies/LoggerProxy.h"
 
+#include "mainWindow.h"
+#include "modules/splashScreen/splashwidget.h"
+#include "modules/preloaderDialog/preloader.h"
+#include "modules/grafkitContext/QGrafkitContextWidget.h"
+
 using namespace Idogep;
 
 EditorApplicationQt::EditorApplicationQt(int argc, char** argv) : EditorApplication(argc, argv), m_qApp(argc, argv)

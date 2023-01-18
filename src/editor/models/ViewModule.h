@@ -2,22 +2,22 @@
 
 #include <qobject.h>
 
-#include "event.h"
-#include "command.h"
+#include "utils/Event.h"
+#include "utils/Command.h"
 
 namespace Idogep {
 
-class View;
+	class View;
 
-namespace Role {
-class CanRefreswViewRole{
-};
+	namespace Role {
+		class CanRefreswViewRole {
+		};
 
-class CanEncapulateViews {
-};
-	class ViewRefreshQueue;
+		class CanEncapulateViews {
+		};
+		class ViewRefreshQueue;
 
-}
+	}
 
 	class View {
 		friend class ViewRefreshQueue;
@@ -30,25 +30,25 @@ class CanEncapulateViews {
 	protected:
 		virtual void RefreshView(bool force) = 0;
 
-		#if 0
+#if 0
 	private:
 		ViewRefreshQueue * m_refreshQueueObject;
-	#endif
+#endif
 	};
 
 	namespace Role {
-	// TODO: implement
-	/// ... 
-	#if 0
-	class ViewRefreshQueue : public QObject {
-		Q_OBJECT
-	public:
-		ViewRefreshQueue(View * const & view);
-	public /*slots*/:
-		void refreshViewSlot();
-	private:
-		View * m_view;
-	};
+		// TODO: implement
+		/// ... 
+#if 0
+		class ViewRefreshQueue : public QObject {
+			Q_OBJECT
+		public:
+			ViewRefreshQueue(View * const & view);
+		public /*slots*/:
+			void refreshViewSlot();
+		private:
+			View * m_view;
+		};
 #endif
 	}
 }

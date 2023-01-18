@@ -1,4 +1,3 @@
-#include <cassert>
 #include "utils/Command.h"
 
 void Idogep::CommandStack::ConnectEmitter(EmitsCommandRole * emitter)

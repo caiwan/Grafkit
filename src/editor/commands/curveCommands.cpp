@@ -1,6 +1,6 @@
 #include "curveCommands.h"
 
-#include "ui/View.h"
+#include "models/ViewModule.h"
 
 using namespace Grafkit;
 using namespace Idogep;

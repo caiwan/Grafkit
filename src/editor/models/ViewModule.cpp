@@ -1,14 +1,15 @@
-#include "View.h"
+#include "ViewModule.h"
+
 using namespace Idogep;
 
 Idogep::View::View()
 {
-	m_refreshQueueObject = new ViewRefreshQueue(this);
+	//m_refreshQueueObject = new ViewRefreshQueue(this);
 }
 
 Idogep::View::~View()
 {
-	delete m_refreshQueueObject;
+	//delete m_refreshQueueObject;
 }
 
 void Idogep::View::RequestRefreshView(bool force)
@@ -23,8 +24,7 @@ void Idogep::View::RequestRefreshView(bool force)
 		RefreshView(force);
 	}
 }
-#include <qobject.h>
 
-void Idogep::ViewRefreshQueue::refreshViewSlot()
-{
-}
+//void Idogep::ViewRefreshQueue::refreshViewSlot()
+//{
+//}

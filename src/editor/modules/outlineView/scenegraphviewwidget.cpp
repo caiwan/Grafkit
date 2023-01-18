@@ -6,8 +6,6 @@
 
 #include "utils/tree/treemodel.h"
 
-#include "models/Document.h"
-
 using namespace Idogep;
 using namespace Grafkit;
 
