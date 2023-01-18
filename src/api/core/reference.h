@@ -14,6 +14,9 @@
 /**
 	Baseclass for all classes that support reference counting.
  */
+
+ ///@todo refcount legyen mutable/volatile + mukodjon a refszamlalas const tipussal is 
+
 class Referencable {
 public:
 	Referencable() : _ref_count(0) { }
