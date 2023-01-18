@@ -31,6 +31,39 @@ EditorApplicationQt::~EditorApplicationQt()
 
 int EditorApplicationQt::ExecuteParentFramework()
 {
+	m_editor = new Editor(m_render, this);
+	m_mainWindow = new MainWindow(m_editor);
+
+	m_preloadWindow = new Preloader(m_mainWindow);
+	onFocusChanged += Delegate(m_preloadWindow, &Preloader::FocusChanged);
+
+	SetPreloadListener(m_preloadWindow);
+
+	SplashWidget *sw = new SplashWidget();
+
+	LoaderThread *loader = new LoaderThread();
+
+	onLoaderFinished += Delegate(sw, &SplashWidget::hide);
+	onLoaderFinished += Delegate(sw, &SplashWidget::deleteLater);
+	onLoaderFinished += Delegate(m_mainWindow, &MainWindow::showMaximized);
+	onLoaderFinished += Delegate(this, &EditorApplication::nextTick);
+	onLoaderFinished += Delegate(loader, &LoaderThread::deleteLater);
+
+	sw->show();
+
+	BuildMainWindow();
+	BuildEditorModules();
+
+	connect(loader, SIGNAL(finished()), this, SLOT(loaderFinished()));
+	loader->start();
+
+	m_renderWidget = new QGrafkitContextWidget(m_render);
+	m_renderWidget->Initialize();
+
+	m_mainWindow->setCentralWidget(m_renderWidget);
+
+	m_editor->NewDocument();
+
 	return m_qApp.exec();
 }
 

@@ -7,6 +7,10 @@
 #include "utils/Event.h"
 #include "utils/Command.h"
 
+#include "ViewModule.h"
+
+#include "mediators/EditingMediator.h"
+
 namespace Grafkit {
 	class IResourceManager;
 }
@@ -18,16 +22,12 @@ namespace Idogep {
 
 	class Document;
 
-	//class MusicProxy;
-	//class LoggerProxy;
-
 	class Editor : public Module{
 	public:
 		Editor(Ref<Module> parent, Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
 		~Editor();
 
-		void Initialize() override;
-		//void MediateSiblingModule(Ref<Module> module);
+		void Initialize(Ref<Module> parent);
 
 		void InitializeDocument();
 
@@ -64,7 +64,6 @@ namespace Idogep {
 
 		CommandStack* m_commandStack;
 		Document * m_document;
-		//MusicProxy *m_musicProxy;
 		
 		bool m_precalcRequested;
 		bool m_reloadRequested;

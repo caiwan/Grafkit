@@ -2,18 +2,15 @@
 
 #include "common.h"
 #include "utils/Event.h"
-#include "models/ViewModule.h"
 
-class QAction;
+#include "ViewModule.h"
 
 namespace Idogep {
 
-	class TreeItem;
 	class CommandStack;
+	class Editor;
 
 	namespace Roles {
-
-
 		class ManageCommandStackRole {
 		public:
 			ManageCommandStackRole();
@@ -28,11 +25,26 @@ namespace Idogep {
 			virtual void ToggleRedo(bool enabled) = 0;
 
 			void ConnectCommandStackEvents(CommandStack * const & stack);
-
-		protected:
-			QAction * m_undoAct;
-			QAction * m_redoAct;
 		};
 
+		class ManageFileOperationsRole {
+		public :
+			Event<> onOpen;
+			Event<> onSave;
+			Event<> onNew;
+
+			// dirty check maybe?
+		};
 	}
+
+	class EditorView : virtual public Referencable, public View,
+		public Roles::ManageCommandStackRole,
+		public Roles::ManageFileOperationsRole
+	{
+	public:
+		EditorView();
+		// on exit? 
+
+		virtual void Initialize() = 0;
+	};
 }
