@@ -113,8 +113,6 @@ void Grafkit::Texture::Initialize(Renderer & device, BitmapResourceRef bitmap)
 	if (data != bitmap->GetData()) delete data;
 	delete[] initialData;
 
-	LOGGER(LOG(TRACE) << "Texture buffer with" << x << y << ch << "created");
-
 	// --- shderresourceref
 	D3D11_SHADER_RESOURCE_VIEW_DESC resDesc;
 	ZeroMemory(&resDesc, sizeof(resDesc));

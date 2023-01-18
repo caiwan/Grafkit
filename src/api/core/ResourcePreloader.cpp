@@ -167,11 +167,10 @@ IAssetRef Grafkit::AssetPreloader::GetResource(std::string filename)
 		}
 		catch (FileNotFoundException &e)
 		{
-			LOGGER(LOG(INFO) << "Could not found file in generator " << i << filename << "moving on");
 			continue;
 		}
 		catch (Exception &e) {
-			LOGGER(LOG(WARNING) << "Other error type of exception was thrown");
+			// ... 
 			throw e;
 		}
 	}
@@ -188,10 +187,7 @@ void Grafkit::AssetPreloader::DoPrecalc()
 
 	for (std::list<IResourceBuilder*>::iterator it = m_builders.begin(); it != m_builders.end(); it++)
 	{
-		LOGGER(LOG(INFO) << "Loading asset" << (int)i << "of" << (int)len);
-
-		// (**it)(this);
-		// (*it)->
+		LOGGER(Log::Logger().Trace("Loading asset %d of %d", i, len));
 		
 		if (m_pPreloader) m_pPreloader->OnElemLoad(i, len);
 		i++;

@@ -6,17 +6,22 @@
 	http://www.mr-edd.co.uk/blog/beginners_guide_streambuf
 */
 
-#ifndef __LOGGER_H__
+#pragma once
 
+//#define USE_LOGGER
+//
+//#ifndef __LOGGER_H__
+//
+//#ifndef USE_LOGGER
+//
+//#define LOGGER(x) 
+//
+//#else // USE_LOGGER
 
-
-#ifndef USE_LOGGER
-
-#define LOGGER(x) 
-
-#else // USE_LOGGER
+#define LOGGER(x) x
 
 #include <cstdio>
+#include <set>
 #include <cstdlib>
 #include <varargs.h>
 
@@ -27,7 +32,8 @@ namespace Grafkit {
 
 	class Logger
 	{
-		friend class Log;
+		friend class Grafkit::Log;
+
 	public:
 
 		// --- 
@@ -44,31 +50,29 @@ namespace Grafkit {
 
 		// --- 
 		// Logger handler  class 
-		class ILoggerHandler : public Observer
+		class ILoggerHandler
 		{
 			friend class Logger;
 		public:
 			ILoggerHandler() {}
 			~ILoggerHandler() {}
 		protected:
-			void Update(Observable* source, void* data);
-
 			// pure virtual 
 			virtual void Write(message_t * const & message) = 0;
 		};
 
 		// Methods 
 
-		void AddHandler(ILoggerHandler* hdl) { /*this->AddObserver(hdl);*/ }
-		void RemoveHandler(ILoggerHandler* hdl) { /*this->RemoveHandler(hdl);*/ }
+		void AddHandler(ILoggerHandler* hdl) { this->m_loggers.insert(hdl);}
+		void RemoveHandler(ILoggerHandler* hdl) { this->m_loggers.erase(this->m_loggers.find(hdl));}
 
-		inline void Write(logger_msg_type_e type, const char* const message);
+		 void Write(logger_msg_type_e type, const char* const message);
 		
-		inline void Trace(const char* const message, ... );
-		inline void Debug(const char* const message, ...);
-		inline void Info(const char* const message, ...);
-		inline void Warn(const char* const message, ...);
-		inline void Error(const char* const message, ...);
+		 void Trace(const char* const message, ... );
+		 void Debug(const char* const message, ...);
+		 void Info(const char* const message, ...);
+		 void Warn(const char* const message, ...);
+		 void Error(const char* const message, ...);
 
 	protected:
 		Logger();
@@ -76,12 +80,15 @@ namespace Grafkit {
 
 
 	private:
-		// ... 
+		typedef std::set<ILoggerHandler*> loggers_t;
+
+		loggers_t m_loggers;
 
 	};
 
 	class Log {
 		/// get logger; lazy singleton 
+	public:
 		static Logger & Logger()
 		{
 			static Grafkit::Logger logger;
@@ -89,19 +96,36 @@ namespace Grafkit {
 		}
 	};
 
-	// =======================================================================================================================================
-
-	class FileLoggerHandler : public Logger::ILoggerHandler {
+	class LoggerHandler {
+		// =======================================================================================================================================
 	public:
-		FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);
-		~FileLoggerHandler();
-	protected:
-		virtual void Write(Grafkit::Logger::message_t * const & message);
-	private:
-		FILE* m_stdout;
-		FILE* m_stderr;
-	};
+		class FileLoggerHandler : public Logger::ILoggerHandler {
+		public:
+			FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);
+			~FileLoggerHandler();
+		protected:
+			virtual void Write(Grafkit::Logger::message_t * const & message);
+		private:
+			FILE* m_stdout;
+			FILE* m_stderr;
+		};
 
+		// ------------------------------------------------------------------
+
+		class ConsoleLogger : public FileLoggerHandler {
+		public:
+			ConsoleLogger();
+			~ConsoleLogger();
+		protected:
+			// virtual void Write(Grafkit::Logger::message_t * const & message);
+
+		private:
+			FILE* m_stdout;
+			FILE* m_stderr;
+		};
+	};
 }
-#endif //USE_LOGGER
-#endif //__LOGGER_H__
+
+//#endif //USE_LOGGER
+//#endif //__LOGGER_H__
+//
