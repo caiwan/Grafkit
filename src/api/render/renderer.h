@@ -9,12 +9,26 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 #include "dxtypes.h"
-#include "../math/matrix.h"
 #include "../core/reference.h"
 
 using namespace DirectX;
 
 namespace FWrender {
+	/**
+	Drawable interface
+	*/
+
+	//class Drawable {
+	//public:
+	//	Drawable();
+	//	virtual ~Drawable();
+
+	//	/**Renders the insides */
+	//	virtual void Render(ID3D11DeviceContext* deviceContext) = 0;
+
+	//	/** deletes/releases resources */
+	//	// virtual void Shutdown() = 0;
+	//};
 
 	class Camera;
 	class Model;
@@ -37,18 +51,18 @@ namespace FWrender {
 		Renderer();
 		~Renderer();
 
+		///@todo  alignmenttel kezdeni kell valamit majd 
 		void* operator new(size_t);
 		void operator delete(void*);
 
-		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, int fullscreen); //, float screenDepth, float screenNear);
-		void Shutdown();
+		///@todo viewporttal kell kezdnei valmait majd 
+		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen);
+		
 
 		// --- operations 
 		void BeginScene(float red, float green, float blue, float alpha);
 		void BeginScene();
 		void EndScene();
-
-		void Viewport(int width, int height, int offsetX = 0, int offsetY = 0);
 
 		// --- getters
 		ID3D11Device* GetDevice() { return this->m_device; }
@@ -57,13 +71,13 @@ namespace FWrender {
 		ID3D11DeviceContext* GetDeviceContext() { return this->m_deviceContext; }
 		operator ID3D11DeviceContext*() { return this->m_deviceContext; }
 
-		void GetWorldMatrix(FWmath::Matrix&);
+		void GetWorldMatrix(matrix&);
 
-		void SetupCameraMetrics(Camera& camera);
-
-		void GetVideoCardInfo(char* cardName);
+		void GetVideoCardInfo(char*);
 
 	private:
+		void Shutdown();
+
 		bool m_vsync_enabled;
 		char m_videoCardDescription[128];
 		IDXGISwapChain* m_swapChain;
@@ -74,11 +88,8 @@ namespace FWrender {
 		ID3D11DepthStencilState* m_depthStencilState;
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11RasterizerState* m_rasterState;
-
-		FWmath::Matrix m_worldMatrix;
-
-		D3D11_VIEWPORT m_viewport;
-
+		
+		matrix m_worldMatrix;
 	};
 }
 #endif
