@@ -71,19 +71,19 @@ namespace {
 	};
 }
 
-TextureRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, FWassets::IRenderAssetManager * const & assman)
+TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, FWassets::IRenderAssetManager * const & assman)
 {
 	aiString path;
-	TextureRef texture;
+	TextureAssetRef textureAsset;
 	aiReturn result = material->GetTexture(source, subnode, &path);
 
 	std::string name = path.C_Str();
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		texture = (Texture*)(assman->GetObjectByName(IRenderAsset::RA_TYPE_Texture, name));
+		textureAsset  = (TextureAsset*)(assman->GetObjectByName(IRenderAsset::RA_TYPE_Texture, name));
 	}
 
-	return texture;
+	return textureAsset;
 }
 
 // ================================================================================================================================================================

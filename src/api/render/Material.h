@@ -5,6 +5,7 @@
 #include "dxtypes.h"
 #include "reference.h"
 #include "renderer.h"
+#include "texture.h"
 #include "shader.h"
 
 #include "../core/renderassets.h"
@@ -61,9 +62,9 @@ namespace FWrender {
 
 		/// @todo slotok kezelese -> a texturaknak legyen sajat nevuk is
 		/// @todo bounds check
-		TextureRef &GetTexture(texture_type_e bucket, int n = 0);
-		void SetTexture(TextureRef texture, texture_type_e bucket = TT_diffuse, int n = 0);
-		void AddTexture(TextureRef texture, texture_type_e bucket = TT_diffuse);
+		FWrender::TextureAssetRef &GetTexture(texture_type_e bucket, int n = 0);
+		void SetTexture(FWrender::TextureAssetRef texture, texture_type_e bucket = TT_diffuse, int n = 0);
+		void AddTexture(FWrender::TextureAssetRef texture, texture_type_e bucket = TT_diffuse);
 
 		size_t GetTextureBucketCount(texture_type_e bucket) { return this->m_texture_buckets[bucket].size(); }
 
@@ -87,13 +88,13 @@ namespace FWrender {
 
 		struct Material m_mater;
 
-		std::vector<TextureRef> m_texture_buckets[TT_COUNT];
+		std::vector<TextureAssetRef> m_texture_buckets[TT_COUNT];
 		ShaderRef m_framgentShader;
 
 		struct reflection_texture_entity 
 		{
 			FWrender::Shader::BoundResourceRecord *brecord;
-			TextureRef texture;
+			TextureAssetRef texture;
 		};
 
 		std::vector<struct reflection_texture_entity> m_reflected_textures;

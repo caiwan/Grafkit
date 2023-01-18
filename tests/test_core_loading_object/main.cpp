@@ -16,7 +16,7 @@ using namespace FWrender;
 using FWmodel::AssimpLoader;
 using FWmath::Matrix;
 
-class Application : public FWcore::System, public FWassets::AssetPreloader //public FWassets::IRenderAssetManager
+class Application : public FWcore::System, public FWassets::AssetPreloader
 {
 public:
 	Application() : FWcore::System(),
@@ -63,7 +63,7 @@ protected:
 		this->RegisterRecourceFactory(m_file_loader);
 		this->LoadCache();
 
-		// -> obtain stuffz
+		this->GetBuilders();
 
 		// -- camera
 		camera = new Camera();
@@ -71,17 +71,19 @@ protected:
 
 		// -- load shaderZ
 		shader_vs = new Shader();
-		shader_vs->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+		shader_vs->LoadFromFile(render, "TextureVertexShader", L"./shaders/texture.hlsl", ST_Vertex);
 
 		shader_fs = new Shader();
-		shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+		shader_fs->LoadFromFile(render, "TexturePixelShader", L"./shaders/texture.hlsl", ST_Pixel);
 
 		// -- model 
 		scene = new Scenegraph();
-		AssimpLoader loader(this->m_file_loader->GetResourceByName("tegla.3ds"), scene);
+		AssimpLoader loader(this->m_file_loader->GetResourceByName("./models/tegla.3ds"), scene);
 		loader(this);
 
 		this->t = 0;
+
+		DoPrecalc();
 
 		return 0;
 	};

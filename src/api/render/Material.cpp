@@ -8,14 +8,16 @@
 using FWrender::Renderer;
 using FWrender::Texture;
 using FWrender::Shader;
+using FWrender::TextureAssetRef;
 using FWrender::TextureRef;
 using FWrender::ShaderRef;
+
 using std::vector;
 
 FWrender::MaterialBase::MaterialBase()
 {
 	for (size_t i = 0; i < TT_COUNT; i++) {
-		this->m_texture_buckets[i] = vector<TextureRef>();
+		this->m_texture_buckets[i] = vector<TextureAssetRef>();
 	}
 }
 
@@ -54,19 +56,19 @@ void FWrender::MaterialBase::Render(ID3D11DeviceContext * deviceContext)
 
 // ====================================
 
-TextureRef & FWrender::MaterialBase::GetTexture(texture_type_e bucket, int n)
+TextureAssetRef & FWrender::MaterialBase::GetTexture(texture_type_e bucket, int n)
 {
 	/// @todo bounds check
 	return m_texture_buckets[bucket][n];
 }
 
-void FWrender::MaterialBase::SetTexture(TextureRef texture, texture_type_e bucket, int n)
+void FWrender::MaterialBase::SetTexture(TextureAssetRef texture, texture_type_e bucket, int n)
 {
 	/// @todo bounds check
 	m_texture_buckets[bucket][n] = texture;
 }
 
-void FWrender::MaterialBase::AddTexture(TextureRef texture, texture_type_e bucket)
+void FWrender::MaterialBase::AddTexture(TextureAssetRef texture, texture_type_e bucket)
 {
 	m_texture_buckets[bucket].push_back(texture);
 }

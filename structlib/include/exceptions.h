@@ -85,7 +85,7 @@ DEFINE_EXCEPTION(InvalidFormatException, 2, "Invalid format")
 DEFINE_EXCEPTION(InvalidOperationException, 3, "Invalid operation committed")
 DEFINE_EXCEPTION(InvalidParameterException, 4, "Invalid parameter")
 DEFINE_EXCEPTION(ResourceNotFound, 5, "Resource or asset not found")
-DEFINE_EXCEPTION(FileNotFound, 6, "File not found")
+DEFINE_EXCEPTION(FileNotFoundException, 6, "File not found")
 DEFINE_EXCEPTION(OutOfBoundsException, 7, "Index out of bounds");
 DEFINE_EXCEPTION(NotImplementedMethodException, 8, "Method that being called has no implementation");
 

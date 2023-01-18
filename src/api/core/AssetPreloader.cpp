@@ -1,5 +1,11 @@
 #include "AssetPreloader.h"
 
+#include "easyloggingpp.h"
+#include "exceptions.h"
+
+using FWdebug::Exception;
+using namespace FWdebugExceptions;
+
 using namespace FWassets;
 
 namespace {
@@ -13,7 +19,7 @@ namespace {
 	};
 }
 
-AssetPreloader::AssetPreloader() : FWassets::IRenderAssetManager()
+AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : FWassets::IRenderAssetManager(), m_pPreloader(nullptr)
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
 	for (size_t i = 0; i < sizeof(rules) / sizeof(rules[0]); i++) {
@@ -29,6 +35,7 @@ AssetPreloader::~AssetPreloader()
 	}
 }
 
+// ============================================================================================================
 /// ---- ezt lehet kulon fileba kene tenni
 #include "../render/texture.h"
 #include "../render/text.h"
@@ -44,8 +51,8 @@ void FWassets::AssetPreloader::LoadCache()
 		if (m_filters[i] == nullptr)
 			continue;
 
-		for (size_t j = 0; j < this->m_factories.size(); j++) {
-			IResourceFactory *loader = this->m_factories[j];
+		for (size_t j = 0; j < this->m_loaders.size(); j++) {
+			IResourceFactory *loader = this->m_loaders[j];
 			filelist_t filelist = loader->GetResourceList(m_filters[i]);
 
 			if (!filelist.empty()) for (filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++)
@@ -63,7 +70,7 @@ void FWassets::AssetPreloader::LoadCache()
 					TextureAsset* texture = new TextureAsset;
 					texture->SetName(name);
 
-					m_generated_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), texture));
+					m_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), texture));
 					AddObject(texture);
 				}
 				break;
@@ -84,11 +91,50 @@ void FWassets::AssetPreloader::LoadCache()
 			}
 		}
 	}
+
+	/// --- load cache if any
+
 }
 
 void FWassets::AssetPreloader::SaveCache()
 {
+	/// -- save cached files if any 
 }
 
+// ============================================================================================================
 
-// folytkov ... 
+IResourceRef FWassets::AssetPreloader::GetResource(std::string filename)
+{
+	for (size_t i = 0; i < this->m_loaders.size(); i++) {
+		try {
+			return this->m_loaders[i]->GetResourceByName(filename);
+		}
+		catch (FileNotFoundException &e)
+		{
+			LOG(INFO) << "Could not found file in generator " << i << filename << "moving on";
+			continue;
+		}
+		catch (Exception &e) {
+			LOG(WARNING) << "Other error type of exception was thrown";
+			throw e;
+		}
+	}
+
+	throw EX_DETAILS(FileNotFoundException, filename.c_str());
+}
+
+void FWassets::AssetPreloader::DoPrecalc()
+{
+	if (m_pPreloader) m_pPreloader->OnBeginLoad();
+	
+	size_t len = m_builders.size(), i = 0;
+
+	for (std::list<IRenderAssetBuilder*>::iterator it = m_builders.begin(); it != m_builders.end(); it++)
+	{
+		(**it)(this);
+		if (m_pPreloader) m_pPreloader->OnElemLoad(i, len);
+		i++;
+	}
+
+	if (m_pPreloader) m_pPreloader->OnEndLoad();
+}
