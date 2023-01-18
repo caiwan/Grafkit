@@ -21,7 +21,9 @@ namespace Idogep {
 	class EditorApplication;
 
 	class Document;
-	
+
+	class MusicProxy;
+
 	class Editor : public Module{
 	public:
 		Editor(Ref<Module> parent, Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
@@ -53,6 +55,8 @@ namespace Idogep {
 
 		Document * const & GetDocument() const { return m_document; }
 		CommandStack * GetCommandStack() const { return m_commandStack; }
+
+		MusicProxy * GetMusicProxy() const { return m_musicProxy;  }
 		
 	private:
 		bool DirtyCheck();

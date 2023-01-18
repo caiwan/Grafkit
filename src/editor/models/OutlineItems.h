@@ -18,8 +18,7 @@ namespace Idogep {
 		~HasItemAnimationsRole();
 
 		void SetAnimation(Grafkit::AnimationRef animation);
-		Grafkit::AnimationRef GetAnimation() { return m_animation; }
-
+		Grafkit::AnimationRef GetAnimation() const ;
 	protected:
 		Grafkit::AnimationRef m_animation;
 	};

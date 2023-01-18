@@ -15,6 +15,7 @@
 #include "generator/ShaderLoader.h"
 
 #include "utils/ResourceManager.h"
+#include "generator/MusicBassLoader.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -43,9 +44,20 @@ void Document::Initialize(Renderer & render)
 	InitTestStuff(render);
 }
 
-//void Document::Shutdown()
-//{
-//}
+SceneGraphRef Document::GetScenegraph() const
+{
+	return m_scenegraph;
+}
+
+SceneResRef Document::GetScene() const
+{
+	return m_scene;
+}
+
+MusicResRef Document::GetMusic() const
+{
+	return m_music;
+}
 
 // ---------------------------------------------------------------
 // in-dev-things

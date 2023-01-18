@@ -21,7 +21,7 @@ Idogep::Editor::Editor(Ref<Module> parent, Grafkit::Renderer & render, Grafkit::
 
 Idogep::Editor::~Editor()
 {
-	//delete m_musicProxy;
+	delete m_musicProxy;
 	delete m_commandStack;
 }
 
@@ -43,7 +43,8 @@ void Idogep::Editor::InitializeDocument()
 		onDocumentChanged(m_document);
 		m_musicProxy->onMusicChanged();
 
-		//m_musicProxy->Play();
+
+		m_musicProxy->Play();
 	}
 	catch (FWdebug::Exception* ex)
 	{
