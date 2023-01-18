@@ -20,22 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FWrender.cd" />
-    <None Include="texture.hlsl">
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </EntryPointName>
-      <FileType>Document</FileType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="builtin_data\c64palette.cpp" />
     <ClCompile Include="builtin_data\cbm64font.cpp" />
     <ClCompile Include="builtin_data\cube.cpp" />
-    <ClCompile Include="core\exceptions.cpp" />
     <ClCompile Include="core\input.cpp" />
-    <ClCompile Include="core\memory.cpp" />
-    <ClCompile Include="core\memory_alloc.cpp" />
     <ClCompile Include="core\system.cpp" />
     <ClCompile Include="core\window.cpp" />
     <ClCompile Include="render\Actor.cpp" />
@@ -75,11 +65,7 @@
     <ClInclude Include="builtin_data\c64palette.h" />
     <ClInclude Include="builtin_data\cbm64Font.h" />
     <ClInclude Include="builtin_data\cube.h" />
-    <ClInclude Include="core\exceptions.h" />
     <ClInclude Include="core\input.h" />
-    <ClInclude Include="core\memory.h" />
-    <ClInclude Include="core\memory_alloc.h" />
-    <ClInclude Include="core\reference.h" />
     <ClInclude Include="core\system.h" />
     <ClInclude Include="core\window.h" />
     <ClInclude Include="math\matrix.h" />
@@ -124,6 +110,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\structlib\structlib.vcxproj">
+      <Project>{67008a74-f4f3-482b-8b25-ca93088bf79b}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BFF1AD5F-469C-4EBE-8C53-698DAE473A13}</ProjectGuid>
     <RootNamespace>Hello</RootNamespace>
@@ -134,27 +125,27 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -177,27 +168,29 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(WindowsSdkDir_81)Redist\D3D\x86;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)build\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(WindowsSdkDir_81)Redist\D3D\x86;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)build\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)build\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>$(WindowsSdkDir_81)Redist\D3D\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)build\obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)build\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>$(WindowsSdkDir_81)Redist\D3D\x64;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\; $(SolutionDir)structlib\include\</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -213,7 +206,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\; $(SolutionDir)structlib\include\</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -231,7 +224,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\; $(SolutionDir)structlib\include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -252,7 +245,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)externals\include\; $(SolutionDir)structlib\include\</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <PreprocessorDefinitions>INITGUID;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
