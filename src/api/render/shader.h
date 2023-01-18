@@ -212,5 +212,21 @@ DEFINE_EXCEPTION(ConstantBufferCreateException, 1104, "Could not create constant
 DEFINE_EXCEPTION(ConstantBufferLocateException, 1106, "Could not locate constant buffer")
 
 ///@Todo ennek teljesen sajat exceptiont kell definialni
+
+#if 1 // NO_ShaderException
+
 DEFINE_EXCEPTION(ShaderException, 1200, "Could not compile shader")
+
+#else 0 // NO_ShaderException
+
+#define HAS_ShaderException
+
+namespace FWdebugExceptions {
+	class ShaderException {
+		// ... 
+
+	};
+}
+
+#endif // NO_ShaderException
 
