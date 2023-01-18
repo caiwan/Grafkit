@@ -30,8 +30,6 @@ namespace FWassets{
 		friend class IRenderAssetGenerator;
 
 	public:
-
-		//IRenderAsset(IRenderAssetManager * assman = nullptr);
 		IRenderAsset();
 		virtual ~IRenderAsset();
 
@@ -41,12 +39,28 @@ namespace FWassets{
 		Guid GetUUID() { return this->m_guid; }
 		Guid GenerateGUID();
 
+		enum RA_type_e {
+			RA_TYPE_Texture,
+			RA_TYPE_Font,
+			RA_TYPE_Material,
+			RA_TYPE_Shader,
+			RA_TYPE_Entity3D,
+			RA_TYPE_Aux0,
+			RA_TYPE_Aux1,
+			RA_TYPE_Aux2,
+			RA_TYPE_Aux3,
+			RA_TYPE_Aux4,
+			RA_TYPE_COUNT
+		};
+
+		virtual enum RA_type_e GetBucketID() = 0;
+
 	protected:
 		/// Sets asset manager 
 		std::string m_name;
 		Guid m_guid;
 
-		IRenderAssetManager* m_assman;
+		// IRenderAssetManager* m_assman;
 	};
 
 	/**
@@ -67,23 +81,29 @@ namespace FWassets{
 		virtual FWrender::Renderer & GetDeviceContext() = 0;
 
 	public:
+		/**
+		Hozzaadja az assetet a repohoz.
+		*/
 		void AddObject(IRenderAsset* obj);
 		void RemoveObject(IRenderAsset* obj);
-		void ChangeName(IRenderAsset* obj, std::string oldname);	///@todo ezt forditva kellene: *obj, amiben a regi uuid/nev van, es az uj nevet adna at.
-		void ChangeUUID(IRenderAsset *obj, Guid olduuid);
 
-		IRenderAsset* GetObjectByUUID(Guid uuid);
-		IRenderAsset* GetObjectByName(std::string name);
+		///@{
+		/**
+		Ha van asset manager beállitva a render assetek fele, azok minden set name es guid hivaskor meghivjak ezeket.
+		Ha lehet, érdmes elõbb beállítani az nevet es az uuid-t, majd aztan beallitani az asset managert, es hozza adni az asset repokohz a dolgokat.
+		*/
+		void ChangeName(IRenderAsset* obj, std::string newname);
+		void ChangeUUID(IRenderAsset *obj, Guid newuuid);
+		///@}
+		IRenderAsset* GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid);
+		IRenderAsset* GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name);
 
 	private:
 		typedef std::map<std::string, IRenderAsset*> name_map_t;
 		typedef std::map<Guid, IRenderAsset*> id_map_t;
 
-		name_map_t::iterator GetNameItertator(std::string name);
-		id_map_t::iterator GetIDIterator(Guid uuid);
-
-		name_map_t m_mapNames;
-		id_map_t m_mapID;
+		name_map_t m_mapNames[IRenderAsset::RA_TYPE_COUNT];
+		id_map_t m_mapID[IRenderAsset::RA_TYPE_COUNT];
 	};
 
 	/**

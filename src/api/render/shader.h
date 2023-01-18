@@ -63,6 +63,8 @@ namespace FWrender {
 
 			enum ShaderType_e GetShaderType() { return this->m_type; }
 
+			virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Shader; }
+
 		private:
 			void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
 

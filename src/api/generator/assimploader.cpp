@@ -16,6 +16,7 @@
 
 using namespace FWrender;
 using namespace FWdebugExceptions;
+using FWassets::IRenderAsset;
 
 // ================================================================================================================================================================
 // Assimp helpers
@@ -76,10 +77,20 @@ TextureRef assimpTexture(enum aiTextureType source, aiMaterial* material, int su
 	TextureRef texture;
 	aiReturn result = material->GetTexture(source, subnode, &path);
 
+	std::string name = path.C_Str();
+
 	if (result == AI_SUCCESS && path.data[0]) {
 		// obj lut goez here?
-		TextureGenFromBitmap txgen(assman->GetResourceFactory()->GetResourceByName("Normap.jpg"), assman, texture); 
-		txgen();
+		texture = (Texture*)(assman->GetObjectByName(IRenderAsset::RA_TYPE_Texture, name));
+		
+		///@todo :Ez nem kell majd ide, lehessen felirni a generatorokat az asset managerre is, es o allitsa elo a texturat, ha lehet
+		if (texture.Invalid()) {
+			TextureGenFromBitmap txgen(assman->GetResourceFactory()->GetResourceByName(name), assman, texture);
+			txgen();
+			
+			texture->SetName(name);
+			assman->AddObject(texture.Get());
+		}
 	}
 
 	return texture;
@@ -129,8 +140,6 @@ void FWmodel::AssimpLoader::operator()()
 			MaterialRef material = new MaterialBase();
 			aiMaterial *curr_mat = scene->mMaterials[i];
 
-			this->m_assman->AddObject(material.Get());
-
 			if (curr_mat->Get(AI_MATKEY_NAME, name) == AI_SUCCESS) 
 				material->SetName(name.C_Str());
 
@@ -153,6 +162,7 @@ void FWmodel::AssimpLoader::operator()()
 			assimpMaterialKey_2_float(curr_mat, AI_MATKEY_SHININESS_STRENGTH, material->GetSpecularLevel());
 
 			materials.push_back(material);
+			this->m_assman->AddObject(material.Get());
 		}
 	}
 	

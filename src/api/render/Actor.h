@@ -48,6 +48,8 @@ namespace FWrender {
 
 			/// @todo + transformation matrix
 			/// @todo + bounding box, ha kell 1
+
+			virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Entity3D; }
 	};
 
 

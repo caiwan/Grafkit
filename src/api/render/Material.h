@@ -73,6 +73,10 @@ namespace FWrender {
 		/// Legyen public arra az esetre, ha megis ... 
 		virtual void ReflectShader();
 
+		virtual enum RA_type_e GetBucketID() {
+			return FWassets::IRenderAsset::RA_TYPE_Material;
+		}
+
 	protected:
 		/**
 			Will look for textures with name `texture_%type%%count%`

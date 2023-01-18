@@ -2,10 +2,11 @@
 
 #include "render/renderer.h"
 #include "render/camera.h"
-#include "render/model.h"
-#include "render/texture.h"
 #include "render/Material.h"
 #include "render/shader.h"
+
+#include "generator/assimploader.h"
+#include "render/Scenegraph.h"
 
 #include "math/matrix.h"
 
@@ -13,12 +14,10 @@
 #include "core/assets.h"
 
 using namespace FWrender;
+using FWmodel::AssimpLoader;
 using FWmath::Matrix;
 
-// #include "textureShaderClass.h"
-#include "builtin_data/cube.h"
-
-class Application : public FWcore::System, FWassets::IRenderAssetManager
+class Application : public FWcore::System, public FWassets::IRenderAssetManager
 {
 public:
 	Application() : FWcore::System(),
@@ -39,7 +38,8 @@ public:
 protected:
 	Renderer render;
 	CameraRef camera;
-	ModelRef model;
+	
+	Scenegraph * scene;
 
 	float t;
 
@@ -63,16 +63,10 @@ protected:
 		this->m_file_loader = new FWassets::FileResourceManager("./");
 
 		// -- camera
-		camera = new Camera;
+		camera = new Camera();
 		camera->SetPosition(0.0f, 0.0f, -5.0f);
 
-		// -- texture
-		TextureRef texture;
-
-		TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, texture);
-		txgen();
-
-		// -- load shader
+		// -- load shaderZ
 		shader_vs = new Shader();
 		shader_vs->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
 
@@ -80,17 +74,9 @@ protected:
 		shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
 
 		// -- model 
-		model = new Model;
-		model->SetMaterial(new MaterialBase);
-		model->GetMaterial()->AddTexture(texture);	// elobb a texturakat toltod fel, aztad adod hozza a shadert.
-		model->GetMaterial()->SetShader(shader_fs);
-
-
-		SimpleMeshGenerator generator(render, shader_vs);
-		generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
-		generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
-
-		generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
+		scene = new Scenegraph();
+		AssimpLoader loader(this->m_file_loader->GetResourceByName("tegla.3ds"), this, scene);
+		loader();
 
 		this->t = 0;
 
@@ -130,7 +116,8 @@ protected:
 			shader_vs->Render(render);
 			shader_fs->Render(render);
 
-			model->Render(render);
+			// model->Render(render);
+			// render of scenegraph goez here 
 
 			this->t += 0.001;
 		}
@@ -142,8 +129,8 @@ protected:
 private:
 	FWassets::FileResourceManager *m_file_loader;
 public:
-	FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
-	FWrender::Renderer & GetDeviceContext() { return this->render; };
+	FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; }
+	FWrender::Renderer & GetDeviceContext() { return render; }
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)

@@ -3,7 +3,7 @@
 
 using namespace FWrender;
 
-FWrender::Entity3D::Entity3D()
+FWrender::Entity3D::Entity3D() : FWassets::IRenderAsset()
 {
 	this->m_parent = NULL;
 }
