@@ -2,13 +2,14 @@
 #include <fstream>
 
 #include "shader.h"
-#include "../core/exceptions.h"
+
 #include "../math/matrix.h"
 
 using namespace std;
 using namespace FWrender;
-using FWdebug::Exception;
-using FWdebug::NullPointerException;
+
+using namespace FWdebugExceptions;
+
 using FWmath::Matrix;
 
 // =============================================================================================================================
@@ -35,9 +36,9 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	D3D11_SAMPLER_DESC samplerDesc;
 
 	// input checking
-	if (!vsEntry) throw new NullPointerException(EX_WHERE);
-	if (!fsEntry) throw new NullPointerException(EX_WHERE);
-	if (!vsFile) throw new NullPointerException(EX_WHERE);
+	if (!vsEntry) throw new EX(NullPointerException);
+	if (!fsEntry) throw new EX(NullPointerException);
+	if (!vsFile) throw new EX(NullPointerException);
 
 	// Initialize the pointers this function will use to null.
 	errorMessage = 0;
@@ -57,7 +58,7 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			throw new Exception(1000, L"Missing shader file", EX_WHERE);
+			throw new EX(MissingShaderExcepotion);
 		}
 	}
 
@@ -75,7 +76,7 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 		// If there was nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			throw new Exception(1000, L"Missing shader file", EX_WHERE);
+			throw new EX(MissingShaderExcepotion);
 		}
 	}
 
@@ -83,14 +84,14 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
 	if (FAILED(result))
 	{
-		throw new Exception(1001, L"Could not create vertex shader", EX_WHERE);
+		throw new EX(VSCrerateException);
 	}
 
 	// Create the pixel shader from the buffer.
 	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
 	if (FAILED(result))
 	{
-		throw new Exception(1001, L"Could not create fragment shader", EX_WHERE);
+		throw new EX(FSCrerateException);
 	}
 
 	// Create the vertex input layout description.
@@ -118,7 +119,7 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_layout);
 	if (FAILED(result))
 	{
-		throw new Exception(1001, L"Could not create input layout", EX_WHERE);
+		throw new EX(InputLayoutCreateException);
 	}
 
 	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
@@ -140,7 +141,7 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
 	if (FAILED(result))
 	{
-		throw new Exception(1001, L"Could not create constant buffer", EX_WHERE);
+		throw new EX(ConstantBufferCreateException); //Exception(1001, L"Could not create constant buffer", EX_WHERE);
 	}
 
 	// Create a texture sampler state description.
@@ -162,7 +163,7 @@ void FWrender::Shader::LoadFromFile(ID3D11Device * device, LPCSTR vsEntry, LPCST
 	result = device->CreateSamplerState(&samplerDesc, &m_sampleState);
 	if (FAILED(result))
 	{
-		throw new Exception(1001, L"Could not create sampler state", EX_WHERE);
+		throw new EX(SamplerStateCreateException);
 	}
 
 }
@@ -194,7 +195,7 @@ void FWrender::Shader::SetCameraMatrices(ID3D11DeviceContext * deviceContext, FW
 	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
-		throw new Exception(1003, L"Could not loc constant buffer", EX_WHERE);
+		throw new EX(ConstantBufferLocateException);
 	}
 
 	mMatrix = (MatrixBufferType*)mappedResource.pData;
@@ -235,6 +236,6 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	errorMessage->Release();
 	errorMessage = 0;
 
-	throw new Exception(1002, L"Some shit happend while compiling the shaders. Check error output, and prepare yourself for an awesome adventure!", EX_WHERE);
+	throw new EX(ShaderException);
 }
 

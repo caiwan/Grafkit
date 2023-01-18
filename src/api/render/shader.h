@@ -2,6 +2,7 @@
 #pragma once 
 
 #include "dxtypes.h"
+#include "../core/exceptions.h"
 
 namespace FWrender {
 	class Shader {
@@ -17,13 +18,14 @@ namespace FWrender {
 		virtual ~Shader();
 
 		/**
+			@param device device context
 			@param vsEntry entry point of vertex shader
 			@param fsEntry entry point of fragment/pixel shader
 			@param vsFile source file of vertex shader
 			@param fsFile source file of fragment/pixel shader. NULL if shared with vertex shader
-			@throws lots of exceptions
 		*/
 		void LoadFromFile(ID3D11Device* device, LPCSTR vsEntry, LPCSTR fsEntry, LPCWCHAR vsFile, LPCWCHAR fsFile = NULL);
+		
 		void Shutdown();
 		void Render(ID3D11DeviceContext* deviceContext);
 
@@ -42,3 +44,19 @@ namespace FWrender {
 		ID3D11SamplerState* m_sampleState;
 	};
 }
+
+// Definition of exceptions
+
+DEFINE_EXCEPTION(MissingShaderExcepotion, 1100, "Missing shader file")
+
+///@todo ezeket at kell pakolni a shader exceptionbe majd
+DEFINE_EXCEPTION(VSCrerateException, 1101, "Could not create vertex shader")
+DEFINE_EXCEPTION(FSCrerateException, 1102, "Could not create framgent shader")
+
+DEFINE_EXCEPTION(InputLayoutCreateException, 1103, "Could not create input layout")
+DEFINE_EXCEPTION(ConstantBufferCreateException, 1104, "Could not create constant buffer")
+DEFINE_EXCEPTION(SamplerStateCreateException, 1105, "Could not create sampler state")
+DEFINE_EXCEPTION(ConstantBufferLocateException, 1106, "Could not locate constant buffer")
+
+///@Todo ennek teljesen sajat exceptiont kell definialni
+DEFINE_EXCEPTION(ShaderException, 1200, "Could not compile shader")
