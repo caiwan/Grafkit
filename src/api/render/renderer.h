@@ -9,7 +9,9 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 #include "dxtypes.h"
-#include "../core/reference.h"
+#include "reference.h"
+
+#include "memory_align.h"
 
 using namespace DirectX;
 
@@ -30,15 +32,19 @@ namespace FWrender {
 		Core renderer
 		**Hack**: Extended ID3D11Device via reference counting, gives direct access to the deive with `operator ->` .
 	*/
+# if 0 // sometimes it comflicts with MFC's new and delete; please mind it. 
+	__declspec(align(16)) class Renderer : Ref<ID3D11Device>, public AlignedNew<Renderer>
+#else
 	class Renderer : Ref<ID3D11Device>
+#endif
 	{
 	public:
 		Renderer();
-		~Renderer();
+		virtual ~Renderer();
 
 		///@todo  alignmenttel kezdeni kell valamit majd 
-		void* operator new(size_t);
-		void operator delete(void*);
+		// void* operator new(size_t);
+		// void operator delete(void*);
 
 		///@todo viewporttal kell kezdnei valmait majd 
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen);
@@ -59,6 +65,13 @@ namespace FWrender {
 		void GetWorldMatrix(matrix&);
 
 		void GetVideoCardInfo(char*);
+
+		void getScreenSize(int &screenW, int &screenH);
+		void getScreenSize_f(float &screenW, float &screenH) {
+			int w=0, h=0;
+			this->getScreenSize(w, h);
+			screenW = (float)w, screenH = (float)h;
+		}
 
 	private:
 		bool m_vsync_enabled;
