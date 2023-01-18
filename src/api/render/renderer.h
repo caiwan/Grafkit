@@ -57,7 +57,7 @@ namespace FWrender {
 
 		///@todo viewporttal kell kezdnei valmait majd 
 		int Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen);
-		
+		void Shutdown();
 
 		// --- operations 
 		void BeginScene(float red, float green, float blue, float alpha);
@@ -76,8 +76,6 @@ namespace FWrender {
 		void GetVideoCardInfo(char*);
 
 	private:
-		void Shutdown();
-
 		bool m_vsync_enabled;
 		char m_videoCardDescription[128];
 		IDXGISwapChain* m_swapChain;
