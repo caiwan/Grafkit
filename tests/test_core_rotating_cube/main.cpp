@@ -60,10 +60,15 @@ public:
 
 			// -- model 
 			model = new Model;
-			result = this->model->Initialize(
-				render, texture,
-				FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
-				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float2*)FWBuiltInData::cubeTextureUVs);
+
+			SimpleMeshGenerator generator(render);
+
+			MeshRef mesh = generator(
+				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, NULL,
+				FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices
+				);
+
+			// todo: add texture to the mesh somehow
 
 			shader_texture = new TextureShaderClass();
 			result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
