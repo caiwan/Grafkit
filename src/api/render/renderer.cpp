@@ -1,52 +1,26 @@
 
 #include "Renderer.h"
 
-#include "../core/memory.h"
+#include "memory.h"
 
 using namespace FWrender;
 
-Renderer::Renderer()
+Renderer::Renderer() :
+	m_swapChain(nullptr),
+	m_device(nullptr),
+	m_deviceContext(nullptr),
+	m_renderTargetView(nullptr),
+	m_depthStencilBuffer(nullptr),
+	m_depthStencilState(nullptr),
+	m_depthStencilView(nullptr),
+	m_rasterState(nullptr)
 {
-	m_swapChain = 0;
-	m_device = 0;
-	m_deviceContext = 0;
-	m_renderTargetView = 0;
-	m_depthStencilBuffer = 0;
-	m_depthStencilState = 0;
-	m_depthStencilView = 0;
-	m_rasterState = 0;
-
 	m_worldMatrix = XMMatrixIdentity();
 }
 
 Renderer::~Renderer()
 {
 	this->Shutdown();
-}
-
-///@todo ezzel kezdeni kell valamit 
-void* Renderer::operator new(size_t memorySize)
-{
-	size_t alignment;
-	void* memoryBlockPtr;
-
-
-	// Set the alignment of the Renderer to 16 byte to support high speed XMMATRIX calculations and prevent crashes.
-	alignment = 16;
-
-	// Allocate the memory.
-	memoryBlockPtr = _aligned_malloc(memorySize, alignment);
-
-	return memoryBlockPtr;
-}
-
-///@todo ezzel kezdeni kell valamit 
-void Renderer::operator delete(void* memoryBlockPtr)
-{
-	// Free the class memory that had been allocated using the _aligned_malloc function.
-	_aligned_free(memoryBlockPtr);
-
-	return;
 }
 
 
@@ -67,7 +41,6 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-	D3D11_RASTERIZER_DESC rasterDesc;
 	D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
 
@@ -97,7 +70,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	}
 
 	// Get the number of modes that fit the DXGI_FORMAT_R8G8B8A8_UNORM display format for the adapter output (monitor).
-	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
+	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr);
 	if(FAILED(result))
 	{
 		return false;
@@ -228,9 +201,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 #endif
 
 	result = D3D11CreateDeviceAndSwapChain(
-		NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, deviceCreationFlags, 
+		nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, deviceCreationFlags, 
 		&featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, 
-		&m_swapChain, &m_device, NULL, &m_deviceContext
+		&m_swapChain, &m_device, nullptr, &m_deviceContext
 		);
 
 	if(FAILED(result))
@@ -243,7 +216,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// Create debug layer
 #ifdef _DEBUG
-	ID3D11Debug *d3dDebug = NULL;
+	ID3D11Debug *d3dDebug = nullptr;
 	if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug)))
 	{
 		ID3D11InfoQueue *d3dInfoQueue = nullptr;
@@ -278,7 +251,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	}
 
 	// Create the render target view with the back buffer pointer.
-	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
+	result = m_device->CreateRenderTargetView(backBufferPtr, nullptr, &m_renderTargetView);
 	if(FAILED(result))
 	{
 		return false;
@@ -305,7 +278,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	depthBufferDesc.MiscFlags = 0;
 
 	// Create the texture for the depth buffer using the filled out description.
-	result = m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_depthStencilBuffer);
+	result = m_device->CreateTexture2D(&depthBufferDesc, nullptr, &m_depthStencilBuffer);
 	if(FAILED(result))
 	{
 		return false;
@@ -364,19 +337,11 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
 
 	// Setup the raster description which will determine how and what polygons will be drawn.
-	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_BACK;
-	rasterDesc.DepthBias = 0;
-	rasterDesc.DepthBiasClamp = 0.0f;
-	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = D3D11_FILL_SOLID;
-	rasterDesc.FrontCounterClockwise = false;
-	rasterDesc.MultisampleEnable = false;
-	rasterDesc.ScissorEnable = false;
-	rasterDesc.SlopeScaledDepthBias = 0.0f;
+	D3D11_RASTERIZER_DESC rastDesc = CD3D11_RASTERIZER_DESC(CD3D11_DEFAULT());
+	// rastDesc.CullMode = D3D11_CULL_NONE;
 
 	// Create the rasterizer state from the description we just filled out.
-	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	result = m_device->CreateRasterizerState(&rastDesc, &m_rasterState);
 	if(FAILED(result))
 	{
 		return false;
@@ -407,7 +372,7 @@ void Renderer::Shutdown()
 	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
 	if(m_swapChain)
 	{
-		m_swapChain->SetFullscreenState(false, NULL);
+		m_swapChain->SetFullscreenState(false, nullptr);
 	}
 
 	if(m_rasterState)
@@ -448,8 +413,8 @@ void Renderer::Shutdown()
 
 	if(m_device)
 	{
-		// Assign a NULL to the ref will automatically release and delete it
-		this->AssingnRef(NULL);
+		// Assign a nullptr to the ref will automatically release and delete it
+		this->AssingnRef(nullptr);
 		m_device = 0;
 	}
 
@@ -475,6 +440,17 @@ void Renderer::GetVideoCardInfo(char* cardName)
 	return;
 }
 
+void FWrender::Renderer::GetScreenSize(int & screenW, int & screenH)
+{
+	/*static */ D3D11_VIEWPORT viewport;
+	UINT p_viewports[] = { 1 };
+
+	this->m_deviceContext->RSGetViewports(p_viewports, &viewport);
+
+	screenW = viewport.Width;
+	screenH = viewport.Height;
+}
+
 
 void Renderer::BeginScene(float red, float green, float blue, float alpha)
 {
@@ -491,12 +467,12 @@ void Renderer::BeginScene(float red, float green, float blue, float alpha)
 	m_deviceContext->ClearRenderTargetView(m_renderTargetView, color);
 	
 	// Clear the depth buffer.
-	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 0.0f, 0);
 
 	return;
 }
 
-const float color_black[4] = {0.f,0.f,0.f, 1.f};
+const float color_black[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
 
 void Renderer::BeginScene()
 {
@@ -526,18 +502,3 @@ void Renderer::EndScene()
 
 	return;
 }
-
-
-/*
-ID3D11Device* Renderer::GetDevice()
-{
-	return m_device;
-}
-
-
-ID3D11DeviceContext* Renderer::GetDeviceContext()
-{
-	return m_deviceContext;
-}
-*/
-
