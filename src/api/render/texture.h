@@ -13,10 +13,63 @@
 namespace FWrender
 {
 	class Texture;
-	typedef Ref<Texture> TextureRef;
-	//class TextureRef;
+
+	typedef Ref<Texture> TextureRef_t;
+	typedef TextureRef_t TextureRef;
+
 	class TextureAsset;
-	typedef Ref<TextureAsset> TextureAssetRef;
+	typedef Ref<TextureAsset> TextureAssetRef_t;
+
+	class TextureAssetRef;
+
+
+	// ========================================================================================================================
+
+	/**
+	`DHOM` - A wrapper class to embed volatile textures
+	- A Render asset interacet, es a textura objektumot egyesiti
+	- A dolog ugy nez ki, hogy ennek van egy `Texture* ptr` adattagja.
+	- Megvalositja a render assetet, es emellett referencia szamlaloja a texturanak
+	- Rendelkezik a referenciatipus tagfuggvenyeivel
+	*/
+
+	class TextureAsset : public FWassets::IRenderAsset, public TextureRef_t
+	{
+		friend class TextureAssetRef;
+	public:
+		TextureAsset();
+		~TextureAsset();
+
+		virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Texture; }
+	};
+
+	/**
+	Egy wrapper, *ami elviekben segit elerni* a texurat a texture asset objektum belsejebol. A `TextureAsset` referenciatipusat orokiti tovabb.
+	- van egy ptr adattagja, ami a `TextureAsset`-re mutat, illetve elvegzi annak referenciaszamlalasat
+	- a `this->ptr` ide mutat, es a this->ptr->ptr mutat a Texturarar kozvetlen
+	- ezt delegacio segiti
+	
+	**Remeljuk osszeszoritott farpofakkal, hogy mindez mukodik.**
+	- Azt kell eszben tartani, hogy a `.` operator a refet eri el, ami az assetet fedezi
+	- a `->` operator a texture refet eri el, ami a texturat fedezi. 
+	
+	*/
+	class TextureAssetRef : public TextureAssetRef_t
+	{
+		// add conversion to Texture*
+	public:
+		TextureAssetRef() {}
+		TextureAssetRef(TextureAssetRef& other) { this->AssingnRef(other); }
+		TextureAssetRef(TextureAsset* other) { this->AssingnRef(other); }
+
+		operator Texture* () { return this->ptr->ptr; }
+		operator TextureRef () { return this->ptr->ptr; }
+		TextureAssetRef& operator = (Texture* in_ptr) { this->ptr->ptr = in_ptr; return *this; }
+		TextureAssetRef& operator = (TextureAsset* in_ptr) { this->AssingnRef(in_ptr); return *this; }
+		TextureAssetRef& operator = (TextureAssetRef& other) { this->AssingnRef(other); return *this; }
+	};
+
+	// ========================================================================================================================
 
 	/**
 	A bitmap resource that contains a raw bitmap. This ig enerated by the generated, and loaded into the texture object.
@@ -44,19 +97,21 @@ namespace FWrender
 
 	typedef Ref<BitmapResource> BitmapResourceRef;
 
+	// ========================================================================================================================
+
 	/**
 	Texture generator interface
 	*/
 	class ITextureBuilder : public FWassets::IRenderAssetBuilder
 	{
 	public:
-		ITextureBuilder(TextureRef * const in) : IRenderAssetBuilder(), m_in(in) {}
+		ITextureBuilder(TextureAssetRef in) : IRenderAssetBuilder(), m_in(in) {}
 		virtual ~ITextureBuilder() {}
 
 		virtual void operator() (FWassets::IRenderAssetManager * const & assman) = 0;
 
 	protected:
-		TextureRef * const m_in;
+		TextureAssetRef m_in;
 	};
 
 	// ========================================================================================================================
@@ -89,29 +144,16 @@ namespace FWrender
 
 	// ========================================================================================================================
 
-	/**
-	`DHOM`
-	A wrapper class to embed volatile textures
-	*/
-
-	class TextureAsset: public FWassets::IRenderAsset, public TextureRef
-	{
-	public:
-		TextureAsset();
-		~TextureAsset();
-
-		virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Texture; }
-	};
-
-	// ========================================================================================================================
-
 	/** 
 	Texture loader from bitmap
+
+	Ide kijegyzetelem, hogy mije van ennek, es hogyan kell vele banni:
+
 	*/
 	class TextureFromBitmap : public ITextureBuilder
 	{
 		public:
-			TextureFromBitmap(FWassets::IResourceRef resource, TextureRef * const in);
+			TextureFromBitmap(FWassets::IResourceRef resource, TextureAssetRef in);
 			~TextureFromBitmap();
 
 			void Resize(int x, int y) { m_w = x, m_h = y; }
@@ -126,6 +168,7 @@ namespace FWrender
 	*/
 	class RenderTarget : public Referencable
 	{
+		///@todo implement this
 	};
 }
 
