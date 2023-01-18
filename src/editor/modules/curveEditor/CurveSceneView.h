@@ -1,17 +1,15 @@
 #pragma once
 #include "utils/ViewModule.h"
 
-class QImage;
-
 namespace Idogep
 {
 	namespace Roles
 	{
+
 		class TimelineSceneViewRole
 		{
 		public:
-
-			Event<QImage**, float, float, int, int> onRequestAudiogram; //audiogramImgage, leftTime, rightTime, width, height
+			Event<float*&, size_t&, size_t&, size_t&> onRequestWaveform; // ptr, samplecount, channelcount, samplePerSec
 
 			virtual void MusicChanged() = 0;
 

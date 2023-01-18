@@ -3,8 +3,13 @@
 #include "utils/tree/treeitem.h"
 #include "utils/tree/treemodel.h"
 
-#include "curveeditorwidget.h"
 #include "CurveView.h"
+#include "curveeditorwidget.h"
+
+#include "CurveSceneModule.h"
+
+#include "Editor.h"
+#include "proxies/MusicProxy.h"
 
 #include <QWidget>
 
@@ -13,6 +18,7 @@ using namespace Grafkit;
 
 Idogep::CurveEditorModule::CurveEditorModule(Ref<Module> parent) : Module(parent)
 {
+	m_curveScene = new CurveSceneModule(this);
 }
 
 Idogep::CurveEditorModule::~CurveEditorModule()
@@ -27,5 +33,16 @@ void Idogep::CurveEditorModule::Initialize()
 	QWidget* parentWidget = dynamic_cast<QWidget *>(m_parent->GetView().Get());
 	assert(parentWidget);
 	m_myView = new CurveEditorWidget(parentWidget);
-	SetView(m_myView);
+
+    // manage playback role 
+	Editor* editor = dynamic_cast<Editor*>(GetRootModule().Get());
+	assert(editor);
+	Timer* timer = editor->GetMusicProxy();
+	assert(timer);
+
+	m_myView->onTogglePlayback += Delegate(timer, &Timer::TogglePlay);
+
+    // ... 
+	
+    SetView(m_myView);
 }

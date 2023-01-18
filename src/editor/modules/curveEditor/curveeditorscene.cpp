@@ -23,34 +23,31 @@ namespace {
 	const QColor purple = QColor(255, 128, 255);
 }
 
-CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent)
-, m_area(nullptr)
-, m_displayWaveform(false)
-, m_audiogramImage(nullptr)
+Idogep::CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent),
+m_area(nullptr)
 {
 	m_area = new TimelineArea();
-	m_displayWaveform = true;
 
-	setBackgroundBrush(QColor(48, 48, 48));
+    setBackgroundBrush(QColor(48, 48, 48));
 }
 
-CurveEditorScene::~CurveEditorScene()
-{
-	delete m_area;
-	delete m_audiogramImage;
-}
-
-void CurveEditorScene::RefreshView(bool force)
-{
-	update();
-	// TODO if (force)
-}
-
-void CurveEditorScene::PlaybackChanged(bool isPlaying)
+Idogep::CurveEditorScene::~CurveEditorScene()
 {
 }
 
-void CurveEditorScene::DemoTimeChanged(float time)
+void Idogep::CurveEditorScene::RefreshView(bool force)
+{
+}
+
+void Idogep::CurveEditorScene::MusicChanged()
+{
+}
+
+void Idogep::CurveEditorScene::PlaybackChanged(bool isPlaying)
+{
+}
+
+void Idogep::CurveEditorScene::DemoTimeChanged(float time)
 {
 }
 
@@ -64,115 +61,50 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 	setSceneRect(views().at(0)->geometry());
 
-	if (m_displayWaveform)
-	{
-		painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
-
-		UpdateAudiogram();
-
-		if (m_audiogramImage)
-		{
-			painter->drawImage(r, *m_audiogramImage);
-		}
-	}
-
 	// because rect() is relative to the widgets parent
 	painter->translate(r.topLeft());
 
 	// Draw grid here 
+	painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
 
 	m_area->SetSceneRect(sceneRect());
 	m_area->drawGrid(painter, r);
 
 	// Draw curve 
-	// ?? 
 
-	//draw cursor?
-	 // ??
+    // ?? 
+
+
+    //draw cursor ?
+
+     // ??
 }
-
-
-void CurveEditorScene::UpdateAudiogram()
-{
-	const auto offset = m_area->Offset();
-	const auto scale = m_area->Scale();
-
-	const float leftTime = -float(offset.x()) / float(scale.width());
-	const float rightTime = leftTime + (float(sceneRect().width()) / float(scale.width()));
-
-	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) 
-		return;
-
-	QImage* img = nullptr;
-
-	onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
-
-	if (!img) 
-		return;
-
-	delete m_audiogramImage;
-	m_audiogramImage = img;
-}
-
 
 // ------------------------------------------------------------------
-TimelineArea::TimelineArea()
+Idogep::TimelineArea::TimelineArea()
 {
-	m_scale = QSizeF(64, 64);
-	m_offset = QPointF(0, 0);
-}
-
-QPointF TimelineArea::Point2Screen(QPointF point) const
-{
-	return {
-		point.x() * m_scale.width() + m_offset.x() + m_sceneRect.topLeft().x(),
-		point.y() * -m_scale.height() + m_offset.y() + m_sceneRect.topLeft().y()
-	};
-}
-
-QPointF TimelineArea::Screen2Point(QPointF point) const
-{
-	return {
-		(point.x() - m_offset.x() - m_sceneRect.topLeft().x()) / m_scale.width(),
-		(point.y() - m_offset.y() - m_sceneRect.topLeft().y()) / -m_scale.height()
-	};
+     // ...
 }
 
 // ReSharper disable CppInconsistentNaming
-void TimelineArea::drawGrid(QPainter * painter, const QRectF & r) const
+QPointF TimelineArea::point2Screen(QPointF point) const
 {
-	float sPos = 0.0f;
-	if (r.x() < 0.0f)
-		sPos = -1.0f * fmod(fabs(r.x()), m_scale.width());
-	else sPos = fmod(fabs(r.x()), m_scale.width());
+	return QPointF(
+		point.x() * Scale().width() + Offset().x() + SceneRect().topLeft().x(),
+		point.y() * -Scale().height() + Offset().y() + SceneRect().topLeft().y()
+	);
+}
 
-	float sc = m_scale.width() / 4.0f;
-	for (float f = fmod(m_offset.x(), sc); f <= m_sceneRect.width() + fmod(m_offset.x(), sc); f += sc) {
-		painter->setPen(QPen(QColor(56, 56, 56)));
-		painter->drawLine(f, 0.0f, f, m_sceneRect.height());
-	}
-	sc = m_scale.width();
-	for (float f = fmod(m_offset.x(), sc); f <= m_sceneRect.width() + fmod(m_offset.x(), sc); f += sc) {
-		painter->setPen(QPen(QColor(64, 64, 64)));
-		painter->drawLine(f, 0.0f, f, m_sceneRect.height());
-	}
+QPointF TimelineArea::screen2Point(QPointF point) const
+{
+	return QPointF(
+		(point.x() - Offset().x() - SceneRect().topLeft().x()) / Scale().width(),
+		(point.y() - Offset().y() - SceneRect().topLeft().y()) / -Scale().height()
+	);
+}
 
-	sc = m_scale.height() / 4.0f;
-	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y(), sc); f += sc) {
-		painter->setPen(QPen(QColor(56, 56, 56)));
-		painter->drawLine(0.0f, f, m_sceneRect.width(), f);
-	}
-	sc = m_scale.height();
-	for (float f = fmod(m_offset.y(), sc); f <= m_sceneRect.height() + fmod(m_offset.y(), sc); f += sc) {
-		painter->setPen(QPen(QColor(64, 64, 64)));
-		painter->drawLine(0.0f, f, m_sceneRect.width(), f);
-	}
-
-	painter->setPen(QPen(QColor(144, 144, 144)));
-	painter->drawLine(m_offset.x(), 0.0f, m_offset.x(), m_sceneRect.height());
-	painter->setPen(QPen(QColor(144, 144, 144)));
-	painter->drawLine(0.0f, m_offset.y(), m_sceneRect.width(), m_offset.y());
-
+void Idogep::TimelineArea::drawGrid(QPainter * painter, const QRectF & r)
+{
 }
 // ReSharper restore CppInconsistentNaming
 
@@ -367,6 +299,25 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 }
 #endif
 
+
+// megvan:
+
+//QPointF Idogep::CurveEditorScene::point2Screen(QPointF point) const
+//{
+//	return QPointF(
+//		point.x() * scale().width() + offset().x() + sceneRect().topLeft().x(),
+//		point.y() * -scale().height() + offset().y() + sceneRect().topLeft().y()
+//	);
+//}
+//
+//QPointF Idogep::CurveEditorScene::screen2Point(QPointF point) const
+//{
+//	return QPointF(
+//		(point.x() - offset().x() - sceneRect().topLeft().x()) / scale().width(),
+//		(point.y() - offset().y() - +sceneRect().topLeft().y()) / -scale().height()
+//	);
+//}
+
 void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect)
 {
 	// 2. draw the curves.
@@ -560,6 +511,13 @@ void Idogep::CurveEditorScene::drawCursor(QPainter * painter, const QRectF & rec
 }
 
 
+
+#endif 
+
+	if (!img) return;
+
+	m_audiogramImage = img;
+}
 
 #endif 
 

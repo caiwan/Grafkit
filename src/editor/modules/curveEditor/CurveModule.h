@@ -7,6 +7,7 @@
 namespace  Idogep
 {
 	class CurveEditorView;
+	class CurveSceneModule;
 
 	// ========================================================================================================
 
@@ -20,6 +21,7 @@ namespace  Idogep
 
 	private:
 		Ref<CurveEditorView> m_myView;
+		Ref<CurveSceneModule> m_curveScene;
 	};
 
 }
