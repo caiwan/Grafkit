@@ -3,6 +3,8 @@
 #include <string>
 #include "renderer.h"
 
+#include "renderassets.h"
+
 #define MULTITEXTURE_MAX 16
 
 namespace FWrender
@@ -10,7 +12,8 @@ namespace FWrender
 	/**
 	Texture generator interface
 	*/
-	class ITextureGenerator {
+	class ITextureGenerator : virtual public FWrender::IRenderAssetGenerator
+	{
 	public: 
 		ITextureGenerator() {}
 		virtual ~ITextureGenerator() {} 
@@ -21,7 +24,7 @@ namespace FWrender
 	/**
 	Texture class
 	*/
-	class Texture : public Referencable
+	class Texture : virtual public Referencable, public IRenderAsset
 	{
 	public:
 		Texture();
