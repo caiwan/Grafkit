@@ -16,7 +16,7 @@ namespace Grafkit {
 
 	/// Using materials as a stuct. For now. 
 	struct Material_t {
-		float4 ambient, diffuse, specular, emission;
+		float4 T_ambient, diffuse, specular, emission;
 		float specularLevel;
 		float shininess;
 	};
@@ -30,7 +30,7 @@ namespace Grafkit {
 	//class MaterialBase : public Grafkit::IResource 
 	{
 	public:
-		MaterialBase() : IResource() {};
+		MaterialBase() : IResource(), m_material() {};
 		~MaterialBase() {}
 
 		/// @todo ez nem ilyen lesz a jovoben
@@ -49,7 +49,7 @@ namespace Grafkit {
 		*/
 
 		/// @todo valahogy ide valamilyen kulcs-ertek parok formajaban kellene a cbuffer cuccait betolni. 
-		float4 &GetAmbient() { return m_material.ambient; }
+		float4 &GetAmbient() { return m_material.T_ambient; }
 		float4 &GetDiffuse() { return m_material.diffuse; }
 		float4 &GetSpecular() { return m_material.specular; }
 		float4 &GetEmission() { return m_material.emission; }
@@ -62,7 +62,7 @@ namespace Grafkit {
 		void AddTexture(TextureResRef texture, std::string bindName);
 		void RemoveTexture(TextureResRef texture, std::string bindName);
 
-		virtual void Render(ID3D11DeviceContext* deviceContext, ShaderRef &shader);
+		virtual void Render(Renderer& render, ShaderRef &shader);
 
 		virtual const char* GetBucketID() { return MATERIAL_BUCKET; }
 

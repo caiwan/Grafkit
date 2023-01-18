@@ -10,7 +10,8 @@ using namespace FWdebugExceptions;
 
 
 // ==================================================================
-Grafkit::Mesh::Mesh()
+Grafkit::Mesh::Mesh() : 
+	m_buffer()
 {
 	//m_vertexBuffer = 0;
 	m_indexBuffer = 0;

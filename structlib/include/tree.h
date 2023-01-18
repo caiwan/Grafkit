@@ -76,7 +76,8 @@ public:
 	virtual void previous() {}	///< not supported
 	virtual int hasPrev() { return false; }; ///< not supported
 
-	virtual Node* getCurrent() { return (Node*)m_pCurrent; };
+	//virtual Node* getCurrent() { return dynamic_cast<Node*>(m_pCurrent); }
+	virtual Node* getCurrent() { return (Node*)(m_pCurrent); } ///@todo a picaert nem megy a static vagy dynamic cast
 
 	void setParser(TreeParser* parser) { this->m_parser = parser; }
 
@@ -86,7 +87,7 @@ public:
 	virtual int hasNext() = 0;
 
 protected:
-	TreeNode* m_pRoot, *m_pCurrent;
+	TreeNode *m_pRoot, *m_pCurrent;
 	TreeParser* m_parser;
 	std::stack<TreeNode*> m_sNode;
 };

@@ -36,17 +36,22 @@ namespace Grafkit {
 	class ShaderParamManager {
 		// ... 
 	public:
-		ShaderParamManager(Renderer &render, Shader*shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype =0);
+		ShaderParamManager(Shader*shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype =0);
+		~ShaderParamManager();
+
+		ShaderParamManager operator[](const char* name); 
+		ShaderParamManager operator[](size_t id);
+
+		size_t GetVarCount();
 
 		void operator= (float v) { Set(&v); }
+
+		void operator= (void* v) { Set(v); }
 
 		void operator= (const float3 &v) { Set(&v); }
 		void operator= (const float2 &v) { Set(&v); }
 		void operator= (const float4 &v) { Set(&v); }
 		void operator= (const matrix &v) { Set(&v); }
-
-		/// @todo 16-os alignmentet meg kell szerelni
-		//void operator= (Grafkit::Matrix v);
 
 		void Set(const void * const pData);
 		void Set(const void * const pData, size_t offset, size_t width);
@@ -66,7 +71,6 @@ namespace Grafkit {
 		int IsSubtype() { return m_is_subtype; }
 
 	private:
-		Renderer & m_rRender;
 		Shader * m_pShader;
 
 		int m_is_subtype;
@@ -75,9 +79,20 @@ namespace Grafkit {
 	};
 
 	class ShaderResourceManager {
-		// ... 
 	public:
+		ShaderResourceManager(Shader* shader = nullptr, size_t id = 0);
+		
+		void operator= (void* v) { Set(v); }
 
+		void Set(void*);
+
+		inline D3D11_SHADER_INPUT_BIND_DESC GetBResDesc();
+
+		int IsValid() { return (m_pShader != nullptr); }
+
+	private:
+		Shader * m_pShader;
+		size_t m_id;
 	};
 
 	// ================================================================================================================================
@@ -128,37 +143,44 @@ namespace Grafkit {
 
 		// ----
 		// access constant buffers and variables 
-		size_t GetParamCount() { return this->m_vCBuffers.size(); }
-		size_t GetParamCount(size_t id) { this->m_vCBuffers[id].m_vConstVars.size(); } ///@todo bounds check
+		///@todo bounds check
+		size_t GetParamCount() { return this->m_cBufferCount; }
+		size_t GetParamCount(size_t id) { return id>=this->m_cBufferCount?0:this->m_cBuffers[id].m_cbVarCount; }
 
-		///@todo ezeblol csinaljon valaki operator[]-t
+		///@todo ezekre bounds chackinget kellene alkalmazni
+		ShaderParamManager operator[](const char* name) { return GetParam(std::string(name)); }
+		ShaderParamManager operator[](size_t id) { return GetParam(id); }
 
-		inline ShaderParamManager GetParam(Renderer &render, const char* name) { return GetParam(render, std::string(name)); }
-		inline ShaderParamManager GetParam(Renderer &render, std::string name);
-		inline ShaderParamManager GetParam(Renderer &render, size_t id);
-									
-		inline ShaderParamManager GetParam(Renderer &render, const char* name, const char* varname) { return GetParam(render, std::string(name), std::string(name)); }
-		inline ShaderParamManager GetParam(Renderer &render, std::string name, std::string varname);
-		inline ShaderParamManager GetParam(Renderer &render, size_t id, const char* varname) { return GetParam(render, id, std::string(varname)); }
-		inline ShaderParamManager GetParam(Renderer &render, size_t id, std::string varname);
-		inline ShaderParamManager GetParam(Renderer &render, size_t id, size_t vid);
+		ShaderParamManager GetParam(const char* name) { return GetParam(std::string(name)); }
+		ShaderParamManager GetParam(std::string name);
+		ShaderParamManager GetParam(size_t id);
+							
+		ShaderParamManager GetParam(const char* name, const char* varname) { return GetParam(std::string(name), std::string(name)); }
+		ShaderParamManager GetParam(std::string name, std::string varname);
+		ShaderParamManager GetParam(size_t id, const char* varname) { return GetParam(id, std::string(varname)); }
+		ShaderParamManager GetParam(size_t id, std::string varname);
+		ShaderParamManager GetParam(size_t id, size_t vid);
 
-		inline void* MapParamBuffer(Renderer& render, size_t id);
-		inline void* GetMappedPtr(size_t id);
-		inline void UnMapParamBuffer(Renderer& render, size_t id);
+		void* MapParamBuffer(size_t id);
+		void* GetMappedPtr(size_t id);
+		void UnMapParamBuffer(size_t id);
 		
-		inline D3D11_MAPPED_SUBRESOURCE GetCBMappedResourceDesc(size_t id);
-		inline D3D11_SHADER_BUFFER_DESC GetCBDescription(size_t id);
+		D3D11_MAPPED_SUBRESOURCE GetCBMappedResourceDesc(size_t id);
+		D3D11_SHADER_BUFFER_DESC GetCBDescription(size_t id);
 		
-		inline D3D11_SHADER_VARIABLE_DESC GetCBVariableDescriptor(size_t id, size_t vid);
-		inline D3D11_SHADER_TYPE_DESC GetCBTypeDescriptor(size_t id, size_t vid);
+		D3D11_SHADER_VARIABLE_DESC GetCBVariableDescriptor(size_t id, size_t vid);
+		D3D11_SHADER_TYPE_DESC GetCBTypeDescriptor(size_t id, size_t vid);
 
 		// ----
 		// access bounded resources
-		size_t GetBResCount() { return this->m_vBResources.size(); }
-		ShaderParamManager GetBRes(Renderer &render, const char * name) { return GetBRes(render, std::string(name)); }
-		ShaderParamManager GetBRes(Renderer &render, std::string name);
-		ShaderParamManager GetBRes(Renderer &render, size_t id);
+		///@todo bounds check
+		size_t GetBResCount() { return this->m_bResourceCount; }
+		ShaderParamManager GetBRes(const char * name) { return GetBRes(std::string(name)); }
+		ShaderParamManager GetBRes(std::string name);
+		ShaderParamManager GetBRes(size_t id);
+		D3D11_SHADER_INPUT_BIND_DESC GetBResDesc(size_t id);
+
+		void SetBResPointer(size_t id, void* ptr);
 
 		// ----
 		// access input layout 
@@ -182,7 +204,7 @@ namespace Grafkit {
 		ID3D11VertexShader* m_vxShader;
 		ID3D11PixelShader* m_pxShader;
 
-		// 
+		ID3D11DeviceContext* m_pDC;
 
 	protected:
 		ID3D11ShaderReflection *m_pReflector;
@@ -204,18 +226,20 @@ namespace Grafkit {
 			ID3D11Buffer *m_buffer;
 			UINT m_slot;
 
-			cb_variableMap_t m_mapConstVars;
-			std::vector<CBVar> m_vConstVars;
+			cb_variableMap_t m_cbVarMap;
+			size_t m_cbVarCount;
+			CBVar *m_cbVars;
 		};
 
 		typedef std::map<std::string, size_t> CBMap_t;
 		typedef CBMap_t::iterator CBMap_it_t;
 
 		CBMap_t m_mapCBuffers;
-		std::vector<CBRecord> m_vCBuffers;
+		size_t m_cBufferCount;
+		CBRecord *m_cBuffers;
 
 		// -- input layout 
-		typedef std::vector<InputElementRecord> inputElements_t;
+		typedef std::vector<InputElementRecord> inputElements_t;	///@todo std::vectort el kell tuntetni innen
 		inputElements_t m_mapInputElems;
 		ID3D11InputLayout* m_layout;
 
@@ -229,124 +253,11 @@ namespace Grafkit {
 		typedef std::map<std::string, size_t> BResMap_t;
 		typedef BResMap_t::iterator BResMap_it_t;
 		BResMap_t m_mapBResources;
-		std::vector<BResRecord> m_vBResources;
+		
+		size_t  m_bResourceCount;
+		BResRecord* m_bResources;
 
 		// -- output sampler
-
-	public:
-		// ==========================================================================================
-		/**
-		A class that contains and manages one entire constant buffer with its elements from
-		the reflection record for a certain constant buffer and aids to set variables into it
-		*/
-
-#if 0
-		class ConstantBufferRecord
-		{
-		friend class Shader;
-		friend class ConstantBufferElement;
-
-		public:
-			// This class has to have a public accessable default constructor due to std::map
-			ConstantBufferRecord();
-			~ConstantBufferRecord();
-
-		protected:
-			ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer * pConstantBuffer);
-
-		public:
-			void Set(const void* const pData);
-			void Set(const void* const pData, size_t offset, size_t width);
-
-			size_t GetElementCount() { return this->m_vConstVars.size(); }
-			ConstantBufferElement& operator[](const char* name);
-			ConstantBufferElement& operator[](size_t id);
-
-			D3D11_SHADER_BUFFER_DESC& const GetBufferDesc() { return this->m_description; }
-
-		protected:
-			void Map();
-			void Unmap();
-			void *GetMappedPtr();
-		private:
-			ID3D11DeviceContext* m_pDC;
-			D3D11_MAPPED_SUBRESOURCE m_mappedResource;
-			D3D11_SHADER_BUFFER_DESC m_description;
-			ID3D11Buffer *m_buffer;
-			UINT m_slot;
-
-		protected:
-			typedef std::map<std::string, size_t> cb_variableMap_t;
-			cb_variableMap_t m_mapConstVars;
-
-			// a getterek miatt kell
-			std::vector<ConstantBufferElement> m_vConstVars;
-
-		};
-
-		/**
-		Helps to bind one element from the constant buffer
-		*/
-		class ConstantBufferElement
-		{
-		friend class ConstantBufferRecord;
-		public:
-			ConstantBufferElement();
-			~ConstantBufferElement();
-
-		protected:
-			ConstantBufferElement(Shader::ConstantBufferRecord* parent_record, ID3D11ShaderReflectionVariable* shader_variable);
-
-		public:
-			/// @todo implement 
-			void operator= (float v) { set(&v); }
-
-			void operator= (const float3 &v) { set(&v); }
-			void operator= (const float2 &v) { set(&v); }
-			void operator= (const float4 &v) { set(&v); }
-			void operator= (const matrix &v) { set(&v); }
-
-			/// @todo 16-os alignmentet meg kell szerelni
-			//void operator= (Grafkit::Matrix v);
-
-			void set(const void * const v);
-
-			void set(const float v0);
-			void set(const float v0, const float v1);
-			void set(const float v0, const float v1, const float v2);
-			void set(const float v0, const float v1, const float v2, const float v3);
-
-			D3D11_SHADER_VARIABLE_DESC & const GetVarDesc();
-			D3D11_SHADER_TYPE_DESC & const GetTypeDesc();
-
-		protected:
-			Shader::ConstantBufferRecord* m_pBufferRecord;
-
-			D3D11_SHADER_VARIABLE_DESC m_var_desc;
-			D3D11_SHADER_TYPE_DESC m_type_desc;
-		};
-
-		/**
-		Azt. 
-		*/
-		class BoundResourceRecord {
-			friend class Shader;
-			public:
-				BoundResourceRecord();
-				BoundResourceRecord(D3D11_SHADER_INPUT_BIND_DESC desc);
-
-				D3D11_SHADER_INPUT_BIND_DESC & GetDesc() { return m_desc; }
-				void SetTexture(TextureRef texture = nullptr) { m_rBoundTexture = texture; }
-
-				int IsValid() { return m_is_valid; }
-
-			protected:
-				TextureRef m_rBoundTexture;
-				D3D11_SHADER_INPUT_BIND_DESC m_desc;
-
-				int m_is_valid;
-		};
-#endif
 	};
 
 	// ================================================================================================================================
@@ -363,8 +274,8 @@ namespace Grafkit {
 		friend class ShaderResRef;
 
 	public:
-		// Shader::ConstantBufferRecord& operator[](const char *name) { return this->ptr->operator[](name); }
-		// Shader::ConstantBufferRecord& operator[](size_t id) { return this->ptr->operator[](id); }
+		inline ShaderParamManager operator[](const char *name) { return this->ptr->operator[](name); }
+		inline ShaderParamManager operator[](size_t id) { return this->ptr->operator[](id); }
 
 		ShaderRes() : IResource() {}
 		ShaderRes(Shader* ptr) : IResource(), ShaderRef_t(ptr) {}

@@ -34,6 +34,8 @@ public:
 			screenWidth = 800;
 			screenHeight = 600;
 
+			t = 0;
+
 			// initwindowot is ertelmesebb helyre kell rakni
 			InitializeWindows(screenWidth, screenHeight);
 		}
@@ -56,11 +58,11 @@ protected:
 			// --- ezeket kell osszeszedni egy initwindowban
 			const int screenWidth = m_window.getRealWidth(), screenHeight = m_window.getRealHeight();
 			const int VSYNC_ENABLED = 1, FULL_SCREEN = 0;
-			const float SCREEN_DEPTH = 0.1f, SCREEN_NEAR = 1000.f;
+			// const float SCREEN_DEPTH = 0.1f, SCREEN_NEAR = 1000.f;
 
-			int result = 0;
+			// int result = 0;
 
-			result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
+			/*result = */ this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
 			this->m_file_loader = new FileAssetManager("./");
@@ -130,34 +132,7 @@ protected:
 		// ==================================================================================================================
 		int mainloop() {
 			this->render.BeginScene();
-			{
-				//struct {
-				//	matrix worldMatrix;
-				//	matrix viewMatrix;
-				//	matrix projectionMatrix;
-				//} matbuff;
-
-				//camera->Calculate(render);
-
-				//matbuff.viewMatrix = camera->GetViewMatrix().Get();
-				//matbuff.projectionMatrix= camera->GetProjectionMatrix().Get();
-
-				////matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
-				//matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t*10, t*15, t*20);
-
-				//// --- ez a legfontosabb dolog, amit meg meg kell itt tenni mielott atadod a cbuffernek:
-				//matbuff.worldMatrix = XMMatrixTranspose(matbuff.worldMatrix);
-				//matbuff.viewMatrix = XMMatrixTranspose(matbuff.viewMatrix);
-				//matbuff.projectionMatrix = XMMatrixTranspose(matbuff.projectionMatrix);
-				//// ---
-
-				//shader_vs["MatrixBuffer"].Set(&matbuff);
-
-				//shader_vs->Render(render);
-				//shader_fs->Render(render);
-
-				//model->Render(render);
-				
+			{				
 				scene->PreRender(render);
 				scene->Render(render);
 

@@ -37,7 +37,7 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	viewMatrices.viewMatrix = XMMatrixTranspose(camera->GetViewMatrix().Get());
 	viewMatrices.projectionMatrix = XMMatrixTranspose(camera->GetProjectionMatrix().Get());
 
-	m_vertexShader["MatrixBuffer"].Set(&viewMatrices);
+	// m_vertexShader["MatrixBuffer"] = &viewMatrices;
 
 	//ez itt elviekben jo kell, hogy legyen
 	m_vertexShader->Render(render);

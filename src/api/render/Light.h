@@ -32,7 +32,7 @@ namespace Grafkit{
 		float4 &GetBasePosition() { return m_position; }
 		float4 &GetBaseDirection() { return m_direction; }
 
-		float4 &GetAmbient() { return m_light.ambient; }
+		float4 &GetAmbient() { return m_light.T_ambient; }
 		float4 &GetDiffuse() { return m_light.diffuse; }
 		float4 &GetSpecular() { return m_light.specular; }
 
@@ -52,7 +52,7 @@ namespace Grafkit{
 
 		///@todo ez egy kurvaszar megoldas, es nem kene hasznalni a feny tipusanak meghatarozasara; helyette virtualis fuggvennyekkel kellene~
 		enum type_t {
-			INVALID = 0, point, directional, spot, ambient, COUNT
+			INVALID = 0, T_point, T_directional, T_spot, T_ambient, COUNT
 		};
 
 		virtual enum type_t GetLightType() = 0;
@@ -62,7 +62,7 @@ namespace Grafkit{
 			float4 position;
 			float4 direction;
 
-			float4 ambient;
+			float4 T_ambient;
 			float4 diffuse;
 			float4 specular;
 
@@ -88,7 +88,7 @@ namespace Grafkit{
 		~PointLight() {}
 
 	private:
-		virtual enum type_t GetLightType() { return point; }
+		virtual enum type_t GetLightType() { return T_point; }
 	};
 
 	__declspec(align(16)) class DirectionalLight : public BaseLight, public AlignedNew<DirectionalLight>
@@ -99,7 +99,7 @@ namespace Grafkit{
 		~DirectionalLight() {}
 
 	private:
-		virtual enum type_t GetLightType() { return directional; }
+		virtual enum type_t GetLightType() { return T_directional; }
 
 	};
 
@@ -111,7 +111,7 @@ namespace Grafkit{
 		~SpotLight() {}
 
 	private:
-		virtual enum type_t GetLightType() { return spot; }
+		virtual enum type_t GetLightType() { return T_spot; }
 	};
 
 	__declspec(align(16)) class AmbientLight : public BaseLight, public AlignedNew<AmbientLight>
@@ -122,6 +122,6 @@ namespace Grafkit{
 		~AmbientLight() {}
 
 	private:
-		virtual enum type_t GetLightType() { return ambient; }
+		virtual enum type_t GetLightType() { return T_ambient; }
 	};
 }

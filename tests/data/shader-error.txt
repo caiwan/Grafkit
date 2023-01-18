@@ -1,0 +1,2 @@
+C:\Users\psari\prog\grafkit2\tests\data\texture.hlsl(56,2-7): error X3000: syntax error: unexpected token 'return'
+
