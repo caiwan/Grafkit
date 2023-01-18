@@ -2,12 +2,41 @@
 #include "input.h"
 #include "exceptions.h"
 
+#include "easyloggingpp.h"
+
+#define ELPP_THREAD_SAFE
+
+#ifndef _DEBUG
+#define ELPP_DISABLE_DEBUG_LOGS
+#define ELPP_DISABLE_INFO_LOGS
+#define ELPP_DISABLE_VERBOSE_LOGS
+#define ELPP_DISABLE_TRACE_LOGS
+#endif // _DEBUG
+
+#include "easyloggingpp.h"
+
+INITIALIZE_EASYLOGGINGPP
+
+
 using namespace FWcore;
 
 System::System()
-	: Window::WindowHandler() , m_window(this)
+	: Window::WindowHandler() , m_window(this), m_Input(nullptr)
 {
-	m_Input = 0;
+	// init logger 
+	el::Configurations defaultConf;
+	defaultConf.setToDefault();
+
+#ifdef _DEBUG
+	defaultConf.setGlobally(el::ConfigurationType::Format, "%logger [%levshort]: %msg - at %fbase function %func line %line tid=%thread");
+#else 
+	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
+#endif // _DEBUG
+
+	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
+	el::Loggers::reconfigureLogger("default", defaultConf);
+
+	// LOG(TRACE) << SOMETHING;
 }
 
 System::~System()
@@ -26,68 +55,70 @@ int System::execute() {
 	
 	// +++ crete graphics device here 
 	
-	// + exception handling
-	try
-	{
-		result = this->init();
-		if (result != 0) {
-			this->release();
-			return 1;
-		}
-	}
-	catch (FWdebug::Exception* ex)
-	{
-		///@todo handle exceptions here 
-		//DebugBreak();
-		MessageBox(NULL, ex->getError(), L"Exception", 0);
-		delete ex;
-		goto teardown;
-	}
-
-	// ================================================================================================================================
-	// --- mainloop
-
-	try
-	{
-		int done = 0;
-		while (!done)
+	do {
+		// + exception handling
+		try
 		{
-			// Handle the windows messages.
-			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
+			result = this->init();
+			if (result != 0) {
+				this->release();
+				return 1;
 			}
+		}
+		catch (FWdebug::Exception& ex)
+		{
+			///@todo handle exceptions here 
+			//DebugBreak();
+			MessageBoxA(NULL, ex.what(), "Exception", 0);
+			//goto teardown;
+			break;
+		}
 
-			// If windows signals to end the application then exit out.
-			if (msg.message == WM_QUIT)
+		// ================================================================================================================================
+		// --- mainloop
+
+		try
+		{
+			int done = 0;
+			while (!done)
 			{
-				done = 1;
-			}
-			else
-			{
-				// Otherwise do the frame processing.
-				result = this->mainloop();
-				if (result != 0)
+				// Handle the windows messages.
+				if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+				{
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+
+				// If windows signals to end the application then exit out.
+				if (msg.message == WM_QUIT)
 				{
 					done = 1;
 				}
+				else
+				{
+					// Otherwise do the frame processing.
+					result = this->mainloop();
+					if (result != 0)
+					{
+						done = 1;
+					}
+				}
+
 			}
 
 		}
+		catch (FWdebug::Exception& ex)
+		{
+			///@todo handle exceptions here 
+			//  DebugBreak();
+			MessageBoxA(NULL, ex.what(), "Exception", 0);
+			// goto teardown;
+			break;
+		}
+		// ================================================================================================================================
+		// --- teardown
 
-	}
-	catch (FWdebug::Exception* ex)
-	{
-		///@todo handle exceptions here 
-		//  DebugBreak();
-		MessageBox(NULL, ex->getError(), L"Exception", 0);
-		delete ex;
-		goto teardown;
-	}
-	// ================================================================================================================================
-	// --- teardown
-
+	} while (0);
 	teardown: {
 		this->release();
 		this->ShutdownWindows();
