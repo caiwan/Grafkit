@@ -5,6 +5,8 @@
 #include "utils/ViewModule.h"
 #include "models/Curve.h"
 
+#include "CurvePointEditor.h"
+
 class QStyleOptionGraphicsItem;
 
 namespace Idogep
@@ -56,15 +58,17 @@ namespace Idogep
 		Grafkit::Animation::Key GetKey() const { return m_key; }
 		void SetKey(const Grafkit::Animation::Key& key) { m_key = key; }
 
+        // TODO protected: + Friend CurveEditor
         Grafkit::Animation::Key GetOriginalKey() const { return m_originalKey; }
-        
+        void SetOriginalKey(const Grafkit::Animation::Key& originalKey) { m_originalKey = originalKey; }
+
         uint32_t GetId() const { return m_id; }
         void SetId(const uint32_t id) { m_id = id; }
 
         // events
-        Event<CurvePointItem*> onEditKey;
-        Event<CurvePointItem*> onStartEdit;
-        Event<CurvePointItem*> onCommitEdit;
+        KeyEditEvent onEditKey;
+        KeyEditEvent onStartEdit;
+        KeyEditEvent onCommitEdit;
 
         // --- 
         QRectF boundingRect() const override;

@@ -100,12 +100,12 @@ void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	case Qt::RightButton:
 		m_showTangent = true;
 		m_radix2 = m_radix;
-		m_originalKey = m_key;
-		onStartEdit(this);
+		//m_originalKey = m_key; // will set when start was called
+		onStartEdit(m_id, m_key);
 		break;
 	case Qt::LeftButton:
-		m_originalKey = m_key;
-		onStartEdit(this);
+		//m_originalKey = m_key; // will set when start was called
+		onStartEdit(m_id, m_key);
 		QGraphicsItem::mousePressEvent(event);
 		break;
 
@@ -123,11 +123,11 @@ void CurvePointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	case Qt::RightButton:
 		m_showTangent = false;
 		m_radix2 = RADIX_DEFUALT;
-		onCommitEdit(this);
+		onCommitEdit(m_id, m_key);
 		break;
 
 	case Qt::LeftButton:
-		onCommitEdit(this);
+		onCommitEdit(m_id, m_key);
 		QGraphicsItem::mouseReleaseEvent(event);
 		break;
 
@@ -243,7 +243,7 @@ void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event) {
 
 	SetTangent(tangent);
 
-	onEditKey(this);
+	onEditKey(m_id, m_key);
 }
 
 void Idogep::CurvePointItem::RefreshView(bool force)
@@ -262,7 +262,7 @@ void CurvePointItem::EditPosition(class QGraphicsSceneMouseEvent* event) {
 
 	SetCoord(coord);
 
-	onEditKey(this);
+	onEditKey(m_id, m_key);
 }
 
 void CurvePointItem::ToggleTangentEditing() {

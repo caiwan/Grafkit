@@ -4,6 +4,8 @@
 
 #include "utils/ViewModule.h"
 
+#include "CurvePointEditor.h"
+
 namespace Idogep
 {
     class CurveCursor;
@@ -43,7 +45,9 @@ namespace Idogep
         Grafkit::Animation::Key GetPointKey() const { return m_pointKey; }
         void SetPointKey(const Grafkit::Animation::Key& pointKey) { m_pointKey = pointKey; }
 
-        Event<size_t, Grafkit::Animation::Key> onEditKeyEvent;
+        KeyEditEvent onEditKey;
+        KeyEditEvent onStartEdit;
+        KeyEditEvent onCommitEdit;
 
     protected:
         size_t m_pointId;

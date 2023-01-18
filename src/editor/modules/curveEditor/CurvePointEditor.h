@@ -17,6 +17,8 @@ namespace Idogep {
 
     typedef std::vector<CurvePointItem*> CurvePointList;
 
+    typedef Event<const size_t&, const Grafkit::Animation::Key &> KeyEditEvent;
+
     class CurvePointEditor : public Controller, public EmitsCommandRole
     {
         friend class CurvePointItem;
@@ -29,7 +31,7 @@ namespace Idogep {
 
         void Recalculate(TimelineArea* const area) const;
 
-        void UpdateKey(const Grafkit::Animation::ChannelRef& channel, size_t id, const Grafkit::Animation::Key& key);
+        void UpdateKey(const Grafkit::Animation::ChannelRef& channel, size_t index, const Grafkit::Animation::Key& key);
         
         void Initialize(PointEditorView *pointEditorView);
 
@@ -41,20 +43,19 @@ namespace Idogep {
         void ShowPoints();
 
         // Events
-        void StartEditEvent(CurvePointItem *item);
-        void CommitEditEvent(CurvePointItem *item);
+        void StartEditEvent(const size_t &index, const Grafkit::Animation::Key &key);
+        void CommitEditEvent(const size_t &index, const Grafkit::Animation::Key &key);
 
-        void CommitAddPointEvent(float key, float value);
-        void CommitRemovePointEvent(float key, float value);
+        void CommitAddPointEvent(const float &key, const float &value);
+        void CommitRemovePointEvent(const float &key, const float &value);
 
-        void EditKeyPointItemEvent(CurvePointItem * item);
-        void EditKeyEvent(size_t index, Grafkit::Animation::Key key);
+        void EditKeyEvent(const size_t &index, const Grafkit::Animation::Key &key);
 
         bool HasCurvePoints() const { return !m_points.empty(); }
         size_t GetPointCount() const { return m_points.size(); }
-        CurvePointItem* GetPoint(size_t id) { return m_points[id]; }
+        CurvePointItem* GetPoint(size_t index) { return m_points[index]; }
 
-        void PointSelectedEvent(size_t id);
+        void PointSelectedEvent(size_t index);
         void PointDeSelectedEvent();
 
     private:
