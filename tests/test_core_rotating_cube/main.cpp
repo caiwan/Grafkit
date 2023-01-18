@@ -4,6 +4,7 @@
 #include "render/camera.h"
 #include "render/model.h"
 #include "render/texture.h"
+#include "render/Material.h"
 #include "render/shader.h"
 
 #include "math/matrix.h"
@@ -73,7 +74,8 @@ protected:
 
 			// -- model 
 			model = new Model;
-			model->setTexture(texture);
+			model->SetMaterial(new MaterialBase);
+			model->GetMaterial()->SetTexture(texture);
 
 			//shader_texture = new TextureShaderClass();
 			//result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
