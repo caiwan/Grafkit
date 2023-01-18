@@ -48,6 +48,7 @@ protected:
 		Ref<Scene> scene;
 
 		TextureSamplerRef m_textureSampler;
+		TextureRef m_texOut;
 
 		ActorRef m_rootActor;
 
@@ -80,6 +81,7 @@ protected:
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
+			m_textureSampler->Initialize(render);
 
 			// -- load shader
 			m_vertexShader = new Shader();
@@ -99,7 +101,6 @@ protected:
 			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
 			
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
-
 
 			// -- setup scene 
 			scene = new Scene();
@@ -131,9 +132,12 @@ protected:
 			scene->SetVShader(m_vertexShader);
 			scene->SetFShader(m_fragmentShader);
 
-			// --- 
+			// -- setup postfx 
 
-			this->t = 0;
+			m_texOut = new Texture();
+			m_texOut->Initialize(render);
+
+			// --- 
 
 			return 0;
 		};
@@ -146,20 +150,27 @@ protected:
 
 		// ==================================================================================================================
 		int mainloop() {
+
+			m_texOut->SetRenderTargetView(render);
+
+			// pre fx-pass
 			this->render.BeginScene();
 			{				
 				m_rootActor->Matrix().Identity();
 				m_rootActor->Matrix().RotateRPY(t,0,0);
 
-				m_fragmentShader["SampleType"] = m_textureSampler->GetSamplerState();
+				Shader::ShaderResourceManager rm = m_fragmentShader->GetBRes("SampleType");// = m_textureSampler->GetSamplerState();
+				rm = m_textureSampler->GetSamplerState();
 
 				scene->PreRender(render);
 				scene->Render(render);
 
 				this->t += 0.01;
 			}
-
 			this->render.EndScene();
+
+			// render fx chain 
+
 			return 0;
 		};
 	
