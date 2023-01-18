@@ -44,11 +44,12 @@ public:
 
 protected:
 		Renderer render;
-		Ref<Scene> scene;
+
+		CameraRef m_camera;
 
 		TextureSamplerRef m_textureSampler;
-
-		ActorRef m_rootActor;
+		TextureRef m_texture;
+		ModelRef m_model;
 
 		float t;
 
@@ -63,73 +64,44 @@ protected:
 			this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FileAssetManager("./");
+			this->m_file_loader = new FileAssetManager("");
 
 			// --------------------------------------------------
 
 			// -- camera
-			CameraRef camera = new Camera;
-			camera->SetPosition(0.0f, 0.0f, -10.0f);
+			m_camera = new Camera;
+			m_camera->SetPosition(0.0f, 0.0f, -10.0f);
 
 			// -- texture
-			TextureResRef texture = new TextureRes();
+			TextureResRef textureRes = new TextureRes();
+			TextureFromBitmap *textureLoader = new TextureFromBitmap("c:\\Users\\psari\\prog\\grafkit2\\assets\\rotating_cube\\normap.jpg");
+			textureLoader->Load(this, textureRes);
 
-			texture = this->Load<TextureRes>(new TextureFromBitmap("Normap.jpg"));
+			this->m_texture = textureRes->Get();
+
+			delete textureLoader;
 
 			// -- texture sampler
 			m_textureSampler = new TextureSampler();
 
 			// -- load shader
 			m_vertexShader = new Shader();
-			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"c:\\Users\\psari\\prog\\grafkit2\\assets\\rotating_cube\\texture.hlsl", ST_Vertex);
 
 			m_fragmentShader = new Shader();
-			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"c:\\Users\\psari\\prog\\grafkit2\\assets\\rotating_cube\\texture.hlsl", ST_Pixel);
 
 			// -- model 
-			ModelRef model = new Model;
-			model->SetMaterial(new MaterialBase);
-			model->GetMaterial()->AddTexture(texture, "diffuse");
+			this->m_model = new Model;
+			// m_model->SetMaterial(new MaterialBase);
+			// m_model->GetMaterial()->AddTexture(new TextureRes(this->m_texture), "diffuse");
 
-
+			// -- generator
 			SimpleMeshGenerator generator(render, m_vertexShader);
 			generator["POSITION"] = (void*)GrafkitData::cubeVertices;
 			generator["TEXCOORD"] = (void*)GrafkitData::cubeTextureUVs;
 			
-			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, model);
-
-			// --- 
-			this->DoPrecalc();
-
-			// -- setup scene 
-			scene = new Scene();
-			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
-			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
-			
-			ActorRef modelActorL = new Actor(); modelActorL->AddEntity(model); modelActorL->Matrix().Translate(3, 0, 0); modelActor->AddChild(modelActorL);
-			ActorRef modelActorR = new Actor(); modelActorR->AddEntity(model); modelActorR->Matrix().Translate(-3, 0, 0); modelActor->AddChild(modelActorR);
-
-			ActorRef modelActorU = new Actor(); modelActorU->AddEntity(model);  modelActorU->Matrix().Translate(0, 3, 0); modelActor->AddChild(modelActorU);
-			ActorRef modelActorD = new Actor(); modelActorD->AddEntity(model);  modelActorD->Matrix().Translate(0, -3, 0); modelActor->AddChild(modelActorD);
-
-			ActorRef modelActorF = new Actor(); modelActorF->AddEntity(model); modelActorF->Matrix().Translate(0, 0, 3); modelActor->AddChild(modelActorF);
-			ActorRef modelActorB = new Actor(); modelActorB->AddEntity(model); modelActorB->Matrix().Translate(0, 0, -3); modelActor->AddChild(modelActorB);
-			
-
-			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
-
-			ActorRef rootActor = new Actor();
-			rootActor->AddChild(cameraActor);
-			rootActor->AddChild(modelActor);
-
-			m_rootActor = rootActor;
-
-			scene->SetRootNode(rootActor);
-			scene->SetCameraNode(cameraActor);
-			// scene->AddLightNode(lightActor);
-
-			scene->SetVShader(m_vertexShader);
-			scene->SetFShader(m_fragmentShader);
+			generator(GrafkitData::cubeVertexLength, GrafkitData::cubeIndicesLength, GrafkitData::cubeIndices, this->m_model);
 
 			// --- 
 
@@ -147,14 +119,32 @@ protected:
 		// ==================================================================================================================
 		int mainloop() {
 			this->render.BeginScene();
-			{				
-				m_rootActor->Matrix().Identity();
-				m_rootActor->Matrix().RotateRPY(t,0,0);
+			{		
+				Matrix worldMatrix;
+				worldMatrix.Identity();
+				worldMatrix.RotateRPY(t, .3455*t, .7346*t);
 
-				// ((Shader)(*m_fragmentShader))["SampleType"] = m_textureSampler->GetSamplerState();
+				struct {
+					matrix worldMatrix;
+					matrix viewMatrix;
+					matrix projectionMatrix;
+				} viewMatrices;
 
-				scene->PreRender(render);
-				scene->Render(render);
+				m_camera->Calculate(render);
+
+				viewMatrices.worldMatrix = XMMatrixTranspose(worldMatrix.Get());
+				viewMatrices.viewMatrix = XMMatrixTranspose(m_camera->GetViewMatrix().Get());
+				viewMatrices.projectionMatrix = XMMatrixTranspose(m_camera->GetProjectionMatrix().Get());
+
+				m_vertexShader->GetParam("MatrixBuffer").SetP(&viewMatrices);
+
+				m_fragmentShader->GetBRes("diffuse").Set(m_texture->GetTextureResource());
+				m_fragmentShader->GetBRes("SampleType").Set(m_textureSampler->GetSamplerState());
+
+				m_vertexShader->Render(this->render);
+				m_fragmentShader->Render(this->render);
+
+				m_model->RenderMesh(this->render);
 
 				this->t += 0.01;
 			}
