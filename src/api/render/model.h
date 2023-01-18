@@ -11,6 +11,7 @@
 
 #include "mesh.h"
 #include "actor.h"
+#include "texture.h"
 
 #include <vector>
 #include <array>
@@ -34,13 +35,16 @@ namespace FWrender
 
 		//void addMesh(MeshRef mesh, /*materials, textures*/);
 
-	private:
-		//MeshRef mesh;
+		inline void setTexture(TextureRef texture, int n = 0);
+		inline TextureRef& getTexture(int n = 0);
 
+	private:
 		// + material
-		// + texture 
+		TextureRef m_textures[MULTITEXTURE_MAX];
 
 	};
+
+	typedef Ref<Model> ModelRef;
 }
 
 #endif
