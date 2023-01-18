@@ -1,6 +1,8 @@
 
 #include "Renderer.h"
 
+#include "../core/memory.h"
+
 using namespace FWrender;
 
 Renderer::Renderer()
@@ -13,13 +15,16 @@ Renderer::Renderer()
 	m_depthStencilState = 0;
 	m_depthStencilView = 0;
 	m_rasterState = 0;
+
+	m_worldMatrix = XMMatrixIdentity();
 }
 
 Renderer::~Renderer()
 {
+	this->Shutdown();
 }
 
-
+///@todo ezzel kezdeni kell valamit 
 void* Renderer::operator new(size_t memorySize)
 {
 	size_t alignment;
@@ -35,7 +40,7 @@ void* Renderer::operator new(size_t memorySize)
 	return memoryBlockPtr;
 }
 
-
+///@todo ezzel kezdeni kell valamit 
 void Renderer::operator delete(void* memoryBlockPtr)
 {
 	// Free the class memory that had been allocated using the _aligned_malloc function.
@@ -45,7 +50,7 @@ void Renderer::operator delete(void* memoryBlockPtr)
 }
 
 
-int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
+int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen)
 {
 	HRESULT result;
 	IDXGIFactory* factory;
@@ -237,17 +242,16 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	this->AssingnRef(m_device);
 
 	// Create debug layer
-	ID3D11Debug *d3dDebug = nullptr;
+#ifdef _DEBUG
+	ID3D11Debug *d3dDebug = NULL;
 	if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug)))
 	{
 		ID3D11InfoQueue *d3dInfoQueue = nullptr;
 		if (SUCCEEDED(d3dDebug->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&d3dInfoQueue)))
 		{
-#ifdef _DEBUG
+
 			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
 			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
-#endif
-
 
 			D3D11_MESSAGE_ID hide[] =
 			{
@@ -264,6 +268,7 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 		}
 		d3dDebug->Release();
 	}
+#endif
 
 	// Get the pointer to the back buffer.
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
@@ -380,6 +385,9 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 	// Now set the rasterizer state.
 	m_deviceContext->RSSetState(m_rasterState);
 	
+
+	// ---------------------------------------------
+
 	// Setup the viewport for rendering.
 	viewport.Width = (float)screenWidth;
 	viewport.Height = (float)screenHeight;
@@ -390,19 +398,6 @@ int Renderer::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwn
 
 	// Create the viewport.
 	m_deviceContext->RSSetViewports(1, &viewport);
-
-	// Setup the projection matrix.
-	fieldOfView = 3.141592654f / 4.0f;
-	screenAspect = (float)screenWidth / (float)screenHeight;
-
-	// Create the projection matrix for 3D rendering.
-	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
-
-	// Initialize the world matrix to the identity matrix.
-	m_worldMatrix = XMMatrixIdentity();
-
-	// Create an orthographic projection matrix for 2D rendering.
-	m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
 }
@@ -468,27 +463,11 @@ void Renderer::Shutdown()
 }
 
 
-
-void Renderer::GetProjectionMatrix(XMMATRIX& projectionMatrix)
-{
-	projectionMatrix = m_projectionMatrix;
-	return;
-}
-
-
-void Renderer::GetWorldMatrix(XMMATRIX& worldMatrix)
+void Renderer::GetWorldMatrix(matrix& worldMatrix)
 {
 	worldMatrix = m_worldMatrix;
 	return;
 }
-
-
-void Renderer::GetOrthoMatrix(XMMATRIX& orthoMatrix)
-{
-	orthoMatrix = m_orthoMatrix;
-	return;
-}
-
 
 void Renderer::GetVideoCardInfo(char* cardName)
 {
