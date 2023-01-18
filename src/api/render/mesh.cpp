@@ -25,14 +25,31 @@ FWrender::Mesh::~Mesh()
 	this->Shutdown();
 }
 
-void FWrender::Mesh::Render(ID3D11DeviceContext * deviceContext)
+void FWrender::Mesh::Render(ID3D11DeviceContext * dev)
 {
-	RenderBuffers(deviceContext);
+	dev->IASetVertexBuffers(0, 1, &this->m_buffer.buffer, &this->m_buffer.stride, &this->m_buffer.offset);
+	dev->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	dev->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	dev->DrawIndexed(this->m_indexCount, 0, 0);
 }
 
 void FWrender::Mesh::Shutdown()
 {
-	this->ShutdownBuffers();
+	if (m_indexBuffer)
+	{
+		m_indexBuffer->Release();
+		m_indexBuffer = 0;
+	}
+
+	//for (int i = 0; i < this->m_buffers.size(); i++) {
+	//	this->m_buffers[i].buffer->Release();
+	//}
+
+	if (this->m_buffer.buffer) 
+		this->m_buffer.buffer->Release();
+
+	return;
 }
 
 void FWrender::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
@@ -41,45 +58,34 @@ void FWrender::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
 	elem.buffer = pBuffer;
 	elem.stride = stride;
 	elem.offset = offset;
-	this->m_buffers.push_back(elem);
+	// this->m_buffers.push_back(elem);
+	this->m_buffer = elem;
 }
 
 
-void FWrender::Mesh::RenderBuffers(ID3D11DeviceContext * deviceContext)
-{
-	for (size_t i = 0; i<this->m_buffers.size(); ++i)
-	{
-		BufferStateDescriptor &elem = this->m_buffers[i];
+//void FWrender::Mesh::RenderBuffers(ID3D11DeviceContext * deviceContext)
+//{
+//	for (size_t i = 0; i<this->m_buffers.size(); ++i)
+//	{
+//		BufferStateDescriptor &elem = this->m_buffers[i];
+//
+//		/// @todo --- ezt
+//		/// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476456(v=vs.85).aspx
+//		deviceContext->IASetVertexBuffers(0, 1, &elem.buffer, &elem.stride, &elem.offset); // < megbasz
+//	}
+//	
+//	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+//	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//	
+//	// FYI https://msdn.microsoft.com/en-us/library/windows/desktop/ff728726(v=vs.85).aspx
+//
+//	return;
+//}
 
-		/// @todo --- ezt
-		/// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476456(v=vs.85).aspx
-		deviceContext->IASetVertexBuffers(0, 1, &elem.buffer, &elem.stride, &elem.offset); // < megbasz
-	}
-	
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	
-	// FYI https://msdn.microsoft.com/en-us/library/windows/desktop/ff728726(v=vs.85).aspx
-
-	return;
-}
-
-void FWrender::Mesh::ShutdownBuffers()
-{
-	// Release the index buffer.
-	
-	if (m_indexBuffer)
-	{
-		m_indexBuffer->Release();
-		m_indexBuffer = 0;
-	}
-
-	for (int i = 0; i < this->m_buffers.size(); i++) {
-		this->m_buffers[i].buffer->Release();
-	}
-
-	return;
-}
+//void FWrender::Mesh::ShutdownBuffers()
+//{
+//
+//}
 
 
 // ========================================================================

@@ -38,8 +38,8 @@ namespace FWrender
 			int GetIndexCount() { return m_indexCount; }
 
 		protected:
-			void RenderBuffers(ID3D11DeviceContext* deviceContext);
-			void ShutdownBuffers();
+			// void RenderBuffers(ID3D11DeviceContext* deviceContext);
+			// void ShutdownBuffers();
 			void Shutdown();
 
 		protected:
@@ -55,7 +55,8 @@ namespace FWrender
 
 		private:
 			ID3D11Buffer *m_indexBuffer;
-			std::vector<BufferStateDescriptor> m_buffers;
+			// std::vector<BufferStateDescriptor> m_buffers;
+			BufferStateDescriptor m_buffer;
 			int m_vertexCount, m_indexCount;
 	};
 

@@ -18,7 +18,8 @@ Shader::Shader() :
 	m_pShader(NULL),
 	m_vShader(NULL),
 	m_pReflector(NULL),
-	m_layout(NULL)
+	m_layout(NULL),
+	m_type(ST_NONE)
 {
 }
 
@@ -42,6 +43,8 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 	// input checking
 	if (!entry) throw new EX(NullPointerException);
 	if (!file) throw new EX(NullPointerException);
+
+	this->m_type = type;
 
 	// Compile the vertex shader code.
 	if (type == ST_Vertex) {
@@ -107,26 +110,6 @@ void FWrender::Shader::Shutdown()
 void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 {
 
-	// fuck the constant buffers around
-	if (!this->m_mapBuffers.empty()) {
-		bufferMap_t::iterator it;
-		for (it = this->m_mapBuffers.begin(); it != this->m_mapBuffers.end(); it++) {
-			if (it->second.m_buffer) {
-				ID3D11Buffer* buffer = it->second.m_buffer;
-//				UINT slot = 1;
-
-				if (this->m_type == ST_Vertex) {
-					deviceContext->VSGetConstantBuffers(it->second.m_slot, 1, &buffer);
-
-				}
-				else if (this->m_type == ST_Pixel) {
-					deviceContext->PSGetConstantBuffers(it->second.m_slot, 1, &buffer);
-				}
-			}
-		}
-	}
-	// fuck through the resources
-
 	// go the fuck off 
 	if (this->m_type == ST_Vertex) {
 		// fuck off the layout
@@ -136,6 +119,26 @@ void FWrender::Shader::Render(ID3D11DeviceContext * deviceContext)
 	else if (this->m_type == ST_Pixel) {
 		deviceContext->PSSetShader(m_pShader, NULL, 0);
 	}
+
+	// fuck the constant buffers around
+	if (!this->m_mapBuffers.empty()) {
+		bufferMap_t::iterator it;
+		for (it = this->m_mapBuffers.begin(); it != this->m_mapBuffers.end(); it++) {
+			if (it->second.m_buffer) {
+				ID3D11Buffer* buffer = it->second.m_buffer;
+//				UINT slot = 1;
+
+				if (this->m_type == ST_Vertex) {
+					deviceContext->VSSetConstantBuffers(it->second.m_slot, 1, &buffer);
+
+				}
+				else if (this->m_type == ST_Pixel) {
+					deviceContext->PSSetConstantBuffers(it->second.m_slot, 1, &buffer);
+				}
+			}
+		}
+	}
+	// fuck through the resources
 
 }
 
@@ -356,7 +359,8 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* device, ID3D11ShaderReflectionConstantBuffer *pConstBuffer) :
 	m_pDC(NULL),
 	m_buffer(NULL),
-	m_description()
+	m_description(),
+	m_slot(0) ///@todo slotok 
 {
 	// create a dummy object w/o parsing
 	if (!device || !pConstBuffer)
