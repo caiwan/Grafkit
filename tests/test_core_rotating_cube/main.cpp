@@ -118,6 +118,9 @@ public:
 					(*model->getTexture().Get())
 					);
 				*/
+
+				Shader::ConstantBufferRecord record = (*shader_vs)["MatrixBuffer"];
+
 				this->t += 0.001;
 			}
 			this->render.EndScene();
