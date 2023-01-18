@@ -172,6 +172,14 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 
 }
 
+void CurveEditorScene::keyPressEvent(QKeyEvent* event) {
+    QGraphicsScene::keyPressEvent(event);
+}
+
+void CurveEditorScene::keyReleaseEvent(QKeyEvent* event) {
+    QGraphicsScene::keyReleaseEvent(event);
+}
+
 void CurveEditorScene::SelectionChangedSlot()
 {
     QList<QGraphicsItem*> items = selectedItems();

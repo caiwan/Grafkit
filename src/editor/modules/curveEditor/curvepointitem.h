@@ -94,12 +94,12 @@ namespace Idogep
         void RefreshView(bool force) override;
 
     private:
-        float /*m_radix, */m_lastRadix;
-        float /*m_angle, */m_lastAngle;
-
-        //QPointF m_angle; // Will take care of it later
+        float m_lastRadius;
+        float m_lastAngle;
 
         bool m_showTangent;
+        bool m_snapXAxis;
+        bool m_snapYAxis;
 
         uint32_t m_id;
 

@@ -5,6 +5,7 @@
 
 #include "CurvePointItem.h"
 #include "CurvePointEditor.h"
+#include <QKeyEvent>
 
 using namespace Idogep;
 
@@ -13,6 +14,8 @@ using namespace Grafkit;
 #define KEY_SET_INTERPOLATION (Qt::Key_I)
 #define KEY_SET_TANGENT (Qt::Key_R)
 
+#define KEY_SNAP_X (Qt::Key_Shift)
+#define KEY_SNAP_Y (Qt::Key_Alt)
 
 #define BOUNDING_BOX_SCALE 16.
 #define RADIX_SCALE 32.
@@ -27,12 +30,15 @@ CurvePointItem::CurvePointItem(const Animation::Key key, const size_t index, QGr
     m_nodeType = 0;
 
     m_showTangent = false;
+    m_snapXAxis = false;
+    m_snapYAxis = false;
 
-    m_lastRadix = 1.;
+    m_lastRadius = 1.;
     m_lastAngle = 0.;
 
     setFlag(ItemIsMovable);
     setFlag(ItemIsSelectable);
+    setFlag(ItemIsFocusable);
 
     show();
 }
@@ -100,7 +106,7 @@ void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
             return;
 
         m_showTangent = true;
-        m_lastRadix = m_key.m_radius;
+        m_lastRadius = m_key.m_radius;
         m_lastAngle = m_key.m_angle;
         onStartEdit(m_id, m_key);
         break;
@@ -193,31 +199,63 @@ void CurvePointItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
 void CurvePointItem::keyPressEvent(QKeyEvent * event)
 {
-    // itt csak modosito billnetyuket lenene erdemes 
-    QGraphicsItem::keyPressEvent(event);
+    if (isSelected())
+    {
+        switch (event->key())
+        {
+        case KEY_SNAP_X:
+            m_showTangent = true;
+            m_snapXAxis = true; break;
+
+        case KEY_SNAP_Y:
+            m_showTangent = true;
+            m_snapYAxis = true; break;
+
+        default:
+            QGraphicsItem::keyReleaseEvent(event);
+            return;
+        }
+
+        event->accept();
+    }
+    else {
+        QGraphicsItem::keyReleaseEvent(event);
+    }
 }
 
 void CurvePointItem::keyReleaseEvent(QKeyEvent * event)
 {
-    //if (isSelected()) {
-    //	switch (event->key())
-    //	{
-    //	case KEY_SET_INTERPOLATION:
-    //		// set interpolation, toggle 
-    //		event->accept();
-    //		break;
-    //	case KEY_SET_TANGENT:
-    //		toggleTangentEditing();
-    //		event->accept();
-    //		break;
-    //	default:
-    //		event->ignore();
-    //		break;
-    //	}
-    //}
-    //else {
-    //	event->ignore();
-    //}
+    if (isSelected()) {
+        switch (event->key())
+        {
+        case KEY_SNAP_X:
+            m_showTangent = false;
+            m_snapXAxis = false;
+            break;
+
+        case KEY_SNAP_Y:
+            m_showTangent = false;
+            m_snapYAxis = false;
+            break;
+
+            //	case KEY_SET_INTERPOLATION:
+            //		// set interpolation, toggle 
+            //		event->accept();
+            //		break;
+            //	case KEY_SET_TANGENT:
+            //		toggleTangentEditing();
+            //		event->accept();
+            //		break;
+        default:
+            QGraphicsItem::keyReleaseEvent(event);
+            return;
+        }
+
+        event->accept();
+    }
+    else {
+        QGraphicsItem::keyReleaseEvent(event);
+    }
 }
 
 void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event)
@@ -225,14 +263,23 @@ void CurvePointItem::EditTangent(class QGraphicsSceneMouseEvent* event)
     const float x = event->pos().x();
     const float y = event->pos().y();
 
-    m_key.m_radius = sqrt(x * x + y * y) / 32.0f;
-    m_key.m_angle = atan2(-y, x) / (.5*M_PI); // -1 .. 1
+    const float radius = sqrt(x * x + y * y) / 32.0f;
+    const float angle = atan2(-y, x) / (.5*M_PI); // -1 .. 1
 
-    // TODO: we should take care of edit delta
+    if (m_snapXAxis)
+        m_key.m_radius += radius - m_lastRadius;
+    else
+        m_key.m_radius = radius;
+
+    if (m_snapYAxis)
+        m_key.m_angle += angle - m_lastAngle;
+    else
+        m_key.m_angle = angle;
 
     onEditKey(m_id, m_key); // will check and update constraints
-    m_lastAngle = m_key.m_angle;
-    m_lastRadix = m_key.m_radius;
+
+    m_lastAngle = angle;
+    m_lastRadius = radius;
 }
 
 void CurvePointItem::RefreshView(bool force) { scene()->update(); }
@@ -253,8 +300,8 @@ void CurvePointItem::EditPosition(class QGraphicsSceneMouseEvent* event)
 
 void CurvePointItem::ToggleTangentEditing()
 {
-    if (m_showTangent) { m_lastRadix = 1.0f; }
-    else { m_lastRadix = m_key.m_radius; }
+    if (m_showTangent) { m_lastRadius = 1.0f; }
+    else { m_lastRadius = m_key.m_radius; }
 
     m_showTangent = !m_showTangent;
     this->update();
