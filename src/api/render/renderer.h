@@ -15,6 +15,8 @@
 
 #include "memory_align.h"
 
+#define RENDER_TARGET_MAX 8
+
 using namespace DirectX;
 
 namespace Grafkit {
@@ -63,7 +65,8 @@ namespace Grafkit {
 		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
 		void SetSurface(int screenW, int screenH);
 
-		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr);
+		void SetRenderTargetViewCount(size_t n = 0) { m_renderTargetViewCount = n < RENDER_TARGET_MAX ? n: RENDER_TARGET_MAX; }
+		void SetRenderTargetView(ID3D11RenderTargetView* pRenderTargetView = nullptr, size_t n = 0);
 
 		// --- getters
 		ID3D11Device* GetDevice() { return this->m_device; }
@@ -75,7 +78,7 @@ namespace Grafkit {
 
 		void GetWorldMatrix(matrix&);
 
-		void GetVideoCardInfo(char*);
+		void GetVideoCardInfo(char* dest);
 
 		void GetScreenSize(int &screenW, int &screenH);
 		void GetScreenSizef(float &screenW, float &screenH) {
@@ -89,7 +92,8 @@ namespace Grafkit {
 		IDXGISwapChain* m_swapChain;
 		ID3D11Device* m_device;
 		ID3D11DeviceContext* m_deviceContext;
-		ID3D11RenderTargetView* m_renderTargetView, *m_myRenderTargetView;
+		ID3D11RenderTargetView *m_renderTargetViews[RENDER_TARGET_MAX], *m_myRenderTargetView;
+		size_t m_renderTargetViewCount;
 		ID3D11Texture2D* m_depthStencilBuffer;
 		ID3D11DepthStencilState* m_depthStencilState;
 		ID3D11DepthStencilView* m_depthStencilView;
@@ -99,7 +103,9 @@ namespace Grafkit {
 	};
 }
 
-DEFINE_EXCEPTION(InitializeRendererException, 0, "Failed to initialize renderer object");
-DEFINE_EXCEPTION(ResizeRenderSurfaceException, 0, "Can not resize render surface");
+#define EX_ERROR_RENDERER 1000
+
+DEFINE_EXCEPTION(InitializeRendererException, EX_ERROR_RENDERER + 0, "Failed to initialize renderer object");
+DEFINE_EXCEPTION(ResizeRenderSurfaceException, EX_ERROR_RENDERER + 1, "Can not resize render surface");
 
 #endif
