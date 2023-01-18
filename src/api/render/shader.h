@@ -29,6 +29,7 @@ struct cmp_str
 namespace FWrender {
 
 	class Shader;
+	class ShaderRef;
 
 	enum ShaderType_e {
 		ST_NONE = 0,
@@ -38,6 +39,7 @@ namespace FWrender {
 	};
 
 	class Shader : virtual public Referencable {
+		friend class ShaderRef;
 	public:
 
 		/// @todo ezt innen el kell pakoni - egyik felet a node-ba, a masikat a kameraba
@@ -105,7 +107,7 @@ namespace FWrender {
 
 		private:
 			ConstantBufferRecord(ConstantBufferRecord&) {}
-			ConstantBufferRecord& operator= (ConstantBufferRecord&) {}
+			ConstantBufferRecord& operator= (ConstantBufferRecord&) { return *this; }
 		};
 
 		ConstantBufferRecord& operator[] (const char* name);
@@ -130,15 +132,61 @@ namespace FWrender {
 		// ID3D11DeviceContext* m_pDeviceContext;
 	};
 
-	/*
+	/// enhance Reference with operator [] to acces the shader's indides, without dereferencing
 	class ShaderRef : public Ref<Shader> {
-		/// enhance Reference with operator [] to acces the shader's indides, without dereferencing
-		// ... 
-		///@todo a = operator nem toltodik at -> tagfuggveny elrejtes? 
-	};
-	*/
+		friend class ShaderRef;
 
-	typedef Ref<Shader> ShaderRef;
+	public:
+		Shader::ConstantBufferRecord& operator[](const char *name){
+			this->ptr->operator[](name);
+		}
+
+
+		// --- compatibility with Ref<T>
+		ShaderRef & operator=(Shader* pointer)
+		{
+			AssingnRef(pointer);
+			return *this;
+		}
+
+		ShaderRef& operator=(const ShaderRef& other)
+		{
+			if (&other != this && this->ptr != other.ptr) {
+				if (ptr != NULL &&
+					ptr->Release() == 0) {
+					delete ptr;
+				}
+
+				ptr = other.ptr;
+
+				if (ptr != NULL) {
+					ptr->AddRef();
+				}
+			}
+
+			return *this;
+		}
+
+		template<typename T1> ShaderRef& operator=(const Ref<T1>& other)
+		{
+			if (&other != this && this->ptr != other.Get()) {
+				if (ptr != NULL &&
+					ptr->Release()) {
+					delete ptr;
+				}
+
+				ptr = other.Get();
+
+				if (ptr != NULL) {
+					ptr->AddRef();
+				}
+			}
+
+			return *this;
+		}
+	};
+
+	//typedef Ref<Shader> ShaderRef;
 
 	struct shader_pair {
 		ShaderRef vs, fs;

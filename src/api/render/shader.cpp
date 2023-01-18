@@ -260,7 +260,7 @@ FWrender::Shader::ConstantBufferRecord::ConstantBufferRecord(ID3D11Device* devic
 
 void FWrender::Shader::ConstantBufferRecord::set(void * data)
 {
-	if (!m_buffer)
+	if (!data || !m_buffer)
 		return;
 
 	HRESULT result = 0;

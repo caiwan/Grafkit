@@ -111,15 +111,10 @@ public:
 
 				worldMatrix.RotateRPY(t*10, t*15, t*20);
 
-				/*
-				shader_texture->Render(
-					render.GetDeviceContext(),
-					model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-					(*model->getTexture().Get())
-					);
-				*/
+				(*shader_vs)["MatrixBuffer"].set(NULL);
 
-				Shader::ConstantBufferRecord record = (*shader_vs)["MatrixBuffer"];
+				shader_vs->Render(render.GetDeviceContext());
+				shader_fs->Render(render.GetDeviceContext());
 
 				this->t += 0.001;
 			}
