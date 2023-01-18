@@ -31,14 +31,6 @@ void Idogep::Editor::Initialize()
 	//InitializeDocument();
 }
 
-void Idogep::Editor::MediateSiblingModule(Ref<Module> module)
-{
-	EmitsCommandRole* commandEmittingModule = dynamic_cast<EmitsCommandRole*>(module.Get());
-	if (commandEmittingModule) {
-		m_commandStack->ConnectEmitter(commandEmittingModule);
-	}
-}
-
 void Idogep::Editor::InitializeDocument()
 {
 	try {
