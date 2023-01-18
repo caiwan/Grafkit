@@ -279,9 +279,6 @@
     <Image Include="UserImages.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\scintilla\win32\SciLexer.vcxproj">
-      <Project>{fbe04237-9c7b-4973-9c60-505975998b39}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\api\grafkit.vcxproj">
       <Project>{bff1ad5f-469c-4ebe-8c53-698dae473a13}</Project>
     </ProjectReference>
