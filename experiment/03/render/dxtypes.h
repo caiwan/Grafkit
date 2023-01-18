@@ -10,9 +10,21 @@
 
 //using namespace DirectX;
 
-typedef DirectX::XMFLOAT2 float2;
+typedef DirectX::XMVECTOR float2;
 typedef DirectX::XMFLOAT3 float3;
 typedef DirectX::XMFLOAT4 float4;
 
+typedef DirectX::XMVECTOR dxvector;
 typedef DirectX::XMMATRIX matrix;
 
+
+// ---- predefs
+
+namespace FWmath
+{
+	class Matrix;
+}
+
+
+// usage of left-handed coordinate system
+#define USE_LEFT_HANDED_SYSTEM
