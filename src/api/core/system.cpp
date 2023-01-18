@@ -27,11 +27,11 @@ System::System()
 	el::Configurations defaultConf;
 	defaultConf.setToDefault();
 
-#ifdef _DEBUG
-	defaultConf.setGlobally(el::ConfigurationType::Format, "%logger [%levshort]: %msg - at %fbase function %func line %line tid=%thread");
-#else 
+//#ifdef _DEBUG
+//	defaultConf.setGlobally(el::ConfigurationType::Format, "%logger [%levshort]: %msg - at %fbase function %func line %line tid=%thread");
+//#else 
 	defaultConf.setGlobally(el::ConfigurationType::Format, "[%levshort] %msg");
-#endif // _DEBUG
+//#endif // _DEBUG
 
 	el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
 	el::Loggers::reconfigureLogger("default", defaultConf);

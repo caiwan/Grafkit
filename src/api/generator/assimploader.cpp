@@ -179,7 +179,7 @@ void FWmodel::AssimpLoader::operator()()
 
 			aiString name;
 			const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
-			///@todo model->SetName(mesh_name);
+			model->SetName(mesh_name);
 
 			///@todo 
 			//model->pushVert(reinterpret_cast<vec3float*>(curr_mesh->mVertices), curr_mesh->mNumVertices);
@@ -220,6 +220,7 @@ void FWmodel::AssimpLoader::operator()()
 
 			//FWmath::Matrix modelview = model->getModelviewMatrix();
 			//this->models.push(model);
+			m_assman->AddObject(model);
 		}
 	}
 

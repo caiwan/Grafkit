@@ -67,7 +67,7 @@ void FWassets::IRenderAssetManager::AddObject(IRenderAsset * obj)
 	this->m_mapID[id][obj->GetUUID()] = obj;
 	this->m_mapNames[id][obj->GetName()] = obj;
 
-	LOG(TRACE) << "Object added to assman" << obj->GetName() << obj->GetUUID().toString_c_str();
+	LOG(TRACE) << "Object added to assman" << obj->GetName() << obj->GetUUID().toString().c_str() << id;
 }
 
 void FWassets::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
@@ -81,10 +81,10 @@ void FWassets::IRenderAssetManager::RemoveObject(IRenderAsset * obj)
 	{
 		m_mapID[id].erase(it_id);
 		m_mapNames[id].erase(it_name);
-		LOG(TRACE) << "Object removed from assman" << obj->GetName() << obj->GetUUID().toString_c_str();
+		LOG(TRACE) << "Object removed from assman" << obj->GetName() << obj->GetUUID().toString().c_str() << id;
 	}
 	else {
-		LOG(WARNING) << "No object to remove from assman" << obj->GetName() << obj->GetUUID().toString_c_str();
+		LOG(WARNING) << "No object to remove from assman" << obj->GetName() << obj->GetUUID().toString().c_str() << id;
 	}
 
 	//if (obj->m_assman == this) obj->m_assman = nullptr;
