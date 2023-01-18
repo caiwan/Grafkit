@@ -83,91 +83,77 @@ void FWrender::Mesh::ShutdownBuffers()
 
 
 // ========================================================================
-# if 0
-MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 * pPosition, int indexCount, const int * pIndices, MeshRef input_mesh)
+FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * device, ShaderRef shader)
+	: m_device(device), m_shader(shader)
 {
-	Mesh* mesh = NULL;
-	HRESULT result = 0;
-	typedef struct Mesh::VertexType_pos _vertex_t;
-	
-	// check inputs
-	if (!vertexCount || !pPosition || !indexCount || !pIndices)
-		throw EX(NullPointerException);
-	
-	ID3D11Buffer *vertexBuffer = NULL;
-
-	if (input_mesh.Invalid()) {
-		mesh = new Mesh();
-	}
-	else {
-		mesh = input_mesh;
-	}	this->createIndexBuffer(mesh, indexCount, pIndices);
-
-	// --- 
-	_vertex_t* vertices = NULL;
-
-	D3D11_BUFFER_DESC vertexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData;
-	
-	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
-	ZeroMemory(&vertexData, sizeof(vertexData));
-
-	// -- create vertex struct buffer + copy 
-	vertices = new _vertex_t[vertexCount];		//zero nem kell?
-
-	for (size_t i = 0; i < vertexCount; i++)
-	{
-		vertices[i].position = pPosition[i];
-	}
-
-	// --- create static VBO
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(_vertex_t) * vertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
-
-	// Give the subresource structure a pointer to the vertex data.
-	vertexData.pSysMem = vertices;
-	vertexData.SysMemPitch = 0;
-	vertexData.SysMemSlicePitch = 0;
-
-	// Now create the vertex buffer.
-	result = this->m_device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
-	if (FAILED(result)) { 
-		throw EX(CreateIndevBufferException);
-	}
-
-	delete[] vertices; vertices = 0;
-
-	mesh->addElement(vertexBuffer, sizeof(_vertex_t), 0);
-
-	return mesh;
 }
 
-MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 *pPosition, const float3 *pNormal, const float2 *pUv, const float3 *pTangent, int indexCount, const int *pIndices, MeshRef input_mesh)
+MeshRef FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* indices, MeshRef mesh_input)
 {
-	Mesh* mesh = NULL;
-	HRESULT result = 0;
-	typedef struct Mesh::VertexType_pos_tex _vertex_t;	/// @todo ezt bele lehetne rangatni egy templatebe, nem?
-
-	// check inputs
-	if (!vertexCount || !pPosition || !indexCount || !pIndices || !pNormal || !pTangent || !pUv)
+	if (this->m_shader.Invalid()) {
 		throw EX(NullPointerException);
+	}
+	
+	HRESULT result = 0;
 
-	ID3D11Buffer *vertexBuffer = NULL;
+	// obtain input layout elements, and collect pointers that were set before
+	size_t elem_count = this->m_shader->getILayoutElemCount();
 
-	if (input_mesh.Invalid()) {
-		mesh = new Mesh();
+	std::vector<BYTE*> src_ptrs;
+	std::vector<size_t> src_widths;
+
+	size_t struct_width = 0;
+
+	for (size_t i = 0; i < elem_count; ++i) {
+		Shader::InputElementRecord &record = this->m_shader->getILayoutElem(i);
+		mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
+		if (it == this->m_mapPtr.end()) {
+			src_ptrs.push_back(NULL);
+		}
+		else {
+			src_ptrs.push_back((BYTE*)it->second);
+		}
+
+		src_widths.push_back(record.width);
+		//struct_width += record.width;
+		// using fix 16 byte alignemnts
+		struct_width += 16;
+	}
+
+	MeshRef mesh;
+	if (mesh_input.Valid()) {
+		mesh = mesh_input;
 	}
 	else {
-		mesh = input_mesh;
+		mesh = new Mesh();
 	}
-	this->createIndexBuffer(mesh, indexCount, pIndices);
+	// fetch trough vertices
+	size_t vd_size = struct_width * vertexCount;
+	BYTE* vertex_data = new BYTE[vd_size];
+	ZeroMemory(vertex_data, vd_size);
 
-	// --- 
-	_vertex_t* vertices = NULL;
+	// start address of the current structure
+	BYTE* dst_struct = (BYTE*)vertex_data;
+
+	for (size_t j = 0; j < elem_count; j++) {
+		size_t src_width = src_widths[j];
+		BYTE* src_ptr = src_ptrs[j];
+		size_t i = vertexCount;
+		if (src_ptr) {
+			BYTE* dst_ptr = dst_struct + 16 * j;
+			while (i--) {
+				size_t k = src_width;
+				while (k--) {
+					dst_ptr[k] = src_ptr[k];
+				}
+				dst_ptr += struct_width;
+				src_ptr += src_width;
+			}
+		}
+	}
+
+	// create buffer + index
+	ID3D11Buffer *vertexBuffer = NULL;
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData;
@@ -175,28 +161,15 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 
 	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 	ZeroMemory(&vertexData, sizeof(vertexData));
 
-	// -- create vertex struct buffer + copy 
-	vertices = new _vertex_t[vertexCount];		//zero nem kell?
-
-	/// todo ezt a kernelt lehetne altalnositani, nem? valahogy? 
-	for (size_t i = 0; i < vertexCount; i++)
-	{
-		vertices[i].position = pPosition[i];
-		vertices[i].normal = pNormal[i];
-		vertices[i].tangent= pTangent[i];
-		vertices[i].texture = pUv[i];
-	}
-
-	// --- create static VBO
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(_vertex_t) * vertexCount;
+	vertexBufferDesc.ByteWidth = vd_size;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
 	vertexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the vertex data.
-	vertexData.pSysMem = vertices;
+	vertexData.pSysMem = vertex_data;
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
@@ -206,9 +179,10 @@ MeshRef FWrender::SimpleMeshGenerator::operator()(int vertexCount, const float3 
 		throw EX(CreateIndevBufferException);
 	}
 
-	delete[] vertices; vertices = 0;
+	delete[] vertex_data; //vertex_data = 0;
 
-	mesh->addElement(vertexBuffer, sizeof(_vertex_t), 0);
+	this->createIndexBuffer(mesh, indexCount, indices);
+	mesh->addElement(vertexBuffer, struct_width, 0);
 
 	return mesh;
 }
@@ -227,20 +201,20 @@ void FWrender::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCou
 
 	// check inputs
 	if (mesh.Invalid() || !indexCount || !pIndices)
-		throw EX(NullPointerException);	
+		throw EX(NullPointerException);
 
 	// --- 
 
 	// -- indices buffer + copy 
 	ULONG* indices = NULL;
 	indices = new ULONG[indexCount];	// zero nem kell?
-	
-	// !copy
+
+										// !copy
 	for (size_t i = 0; i < indexCount; i++)
 	{
 		indices[i] = pIndices[i];
 	}
-	
+
 	// --- create static index buffer
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned long) * indexCount;
@@ -248,55 +222,19 @@ void FWrender::SimpleMeshGenerator::createIndexBuffer(MeshRef mesh, int indexCou
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
 	indexBufferDesc.StructureByteStride = 0;
-	
+
 	// Give the subresource structure a pointer to the index data.
 	indexData.pSysMem = indices;
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
-	
+
 	// Create the index buffer.
 	result = this->m_device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
-	if (FAILED(result)) { 
+	if (FAILED(result)) {
 		throw EX(CreateIndevBufferException);
 	}
-	
+
 	delete[] indices; indices = 0;
 
 	mesh->addIndices(indexBuffer, indexCount);
-}
-#endif 
-
-FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * device, ShaderRef shader)
-	: m_device(device), m_shader(shader)
-{
-}
-
-void FWrender::SimpleMeshGenerator::operator()(size_t vertexCount, size_t indexCount, const int* indices)
-{
-	if (this->m_shader.Invalid()) {
-		throw EX(NullPointerException);
-	}
-	size_t elem_count = this->m_shader->getILayoutElemCount();
-
-	std::vector<void*> ptrs;
-	std::vector<size_t> widths;
-
-	for (size_t i = 0; i < elem_count; ++i) {
-		Shader::InputElementRecord &record = this->m_shader->getILayoutElem(i);
-		mapPtr_t::iterator it = this->m_mapPtr.find(record.desc.SemanticName);
-		if (it == this->m_mapPtr.end()) {
-			ptrs.push_back(NULL);
-		}
-		else {
-			ptrs.push_back(it->second);
-		}
-
-		widths.push_back(record.width);
-	}
-
-	// create constant buffer
-
-	// fetch trough vertices
-
-	// return mesh
 }

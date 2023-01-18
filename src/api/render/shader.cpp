@@ -182,7 +182,7 @@ void FWrender::Shader::DispatchShaderErrorMessage(ID3D10Blob* errorMessage, LPCW
 	throw new EX_DETAILS(ShaderException, L"See shader-error.txt");
 }
 
-void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT byteWidth) {
+void Shader::getDXGIFormat(D3D11_SIGNATURE_PARAMETER_DESC pd, DXGI_FORMAT &res, UINT &byteWidth) {
 	BYTE mask = pd.Mask;
 	int varCount = 0;
 	while (mask)
@@ -298,7 +298,7 @@ void FWrender::Shader::BuildReflection(ID3D11Device* device, ID3D10Blob* shaderB
 		elementDesc.SemanticName = input_desc.SemanticName;
 		elementDesc.SemanticIndex = input_desc.SemanticIndex;
 		elementDesc.InputSlot = 0;
-		elementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		elementDesc.AlignedByteOffset = 16;		// 16 bytes alignment
 		elementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;	
 		elementDesc.InstanceDataStepRate = 0;
 

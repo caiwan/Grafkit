@@ -64,8 +64,6 @@ public:
 			// -- model 
 			model = new Model;
 
-			//SimpleMeshGenerator generator(render);
-
 			//generator(
 			//	FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, (float3*)FWBuiltInData::cubeNormals,
 			//	FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
@@ -84,6 +82,11 @@ public:
 			shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
 
 			// shader_vs->setInputLayout(model->getInputLayout);
+
+			SimpleMeshGenerator generator(render, shader_vs);
+			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
+			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
 
 			this->t = 0;
 
