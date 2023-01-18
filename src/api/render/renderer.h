@@ -11,6 +11,8 @@
 #include "dxtypes.h"
 #include "reference.h"
 
+#include "exceptions.h"
+
 #include "memory_align.h"
 
 using namespace DirectX;
@@ -88,4 +90,9 @@ namespace FWrender {
 		matrix m_worldMatrix;
 	};
 }
+
+DEFINE_EXCEPTION(InitializeRendererException, 0, "Failed to initialize renderer object");
+DEFINE_EXCEPTION(ResizeRenderSurfaceException, 0, "Can not resize render surface");
+
+
 #endif
