@@ -8,47 +8,39 @@
 #include "dxtypes.h"
 
 #include "../core/reference.h"
+#include "mesh.h"
+#include "Actor.h"
 
-namespace FWrender {
+#include <vector>
+#include <array>
 
-	class Model : public Referencable
-	{
-	private:
-		struct VertexType
-		{
-			float3 position;
-			float2 texture;
-		};
+namespace FWrender 
+{
+	/**
+	Stores extended data for a mesh, that makes it a model
+	*/
 
+	class Model : public virtual Referencable, public Actor, public Mesh{
 	public:
 		Model();
-		Model(const Model&);
 		~Model();
 
-		bool Initialize(
-			ID3D11Device* device, 
-			FWrender::TextureRef texture,
-			int indicesCount, const int* indices,
-			int verticesCount, const float3* position, const float2* uv
-		);
-		
-		inline void Shutdown();
-		void Render(ID3D11DeviceContext* deviceContext);
-
-		int GetIndexCount() { return m_indexCount; }
-
-		ID3D11ShaderResourceView* GetTexture();
+		void addMesh(MeshRef mesh, /*materials, textures*/);
 
 	private:
-		void ShutdownBuffers();
-		void RenderBuffers(ID3D11DeviceContext* deviceContext);
+		/** @todo 
+		Ezt kesobb valaszd szet. Egy model, csak egy mesht, es annak egy materialjat tarolja. 
+		Legyen egy absztrakt osztaly - 3Dentity - az Actor helyett, amibol szarmazik, es az
+		Actor ezeket gyujtse
+		*/
 
-	private:
-		FWrender::TextureRef m_texture;
-
-		ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-		int m_vertexCount, m_indexCount;
+		struct entity_t{
+			MeshRef mesh;
+			// + material
+			// + textures
+		};
+		std::vector<struct entity_t> entities;
 	};
-
 }
+
 #endif

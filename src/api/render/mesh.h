@@ -1,8 +1,8 @@
 /**
 */
 
-#ifndef _Model_H_
-#define _Model_H_
+#ifndef _Mesh_H_
+#define _Mesh_H_
 
 #include "renderer.h"
 #include "dxtypes.h"
