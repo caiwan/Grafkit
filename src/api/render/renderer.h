@@ -66,10 +66,10 @@ namespace FWrender {
 
 		void GetVideoCardInfo(char*);
 
-		void getScreenSize(int &screenW, int &screenH);
-		void getScreenSize_f(float &screenW, float &screenH) {
+		void GetScreenSize(int &screenW, int &screenH);
+		void GetScreenSizef(float &screenW, float &screenH) {
 			int w=0, h=0;
-			this->getScreenSize(w, h);
+			this->GetScreenSize(w, h);
 			screenW = (float)w, screenH = (float)h;
 		}
 
