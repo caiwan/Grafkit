@@ -36,7 +36,6 @@ namespace FWrender
 			TextureRef& getTexture(int n = 0);
 
 		private:
-			// + fragment shader 
 			// + material
 			TextureRef m_textures[MULTITEXTURE_MAX];
 
