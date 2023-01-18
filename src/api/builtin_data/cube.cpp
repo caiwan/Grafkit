@@ -56,35 +56,35 @@ const unsigned short FWBuiltInData::quadIndicesLen = 4;
 // vertex
 static const float _cube_vertices[] = {	
 		//0
-		-1.0f, -1.0f,  1.0f,	//0
-		 1.0f, -1.0f,  1.0f,	//1
-		 1.0f,  1.0f,  1.0f,	//2
-		-1.0f,  1.0f,  1.0f,	//3
+		-1.0f, -1.0f,  1.0f, 1.0f,	//0
+		 1.0f, -1.0f,  1.0f, 1.0f,	//1
+		 1.0f,  1.0f,  1.0f, 1.0f,	//2
+		-1.0f,  1.0f,  1.0f, 1.0f,	//3
 		//1
-		-1.0f, -1.0f, -1.0f,	//4
-		-1.0f,  1.0f, -1.0f,	//5
-		 1.0f,  1.0f, -1.0f,	//6
-		 1.0f, -1.0f, -1.0f,	//7
+		-1.0f, -1.0f, -1.0f, 1.0f,	//4
+		-1.0f,  1.0f, -1.0f, 1.0f,	//5
+		 1.0f,  1.0f, -1.0f, 1.0f,	//6
+		 1.0f, -1.0f, -1.0f, 1.0f,	//7
 		//2
-		-1.0f,  1.0f, -1.0f,	//8
-		-1.0f,  1.0f,  1.0f,	//9
-		 1.0f,  1.0f,  1.0f,	//10
-		 1.0f,  1.0f, -1.0f,	//11
+		-1.0f,  1.0f, -1.0f, 1.0f,	//8
+		-1.0f,  1.0f,  1.0f, 1.0f,	//9
+		 1.0f,  1.0f,  1.0f, 1.0f,	//10
+		 1.0f,  1.0f, -1.0f, 1.0f,	//11
 		//3
-		-1.0f, -1.0f, -1.0f,	//12
-		 1.0f, -1.0f, -1.0f,	//13
-		 1.0f, -1.0f,  1.0f,	//14
-		-1.0f, -1.0f,  1.0f,	//15
+		-1.0f, -1.0f, -1.0f, 1.0f,	//12
+		 1.0f, -1.0f, -1.0f, 1.0f,	//13
+		 1.0f, -1.0f,  1.0f, 1.0f,	//14
+		-1.0f, -1.0f,  1.0f, 1.0f,	//15
 		//4
-		 1.0f, -1.0f, -1.0f,	//16
-		 1.0f,  1.0f, -1.0f,	//17
-		 1.0f,  1.0f,  1.0f,	//18
-		 1.0f, -1.0f,  1.0f,	//19
+		 1.0f, -1.0f, -1.0f, 1.0f,	//16
+		 1.0f,  1.0f, -1.0f, 1.0f,	//17
+		 1.0f,  1.0f,  1.0f, 1.0f,	//18
+		 1.0f, -1.0f,  1.0f, 1.0f,	//19
 		//5
-		-1.0f, -1.0f, -1.0f,	//20
-		-1.0f, -1.0f,  1.0f,	//21
-		-1.0f,  1.0f,  1.0f,	//22
-		-1.0f,  1.0f, -1.0f		//23
+		-1.0f, -1.0f, -1.0f, 1.0f,	//20
+		-1.0f, -1.0f,  1.0f, 1.0f,	//21
+		-1.0f,  1.0f,  1.0f, 1.0f,	//22
+		-1.0f,  1.0f, -1.0f, 1.0f,	//23
 };
 
 // normals
@@ -285,7 +285,7 @@ const float * const FWBuiltInData::cubeNormals = _cube_normals;
 const float * const FWBuiltInData::cubeTextureUVs =_cube_texture_uvs;
 const   int * const FWBuiltInData::cubeIndices = _cube_indices;
 
-static const unsigned int _cube_vertex_length = sizeof(_cube_vertices)/sizeof(*_cube_vertices) / 3;
+static const unsigned int _cube_vertex_length = sizeof(_cube_vertices)/sizeof(*_cube_vertices) / 4;
 static const unsigned int _cube_indices_length = sizeof(_cube_indices)/sizeof(*_cube_indices);
 
 const unsigned int FWBuiltInData::cubeVertexLength = _cube_vertex_length;
