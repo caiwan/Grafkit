@@ -17,170 +17,6 @@ using namespace FWdebugExceptions;
 
 // =============================================================================================================================
 
-ShaderParamManager::ShaderParamManager(Shader * shader, size_t id, size_t vid, int is_subtype)
-	: m_pShader(shader),
-	m_id(id), m_vid(vid), m_is_subtype(is_subtype)
-{
-}
-
-Grafkit::ShaderParamManager::~ShaderParamManager()
-{
-}
-
-ShaderParamManager ShaderParamManager::operator[](const char * name)
-{
-	if (this->IsValid() && this->IsSubtype()) {
-		return m_pShader->GetParam(m_id, name);
-	}
-	return ShaderParamManager();
-}
-
-ShaderParamManager ShaderParamManager::operator[](size_t id)
-{
-	if (this->IsValid() && this->IsSubtype()) {
-		return m_pShader->GetParam(m_id, id);
-	}
-	return ShaderParamManager();
-}
-
-size_t ShaderParamManager::GetVarCount()
-{
-	if (this->IsValid() && this->IsSubtype()) {
-		return m_pShader->GetParamCount(m_id);
-	}
-	return 0;
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------
-
-void ShaderParamManager::Set(const void * const pData)
-{
-	return;
-	if (this->IsValid()) {
-		void* ptr = reinterpret_cast<void*>(((BYTE*)m_pShader->MapParamBuffer(m_id)));
-		if (ptr) {
-			memcpy(ptr, pData, m_pShader->GetCBDescription(m_id).Size);
-		}
-		m_pShader->UnMapParamBuffer(m_id);
-	}
-}
-
-void ShaderParamManager::Set(const void * const pData, size_t offset, size_t width)
-{
-	return;
-	if (this->IsValid()) {
-		void* ptr = reinterpret_cast<void*>(((BYTE*)m_pShader->MapParamBuffer(m_id)) + offset);
-		if (ptr) {
-			memcpy(ptr, pData, width);
-			m_pShader->UnMapParamBuffer(m_id);
-		}
-	}
-}
-
-void ShaderParamManager::Set(const float v0)
-{
-	return;
-	if (this->IsValid() && this->IsSubtype()) {
-		
-		float* ptr = reinterpret_cast<float*>(((BYTE*)m_pShader->MapParamBuffer(m_id)) + m_pShader->GetCBVariableDescriptor(m_id, m_vid).StartOffset);
-		if (ptr) {
-			ptr[0] = v0;
-		}
-		m_pShader->UnMapParamBuffer(m_id);
-	}
-}
-
-void ShaderParamManager::Set(const float v0, const float v1)
-{
-	return;
-	if (this->IsValid() && this->IsSubtype()) {
-		float* ptr = reinterpret_cast<float*>(((BYTE*)m_pShader->MapParamBuffer(m_id)) + m_pShader->GetCBVariableDescriptor(m_id, m_vid).StartOffset);
-		if (ptr) {
-			ptr[0] = v0; ptr[1] = v1;
-		}
-		m_pShader->UnMapParamBuffer(m_id);
-	}
-}
-
-void ShaderParamManager::Set(const float v0, const float v1, const float v2)
-{
-	return;
-	if (this->IsValid() && this->IsSubtype()) {
-		float* ptr = reinterpret_cast<float*>(((BYTE*)m_pShader->MapParamBuffer(m_id)) + m_pShader->GetCBVariableDescriptor(m_id, m_vid).StartOffset);
-		if (ptr) {
-			ptr[0] = v0; ptr[1] = v1; ptr[2] = v2; 
-		}
-		m_pShader->UnMapParamBuffer(m_id);
-	}
-}
-
-void ShaderParamManager::Set(const float v0, const float v1, const float v2, const float v3)
-{
-	return;
-	if (this->IsValid() && this->IsSubtype()) {
-		float* ptr = reinterpret_cast<float*>(((BYTE*)m_pShader->MapParamBuffer(m_id)) + m_pShader->GetCBVariableDescriptor(m_id, m_vid).StartOffset);
-		if (ptr) {
-			ptr[0] = v0; ptr[1] = v1; ptr[2] = v2; ptr[3] = v3;
-		}
-		m_pShader->UnMapParamBuffer(m_id);
-	}
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------
-
-D3D11_MAPPED_SUBRESOURCE ShaderParamManager::GetappedResourceDesc()
-{
-	return D3D11_MAPPED_SUBRESOURCE();
-}
-
-D3D11_SHADER_BUFFER_DESC ShaderParamManager::GetBufferDesc()
-{
-	if (this->IsValid()) {
-
-	}
-	return D3D11_SHADER_BUFFER_DESC();
-}
-
-D3D11_SHADER_VARIABLE_DESC ShaderParamManager::GetVarDesc()
-{
-	if (this->IsValid() && this->IsSubtype()) {
-
-	}
-	return D3D11_SHADER_VARIABLE_DESC();
-}
-
-D3D11_SHADER_TYPE_DESC ShaderParamManager::GetTypeDesc()
-{
-	if (this->IsValid() && this->IsSubtype()) {
-
-	}
-	return D3D11_SHADER_TYPE_DESC();
-}
-
-// =============================================================================================================================
-
-ShaderResourceManager::ShaderResourceManager(Shader * shader, size_t id) : 
-m_pShader(shader), m_id(id)
-{
-}
-
-void Grafkit::ShaderResourceManager::Set(void * ptr)
-{
-	if (this->IsValid()) {
-		return m_pShader->SetBResPointer(m_id, ptr);
-	}
-}
-
-inline D3D11_SHADER_INPUT_BIND_DESC Grafkit::ShaderResourceManager::GetBResDesc()
-{
-	if (this->IsValid()) {
-		return m_pShader->GetBResDesc(m_id);
-	}
-	return D3D11_SHADER_INPUT_BIND_DESC();
-}
-
-// =============================================================================================================================
-
 Shader::Shader() : //IResource(),
 	m_pxShader(nullptr),
 	m_vxShader(nullptr),
@@ -350,7 +186,8 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 	}
 
 	// duck through the resources
-	if (!this->m_bResourceCount) {
+	//if (this->m_bResourceCount) 
+	{
 		for (size_t i = 0; i < this->m_bResourceCount; i++) {
 			BResRecord &brRecord = this->m_bResources[i];
 			if (brRecord.m_boundSource != nullptr) {
@@ -417,7 +254,7 @@ void Shader::CompileShader(Renderer & device, ID3D10Blob* shaderBuffer)
 
 // ============================================================================================================================================
 
-ShaderParamManager Shader::GetParam(std::string name)
+Shader::ShaderParamManager Shader::GetParam(std::string name)
 {
 	CBMap_it_t it = this->m_mapCBuffers.find(name);
 	if (it != this->m_mapCBuffers.end()) {
@@ -426,12 +263,12 @@ ShaderParamManager Shader::GetParam(std::string name)
 	return ShaderParamManager();
 }
 
-ShaderParamManager Shader::GetParam(size_t id)
+Shader::ShaderParamManager Shader::GetParam(size_t id)
 {
-	return ShaderParamManager(this, id);
+	return (id < m_cBufferCount) ? ShaderParamManager(this, id) : ShaderParamManager();
 }
 
-ShaderParamManager Shader::GetParam(std::string name, std::string varname)
+Shader::ShaderParamManager Shader::GetParam(std::string name, std::string varname)
 {
 	CBMap_it_t it = this->m_mapCBuffers.find(name);
 	if (it != this->m_mapCBuffers.end()) {
@@ -441,7 +278,7 @@ ShaderParamManager Shader::GetParam(std::string name, std::string varname)
 	return ShaderParamManager();
 }
 
-ShaderParamManager Shader::GetParam(size_t id, std::string varname)
+Shader::ShaderParamManager Shader::GetParam(size_t id, std::string varname)
 {
 	cb_variableMap_it it = m_cBuffers[id].m_cbVarMap.find(varname);
 	if (it != this->m_cBuffers[id].m_cbVarMap.end()) {
@@ -451,74 +288,98 @@ ShaderParamManager Shader::GetParam(size_t id, std::string varname)
 	return ShaderParamManager();
 }
 
-ShaderParamManager Shader::GetParam(size_t id, size_t vid)
+Shader::ShaderParamManager Shader::GetParam(size_t id, size_t vid)
 {
-	return ShaderParamManager(this, id, vid, 1);
+	return (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount) ? ShaderParamManager(this, id, vid, 1) : ShaderParamManager();
 }
 
 // ============================================================================================================================================
 
-void* Shader::MapParamBuffer(size_t id)
+void Shader::SetParamPtr(size_t id, const void const * pData, size_t size, size_t offset)
 {
-	if (id >= m_cBufferCount)
-		return nullptr;
+	if (id < m_cBufferCount) 
+	{
+		if (size == 0) {
+			size = m_cBuffers[id].m_description.Size;
+			offset = 0;
+		}
 
-	return nullptr;
-	
-	HRESULT result = 0;
+		if (size + offset <= m_cBuffers[id].m_description.Size) 
+		{
+			CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
+		} else 
+			DebugBreak();
 
-	CBRecord & cbRecord = m_cBuffers[id];
-	 result = m_pDC->Map(cbRecord.m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &cbRecord.m_mappedResource);
-	if (FAILED(result)) {
-		throw EX_DETAILS(ConstantBufferMapException, "Cannot map buffer to a resource");
+
+		CopyMemory((BYTE*)this->MapParamBuffer(id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+		this->UnMapParamBuffer(id);
 	}
-	return cbRecord.m_mappedResource.pData;
+
+}
+
+///@todo ez egyelore nem mukodik 
+void Shader::SetParamPtr(size_t id, size_t vid, const void const * pData, size_t size, size_t offset)
+{
+	if (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount)
+	{
+		offset += m_cBuffers[id].m_cbVars[vid].m_var_desc.StartOffset;
+		
+		if (size == 0) {
+			size = m_cBuffers[id].m_cbVars[vid].m_var_desc.Size;
+		}
+
+		if (size + offset <= m_cBuffers[id].m_cbVars[vid].m_var_desc.Size) 
+		{
+			CopyMemory(m_cBuffers[id].m_cpuBuffer + offset, pData, size);
+		}
+		else
+			DebugBreak();
+
+		CopyMemory(this->MapParamBuffer(id), m_cBuffers[id].m_cpuBuffer, m_cBuffers[id].m_description.Size);
+		this->UnMapParamBuffer(id);
+	}
+}
+
+void* Shader::MapParamBuffer(size_t id, int isDiscard)
+{
+	//if (id < m_cBufferCount) 
+	{
+		HRESULT result = 0;
+
+		CBRecord & cbRecord = m_cBuffers[id];
+		result = m_pDC->Map(cbRecord.m_buffer, 0, 
+			//isDiscard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE, 
+			// D3D11_MAP_WRITE,
+			D3D11_MAP_WRITE_DISCARD,
+			0, &cbRecord.m_mappedResource);
+		if (FAILED(result)) {
+			throw EX_DETAILS(ConstantBufferMapException, "Cannot map buffer to a resource");
+		}
+		return cbRecord.m_mappedResource.pData;
+	}  
+	// else 	
+	//	return nullptr;
 }
 
 void * Shader::GetMappedPtr(size_t id)
 {
-	if (id >= m_cBufferCount)
-		return nullptr;
-	
-	return nullptr;
-	
+	// return (id < m_cBufferCount) ? m_cBuffers[id].m_mappedResource.pData : nullptr;
 	return m_cBuffers[id].m_mappedResource.pData;
 }
 
 void Shader::UnMapParamBuffer(size_t id)
 {
-	if (id >= m_cBufferCount)
-		return;
-
-	CBRecord & cbRecord = m_cBuffers[id];
-	m_pDC->Unmap(cbRecord.m_buffer, 0);
+	//if (id < m_cBufferCount)
+	{
+		CBRecord & cbRecord = m_cBuffers[id];
+		m_pDC->Unmap(cbRecord.m_buffer, 0);
+	}
 }
+
 
 // ============================================================================================================================================
 
-D3D11_MAPPED_SUBRESOURCE Shader::GetCBMappedResourceDesc(size_t id)
-{
-	return m_cBuffers[id].m_mappedResource;
-}
-
-D3D11_SHADER_BUFFER_DESC Shader::GetCBDescription(size_t id)
-{
-	return m_cBuffers[id].m_description;
-}
-
-D3D11_SHADER_VARIABLE_DESC Shader::GetCBVariableDescriptor(size_t id, size_t vid)
-{
-	return m_cBuffers[id].m_cbVars[vid].m_var_desc;
-}
-
-D3D11_SHADER_TYPE_DESC Shader::GetCBTypeDescriptor(size_t id, size_t vid)
-{
-	return m_cBuffers[id].m_cbVars[vid].m_type_desc;
-}
-
-// ============================================================================================================================================
-
-ShaderParamManager Shader::GetBRes(std::string name)
+Shader::ShaderResourceManager Shader::GetBRes(std::string name)
 {
 	if (!this->m_mapBResources.empty()) {
 		BResMap_it_t it = m_mapBResources.find(name);
@@ -526,23 +387,23 @@ ShaderParamManager Shader::GetBRes(std::string name)
 			return GetBRes(it->second);
 		}
 	}
-	return ShaderParamManager();
+	return ShaderResourceManager();
 }
 
-ShaderParamManager Shader::GetBRes(size_t id)
+Shader::ShaderResourceManager Shader::GetBRes(size_t id)
 {
-	return ShaderParamManager(this, id);
+	return (id < m_bResourceCount) ? ShaderResourceManager(this, id) : ShaderResourceManager();
 }
 
-inline D3D11_SHADER_INPUT_BIND_DESC Grafkit::Shader::GetBResDesc(size_t id)
+D3D11_SHADER_INPUT_BIND_DESC Shader::GetBResDesc(size_t id)
 {
-	return m_bResources[id].m_desc;
+	return (id < m_bResourceCount) ? m_bResources[id].m_desc : D3D11_SHADER_INPUT_BIND_DESC();
 }
 
-inline void Shader::SetBResPointer(size_t id, void * ptr)
+void Shader::SetBResPointer(size_t id, void * ptr)
 {
-	return; 
-	this->m_bResources[id].m_boundSource = ptr;
+	if (id < m_bResourceCount)
+		this->m_bResources[id].m_boundSource = ptr;
 }
 
 // ============================================================================================================================================
@@ -756,7 +617,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		// --- create buffer
 		// ezt lehet ki kellene venni innen, nem?
 		D3D11_BUFFER_DESC bufferDesc;
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.Usage = D3D11_USAGE_DYNAMIC; // D3D11_USAGE_DEFAULT;
 		bufferDesc.ByteWidth = ((cbRecord.m_description.Size/16)+1)*16; 
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -768,6 +629,9 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 			throw EX(ConstantBufferCreateException);
 		}
 
+		cbRecord.m_cpuBuffer = new BYTE[bufferDesc.ByteWidth];
+		ZeroMemory(cbRecord.m_cpuBuffer, bufferDesc.ByteWidth);
+
 		LOG(TRACE) << "Constant buffer record" << cbRecord.m_description.Name << cbRecord.m_description.Size << cbRecord.m_description.Type;
 
 		// build up cbuffer variables
@@ -775,7 +639,7 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 		cbRecord.m_cbVars = new CBVar[cbRecord.m_cbVarCount];
 
 		for (size_t j = 0; j < cbRecord.m_cbVarCount; j++) {
-			ID3D11ShaderReflectionVariable* shader_variable = pConstBuffer->GetVariableByIndex(i);
+			ID3D11ShaderReflectionVariable* shader_variable = pConstBuffer->GetVariableByIndex(j);
 			CBVar &cbVar = cbRecord.m_cbVars[j];
 
 			// feltolt 
@@ -797,10 +661,8 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 			cbRecord.m_cbVarMap[cbVar.m_var_desc.Name] = j;
 		}
 
-		this->m_mapCBuffers[cbRecord.m_description.Name] = i;
+		m_mapCBuffers[cbRecord.m_description.Name] = i;
 	}
-
-	return; 
 
 	// fetch bounded resources 
 	this->m_bResourceCount = desc.BoundResources;
@@ -825,4 +687,49 @@ void Shader::BuildReflection(Renderer & device, ID3D10Blob* shaderBuffer)
 	// 
 }
 
-// ============================================================================================================
+// =============================================================================================================================
+
+inline void Shader::ShaderParamManager::Set(const float v0)
+{
+	if (this->IsValid() && this->IsSubtype()) {
+		float v[1];
+		v[0] = v0;
+		Set(v);
+	}
+}
+
+inline void Shader::ShaderParamManager::Set(const float v0, const float v1)
+{
+	if (this->IsValid() && this->IsSubtype()) {
+		float v[2];
+		v[0] = v0;
+		v[1] = v1;
+		Set(v);
+	}
+}
+
+inline void Shader::ShaderParamManager::Set(const float v0, const float v1, const float v2)
+{
+	if (this->IsValid() && this->IsSubtype()) {
+		float v[3];
+		v[0] = v0;
+		v[1] = v1;
+		v[2] = v2;
+		Set(v);
+	}
+}
+
+inline void Shader::ShaderParamManager::Set(const float v0, const float v1, const float v2, const float v3)
+{
+	if (this->IsValid() && this->IsSubtype()) {
+		float v[4];
+		v[0] = v0;
+		v[1] = v1;
+		v[2] = v2;
+		v[3] = v3;
+		Set(v);
+	}
+}
+
+
+// =============================================================================================================================

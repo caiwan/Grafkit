@@ -21,7 +21,5 @@ void Grafkit::Model::Render(Grafkit::Renderer & render, Scene* scene)
 	if (m_material) 
 		this->m_material->Render(render, scene->GetFShader());
 
-
-
 	this->RenderMesh(render);
 }

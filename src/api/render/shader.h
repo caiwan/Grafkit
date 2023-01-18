@@ -33,67 +33,7 @@ namespace Grafkit {
 	class ShaderRes;
 	class ShaderResRef;
 
-	class ShaderParamManager {
-		// ... 
-	public:
-		ShaderParamManager(Shader*shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype =0);
-		~ShaderParamManager();
 
-		ShaderParamManager operator[](const char* name); 
-		ShaderParamManager operator[](size_t id);
-
-		size_t GetVarCount();
-
-		void operator= (float v) { Set(&v); }
-
-		void operator= (void* v) { Set(v); }
-
-		void operator= (const float3 &v) { Set(&v); }
-		void operator= (const float2 &v) { Set(&v); }
-		void operator= (const float4 &v) { Set(&v); }
-		void operator= (const matrix &v) { Set(&v); }
-
-		void Set(const void * const pData);
-		void Set(const void * const pData, size_t offset, size_t width);
-
-		void Set(const float v0);
-		void Set(const float v0, const float v1);
-		void Set(const float v0, const float v1, const float v2);
-		void Set(const float v0, const float v1, const float v2, const float v3);
-
-		D3D11_MAPPED_SUBRESOURCE GetappedResourceDesc();
-		D3D11_SHADER_BUFFER_DESC GetBufferDesc(); //{ return this->m_description; }
-
-		D3D11_SHADER_VARIABLE_DESC GetVarDesc(); // {return this->}
-		D3D11_SHADER_TYPE_DESC  GetTypeDesc();
-
-		int IsValid() { return (m_pShader != nullptr); }
-		int IsSubtype() { return m_is_subtype; }
-
-	private:
-		Shader * m_pShader;
-
-		int m_is_subtype;
-		size_t m_id, m_vid;
-
-	};
-
-	class ShaderResourceManager {
-	public:
-		ShaderResourceManager(Shader* shader = nullptr, size_t id = 0);
-		
-		void operator= (void* v) { Set(v); }
-
-		void Set(void*);
-
-		inline D3D11_SHADER_INPUT_BIND_DESC GetBResDesc();
-
-		int IsValid() { return (m_pShader != nullptr); }
-
-	private:
-		Shader * m_pShader;
-		size_t m_id;
-	};
 
 	// ================================================================================================================================
 	__declspec(align(16)) class Shader : virtual public Referencable, public AlignedNew<Shader>
@@ -101,9 +41,8 @@ namespace Grafkit {
 	{
 
 	public:
-		class ConstantBufferElement;
-		class ConstantBufferRecord;
-		class BoundResourceRecord;
+		class ShaderParamManager;
+		class ShaderResourceManager;
 
 	public:
 		Shader();
@@ -147,7 +86,6 @@ namespace Grafkit {
 		size_t GetParamCount() { return this->m_cBufferCount; }
 		size_t GetParamCount(size_t id) { return id>=this->m_cBufferCount?0:this->m_cBuffers[id].m_cbVarCount; }
 
-		///@todo ezekre bounds chackinget kellene alkalmazni
 		ShaderParamManager operator[](const char* name) { return GetParam(std::string(name)); }
 		ShaderParamManager operator[](size_t id) { return GetParam(id); }
 
@@ -161,23 +99,35 @@ namespace Grafkit {
 		ShaderParamManager GetParam(size_t id, std::string varname);
 		ShaderParamManager GetParam(size_t id, size_t vid);
 
-		void* MapParamBuffer(size_t id);
+		void SetParamPtr(size_t id, const void const * pData, size_t size = 0, size_t offset = 0);
+		void SetParamPtr(size_t id, size_t vid, const void const * pData, size_t size = 0, size_t offset = 0);
+
+	protected:
+		void* MapParamBuffer(size_t id, int isDiscard = 1);
 		void* GetMappedPtr(size_t id);
 		void UnMapParamBuffer(size_t id);
 		
-		D3D11_MAPPED_SUBRESOURCE GetCBMappedResourceDesc(size_t id);
-		D3D11_SHADER_BUFFER_DESC GetCBDescription(size_t id);
+	public:
+
+		D3D11_SHADER_BUFFER_DESC GetCBDescription(size_t id) {
+			return (id < m_cBufferCount) ? m_cBuffers[id].m_description : D3D11_SHADER_BUFFER_DESC();
+		}
 		
-		D3D11_SHADER_VARIABLE_DESC GetCBVariableDescriptor(size_t id, size_t vid);
-		D3D11_SHADER_TYPE_DESC GetCBTypeDescriptor(size_t id, size_t vid);
+		D3D11_SHADER_VARIABLE_DESC GetCBVariableDescriptor(size_t id, size_t vid) {
+			return (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount) ? m_cBuffers[id].m_cbVars[vid].m_var_desc : D3D11_SHADER_VARIABLE_DESC();
+		}
+		D3D11_SHADER_TYPE_DESC GetCBTypeDescriptor(size_t id, size_t vid) {
+			return (id < m_cBufferCount && vid < m_cBuffers[id].m_cbVarCount) ? m_cBuffers[id].m_cbVars[vid].m_type_desc : D3D11_SHADER_TYPE_DESC();
+		}
+
 
 		// ----
 		// access bounded resources
 		///@todo bounds check
 		size_t GetBResCount() { return this->m_bResourceCount; }
-		ShaderParamManager GetBRes(const char * name) { return GetBRes(std::string(name)); }
-		ShaderParamManager GetBRes(std::string name);
-		ShaderParamManager GetBRes(size_t id);
+		ShaderResourceManager GetBRes(const char * name) { return GetBRes(std::string(name)); }
+		ShaderResourceManager GetBRes(std::string name);
+		ShaderResourceManager GetBRes(size_t id);
 		D3D11_SHADER_INPUT_BIND_DESC GetBResDesc(size_t id);
 
 		void SetBResPointer(size_t id, void* ptr);
@@ -211,6 +161,9 @@ namespace Grafkit {
 
 		// -- constant buffer
 		// Constant buffer variable 
+
+		///@todo a kovetkezo iteracioban nem kell reflektalni teljesen a shadert, eleg csak a buffereket letrehozni CPU oldalon
+		
 		struct CBVar {
 			D3D11_SHADER_VARIABLE_DESC m_var_desc;
 			D3D11_SHADER_TYPE_DESC m_type_desc;
@@ -224,6 +177,7 @@ namespace Grafkit {
 			D3D11_MAPPED_SUBRESOURCE m_mappedResource;
 			D3D11_SHADER_BUFFER_DESC m_description;
 			ID3D11Buffer *m_buffer;
+			BYTE *m_cpuBuffer;
 			UINT m_slot;
 
 			cb_variableMap_t m_cbVarMap;
@@ -258,9 +212,80 @@ namespace Grafkit {
 		BResRecord* m_bResources;
 
 		// -- output sampler
+
+		// ================================================================================================================================
+
+		public:
+
+			class ShaderParamManager {
+			public:
+				ShaderParamManager(Shader* shader = nullptr, size_t id = 0, size_t vid = 0, int is_subtype = 0)
+					: m_pShader(shader), m_id(id), m_vid(vid), m_is_subtype(is_subtype)
+				{}
+
+				~ShaderParamManager() {}
+
+				inline ShaderParamManager operator[](const char* name) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, name) : ShaderParamManager(); }
+				inline ShaderParamManager operator[](size_t id) { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParam(m_id, id) : ShaderParamManager(); }
+				
+				inline size_t GetVarCount() { return (this->IsValid() && !this->IsSubtype()) ? this->m_pShader->GetParamCount() : 0; }
+
+				inline void operator= (float v) { Set(&v); }
+			
+				inline void operator= (void* v) { Set(v); }
+				
+				inline void operator= (const float3 &v) { Set(&v); }
+				inline void operator= (const float2 &v) { Set(&v); }
+				inline void operator= (const float4 &v) { Set(&v); }
+				inline void operator= (const matrix &v) { Set(&v); }
+
+				inline void Set(const void * const pData) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, m_vid, pData) : this->m_pShader->SetParamPtr(m_id, pData); }
+				inline void Set(const void * const pData, size_t width, size_t offset = 0) { if (this->IsValid()) this->IsSubtype() ? this->m_pShader->SetParamPtr(m_id, pData, width, offset) : this->m_pShader->SetParamPtr(m_id, pData, width, offset); }
+
+				inline void Set(const float v0);
+				inline void Set(const float v0, const float v1);
+				inline void Set(const float v0, const float v1, const float v2);
+				inline void Set(const float v0, const float v1, const float v2, const float v3);
+
+				inline D3D11_SHADER_BUFFER_DESC GetBufferDesc() { return (this->IsValid()) ? this->m_pShader->GetCBDescription(m_id) : D3D11_SHADER_BUFFER_DESC(); }
+				
+				inline D3D11_SHADER_VARIABLE_DESC GetVarDesc() { return (this->IsValid()) ? this->m_pShader->GetCBVariableDescriptor(m_id, m_vid) : D3D11_SHADER_VARIABLE_DESC(); }
+				inline D3D11_SHADER_TYPE_DESC  GetTypeDesc() { return (this->IsValid()) ? this->m_pShader->GetCBTypeDescriptor(m_id, m_vid) : D3D11_SHADER_TYPE_DESC(); }
+				
+				inline int IsValid() { return (m_pShader != nullptr); }
+				inline int IsSubtype() { return m_is_subtype; }
+
+			private:
+				Shader * m_pShader;
+
+				int m_is_subtype;
+				size_t m_id, m_vid;
+
+			};
+
+			class ShaderResourceManager {
+			public:
+				ShaderResourceManager(Shader* shader = nullptr, size_t id = 0) : 
+					m_pShader(shader), m_id(id)
+				{}
+
+				~ShaderResourceManager() {}
+
+				void operator= (void* v) { Set(v); }
+
+				void Set(void* p) { if (IsValid()) this->m_pShader->SetBResPointer(m_id, p); }
+
+				inline D3D11_SHADER_INPUT_BIND_DESC GetDescriptor() { if (IsValid()) m_pShader->GetBResDesc(m_id); }
+
+				int IsValid() { return (m_pShader != nullptr); }
+
+			private:
+				Shader * m_pShader;
+				size_t m_id;
+			};
 	};
 
-	// ================================================================================================================================
+	
 
 	typedef Ref<Shader> ShaderRef_t;
 
@@ -274,8 +299,8 @@ namespace Grafkit {
 		friend class ShaderResRef;
 
 	public:
-		inline ShaderParamManager operator[](const char *name) { return this->ptr->operator[](name); }
-		inline ShaderParamManager operator[](size_t id) { return this->ptr->operator[](id); }
+		inline Shader::ShaderParamManager operator[](const char *name) { return this->ptr->operator[](name); }
+		inline Shader::ShaderParamManager operator[](size_t id) { return this->ptr->operator[](id); }
 
 		ShaderRes() : IResource() {}
 		ShaderRes(Shader* ptr) : IResource(), ShaderRef_t(ptr) {}

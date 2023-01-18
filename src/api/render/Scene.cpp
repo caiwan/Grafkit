@@ -17,12 +17,9 @@ Grafkit::Scene::~Scene()
 
 void Grafkit::Scene::Render(Grafkit::Renderer & render)
 {
-	m_cureentViewMatrix.Identity();
+	m_currentWorldMatrix.Identity();
 	
 	// + kamerat + fenyket at kell tudni adni valahol meg
-
-	Matrix worldmatrix;
-	worldmatrix.Identity();
 
 	struct {
 		matrix worldMatrix;
@@ -33,11 +30,11 @@ void Grafkit::Scene::Render(Grafkit::Renderer & render)
 	CameraRef &camera = GetCamera();
 	camera->Calculate(render);
 
-	viewMatrices.worldMatrix = XMMatrixTranspose(worldmatrix.Get());
+	viewMatrices.worldMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
 	viewMatrices.viewMatrix = XMMatrixTranspose(camera->GetViewMatrix().Get());
 	viewMatrices.projectionMatrix = XMMatrixTranspose(camera->GetProjectionMatrix().Get());
 
-	// m_vertexShader["MatrixBuffer"] = &viewMatrices;
+	m_vertexShader["MatrixBuffer"] = &viewMatrices;
 
 	//ez itt elviekben jo kell, hogy legyen
 	m_vertexShader->Render(render);
@@ -78,10 +75,9 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 	if (maxdepth < 0) return;
 	if (!actor) return;
 
-	m_cureentViewMatrix.Multiply(actor->Matrix());
-
-	matrix viewMatrix = XMMatrixTranspose(m_cureentViewMatrix.Get());
-	m_vertexShader["MatrixBuffer"]["viewMatrix"] = viewMatrix;
+	m_currentWorldMatrix.Multiply(actor->Matrix());
+	matrix viewMatrix = XMMatrixTranspose(m_currentWorldMatrix.Get());
+	m_vertexShader["MatrixBuffer"]["worldMatrix"] = viewMatrix;
 
 	actor->Render(render, this);
 	push();
@@ -95,11 +91,11 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 
 void Grafkit::Scene::push()
 {
-	this->m_viewMatrixStack.push(m_cureentViewMatrix);
+	this->m_worldMatrixStack.push(m_currentWorldMatrix);
 }
 
 void Grafkit::Scene::pop()
 {
-	m_cureentViewMatrix = this->m_viewMatrixStack.top();
-	this->m_viewMatrixStack.pop();
+	m_currentWorldMatrix = this->m_worldMatrixStack.top();
+	this->m_worldMatrixStack.pop();
 }

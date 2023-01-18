@@ -55,7 +55,7 @@ namespace Grafkit {
 		LightRef GetLight(int n) { return dynamic_cast<BaseLight*>(this->m_pvLightNodes[n]->GetEntities()[0].Get()); }
 		size_t GetLightCount() { return this->m_pvLightNodes.size(); }
 
-		Grafkit::Matrix& GetWorldMatrix() { return this->m_cureentViewMatrix; }
+		Grafkit::Matrix& GetWorldMatrix() { return this->m_currentWorldMatrix; }
 
 		ShaderRef &GetVShader() { return this->m_vertexShader; }
 		ShaderRef &GetFShader() { return this->m_fragmentShader; }
@@ -86,8 +86,8 @@ namespace Grafkit {
 
 		Grafkit::Matrix m_cameraMatrix;
 
-		Grafkit::Matrix m_cureentViewMatrix;
-		std::stack<Grafkit::Matrix> m_viewMatrixStack; 
+		Grafkit::Matrix m_currentWorldMatrix;
+		std::stack<Grafkit::Matrix> m_worldMatrixStack; 
 
 	private:
 			
