@@ -11,6 +11,8 @@ A generator interface for assets
 #include "node.h"
 #include "guid.h"
 
+#include "assets.h"
+
 namespace FWassets{
 
 	class IRenderAsset;
@@ -61,7 +63,7 @@ namespace FWassets{
 		IRenderAssetManager();
 		virtual ~IRenderAssetManager();
 
-		// ... file access bullshit goez here 
+		virtual FWassets::IResourceFactory* GetResourceFactory() = 0;
 
 	protected:
 		void AddObject(IRenderAsset* obj);

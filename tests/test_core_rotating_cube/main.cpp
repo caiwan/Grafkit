@@ -19,10 +19,9 @@ using FWmath::Matrix;
 
 class Application : public FWcore::System, FWassets::IRenderAssetManager
 {  
-private: 
-
 public:
-		Application() : FWcore::System()
+	Application() : FWcore::System(),
+		m_file_loader(nullptr)
 		{
 			int screenWidth, screenHeight;
 
@@ -36,6 +35,7 @@ public:
 		~Application() {
 		}
 
+protected:
 		Renderer render;
 		CameraRef camera;
 		ModelRef model;
@@ -58,15 +58,18 @@ public:
 
 			result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
+			// init file loader
+			this->m_file_loader = new FWassets::FileResourceManager("./");
+
 			// -- camera
 			camera = new Camera;
 			camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 			// -- texture
 			TextureRef texture;
-			TextureGenFromBitmap txgen(L"Normap.jpg", this, render, texture);
+
+			TextureGenFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), this, render, texture);
 			txgen();
-			//texture->Initialize(render, L"Normap.jpg");
 
 			// -- model 
 			model = new Model;
@@ -86,8 +89,8 @@ public:
 			SimpleMeshGenerator generator(render, shader_vs);
 			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
 			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
+			
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
-
 
 			shader_fs->GetBResource("shaderTexture").SetTexture(texture);
 
@@ -98,9 +101,6 @@ public:
 		
 		void release() {
 			this->render.Shutdown();
-			
-			// delete this->shader_texture;
-
 		};
 
 		int mainloop() {
@@ -141,6 +141,10 @@ public:
 			return 0;
 		};
 	
+	private:
+		FWassets::FileResourceManager *m_file_loader;
+	public:
+		FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)

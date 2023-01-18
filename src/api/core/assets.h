@@ -26,7 +26,7 @@ namespace FWassets {
 	/// An interface for resource obtaining mechnaism
 	class IResourceFactory 
 	{
-	protected:
+	public:
 		IResourceFactory() {}
 		virtual ~IResourceFactory() {}
 
@@ -39,7 +39,7 @@ namespace FWassets {
 	// ==============================================================================
 
 	// loads resources from file
-	class FileResourceManager : IResourceFactory
+	class FileResourceManager : public IResourceFactory
 	{
 	public:
 		class FileResource;
@@ -58,13 +58,13 @@ namespace FWassets {
 		class FileResource : public IResource {
 			friend class FileResourceManager;
 		public:
-			FileResource();
+			FileResource(): m_size(0), m_data(nullptr){}
 			~FileResource();
-			virtual void* GetData();
-			virtual size_t GetSize();
+			virtual void* GetData() { return m_data; }
+			virtual size_t GetSize() { return m_size; }
 
 		protected:
-			FileResource(void* data, size_t size);
+			FileResource(void* data, size_t size): m_data(data), m_size(size) {}
 
 		private:
 			size_t m_size;

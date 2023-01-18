@@ -28,7 +28,7 @@ IResourceRef FWassets::FileResourceManager::GetResourceByName(std::string name)
 	FILE* fp = nullptr;
 
 	std::string fullname = m_root + name;
-	fopen_s(&fp, fullname.c_str(), "b");
+	fopen_s(&fp, fullname.c_str(), "rb");
 
 	if (!fp) {
 		throw EX_DETAILS(AssetLoadException, fullname.c_str());
@@ -52,28 +52,9 @@ IResourceRef FWassets::FileResourceManager::GetResourceByUUID(Guid uuid)
 
 // ==================================================================================== 
 
-FWassets::FileResourceManager::FileResource::FileResource() :
-	m_data(nullptr), m_size(0)
-{
-}
-
-FWassets::FileResourceManager::FileResource::~FileResource()
+inline FWassets::FileResourceManager::FileResource::~FileResource()
 {
 	//if (m_data)
 	free(m_data);
 }
 
-void * FWassets::FileResourceManager::FileResource::GetData()
-{
-	return m_data;
-}
-
-size_t FWassets::FileResourceManager::FileResource::GetSize()
-{
-	return m_size;
-}
-
-FWassets::FileResourceManager::FileResource::FileResource(void * data, size_t size) : 
-	m_data(data), m_size(size)
-{
-}
