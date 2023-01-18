@@ -53,10 +53,9 @@ namespace Idogep {
 
 		Grafkit::IResourceManager *GetResourceManager();
 
-		Document * const & GetDocument() const { return m_document; }
-		CommandStack * GetCommandStack() const { return m_commandStack; }
-
-		MusicProxy * GetMusicProxy() const { return m_musicProxy;  }
+		Document * GetDocument() { return m_document; }
+		CommandStack * GetCommandStack() { return m_commandStack; }
+		MusicProxy * GetMusicProxy() { return m_musicProxy; }
 		
 	private:
 		bool DirtyCheck();
