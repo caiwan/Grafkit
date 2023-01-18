@@ -14,7 +14,7 @@
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
-ActorAnimationLoader::ActorAnimationLoader(std::string name, std::string sourcename, std::string uuid, std::string targetUuid): IAnimationLoader(name, sourcename, uuid, targetUuid) {
+ActorAnimationLoader::ActorAnimationLoader(std::string name, std::string sourcename, std::string uuid, std::string targetUuid) : IAnimationLoader(name, sourcename, uuid, targetUuid) {
 }
 
 IResource* ActorAnimationLoader::NewResource() { return new ActorAnimationRes(); }
@@ -54,9 +54,22 @@ void ActorAnimationLoader::Load(IResourceManager* const& resman, IResource* sour
     }
 
     if (!animation)
-    THROW_EX_DETAILS(NullPointerException, "Could not load Animation");
+        THROW_EX_DETAILS(NullPointerException, "Could not load Animation");
 
-    LOGGER(Log::Logger().Debug("Animation loaded %d %s Ptr: %#x", m_name.c_str(), m_uuid.c_str(), animation.Get()));
+    LOGGER(Log::Logger().Debug("Animation loaded %s %s Ptr: %p", m_name.c_str(), m_uuid.c_str(), animation.Get()));
+    {
+        for (size_t i = 0; i < animation->GetTrackCount(); ++i)
+        {
+            Ref<Animation::Track> track = animation->GetTrack(i);
+            LOGGER(Log::Logger().Debug("- Track %s Ptr: %p", track->GetName().c_str(), track.Get()));
+
+            for (size_t j = 0; j < track->GetChannelCount(); ++j)
+            {
+                Ref<Animation::Channel> channel = track->GetChannel(j);
+                LOGGER(Log::Logger().Debug("-- Channel %s Ptr: %p", channel->GetName().c_str(), channel.Get()));
+            }
+        }
+    }
 
     dstAnimation->AssingnRef(animation);
 }

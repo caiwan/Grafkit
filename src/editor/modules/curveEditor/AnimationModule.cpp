@@ -63,16 +63,39 @@ void AnimationEditor::AnimationSelectedEvent(TreeItem* const item)
         return;
     }
 
-    AnimationWrapperRef animation = animationItem->GetAnimation();
+    AnimationWrapperRef animationWrapper = animationItem->GetAnimation();
 
-    if (!animation->GetAnimationListModel()) // TODO -> Animationwrapper maybe?
+    AnimationRef animation = animationWrapper->GetAnimation();
+    qDebug() << "Animation selected" << animation.Get();
+
+    // --- 
+    // TODO remove this later on
+#if 1
     {
-        AnimationTreeModel* newModel = new AnimationTreeModel(animation);
+        for (size_t k = 0; k < animation->GetTrackCount(); ++k)
+        {
+            Ref<Animation::Track> track = animation->GetTrack(k);
+            qDebug() << "- Track" << QString::fromStdString(track->GetName()) << "Ptr:" << track.Get();
+
+            for (size_t l = 0; l < track->GetChannelCount(); ++l)
+            {
+                Ref<Animation::Channel> channel = track->GetChannel(l);
+                qDebug() << "-- Channel" << QString::fromStdString(channel->GetName()) << "Ptr:" << channel.Get();
+
+            }
+        }
+    }
+#endif
+    // --- 
+
+    if (!animationWrapper->GetAnimationListModel()) // TODO -> Animationwrapper maybe?
+    {
+        AnimationTreeModel* newModel = new AnimationTreeModel(animationWrapper);
         newModel->BuildModel();
-        animation->SetAnimationListModel(newModel);
+        animationWrapper->SetAnimationListModel(newModel);
     }
 
-    m_animationListModel = animation->GetAnimationListModel();
+    m_animationListModel = animationWrapper->GetAnimationListModel();
     m_myView->UpdateAnimationModel(m_animationListModel);
 }
 

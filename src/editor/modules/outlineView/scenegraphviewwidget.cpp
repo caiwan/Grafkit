@@ -13,6 +13,11 @@ SceneGraphViewWidgetModel::SceneGraphViewWidgetModel() :
 {
 }
 
+SceneGraphViewWidgetModel::~SceneGraphViewWidgetModel() {
+}
+
+// ==============================================================================================================================
+
 SceneGraphViewWidget::SceneGraphViewWidget(QWidget* parent)
     : QDockWidget(parent)
     , OutlineView()

@@ -55,10 +55,9 @@ void Editor::InitializeDocument()
     assert(demo);
     try
     {
-        //demo->Preload(m_context);
         m_context->DoPrecalc();
 
-        // TODO: remove it later
+        // TODO: remove it later on 
 
         m_context->Intitialize();
 
@@ -66,8 +65,6 @@ void Editor::InitializeDocument()
 
         onDocumentChanged(demo);
         m_musicProxy->onMusicChanged();
-
-        //m_musicProxy->Play();
     }
     catch (FWdebug::Exception & ex)
     {
@@ -78,6 +75,8 @@ void Editor::InitializeDocument()
 
         // TODO: Rollback stuff here or some shit 
     }
+
+    m_commandStack->ClearStack();
 }
 
 bool Editor::RenderFrame()
@@ -119,8 +118,10 @@ void Editor::NewDocument()
     m_reloadRequested = true;
 }
 
-void Editor::SaveDocument() {
-
+void Editor::SaveDocument() 
+{
+    m_context->SaveCache();
+    m_context->SaveSchema();
 }
 
 void Editor::OpenDocument() {

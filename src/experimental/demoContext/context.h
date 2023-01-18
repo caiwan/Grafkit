@@ -22,8 +22,8 @@ namespace GkDemo
 
         void Intitialize();
 
-        Demo* GetDemo() const { return m_demo; }
-        void SetDemo(Demo* const demo) { m_demo = demo; }
+        Ref<Demo> GetDemo() const;
+        void SetDemo(const Ref<Demo> &demo);
 
         Grafkit::Renderer& GetDeviceContext() override { return m_render; }
         Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory; }
@@ -32,7 +32,7 @@ namespace GkDemo
     protected:
         Grafkit::Renderer& m_render;
         
-        Demo* m_demo;
+        Ref<Demo> m_demo;
 
         Grafkit::IAssetFactory* m_assetFactory;
 

@@ -39,7 +39,6 @@ Demo::~Demo() {
 
 void Demo::Initialize(Renderer& render)
 {
-
     for (size_t i = 0; i < GetSceneCount(); i++)
     {
         SceneResRef scene = GetScene(i);
@@ -47,6 +46,32 @@ void Demo::Initialize(Renderer& render)
         {
             (*scene)->Initialize();
             (*scene)->Build(render, m_vs, m_ps);
+
+            size_t animationCount = (*scene)->GetAnimationCount();
+            for (size_t j = 0; j< animationCount; j++)
+            {
+                AnimationRef animation = (*scene)->GetAnimation(j);
+                // -- snipity snapity
+#if 1
+                LOGGER(Log::Logger().Debug("Animation %d %s %p", j, animation->GetName().c_str(), animation.Get()));
+                // --- 
+                {
+                    for (size_t k = 0; k < animation->GetTrackCount(); ++k)
+                    {
+                        Ref<Animation::Track> track = animation->GetTrack(k);
+                        LOGGER(Log::Logger().Debug("- Track %s Ptr: %p", track->GetName().c_str(), track.Get()));
+
+                        for (size_t l = 0; l < track->GetChannelCount(); ++l)
+                        {
+                            Ref<Animation::Channel> channel = track->GetChannel(l);
+                            LOGGER(Log::Logger().Debug("-- Channel %s Ptr: %p", channel->GetName().c_str(), channel.Get()));
+                        }
+                    }
+                }
+                // --- 
+#endif
+            // -- snipity snapity
+            }
         }
     }
 }
@@ -77,7 +102,6 @@ int Demo::Render(Renderer& render, float time)
     // ---
     return 0;
 }
-
 
 ShaderResRef Demo::GetPs() const { return m_ps; }
 void Demo::SetPs(const ShaderResRef& resource) { m_ps = resource; }

@@ -8,7 +8,7 @@ using namespace Grafkit;
 
 // ========================================================================================================
 
-AnimationChannelItem::AnimationChannelItem(const QList<QVariant>& data, TreeItem* parentItem, const Grafkit::Animation::TrackRef& track, size_t trackId, const Grafkit::Animation::ChannelRef& channel): TreeItem(data, parentItem)
+AnimationChannelItem::AnimationChannelItem(const QList<QVariant>& data, TreeItem* parentItem, const Animation::TrackRef& track, size_t trackId, const Grafkit::Animation::ChannelRef& channel): TreeItem(data, parentItem)
     , m_track(track)
     , m_trackId(trackId)
     , m_channel(channel) {

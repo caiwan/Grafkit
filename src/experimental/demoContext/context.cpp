@@ -46,7 +46,7 @@ void Context::Relocate(std::string path)
 {
     if (!m_demo)
         return;
- 
+
     LOGGER(Log::Logger().Info("Relocate context path %s", path.c_str()));
 
     m_assetFactory->SetBasePath(path);
@@ -54,14 +54,13 @@ void Context::Relocate(std::string path)
     m_demo = nullptr;
     this->ClearLoadStack();
     this->RemoveAll();
-
-    // LOGGER(Log::Logger().Info("Relocate context path %s", path.c_str()));
 }
 
 void Context::SaveSchema() {
 }
 
-void Context::LoadScema() {
+void Context::LoadScema()
+{
     m_builder.LoadFromAsset(m_assetFactory->Get("/schema.json"), this);
     m_demo = m_builder.GetDemo();
     assert(m_demo);
@@ -69,13 +68,19 @@ void Context::LoadScema() {
 
 void Context::Intitialize()
 {
-    IResourceManager *const & resman = this;
-    m_builder.Initialize(resman); m_demo->Initialize(m_render);
+    LOGGER(Log::Logger().Debug("Demo ptr: %p", m_demo.Get()));
+    IResourceManager*const & resman = this;
+    m_builder.Initialize(resman);
+    m_demo->Initialize(m_render);
 }
+
+Ref<Demo> Context::GetDemo() const { return m_demo; }
+
+void Context::SetDemo(const Ref<Demo>& demo) { m_demo = demo; }
 
 void Context::CreateTestStuff()
 {
-    Demo* demo = new Demo();
+    Ref<Demo> demo = new Demo();
 
     ShaderResRef vs = Load<ShaderRes>(new VertexShaderLoader("vertexShader", "shaders/vertex.hlsl", ""));
     ShaderResRef ps = Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/flat.hlsl", ""));

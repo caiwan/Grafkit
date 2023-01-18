@@ -1,6 +1,8 @@
+#include "outlineTreeModel.h"
+#include <QDebug>
+
 #include "outlineModule.h"
 
-#include "outlineTreeModel.h"
 #include "experimental/scene.h"
 #include "demo.h"
 //#include "render/SceneGraph.h"
@@ -41,6 +43,10 @@ void OutlineModule::DocumentChangedEvent(const DemoRef& demo) {
 
     auto newModel = new SceneGraphViewWidgetModel();
 
+
+    //qDebug() << "Demo ptr:" << demo.Get();
+
+
     // build stuff
     DemoModel*const newModelBuilder = new DemoModel(demo);
 
@@ -48,7 +54,11 @@ void OutlineModule::DocumentChangedEvent(const DemoRef& demo) {
     newModel->SetModel(newModelBuilder);
 
     // replace shit 
-    delete m_myModel;
+    if (m_myModel)
+    {
+        delete m_myModel->GetModel();
+        delete m_myModel;
+    }
     m_myModel = newModel;
 
     // push
