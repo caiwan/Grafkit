@@ -34,7 +34,7 @@ namespace Grafkit {
 		~MaterialBase() {}
 
 		/// @todo ez nem ilyen lesz a jovoben
-		operator Material_t& () { return this->m_mater; }
+		operator Material_t& () { return this->m_material; }
 
 		/**
 		@todo three.js szerint:
@@ -49,12 +49,12 @@ namespace Grafkit {
 		*/
 
 		/// @todo valahogy ide valamilyen kulcs-ertek parok formajaban kellene a cbuffer cuccait betolni. 
-		float4 &GetAmbient() { return m_mater.ambient; }
-		float4 &GetDiffuse() { return m_mater.diffuse; }
-		float4 &GetSpecular() { return m_mater.specular; }
-		float4 &GetEmission() { return m_mater.emission; }
-		float &GetSpecularLevel() { return m_mater.specularLevel; }
-		float &GetShininess() { return m_mater.shininess; }
+		float4 &GetAmbient() { return m_material.ambient; }
+		float4 &GetDiffuse() { return m_material.diffuse; }
+		float4 &GetSpecular() { return m_material.specular; }
+		float4 &GetEmission() { return m_material.emission; }
+		float &GetSpecularLevel() { return m_material.specularLevel; }
+		float &GetShininess() { return m_material.shininess; }
 
 		TextureResRef GetTexture(std::string bindName /*texture_type_e bucket, int n = 0*/);
 
@@ -67,7 +67,7 @@ namespace Grafkit {
 		virtual const char* GetBucketID() { return MATERIAL_BUCKET; }
 
 	protected:
-		struct Material_t m_mater;
+		struct Material_t m_material;
 
 		typedef std::map<std::string, TextureResRef> textureMap_t;
 		typedef textureMap_t::iterator textureMap_it_t;

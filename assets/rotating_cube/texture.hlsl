@@ -7,7 +7,7 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
-Texture2D texture_diffuse;
+Texture2D diffuse;
 SamplerState SampleType;
 
 // TYPEDEFS //
@@ -51,7 +51,7 @@ PixelInputType TextureVertexShader(VertexInputType input)
 float4 TexturePixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 textureColor = float4(0,0,0,1);
-	textureColor = texture_diffuse.Sample(SampleType, input.tex);
+	textureColor = diffuse.Sample(SampleType, input.tex);
 	//textureColor.x = 0;
 	//textureColor.w = 1;
 	return textureColor;

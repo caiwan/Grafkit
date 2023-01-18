@@ -28,7 +28,10 @@ namespace Grafkit{
 		/// @todo ez csak egy QnD Hack, ki kell majd javitani a jovoben
 		float4 &GetPosition() { return m_light.position; }
 		float4 &GetDirection() { return m_light.direction; }
-			   			   
+
+		float4 &GetBasePosition() { return m_position; }
+		float4 &GetBaseDirection() { return m_direction; }
+
 		float4 &GetAmbient() { return m_light.ambient; }
 		float4 &GetDiffuse() { return m_light.diffuse; }
 		float4 &GetSpecular() { return m_light.specular; }
@@ -69,6 +72,10 @@ namespace Grafkit{
 		};
 
 		struct light_t m_light;
+
+		// ez amit tarolunk a ndoeban
+		float4 m_position;
+		float4 m_direction;
 
 	};
 

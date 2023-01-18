@@ -476,7 +476,7 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IResourceManager * const &assman
 	m_scenegraph->SetRootNode(s.actor_node);
 
 #else // fallback: recursive fill 
-	Actor* root_node = new Actor;
+	ActorRef root_node = new Actor;
 	// assimp_parseScenegraph(asset_repo, scene->mRootNode, &root_node);
 	m_scenegraph->SetRootNode(root_node);
 

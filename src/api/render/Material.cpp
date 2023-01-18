@@ -114,5 +114,9 @@ void Grafkit::MaterialBase::RemoveTexture(TextureResRef texture, std::string bin
 
 void Grafkit::MaterialBase::Render(ID3D11DeviceContext * deviceContext, ShaderRef &shader)
 {
-	// setup cbufferrs + binded resources
+	shader["material"].Set(&m_material);
+
+	for (textureMap_it_t it = this->m_textures.begin(); it != this->m_textures.end(); it++) {
+		shader->GetBResource(it->first.c_str()).SetTexture(it->second);
+	}
 }

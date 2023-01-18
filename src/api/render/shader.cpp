@@ -592,6 +592,11 @@ inline void * Shader::ConstantBufferRecord::GetMappedPtr()
 
 void Shader::ConstantBufferRecord::Set(void * data)
 {
+	if (!this->m_pDC) {
+		LOG(TRACE) << "No buffer was created"; //<< this->m_description.Name;
+		return;
+	}
+
 	this->Map();
 	memcpy(this->GetMappedPtr(), data, this->m_description.Size);
 	this->Unmap();
@@ -601,7 +606,7 @@ void Shader::ConstantBufferRecord::Set(void * data)
 void Shader::ConstantBufferRecord::Set(void * pData, size_t offset, size_t width)
 {
 	if (!m_buffer) {
-		LOG(TRACE) << "No buffer was created";
+		LOG(TRACE) << "No buffer was created"; // << this->m_description.Name;
 		return;
 	}
 

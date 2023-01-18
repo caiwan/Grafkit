@@ -47,12 +47,13 @@ namespace Grafkit {
 
 		// --- 
 
-		CameraRef& GetCamera() { return this->m_rCamera; }
+		CameraRef GetCamera() { return dynamic_cast<Camera*>(this->m_pCameraNode->GetEntities()[0].Get()); }
 
-		void SetCameraNode(ActorRef &camera) { m_pCameraNode = camera; }
-		void AddLightNode(ActorRef &light) { m_pvLightNodes.push_back(light); }
+		void SetCameraNode(ActorRef &camera);
+		void AddLightNode(ActorRef &light);
 
-		std::vector<LightRef>& GetLights() { return this->m_rvLights; }
+		LightRef GetLight(int n) { return dynamic_cast<BaseLight*>(this->m_pvLightNodes[n]->GetEntities()[0].Get()); }
+		size_t GetLightCount() { return this->m_pvLightNodes.size(); }
 
 		Grafkit::Matrix& GetWorldMatrix() { return this->m_cureentViewMatrix; }
 
@@ -71,8 +72,8 @@ namespace Grafkit {
 		ActorRef m_pCameraNode;
 		std::vector<ActorRef> m_pvLightNodes;
 		
-		std::vector<LightRef> m_rvLights;
-		CameraRef m_rCamera;
+		// std::vector<LightRef> m_rvLights;
+		// CameraRef m_rCamera;
 
 		//shader_pair_t m_shader;
 		ShaderRef m_vertexShader;
@@ -82,6 +83,8 @@ namespace Grafkit {
 		void RenderNode(Grafkit::Renderer & render, Actor* actor, int maxdepth = TREE_MAXDEPTH);
 		void push();
 		void pop();
+
+		Grafkit::Matrix m_cameraMatrix;
 
 		Grafkit::Matrix m_cureentViewMatrix;
 		std::stack<Grafkit::Matrix> m_viewMatrixStack; 

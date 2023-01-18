@@ -16,7 +16,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\data\texture.hlsl">
+    <None Include="..\..\assets\rotating_cube\texture.hlsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

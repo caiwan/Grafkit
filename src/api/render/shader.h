@@ -81,12 +81,12 @@ namespace Grafkit {
 			InputElementRecord() {}
 		};
 
-		ConstantBufferRecord &operator[] (const char* name);
+		ConstantBufferRecord &operator[] (const char* name);	///@todo std::stringre is!
 		ConstantBufferRecord &operator[] (size_t id);
 		size_t GetConstantBufferCount() { return this->m_vBuffers.size(); }
 
 		size_t GetBResourceCount() { return this->m_vBResources.size(); }
-		BoundResourceRecord & GetBResource(const char*const name);
+		BoundResourceRecord & GetBResource(const char*const name);		///@todo std::stringre is!
 		BoundResourceRecord & GetBResource(size_t id);
 
 		size_t GetILayoutElemCount() { return this->m_mapInputElems.size(); }
