@@ -50,8 +50,8 @@ IAssetFactory::filelist_t listdir(std::string root, IAssetFactory::filelist_t &d
 	DIR *dir;
 	struct dirent *ent;
 	std::string path = root + droot;
-	if ((dir = opendir(path.c_str())) != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
+	if ((dir = opendir(path.c_str())) != nullptr) {
+		while ((ent = readdir(dir)) != nullptr) {
 			// skip root and parent
 			if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
 				continue;
@@ -86,30 +86,24 @@ namespace LiveReload {
 	*/
 
 	class WatchDirectory : public IFileEventWatch, public Thread {
-	private:
-		HANDLE m_hDir;
-		CHAR m_lpszDirName[MAX_PATH];
-		CHAR m_lpBuffer[MAX_BUFFER];
-		DWORD m_dwBufLength;
-		OVERLAPPED Overlapped;
-
 	public:
 
-		WatchDirectory(LPCSTR path) : Thread()
-		{
-			m_hDir = CreateFile(path, GENERIC_READ | FILE_LIST_DIRECTORY,
-				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-				NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
-				NULL);
+	    explicit WatchDirectory(LPCSTR path) : Thread()
+	        , m_dwBufLength(0)
+	    {
+	        m_hDir = CreateFile(path, GENERIC_READ | FILE_LIST_DIRECTORY,
+	            FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+	            nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+	            nullptr);
 
-			if (m_hDir == INVALID_HANDLE_VALUE)
-			{
-				return; //cannot open folder
-			}
-			lstrcpy(m_lpszDirName, path);
+	        if (m_hDir == INVALID_HANDLE_VALUE)
+	        {
+	            return; //cannot open folder
+	        }
+	        lstrcpy(m_lpszDirName, path);
 
-			LOGGER(Log::Logger().Info("Creating watcher for directory: %s", path));
-		}
+	        LOGGER(Log::Logger().Info("Creating watcher for directory: %s", path));
+	    }
 
 		~WatchDirectory() {
 			if (m_hDir)
@@ -118,7 +112,7 @@ namespace LiveReload {
 
 		void PushFile(std::string infn) {
 			MutexLocker locker(&m_queueMutex);
-			std::replace(infn.begin(), infn.end(), '\\', '/');
+			replace(infn.begin(), infn.end(), '\\', '/');
 			m_fileReloadList.push_back(infn);
 		}
 
@@ -140,9 +134,8 @@ namespace LiveReload {
 			OVERLAPPED PollingOverlap;
 
 			FILE_NOTIFY_INFORMATION* pNotify = nullptr;
-			int offset;
-			PollingOverlap.OffsetHigh = 0;
-			PollingOverlap.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		    PollingOverlap.OffsetHigh = 0;
+			PollingOverlap.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 			while (result)
 			{
 				ZeroMemory(buf, 8192);
@@ -160,21 +153,21 @@ namespace LiveReload {
 					0,
 					&nRet,// number of bytes returned
 					&PollingOverlap,// pointer to structure needed for overlapped I/O
-					NULL);
+					nullptr);
 
 				WaitForSingleObject(PollingOverlap.hEvent, INFINITE);
 
-				offset = 0;
+				int offset = 0;
 				int rename = 0;
 				char oldName[260];
 				char newName[260];
 
 				do
 				{
-					pNotify = (FILE_NOTIFY_INFORMATION*)((char*)buf + offset);
+					pNotify = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(static_cast<char*>(buf) + offset);
 
 					filename[0] = 0;
-					int filenamelen = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName, pNotify->FileNameLength / 2, filename, sizeof(filename), NULL, NULL);
+					int filenamelen = WideCharToMultiByte(CP_ACP, 0, pNotify->FileName, pNotify->FileNameLength / 2, filename, sizeof(filename), nullptr, nullptr);
 					filename[pNotify->FileNameLength / 2] = 0;
 					switch (pNotify->Action)
 					{
@@ -211,30 +204,31 @@ namespace LiveReload {
 
 		}
 
+        private:
+            HANDLE m_hDir;
+            CHAR m_lpszDirName[MAX_PATH];
+            CHAR m_lpBuffer[MAX_BUFFER];
+            DWORD m_dwBufLength;
+            OVERLAPPED Overlapped;
+
 	};
-
-
 }
 
 #endif /*LIVE_RELEASE*/
 
-FileAssetFactory::FileAssetFactory(std::string root) : m_root(root), m_eventWatcher(nullptr)
-{
-	listdir(root, m_dirlist);
-
-	/* Livereload */
-#ifndef LIVE_RELEASE
-	m_eventWatcher = new LiveReload::WatchDirectory(root.c_str());
-	((LiveReload::WatchDirectory*)m_eventWatcher)->Start();
-#endif
+FileAssetFactory::FileAssetFactory(std::string root) : m_root(), m_eventWatcher(nullptr)
+{ FileAssetFactory::SetBasePath(root);
 }
 
 
 FileAssetFactory::~FileAssetFactory()
 {
 #ifndef LIVE_RELEASE
-	((LiveReload::WatchDirectory*)m_eventWatcher)->Stop();
-	if (m_eventWatcher) delete m_eventWatcher;
+    if (m_eventWatcher)
+    {
+        static_cast<LiveReload::WatchDirectory*>(m_eventWatcher)->Stop();
+        delete m_eventWatcher;
+    }
 #endif
 }
 
@@ -262,13 +256,13 @@ IAssetRef FileAssetFactory::Get(std::string name)
 	return IAssetRef(new FileAsset(data, size));
 }
 
-Grafkit::IAssetFactory::filelist_t FileAssetFactory::GetAssetList()
+IAssetFactory::filelist_t FileAssetFactory::GetAssetList()
 {
 	return this->m_dirlist;
 }
 
 
-Grafkit::IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter * filter)
+IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilter * filter)
 {
 	filelist_t filelist;
 	for (filelist_t::iterator it = m_dirlist.begin(); it != m_dirlist.end(); it++)
@@ -280,12 +274,12 @@ Grafkit::IAssetFactory::filelist_t FileAssetFactory::GetAssetList(AssetFileFilte
 	return filelist;
 }
 
-bool Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
+bool FileAssetFactory::PollEvents(IResourceManager *resman)
 {
 #ifndef LIVE_RELEASE
 	static unsigned char count;
 	if (count == 0) {
-		LiveReload::WatchDirectory* w = ((LiveReload::WatchDirectory*)m_eventWatcher);
+		LiveReload::WatchDirectory* w = static_cast<LiveReload::WatchDirectory*>(m_eventWatcher);
 		bool triggered = false;
 		if (w && w->HasItems()) {
 			do {
@@ -300,6 +294,33 @@ bool Grafkit::FileAssetFactory::PollEvents(IResourceManager *resman)
 	return false;
 #else
 	return false;
+#endif
+}
+
+void FileAssetFactory::SetBasePath(const std::string& root)
+{
+    assert(!root.empty());
+
+    #ifndef LIVE_RELEASE
+    if (m_eventWatcher)
+    {
+        
+    static_cast<LiveReload::WatchDirectory*>(m_eventWatcher)->Stop();
+     delete m_eventWatcher;
+    }
+#endif
+
+    m_root = root + "/";
+
+    // TODO: sanitize double slash?
+
+    m_dirlist.clear();
+    listdir(root, m_dirlist);
+
+    /* Livereload */
+#ifndef LIVE_RELEASE
+    m_eventWatcher = new LiveReload::WatchDirectory(root.c_str());
+    static_cast<LiveReload::WatchDirectory*>(m_eventWatcher)->Start();
 #endif
 }
 

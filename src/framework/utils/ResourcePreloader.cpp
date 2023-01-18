@@ -56,7 +56,7 @@ void Grafkit::ResourcePreloader::LoadCache()
 			{
 
 				std::string filename = *it, name, path, ext;
-				AssetFileFilter::trimpath(filename, path, name, ext);
+				AssetFileFilter::TrimPath(filename, path, name, ext);
 
 				int type = preloadFilters[i].type;
 

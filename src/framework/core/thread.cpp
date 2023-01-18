@@ -9,14 +9,14 @@ Thread::Thread(Runnable *r) : m_pRunnable(r) {
 	if(!m_pRunnable)
 		THROW_EX_DETAILS(ThreadException, "Runnable *r failed ");
 	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
-	this->m_hThread = CreateThread(nullptr, 0, Thread::startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
+	this->m_hThread = CreateThread(nullptr, 0, startThreadRunnable, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	if(!m_hThread)
 		THROW_EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
 
 Thread::Thread() : m_pRunnable(nullptr) {
 	//m_hThread = (HANDLE)_beginthreadex(nullptr,0,Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &m_wThreadID);
-	this->m_hThread = CreateThread(nullptr, 0, Thread::startThread, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
+	this->m_hThread = CreateThread(nullptr, 0, startThread, (LPVOID)this, CREATE_SUSPENDED, &this->m_wThreadID);
 	if(!m_hThread)
 		THROW_EX_DETAILS(ThreadException, "_beginthreadex failed");
 }
@@ -86,21 +86,21 @@ int Thread::GetCPUCount(){
 
 Mutex::Mutex() : m_isLocked(0)
 {
-	m_hMutex = CreateMutex(nullptr, FALSE, nullptr);
+	m_hMutex = CreateMutex(nullptr, true, nullptr);
 }
 
-Grafkit::Mutex::~Mutex()
+Mutex::~Mutex()
 {
 	if (m_hMutex)
 		CloseHandle(m_hMutex);
 }
 
-void Grafkit::Mutex::Lock() {
+void Mutex::Lock() {
 	WaitForSingleObject(m_hMutex, INFINITE);
 	m_isLocked++;
 }
 
-void Grafkit::Mutex::Unlock() {
+void Mutex::Unlock() {
 	m_isLocked--;
 	ReleaseMutex(m_hMutex);
 }

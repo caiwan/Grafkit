@@ -10,6 +10,7 @@
 #include "context.h"
 
 #include "proxies/MusicProxy.h"
+#include "schema.h"
 
 using namespace Idogep;
 using namespace GkDemo;
@@ -21,7 +22,8 @@ Editor::Editor(Renderer& render, Context* const& context)
     , m_precalcRequested(false)
     , m_reloadRequested(false)
     , m_isDirty(false)
-    , m_demo(nullptr)
+    , m_tmpInitTestStuff(false)
+    //, m_demo(nullptr)
     , m_context(context)
 {
     m_commandStack = new CommandStack();
@@ -42,40 +44,46 @@ void Editor::Initialize(IResourceManager* const& resman)
     m_myView->onUndo += Delegate(m_commandStack, &CommandStack::Undo);
     m_myView->onRedo += Delegate(m_commandStack, &CommandStack::Redo);
 
-    NewDocument(); // Emit, or put the end of the event queue somehow?
+    //m_myView->onNew += Delegate(m_commandStack, &CommandStack::Redo);
+    m_myView->onLoad += Delegate(this, &Editor::OpenDocument);
+    m_myView->onSave += Delegate(this, &Editor::SaveDocument);
 }
 
 void Editor::InitializeDocument()
 {
+    Demo* demo = m_context->GetDemo();
+    assert(demo);
     try
     {
-        m_demo->Preload(m_context);
+        //demo->Preload(m_context);
         m_context->DoPrecalc();
 
-        m_demo->Initialize(m_render);
+        // TODO: remove it later
 
-        m_musicProxy->m_music = m_demo->GetMusic();
+        m_context->Intitialize();
 
-        onDocumentChanged(m_demo);
+        m_musicProxy->m_music = demo->GetMusic();
+
+        onDocumentChanged(demo);
         m_musicProxy->onMusicChanged();
 
-    //m_musicProxy->Play();
+        //m_musicProxy->Play();
     }
-    catch (FWdebug::Exception* ex)
+    catch (FWdebug::Exception & ex)
     {
-        MessageBoxA(nullptr, ex->what(), "Exception", 0);
+        MessageBoxA(nullptr, ex.what(), "Exception", 0);
 
-        delete m_demo;
-        m_demo = nullptr;
+        delete demo;
+        m_context->SetDemo(nullptr);
 
-        delete ex;
-
-    // TODO: Rollback stuff here
+        // TODO: Rollback stuff here or some shit 
     }
 }
 
 bool Editor::RenderFrame()
 {
+    Demo* demo = m_context->GetDemo();
+
     if (m_reloadRequested)
     {
         m_reloadRequested = false;
@@ -92,8 +100,8 @@ bool Editor::RenderFrame()
 
     float time = m_musicProxy->GetTime();
 
-    if (m_demo)
-        m_demo->Render(m_render, time);
+    if (demo)
+        demo->Render(m_render, time);
 
     if (m_musicProxy->IsPlaying())
         onDemoTimeChanged(time);
@@ -104,25 +112,36 @@ bool Editor::RenderFrame()
 void Editor::NewDocument()
 {
     // check shit here
-
-    m_demo = new Demo();
+    m_context->CreateTestStuff();
     m_reloadRequested = true;
-
 }
 
-// ReSharper disable CppMemberFunctionMayBeStatic
-// ReSharper disable CppMemberFunctionMayBeConst
 void Editor::SaveDocument() {
+
 }
 
-void Editor::OpenDocument(std::string filename) {
+void Editor::OpenDocument() {
+    assert(m_myView);
+    if (m_isDirty)
+    {
+        // Todo: confirm save dialog
+    }
+    std::string path;
+    if (m_myView->OpenFolder(path))
+    {
+        try
+        {
+            m_context->Relocate(path);
+            m_context->LoadScema();
+            m_reloadRequested = true;
+        }
+        catch (FWdebug::Exception & ex)
+        {
+            MessageBoxA(nullptr, ex.what(), "Exception", 0);
+        }
+    }
 }
-
-// ReSharper restore CppMemberFunctionMayBeConst
 
 bool Editor::DirtyCheck() const { return false; }
-// ReSharper restore CppMemberFunctionMayBeStatic
 
 IResourceManager* Editor::GetResourceManager() const { return m_context; }
-
-//IResourceManager* Editor::GetApplicationResourceManager() const { return m_resourceManager; }

@@ -28,7 +28,7 @@ namespace Grafkit {
 
 	class Logger
 	{
-		friend class Grafkit::Log;
+		friend class Log;
 
 	public:
 
@@ -82,7 +82,7 @@ namespace Grafkit {
 	private:
 		std::set<ILoggerHandler*> m_loggers;
 		char * m_buffer;
-		Grafkit::Mutex *m_mutex;
+		Mutex *m_mutex;
 
 		bool m_hideMessage[_LOG_COUNT];
 	};
@@ -114,7 +114,7 @@ namespace Grafkit {
 			FileLoggerHandler(const char* filename = nullptr, const char* errfile = nullptr);
 			~FileLoggerHandler();
 		protected:
-		    void Write(Grafkit::Logger::message_t * const & message) override;
+		    void Write(Logger::message_t * const & message) override;
 		private:
 			FILE* m_stdout;
 			FILE* m_stderr;
@@ -127,7 +127,7 @@ namespace Grafkit {
 			ConsoleLogger();
 			~ConsoleLogger();
 		protected:
-		    void Write(Grafkit::Logger::message_t * const & message) override;
+		    void Write(Logger::message_t * const & message) override;
 
 		private:
 			FILE* m_stdout;
@@ -143,7 +143,7 @@ namespace Grafkit {
 			MsvcOutLogger();
 			~MsvcOutLogger();
 		protected:
-		    void Write(Grafkit::Logger::message_t * const & message) override;
+		    void Write(Logger::message_t * const & message) override;
 		};
 
 	};

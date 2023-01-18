@@ -31,11 +31,13 @@ namespace Idogep {
 			ManageFileOperationsRole() = default;
 		    virtual ~ManageFileOperationsRole() = default;
 
-			Event<> onOpen;
+			Event<> onLoad;
 			Event<> onSave;
 			Event<> onNew;
 
 			// dirty check maybe?
+
+            virtual bool OpenFolder(std::string & outFilename) = 0;
 		};
 	}
 
@@ -47,7 +49,7 @@ namespace Idogep {
 	    explicit EditorView();
 		virtual ~EditorView() = default;
 
-        // ... 
+	    // ... 
 
 	};
 }

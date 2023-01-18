@@ -69,7 +69,8 @@ void IResourceManager::RemoveByName(const std::string& pName)
     }
 }
 
-void IResourceManager::RemoveByUuid(const std::string& uuid) {
+void IResourceManager::RemoveByUuid(const std::string& uuid)
+{
     auto it = m_uuidMap.find(uuid);
     if (it != m_uuidMap.end())
     {
@@ -84,7 +85,11 @@ void IResourceManager::RemoveByUuid(const std::string& uuid) {
     }
 }
 
-void IResourceManager::RemoveAll() { m_nameMap.clear(); }
+void IResourceManager::RemoveAll()
+{
+    m_uuidMap.clear();
+    m_nameMap.clear();
+}
 
 // STL components p115
 struct get_second : std::unary_function<std::map<std::string, Ref<IResource>>::value_type, Ref<IResource>>

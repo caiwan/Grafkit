@@ -34,21 +34,27 @@ using namespace GrafkitData;
 Demo::Demo(): m_activeSceneId(0) {
 }
 
-Demo::~Demo() {
+Demo::~Demo() { //(*m_music)->Stop();
 }
 
 void Demo::Preload(IResourceManager* const& resman)
 {
-    m_vs = resman->Load<ShaderRes>(new VertexShaderLoader("vertexShader", "shaders/vertex.hlsl", ""));
-    m_ps = resman->Load<ShaderRes>(new PixelShaderLoader("pixelShader", "shaders/flat.hlsl", ""));
-
-    m_music = resman->Load<MusicRes>(new MusicBassLoader("music/alpha_c_-_euh.ogg"));
+    assert(0);
 }
 
 void Demo::Initialize(Renderer& render)
 {
     AddAnimation(new DemoAnimation());
-    InitTestStuff(render);
+
+    for (size_t i = 0; i < GetSceneCount(); i++)
+    {
+        SceneResRef scene = GetScene(i);
+        if (scene && *scene)
+        {
+            (*scene)->Initialize();
+            (*scene)->Build(render, m_vs, m_ps);
+        }
+    }
 
     for (size_t i = 0; i < GetAnimationCount(); ++i)
     {
@@ -57,13 +63,9 @@ void Demo::Initialize(Renderer& render)
     }
 }
 
-SceneResRef Demo::GetActiveScene() const {
-    return m_scenes.at(m_activeSceneId);
-}
+SceneResRef Demo::GetActiveScene() const { return m_scenes.at(m_activeSceneId); }
 
-int Demo::PreRender(Renderer& render, float time) const {
-    return 0;
-}
+int Demo::PreRender(Renderer& render, float time) const { return 0; }
 
 
 int Demo::Render(Renderer& render, float time) const
@@ -71,13 +73,10 @@ int Demo::Render(Renderer& render, float time) const
     // --- 
     render.BeginScene();
 
-    float &t = time;
+    float& t = time;
 
     SceneResRef scene = GetActiveScene();
-    if (scene)
-    {
-        (*scene)->RenderFrame(render, t);
-    }
+    if (scene) { (*scene)->RenderFrame(render, t); }
 
     render.EndScene();
 
@@ -86,119 +85,27 @@ int Demo::Render(Renderer& render, float time) const
 }
 
 ShaderResRef Demo::GetPs() const { return m_ps; }
-
 void Demo::SetPs(const ShaderResRef& resource) { m_ps = resource; }
+ShaderResRef Demo::GetVs() const { return m_vs; }
+void Demo::SetVs(const ShaderResRef& resource) { m_vs = resource; }
 
 MusicResRef Demo::GetMusic() const { return m_music; }
 
-void Demo::AddScene(uint32_t id, const SceneResRef& ref) {
-    if (id >= m_scenes.size())
-    {
-        fill_n(back_inserter(m_scenes), id - m_scenes.size() + 1, nullptr);
-    }
+void Demo::SetMusic(const MusicResRef& resource) { m_music = resource; }
+
+void Demo::AddScene(uint32_t id, const SceneResRef& ref)
+{
+    if (id >= m_scenes.size()) { fill_n(back_inserter(m_scenes), id - m_scenes.size() + 1, nullptr); }
 
     m_scenes[id] = ref;
 }
 
 // This thing serves testing purposes for the editor.
-void Demo::InitTestStuff(Renderer& render) {
-    // -- model 
-    ModelRef model = new Model(new Mesh());
-    model->SetMaterial(new Material());
-    //model->GetMaterial()->AddTexture(texture, Material::TT_diffuse);
-    model->GetMaterial()->SetName("GridMaterial");
-
-    // -- camera
-    CameraRef camera = new Camera();
-    camera->SetName("Camera");
-
-    ActorRef cameraActor = new Actor(camera);
-    cameraActor->SetName("CameraActor");
-
-    // Add animation here
-
-    model->SetName("cube");
-    model->GetMesh()->AddPointer("POSITION", cubeVertexSize, cubeVertices);
-    model->GetMesh()->AddPointer("TEXCOORD", cubeVertexSize, cubeTextureUVs);
-    model->GetMesh()->AddPointer("NORMAL", cubeVertexSize, cubeNormals);
-    model->GetMesh()->SetIndices(cubeVertexCount, cubeIndicesCount, cubeIndices);
-
-    // -- actors
-
-    ActorRef cubeActor = new Actor(model);
-    cubeActor->SetName("CubeActor");
-
-    ActorRef rootActor = new Actor();
-    rootActor->SetName("RootActor");
-
-
-    rootActor->AddChild(cameraActor);
-    rootActor->AddChild(cubeActor);
-
-    // -- scenegraph
-    SceneGraphRef sceneGraph = new SceneGraph();
-    sceneGraph->SetName("Scene");
-    sceneGraph->SetRootNode(rootActor);
-
-    // -- scene 
-    SceneResRef scene = new SceneRes(new Scene());
-    (*scene)->SetSceneGraph(sceneGraph);
-    (*scene)->AddAnimation(new ActorAnimation(rootActor));
-    (*scene)->AddAnimation(new ActorAnimation(cubeActor));
-
-    AnimationRef cameraAnimation = new ActorAnimation(cameraActor);
-    (*scene)->AddAnimation(cameraAnimation);
-
-    for (size_t i = 0; i < (*scene)->GetAnimationCount(); ++i)
-    {
-        AnimationRef animation = (*scene)->GetAnimation(i);
-        animation->Initialize();
-    }
-
-    cameraAnimation->GetTrack(0)->SetFloat3(0, float3(0,0,10));
-
-#if 0
-    for (size_t i = 0; i < (*m_scene)->GetAnimationCount(); ++i)
-    {
-        AnimationRef animation = (*m_scene)->GetAnimation(i);
-
-        for (size_t j = 0; j < animation->GetTrackCount(); ++j)
-        {
-            Ref<Animation::Track> track = animation->GetTrack(j);
-
-            for (size_t k = 0; k < track->GetChannelCount(); ++k)
-            {
-                Ref<Animation::Channel> channel = track->GetChannel(k);
-                for (size_t l = 0; l < 256; ++l)
-                {
-                    const float v = 2 * static_cast<float>(rand()) / static_cast<float>(RAND_MAX) - 1;
-                    const float t = 1. + l;
-
-                    Animation::Key key(t, v);
-                    key.m_type = Animation::KI_hermite;
-                    //key.m_type = static_cast<Animation::KeyInterpolation_e>(l % Animation::KI_COUNT);
-                    channel->AddKey(key);
-
-                    //Animation::Key key2(t + .5, 0.);
-                    //key2.m_type = Animation::KI_step;
-                    //channel->AddKey(key2);
-                }
-            }
-        }
-
-    }
-
-#endif
-
-    (*scene)->Initialize();
-    (*scene)->Build(render, m_vs, m_ps);
-
-    m_scenes.push_back(scene);
+void Demo::InitTestStuff(Renderer& render)
+{
+    assert(0);
 }
 
-ShaderResRef Demo::GetVs() const { return m_vs; }
-
-void Demo::SetVs(const ShaderResRef& resource) { m_vs = resource; }
 
 // ============================================================================================
 
@@ -211,7 +118,8 @@ void DemoAnimation::Initialize()
     AddTrack(m_activeScene);
 }
 
-void DemoAnimation::Update(double time) {
+void DemoAnimation::Update(double time)
+{
     if (m_target)
     {
         float id = floor(m_activeScene->GetChannel(0)->GetValue(time));
@@ -220,6 +128,5 @@ void DemoAnimation::Update(double time) {
     }
 }
 
-void DemoAnimation::Serialize(Archive & ar)
-{
+void DemoAnimation::Serialize(Archive& ar) {
 }

@@ -10,91 +10,108 @@
 
 #include <process.h>
 
-namespace Grafkit {
+namespace Grafkit
+{
+    class Thread;
 
-	class Thread;
+    /**
+    Java-like Runnable interface
+    */
+    class Runnable
+    {
+        friend Thread;
 
-	/**
-	Java-like Runnable interface
-	*/
-	class Runnable {
-		friend Thread;
+    public:
+        virtual int Run() = 0;
 
-	public:
-		virtual int Run() = 0;
-		virtual ~Runnable() {}
-	};
-
-
-	/**
-		Java-like thread management
-	*/
-	class Thread {
-	public:
-		//Thread(std::auto_ptr<Runnable> run);
-		Thread(Runnable *run);
-		Thread();
-
-		virtual ~Thread();
-
-		void Start();
-		void Stop();
-		void Join();
-
-		static int GetCPUCount();
-
-	protected:
-		virtual int Run() { return 0; }
-
-	protected:
-		Runnable *m_pRunnable;
-
-	private:
-		HANDLE m_hThread;
-		DWORD m_wThreadID;
-
-		Thread(const Thread&);
-		const Thread& operator=(const Thread&);
-
-		// stores return value from run()
-		int m_lastResult;
+        virtual ~Runnable() {
+        }
+    };
 
 
-		static DWORD WINAPI startThreadRunnable(LPVOID pVoid);
-		static DWORD WINAPI startThread(LPVOID pVoid);
-	};
+    /**
+        Java-like thread management
+    */
+    class Thread
+    {
+    public:
+        //Thread(std::auto_ptr<Runnable> run);
+        Thread(Runnable* run);
+        Thread();
 
-	/**
-	QT-like Mutex class
-	*/
-	class Mutex {
-	public:
-		Mutex();
-		~Mutex();
+        virtual ~Thread();
 
-		void Lock();
-		void Unlock();
+        void Start();
+        void Stop();
+        void Join();
 
-		bool IsLocked() { return m_isLocked != 0; }
+        static int GetCPUCount();
 
-	private:
-		int m_isLocked;
-		HANDLE m_hMutex;
-	};
+    protected:
+        virtual int Run() { return 0; }
 
-	// Qt-inspired context/mutex locker
-	class MutexLocker {
-	public:
-		MutexLocker(Mutex& mutex) : m_mutex(&mutex) { m_mutex->Lock(); }
-		MutexLocker(Mutex* mutex) : m_mutex(mutex) { m_mutex->Lock(); }
-		~MutexLocker() { m_mutex->Unlock(); }
+    protected:
+        Runnable * m_pRunnable;
 
-		Mutex * GetMutex() { return m_mutex; }
+    private:
+        HANDLE m_hThread;
+        DWORD m_wThreadID;
 
-	private:
-		Mutex * m_mutex;
-	};
+        Thread(const Thread&);
+        const Thread& operator=(const Thread&);
 
+        // stores return value from run()
+        int m_lastResult;
+
+
+        static DWORD WINAPI startThreadRunnable(LPVOID pVoid);
+        static DWORD WINAPI startThread(LPVOID pVoid);
+    };
+
+    /**
+    QT-like Mutex class
+    */
+    class Mutex
+    {
+    public:
+        Mutex();
+        ~Mutex();
+
+        void Lock();
+        void Unlock();
+
+        bool IsLocked() const { return m_isLocked != 0; }
+
+    private:
+        int m_isLocked;
+        HANDLE m_hMutex;
+    };
+
+    // Qt-inspired context/mutex locker
+    class MutexLocker
+    {
+    public:
+        explicit MutexLocker(Mutex& mutex) : m_mutex(&mutex) {
+            //assert(!m_mutex->IsLocked());
+            m_mutex->Lock();
+        }
+        explicit MutexLocker(Mutex* mutex) : m_mutex(mutex)
+        {
+            //assert(!m_mutex->IsLocked());
+            m_mutex->Lock();
+        }
+
+        ~MutexLocker()
+        {
+            m_mutex->Unlock();
+            assert(!m_mutex->IsLocked());
+        }
+
+        Mutex* GetMutex() const { return m_mutex; }
+
+    private:
+        Mutex * m_mutex;
+    };
 }
 
 DEFINE_EXCEPTION(ThreadException, 0, "Thread Exception");

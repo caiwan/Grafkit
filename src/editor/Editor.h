@@ -38,7 +38,7 @@ namespace Idogep
         explicit Editor(Grafkit::Renderer& render, GkDemo::Context*const& context);
         ~Editor();
 
-        void Initialize(Grafkit::IResourceManager  * const &  resourceManager) override;
+        void Initialize(Grafkit::IResourceManager * const & resourceManager) override;
 
         void InitializeDocument();
 
@@ -49,7 +49,7 @@ namespace Idogep
 
         void NewDocument();
         void SaveDocument();
-        void OpenDocument(std::string filename);
+        void OpenDocument();
 
         //void ExitingApp(bool &isPreventExit);
 
@@ -64,8 +64,6 @@ namespace Idogep
         Grafkit::IResourceManager* GetResourceManager() const;
 
         // Application's own manager
-        //Grafkit::IResourceManager* GetApplicationResourceManager() const;
-
         void SetDirty() { m_isDirty = true; }
         bool IsDirty() const { return m_isDirty; }
 
@@ -86,8 +84,9 @@ namespace Idogep
         bool m_reloadRequested;
 
         bool m_isDirty;
+        bool m_tmpInitTestStuff;
 
-        GkDemo::Demo* m_demo;
+        //GkDemo::Demo* m_demo;
         GkDemo::Context*const& m_context;
     };
 }

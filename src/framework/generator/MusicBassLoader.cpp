@@ -74,6 +74,8 @@ namespace {
         const void* data = m_asset->GetData();
         const size_t dataSize = m_asset->GetSize();
 
+        // TODO: Put init to static or something
+
         int res = BASS_Init(-1, 44100, 0, nullptr, nullptr);
 
         bool isNosound = false;
@@ -81,12 +83,20 @@ namespace {
 
             // ignore sound if no sound device detected or installed
             const int errorCode = BASS_ErrorGetCode();
-            if (errorCode == 23) {
-                res = BASS_Init(0, 44100, 0, nullptr, nullptr);
-                isNosound = true;
+
+            // hack something around error codes
+            if (errorCode != BASS_ERROR_ALREADY)
+            {
+                if (errorCode == BASS_ERROR_DEVICE) {
+                    res = BASS_Init(0, 44100, 0, nullptr, nullptr);
+                    isNosound = true;
+                }
+                if (!res)
+                {
+                    LOGGER(Log::Logger().Error("BASS Error code %d", errorCode));
+                    THROW_EX(MusicDeviceInitException);
+                }
             }
-            if (!res)
-                THROW_EX(MusicDeviceInitException);
         }
 
         m_sample = BASS_SampleLoad(true, data, 0, dataSize, 1, BASS_STREAM_PRESCAN | (isNosound ? BASS_DEVICE_NOSPEAKER : 0) | 0);
@@ -284,14 +294,14 @@ namespace {
 /// ====================================================================================================================================================
 /// Factory class implementation
 /// ====================================================================================================================================================
-Grafkit::MusicBassLoader::MusicBassLoader(const std::string& sourceName) : Grafkit::IResourceBuilder(sourceName, sourceName)
+MusicBassLoader::MusicBassLoader(const std::string& sourceName) : IResourceBuilder(sourceName, sourceName)
 {
 }
 
-Grafkit::MusicBassLoader::~MusicBassLoader()
+MusicBassLoader::~MusicBassLoader()
 = default;
 
-void Grafkit::MusicBassLoader::Load(IResourceManager * const & resman, IResource * source)
+void MusicBassLoader::Load(IResourceManager * const & resman, IResource * source)
 {
     MusicResRef dest = dynamic_cast<MusicRes*>(source);
     if (dest.Invalid()) {
@@ -306,7 +316,7 @@ void Grafkit::MusicBassLoader::Load(IResourceManager * const & resman, IResource
     dest->AssingnRef(music);
 }
 
-IResource * Grafkit::MusicBassLoader::NewResource()
+IResource * MusicBassLoader::NewResource()
 {
     return new MusicRes();
 }

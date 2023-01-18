@@ -23,11 +23,14 @@ namespace GkDemo
         //void LoadFromFile(const char * filename);
         void LoadFromAsset(const Grafkit::IAssetRef& asset, Grafkit::IResourceManager* resourceManager);
         void Initialize() const;
-        Ref<Demo> GetDemo() const;
+        //Ref<Demo> GetDemo() const;
+        Demo* GetDemo() const;
 
     protected:
         void Build(Grafkit::IResourceManager*const& resourceManager, const Json& json);
         void BuildResources(Grafkit::IResourceManager*const& resourceManager, const Json& json);
+
+        void AssignShader(Grafkit::IResourceManager * const & resourceManager, Json sceneJson);
 
         void BuildScenes(Grafkit::IResourceManager * const & resourceManager, const Json & demo);
 
@@ -48,7 +51,8 @@ namespace GkDemo
         void BuildEffects(Grafkit::IResourceManager*& resourceManager, const Json& effects);
 
     private:
-        Ref<Demo> m_demo;
+        //Ref<Demo> m_demo;
+        Demo * m_demo;
     };
 }
 

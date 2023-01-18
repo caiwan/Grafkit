@@ -35,7 +35,7 @@ using namespace FWdebugExceptions;
 
 using json = nlohmann::json;
 
-SchemaBuilder::SchemaBuilder() {
+SchemaBuilder::SchemaBuilder() : m_demo(nullptr) {
 }
 
 SchemaBuilder::~SchemaBuilder() {
@@ -59,15 +59,39 @@ void SchemaBuilder::LoadFromAsset(const IAssetRef& asset, IResourceManager* reso
 }
 
 void SchemaBuilder::Initialize() const {
+    //??? 
 }
 
-Ref<Demo> SchemaBuilder::GetDemo() const { return m_demo; }
-
+Demo* SchemaBuilder::GetDemo() const { return m_demo; }
 
 void SchemaBuilder::BuildResources(IResourceManager*const& resourceManager, const Json& json)
 {
     BuildAssets(resourceManager, json.at("assets"));
     BuildSceneGraphs(resourceManager, json.at("scenegraphs"));
+}
+
+void SchemaBuilder::AssignShader(IResourceManager* const& resourceManager, Json sceneJson) {
+    Ref<Resource<SceneGraph>> sceneResource;
+    std::string vsUuid = sceneJson.at("vs").get<std::string>();
+    std::string psUuid = sceneJson.at("ps").get<std::string>();
+
+    ShaderResRef ps = resourceManager->GetByUuid<ShaderRes>(vsUuid);
+    ShaderResRef vs = resourceManager->GetByUuid<ShaderRes>(psUuid);
+
+    if (ps && vs) // threst will be preloaded
+    {
+        LOGGER(Log::Logger().Info("--- VS %s uuid=%s ", vs->GetName().c_str(), vs->GetUuid().c_str()));
+        LOGGER(Log::Logger().Info("--- PS %s uuid=%s", ps->GetName().c_str(), ps->GetUuid().c_str()));
+
+        m_demo->SetPs(ps);
+        m_demo->SetVs(vs);
+
+    }
+    else
+    {
+        // todo: throw
+        THROW_EX_DETAILS(SchemaParseException, "Nincs PS vagy VS");
+    }
 }
 
 void SchemaBuilder::BuildScenes(IResourceManager* const& resourceManager, const Json &demo) {
@@ -94,28 +118,7 @@ void SchemaBuilder::BuildScenes(IResourceManager* const& resourceManager, const 
                 sceneResource->GetUuid().c_str()
             ));
 
-            std::string vsUuid = sceneJson.at("vs").get<std::string>();
-            std::string psUuid = sceneJson.at("ps").get<std::string>();
-
-            ShaderResRef ps = resourceManager->GetByUuid<ShaderRes>(vsUuid);
-            ShaderResRef vs = resourceManager->GetByUuid<ShaderRes>(psUuid);
-
-            if (ps && vs) // threst will be preloaded
-            {
-                LOGGER(Log::Logger().Info("--- Scene VS %s uuid=%s ", vs->GetName().c_str(), vs->GetUuid().c_str()));
-                LOGGER(Log::Logger().Info("--- Scene PS %s uuid=%s", ps->GetName().c_str(), ps->GetUuid().c_str()));
-
-                (*sceneResource)->SetPShader(ps);
-                (*sceneResource)->SetVShader(vs);
-            }
-            else
-            {
-                // todo: throw
-                THROW_EX_DETAILS(SchemaParseException, "Nincs PS vagy VS");
-            }
-
             // TODO add scene here 
-            //SceneResRef = new SceneResRef()
             SceneRef scene = new Scene();
             BuildObject(sceneJson, scene);
             scene->SetSceneGraph(sceneResource);
@@ -182,6 +185,8 @@ void SchemaBuilder::Build(IResourceManager*const& resourceManager, const Json& j
             m_demo->AddScene(id, scene);
         }
     }
+
+    AssignShader(resourceManager, demo.at("render").at("forward"));
 
     // buffers? shit?
 

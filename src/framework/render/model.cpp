@@ -66,7 +66,6 @@ void Model::SetGeometryShader(ShaderResRef shader) { m_geometryShader = shader; 
 
 ShaderResRef Model::GetGeometryShader() const { return m_geometryShader; }
 
-
 void Model::Serialize(Archive& ar)
 {
     Object::_Serialize(ar);

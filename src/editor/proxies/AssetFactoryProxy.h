@@ -14,14 +14,16 @@ namespace Idogep {
 
 	class AssetFactoryProxy : public Grafkit::IAssetFactory {
 	public:
-		AssetFactoryProxy(Grafkit::IAssetFactory * const & parentFactory);
+		AssetFactoryProxy(IAssetFactory * const & parentFactory);
 
-		virtual bool PollEvents(Grafkit::IResourceManager *resman) { return m_parentFactory->PollEvents(resman); }
+	    bool PollEvents(Grafkit::IResourceManager *resman) override { return m_parentFactory->PollEvents(resman); }
 
-		virtual Grafkit::IAssetRef Get(std::string name);
+	    Grafkit::IAssetRef Get(std::string name) override;
 
-		virtual filelist_t GetAssetList() { return m_parentFactory->GetAssetList(); }
-		virtual filelist_t GetAssetList(Grafkit::AssetFileFilter * filter) { return m_parentFactory->GetAssetList(filter); }
+	    filelist_t GetAssetList() override { return m_parentFactory->GetAssetList(); }
+	    filelist_t GetAssetList(Grafkit::AssetFileFilter * filter) override { return m_parentFactory->GetAssetList(filter); }
+
+	    void SetBasePath(const std::string& path) override;
 
 	private:
 		IAssetFactory * const & m_parentFactory;
@@ -33,8 +35,8 @@ namespace Idogep {
 	public:
 		QResourceAsset(QByteArray &data) : IAsset(), m_data(data) {}
 
-		virtual void* GetData() { return m_data.data(); }
-		virtual size_t GetSize() { return m_data.size(); }
+	    void* GetData() override { return m_data.data(); }
+	    size_t GetSize() override { return m_data.size(); }
 
 	private:
 		QByteArray m_data;

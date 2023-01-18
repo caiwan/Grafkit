@@ -15,8 +15,7 @@ inline Grafkit::ActorRef Grafkit::EntityContainer::GetActor(std::string name)
 	auto it = m_entityMap.find(name);
 	if (it != m_entityMap.end())
 		return it->second.m_actor;
-	else
-		return nullptr;
+    return nullptr;
 }
 
 inline Grafkit::Entity3DRef Grafkit::EntityContainer::GetEntity(std::string name)
@@ -24,8 +23,7 @@ inline Grafkit::Entity3DRef Grafkit::EntityContainer::GetEntity(std::string name
 	auto it = m_entityMap.find(name);
 	if (it != m_entityMap.end())
 		return it->second.m_entity;
-	else
-		return nullptr;
+    return nullptr;
 }
 
 inline size_t Grafkit::EntityContainer::GetId(std::string name)
@@ -33,8 +31,7 @@ inline size_t Grafkit::EntityContainer::GetId(std::string name)
 	auto it = m_entityMap.find(name);
 	if (it != m_entityMap.end())
 		return it->second.m_id;
-	else
-		return 0;
+    return 0;
 }
 
 inline void Grafkit::EntityContainer::Calculate(Renderer & render, size_t id)
@@ -47,7 +44,7 @@ inline void Grafkit::EntityContainer::Calculate(Renderer & render, size_t id)
 
 inline void Grafkit::EntityContainer::CalculateAll(Renderer & render)
 {
-	for (auto it = m_entities.begin(); it != m_entities.end(); it++) {
+	for (auto it = m_entities.begin(); it != m_entities.end(); ++it) {
 
 		if (it->m_actor.Invalid() || it->m_entity.Invalid())
 			continue;

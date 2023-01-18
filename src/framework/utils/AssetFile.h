@@ -43,8 +43,7 @@ namespace Grafkit {
 	public:
 		class FileAsset;
 
-	public:
-		FileAssetFactory(std::string root);
+	    FileAssetFactory(std::string root);
 		~FileAssetFactory();
 
 	    IAssetRef Get(std::string name) override;
@@ -53,6 +52,8 @@ namespace Grafkit {
 	    filelist_t GetAssetList(AssetFileFilter * filter) override;
 
 	    bool PollEvents(IResourceManager *resman) override;
+
+	    void SetBasePath(const std::string& path) override;
 
 	private:
 		std::string m_root;

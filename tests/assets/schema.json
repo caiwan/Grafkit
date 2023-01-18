@@ -3,14 +3,18 @@
     "music": {
       "filename": "alpha_c_-_euh.ogg"
     },
+    "render": {
+      "forward": {
+        "vs": "43ae2c7a-b8e7-4eb0-a888-7ce1c2fa90a1",
+        "ps": "5f72e9aa-93f5-4d86-ada8-9543b625337e"
+      } 
+    }, 
     "scenes": [
       {
         "id": 0,
         "name":  "TesrScene" ,
         "uuid": "dd0900ab-d654-4d65-9960-42c0633c535e",
-        "scene": "858543a6-bf2d-42b5-93b9-0c73cec79369",
-        "vs": "43ae2c7a-b8e7-4eb0-a888-7ce1c2fa90a1",
-        "ps": "5f72e9aa-93f5-4d86-ada8-9543b625337e"
+        "scene": "858543a6-bf2d-42b5-93b9-0c73cec79369"
       }
     ]
   },

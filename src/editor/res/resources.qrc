@@ -21,7 +21,9 @@
     <file alias="light.png">img/icons/light.png</file>
     <file alias="mesh.png">img/icons/polygon.png</file>
 	<file alias="demo.png">img/icons/duck.png</file>
+	<file alias="quit.png">img/icons/shutdown.png</file>
   </qresource>
+  
   <qresource prefix="/style">
     <file alias="branch_closed.png">img/style/branch_closed.png</file>
     <file alias="branch_closed-on.png">img/style/branch_closed-on.png</file>

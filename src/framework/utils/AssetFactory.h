@@ -21,7 +21,7 @@ namespace Grafkit {
 		/**
 		Trims out filepath, filename, and extension (if any) from the given full filename
 		*/
-		static int trimpath(std::string fullpath, std::string &path, std::string &filename, std::string &extension);
+		static int TrimPath(const std::string& fullpath, std::string& path, std::string& filename, std::string& extension);
 
 		/// 
 		int IsFileInfilter(std::string path);
@@ -42,8 +42,7 @@ namespace Grafkit {
 		virtual ~IAssetFactory() {}
 
 		virtual bool PollEvents(IResourceManager *resman) { return false; }
-
-	public:
+	    virtual void SetBasePath(const std::string& path) = 0;
 
 		typedef std::list<std::string> filelist_t;
 

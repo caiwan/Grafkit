@@ -23,6 +23,7 @@ namespace GkDemo
 
         void Preload(Grafkit::IResourceManager* const & resman);
         void Initialize(Grafkit::Renderer& render);
+        void InitTestStuff(Grafkit::Renderer& render);
 
         int PreRender(Grafkit::Renderer& render, float time) const;
         Grafkit::SceneResRef GetActiveScene() const;
@@ -38,19 +39,16 @@ namespace GkDemo
         void SetActiveSceneId(const uint32_t activeSceneId) { m_activeSceneId = activeSceneId; }
 
         Grafkit::MusicResRef GetMusic() const;
+        void SetMusic(const Grafkit::MusicResRef& resource);
 
         void AddScene(uint32_t id, const Grafkit::SceneResRef& ref);
         size_t GetSceneCount() const { return m_scenes.size(); }
+
         Grafkit::SceneResRef GetScene(size_t id) const { return m_scenes.at(id); }
-
     private:
-        void InitTestStuff(Grafkit::Renderer& render);
-
 
         Grafkit::MusicResRef m_music;
-
         Grafkit::ShaderResRef m_vs, m_ps;
-
         std::vector<Grafkit::SceneResRef> m_scenes;
 
         //Grafkit::ShaderResRef m_psShowUv;

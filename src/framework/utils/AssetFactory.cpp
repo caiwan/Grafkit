@@ -15,7 +15,7 @@ AssetFileFilter::AssetFileFilter(const char ** const & extensions, size_t count)
 }
 
 
-int AssetFileFilter::trimpath(std::string fullpath, std::string &path, std::string &filename, std::string & extension)
+int AssetFileFilter::TrimPath(const std::string &fullpath, std::string &path, std::string &filename, std::string & extension)
 {
 	int result = 0;
 
@@ -49,13 +49,13 @@ int AssetFileFilter::trimpath(std::string fullpath, std::string &path, std::stri
 int AssetFileFilter::IsFileInfilter(std::string path)
 {
 	std::string dummy0, dummy1, ext;
-	AssetFileFilter::trimpath(path, dummy0, dummy1, ext);
+	TrimPath(path, dummy0, dummy1, ext);
 
 	if (ext.empty())
 		return 0;
 
 	int found = 0;
-	for (extFilter_t::iterator it = m_filterExtensions.begin(); it != m_filterExtensions.end(); it++) {
+	for (extFilter_t::iterator it = m_filterExtensions.begin(); it != m_filterExtensions.end(); ++it) {
 		if (*it == ext) {
 			found = 1;
 			break;

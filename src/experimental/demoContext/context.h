@@ -13,19 +13,19 @@ namespace GkDemo
         explicit Context(Grafkit::Renderer &render, Grafkit::IAssetFactory* assetFactory);
         ~Context() override;
 
-        // -> Editor
-        /*void Intitialize();
-        void Intitialize(Grafkit::IAssetRef document);
-        void IntitializeFromSchema(Grafkit::IAssetRef schemaRef);
+        void Relocate(std::string path);
+        
+        void SaveScema();
+        void LoadScema();
 
-        void Save(std::string filename);
-        void Load(Grafkit::IAssetRef assetRef);*/
+        void Intitialize();
 
         Demo* GetDemo() const { return m_demo; }
         void SetDemo(Demo* const demo) { m_demo = demo; }
 
         Grafkit::Renderer& GetDeviceContext() override { return m_render; }
-        Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory; };
+        Grafkit::IAssetFactory* GetAssetFactory() override { return m_assetFactory; }
+        void CreateTestStuff();
 
     private:
         Grafkit::Renderer& m_render;
@@ -35,14 +35,5 @@ namespace GkDemo
         Grafkit::IAssetFactory* m_assetFactory;
     };
 
-    inline Context::Context(Grafkit::Renderer &render, Grafkit::IAssetFactory* assetFactory): ResourcePreloader()
-        , ClonableInitializer()
-        , m_render(render)
-        , m_demo(nullptr)
-        , m_assetFactory(assetFactory) {
-    }
 
-    inline Context::~Context() {
-    }
- 
 }

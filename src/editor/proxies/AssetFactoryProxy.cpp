@@ -1,22 +1,19 @@
 #include "AssetFactoryProxy.h"
 
 #include <qfile.h>
-#include <qdiriterator.h>
 #include <qdebug.h>
-
-#include "common.h"
 
 using namespace Grafkit;
 using namespace Idogep;
 using namespace FWdebugExceptions;
 
-Idogep::AssetFactoryProxy::AssetFactoryProxy(IAssetFactory * const & parentFactory) : IAssetFactory(), m_parentFactory(parentFactory)
+AssetFactoryProxy::AssetFactoryProxy(IAssetFactory * const & parentFactory) : IAssetFactory(), m_parentFactory(parentFactory)
 {
 }
 
-Grafkit::IAssetRef Idogep::AssetFactoryProxy::Get(std::string name)
+IAssetRef AssetFactoryProxy::Get(std::string name)
 {
-	Grafkit::IAssetRef asset = nullptr;
+	IAssetRef asset = nullptr;
 
 	try {
 		asset = m_parentFactory->Get(name);
@@ -35,4 +32,8 @@ Grafkit::IAssetRef Idogep::AssetFactoryProxy::Get(std::string name)
 	}
 
 	return asset;
+}
+
+void AssetFactoryProxy::SetBasePath(const std::string& path) {
+    m_parentFactory->SetBasePath(path);
 }
