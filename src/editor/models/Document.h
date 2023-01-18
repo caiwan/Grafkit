@@ -19,17 +19,17 @@ namespace Idogep {
 
 	class Music;
 
-	namespace Role {
-		class HasSceneGraphRole {
+	namespace Roles {
+		class HasSceneGraphRole : virtual public Referencable {
 		public:
 			virtual Grafkit::SceneGraphRef GetScenegraph() = 0;
 		};
 
-		class HasEffectRole {
+		class HasEffectRole : virtual public Referencable {
 			// ... 
 		};
 
-		class HasPlaybackRole {
+		class HasPlaybackRole : virtual public Referencable {
 		public:
 			virtual Music * GetMusic() { return m_musicWrapper; }
 		protected:
@@ -37,10 +37,10 @@ namespace Idogep {
 		};
 	}
 
-	class Document : 
-		public Role::HasSceneGraphRole,
-		public Role::HasEffectRole,
-		public Role::HasPlaybackRole
+	class Document : virtual public Referencable,
+		public Roles::HasSceneGraphRole,
+		public Roles::HasEffectRole,
+		public Roles::HasPlaybackRole
 	{
 		friend class Editor;
 	public:

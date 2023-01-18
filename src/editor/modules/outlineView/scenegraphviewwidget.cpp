@@ -6,6 +6,8 @@
 
 #include "utils/tree/treemodel.h"
 
+#include "models/Document.h"
+
 using namespace Idogep;
 using namespace Grafkit;
 
@@ -24,17 +26,21 @@ Idogep::SceneGraphViewWidget::~SceneGraphViewWidget()
 	delete ui;
 }
 
-void Idogep::SceneGraphViewWidget::SetModel(Grafkit::IResource * modelResource)
+void Idogep::SceneGraphViewWidget::SetModel(Ref<Referencable> model)
 {
-	Ref<Resource<SceneGraphViewWidgetModel>> model = dynamic_cast<Resource<SceneGraphViewWidgetModel>*>(modelResource);
-	assert(model.Valid());
-	assert(model->Valid());
-
-	// this will force refresh, probaly.
-	ui->treeView->setModel(nullptr);
-	ui->treeView->setModel((*model)->GetModel());
+	//DEBUG_ASSERT(model.Valid());
+	//Role::HasSceneGraphRole* hasScenegraph = static_cast<Role::HasSceneGraphRole*>(model.Get());
+	//DEBUG_ASSERT(hasScenegraph);
+	//Grafkit::SceneGraphRef sccenegraph = hasScenegraph->GetScenegraph();
+	//RefreshView(false);
 }
 
+//void Idogep::SceneGraphViewWidget::setModel(TreeModel * model)
+//{
+//	// this will force refresh, probaly.
+//	//ui->treeView->setModel(nullptr);
+//	//ui->treeView->setModel(model);
+//}
 
 void Idogep::SceneGraphViewWidget::itemClickedSlot(const QModelIndex & index)
 {

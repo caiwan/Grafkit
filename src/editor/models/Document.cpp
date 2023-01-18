@@ -22,9 +22,9 @@ using namespace Grafkit;
 #include "builtin_data/cube.h"
 
 Idogep::Document::Document() :
-	Role::HasEffectRole(),
-	Role::HasSceneGraphRole(),
-	Role::HasPlaybackRole()
+	Roles::HasEffectRole(),
+	Roles::HasSceneGraphRole(),
+	Roles::HasPlaybackRole()
 {
 }
 
