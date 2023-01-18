@@ -20,7 +20,7 @@ using FWmath::Matrix;
 
 // =============================================================================================================================
 
-Shader::Shader() : IRenderAsset(nullptr),
+Shader::Shader() : IRenderAsset(),
 	m_pxShader(NULL),
 	m_vxShader(NULL),
 	m_pReflector(NULL),
@@ -35,7 +35,7 @@ Shader::~Shader()
 	this->Shutdown();
 }
 
-void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
+void Shader::LoadFromFile(ID3D11Device * const & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type)
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = NULL;
@@ -81,7 +81,7 @@ void Shader::LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, Sha
 }
 
 
-void Shader::LoadFromMemory(ID3D11Device * device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
+void Shader::LoadFromMemory(ID3D11Device * const & device, LPCSTR entry, LPCSTR source, size_t size,  ShaderType_e type)
 {
 	HRESULT result = 0;
 	ID3D10Blob* errorMessage = NULL;
@@ -192,7 +192,7 @@ void Shader::Render(ID3D11DeviceContext * deviceContext)
 }
 
 
-void Shader::CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer)
+void Shader::CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer)
 {
 	HRESULT result = 0;
 	if (this->m_type == ST_Vertex) {

@@ -2,7 +2,7 @@
 
 #include "exceptions.h"
 #include "../render/text.h"
-#include "../render/renderassets.h"
+#include "../core/renderassets.h"
 
 namespace FWtext{
 

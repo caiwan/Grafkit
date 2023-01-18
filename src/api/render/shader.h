@@ -9,7 +9,7 @@
 #include "dxtypes.h"
 #include "renderer.h"
 
-#include "renderassets.h"
+#include "../core/renderassets.h"
 
 #include "reference.h"
 #include "exceptions.h"
@@ -31,12 +31,12 @@ namespace FWrender {
 
 	class Shader;
 
-	class ShaderLoader : public FWrender::IRenderAssetGenerator
+	class ShaderLoader : public FWassets::IRenderAssetGenerator
 	{
 		// implement tis 'ting
 	};
 
-	class Shader : virtual public Referencable, virtual public FWrender::IRenderAsset
+	class Shader : virtual public Referencable, virtual public FWassets::IRenderAsset
 	{
 		friend class ShaderRef;
 
@@ -55,8 +55,8 @@ namespace FWrender {
 				@param file source file of vertex shader
 				@param type type of shader @see FWrender::ShaderType_e
 			*/
-			void LoadFromFile(ID3D11Device* device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
-			void LoadFromMemory(ID3D11Device* device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
+			void LoadFromFile(ID3D11Device* const & device, LPCSTR entry, LPCWCHAR file, ShaderType_e type);
+			void LoadFromMemory(ID3D11Device* const & device, LPCSTR entry, LPCSTR source, size_t size, ShaderType_e type);
 
 			void Shutdown();
 			void Render(ID3D11DeviceContext* deviceContext);
@@ -64,7 +64,7 @@ namespace FWrender {
 			enum ShaderType_e getShaderType() { return this->m_type; }
 
 		private:
-			void CompileShader(ID3D11Device* device, ID3D10Blob* shaderBuffer);
+			void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
 
 		public:
 

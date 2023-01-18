@@ -68,7 +68,7 @@ namespace FWrender
 	class SimpleMeshGenerator {
 		friend class MeshAttribSetter;
 		public:
-			SimpleMeshGenerator(ID3D11Device* device, ShaderRef shader);
+			SimpleMeshGenerator(ID3D11Device *const& device, ShaderRef &shader);
 
 			void SetPtr(std::string name, const void* const ptr) { this->m_mapPtr[name] = ptr; }
 
@@ -81,7 +81,7 @@ namespace FWrender
 			class MeshAttribSetter {
 				friend class SimpleMeshGenerator;
 				protected:
-					MeshAttribSetter(const char*& name, SimpleMeshGenerator& parent) : m_parent(parent), m_name(name) {}
+					MeshAttribSetter(const char *& name, SimpleMeshGenerator& parent) : m_parent(parent), m_name(name) {}
 				public:
 					void operator =(const void* const ptr) { this->m_parent.SetPtr(m_name, ptr); }
 
@@ -105,8 +105,8 @@ namespace FWrender
 			void createIndexBuffer(MeshRef in_mesh, int indexCount, const int* indices);
 
 		private:
-			ID3D11Device *m_device;
-			ShaderRef m_shader;
+			ID3D11Device * const & m_device;
+			ShaderRef &m_shader;
 
 			typedef std::map<std::string, const void* > mapPtr_t;
 			mapPtr_t m_mapPtr;

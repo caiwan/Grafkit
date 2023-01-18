@@ -64,29 +64,8 @@ void FWrender::Mesh::addElement(ID3D11Buffer *pBuffer, UINT stride, UINT offset)
 	this->m_buffer = elem;
 }
 
-
-//void FWrender::Mesh::RenderBuffers(ID3D11DeviceContext * deviceContext)
-//{
-//	for (size_t i = 0; i<this->m_buffers.size(); ++i)
-//	{
-//		BufferStateDescriptor &elem = this->m_buffers[i];
-//
-//		/// @todo --- ezt
-//		/// https://msdn.microsoft.com/en-us/library/windows/desktop/ff476456(v=vs.85).aspx
-//		deviceContext->IASetVertexBuffers(0, 1, &elem.buffer, &elem.stride, &elem.offset); // < megbasz
-//	}
-//	
-//	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-//	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//	
-//	// FYI https://msdn.microsoft.com/en-us/library/windows/desktop/ff728726(v=vs.85).aspx
-//
-//	return;
-//}
-
-
 // ========================================================================
-FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * device, ShaderRef shader)
+FWrender::SimpleMeshGenerator::SimpleMeshGenerator(ID3D11Device * const & device, ShaderRef &shader)
 	: m_device(device), m_shader(shader)
 {
 }

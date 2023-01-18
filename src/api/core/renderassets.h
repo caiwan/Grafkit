@@ -11,7 +11,7 @@ A generator interface for assets
 #include "node.h"
 #include "guid.h"
 
-namespace FWrender {
+namespace FWassets{
 
 	class IRenderAsset;
 	class IRenderAssetManager;
@@ -24,8 +24,11 @@ namespace FWrender {
 	{
 		friend class IRenderAssetManager;
 		friend class IRenderAssetGenerator;
+
 	public:
-		IRenderAsset(IRenderAssetManager * assman);
+
+		//IRenderAsset(IRenderAssetManager * assman = nullptr);
+		IRenderAsset();
 		virtual ~IRenderAsset();
 
 		std::string GetName() { return this->m_name; }
@@ -35,6 +38,9 @@ namespace FWrender {
 		Guid GenerateGUID();
 
 	protected:
+		/// Sets asset manager 
+		void SetAssmanPtr(IRenderAssetManager * assman = nullptr);
+
 		std::string m_name;
 		Guid m_guid;
 
@@ -83,14 +89,14 @@ namespace FWrender {
 	class IRenderAssetGenerator
 	{
 		public:
-			IRenderAssetGenerator(IRenderAssetManager *& assman);
+			IRenderAssetGenerator(IRenderAssetManager * const & assman);
 			virtual ~IRenderAssetGenerator();
 			
-			virtual IRenderAsset * operator () () = 0;
+			virtual void operator () () = 0;
 		
 		protected:
 				/// segg ember
-				IRenderAssetManager*& m_assman;
+				IRenderAssetManager * const & m_assman;
 	};
 	
 	/**
