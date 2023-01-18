@@ -57,6 +57,10 @@ namespace FWrender {
 		void BeginScene();
 		void EndScene();
 
+		// --- setters
+		void SetViewport(int screenW, int screenH, int offsetX = 0, int offsetY = 0);
+		void SetSurface(int screenW, int screenH);
+
 		// --- getters
 		ID3D11Device* GetDevice() { return this->m_device; }
 		operator ID3D11Device *() { return this->m_device; }
