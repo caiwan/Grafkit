@@ -77,29 +77,50 @@
     <ClCompile Include="render\text.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="generator\bmfont_parser.cpp">
-      <Filter>Source Files\generator</Filter>
-    </ClCompile>
-    <ClCompile Include="core\renderassets.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
-    <ClCompile Include="core\assets.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
     <ClCompile Include="generator\assimploader.cpp">
       <Filter>Source Files\generator</Filter>
     </ClCompile>
     <ClCompile Include="render\Material.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
-    <ClCompile Include="core\AssetPreloader.cpp">
-      <Filter>Source Files\core</Filter>
-    </ClCompile>
     <ClCompile Include="render\Scene.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="render\Light.cpp">
       <Filter>Source Files\render</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ResourcePreloader.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\resource.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ResourceManager.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\AssetFactory.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\AssetFile.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\asset.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\TextureLoader.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\FontmapLoader.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="generator\ShaderLoader.cpp">
+      <Filter>Source Files\generator</Filter>
+    </ClCompile>
+    <ClCompile Include="core\ResourceBuilder.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,29 +178,50 @@
     <ClInclude Include="render\text.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="generator\bmfont_parser.h">
-      <Filter>Source Files\generator</Filter>
-    </ClInclude>
-    <ClInclude Include="core\renderassets.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
-    <ClInclude Include="core\assets.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="generator\assimploader.h">
       <Filter>Source Files\generator</Filter>
     </ClInclude>
     <ClInclude Include="render\Material.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="core\AssetPreloader.h">
-      <Filter>Source Files\core</Filter>
-    </ClInclude>
     <ClInclude Include="render\Scene.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
     <ClInclude Include="render\Light.h">
       <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ResourcePreloader.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\resource.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ResourceManager.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\ResourceBuilder.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\AssetFactory.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\AssetFile.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\asset.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\TextureLoader.h">
+      <Filter>Source Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\FontmapLoader.h">
+      <Filter>Source Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="generator\ShaderLoader.h">
+      <Filter>Source Files\generator</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

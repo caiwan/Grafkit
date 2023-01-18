@@ -12,17 +12,13 @@ namespace Grafkit {
 	class ShaderLoader : public Grafkit::IResourceBuilder
 	{
 	public:
-		///@todo leforditott shadert is tudjon elotolteni
-		ShaderLoader(Grafkit::IAssetRef resource, ShaderType_e type, ShaderResRef shaderasset);
-		~ShaderLoader();// {}
+		///@todo a shadernel tobb forrasbol, tobbfele tipusu shader, tobb entrypointbol betolheto. Ezt valahogyan kezelni kellene a jovoben.
+		ShaderLoader(std::string name, std::string filename, std::string entrypoint, ShaderType_e type, ShaderResRef & shaderasset);
+		~ShaderLoader();
 
-		void SetEntryPoint(std::string entrypoint);
-
-		virtual void operator () (Grafkit::IResourceManager * const & assman);
+		virtual void load (Grafkit::IResourceManager * const & assman);
 
 	protected:
-		Grafkit::IAssetRef m_resource;
-		ShaderResRef m_in;
 		ShaderType_e m_type;
 		std::string m_entrypoint;
 	};

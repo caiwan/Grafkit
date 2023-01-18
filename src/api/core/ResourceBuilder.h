@@ -17,15 +17,17 @@ namespace Grafkit {
 	class IResourceBuilder
 	{
 		public:
-			IResourceBuilder(std::string name, IResourceRef &dst) : m_srcName(name), m_dstResource(dst) {}
+			IResourceBuilder(std::string name, std::string sourcename, IResourceRef &dst) : m_name(name), m_srcName(name), m_dstResource(dst) {}
 			virtual ~IResourceBuilder() {}
 			
+			///@todo operator()-t eliminalni kell majd 
 			void operator () (IResourceManager * const & assman);
 
 			virtual void load(IResourceManager * const & assman) = 0;
 
 	protected:
 		IAssetRef GetSourceAsset(IResourceManager * const & assman);
+		std::string m_name;
 		std::string m_srcName;
 		IResourceRef &m_dstResource;
 	};

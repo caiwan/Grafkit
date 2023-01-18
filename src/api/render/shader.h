@@ -332,14 +332,14 @@ namespace Grafkit {
 
 	typedef ShaderRes ShaderRef;
 
-	typedef Ref<ShaderRes> ShaderAssetRef_t;
+	typedef Ref<ShaderRes> ShaderResRef_t;
 
-	class ShaderResRef : public ShaderAssetRef_t
+	class ShaderResRef : public ShaderResRef_t
 	{
 	public:
-		ShaderResRef(): ShaderAssetRef_t(){}
-		ShaderResRef(ShaderRes *ptr) : ShaderAssetRef_t(ptr) {}
-		ShaderResRef(ShaderResRef& other) : ShaderAssetRef_t(other) {}
+		ShaderResRef(): ShaderResRef_t(){}
+		ShaderResRef(ShaderRes *ptr) : ShaderResRef_t(ptr) {}
+		ShaderResRef(ShaderResRef& other) : ShaderResRef_t(other) {}
 
 		~ShaderResRef() {}
 
@@ -357,8 +357,10 @@ namespace Grafkit {
 
 			return this->ptr->ptr; 
 		}
+
 		ShaderResRef& operator = (Shader* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
 		ShaderResRef& operator = (ShaderRef &in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+		ShaderResRef& operator = (ShaderRes *in_ptr) { this->AssingnRef(in_ptr); return *this; }
 		ShaderResRef& operator = (ShaderResRef& other) { this->AssingnRef(other); return *this; }
 	};
 

@@ -197,20 +197,9 @@ void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Ac
 // Head
 // ================================================================================================================================================================
 
-//namespace {
-//	static size_t count;
-//
-//	///@todo ez a nevezesi modszertan nem jo; valami mas megoldast kell keresni majd
-//	std::string GetCounter() {
-//		char buffer[16];
-//		sprintf_s(buffer, "assimp:%d:", count);
-//		count++;
-//		return buffer;
-//	}
-//}
 
-
-Grafkit::AssimpLoader::AssimpLoader(Grafkit::IAssetRef resource, Grafkit::SceneRef & scenegraph) : IResourceBuilder(resource, scenegraph)
+Grafkit::AssimpLoader::AssimpLoader(std::string source_name, Grafkit::SceneRef & scenegraph) 
+	: IResourceBuilder(source_name, source_name, scenegraph) // itt megegyezik a filenev, es az objektum nev
 {
 }
 
