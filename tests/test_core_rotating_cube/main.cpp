@@ -9,6 +9,7 @@
 #include "math/matrix.h"
 
 #include "core/renderassets.h"
+#include "core/assets.h"
 
 using namespace FWrender;
 using FWmath::Matrix;
@@ -18,6 +19,8 @@ using FWmath::Matrix;
 
 class Application : public FWcore::System, FWassets::IRenderAssetManager
 {  
+private: 
+
 public:
 		Application() : FWcore::System()
 		{
@@ -61,9 +64,9 @@ public:
 
 			// -- texture
 			TextureRef texture;
-
 			TextureGenFromBitmap txgen(L"Normap.jpg", this, render, texture);
 			txgen();
+			//texture->Initialize(render, L"Normap.jpg");
 
 			// -- model 
 			model = new Model;
@@ -83,8 +86,8 @@ public:
 			SimpleMeshGenerator generator(render, shader_vs);
 			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
 			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
-			
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
+
 
 			shader_fs->GetBResource("shaderTexture").SetTexture(texture);
 
@@ -95,6 +98,9 @@ public:
 		
 		void release() {
 			this->render.Shutdown();
+			
+			// delete this->shader_texture;
+
 		};
 
 		int mainloop() {
