@@ -46,7 +46,9 @@ namespace FWassets{
 
 	protected:
 		std::vector<IResourceFactory*> m_loaders;
-		ResourceFilter* m_filters[IRenderAsset::RA_TYPE_COUNT];
+		
+		///@todo folytkov
+		std::vector<ResourceFilter*> m_filters; // [IRenderAsset::RA_TYPE_COUNT];
 		std::list<IRenderAssetBuilder*> m_builders;
 
 		PreloadEvents* m_pPreloader;

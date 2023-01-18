@@ -35,7 +35,7 @@ public:
 	virtual int hasNext() = 0;
 	virtual int hasPrev() = 0;
 	
-	///@todo operator ++,-- and () for isDone
+	///@todo operator ++,-- and (bool) for isDone
 
 	virtual Node* getCurrent() = 0;
 };

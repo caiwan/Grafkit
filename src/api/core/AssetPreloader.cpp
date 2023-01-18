@@ -8,19 +8,39 @@ using namespace FWdebugExceptions;
 
 using namespace FWassets;
 
+/// ---- ezt lehet kulon fileba kene tenni
+#include "../render/texture.h"
+#include "../render/text.h"
+
+using FWrender::TextureFromBitmap;
+using FWrender::TextureAssetRef;
+using FWrender::TextureAsset;
+
+///@todo a shader betoltes legyen on-the-fly, es ne itt
+#include "../render/shader.h"
+using FWrender::ShaderLoader;
+using FWrender::ShaderAssetRef;
+using FWrender::ShaderAsset;
+using FWrender::ShaderType_e;
+
 namespace {
+
+	enum {
+		TEXTURES,
+		FONT,
+		SHADERS
+	};
+
 	struct {
-		IRenderAsset::RA_type_e type;
+		//IRenderAsset::RA_type_e type;
+		int type;
+		const char *bucket_names;
 		const char *basedir;
 		const char *extensions[8];
 	} rules[] = {
-		{ FWassets::IRenderAsset::RA_TYPE_Texture, "./textures/", {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
-		{ FWassets::IRenderAsset::RA_TYPE_Font, "./fonts/", {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
-		{ FWassets::IRenderAsset::RA_TYPE_Shader, "./shaders/",{ "hlsl", "fx", "vs", "fs", "gm", "cp", "ps", nullptr, }, },
-		//{ FWassets::IRenderAsset::RA_TYPE_Shader_VS, "./shaders/",{ "hlsl", "fx", "vs", nullptr, nullptr, nullptr, nullptr, nullptr, }, },
-		//{ FWassets::IRenderAsset::RA_TYPE_Shader_PS, "./shaders/",{ "hlsl", "fx", nullptr, "fs", "ps", nullptr, nullptr, nullptr, }, },
-		//{ FWassets::IRenderAsset::RA_TYPE_Shader_GM, "./shaders/",{ "hlsl", "fx", nullptr, nullptr, "gm", nullptr, nullptr, nullptr, }, },
-		//{ FWassets::IRenderAsset::RA_TYPE_Shader_CP, "./shaders/",{ "hlsl", "fx", nullptr, nullptr, "cp", nullptr, nullptr, }, },
+		{ TEXTURES, TEXTURE_BUCKET, "./textures/", {"jpg", "png", "tga", "gif", nullptr, nullptr, nullptr, nullptr, }, },
+		/* { FONT_BUCKET , "./fonts/", {"bmf", "bmt", "bmx", nullptr, nullptr, nullptr, nullptr, nullptr, }, },*/ 
+		{ SHADERS, SHADER_BUCKET , "./shaders/",{ "hlsl", "fx", "vs", "fs", "gm", "cp", "ps", nullptr, }, },
 	};
 
 	const char * shader_postfix[] = {
@@ -32,7 +52,7 @@ AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : FWassets::IRenderAs
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
 	for (size_t i = 0; i < sizeof(rules) / sizeof(rules[0]); i++) {
-		m_filters[rules[i].type] = new ResourceFilter(rules[i].extensions, 8);
+		m_filters.push_back(new ResourceFilter(rules[i].extensions, 8));
 	}
 }
 
@@ -40,30 +60,22 @@ AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : FWassets::IRenderAs
 AssetPreloader::~AssetPreloader()
 {
 	/// @todo ez itt baszik valamit eppen - double delete?
+	/*
 	for (size_t i = 0; i < IRenderAsset::RA_TYPE_COUNT; i++) {
 		//delete m_filters[rules[i].type];
 	}
+	*/
 }
 
 // ============================================================================================================
-/// ---- ezt lehet kulon fileba kene tenni
-#include "../render/texture.h"
-#include "../render/text.h"
-
-using FWrender::TextureFromBitmap;
-using FWrender::TextureAssetRef;
-using FWrender::TextureAsset;
-
-#include "../render/shader.h"
-using FWrender::ShaderLoader;
-using FWrender::ShaderAssetRef;
-using FWrender::ShaderAsset;
-using FWrender::ShaderType_e;
 
 void FWassets::AssetPreloader::LoadCache()
 {
 	/// --- itt becacheli az osszes filet, mait lehet
-	for (size_t i = 0; i < IRenderAsset::RA_TYPE_COUNT; i++) 
+
+	IRenderAssetRepository* repo = this->GetRepository(ROOT_REPOSITORY);
+
+	for (size_t i = 0; i < m_filters.size(); i++) 
 	{
 		if (m_filters[i] == nullptr)
 			continue;
@@ -78,33 +90,31 @@ void FWassets::AssetPreloader::LoadCache()
 				std::string filename = *it, name, path, ext;
 				ResourceFilter::trimpath(filename, path, name, ext);
 
-				IRenderAsset::RA_type_e type = (IRenderAsset::RA_type_e) i;
+				/*IRenderAsset::RA_type_e type = (IRenderAsset::RA_type_e) i;*/
+				int type = rules[i].type;
 
 				switch (type) 
 				{
-				case FWassets::IRenderAsset::RA_TYPE_Texture:
+				case TEXTURES:
 				{
 					TextureAsset* texture = new TextureAsset;
 					texture->SetName(name);
 
 					// get the pointer right from the asset container, and feed it 
-					TextureAssetRef txptr = dynamic_cast<TextureAsset*>(m_assets[AddObject(texture)].Get()); 
+					
+					TextureAssetRef txptr = dynamic_cast<TextureAsset*>(repo->GetObjPtr(repo->AddObject(texture)).Get());
 					m_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), txptr));
 					
 				}
 				break;
 
-				case FWassets::IRenderAsset::RA_TYPE_Font:
+				case FONT:
 				{}
 				break;
 
-				// a tobbiekkel egyelore nem foglalkozunk; ide jonnek majd azok is
-				//case FWassets::IRenderAsset::RA_TYPE_Material:
-				//{}
-				//break;
-
+				///@todo a shader betoltes legyen inkabb on-the-fly
 				///@todo: honnan tudjuk, hogy milyen shadert, es honnan generaltunk le?
-				case IRenderAsset::RA_TYPE_Shader:		/** Vegigprobalunk mindenfele shader tipust*/
+				case SHADERS:		/** Vegigprobalunk mindenfele shader tipust*/
 				{
 					///@todo eloforditott shaderekkel is tudjon kezdeni valamit
 
@@ -123,7 +133,7 @@ void FWassets::AssetPreloader::LoadCache()
 							shader->SetName(name);
 
 						// get the pointer right from the asset container, and feed it 
-						ShaderAssetRef shPtr = dynamic_cast<ShaderAsset*>(m_assets[AddObject(shader)].Get());
+						ShaderAssetRef shPtr = dynamic_cast<ShaderAsset*>(repo->GetObjPtr(repo->AddObject(shader)).Get());
 						m_builders.push_back(new ShaderLoader(loader->GetResourceByName(filename), sh_typ, shPtr));
 					}
 				}

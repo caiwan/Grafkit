@@ -241,6 +241,8 @@ namespace FWrender {
 
 	typedef Ref<Shader> ShaderRef_t;
 
+#define SHADER_BUCKET ":shader"
+
 	/**
 	enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
 	- itt most osszevontam az assettel az egeszet, remelem nem lesz miserable failure az egesz
@@ -260,10 +262,7 @@ namespace FWrender {
 		ShaderAsset& operator = (ShaderAsset in_ptr) { this->AssingnRef(in_ptr); return *this; }
 
 		~ShaderAsset() {}
-		virtual enum RA_type_e GetBucketID() { 
-			//return (enum RA_type_e)((size_t)RA_TYPE_Shader + (size_t)ptr->GetShaderType());
-			return RA_TYPE_Shader;
-		}
+		virtual const char* GetBucketID() { return SHADER_BUCKET; }
 	};
 
 	typedef ShaderAsset ShaderRef;

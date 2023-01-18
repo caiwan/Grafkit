@@ -10,7 +10,7 @@ class Referencable;
 class NodeIterator;
 class Node;
 
-class Node : /*virtual public Referencable,*/ virtual public Iterable{
+class Node : virtual public Iterable{
 	friend class NodeIterator;
 	public:
 		Node();
@@ -23,9 +23,14 @@ class Node : /*virtual public Referencable,*/ virtual public Iterable{
 		Node* getNextNode() { return this->m_rNodeNext; }
 
 		Node* removeNode();
-		void setObject(Referencable* pObject = nullptr);
+		
+		template<typename T> T* getObjectDynamic() { return dynamic_cast<T*>(m_pObject); }
+		template<typename T> T* getObjectStatic() { return static_cast<T*>(m_pObject); }
+		template<typename T> T* getObject() { return (T*)m_pObject; }
 
-		Referencable *& getObject() { return m_pObject; }
+		template<typename T> void setObject(T* obj) { m_pObject = obj; }
+		void setObject(void* obj) {m_pObject = obj; }
+
 		int hasNode() { return m_pObject != nullptr; }
 
 		Iterator* getIterator();
@@ -34,7 +39,7 @@ class Node : /*virtual public Referencable,*/ virtual public Iterable{
 		Node* m_rNodePrev;
 		Node* m_rNodeNext;
 
-		Referencable* m_pObject;
+		void *m_pObject;
 };
 
 
@@ -68,3 +73,4 @@ private:
 	Node* m_current;
 	Node* m_zero;
 };
+ 

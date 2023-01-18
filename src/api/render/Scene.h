@@ -17,6 +17,8 @@ namespace FWrender {
 
 		void Render(FWrender::Renderer & render);
 
+		void SetRootNode(Actor* root) { m_pScenegraph = root; }
+
 	protected:
 		Actor* m_pScenegraph;
 		// fenyek + camera

@@ -2,6 +2,7 @@
 #define ___TREE_H__
 
 #include <vector>
+#include <stack>
 
 #include "node.h"
 #include "iterator.h"
@@ -19,16 +20,11 @@ class BinaryTree;
 class ChainTree;
 class ListTree;
 
-enum NP_searchMode_e {
-	NP_search_preorder = 0,
-	NP_search_inorder,
-	NP_search_postorder,
-	NP_search_COUNT
-};
+/*======================================================================================================================= */
 
 /**
-	Node parser (interface); 
-	az Iterator minden elemet bejarja a fanak, vagy sornak, majd TreeParser
+Tree parser (interface);
+Custom rekurziv fa bejarashoz; ezt az interfacet orokited, implementalod, es jo
 */
 
 class TreeParser
@@ -38,14 +34,74 @@ class TreeParser
 	friend class BinaryTree;
 	friend class ListTree;
 
-	public:
-		TreeParser() {}
-		virtual ~TreeParser() {}
+public:
+	TreeParser() {}
+	virtual ~TreeParser() {}
 
-	protected:
-		virtual void parseNode(TreeNode* node) = 0;
-		virtual void push() = 0;	///< enter subtree
-		virtual void pop() = 0;		///< leave subtree
+protected:
+	/// Visit node 
+	virtual void parseNode(TreeNode* node) = 0;
+
+	/**
+	Push node
+	@param node parent node that being pushed into a stack
+	*/
+	virtual void push(TreeNode* node) = 0;
+
+	/**
+	Pop node
+	@param node the node that popped out of the stack
+	*/
+	virtual void pop(TreeNode*) = 0;
+};
+
+/**
+Tree iterator (interface);
+Custom iterativ fa bejarashoz; ezt az interfacet orokited, implementalod, es jo
+	- Csak eloremeno iteraciora kepes, visszafele nem tud menni - ezt meg kell oldani valahogy majd
+*/
+class TreeIterator : Iterator
+{
+	friend class TreeNode;
+	friend class ChainTree;
+	friend class BinaryTree;
+	friend class ListTree;
+
+public:
+	TreeIterator(TreeNode* root) : Iterator(), m_parser(nullptr), m_pCurrent(nullptr), m_pRoot(root) {}
+	~TreeIterator() {}
+
+	virtual void first() { m_pCurrent = m_pRoot; };
+	virtual void last() {};		///< Not supported
+	virtual void previous() {}	///< not supported
+	virtual int hasPrev() { return false; }; ///< not supported
+
+	virtual Node* getCurrent() { return (Node*)m_pCurrent; };
+
+	void setParser(TreeParser* parser) { this->m_parser = parser; }
+
+	// ezeket kell implementalni:
+	virtual int isDone() = 0;
+	virtual void next() = 0;
+	virtual int hasNext() = 0;
+
+protected:
+	TreeNode* m_pRoot, *m_pCurrent;
+	TreeParser* m_parser;
+	std::stack<TreeNode*> m_sNode;
+};
+
+
+
+/*======================================================================================================================= */
+
+/** milyen tipusu bejaro objektumot hozzon letre
+*/
+enum TRAVELSAL_Gen_Type {
+	TREE_TRAVEL_preorder = 0,
+	TREE_TRAVEL_inorder,
+	TREE_TRAVEL_postorder,
+	TREE_TRAVEL_COUNT
 };
 
 /**
@@ -63,54 +119,71 @@ class TreeNode : public Node
 
 	public:
 		//implementation of Iterable Interafce
+
+		///Alabol preorder iteratort hoz letre
 		virtual Iterator* getIterator();
-		Iterator* getIterator(enum NP_searchMode_e mode);
+		virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode) = 0;
 
 		bool hasParent() { return this->m_pParentNode != nullptr; }
-		
-	public:
-		virtual void parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth);
 
 	protected:
 		TreeNode *m_pParentNode;
 };
 
 /*======================================================================================================================= */
+/**
+*/
 class BinaryTree : public TreeNode
 {
-	friend class BinaryTree;
+friend class BinaryTree;
 public:
-		BinaryTree(BinaryTree* parent = nullptr) : TreeNode(parent) {}
-		~BinaryTree() {}
+	BinaryTree(BinaryTree* parent = nullptr) : TreeNode(parent) {}
+	~BinaryTree() {}
 
-		// editing the tree
-		void setParent(BinaryTree* parent);
-		void setLeftChild(BinaryTree* child);
-		void setRightChild(BinaryTree* child);
+	// editing the tree
+	void setParent(BinaryTree* parent);
+	void setLeftChild(BinaryTree* child);
+	void setRightChild(BinaryTree* child);
 
-		bool hasLeft() { return this->m_pLeftChild != nullptr;}
-		bool hasRight() { return this->m_pRightChild != nullptr;}
+	bool hasLeft() { return this->m_pLeftChild != nullptr;}
+	bool hasRight() { return this->m_pRightChild != nullptr;}
 
-		BinaryTree* insertLeftChild()  {return insertChild(m_pLeftChild);}
-		BinaryTree* insertRightChild() {return insertChild(m_pRightChild);}
+	BinaryTree* insertLeftChild()  {return insertChild(m_pLeftChild);}
+	BinaryTree* insertRightChild() {return insertChild(m_pRightChild);}
 				  
-		BinaryTree* getLeftChild()  { return this->m_pLeftChild; }
-		BinaryTree* getRightChild() { return this->m_pRightChild; }
+	BinaryTree* getLeftChild()  { return this->m_pLeftChild; }
+	BinaryTree* getRightChild() { return this->m_pRightChild; }
 				  
-		BinaryTree* getParent() { return (BinaryTree*)this->m_pParentNode; }
+	BinaryTree* getParent() { return (BinaryTree*)this->m_pParentNode; }
 
-		///@todo add remove features somehow 
+	///@todo add remove features somehow 
 
-		BinaryTree* detachLeftChild() {return this->detachChild(this->m_pLeftChild);}
-		BinaryTree* detachRighChild() {return this->detachChild(this->m_pRightChild);}
+	BinaryTree* detachLeftChild() {return this->detachChild(this->m_pLeftChild);}
+	BinaryTree* detachRighChild() {return this->detachChild(this->m_pRightChild);}
 
-		virtual void parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth = TREE_MAXDEPTH);
+	virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode = TREE_TRAVEL_preorder);
+
+protected:
+	BinaryTree* m_pLeftChild, *m_pRightChild;
+				  
+	BinaryTree* insertChild(BinaryTree* &childNode);
+	BinaryTree* detachChild(BinaryTree* &oldChild);
 
 	protected:
-		BinaryTree* m_pLeftChild, *m_pRightChild;
-				  
-		BinaryTree* insertChild(BinaryTree* &childNode);
-		BinaryTree* detachChild(BinaryTree* &oldChild);
+		class PreorderIterator : public TreeIterator {
+		public:
+			PreorderIterator(BinaryTree* root) : TreeIterator(root){}
+			~PreorderIterator() {}
+			
+			virtual int isDone();
+			virtual void next(); 
+			virtual int hasNext();
+		};
+		
+		/*class InorderIterator : public TreeIterator {
+		};*/
+		class PostorderIterator : public TreeIterator {
+		};
 };
 
 /*======================================================================================================================= */
@@ -178,7 +251,7 @@ class ChainTree : public TreeNode
 
 		// ---------------- // ----------------
 		/// Bejaro algoritmus
-		virtual void parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth = TREE_MAXDEPTH);
+		virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode);
 
 	protected:
 		ChainTree* insertNeighbour(ChainTree* newNode, ChainTree *& insSide, ChainTree *& parentSide);
@@ -249,11 +322,14 @@ class ListTree : public TreeNode
 		inline void deleteChild(int n){delete this->m_vChildren[n]; this->m_vChildren[n] = NULL;}
 		/// @}
 
-		virtual void parse(TreeParser* parser, enum NP_searchMode_e mode = NP_search_inorder, int maxdepth = TREE_MAXDEPTH);
-		//void parse(TreeParser* parser, int maxdepth=TREE_MAXDEPTH);
+		virtual Iterator* getIterator(enum TRAVELSAL_Gen_Type mode);
 
 	private:
 		std::vector<ListTree*> m_vChildren;
 };
+
+
+
+
 
 #endif /*___TREE_H__*/

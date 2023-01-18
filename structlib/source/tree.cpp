@@ -20,27 +20,24 @@ namespace GenIterator{
 
 Iterator * TreeNode::getIterator()
 {
-	return this->getIterator(NP_search_preorder);
+	return this->getIterator(TREE_TRAVEL_preorder);
 }
-
-Iterator * TreeNode::getIterator(NP_searchMode_e mode)
-{
-	TreeNode *gen = nullptr;
-
-	/// @todo ... 
-
-	return nullptr;
-}
-
-void TreeNode::parse(TreeParser * parser, NP_searchMode_e mode, int maxdepth)
-{
-	throw EX(InvalidOperationException);
-}
-
 
 // ====================================================================================================================================================================================
 // Implementation of BinaryTree
 // ====================================================================================================================================================================================
+
+Iterator * BinaryTree::getIterator(enum TRAVELSAL_Gen_Type mode)
+{
+	switch (mode) {
+	case TREE_TRAVEL_preorder:
+		return new BinaryTree::PreorderIterator(this);
+	case TREE_TRAVEL_inorder:
+		return nullptr;
+	case TREE_TRAVEL_postorder:
+		return nullptr;
+	}
+}
 
 // editing
 BinaryTree * BinaryTree::insertChild(BinaryTree * &childNode){
@@ -87,37 +84,86 @@ void BinaryTree::setRightChild(BinaryTree * child)
 //	throw EX_DETAILS(NotImplementedMethodException, "az isten bassza meg, oke");
 //}
 
-void BinaryTree::parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth) {
-	if(!parser) return;
-	if(maxdepth<0) return;
+//void BinaryTree::parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth) {
+//	if(!parser) return;
+//	if(maxdepth<0) return;
+//
+//	///@todo fa bejarasi strategiak (inorder, preorder, ... +inverz)
+//
+//	parser->push();
+//
+//	///@ todo ezeket a bejaro fuggvenyeket ki kene venni inkabb kulon metodusokba
+//	switch (mode) {
+//	case NP_search_inorder: // visit, left, right
+//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
+//		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
+//		break;
+//	
+//	case NP_search_preorder: // left, visit, right
+//		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
+//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
+//		break;
+//	
+//	case NP_search_postorder: // left, right, visit
+//		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
+//		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
+//		if (this->hasNode()) parser->parseNode(this);
+//		break;
+//	}
+//
+//	parser->pop();
+//}
 
-	///@todo fa bejarasi strategiak (inorder, preorder, ... +inverz)
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/// @todo folyt kov http://www.geeksforgeeks.org/inorder-tree-traversal-without-recursion/
+int BinaryTree::PreorderIterator::isDone()
+{
+	return m_sNode.empty() && m_pCurrent == nullptr;
+}
 
-	parser->push();
+void BinaryTree::PreorderIterator::next()
+{
+	BinaryTree *node = (BinaryTree *)m_pCurrent;
+	if (node != nullptr) {
+		if (m_parser)
+			m_parser->parseNode(node);
 
-	///@ todo ezeket a bejaro fuggvenyeket ki kene venni inkabb kulon metodusokba
-	switch (mode) {
-	case NP_search_inorder: // visit, left, right
-		if (this->hasNode()) parser->parseNode(this);
-		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
-		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
-		break;
-	
-	case NP_search_preorder: // left, visit, right
-		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
-		if (this->hasNode()) parser->parseNode(this);
-		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
-		break;
-	
-	case NP_search_postorder: // left, right, visit
-		if (this->m_pLeftChild) this->m_pLeftChild->parse(parser, mode, maxdepth - 1);
-		if (this->m_pRightChild) this->m_pRightChild->parse(parser, mode, maxdepth - 1);
-		if (this->hasNode()) parser->parseNode(this);
-		break;
+		if (node->hasRight()) {
+			// push, right
+			if (m_parser)
+				m_parser->push(node);
+			m_sNode.push(node);
+
+			node = node->getRightChild();
+		}
+
+		if (m_parser)
+			m_parser->push(node);
+
+		// itt nem pusholunk a stackbe, csak a parsert hivjuk meg
+		node = node->getLeftChild();
+	}
+	else {
+		// pop 
+		if (m_parser)
+			m_parser->pop(node);
+		node = (BinaryTree *)m_sNode.top();
+		m_sNode.pop();
 	}
 
-	parser->pop();
+	// keep going 
+	m_pCurrent = node;
 }
+
+int BinaryTree::PreorderIterator::hasNext()
+{
+	BinaryTree * node = (BinaryTree *)m_pCurrent;
+	return node && (node->hasLeft() || node->hasRight());
+}
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // ====================================================================================================================================================================================
 // Implementation of ChainTree
@@ -167,6 +213,11 @@ ChainTree* ChainTree::insertChild(ChainTree *child){
 	return newchild;
 }
 
+Iterator * ChainTree::getIterator(TRAVELSAL_Gen_Type mode)
+{
+	return nullptr;
+}
+
 ChainTree* ChainTree::insertNeighbour(ChainTree* _newNode, ChainTree*& insSide, ChainTree*&parentSide)
 {
 	if (m_pParentNode == nullptr) {
@@ -200,33 +251,33 @@ inline ChainTree* ChainTree::insertRight(ChainTree *right){
 	return insertNeighbour(right, m_pRight, this->getParent()->m_pFarRightChild);
 }
 
-void ChainTree::parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth) {
-	if (!parser) return;
-	if (maxdepth < 0) return;
-
-	///@ todo ezeket a bejaro fuggvenyeket ki kene venni inkabb kulon metodusokba
-	///@todo feltelezezzuk, hogy nincs balra szomszed -> parseolas elott rendezni kell a fat, hogy a kozvetlen leszarmazott legyen a szelso-baloldali elem
-	// innentol csak jobbra indulunk
-
-	if (mode == NP_search_inorder) {
-		parser->push();
-		if (this->hasNode()) parser->parseNode(this);
-		if (this->hasChild()) m_pChild->parse(parser, mode, maxdepth - 1);
-
-		parser->pop();
-
-		if (this->hasRight()) m_pRight->parse(parser, mode, maxdepth - 1);
-	}
-	else {
-		parser->push();
-		if (this->hasChild()) m_pChild->parse(parser, mode, maxdepth - 1);
-		if (this->hasNode()) parser->parseNode(this);
-
-		parser->pop();
-
-		if (this->hasRight()) m_pRight->parse(parser, mode, maxdepth - 1);
-	}
-}
+//void ChainTree::parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth) {
+//	if (!parser) return;
+//	if (maxdepth < 0) return;
+//
+//	///@ todo ezeket a bejaro fuggvenyeket ki kene venni inkabb kulon metodusokba
+//	///@todo feltelezezzuk, hogy nincs balra szomszed -> parseolas elott rendezni kell a fat, hogy a kozvetlen leszarmazott legyen a szelso-baloldali elem
+//	// innentol csak jobbra indulunk
+//
+//	if (mode == NP_search_inorder) {
+//		parser->push();
+//		if (this->hasNode()) parser->parseNode(this);
+//		if (this->hasChild()) m_pChild->parse(parser, mode, maxdepth - 1);
+//
+//		parser->pop();
+//
+//		if (this->hasRight()) m_pRight->parse(parser, mode, maxdepth - 1);
+//	}
+//	else {
+//		parser->push();
+//		if (this->hasChild()) m_pChild->parse(parser, mode, maxdepth - 1);
+//		if (this->hasNode()) parser->parseNode(this);
+//
+//		parser->pop();
+//
+//		if (this->hasRight()) m_pRight->parse(parser, mode, maxdepth - 1);
+//	}
+//}
 
 // ====================================================================================================================================================================================
 // Implementation of ListTree
@@ -243,42 +294,49 @@ void ListTree::insertChild(ListTree *child)
 	child->setParent(this, 0);
 }
 
-void ListTree::parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth) {
-	if(!parser) return;
-	if(maxdepth<0) return;
-
-	///@todo fa bejarasi strategiak
-
-	parser->push();
-
-	///@ todo ezeket a bejaro fuggvenyeket ki kene venni inkabb kulon metodusokba
-
-	//	inorder:= parse, majd gyerek, kulonben forditva
-	if (mode == NP_search_inorder) {
-		// kurrens node feldolg
-
-		if (this->hasNode())
-			parser->parseNode(this);
-
-		// kozvetlen leszarmazott
-		if (this->hasChild()) {
-			for (int i = 0; i < this->getChildCount(); i++) {
-				this->m_vChildren[i]->parse(parser, mode, maxdepth - 1);
-			}
-		}
-	}
-	else
-	{
-		
-		if (this->hasChild()) {
-			for (int i = 0; i < this->getChildCount(); i++) {
-				this->m_vChildren[i]->parse(parser, mode, maxdepth - 1);
-			}
-		}
-
-		if (this->hasNode())
-			parser->parseNode(this);
-	}
-
-	parser->pop();
+Iterator * ListTree::getIterator(TRAVELSAL_Gen_Type mode)
+{
+	return nullptr;
 }
+
+//void ListTree::parse(TreeParser* parser, enum NP_searchMode_e mode, int maxdepth) {
+//	if(!parser) return;
+//	if(maxdepth<0) return;
+//
+//	///@todo fa bejarasi strategiak
+//
+//	parser->push();
+//
+//	///@ todo ezeket a bejaro fuggvenyeket ki kene venni inkabb kulon metodusokba
+//
+//	//	inorder:= parse, majd gyerek, kulonben forditva
+//	if (mode == NP_search_inorder) {
+//		// kurrens node feldolg
+//
+//		if (this->hasNode())
+//			parser->parseNode(this);
+//
+//		// kozvetlen leszarmazott
+//		if (this->hasChild()) {
+//			for (int i = 0; i < this->getChildCount(); i++) {
+//				this->m_vChildren[i]->parse(parser, mode, maxdepth - 1);
+//			}
+//		}
+//	}
+//	else
+//	{
+//		
+//		if (this->hasChild()) {
+//			for (int i = 0; i < this->getChildCount(); i++) {
+//				this->m_vChildren[i]->parse(parser, mode, maxdepth - 1);
+//			}
+//		}
+//
+//		if (this->hasNode())
+//			parser->parseNode(this);
+//	}
+//
+//	parser->pop();
+//}
+
+

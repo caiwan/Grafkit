@@ -110,10 +110,46 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 	std::string name = path.C_Str();
 
 	if (result == AI_SUCCESS && path.data[0]) {
-		textureAsset = (TextureAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Texture, name).Get();
+		textureAsset = (TextureAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(TEXTURE_BUCKET, name).Get();
 	}
 
 	return textureAsset;
+}
+
+// ================================================================================================================================================================
+// Parse assimp scenegraph 
+// ================================================================================================================================================================
+
+
+void assimp_parseScenegraph(aiNode* ai_node, Actor** actor_node, int maxdepth = TREE_MAXDEPTH) 
+{
+	size_t i=0, j=0, k = 0;
+
+	if (!ai_node)
+		return;
+	
+	if (maxdepth < 0)
+		return;
+
+	Actor* actor = new Actor();
+	
+
+	// setup element
+	for (i = 0; i < ai_node->mNumMeshes; i++) {
+		UINT mesh_id = ai_node->mMeshes[i];
+		// ezt kell besetelni a nodeokba entitykkent
+	}
+
+	actor->SetName(ai_node->mName.C_Str());
+
+	// next nodes
+	for (i = 0; i < ai_node->mNumChildren; i++) {
+		Actor *child = nullptr;
+		assimp_parseScenegraph(ai_node->mChildren[i], &child, maxdepth - 1);
+		actor->AddChild(child);
+	}
+
+	*actor_node = actor;
 }
 
 // ================================================================================================================================================================
@@ -163,7 +199,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 	std::vector<MaterialRef> materials;
 	std::vector<ModelRef> models;
 	std::vector<CameraRef> cameras;
-	 std::vector<LightRef> lights;
+	std::vector<LightRef> lights;
 
 	// -- load materials
 	if (scene->HasMaterials()) {
@@ -197,7 +233,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 
 			// -> valahol a loaderen kivul kell megtenni a shader kijelolest, illetve betoltest
 			///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre~
-			ShaderAssetRef shader_fs = (ShaderAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Shader, "default.hlsl:vertex").Get();
+			ShaderAssetRef shader_fs = (ShaderAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 			material->SetShader(shader_fs);
 
 			materials.push_back(material);
@@ -208,7 +244,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 	// Itt letre kell hozni egy uj shadert -> igazabol ezt valahol kivul kellene megtenni
 	
 	///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre
-	ShaderAssetRef shader_vs = (ShaderAsset*)assman->GetObjectByName(IRenderAsset::RA_TYPE_Shader, "default.hlsl:vertex").Get();
+	ShaderAssetRef shader_vs = (ShaderAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 	
 	/*
 	if (shader_vs.Invalid())
@@ -385,7 +421,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 
 	// folyt kov. 
 	Actor* root_node = new Actor;
-	assimp_parseScenegraph(scene->mRootNode, root_node);
+	assimp_parseScenegraph(scene->mRootNode, &root_node);
 	m_scenegraph->SetRootNode(root_node);
 
 #endif

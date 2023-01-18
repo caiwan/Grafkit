@@ -31,3 +31,9 @@ void FWrender::Actor::Render(FWrender::Renderer & render)
 		m_pEntities[i]->Render(render);
 	}
 }
+
+void FWrender::Actor::AddChild(Actor * child)
+{
+	m_pChildren.push_back(child);
+	child->m_pParent = this;
+}

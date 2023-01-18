@@ -43,26 +43,69 @@ namespace FWassets{
 		Guid GenerateUUID();
 		void SetUUID(Guid uuid) { this->m_guid = uuid; }
 
-		/// @todo ezt ki kell venni az osztalybol, es a nevterbe tenni eggyel feljebb
-		enum RA_type_e {
-			RA_TYPE_Texture,
-			RA_TYPE_Font,
-			RA_TYPE_Material,
-			RA_TYPE_Light,
-			RA_TYPE_Shader,  //RA_TYPE_Shader_VS, RA_TYPE_Shader_PS, RA_TYPE_Shader_GM, RA_TYPE_Shader_CP,
-			RA_TYPE_Entity3D, /// @todo per-modelenkkent kell meg egy bucket; vagy meg kellene kovetelni a teljses nev egyediseget
-			//RA_TYPE_Aux0,
-			//RA_TYPE_Aux1,
-			RA_TYPE_COUNT
-		};
-
-		virtual enum RA_type_e GetBucketID() = 0;
+		virtual const char* GetBucketID() = 0;
 
 	protected:
 		/// Sets asset manager 
 		std::string m_name;
 		Guid m_guid;
 	};
+
+	///@todo a render asset manager asset repositorykat tarol; 
+	///@todo a repositiry-k tartoznak egy-egy generatorhoz; esetleg csatolhatok egy scenehez. - mindezek nevvel lennenek ellatva
+
+	/**
+	IRenderAssetRepository;
+		- *Ezen belul bucketek vannak, amik a generatoron belul felhasznalt, es elert asseteket taroljak.												  *
+		- *Legyen egy root repository, ahol a mindenki szamara elerhet kozos cuccok vannak; shaderek, texturak, fontok; ezek. - ilyenre kell atalakitani*
+	*/
+	class IRenderAssetRepository {
+	public:
+		IRenderAssetRepository() {}
+		virtual ~IRenderAssetRepository() {}
+
+	public:
+		/**
+		Hozzaadja az assetet a repohoz.
+		*/
+		size_t AddObject(IRenderAsset* obj);
+		void RemoveObject(IRenderAsset* obj);
+
+		///@{
+		/**
+		Ha van asset manager beallitva a render assetek fele, azok minden set name es guid hivaskor meghivjak ezeket.
+		Ha lehet, erdmes elobb beallitani az nevet es az uuid-t, majd aztan beallitani az asset managert, es hozza adni az asset repokohz a dolgokat.
+		*/
+		///@todo ezek ketten nem fognak mukodni egyelore
+		/*void ChangeName(IRenderAsset* obj, std::string newname);
+		void ChangeUUID(IRenderAsset *obj, Guid newuuid);*/
+		///@}
+
+		Ref<IRenderAsset> GetObjectByUUID(std::string bucket, Guid uuid);
+		Ref<IRenderAsset> GetObjectByName(std::string bucket, std::string name);
+
+		Ref<IRenderAsset> GetObjPtr(size_t id) { return this->m_assets[id]; }
+
+	protected:
+		std::vector<Ref<IRenderAsset>> m_assets;
+
+		typedef std::map<std::string, size_t> name_map_t;
+		typedef std::map<Guid, size_t> id_map_t;
+
+		struct bucket_t {
+			name_map_t m_mapNames;
+			id_map_t m_mapID;
+		};
+
+		struct bucket_t* GetBucket(std::string bucket);
+
+		typedef std::map<std::string, bucket_t> name_bucket_map_t;
+		name_bucket_map_t m_bucket;
+	};
+
+	
+	///@todod harelease-ben forditod, akkor eleg egy ":"
+#define ROOT_REPOSITORY ":root"
 
 	/**
 	An asset manager that 
@@ -81,33 +124,17 @@ namespace FWassets{
 		//virtual FWassets::IResourceFactory* GetResourceFactory() = 0;
 		virtual FWrender::Renderer & GetDeviceContext() = 0;
 
-	public:
-		/**
-		Hozzaadja az assetet a repohoz.
-		*/
-		size_t AddObject(IRenderAsset* obj);
-		void RemoveObject(IRenderAsset* obj);
+		///Arra az esetre, ha valamit kezdeni akarunk vele
+		virtual IRenderAssetRepository* newRenderAssetRepository() { return new IRenderAssetRepository(); }
 
-		///@{
-		/**
-		Ha van asset manager beallitva a render assetek fele, azok minden set name es guid hivaskor meghivjak ezeket.
-		Ha lehet, erdmes elobb beallitani az nevet es az uuid-t, majd aztan beallitani az asset managert, es hozza adni az asset repokohz a dolgokat.
-		*/
-		void ChangeName(IRenderAsset* obj, std::string newname);
-		void ChangeUUID(IRenderAsset *obj, Guid newuuid);
-		///@}
-
-		Ref<IRenderAsset> GetObjectByUUID(enum IRenderAsset::RA_type_e type, Guid uuid);
-		Ref<IRenderAsset> GetObjectByName(enum IRenderAsset::RA_type_e type, std::string name);
+		IRenderAssetRepository* GetRepository(std::string name);
 
 	protected:
-		std::vector<Ref<IRenderAsset>> m_assets;
+		typedef std::map<std::string, IRenderAssetRepository*> repository_map_t;
+		repository_map_t m_repository;
 
-		typedef std::map<std::string, size_t> name_map_t;
-		typedef std::map<Guid, size_t> id_map_t;
 
-		name_map_t m_mapNames[IRenderAsset::RA_TYPE_COUNT];
-		id_map_t m_mapID[IRenderAsset::RA_TYPE_COUNT];
+		///@todo valahova ide be kellene rakni egy mapet, ami megfelelteti az uuid-t a megfelelo rempository bucktjanak az objektumokat
 	};
 
 	///@todo ez az egesz hobelebanc itten e teljes revizionalasra, es ujratervezesre szorul.
@@ -128,3 +155,4 @@ namespace FWassets{
 
 DEFINE_EXCEPTION(NoAssetFoundByNameException, 1, "No asset found by the given name");
 DEFINE_EXCEPTION(NoAssetFoundByUUIDException, 2, "No asset found by the given UUID");
+DEFINE_EXCEPTION(NoAssetBucketFoundException, 3, "No asset bucket found");

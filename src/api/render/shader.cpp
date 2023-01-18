@@ -740,6 +740,7 @@ void FWrender::ShaderLoader::SetEntryPoint(std::string entrypoint)
 	m_entrypoint = entrypoint;
 }
 
+///@todo a shader betoltes menjen on-the-fly, es ne repositorybol
 void FWrender::ShaderLoader::operator()(FWassets::IRenderAssetManager * const & assman)
 {
 	if (m_in.Invalid())
@@ -766,11 +767,14 @@ void FWrender::ShaderLoader::operator()(FWassets::IRenderAssetManager * const & 
 	catch (MissingShaderException &e) {
 		// olyan shadert toltottunk be valoszinuleg, aminek nincs meg az az entrypointja, ami eppen kellene
 		// itt kivesszuk azt az assetmanagerbol, es az exceptiont eltesszuk
-		assman->RemoveObject(m_in);
+		
+		assman->GetRepository(ROOT_REPOSITORY)->RemoveObject(m_in);
+		//assman->RemoveObject(m_in);
 	}
 	catch (ShaderException &e) {
 		// Itt tortent valami a shaderrel, vagy nem fordul le, vagy nincs ilyen entrypoint;
 		// utobbi esetben nem ezeket a drodiokat keressuk
-		assman->RemoveObject(m_in);
+		assman->GetRepository(ROOT_REPOSITORY)->RemoveObject(m_in);
+		//assman->RemoveObject(m_in);
 	}
 }

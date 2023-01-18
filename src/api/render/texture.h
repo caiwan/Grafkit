@@ -22,9 +22,10 @@ namespace FWrender
 
 	class TextureAssetRef;
 
+#define TEXTURE_BUCKET ":texture"
 
 	// ========================================================================================================================
-
+	///@todo erre a mokara fel lehetne talalni egy makrot, ami megcsinalja mindezt
 	/**
 	`DHOM` - A wrapper class to embed volatile textures
 	- A Render asset interacet, es a textura objektumot egyesiti
@@ -40,7 +41,7 @@ namespace FWrender
 		TextureAsset();
 		~TextureAsset();
 
-		virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Texture; }
+		virtual const char* GetBucketID() { return TEXTURE_BUCKET; }
 	};
 
 	/**
@@ -64,7 +65,7 @@ namespace FWrender
 
 		operator Texture* () { return this->ptr->ptr; }
 		operator TextureRef () { return this->ptr->ptr; }
-		TextureAssetRef& operator = (Texture* in_ptr) { this->ptr->ptr = in_ptr; return *this; }
+		TextureAssetRef& operator = (Texture* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
 		TextureAssetRef& operator = (TextureAsset* in_ptr) { this->AssingnRef(in_ptr); return *this; }
 		TextureAssetRef& operator = (TextureAssetRef& other) { this->AssingnRef(other); return *this; }
 	};

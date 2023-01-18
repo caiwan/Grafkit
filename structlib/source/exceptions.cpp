@@ -8,6 +8,8 @@
 using namespace std;
 using namespace FWdebug;
 
+///@todo use std::string !!!
+
 FWdebug::Exception::Exception(int errorCode, const char * message, const char * file, const char * function, int line, const char * details)
 	: 
 	m_formattedMessage(NULL),
@@ -31,7 +33,7 @@ FWdebug::Exception::Exception(int errorCode, const char * message, const char * 
 Exception::~Exception()
 {
 	delete[] this->m_formattedMessage;
-	delete[] * (const_cast<char**>(&m_details)); ///@todo ez mi a faszs
+	delete[] * (const_cast<char**>(&m_details)); ///@todo ez valami kulonos formedveny
 }
 
 char const * FWdebug::Exception::what() const

@@ -11,6 +11,8 @@
 ///@todo aligned new-t mindenre
 namespace FWrender{
 
+#define LIGHT_BUCKET ":light"
+
 	class BaseLight;
 	typedef Ref<BaseLight> LightRef; 
 
@@ -37,7 +39,7 @@ namespace FWrender{
 		/// Setup the corresponding constant buffer inside the shader
 		void SetShaderCB(ShaderRef rPShader);
 
-		virtual enum RA_type_e GetBucketID() { return IRenderAsset::RA_TYPE_Light; }
+		virtual const char* GetBucketID() { return LIGHT_BUCKET; }
 
 	protected:
 

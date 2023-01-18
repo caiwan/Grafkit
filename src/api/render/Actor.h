@@ -22,6 +22,8 @@ namespace FWrender {
 	class Entity3DEvents;
 	class Actor;
 
+#define ENTITY3D_BUCKET ":entity3d"
+
 	class Entity3D : virtual public FWassets::IRenderAsset
 	{
 	friend class Actor;
@@ -55,7 +57,7 @@ namespace FWrender {
 
 		/// @todo + bounding box, ha kell 1
 
-		virtual enum RA_type_e GetBucketID() { return FWassets::IRenderAsset::RA_TYPE_Entity3D; }
+		virtual const char* GetBucketID() { return ENTITY3D_BUCKET; }
 	};
 
 
@@ -66,20 +68,28 @@ namespace FWrender {
 			virtual void onRender(ID3D11DeviceContext* deviceContext, Actor*& actor) {}
 	};
 
+#define ACTOR_BUCKET ":actor"
 
 	/**
 	An actor node - ez a scenegraph es a nodeja
 	*/
-	class Actor //: public virtual Referencable
+	class Actor : public FWassets::IRenderAsset 
 	{
 	friend class Scene;
 	public:
 		Actor();
 		~Actor();
 
-		FWmath::Matrix& Matrix() { return m_viewMatrix; };
-
+		FWmath::Matrix& Matrix() { return m_viewMatrix; }
 		virtual void Render(FWrender::Renderer &render);
+
+		/// @todo igazi ListTree-t hasznaljon, ha lehet, es majd mukodik
+		void AddChild(Actor* child);
+		Actor* GetParent() { return m_pParent; }
+
+		std::vector<Ref<Entity3D>>& GetEntities() { return m_pEntities; }
+
+		virtual const char* GetBucketID() { return ACTOR_BUCKET; }
 
 	protected:
 		///@todo ezek kellenek-e?

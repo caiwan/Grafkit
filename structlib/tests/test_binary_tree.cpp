@@ -52,15 +52,15 @@ public:
 
 TEST_F(BinaryTreeTest, InsertChild) {
 	ASSERT_EQ(nullptr, tree->getParent());
-	ASSERT_EQ(nodeA, tree->getObject());
+	ASSERT_EQ(nodeA, tree->getObject<NodeRef>());
 
 	ASSERT_TRUE(tree->hasLeft());
-	ASSERT_EQ(nodeB, tree->getLeftChild()->getObject());
-	ASSERT_EQ(nodeA, tree->getLeftChild()->getParent()->getObject());
+	ASSERT_EQ(nodeB, tree->getLeftChild()->getObject<NodeRef>());
+	ASSERT_EQ(nodeA, tree->getLeftChild()->getParent()->getObject<NodeRef>());
 
 	ASSERT_TRUE(tree->hasRight());
-	ASSERT_EQ(nodeC, tree->getRightChild()->getObject());
-	ASSERT_EQ(nodeA, tree->getRightChild()->getParent()->getObject());
+	ASSERT_EQ(nodeC, tree->getRightChild()->getObject<NodeRef>());
+	ASSERT_EQ(nodeA, tree->getRightChild()->getParent()->getObject<NodeRef>());
 }
 
 TEST_F(BinaryTreeTest, DeleteChild) {
@@ -87,17 +87,54 @@ TEST_F(BinaryTreeTest, DetachChild) {
 	BinaryTree* subtreeC = tree->getRightChild(); 
 	subtreeC->insertLeftChild()->setObject(nodeD);
 
-	ASSERT_TRUE(subtreeC->getObject() == nodeC);
-	ASSERT_TRUE(subtreeC->getParent()->getObject() == nodeA);
+	ASSERT_TRUE(subtreeC->getObject<NodeRef>() == nodeC);
+	ASSERT_TRUE(subtreeC->getParent()->getObject<NodeRef>() == nodeA);
 
 	// delete?
 
 	subtreeC = subtreeC->detachLeftChild();
 
 	ASSERT_TRUE(subtreeC->getParent()== nullptr);
-	ASSERT_TRUE(subtreeC->getObject() == nodeC);
-	ASSERT_TRUE(subtreeC->getLeftChild()->getObject() == nodeD);
+	ASSERT_TRUE(subtreeC->getObject<NodeRef>() == nodeC);
+	ASSERT_TRUE(subtreeC->getLeftChild()->getObject<NodeRef>() == nodeD);
 
 	// delete?
 }
 
+// === TREE TRAVERSAL, Recursive ===
+TEST_F(BinaryTreeTest, RecursiveTravelsal_Inorder) { FAIL(); }
+TEST_F(BinaryTreeTest, RecursiveTravelsal_Preorder) { FAIL(); }
+TEST_F(BinaryTreeTest, RecursiveTravelsal_Postorder) { FAIL(); }
+
+// === TREE TRAVERSAL, Iterative ===
+TEST_F(BinaryTreeTest, IterativeTravelsal_Inorder) {
+	/* A B C */
+	Iterator* iterator = tree->getIterator();
+	ASSERT_NE(iterator, nullptr);
+
+	iterator->first();
+	ASSERT_FALSE(iterator->isDone());
+	ASSERT_TRUE(iterator->hasNext());
+	ASSERT_EQ(iterator->getCurrent()->getObject<NodeRef>(), nodeA);
+	
+	iterator->next();
+	ASSERT_FALSE(iterator->isDone());
+	ASSERT_TRUE(iterator->hasNext());
+	ASSERT_EQ(iterator->getCurrent()->getObject<NodeRef>(), nodeB);
+	
+	iterator->next();
+	ASSERT_FALSE(iterator->isDone());
+	ASSERT_TRUE(iterator->hasNext());
+	ASSERT_EQ(iterator->getCurrent()->getObject<NodeRef>(), nodeC);
+
+	ASSERT_TRUE(iterator->isDone());
+	ASSERT_FALSE(iterator->hasNext());
+}
+
+TEST_F(BinaryTreeTest, IterativeTravelsal_Preorder) {
+	FAIL();
+}
+
+TEST_F(BinaryTreeTest, IterativeTravelsal_Postorder) {
+	FAIL();
+}

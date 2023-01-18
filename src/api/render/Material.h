@@ -25,16 +25,18 @@ namespace FWrender {
 		
 		TT_alpha,		///< alpha map
 		TT_normal,		///< bump map
-		TT_shiniess,   ///< shininess map
-		TT_specular,   ///< specular map
+		TT_shiniess,	///< shininess map
+		TT_specular,	///< specular map
 		TT_selfillum,	///< self illumination map
-		TT_reflect,	///< reflection map
+		TT_reflect,		///< reflection map
 		TT_bump,		///< bump map
 
 		TT_aux, ///< aux texture, used for pretty much everything else
 
 		TT_COUNT	// count
 	};
+
+#define MATERIAL_BUCKET ":material"
 
 	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
 	///@todo aligned new-t mindenre
@@ -76,9 +78,7 @@ namespace FWrender {
 		/// Legyen public arra az esetre, ha megis ... 
 		virtual void ReflectShader();
 
-		virtual enum RA_type_e GetBucketID() {
-			return FWassets::IRenderAsset::RA_TYPE_Material;
-		}
+		virtual const char* GetBucketID() { return MATERIAL_BUCKET; }
 
 	protected:
 		/**
@@ -105,3 +105,5 @@ namespace FWrender {
 	typedef Ref<MaterialBase> MaterialRef;
 
 }
+
+/// @Todo material generator + kulonbozo tipusu materialok generalasa

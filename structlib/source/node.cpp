@@ -47,16 +47,6 @@ Node* Node::removeNode()
 	return this;
 }
 
-void Node::setObject(Referencable * pObject)
-{
-	//if (m_pObject != nullptr && m_pObject->Release() == 0)
-		//delete m_pObject;
-	
-	//if (pObject) 
-		//pObject->AddRef();
-	m_pObject = pObject;
-}
-
 Iterator * Node::getIterator()
 {
 	return new NodeIterator(this);
