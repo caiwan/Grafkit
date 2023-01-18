@@ -98,6 +98,9 @@
     <ClCompile Include="render\Scene.cpp">
       <Filter>Source Files\render</Filter>
     </ClCompile>
+    <ClCompile Include="render\Light.cpp">
+      <Filter>Source Files\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builtin_data\c64palette.h">
@@ -173,6 +176,9 @@
       <Filter>Source Files\core</Filter>
     </ClInclude>
     <ClInclude Include="render\Scene.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\Light.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
   </ItemGroup>

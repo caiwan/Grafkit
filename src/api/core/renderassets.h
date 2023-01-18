@@ -48,6 +48,7 @@ namespace FWassets{
 			RA_TYPE_Texture,
 			RA_TYPE_Font,
 			RA_TYPE_Material,
+			RA_TYPE_Light,
 			RA_TYPE_Shader,  //RA_TYPE_Shader_VS, RA_TYPE_Shader_PS, RA_TYPE_Shader_GM, RA_TYPE_Shader_CP,
 			RA_TYPE_Entity3D, /// @todo per-modelenkkent kell meg egy bucket; vagy meg kellene kovetelni a teljses nev egyediseget
 			//RA_TYPE_Aux0,
