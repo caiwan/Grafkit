@@ -1,17 +1,16 @@
+#include "CurveEditorScene.h"
+
 #include <QGraphicsScene>
 #include <QGraphicsSceneEvent>
 #include <QDebug>
 
-#include "qgraphicsview.h"
+#include <QGraphicsView>
 
 #include "animation/animation.h"
 
-#include "curveeditorwidget.h"
-#include "curveeditorscene.h"
-#include "curvepointitem.h"
-#include "curvedoc.h"
-#include "CurveSceneModule.h"
-
+#include "CurvePointItem.h"
+#include "CurvePointEditor.h"
+#include "CurveEditor.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -24,7 +23,7 @@ namespace {
 	const QColor purple = QColor(255, 128, 255);
 }
 
-CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent), CurveSceneView()
+CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent), CurveEditorView()
 , m_area(nullptr)
 , m_audiogramImage(nullptr)
 {
@@ -99,19 +98,19 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 
 void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
 {
-	const CurveSceneModule* parent = dynamic_cast<CurveSceneModule*>(m_module.Get());
+	const CurveEditor* parent = dynamic_cast<CurveEditor*>(m_module.Get());
 	assert(parent);
 
-	CurveManager* curveManager = parent->GetCurveManager();
+	//CurvePointEditor* curveManager = parent->();
 
 	// 2. draw the curves.
 
-	auto channel = curveManager->GetChannel();
+	auto channel = parent->GetChannel();
 
 	if (channel.Invalid() || channel->GetKeyCount() == 0)
 		return;
 
-	curveManager->Recalculate(m_area);
+	parent->Recalculate(m_area);
 
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setPen(QPen(grey));

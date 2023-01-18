@@ -24,13 +24,13 @@ namespace Idogep {
 
 	class MusicProxy;
 
-	class Editor : public Module{
+	class Editor : public Controller{
 	public:
-		Editor(Ref<Module> parent, Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
+		Editor(Ref<Controller> parent, Grafkit::Renderer &render, Grafkit::IResourceManager * const & resman);
 		~Editor();
 
 		void Initialize() override;
-		//void MediateSiblingModule(Ref<Module> module);
+		//void MediateSiblingModule(Ref<Controller> module);
 
 		void InitializeDocument();
 

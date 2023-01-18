@@ -27,7 +27,7 @@ namespace Idogep {
 
 	class LoggerProxy;
 
-	class Module;
+	class Controller;
 	class Playback;
 
 	class EditorApplication :
@@ -82,10 +82,10 @@ namespace Idogep {
 
 		// --- modules
 		LoggerProxy * m_logger = nullptr;
-		Ref<Module> m_logModule;
+		Ref<Controller> m_logModule;
 
-		Ref<Module> m_outlineViewModule;
-		Ref<Module> m_curveEditor;
+		Ref<Controller> m_outlineViewModule;
+		Ref<Controller> m_animationEditor;
 
 		// --- singleton element
 		static EditorApplication * s_self;

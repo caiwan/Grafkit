@@ -3,8 +3,8 @@
 
 #include "curveeditorscene.h"
 
-#include "curvepointitem.h"
-#include "curvedoc.h"
+#include "CurvePointItem.h"
+#include "CurvePointEditor.h"
 
 using namespace Idogep;
 

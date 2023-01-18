@@ -2,7 +2,7 @@
 #include "logwidget.h"
 #include "proxies/LoggerProxy.h"
 
-Idogep::LogModule::LogModule(Ref<Module> parent, LoggerProxy * const & loggerProxy) : Module(parent),
+Idogep::LogModule::LogModule(Ref<Controller> parent, LoggerProxy * const & loggerProxy) : Controller(parent),
 m_myView(nullptr), m_loggerProxy(loggerProxy)
 {
 }
@@ -24,7 +24,7 @@ void Idogep::LogModule::Initialize()
 	m_loggerProxy->onUpdateLog += Delegate(m_myView.Get(), &LogView::UpdateLog);
 }
 
-//void Idogep::LogModule::MediateSiblingModule(Ref<Module> other)
+//void Idogep::LogModule::MediateSiblingModule(Ref<Controller> other)
 //{
 //	//...
 //}

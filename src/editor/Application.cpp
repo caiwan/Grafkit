@@ -115,7 +115,7 @@ void Idogep::EditorApplication::Preload()
 
 #include "modules/logView/LogModule.h"
 #include "modules/outlineView/outlineModule.h"
-#include "modules/curveEditor/CurveModule.h"
+#include "modules/curveEditor/AnimationModule.h"
 
 // This part should be refactored eventutally:
 // should put out to a plugin system
@@ -138,16 +138,16 @@ void Idogep::EditorApplication::BuildEditorModules()
 	m_editor->onDocumentChanged += Delegate(dynamic_cast<OutlineModule*>(m_outlineViewModule.Get()), &OutlineModule::DocumentChangedEvent);
 
 	// --- 
-	m_curveEditor = new CurveEditorModule(m_editor);
+	m_animationEditor = new AnimationEditorModule(m_editor);
 
 	// 
 	dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(
-		dynamic_cast<CurveEditorModule*>(m_curveEditor.Get()), &CurveEditorModule::AnimationSelectedEvent);
+		dynamic_cast<AnimationEditorModule*>(m_animationEditor.Get()), &AnimationEditorModule::AnimationSelectedEvent);
 }
 
 void Idogep::EditorApplication::InitializeModules() const
 {
-	std::stack<Ref<Module>> stack;
+	std::stack<Ref<Controller>> stack;
 	stack.push(m_editor);
 	while (!stack.empty()) {
 		auto module = stack.top(); stack.pop();
@@ -169,7 +169,7 @@ void Idogep::EditorApplication::InitializeModules() const
 void Idogep::EditorApplication::BuildDockingWindows() const
 {
 	// 
-	QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_curveEditor->GetView().Get());
+	QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_animationEditor->GetView().Get());
 	assert(curveEditorWidget);
 
 	m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);

@@ -32,11 +32,11 @@ namespace Idogep
 		//};
 	}
 
-	class CurveSceneView : public View, public Roles::TimelineSceneViewRole /*, public Roles::CurveEditorSceneViewRole*/
+	class CurveEditorView: public View, public Roles::TimelineSceneViewRole /*, public Roles::CurveEditorSceneViewRole*/
 	{
 	public:
 
-		CurveSceneView();
+        CurveEditorView();
 
 		void HideAnimationCurves() { m_displayCurve = false; }
 		void ShowAnimationCurves() { m_displayCurve = true; }

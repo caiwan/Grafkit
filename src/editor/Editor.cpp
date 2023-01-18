@@ -11,8 +11,8 @@
 
 using namespace Idogep;
 
-Editor::Editor(Ref<Module> parent, Grafkit::Renderer& render, Grafkit::IResourceManager* const & resman)
-    : Module(parent)
+Editor::Editor(Ref<Controller> parent, Grafkit::Renderer& render, Grafkit::IResourceManager* const & resman)
+    : Controller(parent)
   , m_resourceManager(resman)
   , m_render(render)
   , m_document(nullptr)

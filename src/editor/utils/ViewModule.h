@@ -13,8 +13,8 @@ namespace Grafkit
 namespace Idogep
 {
 	class View;
+	class Controller;
 	class Module;
-	class Mediator;
 
 	namespace Roles
 	{
@@ -25,57 +25,64 @@ namespace Idogep
 	class View : public Referencable
 	{
 		friend class Roles::ViewRefreshQueue;
-		friend class Module;
+		friend class Controller;
 	public:
 		explicit View() = default;
-		explicit View(Ref<Module> parentModule);
+		explicit View(Ref<Controller> parentModule);
 		virtual ~View();
 
 		void RequestRefreshView(bool force);
 
-		Ref<Module> GetModule() const { return m_module; }
-		void SetModule(const Ref<Module>& module) { m_module = module; }
+		Ref<Controller> GetModule() const { return m_module; }
+		void SetModule(const Ref<Controller>& module) { m_module = module; }
 
 	protected:
 		virtual void RefreshView(bool force) = 0;
-		Ref<Module> m_module;
+		Ref<Controller> m_module;
 
 	private:
 		//Roles::ViewRefreshQueue* m_refreshQueueObject;
 	};
 
 	// ----------------------------------------------------------------
-	class Module : public Referencable
+	class Controller : public Referencable
 	{
 	public:
 
-		explicit Module(Ref<Module> parent = nullptr);
-		virtual ~Module();
+		explicit Controller(Ref<Controller> parent = nullptr);
+		virtual ~Controller();
 
 		virtual void Initialize() = 0;
 
 		Ref<View> GetView() const { return m_view; }
-		Ref<Module> GetParentModule() const { return m_parent; }
+		Ref<Controller> GetParentModule() const { return m_parent; }
 
-		Ref<Module> GetChildModule(const size_t id) { return m_children[id]; }
+		Ref<Controller> GetChildModule(const size_t id) { return m_children[id]; }
 		size_t GetChildModuleCount() const { return m_children.size(); }
 
-		Ref<Module> GetRootModule() { return m_parent ? m_parent->GetRootModule() : this; }
+		Ref<Controller> GetRootModule() { return m_parent ? m_parent->GetRootModule() : this; }
 
-		void SetParentModule(const Ref<Module> parent) { m_parent = parent; }
-		void AddChildModule(const Ref<Module> child) { m_children.push_back(child); }
+		void SetParentModule(const Ref<Controller> parent) { m_parent = parent; }
+		void AddChildModule(const Ref<Controller> child) { m_children.push_back(child); }
 
 		void SetView(const Ref<View> view) { m_view = view; m_view->SetModule(this); }
 
 	protected:
-		Ref<Module> m_parent;
-		std::vector<Ref<Module>> m_children;
+		Ref<Controller> m_parent;
+		std::vector<Ref<Controller>> m_children;
 		Ref<View> m_view;
 	};
+
+    class Module
+    {
+        // ... 
+    };
 
 }
 
 // ----------------------------------------------------------------	
+
+// this thing must be solved in some other way 
 
 #include <qobject.h>
 

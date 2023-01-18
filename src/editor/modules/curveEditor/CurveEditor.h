@@ -1,12 +1,19 @@
 #pragma once
-#include "common.h"
+
+//#include "CurvePointEditor.h"
+
 #include "animation/animation.h"
 #include "utils/ViewModule.h"
-#include "curvedoc.h"
 
 namespace Idogep
 {
-	class CurveSceneView;
+    class TimelineArea;
+
+    class CurvePointEditor;
+    class CurveEditorView;
+
+    typedef Ref<Grafkit::Animation::Channel> ChannelRef;
+    typedef Grafkit::Animation::Key AnimationKey;
 
 	namespace Roles {
 
@@ -33,24 +40,24 @@ namespace Idogep
 	}
     // ============================================================
 
-	class CurveSceneModule : public Module, EmitsCommandRole 
+	class CurveEditor : public Controller, public EmitsCommandRole 
 	{
 	public:
-	    explicit CurveSceneModule(const Ref<Module>&& parent);
+	    explicit CurveEditor(const Ref<Controller>&& parent);
 
-	    ~CurveSceneModule() override;
+	    ~CurveEditor() override;
 	    void Initialize() override;
 
 		void ChannelSelectedEvent(Ref<Grafkit::Animation::Channel> chanel);
-		//void ShowTrackEvent(Ref<Grafkit::Animation::Track> track);
 		void ClearChannels();
 
-	    CurveManager* GetCurveManager() const { return m_curveManager; }
+	    void Recalculate(TimelineArea* const area) const;
+        ChannelRef GetChannel() const;
 
 	private:
-		Ref<CurveSceneView> m_myView;
+		Ref<CurveEditorView> m_myView;
 		
 	    Roles::ManageCurveAudiogramRole* m_manageAudiogram;
-		CurveManager *m_curveManager;
+		CurvePointEditor *m_pointEditor;
 	};
 }

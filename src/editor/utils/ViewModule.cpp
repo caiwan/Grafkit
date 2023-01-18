@@ -4,7 +4,7 @@
 
 using namespace Idogep;
 
-Module::Module(Ref<Module> parent)
+Controller::Controller(Ref<Controller> parent)
 	: Referencable()
 {
 	if (parent.Valid())
@@ -12,13 +12,13 @@ Module::Module(Ref<Module> parent)
 	m_parent = parent;
 }
 
-Module::~Module()
+Controller::~Controller()
 {
 }
 
 // ------------------------------------------------------------------------
 
-View::View(Ref<Module> parentModule)
+View::View(Ref<Controller> parentModule)
 	: m_module(parentModule)
     //, m_refreshQueueObject(nullptr)
 {

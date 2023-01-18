@@ -1,17 +1,13 @@
 #pragma once
 
 #include <QtGui>
-#include <qdockwidget.h>
+#include <QDockWidget>
 
-#include "animation/animation.h"
-
-#include "CurveView.h"
-
-#include "curvedoc.h"
+#include "AnimationView.h"
 
 namespace Ui
 {
-    class CurveEditorWidget;
+    class AnimationEditorWidget;
 }
 
 class QTreeView;
@@ -23,13 +19,13 @@ namespace Idogep
 
     // ========================================================================================================
 
-    class CurveEditorWidget : public QDockWidget, public CurveEditorView
+    class AnimationEditorWidget : public QDockWidget, public AnimationEditorView
     {
     Q_OBJECT
 
     public:
-        explicit CurveEditorWidget(QWidget* parent = nullptr);
-        ~CurveEditorWidget();
+        explicit AnimationEditorWidget(QWidget* parent = nullptr);
+        ~AnimationEditorWidget();
 
         /* METHODS */
         void SetGraphicsScene(QGraphicsScene* graphicsScene);
@@ -55,7 +51,7 @@ namespace Idogep
         // ReSharper restore CppInconsistentNaming
 
     private:
-        Ui::CurveEditorWidget* ui;
+        Ui::AnimationEditorWidget* ui;
   
 	};
 }

@@ -1,9 +1,7 @@
-#include "CurveView.h"
+#include "AnimationView.h"
 
 #include "utils/tree/treeitem.h"
 #include "utils/tree/treemodel.h"
-
-#include "curveeditorwidget.h"
 
 using namespace Idogep;
 using namespace Grafkit;
@@ -15,7 +13,7 @@ namespace
     class AnimationTreeModel : public TreeModel
     {
     public:
-        AnimationTreeModel(AnimationRef animation);
+        explicit AnimationTreeModel(AnimationRef animation);
 
         QString GetParentName() const { return m_parentName; }
         void SetParentName(const QString& parentName) { m_parentName = parentName; }

@@ -1,41 +1,38 @@
-#include "CurveModule.h"
+#include "AnimationModule.h"
 
 #include "utils/tree/treeitem.h"
 #include "utils/tree/treemodel.h"
 
-#include "CurveView.h"
-#include "curveeditorwidget.h"
-
-#include "CurveSceneModule.h"
+#include "CurveEditor.h"
 
 #include "Editor.h"
 #include "proxies/MusicProxy.h"
 
-#include <QWidget>
 #include "models/OutlineItems.h"
+#include "AnimationEditorWidget.h"
 
 using namespace Idogep;
 using namespace Grafkit;
 
 // ===========================================================================================
 
-CurveEditorModule::CurveEditorModule(const Ref<Module>& parent)
-	: Module(parent)
+AnimationEditorModule::AnimationEditorModule(const Ref<Controller>& parent)
+	: Controller(parent)
 {
-	m_curveScene = new CurveSceneModule(this);
+	m_curveScene = new CurveEditor(this);
 }
 
-CurveEditorModule::~CurveEditorModule()
+AnimationEditorModule::~AnimationEditorModule()
 = default;
 
-void CurveEditorModule::Initialize()
+void AnimationEditorModule::Initialize()
 {
 	assert(m_parent);
 	assert(m_parent->GetView());
 
 	QWidget* parentWidget = dynamic_cast<QWidget *>(m_parent->GetView().Get());
 	assert(parentWidget);
-	m_myView = new CurveEditorWidget(parentWidget);
+	m_myView = new AnimationEditorWidget(parentWidget);
 
 	// manage playback role 
 	Editor* editor = dynamic_cast<Editor*>(GetRootModule().Get());
@@ -48,7 +45,7 @@ void CurveEditorModule::Initialize()
 	// ... 
 
     // manage animation role
-	m_myView->onChannelSelected += Delegate(m_curveScene.Get(), &CurveSceneModule::ChannelSelectedEvent);
+	m_myView->onChannelSelected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelSelectedEvent);
 
 	SetView(m_myView);
 }
@@ -56,11 +53,11 @@ void CurveEditorModule::Initialize()
 
 // ========================================================================================================
 
-//Ref<CurveSceneModule> CurveEditorModule::GetCurveSceneMoule() const
+//Ref<CurveEditor> AnimationEditorModule::GetCurveSceneMoule() const
 //{
 //}
 
-void Idogep::CurveEditorModule::AnimationSelectedEvent(TreeItem * const item)
+void Idogep::AnimationEditorModule::AnimationSelectedEvent(TreeItem * const item)
 {
 	ItemHasAnimationsRole* animationItem = dynamic_cast<ItemHasAnimationsRole*>(item);
 	if (!animationItem)

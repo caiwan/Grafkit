@@ -14,7 +14,7 @@ using namespace Grafkit;
 
 // -------------------------------------------------------------------------------------------------------------------
 
-Idogep::OutlineModule::OutlineModule(Ref<Module> parent) : Module(parent), m_myView(nullptr), m_myModel(nullptr), m_modelBuilder(nullptr)
+Idogep::OutlineModule::OutlineModule(Ref<Controller> parent) : Controller(parent), m_myView(nullptr), m_myModel(nullptr), m_modelBuilder(nullptr)
 {
 }
 

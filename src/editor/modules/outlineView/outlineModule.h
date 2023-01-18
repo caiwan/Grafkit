@@ -15,11 +15,11 @@ namespace Idogep {
 	class OutlineModule;
 	class OutlineView;
 
-	class OutlineModule : public Module, public EmitsCommandRole
+	class OutlineModule : public Controller, public EmitsCommandRole
 	{
 
 	public:
-		explicit OutlineModule(Ref<Module> parent);
+		explicit OutlineModule(Ref<Controller> parent);
 		virtual ~OutlineModule();
 
 		void Initialize() override;

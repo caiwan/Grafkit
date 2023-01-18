@@ -57,9 +57,9 @@ namespace  Idogep
 
 	// ========================================================================================================
 
-	class CurveEditorView : public View, public ManagePlaybackRole, public ManageAnimationsRole
+	class AnimationEditorView : public View, public ManagePlaybackRole, public ManageAnimationsRole
 	{
 	public:
-		CurveEditorView() = default;
+		AnimationEditorView() = default;
 	};
 }

@@ -15,13 +15,13 @@ namespace Idogep {
 
 	class LoggerProxy;
 
-	class LogModule : public Module {
+	class LogModule : public Controller {
 	public:
-		LogModule(Ref<Module> parent, LoggerProxy* const & loggerProxy);
+		LogModule(Ref<Controller> parent, LoggerProxy* const & loggerProxy);
 		~LogModule();
 
 		void Initialize();
-		//void MediateSiblingModule(Ref<Module> other);
+		//void MediateSiblingModule(Ref<Controller> other);
 
 	private:
 		Ref<LogView> m_myView;

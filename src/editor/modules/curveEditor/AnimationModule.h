@@ -6,19 +6,19 @@
 
 namespace  Idogep
 {
-	class CurveEditorView;
-	class CurveSceneModule;
+	class AnimationEditorView;
+	class CurveEditor;
 
 	class TreeItem;
 
 	// ========================================================================================================
 
 
-	class CurveEditorModule : public Module, public EmitsCommandRole
+	class AnimationEditorModule : public Controller, public EmitsCommandRole
 	{
 	public:
-		explicit CurveEditorModule(const Ref<Module>& parent);
-		~CurveEditorModule() override;
+		explicit AnimationEditorModule(const Ref<Controller>& parent);
+		~AnimationEditorModule() override;
 
 		void Initialize() override;
 
@@ -27,8 +27,8 @@ namespace  Idogep
 		void AnimationSelectedEvent(TreeItem * const item);
 
 	private:
-		Ref<CurveEditorView> m_myView;
-		Ref<CurveSceneModule> m_curveScene;
+		Ref<AnimationEditorView> m_myView;
+		Ref<CurveEditor> m_curveScene;
         
 	};
 

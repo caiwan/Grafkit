@@ -1,16 +1,16 @@
 #include "Editor.h"
 #include "proxies/MusicProxy.h"
 
-#include "CurveSceneModule.h"
-#include "CurveSceneView.h"
+#include "CurveEditor.h"
+#include "CurveEditorView.h"
 
 // impl
-#include "curveeditorwidget.h"
-#include "curveeditorscene.h"
+#include "AnimationEditorWidget.h"
+#include "CurveEditorScene.h"
+#include "CurvePointEditor.h"
 
 using namespace Idogep;
 using namespace Grafkit;
-
 
 
 Roles::ManageCurveAudiogramRole::ManageCurveAudiogramRole()
@@ -92,24 +92,24 @@ void Roles::ManageCurveAudiogramRole::ClearAudiogram()
 
 // ============================================================================================
 
-CurveSceneModule::CurveSceneModule(const Ref<Module>&& parent) : Module(parent), m_manageAudiogram(nullptr)
+CurveEditor::CurveEditor(const Ref<Controller>&& parent) : Controller(parent), m_manageAudiogram(nullptr)
 {
 	m_manageAudiogram = new Roles::ManageCurveAudiogramRole();
-	m_curveManager = new CurveManager(this);
+    m_pointEditor = new CurvePointEditor(this);
 }
 
-CurveSceneModule::~CurveSceneModule()
+CurveEditor::~CurveEditor()
 {
 	delete m_manageAudiogram;
-	delete m_curveManager;
+	delete m_pointEditor;
 }
 
-void CurveSceneModule::Initialize()
+void CurveEditor::Initialize()
 {
 	assert(m_parent);
 	assert(m_parent->GetView());
 
-	CurveEditorWidget* parentWidget = dynamic_cast<CurveEditorWidget*>(m_parent->GetView().Get());
+	AnimationEditorWidget* parentWidget = dynamic_cast<AnimationEditorWidget*>(m_parent->GetView().Get());
 	assert(parentWidget);
 
 	CurveEditorScene *ces = new CurveEditorScene();
@@ -138,20 +138,28 @@ void CurveSceneModule::Initialize()
 	// 
 
     //
-	m_myView = ces; SetView(m_myView);
+	m_myView = ces; 
+    SetView(m_myView);
 }
 
-void CurveSceneModule::ChannelSelectedEvent(Ref<Grafkit::Animation::Channel> channel)
+void CurveEditor::ChannelSelectedEvent(Ref<Grafkit::Animation::Channel> channel)
 {
-	m_curveManager->SetChannel(channel);
+    m_pointEditor->SetChannel(channel);
 	m_myView->ClearCurvePoints();
-	m_curveManager->AddCurveToScene(m_myView);
+    m_pointEditor->AddCurveToScene(m_myView);
 	m_myView->ShowAnimationCurves();
 	m_myView->RequestRefreshView(true);
 }
 
-void CurveSceneModule::ClearChannels()
+void CurveEditor::ClearChannels()
 {
 	m_myView->HideAnimationCurves();
 }
 
+void CurveEditor::Recalculate(TimelineArea* const area) const {
+    m_pointEditor->Recalculate(area);
+}
+
+ChannelRef CurveEditor::GetChannel() const {
+    return m_pointEditor->GetChannel();
+}
