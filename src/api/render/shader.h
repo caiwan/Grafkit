@@ -61,8 +61,6 @@ namespace FWrender {
 
 //		ID3D11InputLayout* m_layout;
 //		ID3D11Buffer* m_matrixBuffer;
-
-		ID3D11SamplerState* m_sampleState;
 	};
 
 	struct shader_pair {
@@ -81,7 +79,6 @@ DEFINE_EXCEPTION(FSCrerateException, 1102, "Could not create framgent shader")
 
 DEFINE_EXCEPTION(InputLayoutCreateException, 1103, "Could not create input layout")
 DEFINE_EXCEPTION(ConstantBufferCreateException, 1104, "Could not create constant buffer")
-DEFINE_EXCEPTION(SamplerStateCreateException, 1105, "Could not create sampler state")
 DEFINE_EXCEPTION(ConstantBufferLocateException, 1106, "Could not locate constant buffer")
 
 ///@Todo ennek teljesen sajat exceptiont kell definialni
