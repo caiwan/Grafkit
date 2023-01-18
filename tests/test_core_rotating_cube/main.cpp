@@ -16,7 +16,7 @@ using FWmath::Matrix;
 class Application : public FWcore::System
 {  
 public:
-		Application()  : FWcore::System()
+		Application() : FWcore::System()
 		{
 			int screenWidth, screenHeight;
 

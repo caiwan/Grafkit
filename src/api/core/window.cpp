@@ -1,3 +1,4 @@
+#include "..\..\idogep\platform\gk_window.h"
 #include <Windows.h>
 #include <tchar.h>
 #include "window.h"
@@ -126,7 +127,6 @@ void Window::init() {
 		exit(1);
 	}
 }
-
 
 Window::~Window(){
 	this->destructEverything();
