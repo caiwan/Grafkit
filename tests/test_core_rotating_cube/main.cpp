@@ -48,7 +48,7 @@ public:
 
 			int result = 0;
 
-			result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR );
+			result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// -- camera
 			camera = new Camera;
