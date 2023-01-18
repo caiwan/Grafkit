@@ -16,10 +16,10 @@ namespace Idogep
 
             Event<QImage**, float, float, int, int> onRequestAudiogram; //audiogramImgage, leftTime, rightTime, width, height
 
-            virtual void MusicChanged() = 0;
+            virtual void MusicChangedEvent() = 0;
 
-            virtual void PlaybackChanged(bool isPlaying) = 0;
-            virtual void DemoTimeChanged(float time) = 0;
+            virtual void PlaybackChangedEvent(bool isPlaying) = 0;
+            virtual void DemoTimeChangedEvent(const float &time) = 0;
         };
     }
 

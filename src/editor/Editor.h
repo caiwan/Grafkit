@@ -49,7 +49,8 @@ namespace Idogep {
 
 		// Events
 		//Event<std::string&> onSaveDialog;
-		Event<Document* const &> onDocumentChanged;
+        Event<Document* const &> onDocumentChanged;
+        Event<const float &> onDemoTimeChanged;
 
 		Grafkit::IResourceManager *GetResourceManager() const;
 

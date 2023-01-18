@@ -129,15 +129,16 @@ void CurveEditor::Initialize()
     // ... 
     Audiogram* music = editor->GetMusicProxy();
     assert(music);
-    m_manageAudiogram->onRequestWaveform += Delegate(music, &Audiogram::GetWaveform);
+    //m_manageAudiogram->onRequestWaveform += Delegate(music, &Audiogram::GetWaveform);
 
     // 
     MusicProxy* musicProxy = editor->GetMusicProxy();
     assert(musicProxy);
     musicProxy->onMusicChanged += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::ClearAudiogram);
-    musicProxy->onMusicChanged += Delegate(ces, &Roles::TimelineSceneViewRole::MusicChanged);
+    musicProxy->onMusicChanged += Delegate(ces, &Roles::TimelineSceneViewRole::MusicChangedEvent);
 
     ces->onRequestAudiogram += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::GetAudiogram);
+    editor->onDemoTimeChanged += Delegate(ces, &Roles::TimelineSceneViewRole::DemoTimeChangedEvent);
 
     m_manageAudiogram->onRequestWaveform += Delegate(musicProxy, &Audiogram::GetWaveform);
 

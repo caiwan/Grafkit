@@ -13,11 +13,11 @@ using namespace Idogep;
 
 Editor::Editor(Ref<Controller> parent, Grafkit::Renderer& render, Grafkit::IResourceManager* const & resman)
     : Controller(parent)
-  , m_resourceManager(resman)
-  , m_render(render)
-  , m_document(nullptr)
-  , m_precalcRequested(false)
-  , m_reloadRequested(false)
+    , m_resourceManager(resman)
+    , m_render(render)
+    , m_document(nullptr)
+    , m_precalcRequested(false)
+    , m_reloadRequested(false)
 {
     m_commandStack = new CommandStack();
     m_musicProxy = new MusicProxy();
@@ -84,9 +84,9 @@ bool Editor::RenderFrame()
 
     m_render.BeginScene();
 
+    float t = m_musicProxy->GetTime();
     if (m_document)
     {
-        float t = m_musicProxy->GetTime();
 
         m_document->m_rootActor->Matrix().Identity();
         //m_document->m_rootActor->Matrix().RotateRPY(0, 0, 0);
@@ -100,6 +100,9 @@ bool Editor::RenderFrame()
     }
 
     m_render.EndScene();
+
+    if (m_musicProxy->IsPlaying())
+        onDemoTimeChanged(t);
 
     // ---
     return true; // keep it infinite for now

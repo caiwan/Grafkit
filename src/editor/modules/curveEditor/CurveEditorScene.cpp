@@ -61,10 +61,12 @@ void CurveEditorScene::RefreshView(const bool force)
     update();
 }
 
-void CurveEditorScene::PlaybackChanged(bool isPlaying) {
+void CurveEditorScene::PlaybackChangedEvent(bool isPlaying) {
 }
 
-void CurveEditorScene::DemoTimeChanged(float time) {
+void CurveEditorScene::DemoTimeChangedEvent(const float &time) {
+    m_cursorItem->SetPosition(time);
+    update();
 }
 
 void CurveEditorScene::ClearCurvePoints() { clear(); }
@@ -89,12 +91,7 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
         if (m_audiogramImage)
         {
             painter->drawImage(r, *m_audiogramImage);
-            //painter->fillRect(0, 0, 16, 16, QBrush(QColor(0, 255, 0)));
         }
-        //else
-        //{
-        //	//painter->fillRect(0, 0, 16, 16, QBrush(QColor(255, 0, 0)));
-        //}
     }
     m_area->DrawGrid(painter, r);
 
@@ -102,8 +99,6 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
         DrawCurve(painter, r);
 
     m_cursorItem->DrawCursor(painter, r);
-
-    // draw cursors here if needed 
 }
 
 void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
@@ -259,7 +254,7 @@ void CurveEditorScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     {
         m_area->SetOffset({ 0,0 });
         m_area->SetScale({ 64, 64 });
-    } 
+    }
     else if (modifyOfs)
     {
         m_area->Pan(delta);
@@ -395,21 +390,15 @@ QPointF TimelineArea::Screen2Point(QPointF point) const
 
 QPointF TimelineArea::GetMin() const { return Screen2Point({ m_sceneRect.topLeft() }); }
 
-QPointF TimelineArea::GetMax() const { return Screen2Point({ m_sceneRect.bottomRight()}); }
+QPointF TimelineArea::GetMax() const { return Screen2Point({ m_sceneRect.bottomRight() }); }
 
 void TimelineArea::DrawGrid(QPainter* const & painter, const QRectF& r)
 {
     if (!m_grid)
     {
         m_grid = new QPicture();
-        const QPoint topLeft = {
-                static_cast<int>(r.topLeft().x()),
-                static_cast<int>(r.topLeft().y()) };
-
-        const QPoint bottomRight = {
-                    static_cast<int>(r.bottomRight().x()),
-                    static_cast<int>(r.bottomRight().y())
-        };
+        const QPoint topLeft = r.topLeft().toPoint();
+        const QPoint bottomRight = r.bottomRight().toPoint();
 
         m_grid->setBoundingRect(QRect(topLeft, bottomRight));
 
@@ -451,8 +440,8 @@ void TimelineArea::Zoom(const QPointF& z)
     const QPointF max = GetMax();
     const QPointF center = (GetMax() + GetMin()) * .5; // unit
     const QPointF delta = {
-        - center.x() * deltaScale.width(),
-        - center.y() * deltaScale.height()
+        -center.x() * deltaScale.width(),
+        -center.y() * deltaScale.height()
     };
 
     Pan(delta);
@@ -509,7 +498,7 @@ void TimelineArea::DrawGridToPicture(QPainter* const& painter, const QRectF& r) 
 
     // Horizontal thin
     sc = m_scale.height() / 4.0f;
-    
+
     for (float f = fmod(offsetY - halfHeight, sc); f <= rectHeight + fmod(offsetY + halfHeight, sc); f += sc)
     {
         painter->setPen(QPen(QColor(56, 56, 56)));
@@ -529,29 +518,60 @@ void TimelineArea::DrawGridToPicture(QPainter* const& painter, const QRectF& r) 
     painter->drawLine(0.0f, offsetY + halfHeight, rectWidth, offsetY + halfHeight);
 }
 
+CursorItem::CursorItem() : m_position(0)
+, m_area(nullptr)
+{
+}
+
 void CursorItem::DrawCursor(QPainter* const & painter, const QRectF& r)
 {
+    assert(m_area);
+
+    // Out of screen 
+    const QPointF minP = m_area->GetMin();
+    const QPointF maxP = m_area->GetMax();
+
+    if (m_position < minP.x() || m_position > maxP.x())
+        return;
+
+    // Time as string
     QString strTime;
+
     int minutes = int(m_position) / 60;
+
     if (minutes < 10)
         strTime.append("0");
     strTime.append(QString::number(minutes)).append(":");
+
     if (fmod(m_position, 60.0f) < 10.0f)
         strTime.append("0");
+
     strTime.append(QString::number(fmod(m_position, 60.0f), 'f', 3));
 
+    // darw stuff, calc
+    float screenPos = m_area->Point2Screen({ m_position, 0 }).x();
+
     float barOffset = 0.0f;
-    QSizeF scale = m_area->GetScale();
-    QPointF offset = m_area->GetOffset();
+    // this will stop the label moving at the corners
+    //if (screenpos)
+    //    barOffset = -56.0f;
 
-    if (abs(r.x() + r.width() - (m_position * scale.width() + offset.x())) < 128)
-        barOffset = -56.0f;
+    // psh
 
+    // draw crsr handler
+    painter->setPen(QPen(QColor(48, 224, 48, 96), 2.0, Qt::SolidLine));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawLine(screenPos, r.top(), screenPos, r.bottom());
+
+    // draw label
     painter->setFont(QFont(QString("Sans"), 8));
     painter->setPen(Qt::NoPen);
     painter->setBrush(QColor(48, 224, 48, 96));
-    painter->drawRect(QRectF(QPointF(m_position * scale.width() + offset.x() + barOffset, r.height() - 16.0f), QSizeF(56.0f, 16.0f)));
+    painter->drawRect(QRectF(QPointF(screenPos, r.bottom() - 16.0f), QSizeF(56.0f, 16.0f)));
+
+    // draw label text
     painter->setPen(QColor(255, 255, 255, 96));
     painter->setBrush(QColor(48, 224, 48, 96));
-    painter->drawText(QRectF(QPointF((m_position * scale.width() + offset.x()) + barOffset, r.height() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
+    painter->drawText(QRectF(QPointF(screenPos + barOffset, r.bottom() - 16.0f), QSizeF(56.0f, 16.0f)), strTime, QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
+
 }
