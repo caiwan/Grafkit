@@ -62,6 +62,6 @@ namespace Idogep
         Ref<CurveEditorView> m_myView;
 
         Roles::ManageCurveAudiogramRole* m_manageAudiogram;
-        CurvePointEditor *m_pointEditor;
+        Ref<CurvePointEditor> m_pointEditor;
     };
 }

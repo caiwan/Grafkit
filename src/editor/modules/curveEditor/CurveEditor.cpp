@@ -87,10 +87,6 @@ void Roles::ManageCurveAudiogramRole::ClearAudiogram()
 
 // ============================================================================================
 
-//CurveEditor::CurveEditor(const Ref<Controller>&& parent) : Controller(parent), m_manageAudiogram(nullptr)
-//{
-//}
-
 CurveEditor::CurveEditor() {
     m_manageAudiogram = new Roles::ManageCurveAudiogramRole();
     //m_pointEditor = new CurvePointEditor();
@@ -99,60 +95,36 @@ CurveEditor::CurveEditor() {
 CurveEditor::~CurveEditor()
 {
     delete m_manageAudiogram;
-    delete m_pointEditor;
+    //delete m_pointEditor;
 }
 
 void CurveEditor::Initialize(Grafkit::IResourceManager* const& resourceManager) {
-//}
-//
-//void CurveEditor::Initialize(IResourceManager* resourceManager) {
-#if 0
-    assert(m_parent);
-    assert(m_parent->GetView());
+    CurveEditorScene *ces = dynamic_cast<CurveEditorScene*>(View::SafeGetView(resourceManager, "CurveEditorView").Get());
+    assert(ces);
 
-    AnimationEditorWidget* parentWidget = dynamic_cast<AnimationEditorWidget*>(m_parent->GetView().Get());
-    assert(parentWidget);
-
-    CurveEditorScene *ces = new CurveEditorScene();
-    parentWidget->SetGraphicsScene(ces);
-
-
-    // manage playback role 
-    Editor* editor = dynamic_cast<Editor*>(GetRootModule().Get());
+    Editor* editor = dynamic_cast<Editor*>(Controller::SafeGetController(resourceManager, "Editor").Get());
     assert(editor);
 
-    // ... 
     Audiogram* music = editor->GetMusicProxy();
     assert(music);
-    //m_manageAudiogram->onRequestWaveform += Delegate(music, &Audiogram::GetWaveform);
 
-    // 
     MusicProxy* musicProxy = editor->GetMusicProxy();
     assert(musicProxy);
     musicProxy->onMusicChanged += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::ClearAudiogram);
     musicProxy->onMusicChanged += Delegate(ces, &Roles::TimelineSceneViewRole::MusicChangedEvent);
 
+    // -- timeline 
     ces->onDemoTimeChanged += Delegate(musicProxy, &MusicProxy::SetTime);
-
-    ces->onRequestAudiogram += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::GetAudiogram);
     editor->onDemoTimeChanged += Delegate(ces, &Roles::TimelineSceneViewRole::DemoTimeChangedEvent);
-
+    
+    // -- audiogram 
+    ces->onRequestAudiogram += Delegate(m_manageAudiogram, &Roles::ManageCurveAudiogramRole::GetAudiogram);
     m_manageAudiogram->onRequestWaveform += Delegate(musicProxy, &Audiogram::GetWaveform);
 
-    // 
-    PointEditorWidget *pew = new PointEditorWidget();
-    m_pointEditor->Initialize(pew);
-    parentWidget->SetPointEditorWidget(pew);
-
-    ces->onPointDeSelected += Delegate(m_pointEditor, &CurvePointEditor::PointDeSelectedEvent);
-    ces->onPointSelected += Delegate(m_pointEditor, &CurvePointEditor::PointSelectedEvent);
-
-    ces->onCommitAddPointEvent += Delegate(m_pointEditor, &CurvePointEditor::CommitAddPointEvent);
-    ces->onCommitRemovePointEvent += Delegate(m_pointEditor, &CurvePointEditor::CommitRemovePointEvent);
-
-    m_myView = ces;
-    SetView(m_myView);
-#endif
+    // -- point editor
+    // is it safe to be here?
+    m_pointEditor = dynamic_cast<CurvePointEditor*>(Controller::SafeGetController(resourceManager, "CurvePointEditor").Get());
+    assert(m_pointEditor);
 }
 
 void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t &trackid, Animation::ChannelRef &channel) const
@@ -167,11 +139,6 @@ void CurveEditor::ChannelSelectedEvent(Animation::TrackRef &track, const size_t 
     }
 
     m_myView->HideAnimationCurves();
-    /*if (!channel) {
-        m_pointEditor->HidePoints();
-        m_myView->RequestRefreshView(false);
-        return;
-    }*/
 
     // throw and build up biew if different curve was selected
     m_myView->ClearCurvePoints();

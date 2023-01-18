@@ -36,7 +36,13 @@ Editor::~Editor()
 
 void Editor::Initialize(IResourceManager* const& resman)
 {
-    NewDocument();
+    m_myView = dynamic_cast<EditorView*>(View::SafeGetView(resman, "EditorView").Get());
+    m_commandStack->onCommandStackChanged += Delegate(m_myView.Get(), &Roles::ManageCommandStackRole::CommandStackChangedEvent);
+
+    m_myView->onUndo += Delegate(m_commandStack, &CommandStack::Undo);
+    m_myView->onRedo += Delegate(m_commandStack, &CommandStack::Redo);
+
+    NewDocument(); // Emit, or put the end of the event queue somehow?
 }
 
 void Editor::InitializeDocument()

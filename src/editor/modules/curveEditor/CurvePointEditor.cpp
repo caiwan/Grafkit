@@ -18,24 +18,24 @@ CurvePointEditor::CurvePointEditor()
     , m_myView(nullptr) {
 }
 
-void CurvePointEditor::Initialize(Grafkit::IResourceManager* const& resourceManager) 
+void CurvePointEditor::Initialize(Grafkit::IResourceManager* const& resourceManager)
 {
-#if 0
-    //void CurvePointEditor::Initialize(PointEditorView* pointEditorView)
-    //{
-    //    assert(0);
-    //    m_myView = pointEditorView;
-    //}
+    CurveEditorScene *ces = dynamic_cast<CurveEditorScene*>(View::SafeGetView(resourceManager, "CurveEditorView").Get());
+    assert(ces);
 
-    void CurvePointEditor::Initialize(Grafkit::IResourceManager * resourceManager)
-    {
-        assert(0);
-        assert(m_myView);
-        m_myView->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
-        m_myView->onStartEdit += Delegate(this, &CurvePointEditor::StartEditEvent);
-        m_myView->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
-    }
-#endif
+    ces->onPointDeSelected += Delegate(this, &CurvePointEditor::PointDeSelectedEvent);
+    ces->onPointSelected += Delegate(this, &CurvePointEditor::PointSelectedEvent);
+
+    ces->onCommitAddPointEvent += Delegate(this, &CurvePointEditor::CommitAddPointEvent);
+    ces->onCommitRemovePointEvent += Delegate(this, &CurvePointEditor::CommitRemovePointEvent);
+
+    m_myView = dynamic_cast<PointEditorView*>(View::SafeGetView(resourceManager, "PointEditorView").Get());
+
+    assert(m_myView);
+
+    m_myView->onEditKey += Delegate(this, &CurvePointEditor::EditKeyEvent);
+    m_myView->onStartEdit += Delegate(this, &CurvePointEditor::StartEditEvent);
+    m_myView->onCommitEdit += Delegate(this, &CurvePointEditor::CommitEditEvent);
 }
 
 void CurvePointEditor::Rebuild()
@@ -58,7 +58,7 @@ void CurvePointEditor::Rebuild()
 
         //point->SetController(this);
     }
-    
+
     m_isCurveChangedFlag = true;
 
 }
@@ -121,14 +121,14 @@ void CurvePointEditor::CommitEditEvent(const size_t& index, const Animation::Key
 
 void CurvePointEditor::CommitAddPointEvent(const float& key, const float& value)
 {
-    Animation::ChannelRef oldChannel= new Animation::Channel(m_channel);
-    
+    Animation::ChannelRef oldChannel = new Animation::Channel(m_channel);
+
     Animation::Key newKey(m_channel->GetKey(key)); // use previous key as prototype
     newKey.m_time = key, newKey.m_value = value;
-    
+
     m_channel->AddKey(newKey);
 
-    Ref<CurveChangeCommand> cmd= new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this); 
+    Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this);
     onNewCommand(cmd);
 
 }
@@ -136,7 +136,7 @@ void CurvePointEditor::CommitAddPointEvent(const float& key, const float& value)
 void CurvePointEditor::CommitRemovePointEvent(const size_t& index)
 {
     Animation::ChannelRef oldChannel = new Animation::Channel(m_channel);
-    
+
     m_channel->DeleteKey(index);
 
     Ref<CurveChangeCommand> cmd = new CurveChangeCommand(m_track, m_channelId, oldChannel, m_channel, this);

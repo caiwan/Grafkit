@@ -124,7 +124,8 @@ void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r) const
     if (channel.Invalid() || channel->GetKeyCount() == 0)
         return;
 
-    parent->Recalculate(m_area);
+    //parent->Recalculate(m_area);
+    //onRecalculate();
 
     painter->setRenderHint(QPainter::Antialiasing);
     painter->setPen(QPen(grey, 1.5f));

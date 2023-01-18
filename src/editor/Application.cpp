@@ -67,7 +67,7 @@ int EditorApplication::Execute()
     onLoaderFinished += Delegate(m_mainWindow, &MainWindow::showMaximized);
     onLoaderFinished += Delegate(this, &EditorApplication::NextTick);
 
-    sw->show();
+    //sw->show();
 
     Initialize();
 
@@ -185,12 +185,17 @@ void EditorApplication::InitializeModules()
 
 void EditorApplication::BuildDockingWindows()
 {
-
     //// 
-    //QDockWidget* curveEditorWidget = dynamic_cast<QDockWidget*>(m_animationEditor->GetView().Get());
-    //assert(curveEditorWidget);
+    AnimationEditorWidget* animationWidget = dynamic_cast<AnimationEditorWidget*>(View::SafeGetView(this, "AnimationView").Get());
+    assert(animationWidget);
 
-    //m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, curveEditorWidget);
+    CurveEditorScene *curveEditorScene= dynamic_cast<CurveEditorScene*>(View::SafeGetView(this, "CurveEditorView").Get());
+    PointEditorWidget *pointEditorWidget = dynamic_cast<PointEditorWidget*>(View::SafeGetView(this, "PointEditorView").Get());
+
+    animationWidget->SetGraphicsScene(curveEditorScene);
+    animationWidget->SetPointEditorWidget(pointEditorWidget);
+
+    m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, animationWidget);
 
     // --- 
     QDockWidget* logWidget = dynamic_cast<QDockWidget*>(View::SafeGetView(this, "LogView").Get());
@@ -198,7 +203,7 @@ void EditorApplication::BuildDockingWindows()
 
     logWidget->setParent(m_mainWindow);
     m_mainWindow->addDockWidget(Qt::BottomDockWidgetArea, logWidget);
-    //m_mainWindow->tabifyDockWidget(logWidget, curveEditorWidget);
+    m_mainWindow->tabifyDockWidget(logWidget, animationWidget);
 
     // -- 
     QDockWidget* outlineWidget  = dynamic_cast<QDockWidget*>(View::SafeGetView(this, "OutlineView").Get());
@@ -206,11 +211,6 @@ void EditorApplication::BuildDockingWindows()
 
     outlineWidget->setParent(m_mainWindow);
     m_mainWindow->addDockWidget(Qt::LeftDockWidgetArea, outlineWidget);
-
-    //// connect redo / undo menus
-    //m_editor->GetCommandStack()->onCommandStackChanged += Delegate(m_mainWindow, &Roles::ManageCommandStackRole::CommandStackChangedEvent);
-    //m_mainWindow->onUndo += Delegate(m_editor->GetCommandStack(), &CommandStack::Undo);
-    //m_mainWindow->onRedo += Delegate(m_editor->GetCommandStack(), &CommandStack::Redo);
 }
 
 

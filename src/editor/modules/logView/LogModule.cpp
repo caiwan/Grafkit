@@ -19,14 +19,4 @@ void LogModule::Initialize(Grafkit::IResourceManager* const& resourceManager)
     m_myView = dynamic_cast<LogView*>(View::SafeGetView(resourceManager, "LogView").Get());
     assert(m_myView.Valid());
     m_loggerProxy->onUpdateLog += Delegate(m_myView.Get(), &LogView::UpdateLog);
-
-#if 0
-    assert(m_parent.Valid());
-    assert(m_parent->GetView().Valid());
-    QWidget * parentWidget = dynamic_cast<QWidget*>(m_parent->GetView().Get());
-    assert(parentWidget);
-    m_myView = new LogWidget(parentWidget);
-    SetView(m_myView);
-    assert(m_loggerProxy);
-#endif
 }

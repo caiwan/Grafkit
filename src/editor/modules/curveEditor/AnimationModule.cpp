@@ -9,6 +9,7 @@
 #include "proxies/MusicProxy.h"
 
 #include "models/OutlineItems.h"
+#include "modules/outlineView/outlineModule.h"
 #include "AnimationEditorWidget.h"
 #include "AnimationTreeModel.h"
 
@@ -24,39 +25,27 @@ AnimationEditor::AnimationEditor()
 AnimationEditor::~AnimationEditor()
 = default;
 
-void AnimationEditor::Initialize(IResourceManager* const& resourceManager) {
-#if 0
-    // TODO: Put this to Application
-    assert(m_parent);
-    assert(m_parent->GetView());
-
-    // We need this one too:
-    //m_curveScene = new CurveEditor(this);
-
-    dynamic_cast<OutlineModule*>(m_outlineViewModule.Get())->onItemSelected += Delegate(dynamic_cast<AnimationEditor*>(m_animationEditor.Get()), &AnimationEditor::AnimationSelectedEvent);
-
-
-    QWidget* parentWidget = dynamic_cast<QWidget *>(m_parent->GetView().Get());
-    assert(parentWidget);
-    m_myView = new AnimationEditorWidget(parentWidget);
-
-    // manage playback role 
-    Editor* editor = dynamic_cast<Editor*>(GetRootModule().Get());
-    assert(editor);
-
-    Timer* timer = editor->GetMusicProxy();
-    assert(timer);
-
-    m_myView->onTogglePlayback += Delegate(timer, &Timer::TogglePlay);
-    m_myView->onStopPlayback += Delegate(timer, &Timer::Stop);
-    // ... 
+void AnimationEditor::Initialize(IResourceManager* const& resourceManager) 
+{
+    m_myView = dynamic_cast<AnimationEditorView*>(View::SafeGetView(resourceManager, "AnimationView").Get());
+    m_curveScene = dynamic_cast<CurveEditor*>(Controller::SafeGetController(resourceManager, "CurveEditor").Get());
 
     // manage animation role
     m_myView->onChannelSelected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelSelectedEvent);
     m_myView->onChannelDeselected += Delegate(m_curveScene.Get(), &CurveEditor::ChannelDeselectedEvent);
 
-    SetView(m_myView);
-#endif
+    OutlineModule* outlineModue = dynamic_cast<OutlineModule*>(Controller::SafeGetController(resourceManager, "OutlineModule").Get());
+    assert(outlineModue);
+    outlineModue->onItemSelected += Delegate(this, &AnimationEditor::AnimationSelectedEvent);
+
+    Ref<Editor> editor = dynamic_cast<Editor*>(Controller::SafeGetController(resourceManager, "Editor").Get());
+    assert(editor);
+
+    // manage playback role 
+    Timer* timer = editor->GetMusicProxy();
+    assert(timer);
+    m_myView->onTogglePlayback += Delegate(timer, &Timer::TogglePlay);
+    m_myView->onStopPlayback += Delegate(timer, &Timer::Stop);
 }
 
 // ===========================================================================================

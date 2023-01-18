@@ -78,7 +78,7 @@ namespace Idogep
 
         bool m_isCurveChangedFlag;
 
-        PointEditorView* m_myView;
+        Ref<PointEditorView> m_myView;
     };
 
     // --- 

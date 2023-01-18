@@ -75,8 +75,9 @@ namespace Idogep
 
         Grafkit::Renderer& m_render;
 
-        MusicProxy* m_musicProxy;
+        Ref<EditorView> m_myView;
 
+        MusicProxy* m_musicProxy;
         CommandStack* m_commandStack;
 
         bool m_precalcRequested;

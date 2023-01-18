@@ -3,6 +3,8 @@
 #include "ResourceManager.h"
 #include "ResourceBuilder.h"
 
+#include <iterator>
+
 using namespace Grafkit;
 using namespace FWdebugExceptions;
 
