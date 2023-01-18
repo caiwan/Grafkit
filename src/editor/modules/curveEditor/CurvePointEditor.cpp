@@ -36,6 +36,20 @@ void CurvePointEditor::Rebuild()
     }
 }
 
+void CurvePointEditor::HidePoints() {
+    for (CurvePointItem* point : m_points)
+    {
+        point->hide();
+    }
+}
+
+void CurvePointEditor::ShowPoints() {
+    for (CurvePointItem* point : m_points)
+    {
+        point->show();
+    }
+}
+
 void CurvePointEditor::Recalculate(TimelineArea* const area) const
 {
     for (CurvePointItem* point : m_points)

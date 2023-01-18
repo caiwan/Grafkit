@@ -45,7 +45,6 @@ namespace Idogep
 	    void Initialize() override;
 
 		void ChannelSelectedEvent(Grafkit::Animation::ChannelRef channel) const;
-		void ClearChannels() const;
 
 	    void Recalculate(TimelineArea* const area) const;
 	    Grafkit::Animation::ChannelRef GetChannel() const;

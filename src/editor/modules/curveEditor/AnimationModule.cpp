@@ -61,7 +61,7 @@ void AnimationEditorModule::Initialize()
 void AnimationEditorModule::AnimationSelectedEvent(TreeItem* const item)
 {
     ItemHasAnimationsRole* animationItem = dynamic_cast<ItemHasAnimationsRole*>(item);
-    if (!animationItem) // hide elements
+    if (!animationItem || !animationItem->GetAnimation()) // hide elements
     {
         m_myView->onChannelSelected(nullptr);
         m_myView->UpdateAnimationModel(nullptr);

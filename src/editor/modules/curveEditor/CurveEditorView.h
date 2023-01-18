@@ -21,33 +21,25 @@ namespace Idogep
 			virtual void DemoTimeChanged(float time) = 0;
 		};
 
-		//class CurveEditorSceneViewRole
-		//{
-
-		//public:
-		//	//virtual void SetAnimationChannel(Ref<Grafkit::Animation::Channel> channel) = 0;
-		//	//virtual void SetAnimationTrack(Ref<Grafkit::Animation::Track> track) = 0;
-		//	virtual void HideAnimationCurves() = 0;
-
-		//};
 	}
 
-	class CurveEditorView: public View, public Roles::TimelineSceneViewRole /*, public Roles::CurveEditorSceneViewRole*/
+	class CurveEditorView: public View, public Roles::TimelineSceneViewRole 
 	{
 	public:
 
         CurveEditorView();
 
-		void HideAnimationCurves() { m_displayCurve = false; }
-		void ShowAnimationCurves() { m_displayCurve = true; }
+        void HideAnimationCurves() { m_displayCurve = false;}
+        void ShowAnimationCurves() { m_displayCurve = true;}
 
 		// TODO hide audiogram
 		// TODO show audiogram
 
-		virtual void ClearCurvePoints() = 0;
+        virtual void ClearCurvePoints() = 0;
 		virtual void AddCurvePoint(CurvePointItem* points) = 0;
 
 	protected:
+
 		bool m_displayWaveform;
 		bool m_displayCurve;
 

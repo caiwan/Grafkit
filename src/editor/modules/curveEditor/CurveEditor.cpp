@@ -142,7 +142,24 @@ void CurveEditor::Initialize()
 
 void CurveEditor::ChannelSelectedEvent(Animation::ChannelRef channel) const
 {
+    // show if was previously hidden
+    if (channel == m_pointEditor->GetChannel())
+    {
+        m_myView->ShowAnimationCurves();
+        m_pointEditor->ShowPoints();
+        m_myView->RequestRefreshView(false);
+        return;
+    }
+
+    // hide all if none selected
     m_myView->HideAnimationCurves();
+    if (!channel) {
+        m_pointEditor->HidePoints();
+        m_myView->RequestRefreshView(false);
+        return;
+    }
+
+    // throw and build up biew if different curve was selected
     m_myView->ClearCurvePoints();
     m_pointEditor->SetChannel(channel);
 
@@ -150,10 +167,6 @@ void CurveEditor::ChannelSelectedEvent(Animation::ChannelRef channel) const
 
     m_myView->ShowAnimationCurves();
     m_myView->RequestRefreshView(true);
-}
-
-void CurveEditor::ClearChannels() const {
-    m_myView->HideAnimationCurves();
 }
 
 void CurveEditor::Recalculate(TimelineArea* const area) const {

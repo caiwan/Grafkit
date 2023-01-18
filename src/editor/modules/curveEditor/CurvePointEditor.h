@@ -33,6 +33,9 @@ namespace Idogep {
 
         void Rebuild();
 
+        void HidePoints();
+        void ShowPoints();
+
         // Events
         void StartEditEvent(CurvePointItem *item);
         void CommitEditEvent(CurvePointItem *item);
