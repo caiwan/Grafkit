@@ -1,13 +1,16 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "dxtypes.h"
 #include "renderer.h"
 #include "texture.h"
 #include "shader.h"
 
-#include "../core/renderassets.h"
+#include "../core/resource.h"
+
+#include "memory_align.h"
 
 namespace Grafkit {
 
@@ -18,37 +21,32 @@ namespace Grafkit {
 		float shininess;
 	};
 
-	///Based on 3ds format's 
-	enum texture_type_e {
-		// regular types	
-		TT_diffuse,	///< 1st map
-		
-		TT_alpha,		///< alpha map
-		TT_normal,		///< bump map
-		TT_shiniess,	///< shininess map
-		TT_specular,	///< specular map
-		TT_selfillum,	///< self illumination map
-		TT_reflect,		///< reflection map
-		TT_bump,		///< bump map
 
-		TT_aux, ///< aux texture, used for pretty much everything else
-
-		TT_COUNT	// count
-	};
-
-//#define MATERIAL_BUCKET ":material"
+#define MATERIAL_BUCKET "material"
 
 	///@todo three.js + hieroglyph3 mintajara tobbfele materrial tipust lehessen legyartani, ha kell~
 	///@todo aligned new-t mindenre
-	///@todo lehet, hogy nem is kell majd igazan ref. szamlalas ehhez 
-	class MaterialBase : public Referencable //: virtual public Grafkit::IRenderAsset
+	__declspec(align(16)) class MaterialBase : public Grafkit::IResource , public AlignedNew<MaterialBase>
+	//class MaterialBase : public Grafkit::IResource 
 	{
 	public:
-		MaterialBase();
-		~MaterialBase();
+		MaterialBase() : IResource() {};
+		~MaterialBase() {}
 
 		/// @todo ez nem ilyen lesz a jovoben
 		operator Material_t& () { return this->m_mater; }
+
+		/**
+		@todo three.js szerint:
+			- blending + blending mode + opacity
+			- depth func + depth test -> itt mintha VS is benn lenne a shaderben, nem csak a FS
+			- polygon offsr, alpha test
+			- is_visible
+
+		@todo consider:
+			- VS hosszadasa 
+			- shadernek valamilyen property managert kell szulni meg, amit ez kezelni fog
+		*/
 
 		/// @todo valahogy ide valamilyen kulcs-ertek parok formajaban kellene a cbuffer cuccait betolni. 
 		float4 &GetAmbient() { return m_mater.ambient; }
@@ -58,53 +56,31 @@ namespace Grafkit {
 		float &GetSpecularLevel() { return m_mater.specularLevel; }
 		float &GetShininess() { return m_mater.shininess; }
 
-		ShaderAssetRef GetShader() { return this->m_framgentShader; }
-		
-		///@todo a shader reflection meg kell oldani valahogyan
-		void SetShader(ShaderAssetRef shader) { this->m_framgentShader = shader; ReflectShader(); }
+		TextureResRef GetTexture(std::string bindName /*texture_type_e bucket, int n = 0*/);
 
-		///@todo ide be kellene meg jatszani a textura szurot meg, jol.
+		void SetTexture(TextureResRef texture, std::string bindName);
+		void AddTexture(TextureResRef texture, std::string bindName);
+		void RemoveTexture(TextureResRef texture, std::string bindName);
 
-		/// @todo slotok kezelese -> a texturaknak legyen sajat nevuk is
-		/// @todo bounds check
-		TextureAssetRef &GetTexture(texture_type_e bucket, int n = 0);
-		void SetTexture(TextureAssetRef texture, texture_type_e bucket = TT_diffuse, int n = 0);
-		void AddTexture(TextureAssetRef texture, texture_type_e bucket = TT_diffuse);
+		virtual void Render(ID3D11DeviceContext* deviceContext, ShaderRef &shader);
 
-		size_t GetTextureBucketCount(texture_type_e bucket) { return this->m_texture_buckets[bucket].size(); }
-
-		virtual void Render(ID3D11DeviceContext* deviceContext);
-
-		/// Setup texture and cbufer locations
-		/// Legyen public arra az esetre, ha megis ... 
-		virtual void ReflectShader();
-
-		//virtual const char* GetBucketID() { return MATERIAL_BUCKET; }
+		virtual const char* GetBucketID() { return MATERIAL_BUCKET; }
 
 	protected:
-		/**
-			Will look for textures with name `texture_%type%%count%`
-			- where `%type%` is textur type in string
-			- where `%count%` is bucket count if multiple
-		*/
-		void ReflectTextures();
-
 		struct Material_t m_mater;
 
-		std::vector<TextureAssetRef> m_texture_buckets[TT_COUNT];
-		ShaderAssetRef m_framgentShader;
+		typedef std::map<std::string, TextureResRef> textureMap_t;
+		typedef textureMap_t::iterator textureMap_it_t;
 
-		struct reflection_texture_entity
-		{
-			Grafkit::Shader::BoundResourceRecord *brecord;
-			Texture* texture;
-		};
+		textureMap_t m_textures;
 
-		std::vector<reflection_texture_entity> m_reflected_textures;
 	};
 
 	typedef Ref<MaterialBase> MaterialRef;
 
+	/// @Todo material generator + kulonbozo tipusu materialok generalasa
+
+	/// @todo 
+
 }
 
-/// @Todo material generator + kulonbozo tipusu materialok generalasa

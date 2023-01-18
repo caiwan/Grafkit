@@ -1,4 +1,6 @@
-#include "AssetPreloader.h"
+#include "ResourcePreloader.h"
+
+#include "ResourceBuilder.h"
 
 #include "easyloggingpp.h"
 #include "exceptions.h"
@@ -10,18 +12,15 @@ using namespace Grafkit;
 
 /// ---- ezt lehet kulon fileba kene tenni
 #include "../render/texture.h"
-#include "../render/text.h"
+#include "../generator/TextureLoader.h"
 
-using Grafkit::TextureFromBitmap;
-using Grafkit::TextureAssetRef;
-using Grafkit::TextureAsset;
+#include "../render/text.h"
+#include "../generator/FontmapLoader.h"
 
 ///@todo a shader betoltes legyen on-the-fly, es ne itt
 #include "../render/shader.h"
-using Grafkit::ShaderLoader;
-using Grafkit::ShaderAssetRef;
-using Grafkit::ShaderAsset;
-using Grafkit::ShaderType_e;
+#include "../generator/ShaderLoader.h"
+
 
 ///@todo kipucolni a kodot
 
@@ -34,7 +33,7 @@ namespace {
 	};
 
 	struct {
-		//IRenderAsset::RA_type_e type;
+		//IResource::RA_type_e type;
 		int type;
 		const char *bucket_names;
 		const char *basedir;
@@ -52,11 +51,11 @@ namespace {
 	};*/
 }
 
-AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IRenderAssetManager(), m_pPreloader(nullptr)
+AssetPreloader::AssetPreloader(PreloadEvents * pPreloader) : Grafkit::IResourceManager(), m_pPreloader(nullptr)
 {
 	ZeroMemory(&m_filters, sizeof(m_filters));
 	for (size_t i = 0; i < sizeof(rules) / sizeof(rules[0]); i++) {
-		m_filters.push_back(new ResourceFilter(rules[i].extensions, 8));
+		m_filters.push_back(new AssetFileFilter(rules[i].extensions, 8));
 	}
 }
 
@@ -65,7 +64,7 @@ AssetPreloader::~AssetPreloader()
 {
 	/// @todo ez itt baszik valamit eppen - double delete?
 	/*
-	for (size_t i = 0; i < IRenderAsset::RA_TYPE_COUNT; i++) {
+	for (size_t i = 0; i < IResource::RA_TYPE_COUNT; i++) {
 		//delete m_filters[rules[i].type];
 	}
 	*/
@@ -85,29 +84,31 @@ void Grafkit::AssetPreloader::LoadCache()
 			continue;
 
 		for (size_t j = 0; j < this->m_loaders.size(); j++) {
-			IResourceFactory *loader = this->m_loaders[j];
-			filelist_t filelist = loader->GetResourceList(m_filters[i]);
+			IAssetFactory *loader = this->m_loaders[j];
+			IAssetFactory::filelist_t filelist = loader->GetAssetList(m_filters[i]);
 
-			if (!filelist.empty()) for (filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++)
+			if (!filelist.empty()) for (IAssetFactory::filelist_t::iterator it = filelist.begin(); it != filelist.end(); it++)
 			{
 
 				std::string filename = *it, name, path, ext;
-				ResourceFilter::trimpath(filename, path, name, ext);
+				AssetFileFilter::trimpath(filename, path, name, ext);
 
-				/*IRenderAsset::RA_type_e type = (IRenderAsset::RA_type_e) i;*/
+				/*IResource::RA_type_e type = (IResource::RA_type_e) i;*/
 				int type = rules[i].type;
 
 				switch (type) 
 				{
 				case TEXTURES:
 				{
-					TextureAsset* texture = new TextureAsset;
-					texture->SetName(name);
+					///@tod folytkov
 
-					// get the pointer right from the asset container, and feed it 
-					
-					TextureAssetRef txptr = dynamic_cast<TextureAsset*>(repo->GetObjPtrByGlobalID(repo->AddObject(texture)).Get());
-					m_builders.push_back(new TextureFromBitmap(loader->GetResourceByName(filename), txptr));
+					//TextureAsset* texture = new TextureAsset;
+					//texture->SetName(name);
+
+					//// get the pointer right from the asset container, and feed it 
+					//
+					//TextureAssetRef txptr = dynamic_cast<TextureAsset*>(repo->GetObjPtrByGlobalID(repo->AddObject(texture)).Get());
+					//m_builders.push_back(new TextureFromBitmap(loader->Get(filename), txptr));
 					
 				}
 				break;
@@ -160,11 +161,11 @@ void Grafkit::AssetPreloader::SaveCache()
 
 // ============================================================================================================
 
-IResourceRef Grafkit::AssetPreloader::GetResource(std::string filename)
+IAssetRef Grafkit::AssetPreloader::GetResource(std::string filename)
 {
 	for (size_t i = 0; i < this->m_loaders.size(); i++) {
 		try {
-			return this->m_loaders[i]->GetResourceByName(filename);
+			return this->m_loaders[i]->Get(filename);
 		}
 		catch (FileNotFoundException &e)
 		{
@@ -186,7 +187,7 @@ void Grafkit::AssetPreloader::DoPrecalc()
 	
 	size_t len = m_builders.size(), i = 0;
 
-	for (std::list<IRenderAssetBuilder*>::iterator it = m_builders.begin(); it != m_builders.end(); it++)
+	for (std::list<IResourceBuilder*>::iterator it = m_builders.begin(); it != m_builders.end(); it++)
 	{
 		LOG(INFO) << "Loading asset" << (int)i << "of" << (int)len;
 

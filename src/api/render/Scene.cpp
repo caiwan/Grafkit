@@ -16,9 +16,11 @@ Grafkit::Scene::~Scene()
 	delete m_pScenegraph;
 }
 
-
-void Grafkit::Scene::Render(Grafkit::Renderer &render)
+void Grafkit::Scene::Render(Grafkit::Renderer & render /*, ShaderRef &FS, ShaderRef &VS*/)
 {
+
+	m_cureentViewMatrix.Identity();
+	
 	PreRender(render);
 
 	// + kamerat + fenyket at kell tudni adni valahol meg
@@ -26,6 +28,12 @@ void Grafkit::Scene::Render(Grafkit::Renderer &render)
 	// render scenegraph
 	RenderNode(render, m_pScenegraph);
 }
+
+/*
+void Grafkit::Scene::Render(Grafkit::Renderer &render)
+{
+
+}*/
 
 void Grafkit::Scene::PreRender(Grafkit::Renderer & render)
 {
@@ -46,9 +54,7 @@ void Grafkit::Scene::RenderNode(Grafkit::Renderer & render, Actor * actor, int m
 
 	m_cureentViewMatrix.Multiply(actor->Matrix());
 
-	// setup camera goez here
-
-	actor->Render(render);	///todo CAMERA + FENYEK paramter atadasa esetleg ??
+	actor->Render(render, this);
 	push();
 	
 	for (size_t i = 0; i < actor->m_pChildren.size(); i++) {

@@ -1,6 +1,7 @@
 #include "core/system.h"
 
 #include "render/renderer.h"
+#include "render/Scene.h"
 #include "render/camera.h"
 #include "render/model.h"
 #include "render/texture.h"
@@ -9,19 +10,23 @@
 
 #include "math/matrix.h"
 
-#include "core/renderassets.h"
-#include "core/assets.h"
+#include "core/asset.h"
+#include "core/AssetFactory.h"
+#include "core/AssetFile.h"
 
-using namespace FWrender;
-using FWmath::Matrix;
+#include "core/ResourceManager.h"
+
+#include "generator/TextureLoader.h"
+
+using namespace Grafkit;
 
 // #include "textureShaderClass.h"
 #include "builtin_data/cube.h"
 
-class Application : public FWcore::System, FWassets::IRenderAssetManager
+class Application : public System, public IResourceManager
 {  
 public:
-	Application() : FWcore::System(),
+	Application() : System(),
 		m_file_loader(nullptr)
 		{
 			int screenWidth, screenHeight;
@@ -38,14 +43,12 @@ public:
 
 protected:
 		Renderer render;
-		CameraRef camera;
-		ModelRef model;
+		Ref<Scene> scene;
 
 		float t;
 
-		// TextureShaderClass *shader_texture;
-		ShaderRef shader_vs;
-		ShaderRef shader_fs;
+		ShaderRef m_vertexShader;
+		ShaderRef m_fragmentShader;
 		
 		int init() {
 			//this->render = new Renderer();
@@ -60,77 +63,100 @@ protected:
 			result = this->render.Initialize(screenWidth, screenHeight, VSYNC_ENABLED, this->m_window.getHWnd(), FULL_SCREEN);
 
 			// init file loader
-			this->m_file_loader = new FWassets::FileResourceManager("./");
+			this->m_file_loader = new FileAssetManager("./");
+
+			// --------------------------------------------------
 
 			// -- camera
-			camera = new Camera;
+			CameraRef camera = new Camera;
 			camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 			// -- texture
-			TextureRef texture;
+			TextureResRef texture = new TextureRes();
 
-			TextureFromBitmap txgen(m_file_loader->GetResourceByName("Normap.jpg"), &texture);
+			TextureFromBitmap txgen( m_file_loader->Get("Normap.jpg"), texture );
 			txgen(this);
 
 			// -- load shader
-			shader_vs = new Shader();
-			shader_vs->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
+			m_vertexShader = new Shader();
+			m_vertexShader->LoadFromFile(render, "TextureVertexShader", L"./texture.hlsl", ST_Vertex);
 
-			shader_fs = new Shader();
-			shader_fs->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
+			m_fragmentShader = new Shader();
+			m_fragmentShader->LoadFromFile(render, "TexturePixelShader", L"./texture.hlsl", ST_Pixel);
 
 			// -- model 
-			model = new Model;
+			ModelRef model = new Model;
 			model->SetMaterial(new MaterialBase);
-			model->GetMaterial()->AddTexture(texture);	// elobb a texturakat toltod fel, aztad adod hozza a shadert.
-			model->GetMaterial()->SetShader(shader_fs);
-			
+			model->GetMaterial()->AddTexture(texture, "diffuse");
 
-			SimpleMeshGenerator generator(render, shader_vs);
+
+			SimpleMeshGenerator generator(render, m_vertexShader);
 			generator["POSITION"] = (void*)FWBuiltInData::cubeVertices;
 			generator["TEXCOORD"] = (void*)FWBuiltInData::cubeTextureUVs;
 			
 			generator(FWBuiltInData::cubeVertexLength, FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices, model);
+
+
+			// -- setup scene 
+			scene = new Scene();
+			ActorRef cameraActor = new Actor(); cameraActor->AddEntity(camera);
+			ActorRef modelActor = new Actor(); modelActor->AddEntity(model);
+			// ActorRef lightActor = new Actor(); lightActor->AddEntity(light);
+
+			ActorRef rootActor = new Actor();
+			rootActor->AddChild(cameraActor);
+			rootActor->AddChild(modelActor);
+
+			scene->SetRootNode(rootActor);
+
+			scene->SetVShader(m_vertexShader);
+			scene->SetFShader(m_fragmentShader);
+
+			// --- 
 
 			this->t = 0;
 
 			return 0;
 		};
 		
+		// ==================================================================================================================
+
 		void release() {
 			this->render.Shutdown();
 		};
 
+		// ==================================================================================================================
 		int mainloop() {
 			this->render.BeginScene();
 			{
-				struct {
-					matrix worldMatrix;
-					matrix viewMatrix;
-					matrix projectionMatrix;
-				} matbuff;
+				//struct {
+				//	matrix worldMatrix;
+				//	matrix viewMatrix;
+				//	matrix projectionMatrix;
+				//} matbuff;
 
-				camera->Render(render);
+				//camera->Calculate(render);
 
-				//render.GetWorldMatrix(matbuff.worldMatrix);
-				camera->GetViewMatrix(matbuff.viewMatrix);
-				camera->GetProjectionMatrix(matbuff.projectionMatrix);
+				//matbuff.viewMatrix = camera->GetViewMatrix().Get();
+				//matbuff.projectionMatrix= camera->GetProjectionMatrix().Get();
 
-				//matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
-				matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t*10, t*15, t*20);
+				////matbuff.worldMatrix = DirectX::XMMatrixIdentity(); 
+				//matbuff.worldMatrix = DirectX::XMMatrixRotationRollPitchYaw(t*10, t*15, t*20);
 
-				// --- ez a legfontosabb dolog, amit meg meg kell itt tenni mielott atadod a cbuffernek:
-				matbuff.worldMatrix = XMMatrixTranspose(matbuff.worldMatrix);
-				matbuff.viewMatrix = XMMatrixTranspose(matbuff.viewMatrix);
-				matbuff.projectionMatrix = XMMatrixTranspose(matbuff.projectionMatrix);
-				// ---
+				//// --- ez a legfontosabb dolog, amit meg meg kell itt tenni mielott atadod a cbuffernek:
+				//matbuff.worldMatrix = XMMatrixTranspose(matbuff.worldMatrix);
+				//matbuff.viewMatrix = XMMatrixTranspose(matbuff.viewMatrix);
+				//matbuff.projectionMatrix = XMMatrixTranspose(matbuff.projectionMatrix);
+				//// ---
 
-				shader_vs["MatrixBuffer"].Set(&matbuff);
+				//shader_vs["MatrixBuffer"].Set(&matbuff);
 
-				shader_vs->Render(render);
-				shader_fs->Render(render);
+				//shader_vs->Render(render);
+				//shader_fs->Render(render);
 
-				model->Render(render);
+				//model->Render(render);
+
+				scene->Render(render);
 
 				this->t += 0.001;
 			}
@@ -140,10 +166,11 @@ protected:
 		};
 	
 	private:
-		FWassets::FileResourceManager *m_file_loader;
+		FileAssetManager *m_file_loader;
+
 	public:
-		FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
-		FWrender::Renderer & GetDeviceContext() { return this->render; };
+		//FWassets::IResourceFactory* GetResourceFactory() { return m_file_loader; };
+		Renderer & GetDeviceContext() { return this->render; };
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)

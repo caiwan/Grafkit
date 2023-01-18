@@ -5,8 +5,11 @@
 #include <vector>
 #include <string>
 
-#include "renderassets.h"
-#include "assets.h"
+#include "ResourceManager.h"
+#include "AssetFactory.h"
+
+#include "../render/renderer.h"
+
 
 namespace Grafkit{
 
@@ -21,35 +24,35 @@ namespace Grafkit{
 	/**
 	Ez egy olyan dolog, ami automatikusan betolt, es cachel objektumokat
 	*/
-	class AssetPreloader : public Grafkit::IRenderAssetManager
+	class AssetPreloader : public Grafkit::IResourceManager
 	{
 	public:
 		//AssetPreloader();
 		AssetPreloader(PreloadEvents* pPreloader = nullptr);
 		~AssetPreloader();
 
-		//Grafkit::IResourceFactory* GetResourceFactory();
+		//Grafkit::IAssetFactory* GetResourceFactory();
 		virtual Grafkit::Renderer & GetDeviceContext() = 0;
 
-		void RegisterRecourceFactory(IResourceFactory* factory) { m_loaders.push_back(factory); }
+		void RegisterRecourceFactory(IAssetFactory* factory) { m_loaders.push_back(factory); }
 
 		void LoadCache();
 		void SaveCache();
 
-		void AddBuilder(IRenderAssetBuilder* ptr) { m_builders.push_back(ptr); }
+		void AddBuilder(IResourceBuilder* ptr) { m_builders.push_back(ptr); }
 		void AddBuilders() {}
 
-		std::list<IRenderAssetBuilder*> GetBuilders() { return m_builders; }
-		IResourceRef GetResource(std::string filename);
+		std::list<IResourceBuilder*> GetBuilders() { return m_builders; }
+		IAssetRef GetResource(std::string filename);
 
 		void DoPrecalc();
 
 	protected:
-		std::vector<IResourceFactory*> m_loaders;
+		std::vector<IAssetFactory*> m_loaders;
 		
 		///@todo folytkov
-		std::vector<ResourceFilter*> m_filters; // [IRenderAsset::RA_TYPE_COUNT];
-		std::list<IRenderAssetBuilder*> m_builders;
+		std::vector<AssetFileFilter*> m_filters; // [IResource::RA_TYPE_COUNT];
+		std::list<IResourceBuilder*> m_builders;
 
 		PreloadEvents* m_pPreloader;
 	};

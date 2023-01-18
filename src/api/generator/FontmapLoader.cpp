@@ -1,10 +1,9 @@
 #include <cstring>
 
-#include "bmfont_parser.h"
+#include "FontmapLoader.h"
 #include "exceptions.h"
 
 using namespace FWdebugExceptions;
-using namespace Grafkit;
 using namespace Grafkit;
 
 BMFontParser::BMFontParser(FontMap* _root) : root(_root){

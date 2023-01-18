@@ -1,27 +1,31 @@
 #pragma once
 
+#include "memory_align.h"
+
 #include "dxtypes.h"
 #include "renderer.h"
 #include "shader.h"
 
-#include "../core/renderassets.h"
+#include "../core/resource.h"
 
 ///@todo minden cuccot egy namespace-be kellene bedobni; 
 ///@todo valahogy a materialba kellene belejatszani mindezt
 ///@todo aligned new-t mindenre
 namespace Grafkit{
 
-#define LIGHT_BUCKET ":light"
+#define LIGHT_BUCKET "light"
 
 	class BaseLight;
 	typedef Ref<BaseLight> LightRef; 
 
-	class BaseLight : virtual public Grafkit::IRenderAsset 
+	//__declspec(align(16)) class BaseLight : public Grafkit::IResource, public AlignedNew<BaseLight>
+	class BaseLight : public Grafkit::IResource 
 	{
 	public:
 		BaseLight();
 		~BaseLight();
 
+		/// @todo ez csak egy QnD Hack, ki kell majd javitani a jovoben
 		float4 &GetPosition() { return m_light.position; }
 		float4 &GetDirection() { return m_light.direction; }
 			   			   
@@ -37,7 +41,7 @@ namespace Grafkit{
 		float& GetFalloff() { return m_light.falloff; }
 
 		/// Setup the corresponding constant buffer inside the shader
-		void SetShaderCB(ShaderRef rPShader);
+		void SetShaderCB(ShaderRef &rPShader);
 
 		virtual const char* GetBucketID() { return LIGHT_BUCKET; }
 
@@ -69,8 +73,8 @@ namespace Grafkit{
 	};
 
 	// ============================================================================================================
-	
-	class PointLight : public BaseLight 
+	__declspec(align(16)) class PointLight : public BaseLight, public AlignedNew<PointLight>
+	// class PointLight : public BaseLight 
 	{
 	public:
 		PointLight() : BaseLight () {}
@@ -80,7 +84,8 @@ namespace Grafkit{
 		virtual enum type_t GetLightType() { return point; }
 	};
 
-	class DirectionalLight : public BaseLight
+	__declspec(align(16)) class DirectionalLight : public BaseLight, public AlignedNew<DirectionalLight>
+	// class DirectionalLight : public BaseLight
 	{
 		public:
 		DirectionalLight() : BaseLight() {}
@@ -91,7 +96,8 @@ namespace Grafkit{
 
 	};
 
-	class SpotLight : public BaseLight
+	__declspec(align(16)) class SpotLight : public BaseLight, public AlignedNew<SpotLight>
+	// class SpotLight : public BaseLight
 	{
 	public:
 		SpotLight() : BaseLight() {}
@@ -101,7 +107,8 @@ namespace Grafkit{
 		virtual enum type_t GetLightType() { return spot; }
 	};
 
-	class AmbientLight : public BaseLight
+	__declspec(align(16)) class AmbientLight : public BaseLight, public AlignedNew<AmbientLight>
+	// class AmbientLight : public BaseLight
 	{
 	public:
 		AmbientLight() : BaseLight() {}

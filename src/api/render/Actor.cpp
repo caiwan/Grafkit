@@ -3,7 +3,7 @@
 
 using namespace Grafkit;
 
-Grafkit::Entity3D::Entity3D() //: Grafkit::IRenderAsset()
+Grafkit::Entity3D::Entity3D() //: Grafkit::IResource()
 {
 }
 
@@ -24,15 +24,14 @@ Grafkit::Actor::~Actor()
 	}
 }
 
-void Grafkit::Actor::Render(Grafkit::Renderer & render)
+void Grafkit::Actor::Render(Grafkit::Renderer & render, Scene * scene)
 {
 	for (size_t i = 0; i < this->m_pEntities.size(); i++) {
-		/// @todo: modelview update goez here - talan a kamerahoz kell hozzagyogyitani ezt?
-		m_pEntities[i]->Render(render);
+		m_pEntities[i]->Render(render, scene);
 	}
 }
 
-void Grafkit::Actor::AddChild(Actor*  child)
+void Grafkit::Actor::AddChild(Actor* child)
 {
 	m_pChildren.push_back(child);
 	child->m_pParent = this;

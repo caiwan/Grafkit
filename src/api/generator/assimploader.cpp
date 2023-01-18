@@ -3,7 +3,8 @@
 #include <stack>
 #include <vector>
 
-#include "../core/renderassets.h"
+#include "../core/resource.h"
+#include "../core/ResourceManager.h"
 
 #include "../render/renderer.h"
 #include "../render/texture.h"
@@ -25,9 +26,6 @@
 
 using namespace Grafkit;
 using namespace FWdebugExceptions;
-using Grafkit::IRenderAsset;
-using Grafkit::IRenderAssetRepository;
-using Grafkit::IRenderAssetManager;
 
 // ================================================================================================================================================================
 // Assimp helpers
@@ -70,12 +68,12 @@ using Grafkit::IRenderAssetManager;
 	(SRC)->Get(_AI_ENUM, scalar);\
 }
 
-FWmath::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
+Grafkit::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 {
 	if (!m) 
 		throw EX(NullPointerException);
 
-	return FWmath::Matrix(
+	return Grafkit::Matrix(
 		m->a1, m->a2, m->a3, m->a4,
 		m->b1, m->b2, m->b3, m->b4,
 		m->c1, m->c2, m->c3, m->c4,
@@ -84,6 +82,25 @@ FWmath::Matrix ai4x4MatrixToFWMatrix(aiMatrix4x4 * m)
 }
 
 namespace {
+
+	///Based on 3ds format's 
+	enum texture_type_e {
+		// regular types	
+		TT_diffuse,	///< 1st map
+
+		TT_alpha,		///< alpha map
+		TT_normal,		///< bump map
+		TT_shiniess,	///< shininess map
+		TT_specular,	///< specular map
+		TT_selfillum,	///< self illumination map
+		TT_reflect,		///< reflection map
+		TT_bump,		///< bump map
+
+		TT_aux, ///< aux texture, used for pretty much everything else
+
+		TT_COUNT	// count
+	};
+
 	// AI texture -- internal texture type mapping 
 	const struct {
 		enum aiTextureType ai;
@@ -104,9 +121,24 @@ namespace {
 		aiTextureType_REFLECTION,	TT_reflect,
 		aiTextureType_UNKNOWN,		TT_aux,
 	};
+
+
+	const char *texture_map_names[TT_COUNT] =
+	{
+		"diffuse",
+		"alpha",
+		"normal",
+		"shiniess",
+		"specular",
+		"selfillum",
+		"reflect",
+		"bump",
+		"aux",
+	};
 }
 
-TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IRenderAssetManager * const & assman)
+#if 0
+TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, int subnode, Grafkit::IResourceManager * const & assman)
 {
 	aiString path;
 	TextureAssetRef textureAsset;
@@ -122,6 +154,7 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 
 	return textureAsset;
 }
+#endif
 
 // ================================================================================================================================================================
 // Parse assimp scenegraph 
@@ -142,7 +175,8 @@ void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Ac
 	
 	for (i = 0; i < ai_node->mNumMeshes; i++) {
 		UINT mesh_id = ai_node->mMeshes[i];
-		actor->GetEntities().push_back((Model*)repo->GetObjPtr(MODEL_BUCKET, mesh_id).Get());
+		///@todo 
+		//actor->GetEntities().push_back((Model*)repo->GetObjPtr(MODEL_BUCKET, mesh_id).Get());
 	}
 
 	///@todo nevet kell nekunk setelni valamikor?
@@ -163,24 +197,24 @@ void assimp_parseScenegraph(IRenderAssetRepository *& repo,  aiNode* ai_node, Ac
 // Head
 // ================================================================================================================================================================
 
-namespace {
-	static size_t count;
+//namespace {
+//	static size_t count;
+//
+//	///@todo ez a nevezesi modszertan nem jo; valami mas megoldast kell keresni majd
+//	std::string GetCounter() {
+//		char buffer[16];
+//		sprintf_s(buffer, "assimp:%d:", count);
+//		count++;
+//		return buffer;
+//	}
+//}
 
-	///@todo ez a nevezesi modszertan nem jo; valami mas megoldast kell keresni majd
-	std::string GetCounter() {
-		char buffer[16];
-		sprintf_s(buffer, "assimp:%d:", count);
-		count++;
-		return buffer;
-	}
-}
 
-Grafkit::AssimpLoader::AssimpLoader(Grafkit::IResourceRef resource, Grafkit::Scene * const & scenegraph) :
-	IRenderAssetBuilder(),
+Grafkit::AssimpLoader::AssimpLoader(Grafkit::IAssetRef resource, Grafkit::Scene * const & scenegraph)
+	:
+	IResourceBuilder(),
 	m_scenegraph(scenegraph), m_resource(resource)
-	// m_name_prefix()
 {
-	// m_name_prefix = GetCounter();
 }
 
 Grafkit::AssimpLoader::~AssimpLoader()
@@ -190,7 +224,7 @@ Grafkit::AssimpLoader::~AssimpLoader()
 // ================================================================================================================================================================
 // It does the trick
 // ================================================================================================================================================================
-void Grafkit::AssimpLoader::operator()(Grafkit::IRenderAssetManager * const &assman)
+void Grafkit::AssimpLoader::operator()(Grafkit::IResourceManager * const &assman)
 {
 	Assimp::Importer importer;
 	/// @todo genNormals szar. Miert?
@@ -230,7 +264,10 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IRenderAssetManager * const &ass
 			// textura-> material 
 			for (k = 0; k < sizeof(texture_load_map) / sizeof(texture_load_map[0]); k++) {
 				for (j = 0; j < curr_mat->GetTextureCount(texture_load_map[k].ai); j++) {
+					///@todo 
+#if 0
 					material->AddTexture(assimpTexture(texture_load_map[k].ai, curr_mat, j, assman), texture_load_map[k].tt);
+#endif
 				}
 			}
 
@@ -244,9 +281,10 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IRenderAssetManager * const &ass
 			// -> valahol a loaderen kivul kell megtenni a shader kijelolest, illetve betoltest
 			
 			///@todo itt a materialt hozzuk lere valahogy, on-the-fly
-			ShaderAssetRef shader_fs = (ShaderAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
+#if 0
+			ShaderResRef shader_fs = (ShaderRes*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
 			material->SetShader(shader_fs);
-
+#endif 
 			materials.push_back(material);
 			//asset_repo->AddObject(material);
 		}
@@ -256,8 +294,10 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IRenderAssetManager * const &ass
 	
 	///@todo a shadereket lehessen filterezni, vagy valamilyen modon customizalni, ha lehetne vegre
 	///@todo itt specialis materialt hozzunk letre, ami betolti a shadert, ha kell 
-	ShaderAssetRef shader_vs = (ShaderAsset*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
-	
+#if 0
+	ShaderResRef shader_vs = (ShaderRes*)assman->GetRepository(ROOT_REPOSITORY)->GetObjectByName(SHADER_BUCKET, "default.hlsl:vertex").Get();
+#endif 
+
 	/*
 	if (shader_vs.Invalid())
 		throw EX_DETAILS(AssimpParseException, "Could not found default vertex shader"); 
@@ -275,18 +315,21 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IRenderAssetManager * const &ass
 			aiMesh* curr_mesh = scene->mMeshes[i];
 
 			///@todo nevet kell nekunk setelni valamikor?
+			
 			//aiString name;
 			// const char* mesh_name = curr_mesh->mName.C_Str(); //for dbg purposes
 			//model->SetName(mesh_name);
 
 			///@todo ezeken a neveket ki kell pakolni valahova
 			///@todo kell egy olyan mesh generator, ami nem a shaderbol szedi ossze az input layoutot
+
+#if 0
 			SimpleMeshGenerator generator(assman->GetDeviceContext(), shader_vs);
 			generator["POSITION"] = curr_mesh->mVertices; 
 			generator["TEXCOORD"] = curr_mesh->mTextureCoords[0];  ///@todo ha tobb textura van akkor toltse be azokat is majd 
 			generator["NORMAL"] = curr_mesh->mNormals;
 			generator["TANGENT"] = curr_mesh->mTangents; 
-
+#endif
 			// -> a generalas reszet is a pointerek es a shader beallitasa utan 
 			///@todo a shadert lehessen a generalas elott geallitani, ne pedig a generator konstruktoraban, sot; ezzel lehetove kellene tenni, hogy csaerelheto legyen a shader a scenegraph eloallitasa utan, de meg a redner elott a preloader szekvenciaban~
 
@@ -301,9 +344,9 @@ void Grafkit::AssimpLoader::operator()(Grafkit::IRenderAssetManager * const &ass
 				for (k = 0; k < curr_face->mNumIndices; k++)
 					indices.push_back(curr_face->mIndices[k]);
 			}
-
+#if 0
 			generator(curr_mesh->mNumVertices, indices.size(), &indices[0], model);
-
+#endif 
 			// -- lookup materials
 			int mat_index = curr_mesh->mMaterialIndex;
 			if (materials.size()>mat_index)

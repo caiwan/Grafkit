@@ -1,4 +1,3 @@
-
 #pragma once 
 
 #include <vector>
@@ -6,17 +5,15 @@
 
 #include <d3d11shader.h>
 
-#include "dxtypes.h"
-#include "renderer.h"
-
-#include "../core/renderassets.h"
-
 #include "reference.h"
 #include "exceptions.h"
 
+#include "dxtypes.h"
+#include "renderer.h"
 #include "texture.h"
 
-#include "../core/renderassets.h"
+#include "../core/resource.h"
+#include "../core/ResourceBuilder.h"
 
 namespace Grafkit {
 
@@ -33,12 +30,12 @@ namespace Grafkit {
 	};
 
 	class Shader;
-	class ShaderAsset;
-	class ShaderAssetRef;
+	class ShaderRes;
+	class ShaderResRef;
 
 	// ================================================================================================================================
-
-	class Shader : virtual public Referencable
+	__declspec(align(16)) class Shader : virtual public Referencable, public AlignedNew<Shader>
+	// class Shader : virtual public Referencable
 	{
 
 	public:
@@ -64,7 +61,7 @@ namespace Grafkit {
 
 		enum ShaderType_e GetShaderType() { return this->m_type; }
 
-		//virtual enum RA_type_e GetBucketID() { return Grafkit::IRenderAsset::RA_TYPE_Shader; }
+		//virtual enum RA_type_e GetBucketID() { return Grafkit::IResource::RA_TYPE_Shader; }
 
 	private:
 		void CompileShader(ID3D11Device * const & device, ID3D10Blob* shaderBuffer);
@@ -197,7 +194,7 @@ namespace Grafkit {
 				void operator= (float4 v);
 
 				/// @todo 16-os alignmentet meg kell szerelni
-				//void operator= (FWmath::Matrix v);
+				//void operator= (Grafkit::Matrix v);
 
 				void set(float v1);
 				void set(float v1, float v2);
@@ -241,42 +238,42 @@ namespace Grafkit {
 
 	typedef Ref<Shader> ShaderRef_t;
 
-#define SHADER_BUCKET ":shader"
+#define SHADER_BUCKET "shader"
 
 	/**
 	enhance Reference with operator [] to acces the shader's indides, avoiding dereferencing
 	- itt most osszevontam az assettel az egeszet, remelem nem lesz miserable failure az egesz
 	*/
-	class ShaderAsset : public ShaderRef_t, public Grafkit::IRenderAsset {
-		friend class ShaderAssetRef;
+	class ShaderRes : public ShaderRef_t, public Grafkit::IResource {
+		friend class ShaderResRef;
 
 	public:
 		Shader::ConstantBufferRecord& operator[](const char *name) { return this->ptr->operator[](name); }
 		Shader::ConstantBufferRecord& operator[](size_t id) { return this->ptr->operator[](id); }
 
-		ShaderAsset() : IRenderAsset() {}
-		ShaderAsset(Shader* ptr) : IRenderAsset(), ShaderRef_t(ptr) {}
-		ShaderAsset(Ref<Shader> ptr) : IRenderAsset(), ShaderRef_t(ptr) {}
+		ShaderRes() : IResource() {}
+		ShaderRes(Shader* ptr) : IResource(), ShaderRef_t(ptr) {}
+		ShaderRes(Ref<Shader> ptr) : IResource(), ShaderRef_t(ptr) {}
 
-		ShaderAsset& operator = (Shader* in_ptr) { this->AssingnRef(in_ptr); return *this; }
-		ShaderAsset& operator = (ShaderAsset in_ptr) { this->AssingnRef(in_ptr); return *this; }
+		ShaderRes& operator = (Shader* in_ptr) { this->AssingnRef(in_ptr); return *this; }
+		ShaderRes& operator = (ShaderRes &in_ptr) { this->AssingnRef(in_ptr); return *this; }
 
-		~ShaderAsset() {}
+		~ShaderRes() {}
 		virtual const char* GetBucketID() { return SHADER_BUCKET; }
 	};
 
-	typedef ShaderAsset ShaderRef;
+	typedef ShaderRes ShaderRef;
 
-	typedef Ref<ShaderAsset> ShaderAssetRef_t;
+	typedef Ref<ShaderRes> ShaderAssetRef_t;
 
-	class ShaderAssetRef : public ShaderAssetRef_t
+	class ShaderResRef : public ShaderAssetRef_t
 	{
 	public:
-		ShaderAssetRef(): ShaderAssetRef_t(){}
-		ShaderAssetRef(ShaderAsset *ptr) : ShaderAssetRef_t(ptr) {}
-		ShaderAssetRef(ShaderAssetRef& other) : ShaderAssetRef_t(other) {}
+		ShaderResRef(): ShaderAssetRef_t(){}
+		ShaderResRef(ShaderRes *ptr) : ShaderAssetRef_t(ptr) {}
+		ShaderResRef(ShaderResRef& other) : ShaderAssetRef_t(other) {}
 
-		~ShaderAssetRef() {}
+		~ShaderResRef() {}
 
 		///@todo release modban makrozza ki az exception dobast
 		operator Shader* () { 
@@ -292,29 +289,17 @@ namespace Grafkit {
 
 			return this->ptr->ptr; 
 		}
-		ShaderAssetRef& operator = (Shader* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
-		ShaderAssetRef& operator = (ShaderRef in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
-		ShaderAssetRef& operator = (ShaderAssetRef& other) { this->AssingnRef(other); return *this; }
+		ShaderResRef& operator = (Shader* in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+		ShaderResRef& operator = (ShaderRef &in_ptr) { this->ptr->AssingnRef(in_ptr); return *this; }
+		ShaderResRef& operator = (ShaderResRef& other) { this->AssingnRef(other); return *this; }
 	};
 
 	// ================================================================================================================================
 
-	class ShaderLoader : public Grafkit::IRenderAssetBuilder
-	{
+	class ShaderParamManager {
+		// ... 
 	public:
-		///@todo leforditott shadert is tudjon elotolteni
-		ShaderLoader(Grafkit::IResourceRef resource, ShaderType_e type, ShaderAssetRef shaderasset);
-		~ShaderLoader();// {}
-		
-		void SetEntryPoint(std::string entrypoint);
 
-		virtual void operator () (Grafkit::IRenderAssetManager * const & assman);
-
-	protected:
-		Grafkit::IResourceRef m_resource;
-		ShaderAssetRef m_in;
-		ShaderType_e m_type;
-		std::string m_entrypoint;
 	};
 
 }

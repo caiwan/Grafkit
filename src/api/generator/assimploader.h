@@ -2,23 +2,26 @@
 
 #include "exceptions.h"
 
-#include "../core/renderassets.h"
+#include "../core/asset.h"
+#include "../core/resource.h"
+#include "../core/ResourceBuilder.h"
+
 #include "../render/Scene.h"
 #include "../render/model.h"
 #include "../render/texture.h"
 
 namespace Grafkit {
 
-	class AssimpLoader : public Grafkit::IRenderAssetBuilder
+	class AssimpLoader : public Grafkit::IResourceBuilder
 	{
 	public:
-		AssimpLoader(Grafkit::IResourceRef resource, Grafkit::Scene * const & scenegraph);
+		AssimpLoader(Grafkit::IAssetRef resource, Grafkit::Scene * const & scenegraph);
 		~AssimpLoader();
 
-		virtual void operator () (Grafkit::IRenderAssetManager * const &assman);
+		virtual void operator () (Grafkit::IResourceManager * const &assman);
 
 	private:
-		Grafkit::IResourceRef m_resource;
+		Grafkit::IAssetRef m_resource;
 		Grafkit::Scene * const & m_scenegraph;
 	};
 
