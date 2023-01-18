@@ -205,11 +205,13 @@ bool TextureShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	// Create the texture sampler state.
-	result = device->CreateSamplerState(&samplerDesc, &m_sampleState);
+	// result = device->CreateSamplerState(&samplerDesc, &m_sampleState);
+	/*
 	if (FAILED(result))
 	{
 		return false;
 	}
+	*/
 
 	return true;
 }
