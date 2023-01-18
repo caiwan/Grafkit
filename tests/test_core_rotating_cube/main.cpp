@@ -63,12 +63,13 @@ public:
 
 			SimpleMeshGenerator generator(render);
 
-			MeshRef mesh = generator(
+			generator(
 				FWBuiltInData::cubeVertexLength, (float3*)FWBuiltInData::cubeVertices, (float3*)FWBuiltInData::cubeNormals, (float2*)FWBuiltInData::cubeTextureUVs, NULL,
-				FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices
-				);
+				FWBuiltInData::cubeIndicesLength, FWBuiltInData::cubeIndices,
+				model
+			);
 
-			// todo: add texture to the mesh somehow
+			model->setTexture(texture);
 
 			shader_texture = new TextureShaderClass();
 			result = this->shader_texture->Initialize(render.GetDevice(), this->m_window.getHWnd());
@@ -104,7 +105,7 @@ public:
 				shader_texture->Render(
 					render.GetDeviceContext(),
 					model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix,
-					model->GetTexture()
+					(*model->getTexture().Get())
 					);
 
 				this->t += 0.001;
