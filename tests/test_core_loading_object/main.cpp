@@ -6,7 +6,7 @@
 #include "render/shader.h"
 
 #include "generator/assimploader.h"
-#include "render/Scenegraph.h"
+#include "render/Scene.h"
 
 #include "math/matrix.h"
 
@@ -38,7 +38,7 @@ protected:
 	Renderer render;
 	CameraRef camera;
 	
-	Scenegraph * scene;
+	Scene * scene;
 
 	float t;
 
@@ -77,7 +77,7 @@ protected:
 		//shader_fs->LoadFromFile(render, "TexturePixelShader", L"./shaders/texture.hlsl", ST_Pixel);
 
 		// -- model 
-		scene = new Scenegraph();
+		scene = new Scene();
 		AssimpLoader * loader = new AssimpLoader(this->m_file_loader->GetResourceByName("./models/tegla.3ds"), scene);
 		//loader(this);
 		this->AddBuilder(loader);

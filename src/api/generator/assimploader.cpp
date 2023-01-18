@@ -1,7 +1,14 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <stack>
+#include <vector>
+
 #include "../render/renderer.h"
 #include "../render/texture.h"
 #include "../render/Material.h"
 #include "../render/model.h"
+#include "../render/camera.h"
+#include "../render/light.h"
 
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
@@ -22,18 +29,41 @@ using FWassets::IRenderAsset;
 // Assimp helpers
 // ================================================================================================================================================================
 
+// aiVector3D to float3
+#define assimp_v3d_f3(SRC, DST)\
+{\
+	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z;\
+}
+
+// aiVector3D to float4
+#define assimp_v3d_f4(SRC, DST, W)\
+{\
+	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z, (DST).w = (W);\
+}
+
+// aiVector4D to float4
+#define assimp_vf4_f4(SRC, DST)\
+{\
+	(DST).x = (SRC).x, (DST).y = (SRC).y, (DST).z = (SRC).z, (DST).w = (SRC).w;\
+}
+
+#define assimp_color_f4(SRC, DST)\
+{\
+	(DST).x = (SRC).r, (DST).y = (SRC).g, (DST).z = (SRC).b, (DST).z = 1.0f; \
+}
+
 // ezeket mashogy nem lehet megoldnai, mert a matkey is egy makro
 #define assimpMaterialKey_2_float4(SRC, _AI_ENUM, OUT)\
 {\
-	aiColor3D ac; float4& fv = OUT; \
-	SRC->Get(_AI_ENUM, ac); \
+	aiColor3D ac; float4& fv = (OUT); \
+	(SRC)->Get(_AI_ENUM, ac); \
 	fv.x = ac.r, fv.y = ac.g, fv.z = ac.b, fv.w = 1.0; \
 }
 
 #define assimpMaterialKey_2_float(SRC, _AI_ENUM, OUT) \
 {\
-	float &scalar = OUT;\
-	SRC->Get(_AI_ENUM, scalar);\
+	float &scalar = (OUT);\
+	(SRC)->Get(_AI_ENUM, scalar);\
 }
 
 FWmath::Matrix ai4x4MatrixToFWMatrix(void* _m)
@@ -93,9 +123,10 @@ TextureAssetRef assimpTexture(enum aiTextureType source, aiMaterial* material, i
 namespace {
 	static size_t count;
 
+	///@todo ez a nevezesi modszertan nem jo; valami mas megoldast kell keresni majd
 	std::string GetCounter() {
 		char buffer[16];
-		sprintf_s(buffer, "%d:", count);
+		sprintf_s(buffer, "assimp:%d:", count);
 		count++;
 		return buffer;
 	}
@@ -129,9 +160,10 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 	}
 
 	int i = 0, j = 0, k = 0, l = 0;
-
-	// build texture -- material LUT
 	std::vector<MaterialRef> materials;
+	std::vector<ModelRef> models;
+	std::vector<CameraRef> cameras;
+	 std::vector<LightRef> lights;
 
 	// -- load materials
 	if (scene->HasMaterials()) {
@@ -169,7 +201,7 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 			material->SetShader(shader_fs);
 
 			materials.push_back(material);
-			assman->AddObject(material.Get());
+			//assman->AddObject(material.Get());
 		}
 	}
 	
@@ -223,22 +255,151 @@ void FWmodel::AssimpLoader::operator()(FWassets::IRenderAssetManager * const &as
 
 			generator(curr_mesh->mNumVertices, indices.size(), &indices[0], model);
 
-
-			// -- luukup materials
+			// -- lookup materials
 			int mat_index = curr_mesh->mMaterialIndex;
 			if (materials.size()>mat_index)
 			{
 				model->SetMaterial(materials[mat_index]);
 			}
 
-			assman->AddObject(model);
+			models.push_back(model);
+			//assman->AddObject(model);
 		}
 	}
 
 	// load cameras
+	if (scene->HasCameras()) {
+		for (j = 0; j < scene->mNumCameras; j++) {
+			CameraRef camera = new Camera();
+			aiCamera *curr_camera = scene->mCameras[j];
+
+			camera->SetFOV(180.*curr_camera->mHorizontalFOV / M_PI);
+			camera->SetClippingPlanes(curr_camera->mClipPlaneNear, curr_camera->mClipPlaneFar);
+
+			// camera <- assmimp camera
+			assimp_v3d_f3(curr_camera->mPosition, camera->GetPosition());
+			assimp_v3d_f3(curr_camera->mLookAt, camera->GetLookAt());
+			assimp_v3d_f3(curr_camera->mUp, camera->GetUp());
+
+			// itt van meg aspekt, amivel kezdeni lehetne valamit
+
+			// --
+			std::string name(curr_camera->mName.C_Str());
+			//this->camera_lookupMap[name] = camera;
+
+			camera->SetName(name);
+
+		}
+	}
 
 	// load lights
+	if (scene->HasLights()) {
+		for (j = 0; j < scene->mNumLights; j++) {
+			LightRef light; 
+			aiLight *curr_light = scene->mLights[i];
+
+			// light <- assimp light
+			switch (curr_light->mType) {
+			case aiLightSource_DIRECTIONAL:
+				light = new DirectionalLight();
+				assimp_v3d_f4(curr_light->mDirection, light->GetDirection(), 0, 0f);
+				break;
+
+			case aiLightSource_POINT:
+				light = new PointLight();
+				assimp_v3d_f4(curr_light->mPosition, light->GetPosition(), 0.0f);
+				break;
+
+			case aiLightSource_SPOT:
+				light = new SpotLight();
+				assimp_v3d_f4(curr_light->mPosition, light->GetPosition(), 1.0f);
+				assimp_v3d_f4(curr_light->mDirection, light->GetDirection(), 0.0f);
+				(light->GetAngle()) = curr_light->mAngleInnerCone;
+				(light->GetFalloff()) = curr_light->mAngleOuterCone - curr_light->mAngleInnerCone;
+				break;
+
+			case aiLightSource_AMBIENT:
+				light = new AmbientLight();
+				break;
+			}
+
+			(light->GetConstantAttenuation()) = curr_light->mAttenuationConstant;
+			(light->GetLinearAttenuation()) = curr_light->mAttenuationLinear;
+			(light->GetQuardicAttenuation()) = curr_light->mAttenuationQuadratic;
+
+			assimp_color_f4(curr_light->mColorAmbient, light->GetAmbient());
+			assimp_color_f4(curr_light->mColorDiffuse, light->GetDiffuse());
+			assimp_color_f4(curr_light->mColorSpecular, light->GetSpecular());
+
+
+			light->SetName(m_name_prefix + std::string(curr_light->mName.C_Str()));
+
+			lights.push_back(light);
+		}
+	}
 
 	// build up scenegraph
-}
 
+# if 0 // ez pedig tok meno lett volna, ha mukodik rekurzio nelkuk,majd legkozelebb
+
+	struct stack_elem_t {
+		aiNode* ai_node;
+		Actor* actor_node;
+		size_t j;
+	};
+
+	std::stack<struct stack_elem_t> node_stack;
+	
+	stack_elem_t s;
+	s.actor_node = new Actor;
+	s.ai_node = scene->mRootNode;
+	s.j = 0;
+
+	//aiNode* curr_node = scene->mRootNode;
+
+	while (! node_stack.empty() || s.ai_node) {
+		if (s.ai_node) {
+			// setup node
+			// s.actor_node = new Actor();
+
+			// visit next node 
+			if (s.ai_node->mNumChildren > 0) {
+				// push
+				s.j = 0;
+				s.actor_node = nullptr;
+				node_stack.push(s);
+			}
+			s.ai_node = s.ai_node->mChildren[s.j];
+			s.j++;
+		}
+		else {
+			// pop
+			s = node_stack.top();
+			node_stack.pop();
+		}
+	}
+
+	m_scenegraph->SetRootNode(s.actor_node);
+
+#else // fallback: recursive fill 
+
+	// folyt kov. 
+	Actor* root_node = new Actor;
+	assimp_parseScenegraph(scene->mRootNode, root_node);
+	m_scenegraph->SetRootNode(root_node);
+
+#endif
+
+	// kamera helyenek kiszedese a scenegraphbol
+	if (scene->HasCameras()) {
+	}
+	
+	// fenyek helyenek kiszedese a scenegraphbol
+	if (scene->HasLights()) {
+	}
+
+	// animation - ha kell a jovoben; 
+	if (scene->HasAnimations()) {
+	
+	}
+}

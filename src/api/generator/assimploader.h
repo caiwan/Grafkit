@@ -3,7 +3,7 @@
 #include "exceptions.h"
 
 #include "../core/renderassets.h"
-#include "../render/Scenegraph.h"
+#include "../render/Scene.h"
 #include "../render/model.h"
 #include "../render/texture.h"
 
