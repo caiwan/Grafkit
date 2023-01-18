@@ -96,7 +96,7 @@
       <Filter>Source Files\render</Filter>
     </ClCompile>
     <ClCompile Include="core\AssetPreloader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +172,8 @@
     <ClInclude Include="render\Material.h">
       <Filter>Source Files\render</Filter>
     </ClInclude>
-    <ClInclude Include="core\AssetPreloader.h" />
+    <ClInclude Include="core\AssetPreloader.h">
+      <Filter>Source Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
