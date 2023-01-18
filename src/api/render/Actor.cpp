@@ -12,14 +12,25 @@ FWrender::Entity3D::~Entity3D()
 {
 }
 
-void FWrender::Entity3D::setShader()
+
+void FWrender::Entity3D::setVertexShader(ShaderRef shader)
 {
+	if (shader.Valid() && shader->getShaderType() == ST_Vertex) {
+		this->m_vertexShader = shader;
+	}
+	else {
+		// thorw EX 
+	}
 }
 
-ShaderRef & FWrender::Entity3D::getShader()
+void FWrender::Entity3D::setFragmentShader(ShaderRef shader)
 {
-	// TODO: insert return statement here
-	return this->m_shader;
+	if (shader.Valid() && shader->getShaderType() == ST_Pixel) {
+		this->m_vertexShader = shader;
+	}
+	else {
+		// thorw EX 
+	}
 }
 
 const Actor * FWrender::Entity3D::getParent()

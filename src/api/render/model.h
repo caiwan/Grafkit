@@ -24,23 +24,21 @@ namespace FWrender
 
 	class Entity3D;
 
-	class Model : public virtual Referencable, 
-		public FWrender::Mesh, public FWrender::Entity3D
+	class Model : public virtual Referencable, public FWrender::Mesh, public FWrender::Entity3D
 	{
-	public:
-		Model();
-		Model(const Model& other);
+		public:
+			Model();
+			Model(const Model& other);
 
-		~Model();
+			~Model();
 
-		//void addMesh(MeshRef mesh, /*materials, textures*/);
+			void setTexture(TextureRef texture, int n = 0);
+			TextureRef& getTexture(int n = 0);
 
-		void setTexture(TextureRef texture, int n = 0);
-		TextureRef& getTexture(int n = 0);
-
-	private:
-		// + material
-		TextureRef m_textures[MULTITEXTURE_MAX];
+		private:
+			// + fragment shader 
+			// + material
+			TextureRef m_textures[MULTITEXTURE_MAX];
 
 	};
 
