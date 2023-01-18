@@ -25,11 +25,11 @@ namespace {
 
 CurveEditorScene::CurveEditorScene(QObject * parent) : QGraphicsScene(parent)
 , m_area(nullptr)
-, m_displayWaveform(false)
+, m_displayWaveform(true), m_displayCurve(false)
 , m_audiogramImage(nullptr)
 {
 	m_area = new TimelineArea();
-	m_displayWaveform = true;
+	
 
 	setBackgroundBrush(QColor(48, 48, 48));
 }
@@ -52,6 +52,16 @@ void CurveEditorScene::PlaybackChanged(bool isPlaying)
 
 void CurveEditorScene::DemoTimeChanged(float time)
 {
+}
+
+void CurveEditorScene::SetAnimationChannel(Ref<Grafkit::Animation::Channel> channel)
+{
+	m_displayCurve = true;
+}
+
+void CurveEditorScene::SetAnimationTrack(Ref<Grafkit::Animation::Track> track)
+{
+	m_displayCurve = true;
 }
 
 // ---------------------------------------------------------------------
@@ -79,18 +89,89 @@ void CurveEditorScene::drawBackground(QPainter* painter, const QRectF& r)
 	// because rect() is relative to the widgets parent
 	painter->translate(r.topLeft());
 
-	// Draw grid here 
-
 	m_area->SetSceneRect(sceneRect());
-	m_area->drawGrid(painter, r);
+	m_area->DrawGrid(painter, r);
 
-	// Draw curve 
-	// ?? 
+	if (m_displayCurve)
+		DrawCurve(painter, r);
 
-	//draw cursor?
-	 // ??
+	//TOOD draw cursor
 }
 
+void CurveEditorScene::DrawCurve(QPainter* painter, const QRectF& r)
+{
+	// 2. draw the curves.
+	QList<CurvePointItem*> *points = m_document->GetCurvePoints();
+
+	// prevernt crash on NPE
+	if (!points || points->isEmpty())
+		return;
+
+	auto channel = m_document->GetChannel();
+
+	painter->setRenderHint(QPainter::Antialiasing);
+	painter->setPen(QPen(grey));
+
+	// boundaries
+	QPointF pMin = m_area->Screen2Point(r.topLeft());
+	int idmin = channel->FindKeyIndex(pMin.x());
+
+	QPointF pMax = m_area->Screen2Point(r.bottomRight());
+	int idmax = channel->FindKeyIndex(pMax.x()) + 1;
+
+	if (idmin == 0 && points->at(0)->x() > r.x())
+		painter->drawLine(
+			0, points->at(0)->pos().y(),
+			points->at(0)->pos().x(), points->at(0)->pos().y()
+		);
+
+	if (points->last()->pos().x() < r.x() + r.width()) {
+		painter->drawLine(
+			points->last()->pos().x(), points->last()->pos().y(),
+			r.x() + r.width(), points->last()->pos().y()
+		);
+
+		points->last()->setVisible(true);
+	}
+
+	if (idmax >= channel->GetKeyCount() - 1)
+		idmax = channel->GetKeyCount() - 1; // avoid max+1 index
+
+	for (int i = idmin; i < idmax; i++)
+	{
+		CurvePointItem *point = points->at(i);
+		point->setVisible(true);
+
+		// debug stuff
+		{
+			QRectF boundingRect = point->boundingRect();
+			boundingRect.moveCenter(point->pos());
+			painter->fillRect(boundingRect, QBrush(QColor(255, 0, 0), Qt::Dense6Pattern));
+		}
+
+		auto k0 = channel->GetKey(i);
+		auto k1 = channel->GetKey(i + 1);
+
+		// valahogy lehetne optiomalgatni ezt is 
+		int steps = 32;
+		double stepWidth = 0.;
+		//steps = 64;
+		stepWidth = (k1.m_time - k0.m_time) / steps;
+
+		for (int j = 0; j < steps; j++) {
+			double t = k0.m_time + j * stepWidth;
+			double v = channel->GetValue(t);
+
+			QPointF p1(t, channel->GetValue(t));
+			p1 = this->m_area->Point2Screen(p1);
+
+			QPointF p2(t + stepWidth, channel->GetValue(t + stepWidth));
+			p2 = this->m_area->Point2Screen(p2);
+
+			painter->drawLine(p1, p2);
+		}
+	}
+}
 
 void CurveEditorScene::UpdateAudiogram()
 {
@@ -100,14 +181,14 @@ void CurveEditorScene::UpdateAudiogram()
 	const float leftTime = -float(offset.x()) / float(scale.width());
 	const float rightTime = leftTime + (float(sceneRect().width()) / float(scale.width()));
 
-	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime) 
+	if (leftTime < 0.0f || rightTime < 0.0f || leftTime >= rightTime)
 		return;
 
 	QImage* img = nullptr;
 
 	onRequestAudiogram(&img, leftTime, rightTime, int(sceneRect().width()), int(sceneRect().height()));
 
-	if (!img) 
+	if (!img)
 		return;
 
 	delete m_audiogramImage;
@@ -139,7 +220,7 @@ QPointF TimelineArea::Screen2Point(QPointF point) const
 }
 
 // ReSharper disable CppInconsistentNaming
-void TimelineArea::drawGrid(QPainter * painter, const QRectF & r) const
+void TimelineArea::DrawGrid(QPainter * painter, const QRectF & r) const
 {
 	float sPos = 0.0f;
 	if (r.x() < 0.0f)
@@ -369,77 +450,7 @@ QPointF CurveEditorScene::_interpolateHermite(QPointF p0, QPointF p1, QPointF r0
 
 void Idogep::CurveEditorScene::drawCurve(QPainter * painter, const QRectF & rect)
 {
-	// 2. draw the curves.
-	QList<CurvePointItem*> *points = m_document->GetCurvePoints();
 
-	// prevernt crash on NPE
-	if (!points || points->isEmpty())
-		return;
-
-	auto channel = m_document->GetChannel();
-
-	painter->setRenderHint(QPainter::Antialiasing);
-	painter->setPen(QPen(grey));
-
-	// boundaries
-	QPointF pMin = screen2Point(rect.topLeft());
-	int idmin = channel->FindKeyIndex(pMin.x());
-
-	QPointF pMax = screen2Point(rect.bottomRight());
-	int idmax = channel->FindKeyIndex(pMax.x()) + 1;
-
-	if (idmin == 0 && points->at(0)->x() > rect.x())
-		painter->drawLine(
-			0, points->at(0)->pos().y(),
-			points->at(0)->pos().x(), points->at(0)->pos().y()
-		);
-
-	if (points->last()->pos().x() < rect.x() + rect.width()) {
-		painter->drawLine(
-			points->last()->pos().x(), points->last()->pos().y(),
-			rect.x() + rect.width(), points->last()->pos().y()
-		);
-
-		points->last()->setVisible(true);
-	}
-
-	if (idmax >= channel->GetKeyCount() - 1)
-		idmax = channel->GetKeyCount() - 1; // avoid max+1 index
-
-	for (int i = idmin; i < idmax; i++)
-	{
-		CurvePointItem *point = points->at(i);
-		point->setVisible(true);
-
-		// debug stuff
-		{
-			QRectF boundingRect = point->boundingRect();
-			boundingRect.moveCenter(point->pos());
-			painter->fillRect(boundingRect, QBrush(QColor(255, 0, 0), Qt::Dense6Pattern));
-		}
-
-		auto k0 = channel->GetKey(i);
-		auto k1 = channel->GetKey(i + 1);
-
-		// valahogy lehetne optiomalgatni ezt is 
-		int steps = 32;
-		double stepWidth = 0.;
-		//steps = 64;
-		stepWidth = (k1.m_time - k0.m_time) / steps;
-
-		for (int j = 0; j < steps; j++) {
-			double t = k0.m_time + j * stepWidth;
-			double v = channel->GetValue(t);
-
-			QPointF p1(t, channel->GetValue(t));
-			p1 = this->point2Screen(p1);
-
-			QPointF p2(t + stepWidth, channel->GetValue(t + stepWidth));
-			p2 = this->point2Screen(p2);
-
-			painter->drawLine(p1, p2);
-		}
-	}
 }
 
 #if 0

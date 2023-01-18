@@ -136,3 +136,9 @@ void CurveSceneModule::Initialize()
     // 
 	m_myView = ces; SetView(m_myView);
 }
+
+void CurveSceneModule::ShowChannelEvent(Ref<Grafkit::Animation::Channel> chanel)
+{
+	m_myView->SetModel();
+    }
+

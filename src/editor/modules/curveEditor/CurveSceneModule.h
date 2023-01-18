@@ -1,6 +1,7 @@
 #pragma once
+#include "common.h"
+#include "animation/animation.h"
 #include "utils/ViewModule.h"
-
 
 namespace Idogep
 {
@@ -30,7 +31,7 @@ namespace Idogep
 		};
 
 	}
-
+    // ============================================================
 
 	class CurveSceneModule : public Module, EmitsCommandRole 
 	{
@@ -39,6 +40,10 @@ namespace Idogep
 
 	    ~CurveSceneModule() override;
 	    void Initialize() override;
+
+		void ShowChannelEvent(Ref<Grafkit::Animation::Channel> chanel);
+		//void ShowTrackEvent(Ref<Grafkit::Animation::Track> track);
+		void ClearChannels();
 
 	private:
 		Ref<CurveSceneView> m_myView;

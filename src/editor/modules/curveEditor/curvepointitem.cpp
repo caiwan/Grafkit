@@ -1,11 +1,10 @@
-#include <cmath>
+#include <QGraphicsScene>
+#include <QGraphicsSceneEvent>
+#include <QPainter>
 
-#include "qgraphicsview.h"
-#include "qgraphicsscene.h"
-#include "qgraphicssceneevent.h"
+#include "curveeditorscene.h"
 
 #include "curvepointitem.h"
-#include "curveeditorscene.h"
 
 using namespace Idogep;
 
@@ -16,31 +15,10 @@ using namespace Grafkit;
 
 #define RADIX_DEFUALT (1.f/4.f)
 
-namespace {
-	const QColor colorStep;
-	const QColor colorLinar;
-	const QColor colorRamp;
-	const QColor colorSmooth;
-	const QColor colorHermite;
-}
-
-#if 0
-
-Idogep::CurvePointItem::CurvePointItem(QGraphicsItem * parent) : QGraphicsItem(parent), m_key(), m_id(0)
-{
-	// todo: rm duplicates
-	m_color = 0;
-	m_nodeType = 0;
-
-	m_showTangent = false;
-
-	m_radix = m_radix2 = RADIX_DEFUALT;
-
-	setFlag(QGraphicsItem::ItemIsMovable);
-	setFlag(QGraphicsItem::ItemIsSelectable);
-}
-
-CurvePointItem::CurvePointItem(Animation::Key key, size_t index, QGraphicsItem* parent) : QGraphicsItem(parent), m_key(key), m_id(index)
+CurvePointItem::CurvePointItem(const Animation::Key key, const size_t index, QGraphicsItem* parent)
+	: QGraphicsItem(parent)
+	, m_id(index)
+	, m_key(key), m_scaling(1, 1)
 {
 	m_color = 0;
 	m_nodeType = 0;
@@ -49,42 +27,40 @@ CurvePointItem::CurvePointItem(Animation::Key key, size_t index, QGraphicsItem* 
 
 	m_radix = m_radix2 = RADIX_DEFUALT;
 
-	setFlag(QGraphicsItem::ItemIsMovable);
-	setFlag(QGraphicsItem::ItemIsSelectable);
+	setFlag(ItemIsMovable);
+	setFlag(ItemIsSelectable);
 }
 
-CurvePointItem::CurvePointItem(const CurvePointItem& other) : QGraphicsItem(other.parentItem())
+// TODO: might be useful when copy
+//CurvePointItem::CurvePointItem(const CurvePointItem& other)
+//    : QGraphicsItem(other.parentItem())
+//{
+//    m_id = other.m_id;
+//    m_color = other.m_color;
+//    m_nodeType = other.m_nodeType;
+//
+//    m_key = other.m_key;
+//
+//    m_showTangent = false;
+//
+//    m_radix = other.m_radix;
+//    m_radix2 = RADIX_DEFUALT;
+//
+//    setFlag(ItemIsMovable);
+//    setFlag(ItemIsSelectable);
+//}
+
+CurvePointItem::~CurvePointItem() = default;
+
+void CurvePointItem::RecalculatePosition(TimelineArea const* area)
 {
-	m_id = other.m_id;
-	m_color = other.m_color;
-	m_nodeType = other.m_nodeType;
-
-	m_key = other.m_key;
-
-	m_showTangent = false;
-
-	m_radix = other.m_radix;
-	m_radix2 = RADIX_DEFUALT;
-
-	setFlag(QGraphicsItem::ItemIsMovable);
-	setFlag(QGraphicsItem::ItemIsSelectable);
-}
-
-CurvePointItem::~CurvePointItem() {
-}
-
-QRectF CurvePointItem::boundingRect() const {
-	return QRectF(-m_radix2 * 32.0f, -m_radix2 * 32.0f, m_radix2*64.0f, m_radix2*64.0f);
-}
-
-void CurvePointItem::recalculatePosition() {
-	CurveEditorScene* ces = (CurveEditorScene*)scene();
-
 	if (m_key.m_time < 0.f)
 		m_key.m_time = 0.f;
-
-	setPos(ces->point2Screen(coord()));
+	setPos(area->Point2Screen(Coord()));
+	m_scaling = area->Scale(); // save last scaling for paint tangent on
 }
+
+QRectF CurvePointItem::boundingRect() const { return { -m_radix2 * 32.0f, -m_radix2 * 32.0f, m_radix2 * 64.0f, m_radix2 * 64.0f }; }
 
 void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
 
@@ -110,14 +86,15 @@ void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 	}
 
 	if (m_showTangent) {
-		const QPointF _tangent = tangent();
+		const QPointF _tangent = Tangent();
 		painter->setPen(QPen(QColor(255, 48, 48), 1.0, Qt::DashLine));
 		painter->setBrush(Qt::NoBrush);
-		CurveEditorScene* ces = (CurveEditorScene*)scene();
-		const float ScreenTangentX = _tangent.x() * ces->scale().width();
-		const float ScreenTangentY = -_tangent.y() * ces->scale().height();
-		const float n = sqrt(ScreenTangentX*ScreenTangentX + ScreenTangentY * ScreenTangentY);
-		QPointF vTgt = QPointF(ScreenTangentX / n, ScreenTangentY / n);
+
+		const float screenTangentX = _tangent.x() * m_scaling.width();
+		const float screenTangentY = -_tangent.y() * m_scaling.height();
+
+		const float n = sqrt(screenTangentX*screenTangentX + screenTangentY * screenTangentY);
+	    const QPointF vTgt = QPointF(screenTangentX / n, screenTangentY / n);
 		painter->drawLine(QPointF(0, 0), vTgt*32.0f*m_radix);
 
 		painter->setPen(QPen(QColor(96, 96, 96), 1.0, Qt::DotLine));
@@ -126,9 +103,11 @@ void CurvePointItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 	}
 }
 
-QVariant CurvePointItem::itemChange(GraphicsItemChange change, const QVariant &value) {
+QVariant CurvePointItem::itemChange(const GraphicsItemChange change, const QVariant &value) {
 	return QGraphicsItem::itemChange(change, value);
 }
+
+#if 0
 
 void CurvePointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
 	switch (event->button()) {

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <QtGui>
 #include <qdockwidget.h>
@@ -9,63 +9,53 @@
 
 #include "curvedoc.h"
 
-#include "CurveModule.h"
-
-namespace Ui {
-	class CurveEditorWidget;
+namespace Ui
+{
+    class CurveEditorWidget;
 }
 
 class QTreeView;
 class QGraphicsScene;
 
-namespace Idogep {
+namespace Idogep
+{
+    class CurveCursor;
 
-	class CurveCursor;
+    // ========================================================================================================
 
-	// ========================================================================================================
+    class CurveEditorWidget : public QDockWidget, public CurveEditorView
+    {
+    Q_OBJECT
 
-	class CurveEditorWidget :
-		public QDockWidget,
-		public CurveEditorView
-	{
-		Q_OBJECT
+    public:
+        explicit CurveEditorWidget(QWidget* parent = nullptr);
+        ~CurveEditorWidget();
 
-	public:
-		explicit CurveEditorWidget(QWidget *parent = 0);
-		~CurveEditorWidget();
+        /* METHODS */
+        void SetGraphicsScene(QGraphicsScene* graphicsScene);
 
-		/* METHODS */
-		void SetGraphicsScene(QGraphicsScene* graphicsScene);
+    protected:
 
-	protected:
-	 
-	    void RefreshView(bool force) override;
+        void RefreshView(bool force) override;
 
-		//virtual bool RequestWaveform(float*& p, size_t& sampleCount, size_t& channelCount, size_t& samplePerSec) { onRequestWaveform(p, sampleCount, channelCount, samplePerSec); return sampleCount > 0; }
-
-		//void onAnimationModelUpdatedEvent(TreeModel* model);
-		virtual void UpdateAnimationModel(TreeModel* model);
+   
+		void UpdateAnimationModel(TreeModel* model) override;
 
         // QT specific
-		protected slots:
-	    // ReSharper disable CppInconsistentNaming
-		void playPressedSlot() { onTogglePlayback(); }
-		void stopPressedSlot() { onStopPlayback(); }
-		//void optionsPressedSlot() { onPlaybackOptions(); }
+        // ReSharper disable CppInconsistentNaming
+    protected slots:
+        void playPressedSlot() { onTogglePlayback(); }
+        void stopPressedSlot() { onStopPlayback(); }
 
-		// ... 
-		void itemClickedSlot(const QModelIndex &index);
-		void itemDoubleClickedSlot(const QModelIndex &index);
+		void itemClickedSlot(const QModelIndex& index);
+        void itemDoubleClickedSlot(const QModelIndex& index);
+        
+    protected:
+        void resizeEvent(QResizeEvent* event) override;
+        // ReSharper restore CppInconsistentNaming
 
-
-	protected:
-	    void resizeEvent(QResizeEvent* event) override;
-	    // ReSharper restore CppInconsistentNaming
-
-	private:
-		Ui::CurveEditorWidget *ui;
-		//CurveEditorScene* m_scene;
-
+    private:
+        Ui::CurveEditorWidget* ui;
+  
 	};
-
 }

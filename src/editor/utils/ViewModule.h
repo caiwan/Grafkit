@@ -33,10 +33,6 @@ namespace Idogep
 
 		void RequestRefreshView(bool force);
 
-		virtual void SetModel(Grafkit::IResource* modelResource)
-		{
-		};
-
 		Ref<Module> GetModule() const { return m_module; }
 		void SetModule(const Ref<Module>& module) { m_module = module; }
 

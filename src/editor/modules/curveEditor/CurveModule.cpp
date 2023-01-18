@@ -47,11 +47,18 @@ void CurveEditorModule::Initialize()
 	m_myView->onTogglePlayback += Delegate(timer, &Timer::TogglePlay);
 	// ... 
 
+    // manage animation role
+    m_myView->onChannelSelected + Delegate(m_curveScene, )
+
 	SetView(m_myView);
 }
 
 
 // ========================================================================================================
+
+//Ref<CurveSceneModule> CurveEditorModule::GetCurveSceneMoule() const
+//{
+//}
 
 void Idogep::CurveEditorModule::AnimationSelectedEvent(TreeItem * const item)
 {

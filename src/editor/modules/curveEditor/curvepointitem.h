@@ -1,46 +1,57 @@
-#pragma once 
-#include <QtGui>
+#pragma once
 #include <qgraphicsitem.h>
 
-#include "animation/animation.h"
 #include "utils/Event.h"
+#include "animation/animation.h"
 
+class QStyleOptionGraphicsItem;
 
-namespace Idogep {
+namespace Idogep
+{
+	class TimelineArea;
 
-#if 0
-
-    class CurvePointItem : public QGraphicsItem
+	class CurvePointItem : public QGraphicsItem
 	{
 	public:
-		CurvePointItem(QGraphicsItem* parent = NULL);
-		CurvePointItem(Grafkit::Animation::Key key,  size_t index, QGraphicsItem* parent = NULL);
-		CurvePointItem(const CurvePointItem& other);
+		//CurvePointItem(QGraphicsItem* parent = nullptr);
+		explicit CurvePointItem(Grafkit::Animation::Key key, size_t index, QGraphicsItem* parent = nullptr);
+
+		// may be useful when copy and paste
+		//CurvePointItem(const CurvePointItem& other);
 
 		~CurvePointItem();
-		
-		QRectF boundingRect() const;
-		void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
-		void recalculatePosition();
+        // Operations
 
-		QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+		void RecalculatePosition(TimelineArea const * area);
 
+        // Properties
+
+		QPointF Coord() const { return QPointF(m_key.m_time, m_key.m_value); }
+		void SetCoord(QPointF c) { m_key.m_time = c.x(); m_key.m_value = c.y(); }
+
+		QPointF Tangent() const { return QPointF(m_key.m_tangent.x, m_key.m_tangent.y); }
+		void SetTangent(QPointF t) { m_key.m_tangent.x = t.x(); m_key.m_tangent.y = t.y(); }
+
+        // events
+		Event<CurvePointItem*> onMovePoint;
+		Event<CurvePointItem*> onMoveTangent;
+		Event<CurvePointItem*> onStartEdit;
+		Event<CurvePointItem*> onCommitEdit;
+
+		// --- 
+		QRectF boundingRect() const override;
+		void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+		QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+#if 0
 		// TODO: refactor rendesen ezeket:
 		float time() const { return m_key.m_time; }
 		void setTime(float t) { m_key.m_time = t; }
 		float value() const { return m_key.m_value; }
 		void setValue(float v) { m_key.m_value = v; }
 
-		QPointF coord() const { return QPointF(m_key.m_time, m_key.m_value); }
-		void setCoord(QPointF c) { m_key.m_time = c.x(); m_key.m_value = c.y(); }
-
-		QPointF tangent() const { return QPointF(m_key.m_tangent.x, m_key.m_tangent.y); }
-		void setTangent(QPointF t) { m_key.m_tangent.x = t.x(); m_key.m_tangent.y = t.y(); }
-		// --- 
-
 		Grafkit::Animation::Key GetKey() const { return m_key; }
-		void SetKey(Grafkit::Animation::Key key) {m_key = key;}
+		void SetKey(Grafkit::Animation::Key key) { m_key = key; }
 
 		// ... 
 
@@ -53,10 +64,7 @@ namespace Idogep {
 		uint32_t color() { return m_color; }
 		void setColor(uint32_t color) { m_color = color; }
 
-		Event<CurvePointItem*> onMovePoint;
-		Event<CurvePointItem*> onMoveTangent;
-		Event<CurvePointItem*> onStartEdit;
-		Event<CurvePointItem*> onCommitEdit;
+
 
 	protected:
 		virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
@@ -76,6 +84,7 @@ namespace Idogep {
 		void toggleTangentEditing();
 
 	private:
+#endif
 		//QPointF m_coord, m_tangent;
 		float m_radix, m_radix2;
 
@@ -87,8 +96,7 @@ namespace Idogep {
 
 		uint32_t m_nodeType;
 		uint32_t m_color;
+
+		QSizeF m_scaling;
 	};
-
-#endif
-
 }

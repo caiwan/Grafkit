@@ -8,6 +8,60 @@
 
 using namespace Idogep;
 
+void Roles::EditCurveRole::StartEdit(CurvePointItem* item)
+{
+}
+
+void Roles::EditCurveRole::CommitEdit(CurvePointItem* item)
+{
+}
+
+void Roles::EditCurveRole::CommitAddPoint(float key, float value)
+{
+}
+
+void Roles::EditCurveRole::CommitRemovePoint(float key, float value)
+{
+}
+
+// ========================================================================
+
+void CurveManager::Rebuild()
+{
+	//delete m_curve;
+	if (m_curve)
+		m_curve->clear();
+
+	m_curve = new QList<Idogep::CurvePointItem*>();
+
+
+	size_t keyCount = m_channel->GetKeyCount();
+	for (size_t i = 0; i < keyCount; i++) {
+		auto key = m_channel->GetKey(i);
+		CurvePointItem *point = new CurvePointItem(key, i);
+		m_curve->push_back(point);
+
+#if 0
+		point->onStartEdit += Delegate(this, &ManageCurveRole::StartEdit);
+		point->onCommitEdit += Delegate(this, &ManageCurveRole::CommitEdit);
+		point->onMovePoint += Delegate(this, &ManageCurveRole::MovePoint);
+		point->onMoveTangent += Delegate(this, &ManageCurveRole::MoveTangent);
+#endif 
+	}
+}
+
+void CurveManager::Recalculate(TimelineArea* const area)
+{
+
+
+}
+
+void CurveManager::AddCurveToScene(CurveEditorScene* parent)
+{
+
+}
+
+
 #if 0
 Idogep::ManageCurveRole::ManageCurveRole() :
 	ManageCurveAudiogramRole(),
@@ -125,3 +179,4 @@ void Idogep::ManageCurveRole::CommitRemovePoint(float key, float value)
 }
 
 #endif
+

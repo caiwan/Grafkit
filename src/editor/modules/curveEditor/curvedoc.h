@@ -9,9 +9,48 @@
 namespace Idogep {
 
 	class CurvePointItem;
+	class CurveCursor;
 	class CurveEditorScene;
 
-	class CurveCursor;
+	class TimelineArea;
+
+	namespace Roles
+	{
+		class EditCurveRole : public EmitsCommandRole
+		{
+
+		public:
+			void StartEdit(CurvePointItem *item);
+			void CommitEdit(CurvePointItem *item);
+
+			void CommitAddPoint(float key, float value);
+			void CommitRemovePoint(float key, float value);
+
+		private:
+			Grafkit::Animation::Key m_originalKey;
+		};
+	}
+
+	class CurveManager : public Roles::EditCurveRole
+	{
+		friend class CurvePointItem;
+
+	public:
+		QList<CurvePointItem*> const * GetCurvePoints() const { return m_curve; }
+		Ref<Grafkit::Animation::Channel> GetChannel() const { return m_channel; }
+
+		void SetChannel(Ref<Grafkit::Animation::Channel>& channel) { m_channel = channel; Rebuild(); }
+
+		void Recalculate(TimelineArea* drawingSurfaceArea);
+		void AddCurveToScene(CurveEditorScene* parent);
+
+	protected:
+		void Rebuild();
+
+	private:
+		QList<CurvePointItem*>* m_curve;
+		Ref<Grafkit::Animation::Channel> m_channel;
+	};
 
 #if 0
 
@@ -26,13 +65,10 @@ namespace Idogep {
 	};
 
 	// --- 
-
-	class ManageCurveRole : public ManageCurveAudiogramRole, public ManageCursorRole, public EmitsCommandRole
+	class ManageCurveRole : public EmitsCommandRole
 	{
-		friend class CurvePointItem;
 		friend class CurveEditorScene;
 
-		//Q_OBJECT
 	public:
 		ManageCurveRole();
 
@@ -62,7 +98,7 @@ namespace Idogep {
 		QList<CurvePointItem*>* m_curve;
 		Ref<Grafkit::Animation::Channel> m_channel;
 #endif
-	    Grafkit::Animation::Key m_originalKey;
+		Grafkit::Animation::Key m_originalKey;
 		Grafkit::Animation::Key m_modifiedKey;
 	};
 

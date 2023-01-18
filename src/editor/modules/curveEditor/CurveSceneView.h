@@ -22,6 +22,11 @@ namespace Idogep
 		class CurveEditorSceneViewRole
 		{
 
+		public:
+			virtual void SetAnimationChannel(Ref<Grafkit::Animation::Channel> channel) = 0;
+			virtual void SetAnimationTrack(Ref<Grafkit::Animation::Track> track) = 0;
+			virtual void HideAnimationCurves() = 0;
+
 		};
 	}
     
